@@ -1,0 +1,12 @@
+[09-Feb-2026 01:13:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/migrations/2021_11_16_195811_create_config_mpesa_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/migrations/2021_11_16_195811_create_config_mpesa_table.php on line 7
+[09-Feb-2026 20:20:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/migrations/2021_11_16_195811_create_config_mpesa_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/migrations/2021_11_16_195811_create_config_mpesa_table.php on line 7
+[21-Mar-2026 10:55:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/migrations/2021_11_16_195811_create_config_mpesa_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/migrations/2021_11_16_195811_create_config_mpesa_table.php on line 7

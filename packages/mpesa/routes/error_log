@@ -1,0 +1,12 @@
+[09-Feb-2026 01:01:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/routes/web.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/routes/web.php on line 8
+[09-Feb-2026 12:17:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/routes/web.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/routes/web.php on line 8
+[21-Mar-2026 10:49:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/routes/web.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/routes/web.php on line 8

@@ -1,0 +1,130 @@
+[09-Feb-2026 02:11:33 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountFactory.php on line 17
+[09-Feb-2026 02:11:33 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountFactory.php on line 17
+[09-Feb-2026 02:24:53 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemMinTaxFactory.php on line 17
+[09-Feb-2026 02:24:53 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemMinTaxFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemMinTaxFactory.php on line 17
+[09-Feb-2026 02:26:25 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserCashierFactory.php on line 17
+[09-Feb-2026 02:26:25 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserCashierFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserCashierFactory.php on line 17
+[09-Feb-2026 02:26:26 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserConfirmFactory.php on line 17
+[09-Feb-2026 02:26:26 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserConfirmFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserConfirmFactory.php on line 17
+[09-Feb-2026 02:29:41 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemTaxFactory.php on line 17
+[09-Feb-2026 02:29:41 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemTaxFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemTaxFactory.php on line 17
+[09-Feb-2026 02:31:23 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFloatFactory.php on line 17
+[09-Feb-2026 02:31:23 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFloatFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFloatFactory.php on line 17
+[09-Feb-2026 02:31:25 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserMultiFactory.php on line 17
+[09-Feb-2026 02:31:25 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserMultiFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserMultiFactory.php on line 17
+[09-Feb-2026 02:35:58 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountTaxFactory.php on line 17
+[09-Feb-2026 02:35:58 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountTaxFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountTaxFactory.php on line 17
+[09-Feb-2026 03:03:48 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/BuyerFactory.php on line 17
+[09-Feb-2026 03:03:48 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/BuyerFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/BuyerFactory.php on line 17
+[09-Feb-2026 04:05:26 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemFactory.php on line 17
+[09-Feb-2026 04:05:26 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemFactory.php on line 17
+[09-Feb-2026 04:05:27 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFactory.php on line 17
+[09-Feb-2026 04:05:27 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFactory.php on line 17
+[09-Feb-2026 14:59:59 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserCashierFactory.php on line 17
+[09-Feb-2026 14:59:59 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserCashierFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserCashierFactory.php on line 17
+[09-Feb-2026 16:55:21 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemFactory.php on line 17
+[09-Feb-2026 16:55:21 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemFactory.php on line 17
+[09-Feb-2026 21:52:47 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/BuyerFactory.php on line 17
+[09-Feb-2026 21:52:47 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/BuyerFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/BuyerFactory.php on line 17
+[09-Feb-2026 22:13:36 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFactory.php on line 17
+[09-Feb-2026 22:13:36 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFactory.php on line 17
+[21-Mar-2026 11:30:09 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountFactory.php on line 17
+[21-Mar-2026 11:30:09 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountFactory.php on line 17
+[21-Mar-2026 11:35:27 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemMinTaxFactory.php on line 17
+[21-Mar-2026 11:35:27 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemMinTaxFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemMinTaxFactory.php on line 17
+[21-Mar-2026 11:36:27 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserCashierFactory.php on line 17
+[21-Mar-2026 11:36:27 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserCashierFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserCashierFactory.php on line 17
+[21-Mar-2026 11:36:28 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserConfirmFactory.php on line 17
+[21-Mar-2026 11:36:28 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserConfirmFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserConfirmFactory.php on line 17
+[21-Mar-2026 11:39:17 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemTaxFactory.php on line 17
+[21-Mar-2026 11:39:17 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemTaxFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemTaxFactory.php on line 17
+[21-Mar-2026 11:40:46 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFloatFactory.php on line 17
+[21-Mar-2026 11:40:46 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFloatFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFloatFactory.php on line 17
+[21-Mar-2026 11:40:47 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserMultiFactory.php on line 17
+[21-Mar-2026 11:40:47 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserMultiFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserMultiFactory.php on line 17
+[21-Mar-2026 11:41:10 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountTaxFactory.php on line 17
+[21-Mar-2026 11:41:10 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountTaxFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemDiscountTaxFactory.php on line 17
+[21-Mar-2026 12:03:51 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/BuyerFactory.php on line 17
+[21-Mar-2026 12:03:51 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/BuyerFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/BuyerFactory.php on line 17
+[21-Mar-2026 12:56:28 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemFactory.php on line 17
+[21-Mar-2026 12:56:28 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/ItemFactory.php on line 17
+[21-Mar-2026 12:56:28 UTC] PHP Warning:  Undefined variable $factory in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFactory.php on line 17
+[21-Mar-2026 12:56:28 UTC] PHP Fatal error:  Uncaught Error: Call to a member function define() on null in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFactory.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/factories/UserFactory.php on line 17

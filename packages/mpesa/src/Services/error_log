@@ -1,0 +1,8 @@
+[09-Feb-2026 02:24:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Services/MPesaPaymentService.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Services/MPesaPaymentService.php on line 12
+[21-Mar-2026 11:35:13 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Services/MPesaPaymentService.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Services/MPesaPaymentService.php on line 16

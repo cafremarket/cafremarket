@@ -1,0 +1,4 @@
+[09-Feb-2026 01:50:52 UTC] PHP Fatal error:  Uncaught Error: Class "App\Repositories\EloquentRepository" not found in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Tax/EloquentTax.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Tax/EloquentTax.php on line 10

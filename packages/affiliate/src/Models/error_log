@@ -1,0 +1,24 @@
+[09-Feb-2026 01:41:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/AffiliateCommission.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/AffiliateCommission.php on line 10
+[09-Feb-2026 02:11:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/AffiliateLink.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/AffiliateLink.php on line 11
+[09-Feb-2026 02:55:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Auth\User" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/Affiliate.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/Affiliate.php on line 18
+[21-Mar-2026 11:08:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/AffiliateCommission.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/AffiliateCommission.php on line 10
+[21-Mar-2026 11:30:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/AffiliateLink.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/AffiliateLink.php on line 11
+[21-Mar-2026 11:56:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Auth\User" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/Affiliate.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Models/Affiliate.php on line 18

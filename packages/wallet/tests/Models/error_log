@@ -1,0 +1,120 @@
+[09-Feb-2026 02:39:35 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\ItemDiscount" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscountTax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscountTax.php on line 7
+[09-Feb-2026 02:54:25 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\Item" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscount.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscount.php on line 9
+[09-Feb-2026 03:12:37 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\Item" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemTax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemTax.php on line 7
+[09-Feb-2026 03:28:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Item.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Item.php on line 19
+[09-Feb-2026 03:28:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/User.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/User.php on line 15
+[09-Feb-2026 03:31:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Buyer.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Buyer.php on line 15
+[09-Feb-2026 03:31:32 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\Item" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemMinTax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemMinTax.php on line 7
+[09-Feb-2026 03:33:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserMulti.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserMulti.php on line 17
+[09-Feb-2026 03:33:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserFloat.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserFloat.php on line 16
+[09-Feb-2026 03:36:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserCashier.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserCashier.php on line 16
+[09-Feb-2026 03:37:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserConfirm.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserConfirm.php on line 17
+[09-Feb-2026 13:53:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserMulti.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserMulti.php on line 17
+[09-Feb-2026 15:22:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserFloat.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserFloat.php on line 16
+[09-Feb-2026 16:23:31 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\Item" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemMinTax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemMinTax.php on line 7
+[09-Feb-2026 21:24:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/User.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/User.php on line 15
+[09-Feb-2026 21:32:35 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\ItemDiscount" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscountTax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscountTax.php on line 7
+[09-Feb-2026 21:45:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserMulti.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserMulti.php on line 17
+[09-Feb-2026 21:59:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Buyer.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Buyer.php on line 15
+[10-Feb-2026 07:00:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserCashier.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserCashier.php on line 16
+[21-Mar-2026 11:43:48 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\ItemDiscount" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscountTax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscountTax.php on line 7
+[21-Mar-2026 11:56:32 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\Item" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscount.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemDiscount.php on line 9
+[21-Mar-2026 12:12:28 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\Item" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemTax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemTax.php on line 7
+[21-Mar-2026 12:26:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Item.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Item.php on line 19
+[21-Mar-2026 12:26:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/User.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/User.php on line 15
+[21-Mar-2026 12:29:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Buyer.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/Buyer.php on line 15
+[21-Mar-2026 12:29:30 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Test\Models\Item" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemMinTax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/ItemMinTax.php on line 7
+[21-Mar-2026 12:30:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserMulti.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserMulti.php on line 17
+[21-Mar-2026 12:31:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserFloat.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserFloat.php on line 16
+[21-Mar-2026 12:34:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserCashier.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserCashier.php on line 16
+[21-Mar-2026 12:35:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserConfirm.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Models/UserConfirm.php on line 17

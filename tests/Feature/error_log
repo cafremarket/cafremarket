@@ -1,0 +1,64 @@
+[09-Feb-2026 00:43:54 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/VendorAdminPanelPageLoadTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/VendorAdminPanelPageLoadTest.php on line 7
+[09-Feb-2026 00:46:43 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/ProductPageDisplayTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/ProductPageDisplayTest.php on line 8
+[09-Feb-2026 01:02:24 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/CustomerDashboardTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/CustomerDashboardTest.php on line 7
+[09-Feb-2026 01:08:23 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/GuestCustomerApiTest.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/GuestCustomerApiTest.php on line 15
+[09-Feb-2026 01:21:27 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/TranslationsTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/TranslationsTest.php on line 8
+[09-Feb-2026 01:21:27 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/OrderInvoiceTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/OrderInvoiceTest.php on line 8
+[09-Feb-2026 01:27:24 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/PageLoadingTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/PageLoadingTest.php on line 7
+[09-Feb-2026 01:29:43 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/GuestCheckoutTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/GuestCheckoutTest.php on line 8
+[21-Mar-2026 10:44:23 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/VendorAdminPanelPageLoadTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/VendorAdminPanelPageLoadTest.php on line 7
+[21-Mar-2026 10:45:27 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/ProductPageDisplayTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/ProductPageDisplayTest.php on line 8
+[21-Mar-2026 10:50:12 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/CustomerDashboardTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/CustomerDashboardTest.php on line 7
+[21-Mar-2026 10:53:01 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/GuestCustomerApiTest.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/GuestCustomerApiTest.php on line 15
+[21-Mar-2026 10:58:15 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/TranslationsTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/TranslationsTest.php on line 8
+[21-Mar-2026 10:58:15 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/OrderInvoiceTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/OrderInvoiceTest.php on line 8
+[21-Mar-2026 11:01:27 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/PageLoadingTest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/PageLoadingTest.php on line 7
+[21-Mar-2026 11:02:46 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\TestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/GuestCheckoutTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Feature/GuestCheckoutTest.php on line 8

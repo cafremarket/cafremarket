@@ -1,0 +1,12 @@
+[09-Feb-2026 01:05:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/WalletServiceProvider.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/WalletServiceProvider.php on line 26
+[21-Mar-2026 10:52:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/WalletServiceProvider.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/WalletServiceProvider.php on line 26
+[22-Mar-2026 17:48:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/WalletServiceProvider.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/WalletServiceProvider.php on line 26

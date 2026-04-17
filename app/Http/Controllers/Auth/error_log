@@ -1,0 +1,24 @@
+[09-Feb-2026 02:00:15 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/ConfirmPasswordController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/ConfirmPasswordController.php on line 9
+[09-Feb-2026 02:11:52 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/ForgotPasswordController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/ForgotPasswordController.php on line 8
+[09-Feb-2026 02:21:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/VerificationController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/VerificationController.php on line 9
+[09-Feb-2026 02:36:04 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/RegisterController.php:24
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/RegisterController.php on line 24
+[09-Feb-2026 02:39:49 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/LoginController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/LoginController.php on line 13
+[09-Feb-2026 02:48:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/ResetPasswordController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Auth/ResetPasswordController.php on line 9

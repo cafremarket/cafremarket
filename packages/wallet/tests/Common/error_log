@@ -1,0 +1,12 @@
+[09-Feb-2026 03:28:21 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Simple\Rate" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Rate.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Rate.php on line 10
+[09-Feb-2026 13:40:44 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Simple\Rate" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Rate.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Rate.php on line 10
+[21-Mar-2026 12:26:39 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Simple\Rate" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Rate.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Rate.php on line 10

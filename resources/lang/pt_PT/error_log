@@ -1,0 +1,20 @@
+[01-Nov-2025 20:05:05 UTC] PHP Parse error:  syntax error, unexpected double-quoted string "empty_inbox", expecting "]" in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/app-static-customer.php on line 172
+[01-Nov-2025 20:08:52 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function config() in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/installer_messages.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/installer_messages.php on line 10
+[05-Nov-2025 18:00:31 UTC] PHP Parse error:  syntax error, unexpected double-quoted string "empty_inbox", expecting "]" in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/app-static-customer.php on line 172
+[05-Nov-2025 18:02:56 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function config() in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/installer_messages.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/installer_messages.php on line 10
+[14-Dec-2025 22:58:29 UTC] PHP Parse error:  syntax error, unexpected double-quoted string "empty_inbox", expecting "]" in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/app-static-customer.php on line 172
+[14-Dec-2025 22:58:58 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function config() in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/installer_messages.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/installer_messages.php on line 10
+[09-Feb-2026 01:07:35 UTC] PHP Parse error:  syntax error, unexpected double-quoted string "empty_inbox", expecting "]" in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt_PT/app-static-customer.php on line 172
+[09-Feb-2026 01:07:35 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function config() in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt_PT/installer_messages.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt_PT/installer_messages.php on line 10

@@ -1,0 +1,8 @@
+[09-Feb-2026 02:23:17 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Services/WalletPaymentService.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Services/WalletPaymentService.php on line 10
+[21-Mar-2026 11:34:19 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Services/WalletPaymentService.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Services/WalletPaymentService.php on line 10

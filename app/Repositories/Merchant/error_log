@@ -1,0 +1,4 @@
+[09-Feb-2026 01:34:43 UTC] PHP Fatal error:  Uncaught Error: Class "App\Repositories\EloquentRepository" not found in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Merchant/EloquentMerchant.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Merchant/EloquentMerchant.php on line 11

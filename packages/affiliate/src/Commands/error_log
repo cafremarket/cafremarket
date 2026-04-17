@@ -1,0 +1,8 @@
+[09-Feb-2026 01:43:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Commands/ReleaseCommissions.blade.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Commands/ReleaseCommissions.blade.php on line 11
+[21-Mar-2026 11:10:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Commands/ReleaseCommissions.blade.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Commands/ReleaseCommissions.blade.php on line 11

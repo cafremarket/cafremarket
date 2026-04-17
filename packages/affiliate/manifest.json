@@ -1,0 +1,18 @@
+{
+  "id": 54,
+  "slug": "affiliate",
+  "name": "Affiliate",
+  "description": "affiliate plugin that allows you to create an affiliate program for your store.",
+  "icon": "handshake-o",
+  "dir": "affiliate",
+  "author": "Incevio Team",
+  "email": "help@incevio.com",
+  "uri": "https://incevio.com",
+  "license": "Copyright reserved to the Incevio",
+  "dependency": "wallet",
+  "warning": "",
+  "active": false,
+  "provider": "Affiliate\\AffiliateServiceProvider",
+  "compatible": "2.18.0",
+  "version": "1.0.1"
+}

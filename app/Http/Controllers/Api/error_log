@@ -1,0 +1,80 @@
+[09-Feb-2026 02:23:12 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/ConversationController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/ConversationController.php on line 12
+[09-Feb-2026 02:25:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/PaymentCredentialController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/PaymentCredentialController.php on line 10
+[09-Feb-2026 02:25:44 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/PackageController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/PackageController.php on line 8
+[09-Feb-2026 02:25:45 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/DisputeController.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/DisputeController.php on line 23
+[09-Feb-2026 02:25:46 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/ListingController.php:24
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/ListingController.php on line 24
+[09-Feb-2026 02:25:47 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AccountController.php:24
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AccountController.php on line 24
+[09-Feb-2026 02:28:01 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AddressController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AddressController.php on line 15
+[09-Feb-2026 02:36:05 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\SocialiteBaseController" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AuthSocialController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AuthSocialController.php on line 10
+[09-Feb-2026 02:36:07 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AttachmentController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AttachmentController.php on line 10
+[09-Feb-2026 02:39:52 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/SearchController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/SearchController.php on line 11
+[09-Feb-2026 03:14:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/CheckoutController.php:24
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/CheckoutController.php on line 24
+[09-Feb-2026 03:17:47 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/FeedbackController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/FeedbackController.php on line 17
+[09-Feb-2026 03:18:51 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/CategoryController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/CategoryController.php on line 14
+[09-Feb-2026 03:18:51 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/WishlistController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/WishlistController.php on line 12
+[09-Feb-2026 03:33:48 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/OrderController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/OrderController.php on line 17
+[09-Feb-2026 03:41:56 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/CartController.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/CartController.php on line 18
+[09-Feb-2026 03:51:15 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/HomeController.php:33
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/HomeController.php on line 33
+[09-Feb-2026 03:51:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/DealController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/DealController.php on line 15
+[09-Feb-2026 03:51:17 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/BlogController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/BlogController.php on line 10
+[09-Feb-2026 03:51:17 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AuthController.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Api/AuthController.php on line 20

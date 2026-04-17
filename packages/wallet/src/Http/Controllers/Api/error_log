@@ -1,0 +1,24 @@
+[09-Feb-2026 06:38:53 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/TransferController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/TransferController.php on line 13
+[09-Feb-2026 07:59:46 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/WalletController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/WalletController.php on line 11
+[09-Feb-2026 08:01:03 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/DepositController.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/DepositController.php on line 18
+[21-Mar-2026 15:05:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/TransferController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/TransferController.php on line 13
+[21-Mar-2026 16:24:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/WalletController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/WalletController.php on line 11
+[21-Mar-2026 16:26:10 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/DepositController.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/Api/DepositController.php on line 19

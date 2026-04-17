@@ -1,0 +1,8 @@
+[09-Feb-2026 01:30:34 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function csrf_token() in /home/afnqtqmb/public_html/Cafrepay/resources/views/installer/layouts/master.blade.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/views/installer/layouts/master.blade.php on line 19
+[09-Feb-2026 04:04:08 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function csrf_token() in /home/afnqtqmb/public_html/Cafrepay/resources/views/installer/layouts/master-update.blade.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/views/installer/layouts/master-update.blade.php on line 15

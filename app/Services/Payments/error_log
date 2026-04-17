@@ -1,0 +1,36 @@
+[09-Feb-2026 01:28:17 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/CybersourcePaymentService.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/CybersourcePaymentService.php on line 9
+[09-Feb-2026 01:28:17 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/PaypalPaymentService-bk.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/PaypalPaymentService-bk.php on line 20
+[09-Feb-2026 01:28:18 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/CodPaymentService.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/CodPaymentService.php on line 5
+[09-Feb-2026 01:28:18 UTC] PHP Fatal error:  Uncaught Error: Interface "App\Contracts\PaymentServiceContract" not found in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/PaymentService.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/PaymentService.php on line 10
+[09-Feb-2026 01:28:23 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/StripeWebPaymentService.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/StripeWebPaymentService.php on line 12
+[09-Feb-2026 01:28:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/PaypalPaymentService.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/PaypalPaymentService.php on line 9
+[09-Feb-2026 01:28:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/StripePaymentService.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/StripePaymentService.php on line 9
+[09-Feb-2026 01:34:11 UTC] PHP Fatal error:  Uncaught Error: Class "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/WirePaymentService.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/WirePaymentService.php on line 5
+[09-Feb-2026 01:34:12 UTC] PHP Fatal error:  Uncaught Error: Interface "App\Services\Payments\PaymentService" not found in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/PipPaymentService.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Services/Payments/PipPaymentService.php on line 5

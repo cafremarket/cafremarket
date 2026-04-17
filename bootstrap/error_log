@@ -1,0 +1,8 @@
+[09-Feb-2026 00:33:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/afnqtqmb/public_html/Cafrepay/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/bootstrap/app.php on line 14
+[21-Mar-2026 10:39:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Application" not found in /home/afnqtqmb/public_html/Cafrepay/bootstrap/app.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/bootstrap/app.php on line 14

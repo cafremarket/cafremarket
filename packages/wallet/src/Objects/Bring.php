@@ -1,0 +1,221 @@
+<?php
+
+namespace Incevio\Package\Wallet\Objects;
+
+use Incevio\Package\Wallet\Interfaces\Mathable;
+// use Incevio\Package\Wallet\Interfaces\Wallet;
+use Incevio\Package\Wallet\Models\Transaction;
+use Incevio\Package\Wallet\Models\Transfer;
+use Ramsey\Uuid\Uuid;
+
+class Bring
+{
+    /**
+     * @var string
+     */
+    protected $status;
+
+    /**
+     * @var Wallet
+     */
+    protected $from;
+
+    /**
+     * @var Wallet
+     */
+    protected $to;
+
+    /**
+     * @var Transaction
+     */
+    protected $deposit;
+
+    /**
+     * @var Transaction
+     */
+    protected $withdraw;
+
+    /**
+     * @var string
+     */
+    protected $uuid;
+
+    /**
+     * @var int
+     */
+    protected $fee;
+
+    /**
+     * @var int
+     */
+    protected $discount;
+
+    /**
+     * Bring constructor.
+     *
+     * @throws
+     */
+    public function __construct()
+    {
+        $this->uuid = Uuid::uuid4()->toString();
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @return static
+     */
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function setDiscount(int $discount): self
+    {
+        $this->discount = app(Mathable::class)->round($discount);
+
+        return $this;
+    }
+
+    /**
+     * @return Wallet model
+     */
+    public function getFrom()
+    {
+        return $this->from;
+    }
+
+    /**
+     * @param  Wallet  $from
+     * @return static
+     */
+    public function setFrom($from): self
+    {
+        $this->from = $from;
+
+        return $this;
+    }
+
+    /**
+     * @return Wallet Model
+     */
+    public function getTo()
+    {
+        return $this->to;
+    }
+
+    /**
+     * @param  Wallet  $to
+     * @return static
+     */
+    public function setTo($to): self
+    {
+        $this->to = $to;
+
+        return $this;
+    }
+
+    public function getDeposit(): Transaction
+    {
+        return $this->deposit;
+    }
+
+    /**
+     * @return static
+     */
+    public function setDeposit(Transaction $deposit): self
+    {
+        $this->deposit = $deposit;
+
+        return $this;
+    }
+
+    public function getWithdraw(): Transaction
+    {
+        return $this->withdraw;
+    }
+
+    /**
+     * @return static
+     */
+    public function setWithdraw(Transaction $withdraw): self
+    {
+        $this->withdraw = $withdraw;
+
+        return $this;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDiscount(): int
+    {
+        return $this->discount;
+    }
+
+    public function getFee(): int
+    {
+        $fee = $this->fee;
+
+        if ($fee === null) {
+            $fee = app(Mathable::class)->round(
+                app(Mathable::class)->sub(
+                    app(Mathable::class)->abs($this->getWithdraw()->amount),
+                    app(Mathable::class)->abs($this->getDeposit()->amount)
+                )
+            );
+        }
+
+        return $fee;
+    }
+
+    /**
+     * @param  int  $fee
+     */
+    public function setFee($fee): self
+    {
+        $this->fee = app(Mathable::class)->round($fee);
+
+        return $this;
+    }
+
+    /**
+     * @throws
+     */
+    public function create(): Transfer
+    {
+        return app(Transfer::class)->create($this->toArray());
+    }
+
+    /**
+     * @throws
+     */
+    public function toArray(): array
+    {
+        return [
+            'status' => $this->getStatus(),
+            'deposit_id' => $this->getDeposit()->getKey(),
+            'withdraw_id' => $this->getWithdraw()->getKey(),
+            'from_type' => $this->getFrom()->getMorphClass(),
+            'from_id' => $this->getFrom()->getKey(),
+            'to_type' => $this->getTo()->getMorphClass(),
+            'to_id' => $this->getTo()->getKey(),
+            'discount' => $this->getDiscount(),
+            'fee' => $this->getFee(),
+            'uuid' => $this->getUuid(),
+        ];
+    }
+}

@@ -1,0 +1,32 @@
+[09-Feb-2026 03:31:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/CreditReward.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/CreditReward.php on line 12
+[09-Feb-2026 03:32:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Transfer.php:28
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Transfer.php on line 28
+[09-Feb-2026 03:33:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Transaction.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Transaction.php on line 17
+[09-Feb-2026 04:22:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Wallet.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Wallet.php on line 37
+[21-Mar-2026 12:29:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/CreditReward.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/CreditReward.php on line 12
+[21-Mar-2026 12:29:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Transfer.php:28
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Transfer.php on line 28
+[21-Mar-2026 12:30:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Transaction.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Transaction.php on line 17
+[21-Mar-2026 13:04:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Wallet.php:37
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Models/Wallet.php on line 37

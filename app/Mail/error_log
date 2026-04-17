@@ -1,0 +1,4 @@
+[09-Feb-2026 01:24:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Mail\Mailable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Mail/OrderShipped.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Mail/OrderShipped.php on line 10

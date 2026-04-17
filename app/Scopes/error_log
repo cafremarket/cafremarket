@@ -1,0 +1,12 @@
+[09-Feb-2026 01:43:06 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Database\Eloquent\Scope" not found in /home/afnqtqmb/public_html/Cafrepay/app/Scopes/RoleScope.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Scopes/RoleScope.php on line 9
+[09-Feb-2026 01:43:09 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Database\Eloquent\Scope" not found in /home/afnqtqmb/public_html/Cafrepay/app/Scopes/MineScope.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Scopes/MineScope.php on line 10
+[09-Feb-2026 01:56:21 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Database\Eloquent\Scope" not found in /home/afnqtqmb/public_html/Cafrepay/app/Scopes/ActiveScope.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Scopes/ActiveScope.php on line 9

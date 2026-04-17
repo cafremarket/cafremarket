@@ -1,0 +1,48 @@
+[09-Feb-2026 02:15:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/PeriodicPayoutCreated.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/PeriodicPayoutCreated.php on line 11
+[09-Feb-2026 02:54:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Pending.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Pending.php on line 11
+[09-Feb-2026 02:54:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Created.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Created.php on line 11
+[09-Feb-2026 02:54:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Deposit.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Deposit.php on line 11
+[09-Feb-2026 02:54:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Approve.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Approve.php on line 11
+[09-Feb-2026 03:41:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Declined.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Declined.php on line 11
+[21-Mar-2026 11:32:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/PeriodicPayoutCreated.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/PeriodicPayoutCreated.php on line 11
+[21-Mar-2026 11:56:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Deposit.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Deposit.php on line 11
+[21-Mar-2026 11:56:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Created.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Created.php on line 11
+[21-Mar-2026 11:56:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Pending.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Pending.php on line 11
+[21-Mar-2026 11:56:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Approve.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Approve.php on line 11
+[21-Mar-2026 12:39:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Declined.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Notifications/Declined.php on line 11

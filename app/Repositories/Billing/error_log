@@ -1,0 +1,4 @@
+[09-Feb-2026 01:30:07 UTC] PHP Fatal error:  Uncaught Error: Interface "App\Contracts\Repositories\InvoiceRepository" not found in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Billing/InvoiceRepository.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Billing/InvoiceRepository.php on line 7

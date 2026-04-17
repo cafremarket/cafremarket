@@ -1,0 +1,18 @@
+{
+  "id": 4,
+  "slug": "Cafre-Pay",
+  "name": "Cafre-Pay",
+  "description": "Este é o módulo de carteira para o Cafremakert.",
+  "icon": "money",
+  "dir": "Cafre-Pay",
+  "author": "Incevio Team",
+  "email": "help@incevio.com",
+  "uri": "https://incevio.com",
+  "license": "Copyright reserved to the Incevio",
+  "dependency": "",
+  "active": false,
+  "warning": "",
+  "provider": "Wallet\\WalletServiceProvider",
+  "compatible": "2.20.0",
+  "version": "1.7.0"
+}

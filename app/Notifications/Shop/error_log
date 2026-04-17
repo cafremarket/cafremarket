@@ -1,0 +1,24 @@
+[09-Feb-2026 01:28:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopDownForMaintainace.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopDownForMaintainace.php on line 11
+[09-Feb-2026 01:30:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopIsLive.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopIsLive.php on line 11
+[09-Feb-2026 01:35:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopConfigUpdated.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopConfigUpdated.php on line 12
+[09-Feb-2026 02:06:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopUpdated.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopUpdated.php on line 11
+[09-Feb-2026 02:11:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopDeleted.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopDeleted.php on line 10
+[09-Feb-2026 02:11:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopCreated.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Shop/ShopCreated.php on line 11

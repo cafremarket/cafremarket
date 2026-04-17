@@ -1,0 +1,16 @@
+[09-Feb-2026 00:43:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/AffiliateServiceProvider.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/AffiliateServiceProvider.php on line 9
+[09-Feb-2026 00:50:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Facade" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/AffiliateFacade.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/AffiliateFacade.php on line 7
+[21-Mar-2026 10:44:16 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/AffiliateServiceProvider.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/AffiliateServiceProvider.php on line 9
+[21-Mar-2026 10:46:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Facade" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/AffiliateFacade.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/AffiliateFacade.php on line 7

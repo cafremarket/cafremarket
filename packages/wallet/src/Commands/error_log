@@ -1,0 +1,32 @@
+[09-Feb-2026 01:59:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/ReleaseCreditRewards.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/ReleaseCreditRewards.php on line 10
+[09-Feb-2026 02:39:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/ReleasePayments.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/ReleasePayments.php on line 10
+[09-Feb-2026 03:31:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/PeriodicPayout.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/PeriodicPayout.php on line 14
+[09-Feb-2026 03:32:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/RefreshBalance.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/RefreshBalance.php on line 12
+[21-Mar-2026 11:20:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/ReleaseCreditRewards.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/ReleaseCreditRewards.php on line 10
+[21-Mar-2026 11:43:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/ReleasePayments.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/ReleasePayments.php on line 10
+[21-Mar-2026 12:29:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/PeriodicPayout.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/PeriodicPayout.php on line 14
+[21-Mar-2026 12:30:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/RefreshBalance.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Commands/RefreshBalance.php on line 12

@@ -1,0 +1,24 @@
+[09-Feb-2026 02:56:10 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Models\Transaction" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/_Transaction.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/_Transaction.php on line 10
+[09-Feb-2026 03:33:44 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Models\Transfer" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/Transfer.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/Transfer.php on line 5
+[09-Feb-2026 04:41:02 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Models\Wallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/Wallet.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/Wallet.php on line 5
+[21-Mar-2026 11:57:40 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Models\Transaction" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/_Transaction.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/_Transaction.php on line 10
+[21-Mar-2026 12:31:29 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Models\Transfer" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/Transfer.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/Transfer.php on line 5
+[21-Mar-2026 13:17:16 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Models\Wallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/Wallet.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Common/Models/Wallet.php on line 5

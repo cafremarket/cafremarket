@@ -1,0 +1,48 @@
+[09-Feb-2026 03:33:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WithdrawalActionsRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WithdrawalActionsRequest.php on line 7
+[09-Feb-2026 03:33:31 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WalletBulkUploadRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WalletBulkUploadRequest.php on line 7
+[09-Feb-2026 03:51:54 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/DepositRequest.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/DepositRequest.php on line 9
+[09-Feb-2026 03:56:54 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/PayoutRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/PayoutRequest.php on line 7
+[09-Feb-2026 04:04:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WithdrawalRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WithdrawalRequest.php on line 8
+[09-Feb-2026 04:22:22 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/TransferRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/TransferRequest.php on line 8
+[21-Mar-2026 12:31:15 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WalletBulkUploadRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WalletBulkUploadRequest.php on line 7
+[21-Mar-2026 12:31:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WithdrawalActionsRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WithdrawalActionsRequest.php on line 7
+[21-Mar-2026 12:47:01 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/DepositRequest.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/DepositRequest.php on line 9
+[21-Mar-2026 12:51:17 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/PayoutRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/PayoutRequest.php on line 7
+[21-Mar-2026 12:55:06 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WithdrawalRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/WithdrawalRequest.php on line 8
+[21-Mar-2026 13:04:45 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/TransferRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Requests/TransferRequest.php on line 8

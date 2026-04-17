@@ -1,0 +1,56 @@
+[09-Feb-2026 00:44:16 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/AuthServiceProvider.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/AuthServiceProvider.php on line 9
+[09-Feb-2026 00:44:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/MysqlScoutServiceProvider.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/MysqlScoutServiceProvider.php on line 13
+[09-Feb-2026 00:44:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/ViewComposerServiceProvider.php:24
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/ViewComposerServiceProvider.php on line 24
+[09-Feb-2026 00:44:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/BroadcastServiceProvider.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/BroadcastServiceProvider.php on line 8
+[09-Feb-2026 00:44:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/GoogleDriveServiceProvider.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/GoogleDriveServiceProvider.php on line 11
+[09-Feb-2026 00:44:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/ValidationServiceProvider.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/ValidationServiceProvider.php on line 10
+[09-Feb-2026 00:44:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/RepositoryServiceProvider.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/RepositoryServiceProvider.php on line 7
+[09-Feb-2026 01:00:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\EventServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/EventServiceProvider.php:25
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/EventServiceProvider.php on line 25
+[09-Feb-2026 01:00:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\RouteServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/RouteServiceProvider.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/RouteServiceProvider.php on line 11
+[09-Feb-2026 01:12:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/AppServiceProvider.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/AppServiceProvider.php on line 20
+[09-Feb-2026 01:13:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/HelperServiceProvider.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/HelperServiceProvider.php on line 8
+[28-Mar-2026 18:48:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\ServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/GoogleDriveServiceProvider.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/GoogleDriveServiceProvider.php on line 11
+[28-Mar-2026 20:32:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/AuthServiceProvider.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/AuthServiceProvider.php on line 9
+[30-Mar-2026 23:10:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/app/Providers/AuthServiceProvider.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Providers/AuthServiceProvider.php on line 9

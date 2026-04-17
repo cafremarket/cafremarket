@@ -1,0 +1,4 @@
+[09-Feb-2026 01:23:11 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function config() in /home/afnqtqmb/public_html/Cafrepay/resources/lang/en/installer_messages.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/lang/en/installer_messages.php on line 10

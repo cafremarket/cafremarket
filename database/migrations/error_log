@@ -1,0 +1,1204 @@
+[02-Jan-2026 15:58:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_19_191545_create_feedbacks_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_19_191545_create_feedbacks_table.php on line 7
+[02-Jan-2026 16:06:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_28_080741_add_download_field_to_order_items_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_28_080741_add_download_field_to_order_items_table.php on line 7
+[04-Jan-2026 18:03:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_19_191545_create_feedbacks_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_19_191545_create_feedbacks_table.php on line 7
+[08-Jan-2026 20:06:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_17_112139_add_type_field_to_images_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_17_112139_add_type_field_to_images_table.php on line 7
+[10-Jan-2026 21:44:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_17_112139_add_type_field_to_images_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_17_112139_add_type_field_to_images_table.php on line 7
+[09-Feb-2026 00:36:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_24_161811_add_split_money_to_payment_methods_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_24_161811_add_split_money_to_payment_methods_table.php on line 8
+[09-Feb-2026 00:36:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_27_114702_add_is_digital_field_to_carts_and_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_27_114702_add_is_digital_field_to_carts_and_orders_table.php on line 7
+[09-Feb-2026 00:36:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_24_151506_create_cart_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_24_151506_create_cart_table.php on line 7
+[09-Feb-2026 00:36:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_22_182024_add_smart_form_id_for_vendor_additional_info_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_22_182024_add_smart_form_id_for_vendor_additional_info_to_systems_table.php on line 7
+[09-Feb-2026 00:36:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_11_20_195815_create_package_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_11_20_195815_create_package_table.php on line 7
+[09-Feb-2026 00:36:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_26_091903_create_carriers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_26_091903_create_carriers_table.php on line 7
+[09-Feb-2026 00:36:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_05_161320_add_total_item_sold_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_05_161320_add_total_item_sold_to_shops_table.php on line 7
+[09-Feb-2026 00:37:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_08_072131_add_shop_id_to_banners_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_08_072131_add_shop_id_to_banners_table.php on line 7
+[09-Feb-2026 00:37:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_28_201222_create_faqs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_28_201222_create_faqs_table.php on line 7
+[09-Feb-2026 00:37:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_21_144404_add_parent_id_field_to_inventories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_21_144404_add_parent_id_field_to_inventories_table.php on line 7
+[09-Feb-2026 00:37:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_device_id_fields_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_device_id_fields_to_orders_table.php on line 7
+[09-Feb-2026 00:37:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_31_191307_add_total_sold_amount_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_31_191307_add_total_sold_amount_to_shops_table.php on line 7
+[09-Feb-2026 00:37:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_01_10_072540_add_delivery_boy_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_01_10_072540_add_delivery_boy_id_to_orders_table.php on line 7
+[09-Feb-2026 00:37:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_17_112139_add_type_field_to_images_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_17_112139_add_type_field_to_images_table.php on line 7
+[09-Feb-2026 00:37:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_05_06_172818_add_email_phone_fields_to_messages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_05_06_172818_add_email_phone_fields_to_messages_table.php on line 7
+[09-Feb-2026 00:37:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_06_02_062412_add_show_item_conditions_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_06_02_062412_add_show_item_conditions_to_systems_table.php on line 7
+[09-Feb-2026 00:37:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_11_202451_create_jobs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_11_202451_create_jobs_table.php on line 7
+[09-Feb-2026 00:37:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_25_192206_create_taxes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_25_192206_create_taxes_table.php on line 7
+[09-Feb-2026 00:37:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162559_create_order_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162559_create_order_table.php on line 7
+[09-Feb-2026 00:37:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_11_20_052700_rename_billing_info_on_billables.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_11_20_052700_rename_billing_info_on_billables.php on line 7
+[09-Feb-2026 00:37:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000001_create_oauth_auth_codes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000001_create_oauth_auth_codes_table.php on line 7
+[09-Feb-2026 00:37:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_12_31_000002_create_tags_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_12_31_000002_create_tags_table.php on line 7
+[09-Feb-2026 00:37:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_description_fields_to_sliders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_description_fields_to_sliders_table.php on line 7
+[09-Feb-2026 00:37:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000010_create_roles_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000010_create_roles_table.php on line 7
+[09-Feb-2026 00:37:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_tickets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_tickets_table.php on line 7
+[09-Feb-2026 00:37:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_10_22_195815_add_stripe_status_to_subscriptions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_10_22_195815_add_stripe_status_to_subscriptions_table.php on line 7
+[09-Feb-2026 00:37:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_01_12_084254_add_dimensions_to_inventories_and_products.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_01_12_084254_add_dimensions_to_inventories_and_products.php on line 7
+[09-Feb-2026 00:37:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135660_create_attribute_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135660_create_attribute_table.php on line 7
+[09-Feb-2026 00:37:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_users_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_users_table.php on line 7
+[09-Feb-2026 00:37:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_pages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_pages_table.php on line 7
+[09-Feb-2026 00:37:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000005_create_oauth_personal_access_clients_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000005_create_oauth_personal_access_clients_table.php on line 7
+[09-Feb-2026 00:37:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_30_061859_add_otp_and_delivery_boy_feedback_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_30_061859_add_otp_and_delivery_boy_feedback_id_to_orders_table.php on line 7
+[09-Feb-2026 00:37:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_16_113142_add_warehouse_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_16_113142_add_warehouse_id_to_orders_table.php on line 7
+[09-Feb-2026 00:37:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162519_create_email_templates_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162519_create_email_templates_table.php on line 7
+[09-Feb-2026 00:37:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_04_051130_add_effect_to_banners_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_04_051130_add_effect_to_banners_table.php on line 7
+[09-Feb-2026 00:37:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000020_create_images_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000020_create_images_table.php on line 7
+[09-Feb-2026 00:37:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_07_054319_add_invoice_template_id_and_shipping_label_id_column_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_07_054319_add_invoice_template_id_and_shipping_label_id_column_to_shops_table.php on line 7
+[09-Feb-2026 00:37:16 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_10_04_071941_add_hide_technical_details_on_product_page_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_10_04_071941_add_hide_technical_details_on_product_page_to_systems_table.php on line 7
+[09-Feb-2026 00:37:16 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_11_05_121536_add_show_vendor_terms_and_conditions_column_to_sytems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_11_05_121536_add_show_vendor_terms_and_conditions_column_to_sytems_table.php on line 7
+[09-Feb-2026 00:37:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_26_052024_create_translation_category_groups_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_26_052024_create_translation_category_groups_table.php on line 7
+[09-Feb-2026 00:37:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000002_create_oauth_access_tokens_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000002_create_oauth_access_tokens_table.php on line 7
+[09-Feb-2026 00:37:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000004_create_oauth_clients_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000004_create_oauth_clients_table.php on line 7
+[09-Feb-2026 00:37:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_systems_table.php on line 7
+[09-Feb-2026 00:37:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000000_create_modules_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000000_create_modules_table.php on line 7
+[09-Feb-2026 00:37:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_01_12_000002_create_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_01_12_000002_create_configs_table.php on line 7
+[09-Feb-2026 00:37:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000020_create_attachments_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000020_create_attachments_table.php on line 7
+[09-Feb-2026 00:37:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000001_create_password_resets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000001_create_password_resets_table.php on line 7
+[09-Feb-2026 00:37:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000011_create_permissions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000011_create_permissions_table.php on line 7
+[09-Feb-2026 00:37:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_12_31_000004_create_addresses_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_12_31_000004_create_addresses_table.php on line 7
+[09-Feb-2026 00:37:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_05_12_151257_create_invoices_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_05_12_151257_create_invoices_table.php on line 7
+[09-Feb-2026 00:37:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_27_032025_create_translation_categories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_27_032025_create_translation_categories_table.php on line 7
+[09-Feb-2026 00:37:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_25_044609_create_translation_attributes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_25_044609_create_translation_attributes_table.php on line 7
+[09-Feb-2026 00:37:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_27_102130_create_translation_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_27_102130_create_translation_shops_table.php on line 7
+[09-Feb-2026 00:37:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_opening_and_close_time_fields_to_warehouse_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_opening_and_close_time_fields_to_warehouse_table.php on line 7
+[09-Feb-2026 00:37:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_25_043454_create_translation_manufacturers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_25_043454_create_translation_manufacturers_table.php on line 7
+[09-Feb-2026 00:37:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000004_create_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000004_create_customers_table.php on line 7
+[09-Feb-2026 00:37:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000003_create_oauth_refresh_tokens_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000003_create_oauth_refresh_tokens_table.php on line 7
+[09-Feb-2026 00:37:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_14_193443_add_uuid_to_failed_jobs_table.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_14_193443_add_uuid_to_failed_jobs_table.php on line 9
+[09-Feb-2026 00:37:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_amount_fields_to_shop_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_amount_fields_to_shop_table.php on line 7
+[09-Feb-2026 00:37:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_08_05_063657_add_api_key_to_users_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_08_05_063657_add_api_key_to_users_table.php on line 7
+[09-Feb-2026 00:37:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_13_114302_add_extra_info_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_13_114302_add_extra_info_to_shops_table.php on line 7
+[09-Feb-2026 00:37:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_12_04_083515_add_payment_ref_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_12_04_083515_add_payment_ref_id_to_orders_table.php on line 7
+[09-Feb-2026 00:37:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_04_02_162042_add_bank_name_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_04_02_162042_add_bank_name_to_configs_table.php on line 7
+[09-Feb-2026 00:37:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_12_31_000001_create_countries_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_12_31_000001_create_countries_table.php on line 7
+[09-Feb-2026 00:37:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_social_auth_fields_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_social_auth_fields_to_systems_table.php on line 7
+[09-Feb-2026 00:37:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_28_080741_add_download_field_to_order_items_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_28_080741_add_download_field_to_order_items_table.php on line 7
+[09-Feb-2026 00:37:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_12_06_052602_add_vendor_bank_detail_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_12_06_052602_add_vendor_bank_detail_to_configs_table.php on line 7
+[09-Feb-2026 00:37:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_11_11_095200_add_fcm_token_to_users_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_11_11_095200_add_fcm_token_to_users_table.php on line 7
+[09-Feb-2026 00:37:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_28_054507_add_pay_to_fields_to_shop_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_28_054507_add_pay_to_fields_to_shop_table.php on line 7
+[09-Feb-2026 00:37:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_12_31_000004_create_blogs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_12_31_000004_create_blogs_table.php on line 7
+[09-Feb-2026 00:37:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_10_30_092938_add_show_customer_terms_and_conditions_column_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_10_30_092938_add_show_customer_terms_and_conditions_column_to_systems_table.php on line 7
+[09-Feb-2026 00:37:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_15_110800_change_warehouse_id_type_to_string.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_15_110800_change_warehouse_id_type_to_string.php on line 7
+[09-Feb-2026 00:37:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_09_13_195828_create_coupons_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_09_13_195828_create_coupons_table.php on line 7
+[09-Feb-2026 00:37:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_refunds_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_refunds_table.php on line 7
+[09-Feb-2026 00:37:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_fulfilment_type_fields_to_orders_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_fulfilment_type_fields_to_orders_table.php on line 8
+[09-Feb-2026 00:37:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_subscriptions_table.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_subscriptions_table.php on line 6
+[09-Feb-2026 00:37:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_21_100724_add_customer_needs_approval_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_21_100724_add_customer_needs_approval_to_systems_table.php on line 7
+[09-Feb-2026 00:37:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_21_080453_add_approval_status_to_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_21_080453_add_approval_status_to_customers_table.php on line 7
+[09-Feb-2026 00:37:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_11_190111_create_inventory_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_11_190111_create_inventory_table.php on line 7
+[09-Feb-2026 00:37:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_active_ecommerce_fields_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_active_ecommerce_fields_to_configs_table.php on line 7
+[09-Feb-2026 00:37:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_01_09_054507_add_payment_instruction_fields_to_order_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_01_09_054507_add_payment_instruction_fields_to_order_table.php on line 7
+[09-Feb-2026 00:37:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_dashboard_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_dashboard_configs_table.php on line 7
+[09-Feb-2026 00:37:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_03_28_080939_update_default_language_length_in_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_03_28_080939_update_default_language_length_in_systems_table.php on line 7
+[09-Feb-2026 00:37:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_18_144404_add_download_limit_field_to_inventories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_18_144404_add_download_limit_field_to_inventories_table.php on line 7
+[09-Feb-2026 00:37:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_13_091819_add_notification_sent_field_to_subscriptions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_13_091819_add_notification_sent_field_to_subscriptions_table.php on line 7
+[09-Feb-2026 00:37:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_12_18_054507_add_cancellation_fields_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_12_18_054507_add_cancellation_fields_to_systems_table.php on line 7
+[09-Feb-2026 00:37:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_28_095259_create_translation_category_sub_groups_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_28_095259_create_translation_category_sub_groups_table.php on line 7
+[09-Feb-2026 00:37:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_07_01_103906_add_cancellation_config_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_07_01_103906_add_cancellation_config_to_systems_table.php on line 7
+[09-Feb-2026 00:37:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_03_19_142336_add_user_id_column_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_03_19_142336_add_user_id_column_to_orders_table.php on line 7
+[09-Feb-2026 00:37:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_12_27_042837_add_show_empty_homepage_slider_column_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_12_27_042837_add_show_empty_homepage_slider_column_to_systems_table.php on line 7
+[09-Feb-2026 00:37:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_pay_in_person_and_pay_online_fields_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_pay_in_person_and_pay_online_fields_to_configs_table.php on line 7
+[09-Feb-2026 00:37:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_17_113230_update_decimal_column_precision_in_subscription_plans_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_17_113230_update_decimal_column_precision_in_subscription_plans_table.php on line 7
+[09-Feb-2026 00:37:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_17_113926_add_customer_phone_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_17_113926_add_customer_phone_to_orders_table.php on line 7
+[09-Feb-2026 00:37:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_contact_us_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_contact_us_table.php on line 7
+[09-Feb-2026 00:37:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_01_30_061710_add_fields_to_packages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_01_30_061710_add_fields_to_packages_table.php on line 7
+[09-Feb-2026 00:37:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2019_12_27_092414_add_notify_chat_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2019_12_27_092414_add_notify_chat_to_configs_table.php on line 7
+[09-Feb-2026 00:37:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_09_17_202406_create_gift_cards_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_09_17_202406_create_gift_cards_table.php on line 7
+[09-Feb-2026 00:37:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_01_04_062059_add_source_column_to_carriers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_01_04_062059_add_source_column_to_carriers_table.php on line 7
+[09-Feb-2026 00:37:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_07_094913_add_pickup_enabled_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_07_094913_add_pickup_enabled_to_shops_table.php on line 7
+[09-Feb-2026 00:37:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_01_11_135657_create_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_01_11_135657_create_shops_table.php on line 7
+[09-Feb-2026 00:37:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_05_28_144404_add_sold_quantity_field_to_inventories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_05_28_144404_add_sold_quantity_field_to_inventories_table.php on line 7
+[09-Feb-2026 00:37:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_01_172738_add_show_merchant_info_as_vendor_system_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_01_172738_add_show_merchant_info_as_vendor_system_table.php on line 7
+[09-Feb-2026 00:37:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_subscription_items_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_subscription_items_table.php on line 7
+[09-Feb-2026 00:37:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_04_115739_create_translation_inventories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_04_115739_create_translation_inventories_table.php on line 7
+[09-Feb-2026 00:37:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_02_064852_create_attribute_categories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_02_064852_create_attribute_categories_table.php on line 7
+[09-Feb-2026 00:37:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_01_04_065320_create_delivery_boys_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_01_04_065320_create_delivery_boys_table.php on line 7
+[09-Feb-2026 00:37:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_04_210334_create_banners_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_04_210334_create_banners_table.php on line 7
+[09-Feb-2026 00:37:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_04_210813_create_sliders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_04_210813_create_sliders_table.php on line 7
+[09-Feb-2026 00:37:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_26_091903_create_shipping_zones_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_26_091903_create_shipping_zones_table.php on line 7
+[09-Feb-2026 00:37:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144548_create_replies_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144548_create_replies_table.php on line 7
+[09-Feb-2026 00:37:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_04_01_151049_create_activity_log_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_04_01_151049_create_activity_log_table.php on line 7
+[09-Feb-2026 00:37:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_06_07_200450_create_avg_feedback_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_06_07_200450_create_avg_feedback_table.php on line 7
+[09-Feb-2026 00:37:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_10_04_162859_create_options_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_10_04_162859_create_options_table.php on line 7
+[09-Feb-2026 00:37:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_07_30_043829_rename_subscription_name_to_type.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_07_30_043829_rename_subscription_name_to_type.php on line 7
+[09-Feb-2026 00:37:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_01_042623_create_pdf_templates_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_01_042623_create_pdf_templates_table.php on line 8
+[09-Feb-2026 00:37:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_messages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_messages_table.php on line 7
+[09-Feb-2026 00:37:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_disputes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_disputes_table.php on line 7
+[09-Feb-2026 00:37:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_15_191220_create_category_groups_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_15_191220_create_category_groups_table.php on line 7
+[09-Feb-2026 00:38:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_16_015501_create_wishlists_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_16_015501_create_wishlists_table.php on line 7
+[09-Feb-2026 00:38:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135714_create_suppliers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135714_create_suppliers_table.php on line 7
+[09-Feb-2026 00:38:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135658_create_products_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135658_create_products_table.php on line 7
+[09-Feb-2026 00:38:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162552_create_payment_methods_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162552_create_payment_methods_table.php on line 7
+[09-Feb-2026 00:38:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_12_28_041244_create_shipping_methods_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_12_28_041244_create_shipping_methods_table.php on line 7
+[09-Feb-2026 00:38:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_11_182034_create_warehouse_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_11_182034_create_warehouse_table.php on line 7
+[09-Feb-2026 00:38:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_stripe_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_stripe_table.php on line 7
+[09-Feb-2026 00:38:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_paypal_express_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_paypal_express_table.php on line 7
+[09-Feb-2026 00:38:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_11_095200_add_fcm_token_to_customers_and_delivery_boys_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_11_095200_add_fcm_token_to_customers_and_delivery_boys_table.php on line 7
+[09-Feb-2026 00:38:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_10_09_064157_add_currency_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_10_09_064157_add_currency_id_to_orders_table.php on line 7
+[09-Feb-2026 00:38:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_09_062412_add_catalog_system_enable_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_09_062412_add_catalog_system_enable_to_systems_table.php on line 7
+[09-Feb-2026 00:38:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_03_19_104344_change_fulfilment_type_column_in_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_03_19_104344_change_fulfilment_type_column_in_orders_table.php on line 7
+[09-Feb-2026 00:38:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135655_create_manufacturers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135655_create_manufacturers_table.php on line 7
+[09-Feb-2026 00:38:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_05_12_131134_create_performance_indicators_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_05_12_131134_create_performance_indicators_table.php on line 7
+[09-Feb-2026 00:38:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_04_12_080346_add_phone_number_to_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_04_12_080346_add_phone_number_to_customers_table.php on line 7
+[09-Feb-2026 00:38:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_08_173634_create_translation_products_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_08_173634_create_translation_products_table.php on line 7
+[09-Feb-2026 00:38:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_06_30_154819_create_cancellation_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_06_30_154819_create_cancellation_table.php on line 7
+[09-Feb-2026 00:38:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_07_100859_add_pickup_instruction_to_warehouses_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_07_100859_add_pickup_instruction_to_warehouses_table.php on line 7
+[09-Feb-2026 00:38:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_01_25_112227_update_email_in_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_01_25_112227_update_email_in_customers_table.php on line 7
+[09-Feb-2026 00:38:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_13_074513_change_subscriptions_tables_for_cashier.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_13_074513_change_subscriptions_tables_for_cashier.php on line 7
+[09-Feb-2026 00:38:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_11_17_065145_create_config_paypals_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_11_17_065145_create_config_paypals_table.php on line 7
+[09-Feb-2026 00:38:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_manual_payments_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_manual_payments_table.php on line 7
+[09-Feb-2026 00:38:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_19_191545_create_feedbacks_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_19_191545_create_feedbacks_table.php on line 7
+[09-Feb-2026 00:38:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2019_07_11_165534_create_languages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2019_07_11_165534_create_languages_table.php on line 7
+[09-Feb-2026 00:38:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_05_27_135039_create_visitors_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_05_27_135039_create_visitors_table.php on line 7
+[09-Feb-2026 00:38:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_07_18_055656_update_activity_log_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_07_18_055656_update_activity_log_table.php on line 7
+[09-Feb-2026 00:38:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_12_25_163942_create_config_instamojo_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_12_25_163942_create_config_instamojo_table.php on line 7
+[09-Feb-2026 00:39:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_08_155212_create_notifications_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_08_155212_create_notifications_table.php on line 7
+[09-Feb-2026 00:42:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_12_25_163942_create_config_cybersource_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_12_25_163942_create_config_cybersource_table.php on line 7
+[09-Feb-2026 01:02:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_09_045614_add_order_invoice_pdf_template_and_shipping_label_pdf_template_columns_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_09_045614_add_order_invoice_pdf_template_and_shipping_label_pdf_template_columns_to_configs_table.php on line 7
+[21-Mar-2026 10:41:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_24_161811_add_split_money_to_payment_methods_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_24_161811_add_split_money_to_payment_methods_table.php on line 8
+[21-Mar-2026 10:41:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_27_114702_add_is_digital_field_to_carts_and_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_27_114702_add_is_digital_field_to_carts_and_orders_table.php on line 7
+[21-Mar-2026 10:41:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_24_151506_create_cart_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_24_151506_create_cart_table.php on line 7
+[21-Mar-2026 10:41:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_22_182024_add_smart_form_id_for_vendor_additional_info_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_22_182024_add_smart_form_id_for_vendor_additional_info_to_systems_table.php on line 7
+[21-Mar-2026 10:41:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_11_20_195815_create_package_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_11_20_195815_create_package_table.php on line 7
+[21-Mar-2026 10:41:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_26_091903_create_carriers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_26_091903_create_carriers_table.php on line 7
+[21-Mar-2026 10:41:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_05_161320_add_total_item_sold_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_05_161320_add_total_item_sold_to_shops_table.php on line 7
+[21-Mar-2026 10:41:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_08_072131_add_shop_id_to_banners_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_08_072131_add_shop_id_to_banners_table.php on line 7
+[21-Mar-2026 10:41:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_28_201222_create_faqs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_28_201222_create_faqs_table.php on line 7
+[21-Mar-2026 10:41:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_21_144404_add_parent_id_field_to_inventories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_21_144404_add_parent_id_field_to_inventories_table.php on line 7
+[21-Mar-2026 10:41:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_device_id_fields_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_device_id_fields_to_orders_table.php on line 7
+[21-Mar-2026 10:41:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_01_10_072540_add_delivery_boy_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_01_10_072540_add_delivery_boy_id_to_orders_table.php on line 7
+[21-Mar-2026 10:41:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_31_191307_add_total_sold_amount_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_31_191307_add_total_sold_amount_to_shops_table.php on line 7
+[21-Mar-2026 10:41:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_17_112139_add_type_field_to_images_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_17_112139_add_type_field_to_images_table.php on line 7
+[21-Mar-2026 10:41:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_05_06_172818_add_email_phone_fields_to_messages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_05_06_172818_add_email_phone_fields_to_messages_table.php on line 7
+[21-Mar-2026 10:41:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_06_02_062412_add_show_item_conditions_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_06_02_062412_add_show_item_conditions_to_systems_table.php on line 7
+[21-Mar-2026 10:41:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_11_202451_create_jobs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_11_202451_create_jobs_table.php on line 7
+[21-Mar-2026 10:41:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162559_create_order_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162559_create_order_table.php on line 7
+[21-Mar-2026 10:41:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_25_192206_create_taxes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_25_192206_create_taxes_table.php on line 7
+[21-Mar-2026 10:41:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_11_20_052700_rename_billing_info_on_billables.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_11_20_052700_rename_billing_info_on_billables.php on line 7
+[21-Mar-2026 10:41:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000001_create_oauth_auth_codes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000001_create_oauth_auth_codes_table.php on line 7
+[21-Mar-2026 10:41:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_12_31_000002_create_tags_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_12_31_000002_create_tags_table.php on line 7
+[21-Mar-2026 10:41:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_description_fields_to_sliders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_description_fields_to_sliders_table.php on line 7
+[21-Mar-2026 10:41:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000010_create_roles_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000010_create_roles_table.php on line 7
+[21-Mar-2026 10:41:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_tickets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_tickets_table.php on line 7
+[21-Mar-2026 10:41:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_10_22_195815_add_stripe_status_to_subscriptions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_10_22_195815_add_stripe_status_to_subscriptions_table.php on line 7
+[21-Mar-2026 10:41:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_01_12_084254_add_dimensions_to_inventories_and_products.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_01_12_084254_add_dimensions_to_inventories_and_products.php on line 7
+[21-Mar-2026 10:41:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135660_create_attribute_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135660_create_attribute_table.php on line 7
+[21-Mar-2026 10:41:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_users_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_users_table.php on line 7
+[21-Mar-2026 10:41:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_pages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_pages_table.php on line 7
+[21-Mar-2026 10:41:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000005_create_oauth_personal_access_clients_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000005_create_oauth_personal_access_clients_table.php on line 7
+[21-Mar-2026 10:41:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_30_061859_add_otp_and_delivery_boy_feedback_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_30_061859_add_otp_and_delivery_boy_feedback_id_to_orders_table.php on line 7
+[21-Mar-2026 10:41:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_16_113142_add_warehouse_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_16_113142_add_warehouse_id_to_orders_table.php on line 7
+[21-Mar-2026 10:41:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162519_create_email_templates_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162519_create_email_templates_table.php on line 7
+[21-Mar-2026 10:41:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_04_051130_add_effect_to_banners_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_04_051130_add_effect_to_banners_table.php on line 7
+[21-Mar-2026 10:41:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000020_create_images_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000020_create_images_table.php on line 7
+[21-Mar-2026 10:41:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_07_054319_add_invoice_template_id_and_shipping_label_id_column_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_07_054319_add_invoice_template_id_and_shipping_label_id_column_to_shops_table.php on line 7
+[21-Mar-2026 10:41:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_10_04_071941_add_hide_technical_details_on_product_page_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_10_04_071941_add_hide_technical_details_on_product_page_to_systems_table.php on line 7
+[21-Mar-2026 10:41:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_11_05_121536_add_show_vendor_terms_and_conditions_column_to_sytems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_11_05_121536_add_show_vendor_terms_and_conditions_column_to_sytems_table.php on line 7
+[21-Mar-2026 10:41:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_26_052024_create_translation_category_groups_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_26_052024_create_translation_category_groups_table.php on line 7
+[21-Mar-2026 10:41:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000002_create_oauth_access_tokens_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000002_create_oauth_access_tokens_table.php on line 7
+[21-Mar-2026 10:41:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_systems_table.php on line 7
+[21-Mar-2026 10:41:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000004_create_oauth_clients_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000004_create_oauth_clients_table.php on line 7
+[21-Mar-2026 10:41:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_01_12_000002_create_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_01_12_000002_create_configs_table.php on line 7
+[21-Mar-2026 10:41:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000000_create_modules_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000000_create_modules_table.php on line 7
+[21-Mar-2026 10:41:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000020_create_attachments_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000020_create_attachments_table.php on line 7
+[21-Mar-2026 10:41:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_12_31_000004_create_addresses_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_12_31_000004_create_addresses_table.php on line 7
+[21-Mar-2026 10:41:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000011_create_permissions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_11_000011_create_permissions_table.php on line 7
+[21-Mar-2026 10:41:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000001_create_password_resets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000001_create_password_resets_table.php on line 7
+[21-Mar-2026 10:41:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_05_12_151257_create_invoices_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_05_12_151257_create_invoices_table.php on line 7
+[21-Mar-2026 10:41:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_25_044609_create_translation_attributes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_25_044609_create_translation_attributes_table.php on line 7
+[21-Mar-2026 10:41:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_27_032025_create_translation_categories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_27_032025_create_translation_categories_table.php on line 7
+[21-Mar-2026 10:41:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_27_102130_create_translation_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_27_102130_create_translation_shops_table.php on line 7
+[21-Mar-2026 10:41:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_opening_and_close_time_fields_to_warehouse_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_opening_and_close_time_fields_to_warehouse_table.php on line 7
+[21-Mar-2026 10:41:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_25_043454_create_translation_manufacturers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_25_043454_create_translation_manufacturers_table.php on line 7
+[21-Mar-2026 10:41:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000004_create_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000004_create_customers_table.php on line 7
+[21-Mar-2026 10:41:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000003_create_oauth_refresh_tokens_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_06_01_000003_create_oauth_refresh_tokens_table.php on line 7
+[21-Mar-2026 10:41:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_14_193443_add_uuid_to_failed_jobs_table.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_14_193443_add_uuid_to_failed_jobs_table.php on line 9
+[21-Mar-2026 10:41:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_08_05_063657_add_api_key_to_users_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_08_05_063657_add_api_key_to_users_table.php on line 7
+[21-Mar-2026 10:41:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_amount_fields_to_shop_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_amount_fields_to_shop_table.php on line 7
+[21-Mar-2026 10:41:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_04_02_162042_add_bank_name_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_04_02_162042_add_bank_name_to_configs_table.php on line 7
+[21-Mar-2026 10:41:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_13_114302_add_extra_info_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_05_13_114302_add_extra_info_to_shops_table.php on line 7
+[21-Mar-2026 10:41:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_12_04_083515_add_payment_ref_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_12_04_083515_add_payment_ref_id_to_orders_table.php on line 7
+[21-Mar-2026 10:41:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_12_31_000001_create_countries_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_12_31_000001_create_countries_table.php on line 7
+[21-Mar-2026 10:41:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_28_080741_add_download_field_to_order_items_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_28_080741_add_download_field_to_order_items_table.php on line 7
+[21-Mar-2026 10:41:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_12_06_052602_add_vendor_bank_detail_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_12_06_052602_add_vendor_bank_detail_to_configs_table.php on line 7
+[21-Mar-2026 10:41:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_social_auth_fields_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_02_01_054507_add_social_auth_fields_to_systems_table.php on line 7
+[21-Mar-2026 10:41:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_28_054507_add_pay_to_fields_to_shop_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_28_054507_add_pay_to_fields_to_shop_table.php on line 7
+[21-Mar-2026 10:41:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_11_11_095200_add_fcm_token_to_users_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_11_11_095200_add_fcm_token_to_users_table.php on line 7
+[21-Mar-2026 10:41:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_12_31_000004_create_blogs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_12_31_000004_create_blogs_table.php on line 7
+[21-Mar-2026 10:42:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_10_30_092938_add_show_customer_terms_and_conditions_column_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_10_30_092938_add_show_customer_terms_and_conditions_column_to_systems_table.php on line 7
+[21-Mar-2026 10:42:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_15_110800_change_warehouse_id_type_to_string.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_15_110800_change_warehouse_id_type_to_string.php on line 7
+[21-Mar-2026 10:42:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_refunds_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_refunds_table.php on line 7
+[21-Mar-2026 10:42:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_09_13_195828_create_coupons_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_09_13_195828_create_coupons_table.php on line 7
+[21-Mar-2026 10:42:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_fulfilment_type_fields_to_orders_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_fulfilment_type_fields_to_orders_table.php on line 8
+[21-Mar-2026 10:42:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_subscriptions_table.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_subscriptions_table.php on line 6
+[21-Mar-2026 10:42:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_21_080453_add_approval_status_to_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_21_080453_add_approval_status_to_customers_table.php on line 7
+[21-Mar-2026 10:42:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_21_100724_add_customer_needs_approval_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_21_100724_add_customer_needs_approval_to_systems_table.php on line 7
+[21-Mar-2026 10:42:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_11_190111_create_inventory_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_11_190111_create_inventory_table.php on line 7
+[21-Mar-2026 10:42:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_active_ecommerce_fields_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_active_ecommerce_fields_to_configs_table.php on line 7
+[21-Mar-2026 10:42:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_01_09_054507_add_payment_instruction_fields_to_order_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_01_09_054507_add_payment_instruction_fields_to_order_table.php on line 7
+[21-Mar-2026 10:42:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_dashboard_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000003_create_dashboard_configs_table.php on line 7
+[21-Mar-2026 10:42:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_03_28_080939_update_default_language_length_in_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_03_28_080939_update_default_language_length_in_systems_table.php on line 7
+[21-Mar-2026 10:42:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_18_144404_add_download_limit_field_to_inventories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_07_18_144404_add_download_limit_field_to_inventories_table.php on line 7
+[21-Mar-2026 10:42:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_13_091819_add_notification_sent_field_to_subscriptions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_13_091819_add_notification_sent_field_to_subscriptions_table.php on line 7
+[21-Mar-2026 10:42:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_07_01_103906_add_cancellation_config_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_07_01_103906_add_cancellation_config_to_systems_table.php on line 7
+[21-Mar-2026 10:42:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_28_095259_create_translation_category_sub_groups_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_06_28_095259_create_translation_category_sub_groups_table.php on line 7
+[21-Mar-2026 10:42:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_12_18_054507_add_cancellation_fields_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_12_18_054507_add_cancellation_fields_to_systems_table.php on line 7
+[21-Mar-2026 10:42:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_03_19_142336_add_user_id_column_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_03_19_142336_add_user_id_column_to_orders_table.php on line 7
+[21-Mar-2026 10:42:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_12_27_042837_add_show_empty_homepage_slider_column_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_12_27_042837_add_show_empty_homepage_slider_column_to_systems_table.php on line 7
+[21-Mar-2026 10:42:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_pay_in_person_and_pay_online_fields_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_03_054507_add_pay_in_person_and_pay_online_fields_to_configs_table.php on line 7
+[21-Mar-2026 10:42:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_17_113230_update_decimal_column_precision_in_subscription_plans_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_08_17_113230_update_decimal_column_precision_in_subscription_plans_table.php on line 7
+[21-Mar-2026 10:42:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_17_113926_add_customer_phone_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_17_113926_add_customer_phone_to_orders_table.php on line 7
+[21-Mar-2026 10:42:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_01_30_061710_add_fields_to_packages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_01_30_061710_add_fields_to_packages_table.php on line 7
+[21-Mar-2026 10:42:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_01_04_062059_add_source_column_to_carriers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_01_04_062059_add_source_column_to_carriers_table.php on line 7
+[21-Mar-2026 10:42:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2019_12_27_092414_add_notify_chat_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2019_12_27_092414_add_notify_chat_to_configs_table.php on line 7
+[21-Mar-2026 10:42:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_contact_us_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_contact_us_table.php on line 7
+[21-Mar-2026 10:42:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_09_17_202406_create_gift_cards_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_09_17_202406_create_gift_cards_table.php on line 7
+[21-Mar-2026 10:42:16 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_07_094913_add_pickup_enabled_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_07_094913_add_pickup_enabled_to_shops_table.php on line 7
+[21-Mar-2026 10:42:16 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_01_11_135657_create_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_01_11_135657_create_shops_table.php on line 7
+[21-Mar-2026 10:42:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_05_28_144404_add_sold_quantity_field_to_inventories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_05_28_144404_add_sold_quantity_field_to_inventories_table.php on line 7
+[21-Mar-2026 10:42:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_01_172738_add_show_merchant_info_as_vendor_system_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_03_01_172738_add_show_merchant_info_as_vendor_system_table.php on line 7
+[21-Mar-2026 10:42:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_subscription_items_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_10_12_000000_create_subscription_items_table.php on line 7
+[21-Mar-2026 10:42:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_04_115739_create_translation_inventories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_04_115739_create_translation_inventories_table.php on line 7
+[21-Mar-2026 10:42:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_02_064852_create_attribute_categories_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_02_02_064852_create_attribute_categories_table.php on line 7
+[21-Mar-2026 10:42:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_26_091903_create_shipping_zones_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_26_091903_create_shipping_zones_table.php on line 7
+[21-Mar-2026 10:42:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144548_create_replies_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144548_create_replies_table.php on line 7
+[21-Mar-2026 10:42:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_04_210813_create_sliders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_04_210813_create_sliders_table.php on line 7
+[21-Mar-2026 10:42:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_06_07_200450_create_avg_feedback_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_06_07_200450_create_avg_feedback_table.php on line 7
+[21-Mar-2026 10:42:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_04_01_151049_create_activity_log_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2014_04_01_151049_create_activity_log_table.php on line 7
+[21-Mar-2026 10:42:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_01_04_065320_create_delivery_boys_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_01_04_065320_create_delivery_boys_table.php on line 7
+[21-Mar-2026 10:42:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_04_210334_create_banners_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_04_210334_create_banners_table.php on line 7
+[21-Mar-2026 10:42:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_10_04_162859_create_options_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_10_04_162859_create_options_table.php on line 7
+[21-Mar-2026 10:42:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_01_042623_create_pdf_templates_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_01_042623_create_pdf_templates_table.php on line 8
+[21-Mar-2026 10:42:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_07_30_043829_rename_subscription_name_to_type.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_07_30_043829_rename_subscription_name_to_type.php on line 7
+[21-Mar-2026 10:42:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_15_191220_create_category_groups_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_15_191220_create_category_groups_table.php on line 7
+[21-Mar-2026 10:42:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_11_182034_create_warehouse_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_03_11_182034_create_warehouse_table.php on line 7
+[21-Mar-2026 10:42:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135714_create_suppliers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135714_create_suppliers_table.php on line 7
+[21-Mar-2026 10:42:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_12_28_041244_create_shipping_methods_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_12_28_041244_create_shipping_methods_table.php on line 7
+[21-Mar-2026 10:42:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_messages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_messages_table.php on line 7
+[21-Mar-2026 10:42:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162552_create_payment_methods_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162552_create_payment_methods_table.php on line 7
+[21-Mar-2026 10:42:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_disputes_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2017_11_27_144538_create_disputes_table.php on line 7
+[21-Mar-2026 10:42:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_16_015501_create_wishlists_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_16_015501_create_wishlists_table.php on line 7
+[21-Mar-2026 10:42:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135658_create_products_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135658_create_products_table.php on line 7
+[21-Mar-2026 10:42:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_stripe_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_stripe_table.php on line 7
+[21-Mar-2026 10:42:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_paypal_express_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_paypal_express_table.php on line 7
+[21-Mar-2026 10:42:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_11_095200_add_fcm_token_to_customers_and_delivery_boys_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_11_095200_add_fcm_token_to_customers_and_delivery_boys_table.php on line 7
+[21-Mar-2026 10:42:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_10_09_064157_add_currency_id_to_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_10_09_064157_add_currency_id_to_orders_table.php on line 7
+[21-Mar-2026 10:42:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_09_062412_add_catalog_system_enable_to_systems_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_11_09_062412_add_catalog_system_enable_to_systems_table.php on line 7
+[21-Mar-2026 10:42:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_03_19_104344_change_fulfilment_type_column_in_orders_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_03_19_104344_change_fulfilment_type_column_in_orders_table.php on line 7
+[21-Mar-2026 10:42:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135655_create_manufacturers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_01_11_135655_create_manufacturers_table.php on line 7
+[21-Mar-2026 10:42:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_05_12_131134_create_performance_indicators_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2015_05_12_131134_create_performance_indicators_table.php on line 7
+[21-Mar-2026 10:42:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_04_12_080346_add_phone_number_to_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_04_12_080346_add_phone_number_to_customers_table.php on line 7
+[21-Mar-2026 10:42:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_08_173634_create_translation_products_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_02_08_173634_create_translation_products_table.php on line 7
+[21-Mar-2026 10:42:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_06_30_154819_create_cancellation_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2020_06_30_154819_create_cancellation_table.php on line 7
+[21-Mar-2026 10:42:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_07_100859_add_pickup_instruction_to_warehouses_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_03_07_100859_add_pickup_instruction_to_warehouses_table.php on line 7
+[21-Mar-2026 10:42:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_01_25_112227_update_email_in_customers_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2023_01_25_112227_update_email_in_customers_table.php on line 7
+[21-Mar-2026 10:42:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_13_074513_change_subscriptions_tables_for_cashier.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2021_10_13_074513_change_subscriptions_tables_for_cashier.php on line 7
+[21-Mar-2026 10:42:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_11_17_065145_create_config_paypals_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2022_11_17_065145_create_config_paypals_table.php on line 7
+[21-Mar-2026 10:42:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_manual_payments_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2016_04_22_162555_create_config_manual_payments_table.php on line 7
+[21-Mar-2026 10:42:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_19_191545_create_feedbacks_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_07_19_191545_create_feedbacks_table.php on line 7
+[21-Mar-2026 10:42:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_05_27_135039_create_visitors_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_05_27_135039_create_visitors_table.php on line 7
+[21-Mar-2026 10:42:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2019_07_11_165534_create_languages_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2019_07_11_165534_create_languages_table.php on line 7
+[21-Mar-2026 10:42:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_07_18_055656_update_activity_log_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2024_07_18_055656_update_activity_log_table.php on line 7
+[21-Mar-2026 10:42:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_12_25_163942_create_config_instamojo_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_12_25_163942_create_config_instamojo_table.php on line 7
+[21-Mar-2026 10:42:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_08_155212_create_notifications_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_04_08_155212_create_notifications_table.php on line 7
+[21-Mar-2026 10:43:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_12_25_163942_create_config_cybersource_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2018_12_25_163942_create_config_cybersource_table.php on line 7
+[21-Mar-2026 10:50:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_09_045614_add_order_invoice_pdf_template_and_shipping_label_pdf_template_columns_to_configs_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/database/migrations/2025_01_09_045614_add_order_invoice_pdf_template_and_shipping_label_pdf_template_columns_to_configs_table.php on line 7

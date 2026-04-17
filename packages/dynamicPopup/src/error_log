@@ -1,0 +1,8 @@
+[09-Feb-2026 01:42:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/src/DynamicPopupServiceProvider.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/src/DynamicPopupServiceProvider.php on line 7
+[21-Mar-2026 11:09:16 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/src/DynamicPopupServiceProvider.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/src/DynamicPopupServiceProvider.php on line 7

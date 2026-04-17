@@ -1,0 +1,16 @@
+[09-Feb-2026 01:22:53 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Ticket/SendAcknowledgementNotification.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Ticket/SendAcknowledgementNotification.php on line 9
+[09-Feb-2026 01:22:54 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Ticket/NotifyAssociatedUsersTicketReplied.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Ticket/NotifyAssociatedUsersTicketReplied.php on line 9
+[09-Feb-2026 01:22:56 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Ticket/NotifyUserTicketUpdated.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Ticket/NotifyUserTicketUpdated.php on line 9
+[09-Feb-2026 01:22:56 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Ticket/NotifyUserTicketAssigned.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Ticket/NotifyUserTicketAssigned.php on line 9

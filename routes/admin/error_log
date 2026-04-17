@@ -1,0 +1,488 @@
+[02-Jan-2026 14:07:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Account.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Account.php on line 6
+[04-Jan-2026 14:31:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Account.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Account.php on line 6
+[09-Feb-2026 00:31:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Config.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Config.php on line 7
+[09-Feb-2026 00:31:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Ticket.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Ticket.php on line 7
+[09-Feb-2026 00:32:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Blog.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Blog.php on line 6
+[09-Feb-2026 00:32:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Tax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Tax.php on line 7
+[09-Feb-2026 00:32:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Faq.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Faq.php on line 8
+[09-Feb-2026 00:32:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Shop.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Shop.php on line 8
+[09-Feb-2026 00:32:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/State.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/State.php on line 6
+[09-Feb-2026 00:32:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Coupon.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Coupon.php on line 7
+[09-Feb-2026 00:32:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Order.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Order.php on line 7
+[09-Feb-2026 00:32:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Theme.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Theme.php on line 7
+[09-Feb-2026 00:32:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Refund.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Refund.php on line 7
+[09-Feb-2026 00:32:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Promos.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Promos.php on line 7
+[09-Feb-2026 00:32:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Banner.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Banner.php on line 10
+[09-Feb-2026 00:32:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Slider.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Slider.php on line 9
+[09-Feb-2026 00:32:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/System.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/System.php on line 8
+[09-Feb-2026 00:32:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Report.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Report.php on line 8
+[09-Feb-2026 00:33:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Page.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Page.php on line 7
+[09-Feb-2026 00:33:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Cart.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Cart.php on line 6
+[09-Feb-2026 00:33:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/User.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/User.php on line 6
+[09-Feb-2026 00:33:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Auth.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Auth.php on line 7
+[09-Feb-2026 00:36:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Category.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Category.php on line 7
+[09-Feb-2026 00:36:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/GiftCard.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/GiftCard.php on line 7
+[09-Feb-2026 00:38:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/PdfTemplate.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/PdfTemplate.php on line 6
+[09-Feb-2026 00:38:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/SubscriptionPlan.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/SubscriptionPlan.php on line 7
+[09-Feb-2026 00:38:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/InventoryProduct.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/InventoryProduct.php on line 7
+[09-Feb-2026 00:39:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/FlashDeal.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/FlashDeal.php on line 6
+[09-Feb-2026 00:39:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Inventory.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Inventory.php on line 10
+[09-Feb-2026 00:40:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Currency.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Currency.php on line 6
+[09-Feb-2026 00:40:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/UserRole.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/UserRole.php on line 6
+[09-Feb-2026 00:41:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CategorySubGroup.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CategorySubGroup.php on line 7
+[09-Feb-2026 00:42:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Package.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Package.php on line 7
+[09-Feb-2026 00:42:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Merchant.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Merchant.php on line 8
+[09-Feb-2026 00:42:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Supplier.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Supplier.php on line 7
+[09-Feb-2026 00:42:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Customer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Customer.php on line 8
+[09-Feb-2026 00:42:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Language.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Language.php on line 7
+[09-Feb-2026 00:43:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/AttributeValues.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/AttributeValues.php on line 6
+[09-Feb-2026 00:43:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShopReport.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShopReport.php on line 7
+[09-Feb-2026 00:45:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Warehouse.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Warehouse.php on line 7
+[09-Feb-2026 00:45:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CustomCSS.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CustomCSS.php on line 6
+[09-Feb-2026 00:45:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Installer.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Installer.php on line 6
+[09-Feb-2026 00:46:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CategoryGroup.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CategoryGroup.php on line 7
+[09-Feb-2026 00:47:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Billing.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Billing.php on line 6
+[09-Feb-2026 00:49:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingConfig.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingConfig.php on line 7
+[09-Feb-2026 00:50:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Attribute.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Attribute.php on line 6
+[09-Feb-2026 00:55:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Carrier.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Carrier.php on line 7
+[09-Feb-2026 00:55:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Country.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Country.php on line 6
+[09-Feb-2026 00:55:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Product.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Product.php on line 9
+[09-Feb-2026 00:55:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Visitor.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Visitor.php on line 7
+[09-Feb-2026 00:55:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Message.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Message.php on line 7
+[09-Feb-2026 00:55:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Account.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Account.php on line 6
+[09-Feb-2026 01:00:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/EmailTemplate.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/EmailTemplate.php on line 6
+[09-Feb-2026 01:02:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Verification.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Verification.php on line 7
+[09-Feb-2026 01:02:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Notification.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Notification.php on line 6
+[09-Feb-2026 01:02:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingRate.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingRate.php on line 6
+[09-Feb-2026 01:02:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingZone.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingZone.php on line 6
+[09-Feb-2026 01:02:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Manufacturer.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Manufacturer.php on line 7
+[09-Feb-2026 01:05:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Dispute.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Dispute.php on line 6
+[09-Feb-2026 01:05:35 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/DeliveryBoy.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/DeliveryBoy.php on line 6
+[09-Feb-2026 01:22:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/SystemConfig.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/SystemConfig.php on line 7
+[09-Feb-2026 01:23:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/PaymentConfig.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/PaymentConfig.php on line 10
+[16-Mar-2026 18:59:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Language.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Language.php on line 7
+[16-Mar-2026 19:22:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Report.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Report.php on line 8
+[16-Mar-2026 19:29:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Inventory.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Inventory.php on line 10
+[16-Mar-2026 19:31:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/SubscriptionPlan.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/SubscriptionPlan.php on line 7
+[16-Mar-2026 19:43:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CustomCSS.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CustomCSS.php on line 6
+[16-Mar-2026 19:49:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Config.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Config.php on line 7
+[16-Mar-2026 19:57:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Slider.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Slider.php on line 9
+[16-Mar-2026 20:06:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Banner.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Banner.php on line 10
+[16-Mar-2026 20:16:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/AttributeValues.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/AttributeValues.php on line 6
+[16-Mar-2026 20:33:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/GiftCard.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/GiftCard.php on line 7
+[16-Mar-2026 20:47:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Ticket.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Ticket.php on line 7
+[16-Mar-2026 21:11:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Billing.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Billing.php on line 6
+[16-Mar-2026 22:05:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingZone.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingZone.php on line 6
+[16-Mar-2026 22:18:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/PdfTemplate.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/PdfTemplate.php on line 6
+[16-Mar-2026 22:27:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Package.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Package.php on line 7
+[16-Mar-2026 22:28:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CategorySubGroup.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CategorySubGroup.php on line 7
+[16-Mar-2026 22:32:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Category.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Category.php on line 7
+[16-Mar-2026 22:46:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Attribute.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Attribute.php on line 6
+[16-Mar-2026 22:52:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Tax.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Tax.php on line 7
+[16-Mar-2026 23:00:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Supplier.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Supplier.php on line 7
+[16-Mar-2026 23:14:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Currency.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Currency.php on line 6
+[16-Mar-2026 23:16:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Faq.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Faq.php on line 8
+[16-Mar-2026 23:27:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Shop.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Shop.php on line 8
+[16-Mar-2026 23:33:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/EmailTemplate.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/EmailTemplate.php on line 6
+[16-Mar-2026 23:46:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Refund.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Refund.php on line 7
+[16-Mar-2026 23:57:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Country.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Country.php on line 6
+[17-Mar-2026 00:01:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Installer.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Installer.php on line 6
+[17-Mar-2026 00:07:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Carrier.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Carrier.php on line 7
+[17-Mar-2026 00:24:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/UserRole.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/UserRole.php on line 6
+[17-Mar-2026 00:24:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/State.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/State.php on line 6
+[17-Mar-2026 00:26:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Visitor.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Visitor.php on line 7
+[17-Mar-2026 00:43:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Manufacturer.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Manufacturer.php on line 7
+[17-Mar-2026 00:44:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CategoryGroup.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/CategoryGroup.php on line 7
+[17-Mar-2026 01:10:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Blog.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Blog.php on line 6
+[17-Mar-2026 01:35:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Account.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Account.php on line 6
+[17-Mar-2026 01:48:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Auth.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Auth.php on line 7
+[17-Mar-2026 02:02:38 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/User.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/User.php on line 6
+[17-Mar-2026 02:03:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/DeliveryBoy.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/DeliveryBoy.php on line 6
+[17-Mar-2026 02:04:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingRate.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingRate.php on line 6
+[17-Mar-2026 02:45:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Theme.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Theme.php on line 7
+[17-Mar-2026 03:03:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Merchant.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Merchant.php on line 8
+[17-Mar-2026 03:18:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/PaymentConfig.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/PaymentConfig.php on line 10
+[17-Mar-2026 03:29:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Message.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Message.php on line 7
+[17-Mar-2026 03:39:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/FlashDeal.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/FlashDeal.php on line 6
+[17-Mar-2026 03:48:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingConfig.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShippingConfig.php on line 7
+[17-Mar-2026 04:14:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Cart.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Cart.php on line 6
+[17-Mar-2026 04:18:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Warehouse.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Warehouse.php on line 7
+[17-Mar-2026 04:22:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Promos.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Promos.php on line 7
+[17-Mar-2026 04:36:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Verification.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Verification.php on line 7
+[17-Mar-2026 05:04:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Notification.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Notification.php on line 6
+[17-Mar-2026 05:06:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Product.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Product.php on line 9
+[17-Mar-2026 05:13:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Coupon.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Coupon.php on line 7
+[17-Mar-2026 05:30:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/InventoryProduct.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/InventoryProduct.php on line 7
+[17-Mar-2026 06:00:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Order.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Order.php on line 7
+[17-Mar-2026 06:02:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShopReport.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/ShopReport.php on line 7
+[17-Mar-2026 06:03:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Customer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Customer.php on line 8
+[17-Mar-2026 06:23:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/SystemConfig.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/SystemConfig.php on line 7
+[17-Mar-2026 06:28:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/System.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/System.php on line 8
+[17-Mar-2026 07:01:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Dispute.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Dispute.php on line 6
+[17-Mar-2026 07:01:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Page.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/admin/Page.php on line 7

@@ -1,0 +1,32 @@
+[09-Feb-2026 01:30:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/common/Image.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/common/Image.php on line 6
+[09-Feb-2026 01:32:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/common/Address.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/common/Address.php on line 8
+[09-Feb-2026 01:36:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/common/Attachment.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/common/Attachment.php on line 6
+[09-Feb-2026 01:37:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/common/Search.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/common/Search.php on line 6
+[16-Mar-2026 19:30:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/common/Attachment.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/common/Attachment.php on line 6
+[16-Mar-2026 20:02:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/common/Address.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/common/Address.php on line 8
+[16-Mar-2026 22:11:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/common/Search.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/common/Search.php on line 6
+[17-Mar-2026 04:48:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/routes/common/Image.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/routes/common/Image.php on line 6

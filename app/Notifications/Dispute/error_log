@@ -1,0 +1,16 @@
+[09-Feb-2026 01:34:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Dispute/SendAcknowledgement.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Dispute/SendAcknowledgement.php on line 12
+[09-Feb-2026 01:34:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Dispute/Solved.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Dispute/Solved.php on line 12
+[09-Feb-2026 01:45:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Dispute/Created.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Dispute/Created.php on line 12
+[09-Feb-2026 01:45:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Dispute/Updated.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Dispute/Updated.php on line 12

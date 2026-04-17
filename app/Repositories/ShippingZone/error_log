@@ -1,0 +1,8 @@
+[09-Feb-2026 01:28:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Repositories\EloquentRepository" not found in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/ShippingZone/EloquentShippingZone.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/ShippingZone/EloquentShippingZone.php on line 12
+[30-Mar-2026 14:51:49 UTC] PHP Fatal error:  Uncaught Error: Class "App\Repositories\EloquentRepository" not found in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/ShippingZone/EloquentShippingZone.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/ShippingZone/EloquentShippingZone.php on line 12

@@ -1,0 +1,16 @@
+[09-Feb-2026 03:45:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Admin/Report/SalesReportController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Admin/Report/SalesReportController.php on line 11
+[09-Feb-2026 03:45:03 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Admin/Report/ShopPerformanceIndicatorsController.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Admin/Report/ShopPerformanceIndicatorsController.php on line 7
+[09-Feb-2026 03:45:04 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Admin/Report/PerformanceIndicatorsController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Admin/Report/PerformanceIndicatorsController.php on line 12
+[09-Feb-2026 03:54:09 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Admin/Report/VisitorController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Admin/Report/VisitorController.php on line 10

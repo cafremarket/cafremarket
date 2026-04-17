@@ -1,0 +1,50 @@
+[31-Dec-2025 18:22:10 Europe/London] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 4096 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/BinaryStream.php on line 149
+[31-Dec-2025 23:23:41 Africa/Lagos] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 20480 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/BinaryStream.php on line 217
+[31-Dec-2025 23:27:19 Africa/Lagos] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 20480 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/BinaryStream.php on line 217
+[31-Dec-2025 23:27:56 Africa/Lagos] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 20480 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/BinaryStream.php on line 217
+[31-Dec-2025 23:28:39 Africa/Lagos] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 20480 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/BinaryStream.php on line 217
+[01-Jan-2026 10:39:08 Africa/Lagos] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 4096 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/Glyph/Outline.php on line 52
+[01-Jan-2026 10:50:22 Africa/Lagos] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 4096 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/BinaryStream.php on line 149
+[01-Jan-2026 11:03:44 Africa/Lagos] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 4096 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/Glyph/Outline.php on line 52
+[01-Jan-2026 11:04:51 UTC] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 2111777 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/autoload_real.php on line 31
+[02-Jan-2026 13:42:33 UTC] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 2111777 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/autoload_real.php on line 31
+[03-Jan-2026 10:50:51 Africa/Harare] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 4096 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/Glyph/Outline.php on line 52
+[03-Jan-2026 11:00:33 Africa/Harare] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 4096 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/Glyph/Outline.php on line 52
+[03-Jan-2026 11:02:07 Africa/Harare] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 4096 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/BinaryStream.php on line 149
+[03-Jan-2026 11:02:28 Africa/Harare] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 4096 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/dompdf/php-font-lib/src/FontLib/BinaryStream.php on line 149
+[03-Jan-2026 09:06:01 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.2.29. in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/afnqtqmb/public_html/Cafrepay/vendor/composer/autoload_real.php(25): require()
+#1 /home/afnqtqmb/public_html/Cafrepay/vendor/autoload.php(22): ComposerAutoloaderInit23962531da3d2dc647ef5c404cc04795::getLoader()
+#2 /home/afnqtqmb/public_html/Cafrepay/public/index.php(42): require('/home/afnqtqmb/...')
+#3 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/platform_check.php on line 26
+[03-Jan-2026 09:06:04 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.2.29. in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/afnqtqmb/public_html/Cafrepay/vendor/composer/autoload_real.php(25): require()
+#1 /home/afnqtqmb/public_html/Cafrepay/vendor/autoload.php(22): ComposerAutoloaderInit23962531da3d2dc647ef5c404cc04795::getLoader()
+#2 /home/afnqtqmb/public_html/Cafrepay/public/index.php(42): require('/home/afnqtqmb/...')
+#3 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/platform_check.php on line 26
+[03-Jan-2026 09:06:08 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.2.29. in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/afnqtqmb/public_html/Cafrepay/vendor/composer/autoload_real.php(25): require()
+#1 /home/afnqtqmb/public_html/Cafrepay/vendor/autoload.php(22): ComposerAutoloaderInit23962531da3d2dc647ef5c404cc04795::getLoader()
+#2 /home/afnqtqmb/public_html/Cafrepay/public/index.php(42): require('/home/afnqtqmb/...')
+#3 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/platform_check.php on line 26
+[10-Jan-2026 07:53:36 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.2.29. in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/afnqtqmb/public_html/Cafrepay/vendor/composer/autoload_real.php(25): require()
+#1 /home/afnqtqmb/public_html/Cafrepay/vendor/autoload.php(22): ComposerAutoloaderInit23962531da3d2dc647ef5c404cc04795::getLoader()
+#2 /home/afnqtqmb/public_html/Cafrepay/public/index.php(42): require('/home/afnqtqmb/...')
+#3 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/platform_check.php on line 26
+[29-Jan-2026 15:41:30 Africa/Harare] PHP Fatal error:  Cannot use empty array elements in arrays in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/notifications.php on line 135
+[29-Jan-2026 15:42:10 Africa/Harare] PHP Fatal error:  Cannot use empty array elements in arrays in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/notifications.php on line 135
+[29-Jan-2026 19:14:47 Africa/Harare] PHP Fatal error:  Cannot use empty array elements in arrays in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/notifications.php on line 67
+[29-Jan-2026 19:30:25 Africa/Harare] PHP Fatal error:  Cannot use empty array elements in arrays in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/notifications.php on line 67
+[02-Feb-2026 20:07:52 Africa/Harare] PHP Fatal error:  Cannot use empty array elements in arrays in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/notifications.php on line 67
+[12-Feb-2026 19:50:13 Africa/Harare] PHP Fatal error:  Cannot use empty array elements in arrays in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/notifications.php on line 67
+[12-Feb-2026 19:53:32 Africa/Harare] PHP Fatal error:  Cannot use empty array elements in arrays in /home/afnqtqmb/public_html/Cafrepay/resources/lang/pt/notifications.php on line 67
+[14-Feb-2026 21:52:29 UTC] PHP Fatal error:  Couldn't execute method Illuminate\Container\Container::offsetGet in Unknown on line 0

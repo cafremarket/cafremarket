@@ -1,0 +1,32 @@
+[09-Feb-2026 00:46:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_28_084422_create_affiliate_commissions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_28_084422_create_affiliate_commissions_table.php on line 7
+[09-Feb-2026 00:46:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_21_040455_create_affiliates_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_21_040455_create_affiliates_table.php on line 8
+[09-Feb-2026 00:48:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_21_042302_create_affiliate_link_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_21_042302_create_affiliate_link_table.php on line 7
+[09-Feb-2026 00:59:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_29_055112_enable_affiliate_and_configs.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_29_055112_enable_affiliate_and_configs.php on line 7
+[21-Mar-2026 10:45:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_28_084422_create_affiliate_commissions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_28_084422_create_affiliate_commissions_table.php on line 7
+[21-Mar-2026 10:45:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_21_040455_create_affiliates_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_21_040455_create_affiliates_table.php on line 8
+[21-Mar-2026 10:45:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_21_042302_create_affiliate_link_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_21_042302_create_affiliate_link_table.php on line 7
+[21-Mar-2026 10:48:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_29_055112_enable_affiliate_and_configs.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/migrations/2024_05_29_055112_enable_affiliate_and_configs.php on line 7

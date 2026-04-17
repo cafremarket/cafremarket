@@ -1,0 +1,4 @@
+[30-Mar-2026 15:15:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/packages/liveChat/routes/web.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/liveChat/routes/web.php on line 7

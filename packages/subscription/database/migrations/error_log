@@ -1,0 +1,20 @@
+[09-Feb-2026 01:13:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2021_03_07_142449_add_custom_subsription_fee_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2021_03_07_142449_add_custom_subsription_fee_to_shops_table.php on line 7
+[09-Feb-2026 01:21:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2020_07_01_103906_add_nullable_on_subscriptions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2020_07_01_103906_add_nullable_on_subscriptions_table.php on line 7
+[10-Feb-2026 00:11:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2020_07_01_103906_add_nullable_on_subscriptions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2020_07_01_103906_add_nullable_on_subscriptions_table.php on line 7
+[21-Mar-2026 10:55:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2021_03_07_142449_add_custom_subsription_fee_to_shops_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2021_03_07_142449_add_custom_subsription_fee_to_shops_table.php on line 7
+[21-Mar-2026 10:58:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2020_07_01_103906_add_nullable_on_subscriptions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/database/migrations/2020_07_01_103906_add_nullable_on_subscriptions_table.php on line 7

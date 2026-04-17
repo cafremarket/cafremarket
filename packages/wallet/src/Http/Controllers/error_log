@@ -1,0 +1,32 @@
+[09-Feb-2026 03:30:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/TransferController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/TransferController.php on line 17
+[09-Feb-2026 03:30:18 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/WithdrawalController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/WithdrawalController.php on line 13
+[09-Feb-2026 03:30:19 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/DepositController.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/DepositController.php on line 21
+[09-Feb-2026 03:30:23 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/WalletController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/WalletController.php on line 9
+[21-Mar-2026 12:28:34 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/TransferController.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/TransferController.php on line 17
+[21-Mar-2026 12:28:35 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/WithdrawalController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/WithdrawalController.php on line 13
+[21-Mar-2026 12:28:36 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/WalletController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/WalletController.php on line 9
+[21-Mar-2026 12:28:36 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/DepositController.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Http/Controllers/DepositController.php on line 23

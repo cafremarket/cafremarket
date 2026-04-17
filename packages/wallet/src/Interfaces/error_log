@@ -1,0 +1,32 @@
+[09-Feb-2026 02:23:30 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Taxable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/MinimalTaxable.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/MinimalTaxable.php on line 5
+[09-Feb-2026 03:54:03 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Wallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Customer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Customer.php on line 8
+[09-Feb-2026 03:54:05 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Product" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Discount.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Discount.php on line 5
+[09-Feb-2026 03:55:23 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Wallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Product.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Product.php on line 5
+[21-Mar-2026 11:34:29 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Taxable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/MinimalTaxable.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/MinimalTaxable.php on line 5
+[21-Mar-2026 12:48:20 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Wallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Customer.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Customer.php on line 8
+[21-Mar-2026 12:48:23 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Product" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Discount.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Discount.php on line 5
+[21-Mar-2026 12:49:55 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Wallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Product.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Interfaces/Product.php on line 5

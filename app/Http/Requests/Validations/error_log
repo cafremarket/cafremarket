@@ -1,0 +1,652 @@
+[09-Feb-2026 02:00:18 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/FulfillOrderRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/FulfillOrderRequest.php on line 7
+[09-Feb-2026 02:00:19 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/AdminUpdateMerchantPasswordRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/AdminUpdateMerchantPasswordRequest.php on line 8
+[09-Feb-2026 02:00:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/AdminCustomerUpdatePasswordRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/AdminCustomerUpdatePasswordRequest.php on line 8
+[09-Feb-2026 02:00:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/QuickInventoryUpdateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/QuickInventoryUpdateRequest.php on line 7
+[09-Feb-2026 02:00:21 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCategoryGroupRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCategoryGroupRequest.php on line 7
+[09-Feb-2026 02:00:21 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCategoryGroupRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCategoryGroupRequest.php on line 7
+[09-Feb-2026 02:00:22 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ApiPaymentCredentialRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ApiPaymentCredentialRequest.php on line 7
+[09-Feb-2026 02:00:22 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateInventoryWithVariantRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateInventoryWithVariantRequest.php on line 7
+[09-Feb-2026 02:00:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateTrendingNowCategoryRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateTrendingNowCategoryRequest.php on line 8
+[09-Feb-2026 02:00:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ConfirmGoodsReceivedRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ConfirmGoodsReceivedRequest.php on line 8
+[09-Feb-2026 02:00:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBasicSystemConfigRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBasicSystemConfigRequest.php on line 7
+[09-Feb-2026 02:00:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateEmailTemplateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateEmailTemplateRequest.php on line 7
+[09-Feb-2026 02:00:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/PackageInstallationRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/PackageInstallationRequest.php on line 8
+[09-Feb-2026 02:00:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFeaturedItemsRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFeaturedItemsRequest.php on line 7
+[09-Feb-2026 02:00:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCategorySubGroupRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCategorySubGroupRequest.php on line 7
+[09-Feb-2026 02:00:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateMainNavCategoryRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateMainNavCategoryRequest.php on line 8
+[09-Feb-2026 02:00:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCategorySubGroupRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCategorySubGroupRequest.php on line 7
+[09-Feb-2026 02:00:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCatalogProductRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCatalogProductRequest.php on line 7
+[09-Feb-2026 02:00:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateAttributeValueRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateAttributeValueRequest.php on line 7
+[09-Feb-2026 02:00:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateAttributeValueRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateAttributeValueRequest.php on line 7
+[09-Feb-2026 02:00:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdatePromotionalTaglineRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdatePromotionalTaglineRequest.php on line 8
+[09-Feb-2026 02:00:31 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateSubscriptionPlanRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateSubscriptionPlanRequest.php on line 7
+[09-Feb-2026 02:00:31 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ToggleMaintenanceModeRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ToggleMaintenanceModeRequest.php on line 7
+[09-Feb-2026 02:00:32 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/AdminUserUpdatePasswordRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/AdminUserUpdatePasswordRequest.php on line 8
+[09-Feb-2026 02:00:32 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSubscriptionPlanRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSubscriptionPlanRequest.php on line 7
+[09-Feb-2026 02:00:33 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFeaturedVendorsRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFeaturedVendorsRequest.php on line 8
+[09-Feb-2026 02:00:33 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateShippingRateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateShippingRateRequest.php on line 7
+[09-Feb-2026 02:00:34 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ThemeInstallationRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ThemeInstallationRequest.php on line 8
+[09-Feb-2026 02:02:57 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/InitiateRefundRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/InitiateRefundRequest.php on line 8
+[09-Feb-2026 02:02:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateSupplierRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateSupplierRequest.php on line 7
+[09-Feb-2026 02:05:15 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ShippingOptionRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ShippingOptionRequest.php on line 7
+[09-Feb-2026 02:05:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCustomerRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCustomerRequest.php on line 7
+[09-Feb-2026 02:14:54 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFeaturedCategories.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFeaturedCategories.php on line 8
+[09-Feb-2026 02:21:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCarrierRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCarrierRequest.php on line 7
+[09-Feb-2026 02:21:59 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DisputeDetailRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DisputeDetailRequest.php on line 8
+[09-Feb-2026 02:21:59 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateMessageRequest.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateMessageRequest.php on line 11
+[09-Feb-2026 02:23:35 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ProductFeedbackCreateRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ProductFeedbackCreateRequest.php on line 8
+[09-Feb-2026 02:23:44 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/NewsletterSubscribeRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/NewsletterSubscribeRequest.php on line 7
+[09-Feb-2026 02:23:45 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateEmailTemplateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateEmailTemplateRequest.php on line 7
+[09-Feb-2026 02:24:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateRoleRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateRoleRequest.php on line 7
+[09-Feb-2026 02:25:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\FormRequest" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CustomCssRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CustomCssRequest.php on line 7
+[09-Feb-2026 02:25:12 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateTaxRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateTaxRequest.php on line 7
+[09-Feb-2026 02:25:13 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateFaqRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateFaqRequest.php on line 7
+[09-Feb-2026 02:25:13 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/FlashdealRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/FlashdealRequest.php on line 8
+[09-Feb-2026 02:25:14 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFaqRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFaqRequest.php on line 7
+[09-Feb-2026 02:25:56 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFeaturedBrandsRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFeaturedBrandsRequest.php on line 8
+[09-Feb-2026 02:25:56 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCatalogProductRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCatalogProductRequest.php on line 7
+[09-Feb-2026 02:26:43 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DraftSendRequest.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DraftSendRequest.php on line 9
+[09-Feb-2026 02:26:43 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ContactUsRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ContactUsRequest.php on line 7
+[09-Feb-2026 02:26:44 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateTaxRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateTaxRequest.php on line 7
+[09-Feb-2026 02:30:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateAttributeRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateAttributeRequest.php on line 7
+[09-Feb-2026 02:37:38 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateShopRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateShopRequest.php on line 7
+[09-Feb-2026 02:37:39 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCartRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCartRequest.php on line 7
+[09-Feb-2026 02:37:39 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateUserRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateUserRequest.php on line 7
+[09-Feb-2026 02:37:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateUserRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateUserRequest.php on line 7
+[09-Feb-2026 02:37:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateRoleRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateRoleRequest.php on line 7
+[09-Feb-2026 02:37:41 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCartRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCartRequest.php on line 7
+[09-Feb-2026 02:37:41 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdatePageRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdatePageRequest.php on line 8
+[09-Feb-2026 02:37:43 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateWarehouseRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateWarehouseRequest.php on line 7
+[09-Feb-2026 02:38:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSupplierRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSupplierRequest.php on line 7
+[09-Feb-2026 02:38:48 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SelfAddressDeleteRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SelfAddressDeleteRequest.php on line 8
+[09-Feb-2026 02:38:49 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateShippingRateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateShippingRateRequest.php on line 7
+[09-Feb-2026 02:38:49 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateShippingZoneRequest.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateShippingZoneRequest.php on line 9
+[09-Feb-2026 02:38:50 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateAnnouncementRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateAnnouncementRequest.php on line 7
+[09-Feb-2026 02:38:50 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateShippingZoneRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateShippingZoneRequest.php on line 7
+[09-Feb-2026 02:38:51 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateAnnouncementRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateAnnouncementRequest.php on line 7
+[09-Feb-2026 02:38:51 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateManufacturerRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateManufacturerRequest.php on line 8
+[09-Feb-2026 02:38:52 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DeleteAttachmentRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DeleteAttachmentRequest.php on line 7
+[09-Feb-2026 02:38:52 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ShopFeedbackCreateRequest.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ShopFeedbackCreateRequest.php on line 9
+[09-Feb-2026 02:39:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBlogRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBlogRequest.php on line 7
+[09-Feb-2026 02:39:41 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreatePageRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreatePageRequest.php on line 8
+[09-Feb-2026 02:39:42 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateBlogRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateBlogRequest.php on line 7
+[09-Feb-2026 02:40:45 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCurrencyRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCurrencyRequest.php on line 7
+[09-Feb-2026 02:40:45 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ArchiveMessageRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ArchiveMessageRequest.php on line 8
+[09-Feb-2026 02:40:46 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/GenerateAppKeyRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/GenerateAppKeyRequest.php on line 8
+[09-Feb-2026 02:40:46 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCategoryRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCategoryRequest.php on line 7
+[09-Feb-2026 02:40:47 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ReplyMyMessageRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ReplyMyMessageRequest.php on line 8
+[09-Feb-2026 02:40:48 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdatePasswordRequest.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdatePasswordRequest.php on line 10
+[09-Feb-2026 02:40:48 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCurrencyRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCurrencyRequest.php on line 7
+[09-Feb-2026 02:40:49 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DirectCheckoutRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DirectCheckoutRequest.php on line 7
+[09-Feb-2026 02:40:49 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateGiftCardRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateGiftCardRequest.php on line 7
+[09-Feb-2026 02:40:50 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ExportCategoryRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ExportCategoryRequest.php on line 7
+[09-Feb-2026 02:40:51 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CustomerSearchRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CustomerSearchRequest.php on line 7
+[09-Feb-2026 02:40:51 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateMerchantRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateMerchantRequest.php on line 7
+[09-Feb-2026 02:40:52 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/MerchantImportRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/MerchantImportRequest.php on line 7
+[09-Feb-2026 02:40:53 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CustomerImportRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CustomerImportRequest.php on line 7
+[09-Feb-2026 02:40:53 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/MerchantVerifyRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/MerchantVerifyRequest.php on line 8
+[09-Feb-2026 02:40:54 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateGiftCardRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateGiftCardRequest.php on line 7
+[09-Feb-2026 02:40:54 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCategoryRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCategoryRequest.php on line 7
+[09-Feb-2026 02:40:55 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateLanguageRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateLanguageRequest.php on line 7
+[09-Feb-2026 02:40:55 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFaqTopicRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateFaqTopicRequest.php on line 7
+[09-Feb-2026 02:40:56 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/MerchantUploadRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/MerchantUploadRequest.php on line 7
+[09-Feb-2026 02:40:57 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCustomerRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCustomerRequest.php on line 7
+[09-Feb-2026 02:40:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateFaqTopicRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateFaqTopicRequest.php on line 7
+[09-Feb-2026 02:40:59 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CustomerUploadRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CustomerUploadRequest.php on line 7
+[09-Feb-2026 02:40:59 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateLanguageRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateLanguageRequest.php on line 7
+[09-Feb-2026 02:41:00 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateMerchantRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateMerchantRequest.php on line 8
+[09-Feb-2026 02:53:01 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateAddressRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateAddressRequest.php on line 7
+[09-Feb-2026 02:53:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ReplyMessageRequest.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ReplyMessageRequest.php on line 9
+[09-Feb-2026 02:53:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateMessageRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateMessageRequest.php on line 7
+[09-Feb-2026 02:53:03 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ReplyDisputeRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ReplyDisputeRequest.php on line 8
+[09-Feb-2026 02:53:03 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateDisputeRequest.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateDisputeRequest.php on line 9
+[09-Feb-2026 02:53:04 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateAddressRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateAddressRequest.php on line 7
+[09-Feb-2026 02:53:04 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCouponRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCouponRequest.php on line 7
+[09-Feb-2026 02:53:05 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCouponRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCouponRequest.php on line 7
+[09-Feb-2026 02:53:05 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ResetDatabaseRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ResetDatabaseRequest.php on line 8
+[09-Feb-2026 02:55:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCarrierRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCarrierRequest.php on line 7
+[09-Feb-2026 02:55:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateTicketRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateTicketRequest.php on line 7
+[09-Feb-2026 02:55:21 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateProductRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateProductRequest.php on line 7
+[09-Feb-2026 02:55:22 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateBannerRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateBannerRequest.php on line 7
+[09-Feb-2026 02:55:23 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/BrowseProductRequest.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/BrowseProductRequest.php on line 9
+[09-Feb-2026 02:55:23 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ApiUpdateCartRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ApiUpdateCartRequest.php on line 7
+[09-Feb-2026 02:55:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CheckoutCartRequest.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CheckoutCartRequest.php on line 13
+[09-Feb-2026 02:55:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/AddInventoryRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/AddInventoryRequest.php on line 7
+[09-Feb-2026 02:55:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ProductImportRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ProductImportRequest.php on line 7
+[09-Feb-2026 02:55:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ContactSellerRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ContactSellerRequest.php on line 8
+[09-Feb-2026 02:55:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSystemRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSystemRequest.php on line 7
+[09-Feb-2026 02:55:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ProductUploadRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ProductUploadRequest.php on line 8
+[09-Feb-2026 02:55:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCountryRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateCountryRequest.php on line 7
+[09-Feb-2026 02:55:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBannerRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBannerRequest.php on line 7
+[09-Feb-2026 02:55:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ProductSearchRequest.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ProductSearchRequest.php on line 9
+[09-Feb-2026 02:55:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSliderRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSliderRequest.php on line 7
+[09-Feb-2026 02:55:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCountryRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateCountryRequest.php on line 7
+[09-Feb-2026 02:55:31 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateSliderRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateSliderRequest.php on line 7
+[09-Feb-2026 02:55:31 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateProfileRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateProfileRequest.php on line 8
+[09-Feb-2026 02:55:32 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateConfigRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateConfigRequest.php on line 7
+[09-Feb-2026 02:55:33 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateProductRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateProductRequest.php on line 8
+[09-Feb-2026 02:55:34 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateTicketRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateTicketRequest.php on line 8
+[09-Feb-2026 02:57:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateStateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateStateRequest.php on line 7
+[09-Feb-2026 02:57:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateStateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateStateRequest.php on line 7
+[09-Feb-2026 02:57:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdatePhotoRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdatePhotoRequest.php on line 8
+[09-Feb-2026 02:57:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DeletePhotoRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/DeletePhotoRequest.php on line 7
+[09-Feb-2026 03:00:33 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SaveEnvFileRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SaveEnvFileRequest.php on line 8
+[09-Feb-2026 03:00:34 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SpcialLoginRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SpcialLoginRequest.php on line 7
+[09-Feb-2026 03:00:35 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateOrderRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateOrderRequest.php on line 7
+[09-Feb-2026 03:00:36 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/OrderDetailRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/OrderDetailRequest.php on line 8
+[09-Feb-2026 03:00:36 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ReplyTicketRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ReplyTicketRequest.php on line 8
+[09-Feb-2026 03:03:44 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSystemConfigRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateSystemConfigRequest.php on line 7
+[09-Feb-2026 03:08:53 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBestFindsRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBestFindsRequest.php on line 7
+[09-Feb-2026 03:08:54 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ResponseDisputeRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/ResponseDisputeRequest.php on line 8
+[09-Feb-2026 03:12:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateInventoryRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateInventoryRequest.php on line 8
+[09-Feb-2026 03:12:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/InventoryUpdateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/InventoryUpdateRequest.php on line 7
+[09-Feb-2026 03:12:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/InventoryImportRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/InventoryImportRequest.php on line 7
+[09-Feb-2026 03:12:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateAttributeRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateAttributeRequest.php on line 7
+[09-Feb-2026 03:12:31 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/InventoryUploadRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/InventoryUploadRequest.php on line 7
+[09-Feb-2026 03:12:32 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateInventoryRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateInventoryRequest.php on line 8
+[09-Feb-2026 03:12:32 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateWarehouseRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateWarehouseRequest.php on line 7
+[09-Feb-2026 03:14:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/OrderCancellationRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/OrderCancellationRequest.php on line 8
+[09-Feb-2026 03:14:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SelfAddressUpdateRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SelfAddressUpdateRequest.php on line 8
+[09-Feb-2026 03:14:21 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/PdfTemplateUpateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/PdfTemplateUpateRequest.php on line 7
+[09-Feb-2026 03:14:22 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/OrderConversationRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/OrderConversationRequest.php on line 8
+[09-Feb-2026 03:14:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\FormRequest" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateDeliveryBoyRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/CreateDeliveryBoyRequest.php on line 7
+[09-Feb-2026 03:14:23 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/RegisterMerchantRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/RegisterMerchantRequest.php on line 8
+[09-Feb-2026 03:14:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/RegisterCustomerRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/RegisterCustomerRequest.php on line 7
+[09-Feb-2026 03:14:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateDeliveryBoyRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateDeliveryBoyRequest.php on line 8
+[09-Feb-2026 03:14:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateTrialPeriodRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateTrialPeriodRequest.php on line 7
+[09-Feb-2026 03:14:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateDealOfTheDayRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateDealOfTheDayRequest.php on line 7
+[09-Feb-2026 03:14:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SelfPasswordUpdateRequest.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SelfPasswordUpdateRequest.php on line 10
+[09-Feb-2026 03:14:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBasicConfigRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateBasicConfigRequest.php on line 7
+[09-Feb-2026 03:14:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/PdfTemplateCreateRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/PdfTemplateCreateRequest.php on line 7
+[09-Feb-2026 03:14:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateManufacturerRequest.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/UpdateManufacturerRequest.php on line 7
+[09-Feb-2026 03:14:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SelfAvatarUpdateRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/SelfAvatarUpdateRequest.php on line 8
+[09-Feb-2026 03:45:33 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/RefundRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Validations/RefundRequest.php on line 8

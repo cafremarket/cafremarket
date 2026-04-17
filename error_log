@@ -1,0 +1,2 @@
+
+[12-Mar-2026 08:35:29 UTC] PHP Fatal error:  Allowed memory size of 67108864 bytes exhausted (tried to allocate 2117220 bytes) in /home/afnqtqmb/public_html/Cafrepay/vendor/composer/autoload_real.php on line 31

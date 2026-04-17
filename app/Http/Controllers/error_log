@@ -1,0 +1,40 @@
+[09-Feb-2026 01:22:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Routing\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Controller.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Controller.php on line 10
+[09-Feb-2026 01:25:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/SocialiteBaseController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/SocialiteBaseController.php on line 12
+[09-Feb-2026 01:25:37 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/AttachmentController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/AttachmentController.php on line 10
+[09-Feb-2026 01:32:34 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/AddressController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/AddressController.php on line 11
+[09-Feb-2026 01:32:34 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/FormDataController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/FormDataController.php on line 10
+[09-Feb-2026 01:32:35 UTC] PHP Fatal error:  Uncaught Error: Class "Laravel\Cashier\Http\Controllers\WebhookController" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/WebhookController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/WebhookController.php on line 12
+[09-Feb-2026 01:32:35 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/ContactUsController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/ContactUsController.php on line 10
+[09-Feb-2026 01:37:34 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/SearchController.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/SearchController.php on line 19
+[09-Feb-2026 01:37:35 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/LocaleController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/LocaleController.php on line 8
+[09-Feb-2026 01:38:15 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/ImageController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/ImageController.php on line 14

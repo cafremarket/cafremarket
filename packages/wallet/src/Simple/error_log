@@ -1,0 +1,40 @@
+[09-Feb-2026 03:12:41 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Simple\BCMath" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/BrickMath.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/BrickMath.php on line 11
+[09-Feb-2026 03:18:44 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Mathable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Math.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Math.php on line 12
+[09-Feb-2026 03:18:46 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Rateable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Rate.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Rate.php on line 12
+[09-Feb-2026 03:28:16 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Simple\Math" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/BCMath.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/BCMath.php on line 10
+[09-Feb-2026 03:46:40 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Storable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Store.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Store.php on line 9
+[21-Mar-2026 12:12:31 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Simple\BCMath" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/BrickMath.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/BrickMath.php on line 11
+[21-Mar-2026 12:17:54 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Rateable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Rate.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Rate.php on line 12
+[21-Mar-2026 12:17:55 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Mathable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Math.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Math.php on line 12
+[21-Mar-2026 12:26:21 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Simple\Math" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/BCMath.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/BCMath.php on line 10
+[21-Mar-2026 12:44:06 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\Wallet\Interfaces\Storable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Store.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Simple/Store.php on line 9

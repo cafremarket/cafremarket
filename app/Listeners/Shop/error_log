@@ -1,0 +1,24 @@
+[09-Feb-2026 01:07:43 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopDownForMaintainace.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopDownForMaintainace.php on line 9
+[09-Feb-2026 01:07:44 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantConfigUpdated.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantConfigUpdated.php on line 9
+[09-Feb-2026 01:07:44 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopDeleted.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopDeleted.php on line 11
+[09-Feb-2026 01:07:45 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopCreated.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopCreated.php on line 9
+[09-Feb-2026 01:07:45 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopUpdated.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopUpdated.php on line 9
+[09-Feb-2026 01:07:46 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopIsLive.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Shop/NotifyMerchantShopIsLive.php on line 9

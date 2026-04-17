@@ -1,0 +1,20 @@
+[09-Feb-2026 01:08:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\FormRequest" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/FlatformUserAccessRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/FlatformUserAccessRequest.php on line 8
+[09-Feb-2026 01:09:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\FormRequest" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/AdminOnlyAccessRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/AdminOnlyAccessRequest.php on line 8
+[09-Feb-2026 01:15:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\FormRequest" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Request.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/Request.php on line 7
+[09-Feb-2026 01:34:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\FormRequest" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/PromotionAccessRequest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/PromotionAccessRequest.php on line 8
+[09-Feb-2026 01:43:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Requests\Request" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/SecretLoginRequest.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Requests/SecretLoginRequest.php on line 5

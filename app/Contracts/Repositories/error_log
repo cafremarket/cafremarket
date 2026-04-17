@@ -1,0 +1,1 @@
+[09-Feb-2026 01:30:54 UTC] PHP Fatal error:  Access type for interface method App\Contracts\Repositories\InvoiceRepository::create() must be public in /home/afnqtqmb/public_html/Cafrepay/app/Contracts/Repositories/InvoiceRepository.php on line 14

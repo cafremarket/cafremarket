@@ -1,0 +1,4 @@
+[09-Feb-2026 00:53:16 UTC] PHP Warning:  Undefined variable $chartDataArray in /home/afnqtqmb/public_html/Cafrepay/resources/views/plugins/report-payment.blade.php on line 18
+[09-Feb-2026 00:53:16 UTC] PHP Warning:  Undefined variable $paymentStatus in /home/afnqtqmb/public_html/Cafrepay/resources/views/plugins/report-payment.blade.php on line 20
+[09-Feb-2026 00:53:16 UTC] PHP Warning:  Undefined variable $paymentMethod in /home/afnqtqmb/public_html/Cafrepay/resources/views/plugins/report-payment.blade.php on line 22
+[09-Feb-2026 00:53:42 UTC] PHP Warning:  Undefined variable $chartDataArray in /home/afnqtqmb/public_html/Cafrepay/resources/views/plugins/report-orders.blade.php on line 12

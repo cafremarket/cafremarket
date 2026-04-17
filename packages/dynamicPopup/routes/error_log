@@ -1,0 +1,12 @@
+[09-Feb-2026 01:35:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/routes/routes.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/routes/routes.php on line 6
+[09-Feb-2026 20:20:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/routes/routes.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/routes/routes.php on line 6
+[21-Mar-2026 11:06:25 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/routes/routes.php:6
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/routes/routes.php on line 6

@@ -1,0 +1,4 @@
+[09-Feb-2026 01:40:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Exceptions\Handler" not found in /home/afnqtqmb/public_html/Cafrepay/app/Exceptions/Handler.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Exceptions/Handler.php on line 13

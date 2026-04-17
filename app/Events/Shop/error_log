@@ -1,0 +1,6 @@
+[09-Feb-2026 01:29:21 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/Shop/DownForMaintainace.php on line 9
+[09-Feb-2026 02:05:11 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/Shop/ConfigUpdated.php on line 10
+[09-Feb-2026 03:33:04 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/Shop/ShopDeleted.php on line 8
+[09-Feb-2026 03:33:05 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/Shop/ShopUpdated.php on line 9
+[09-Feb-2026 03:56:18 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/Shop/ShopCreated.php on line 9
+[09-Feb-2026 03:59:09 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/Shop/ShopIsLive.php on line 9

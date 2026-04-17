@@ -1,0 +1,4 @@
+[30-Mar-2026 14:53:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/liveChat/src/LiveChatServiceProvider.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/liveChat/src/LiveChatServiceProvider.php on line 10

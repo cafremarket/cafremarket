@@ -1,0 +1,16 @@
+[09-Feb-2026 03:40:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Storefront/Auth/RegisterController.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Storefront/Auth/RegisterController.php on line 16
+[09-Feb-2026 03:40:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Storefront/Auth/ResetPasswordController.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Storefront/Auth/ResetPasswordController.php on line 15
+[09-Feb-2026 03:40:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Storefront/Auth/ForgotPasswordController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Storefront/Auth/ForgotPasswordController.php on line 10
+[09-Feb-2026 03:40:34 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\SocialiteBaseController" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Storefront/Auth/LoginController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Controllers/Storefront/Auth/LoginController.php on line 13

@@ -1,0 +1,8 @@
+[09-Feb-2026 01:37:14 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Inventory/ProcessedCsvImport.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Inventory/ProcessedCsvImport.php on line 10
+[09-Feb-2026 01:37:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Inventory/LowInventory.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Inventory/LowInventory.php on line 10

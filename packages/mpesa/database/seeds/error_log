@@ -1,0 +1,16 @@
+[09-Feb-2026 02:40:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Seeder" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/seeds/MPesaSeeder.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/seeds/MPesaSeeder.php on line 10
+[09-Feb-2026 09:38:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Seeder" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/seeds/MPesaSeeder.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/seeds/MPesaSeeder.php on line 10
+[09-Feb-2026 14:53:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Seeder" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/seeds/MPesaSeeder.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/seeds/MPesaSeeder.php on line 10
+[21-Mar-2026 11:44:39 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Seeder" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/seeds/MPesaSeeder.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/database/seeds/MPesaSeeder.php on line 10

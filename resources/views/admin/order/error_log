@@ -1,0 +1,6 @@
+[09-Feb-2026 01:11:22 UTC] PHP Warning:  Undefined variable $i in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/order/_cart.blade.php on line 40
+[09-Feb-2026 01:27:26 UTC] PHP Warning:  Undefined variable $payment_methods in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/order/create.blade.php on line 312
+[09-Feb-2026 01:27:26 UTC] PHP Warning:  Undefined variable $billing_address in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/order/create.blade.php on line 318
+[09-Feb-2026 01:27:26 UTC] PHP Warning:  Undefined variable $packaging_options in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/order/create.blade.php on line 327
+[09-Feb-2026 01:27:26 UTC] PHP Warning:  Undefined variable $shipping_options in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/order/create.blade.php on line 330
+[09-Feb-2026 01:27:26 UTC] PHP Warning:  Undefined variable $inventories in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/order/create.blade.php on line 331

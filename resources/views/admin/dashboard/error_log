@@ -1,0 +1,15 @@
+[09-Feb-2026 01:11:32 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function trans() in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/merchant.blade.php:320
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/merchant.blade.php on line 320
+[09-Feb-2026 02:16:29 UTC] PHP Warning:  Undefined variable $admin_created_total_product_count in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/platform.blade.php on line 541
+[09-Feb-2026 02:16:29 UTC] PHP Warning:  Undefined variable $merchant_created_total_product_count in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/platform.blade.php on line 541
+[09-Feb-2026 02:16:29 UTC] PHP Warning:  Undefined variable $admin_created_total_product_count in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/platform.blade.php on line 541
+[09-Feb-2026 02:16:29 UTC] PHP Warning:  Undefined variable $merchant_created_total_product_count in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/platform.blade.php on line 541
+[09-Feb-2026 02:16:29 UTC] PHP Warning:  Undefined variable $total_weekly_sale_report in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/platform.blade.php on line 549
+[09-Feb-2026 02:16:29 UTC] PHP Warning:  Undefined variable $total_monthly_sale_report in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/platform.blade.php on line 550
+[09-Feb-2026 02:16:29 UTC] PHP Warning:  Undefined variable $total_yearly_sale_report in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/platform.blade.php on line 551
+[09-Feb-2026 02:16:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Helpers\ChartHelper" not found in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/platform.blade.php:558
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/views/admin/dashboard/platform.blade.php on line 558

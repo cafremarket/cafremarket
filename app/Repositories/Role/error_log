@@ -1,0 +1,4 @@
+[09-Feb-2026 01:58:03 UTC] PHP Fatal error:  Uncaught Error: Class "App\Repositories\EloquentRepository" not found in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Role/EloquentRole.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Role/EloquentRole.php on line 13

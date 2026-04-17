@@ -1,0 +1,8 @@
+[09-Feb-2026 03:38:53 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\wallet\Repositories\Payouts\PayoutsRepository" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Repositories/Payouts/EloquentPayoutsRepository.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Repositories/Payouts/EloquentPayoutsRepository.php on line 9
+[21-Mar-2026 12:36:51 UTC] PHP Fatal error:  Uncaught Error: Interface "Incevio\Package\wallet\Repositories\Payouts\PayoutsRepository" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Repositories/Payouts/EloquentPayoutsRepository.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Repositories/Payouts/EloquentPayoutsRepository.php on line 9

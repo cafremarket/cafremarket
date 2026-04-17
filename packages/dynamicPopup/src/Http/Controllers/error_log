@@ -1,0 +1,8 @@
+[09-Feb-2026 03:34:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/src/Http/Controllers/PopupController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/src/Http/Controllers/PopupController.php on line 12
+[21-Mar-2026 12:32:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/src/Http/Controllers/PopupController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/dynamicPopup/src/Http/Controllers/PopupController.php on line 12

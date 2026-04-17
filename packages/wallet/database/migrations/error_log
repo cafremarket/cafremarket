@@ -1,0 +1,48 @@
+[09-Feb-2026 01:05:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_05_124230_create_wallets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_05_124230_create_wallets_table.php on line 7
+[09-Feb-2026 01:05:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_28_082306_add_credit_back_percentage_system.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_28_082306_add_credit_back_percentage_system.php on line 9
+[09-Feb-2026 01:05:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_28_153006_add_order_id_to_transactions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_28_153006_add_order_id_to_transactions_table.php on line 7
+[09-Feb-2026 01:05:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_27_074829_change_enums_at_tranfers_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_27_074829_change_enums_at_tranfers_table.php on line 8
+[09-Feb-2026 01:05:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_07_192923_create_transfers_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_07_192923_create_transfers_table.php on line 8
+[09-Feb-2026 01:05:19 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_06_222923_create_transactions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_06_222923_create_transactions_table.php on line 7
+[21-Mar-2026 10:52:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_05_124230_create_wallets_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_05_124230_create_wallets_table.php on line 7
+[21-Mar-2026 10:52:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_28_082306_add_credit_back_percentage_system.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_28_082306_add_credit_back_percentage_system.php on line 9
+[21-Mar-2026 10:52:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_28_153006_add_order_id_to_transactions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_28_153006_add_order_id_to_transactions_table.php on line 7
+[21-Mar-2026 10:52:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_27_074829_change_enums_at_tranfers_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2024_05_27_074829_change_enums_at_tranfers_table.php on line 8
+[21-Mar-2026 10:52:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_07_192923_create_transfers_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_07_192923_create_transfers_table.php on line 8
+[21-Mar-2026 10:52:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_06_222923_create_transactions_table.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/database/migrations/2018_11_06_222923_create_transactions_table.php on line 7

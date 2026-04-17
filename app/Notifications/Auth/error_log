@@ -1,0 +1,12 @@
+[09-Feb-2026 01:28:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Auth/UserResetPasswordNotification.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Auth/UserResetPasswordNotification.php on line 10
+[09-Feb-2026 01:28:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Auth/SendVerificationEmail.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Auth/SendVerificationEmail.php on line 11
+[09-Feb-2026 01:28:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Auth/CustomerResetPasswordNotification.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Auth/CustomerResetPasswordNotification.php on line 10

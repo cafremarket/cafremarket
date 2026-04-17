@@ -1,0 +1,20 @@
+[09-Feb-2026 01:15:44 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php on line 7
+[26-Mar-2026 06:43:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php on line 7
+[26-Mar-2026 17:48:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php on line 7
+[28-Mar-2026 17:48:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php on line 7
+[30-Mar-2026 19:51:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Http\Kernel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Kernel.php on line 7

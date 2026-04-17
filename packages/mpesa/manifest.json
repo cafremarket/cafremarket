@@ -1,0 +1,18 @@
+{
+  "id": 19,
+  "slug": "mpesa",
+  "name": "M-Pesa Mozambique",
+  "description": "M-Pesa Mozambique (Vodacom Open API) payment for your marketplace",
+  "icon": "money",
+  "dir": "mpesa",
+  "author": "Incevio Team",
+  "email": "help@incevio.com",
+  "uri": "https://incevio.com",
+  "license": "Copyright reserved to the Incevio",
+  "dependency": "",
+  "warning": "",
+  "active": true,
+  "provider": "MPesa\\MPesaServiceProvider",
+  "compatible": "2.8.0",
+  "version": "1.2.0"
+}

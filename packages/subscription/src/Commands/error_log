@@ -1,0 +1,8 @@
+[09-Feb-2026 02:09:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Commands/ChargeSubscriptionFee.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Commands/ChargeSubscriptionFee.php on line 22
+[21-Mar-2026 11:28:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Console\Command" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Commands/ChargeSubscriptionFee.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Commands/ChargeSubscriptionFee.php on line 22

@@ -1,0 +1,8 @@
+[09-Feb-2026 03:31:46 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Objects\Operation" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Objects/Operation.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Objects/Operation.php on line 5
+[21-Mar-2026 12:29:42 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Objects\Operation" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Objects/Operation.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/Objects/Operation.php on line 5

@@ -1,0 +1,4 @@
+[09-Feb-2026 01:09:49 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/System/DownForMaintainace.php on line 9
+[09-Feb-2026 01:14:54 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/System/SystemConfigUpdated.php on line 10
+[09-Feb-2026 01:33:50 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/System/SystemIsLive.php on line 9
+[09-Feb-2026 01:59:59 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/System/SystemInfoUpdated.php on line 10

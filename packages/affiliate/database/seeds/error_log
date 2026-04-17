@@ -1,0 +1,8 @@
+[09-Feb-2026 01:48:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Seeder" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/seeds/AffiliateSeeder.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/seeds/AffiliateSeeder.php on line 10
+[21-Mar-2026 11:12:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Seeder" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/seeds/AffiliateSeeder.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/database/seeds/AffiliateSeeder.php on line 10

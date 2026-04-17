@@ -1,0 +1,20 @@
+[09-Feb-2026 01:02:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionServiceProvider.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionServiceProvider.php on line 30
+[09-Feb-2026 01:02:56 UTC] PHP Fatal error:  Uncaught Error: Class "Laravel\Cashier\SubscriptionBuilder" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionBuilder.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionBuilder.php on line 9
+[09-Feb-2026 19:56:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionServiceProvider.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionServiceProvider.php on line 30
+[21-Mar-2026 10:50:27 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionServiceProvider.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionServiceProvider.php on line 30
+[21-Mar-2026 10:50:33 UTC] PHP Fatal error:  Uncaught Error: Class "Laravel\Cashier\SubscriptionBuilder" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionBuilder.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/SubscriptionBuilder.php on line 9

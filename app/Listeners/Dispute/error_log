@@ -1,0 +1,16 @@
+[09-Feb-2026 01:28:19 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Dispute/SendAcknowledgementNotification.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Dispute/SendAcknowledgementNotification.php on line 9
+[09-Feb-2026 01:28:20 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Dispute/NotifyCustomerDisputeUpdated.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Dispute/NotifyCustomerDisputeUpdated.php on line 10
+[09-Feb-2026 01:28:20 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Dispute/NotifyMerchantDisputeCreated.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Dispute/NotifyMerchantDisputeCreated.php on line 9
+[09-Feb-2026 01:28:21 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Dispute/NotifyCustomerDisputeSolved.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Dispute/NotifyCustomerDisputeSolved.php on line 9

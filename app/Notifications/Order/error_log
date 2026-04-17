@@ -1,0 +1,44 @@
+[09-Feb-2026 01:49:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/MerchantNewOrderCancellation.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/MerchantNewOrderCancellation.php on line 12
+[09-Feb-2026 01:49:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderCancellationApproved.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderCancellationApproved.php on line 13
+[09-Feb-2026 01:49:08 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/MerchantOrderCreatedNotification.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/MerchantOrderCreatedNotification.php on line 13
+[09-Feb-2026 01:49:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/PaymentFailed.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/PaymentFailed.php on line 13
+[09-Feb-2026 01:49:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderCancellationDeclined.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderCancellationDeclined.php on line 13
+[09-Feb-2026 01:49:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/AcknowledgeOrderCancellationRequest.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/AcknowledgeOrderCancellationRequest.php on line 13
+[09-Feb-2026 01:49:10 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderFulfilled.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderFulfilled.php on line 14
+[09-Feb-2026 01:49:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderCanceled.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderCanceled.php on line 14
+[09-Feb-2026 01:49:11 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderBeenPaid.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderBeenPaid.php on line 13
+[09-Feb-2026 01:49:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderUpdated.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderUpdated.php on line 13
+[09-Feb-2026 01:49:16 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderCreated.php:15
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Notifications/Order/OrderCreated.php on line 15

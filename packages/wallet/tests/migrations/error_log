@@ -1,0 +1,8 @@
+[09-Feb-2026 01:22:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/migrations/2019_09_19_191432_alter_column_transaction_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/migrations/2019_09_19_191432_alter_column_transaction_table.php on line 8
+[21-Mar-2026 10:59:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Migrations\Migration" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/migrations/2019_09_19_191432_alter_column_transaction_table.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/tests/migrations/2019_09_19_191432_alter_column_transaction_table.php on line 8

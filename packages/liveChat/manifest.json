@@ -1,0 +1,18 @@
+{
+  "id": 29,
+  "slug": "liveChat",
+  "name": "Live Chat",
+  "description": "A Package to allow user to livechat with vendor",
+  "icon": "comment",
+  "dir": "liveChat",
+  "author": "Incevio Team",
+  "email": "help@incevio.com",
+  "uri": "https://incevio.com",
+  "license": "Copyright reserved to the Incevio",
+  "dependency": "",
+  "warning": "This plugin requires <a href='https://pusher.com/' target='_blank'>Pusher</a> to sync chat messages on both ends.",
+  "active": false,
+  "provider": "LiveChat\\LiveChatServiceProvider",
+  "compatible": "2.13.0",
+  "version": "1.1.0"
+}

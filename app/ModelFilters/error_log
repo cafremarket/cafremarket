@@ -1,0 +1,4 @@
+[09-Feb-2026 00:48:53 UTC] PHP Fatal error:  Uncaught Error: Class "EloquentFilter\ModelFilter" not found in /home/afnqtqmb/public_html/Cafrepay/app/ModelFilters/InventoryFilter.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/ModelFilters/InventoryFilter.php on line 9

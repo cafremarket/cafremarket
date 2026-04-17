@@ -1,0 +1,8 @@
+[09-Feb-2026 01:35:50 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Inventory/NotifyMerchantStockOut.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Inventory/NotifyMerchantStockOut.php on line 8
+[09-Feb-2026 01:35:51 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Inventory/NotifyMerchantInventoryLow.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/Inventory/NotifyMerchantInventoryLow.php on line 8

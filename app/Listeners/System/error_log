@@ -1,0 +1,16 @@
+[09-Feb-2026 01:24:25 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/System/NotifyAdminConfigUpdated.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/System/NotifyAdminConfigUpdated.php on line 9
+[09-Feb-2026 01:24:26 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/System/NotifyAdminSystemIsDown.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/System/NotifyAdminSystemIsDown.php on line 9
+[09-Feb-2026 01:24:27 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/System/NotifyAdminSystemIsLive.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/System/NotifyAdminSystemIsLive.php on line 9
+[09-Feb-2026 01:24:27 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Queue\ShouldQueue" not found in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/System/NotifyAdminSystemUpdated.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Listeners/System/NotifyAdminSystemUpdated.php on line 9

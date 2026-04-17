@@ -1,0 +1,72 @@
+[09-Feb-2026 02:46:12 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/LoginController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/LoginController.php on line 10
+[09-Feb-2026 02:46:13 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/FrontController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/FrontController.php on line 11
+[09-Feb-2026 02:46:13 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/DashboardController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/DashboardController.php on line 9
+[09-Feb-2026 02:46:14 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AccountController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AccountController.php on line 10
+[09-Feb-2026 02:46:14 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/ChartDataController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/ChartDataController.php on line 8
+[09-Feb-2026 02:46:15 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AffiliateController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AffiliateController.php on line 10
+[09-Feb-2026 02:46:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/RegisterController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/RegisterController.php on line 11
+[09-Feb-2026 02:46:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/CommissionController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/CommissionController.php on line 8
+[09-Feb-2026 02:46:17 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AffiliateLinkController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AffiliateLinkController.php on line 10
+[21-Mar-2026 11:49:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/LoginController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/LoginController.php on line 10
+[21-Mar-2026 11:49:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/FrontController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/FrontController.php on line 11
+[21-Mar-2026 11:49:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AccountController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AccountController.php on line 10
+[21-Mar-2026 11:49:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/CommissionController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/CommissionController.php on line 8
+[21-Mar-2026 11:49:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/DashboardController.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/DashboardController.php on line 9
+[21-Mar-2026 11:49:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AffiliateController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AffiliateController.php on line 10
+[21-Mar-2026 11:49:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/ChartDataController.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/ChartDataController.php on line 8
+[21-Mar-2026 11:49:28 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/RegisterController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/RegisterController.php on line 11
+[21-Mar-2026 11:49:29 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AffiliateLinkController.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/affiliate/src/Http/Controllers/AffiliateLinkController.php on line 10

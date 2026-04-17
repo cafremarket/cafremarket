@@ -1,0 +1,2 @@
+[09-Feb-2026 02:08:11 UTC] PHP Warning:  Undefined variable $chartDataArray in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/resources/views/scripts/report.blade.php on line 18
+[21-Mar-2026 11:27:05 UTC] PHP Warning:  Undefined variable $chartDataArray in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/resources/views/scripts/report.blade.php on line 18

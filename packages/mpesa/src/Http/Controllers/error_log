@@ -1,0 +1,24 @@
+[09-Feb-2026 03:49:46 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/ResponseController.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/ResponseController.php on line 14
+[09-Feb-2026 03:49:57 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/ConfigMPesaController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/ConfigMPesaController.php on line 11
+[09-Feb-2026 03:50:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/PaymentController.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/PaymentController.php on line 12
+[21-Mar-2026 12:46:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/ConfigMPesaController.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/ConfigMPesaController.php on line 11
+[21-Mar-2026 12:46:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/ResponseController.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/ResponseController.php on line 21
+[21-Mar-2026 12:46:27 UTC] PHP Fatal error:  Uncaught Error: Class "App\Http\Controllers\Controller" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/PaymentController.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/Http/Controllers/PaymentController.php on line 13

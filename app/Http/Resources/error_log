@@ -1,0 +1,320 @@
+[09-Feb-2026 01:07:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeValueLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeValueLightResource.php on line 7
+[09-Feb-2026 01:07:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategorySubGroupLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategorySubGroupLightResource.php on line 7
+[09-Feb-2026 01:07:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/MerchantRegistrationResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/MerchantRegistrationResource.php on line 7
+[09-Feb-2026 01:07:48 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/InventoryLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/InventoryLightResource.php on line 7
+[09-Feb-2026 01:07:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/TopSellingItemResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/TopSellingItemResource.php on line 7
+[09-Feb-2026 01:07:49 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryDetailResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryDetailResource.php on line 7
+[09-Feb-2026 01:07:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryLightResource.php on line 7
+[09-Feb-2026 01:07:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DeliveryBoyResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DeliveryBoyResource.php on line 7
+[09-Feb-2026 01:07:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/PaymentMethodResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/PaymentMethodResource.php on line 7
+[09-Feb-2026 01:07:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/BlogCommentResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/BlogCommentResource.php on line 7
+[09-Feb-2026 01:07:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DealOfTheDayResource.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DealOfTheDayResource.php on line 9
+[09-Feb-2026 01:07:53 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/SystemConfigResource.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/SystemConfigResource.php on line 11
+[09-Feb-2026 01:07:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ManufacturerLightResource.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ManufacturerLightResource.php on line 8
+[09-Feb-2026 01:07:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryGroupLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryGroupLightResource.php on line 7
+[09-Feb-2026 01:07:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/StaffLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/StaffLightResource.php on line 7
+[09-Feb-2026 01:07:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ProductLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ProductLightResource.php on line 7
+[09-Feb-2026 01:07:56 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeLightResource.php on line 7
+[09-Feb-2026 01:07:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeValueResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeValueResource.php on line 7
+[09-Feb-2026 01:07:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShippingOptionResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShippingOptionResource.php on line 7
+[09-Feb-2026 01:07:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeColorResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeColorResource.php on line 7
+[09-Feb-2026 01:07:58 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/WarehouseLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/WarehouseLightResource.php on line 7
+[09-Feb-2026 01:07:59 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategorySubGroupResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategorySubGroupResource.php on line 7
+[09-Feb-2026 01:08:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DeliveryBoyLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DeliveryBoyLightResource.php on line 7
+[09-Feb-2026 01:08:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ConversationResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ConversationResource.php on line 7
+[09-Feb-2026 01:08:01 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/SupplierLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/SupplierLightResource.php on line 7
+[09-Feb-2026 01:08:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryGroupResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryGroupResource.php on line 7
+[09-Feb-2026 01:08:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CancelationResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CancelationResource.php on line 7
+[09-Feb-2026 01:08:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DisputeFormResource.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DisputeFormResource.php on line 8
+[09-Feb-2026 01:08:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopSettingResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopSettingResource.php on line 7
+[09-Feb-2026 01:08:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopListingResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopListingResource.php on line 7
+[09-Feb-2026 01:08:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ManufacturerResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ManufacturerResource.php on line 7
+[09-Feb-2026 01:08:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DisputeLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DisputeLightResource.php on line 7
+[09-Feb-2026 01:08:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CustomerLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CustomerLightResource.php on line 7
+[09-Feb-2026 01:08:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeDryResource.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeDryResource.php on line 8
+[09-Feb-2026 01:08:06 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/NotificationResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/NotificationResource.php on line 7
+[09-Feb-2026 01:09:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/SliderResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/SliderResource.php on line 7
+[09-Feb-2026 01:09:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttachmentResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttachmentResource.php on line 7
+[09-Feb-2026 01:09:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/OrderLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/OrderLightResource.php on line 7
+[09-Feb-2026 01:09:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/PermissionResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/PermissionResource.php on line 7
+[09-Feb-2026 01:10:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ItemLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ItemLightResource.php on line 7
+[09-Feb-2026 01:10:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopLightResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopLightResource.php on line 7
+[09-Feb-2026 01:11:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/OrderItemResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/OrderItemResource.php on line 7
+[09-Feb-2026 01:11:12 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DashboardResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DashboardResource.php on line 7
+[09-Feb-2026 01:11:13 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/InventoryResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/InventoryResource.php on line 7
+[09-Feb-2026 01:13:26 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/StateResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/StateResource.php on line 7
+[09-Feb-2026 01:13:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ModuleResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ModuleResource.php on line 7
+[09-Feb-2026 01:13:28 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/RefundResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/RefundResource.php on line 7
+[09-Feb-2026 01:13:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/BannerResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/BannerResource.php on line 7
+[09-Feb-2026 01:13:29 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CouponResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CouponResource.php on line 7
+[09-Feb-2026 01:13:30 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CarrirResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CarrirResource.php on line 7
+[09-Feb-2026 01:15:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ImageResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ImageResource.php on line 7
+[09-Feb-2026 01:21:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/RoleResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/RoleResource.php on line 7
+[09-Feb-2026 01:21:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopResource.php on line 7
+[09-Feb-2026 01:21:03 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/UserResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/UserResource.php on line 7
+[09-Feb-2026 01:21:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/OfferResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/OfferResource.php on line 7
+[09-Feb-2026 01:21:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/OrderResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/OrderResource.php on line 7
+[09-Feb-2026 01:21:54 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/StaffResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/StaffResource.php on line 7
+[09-Feb-2026 01:22:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ReplyResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ReplyResource.php on line 7
+[09-Feb-2026 01:22:18 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/BlogResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/BlogResource.php on line 7
+[09-Feb-2026 01:24:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CategoryResource.php on line 7
+[09-Feb-2026 01:24:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/WishlistResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/WishlistResource.php on line 7
+[09-Feb-2026 01:24:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/FeedbackResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/FeedbackResource.php on line 7
+[09-Feb-2026 01:26:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/PageResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/PageResource.php on line 7
+[09-Feb-2026 01:26:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ItemResource.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ItemResource.php on line 8
+[09-Feb-2026 01:29:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CartResource.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CartResource.php on line 8
+[09-Feb-2026 01:29:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/TaxResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/TaxResource.php on line 7
+[09-Feb-2026 01:36:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AttributeResource.php on line 7
+[09-Feb-2026 01:41:32 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/WarehouseResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/WarehouseResource.php on line 7
+[09-Feb-2026 01:43:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CountryResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CountryResource.php on line 7
+[09-Feb-2026 01:43:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ProfileResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ProfileResource.php on line 7
+[09-Feb-2026 01:43:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopDryResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ShopDryResource.php on line 7
+[09-Feb-2026 01:43:05 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ListingResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ListingResource.php on line 7
+[09-Feb-2026 01:50:45 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ProductResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/ProductResource.php on line 7
+[09-Feb-2026 01:50:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AddressResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/AddressResource.php on line 7
+[09-Feb-2026 01:55:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/SupplierResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/SupplierResource.php on line 7
+[09-Feb-2026 01:55:40 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/MerchantResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/MerchantResource.php on line 7
+[09-Feb-2026 01:55:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CustomerResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CustomerResource.php on line 7
+[09-Feb-2026 01:55:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/UserRoleResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/UserRoleResource.php on line 7
+[09-Feb-2026 01:55:42 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CurrencyResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/CurrencyResource.php on line 7
+[09-Feb-2026 01:56:04 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Http\Resources\Json\JsonResource" not found in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DisputeResource.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Http/Resources/DisputeResource.php on line 7

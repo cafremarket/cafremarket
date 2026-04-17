@@ -1,0 +1,2 @@
+[09-Feb-2026 02:42:03 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Bus\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Jobs/SendNotificationJob.php on line 12
+[21-Mar-2026 11:45:45 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Bus\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Jobs/SendNotificationJob.php on line 12

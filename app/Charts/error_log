@@ -1,0 +1,16 @@
+[09-Feb-2026 01:24:41 UTC] PHP Fatal error:  Uncaught Error: Class "ConsoleTVs\Charts\Classes\Highcharts\Chart" not found in /home/afnqtqmb/public_html/Cafrepay/app/Charts/VisitorsOfMonths.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Charts/VisitorsOfMonths.php on line 8
+[09-Feb-2026 01:33:30 UTC] PHP Fatal error:  Uncaught Error: Class "ConsoleTVs\Charts\Classes\Highcharts\Chart" not found in /home/afnqtqmb/public_html/Cafrepay/app/Charts/Subscribers.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Charts/Subscribers.php on line 7
+[09-Feb-2026 01:33:31 UTC] PHP Fatal error:  Uncaught Error: Class "ConsoleTVs\Charts\Classes\Highcharts\Chart" not found in /home/afnqtqmb/public_html/Cafrepay/app/Charts/LatestSales.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Charts/LatestSales.php on line 8
+[09-Feb-2026 01:36:07 UTC] PHP Fatal error:  Uncaught Error: Class "ConsoleTVs\Charts\Classes\Highcharts\Chart" not found in /home/afnqtqmb/public_html/Cafrepay/app/Charts/SalesByPeriod.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Charts/SalesByPeriod.php on line 9

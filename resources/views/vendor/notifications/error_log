@@ -1,0 +1,7 @@
+[09-Feb-2026 01:15:17 UTC] PHP Warning:  Undefined variable $level in /home/afnqtqmb/public_html/Cafrepay/resources/views/vendor/notifications/email.blade.php on line 113
+[09-Feb-2026 01:15:17 UTC] PHP Warning:  Undefined variable $level in /home/afnqtqmb/public_html/Cafrepay/resources/views/vendor/notifications/email.blade.php on line 116
+[09-Feb-2026 01:16:38 UTC] PHP Warning:  Undefined variable $level in /home/afnqtqmb/public_html/Cafrepay/resources/views/vendor/notifications/email-plain.blade.php on line 6
+[09-Feb-2026 01:16:38 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function trans() in /home/afnqtqmb/public_html/Cafrepay/resources/views/vendor/notifications/email-plain.blade.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/resources/views/vendor/notifications/email-plain.blade.php on line 21

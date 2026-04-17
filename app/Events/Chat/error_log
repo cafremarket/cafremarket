@@ -1,0 +1,1 @@
+[09-Feb-2026 03:58:10 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/Chat/NewMessageEvent.php on line 11

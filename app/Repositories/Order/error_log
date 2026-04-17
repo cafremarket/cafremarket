@@ -1,0 +1,4 @@
+[09-Feb-2026 01:42:33 UTC] PHP Fatal error:  Uncaught Error: Class "App\Repositories\EloquentRepository" not found in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Order/EloquentOrder.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Repositories/Order/EloquentOrder.php on line 14

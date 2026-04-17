@@ -1,0 +1,8 @@
+[09-Feb-2026 02:16:40 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Exceptions\InsufficientFunds" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Exceptions/BalanceIsEmpty.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Exceptions/BalanceIsEmpty.php on line 5
+[21-Mar-2026 11:32:51 UTC] PHP Fatal error:  Uncaught Error: Class "Incevio\Package\Wallet\Exceptions\InsufficientFunds" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Exceptions/BalanceIsEmpty.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Exceptions/BalanceIsEmpty.php on line 5

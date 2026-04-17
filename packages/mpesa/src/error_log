@@ -1,0 +1,28 @@
+[09-Feb-2026 01:14:17 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaServiceProvider.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaServiceProvider.php on line 8
+[09-Feb-2026 02:16:33 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Facade" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaFacade.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaFacade.php on line 7
+[09-Feb-2026 11:29:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Facade" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaFacade.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaFacade.php on line 7
+[09-Feb-2026 11:55:36 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaServiceProvider.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaServiceProvider.php on line 8
+[09-Feb-2026 13:35:34 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Facade" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaFacade.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaFacade.php on line 7
+[21-Mar-2026 10:55:57 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Support\Providers\AuthServiceProvider" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaServiceProvider.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaServiceProvider.php on line 8
+[21-Mar-2026 11:32:43 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Facade" not found in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaFacade.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/src/MPesaFacade.php on line 7

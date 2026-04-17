@@ -1,0 +1,10 @@
+[09-Feb-2026 03:09:55 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\HasWallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/HasWalletFloat.php on line 17
+[09-Feb-2026 03:28:24 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\CartPay" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/CanPay.php on line 11
+[09-Feb-2026 03:31:27 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\HasWallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/CartPay.php on line 18
+[09-Feb-2026 03:33:21 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\CanPay" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/CanPayFloat.php on line 5
+[09-Feb-2026 03:57:39 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\MorphOneWallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/HasWallet.php on line 28
+[21-Mar-2026 12:09:57 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\HasWallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/HasWalletFloat.php on line 17
+[21-Mar-2026 12:26:21 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\CartPay" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/CanPay.php on line 11
+[21-Mar-2026 12:29:17 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\HasWallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/CartPay.php on line 18
+[21-Mar-2026 12:31:07 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\CanPay" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/CanPayFloat.php on line 5
+[21-Mar-2026 12:52:02 UTC] PHP Fatal error:  Trait "Incevio\Package\Wallet\Traits\MorphOneWallet" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Traits/HasWallet.php on line 28

@@ -1,0 +1,24 @@
+[09-Feb-2026 01:25:51 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/SubscriptionBillingFailedNotice.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/SubscriptionBillingFailedNotice.php on line 11
+[09-Feb-2026 01:25:52 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/ExpireSoonNotice.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/ExpireSoonNotice.php on line 12
+[09-Feb-2026 01:27:46 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/InsufficientBalance.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/InsufficientBalance.php on line 11
+[21-Mar-2026 11:00:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/SubscriptionBillingFailedNotice.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/SubscriptionBillingFailedNotice.php on line 11
+[21-Mar-2026 11:00:09 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/ExpireSoonNotice.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/ExpireSoonNotice.php on line 12
+[21-Mar-2026 11:01:50 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Notifications\Notification" not found in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/InsufficientBalance.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/subscription/src/Notifications/InsufficientBalance.php on line 11

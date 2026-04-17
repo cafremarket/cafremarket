@@ -1,0 +1,12 @@
+[09-Feb-2026 00:48:24 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/config/config.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/config/config.php on line 10
+[09-Feb-2026 21:13:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/config/config.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/config/config.php on line 10
+[21-Mar-2026 10:46:09 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/config/config.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/packages/mpesa/config/config.php on line 12

@@ -1,0 +1,14 @@
+{
+  "name": "mpesa-node-script",
+  "version": "1.0.0",
+  "description": "M-Pesa Mozambique (Vodacom) using mpesa-mz-nodejs-lib – C2B, query, reversal",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "mpesa-mz-nodejs-lib": "^0.7.16"
+  }
+}

@@ -1,0 +1,2 @@
+[09-Feb-2026 03:02:11 UTC] PHP Fatal error:  Trait "Illuminate\Auth\Access\HandlesAuthorization" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Policies/WalletPolicy.php on line 9
+[21-Mar-2026 12:02:48 UTC] PHP Fatal error:  Trait "Illuminate\Auth\Access\HandlesAuthorization" not found in /home/afnqtqmb/public_html/Cafrepay/packages/wallet/src/Policies/WalletPolicy.php on line 9

@@ -1,0 +1,1 @@
+[09-Feb-2026 02:13:04 UTC] PHP Fatal error:  Trait "Illuminate\Foundation\Events\Dispatchable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Events/Subscription/Saving.php on line 9

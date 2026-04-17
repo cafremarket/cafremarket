@@ -1,0 +1,8 @@
+[09-Feb-2026 01:43:10 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\DuskTestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Browser/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Browser/ExampleTest.php on line 8
+[21-Mar-2026 11:10:04 UTC] PHP Fatal error:  Uncaught Error: Class "Tests\DuskTestCase" not found in /home/afnqtqmb/public_html/Cafrepay/tests/Browser/ExampleTest.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/tests/Browser/ExampleTest.php on line 8

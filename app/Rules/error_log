@@ -1,0 +1,16 @@
+[09-Feb-2026 00:52:04 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Validation\Rule" not found in /home/afnqtqmb/public_html/Cafrepay/app/Rules/License.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Rules/License.php on line 7
+[26-Mar-2026 02:51:09 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Validation\Rule" not found in /home/afnqtqmb/public_html/Cafrepay/app/Rules/License.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Rules/License.php on line 7
+[26-Mar-2026 06:49:32 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Validation\Rule" not found in /home/afnqtqmb/public_html/Cafrepay/app/Rules/License.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Rules/License.php on line 7
+[28-Mar-2026 07:57:08 UTC] PHP Fatal error:  Uncaught Error: Interface "Illuminate\Contracts\Validation\Rule" not found in /home/afnqtqmb/public_html/Cafrepay/app/Rules/License.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Rules/License.php on line 7

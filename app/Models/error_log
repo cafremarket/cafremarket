@@ -1,0 +1,360 @@
+[09-Feb-2026 00:42:22 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/BannerGroup.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/BannerGroup.php on line 5
+[09-Feb-2026 00:42:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\TranslationModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategoryGroupTranslation.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategoryGroupTranslation.php on line 7
+[09-Feb-2026 00:42:33 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\TranslationModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategorySubGroupTranslation.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategorySubGroupTranslation.php on line 5
+[09-Feb-2026 00:44:13 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\TranslationModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ManufacturerTranslation.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ManufacturerTranslation.php on line 5
+[09-Feb-2026 00:45:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\TranslationModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/AttributeTranslation.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/AttributeTranslation.php on line 5
+[09-Feb-2026 00:45:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\TranslationModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/InventoryTranslation.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/InventoryTranslation.php on line 7
+[09-Feb-2026 00:49:45 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\TranslationModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategoryTranslation.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategoryTranslation.php on line 5
+[09-Feb-2026 00:55:50 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ConfigPaypalExpress.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ConfigPaypalExpress.php on line 5
+[09-Feb-2026 00:55:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\TranslationModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ProductTranslation.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ProductTranslation.php on line 7
+[09-Feb-2026 01:01:37 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ConfigCyberSource.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ConfigCyberSource.php on line 5
+[09-Feb-2026 01:02:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Reply.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Reply.php on line 8
+[09-Feb-2026 01:02:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/State.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/State.php on line 5
+[09-Feb-2026 01:02:21 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Order.php:24
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Order.php on line 24
+[09-Feb-2026 01:02:21 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Image.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Image.php on line 7
+[09-Feb-2026 01:03:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategorySubGroup.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategorySubGroup.php on line 12
+[09-Feb-2026 01:03:05 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/SubscriptionPlan.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/SubscriptionPlan.php on line 8
+[09-Feb-2026 01:06:41 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/AttributeCategory.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/AttributeCategory.php on line 8
+[09-Feb-2026 01:11:53 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/SystemConfig.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/SystemConfig.php on line 8
+[09-Feb-2026 01:13:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/TicketCategory.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/TicketCategory.php on line 5
+[09-Feb-2026 01:15:44 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\ShopWallet" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Shop.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Shop.php on line 21
+[09-Feb-2026 01:15:45 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Page.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Page.php on line 9
+[09-Feb-2026 01:15:46 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Role.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Role.php on line 10
+[09-Feb-2026 01:15:47 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Blog.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Blog.php on line 11
+[09-Feb-2026 01:15:47 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Auth\User" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/User.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/User.php on line 21
+[09-Feb-2026 01:15:48 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Cart.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Cart.php on line 7
+[09-Feb-2026 01:15:50 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Tag.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Tag.php on line 7
+[09-Feb-2026 01:15:50 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Faq.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Faq.php on line 5
+[09-Feb-2026 01:15:51 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Tax.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Tax.php on line 8
+[09-Feb-2026 01:16:39 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Banner.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Banner.php on line 8
+[09-Feb-2026 01:16:39 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Coupon.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Coupon.php on line 11
+[09-Feb-2026 01:16:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Slider.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Slider.php on line 7
+[09-Feb-2026 01:16:40 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/System.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/System.php on line 13
+[09-Feb-2026 01:16:41 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Refund.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Refund.php on line 5
+[09-Feb-2026 01:16:49 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/CancellationReason.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/CancellationReason.php on line 5
+[09-Feb-2026 01:22:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Wishlist.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Wishlist.php on line 7
+[09-Feb-2026 01:22:59 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Visitor.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Visitor.php on line 9
+[09-Feb-2026 01:23:00 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Message.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Message.php on line 11
+[09-Feb-2026 01:23:00 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Language.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Language.php on line 7
+[09-Feb-2026 01:23:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Address.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Address.php on line 8
+[09-Feb-2026 01:23:02 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Dispute.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Dispute.php on line 10
+[09-Feb-2026 01:23:03 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Package.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Package.php on line 5
+[09-Feb-2026 01:23:03 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Feedback.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Feedback.php on line 8
+[09-Feb-2026 01:23:04 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Supplier.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Supplier.php on line 10
+[09-Feb-2026 01:23:05 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Carrier.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Carrier.php on line 9
+[09-Feb-2026 01:24:36 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShopWallet.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShopWallet.php on line 11
+[09-Feb-2026 01:25:54 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Module.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Module.php on line 8
+[09-Feb-2026 01:28:31 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Ticket.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Ticket.php on line 11
+[09-Feb-2026 01:28:32 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Config.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Config.php on line 8
+[09-Feb-2026 01:30:18 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Country.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Country.php on line 5
+[09-Feb-2026 01:30:19 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Currency.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Currency.php on line 5
+[09-Feb-2026 01:30:19 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Timezone.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Timezone.php on line 5
+[09-Feb-2026 01:30:20 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\Inspectable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Product.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Product.php on line 16
+[09-Feb-2026 01:30:21 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Category.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Category.php on line 13
+[09-Feb-2026 01:30:22 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\CustomerWallet" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Customer.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Customer.php on line 23
+[09-Feb-2026 01:30:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Invoice.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Invoice.php on line 7
+[09-Feb-2026 01:30:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/GiftCard.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/GiftCard.php on line 10
+[09-Feb-2026 01:30:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/FaqTopic.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/FaqTopic.php on line 5
+[09-Feb-2026 01:32:14 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Dashboard.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Dashboard.php on line 7
+[09-Feb-2026 01:32:16 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Warehouse.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Warehouse.php on line 10
+[09-Feb-2026 01:32:51 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Attachment.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Attachment.php on line 5
+[09-Feb-2026 01:32:53 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Permission.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Permission.php on line 5
+[09-Feb-2026 01:33:55 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Auth\User" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Merchant.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Merchant.php on line 14
+[09-Feb-2026 01:34:21 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\TranslationModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShopTranslation.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShopTranslation.php on line 5
+[09-Feb-2026 01:36:04 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ConfigStripe.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ConfigStripe.php on line 5
+[09-Feb-2026 01:36:08 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/AttributeType.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/AttributeType.php on line 5
+[09-Feb-2026 01:36:08 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/PaymentMethod.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/PaymentMethod.php on line 5
+[09-Feb-2026 01:36:09 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Cancellation.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Cancellation.php on line 8
+[09-Feb-2026 01:36:10 UTC] PHP Fatal error:  Uncaught Error: Class "Laravel\Cashier\Subscription" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Subscription.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Subscription.php on line 7
+[09-Feb-2026 01:36:10 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ConfigPaypal.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ConfigPaypal.php on line 5
+[09-Feb-2026 01:36:11 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategoryGroup.php:12
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/CategoryGroup.php on line 12
+[09-Feb-2026 01:36:11 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/LocalInvoice.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/LocalInvoice.php on line 5
+[09-Feb-2026 01:36:12 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Manufacturer.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Manufacturer.php on line 11
+[09-Feb-2026 01:36:13 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShippingRate.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShippingRate.php on line 7
+[09-Feb-2026 01:37:58 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\Inspectable" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Inventory.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Inventory.php on line 23
+[09-Feb-2026 01:37:59 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ContactUs.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ContactUs.php on line 5
+[09-Feb-2026 01:38:00 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Relations\Pivot" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/OrderItem.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/OrderItem.php on line 7
+[09-Feb-2026 01:38:00 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Attribute.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Attribute.php on line 11
+[09-Feb-2026 01:38:01 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShippingMethod.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShippingMethod.php on line 5
+[09-Feb-2026 01:38:02 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Auth\User" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/CustomerWallet.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/CustomerWallet.php on line 13
+[09-Feb-2026 01:38:03 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/AttributeValue.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/AttributeValue.php on line 10
+[09-Feb-2026 01:40:24 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/EmailTemplate.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/EmailTemplate.php on line 7
+[09-Feb-2026 01:40:25 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShippingZone.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/ShippingZone.php on line 7
+[09-Feb-2026 01:40:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/DisputeType.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/DisputeType.php on line 5
+[09-Feb-2026 01:40:30 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/Inspectable.php:11
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/Inspectable.php on line 11
+[09-Feb-2026 01:40:31 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Foundation\Auth\User" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/DeliveryBoy.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/DeliveryBoy.php on line 18
+[09-Feb-2026 01:40:32 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/BlogComment.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/BlogComment.php on line 8
+[09-Feb-2026 01:40:36 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/PdfTemplate.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/PdfTemplate.php on line 7
+[09-Feb-2026 01:40:37 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/AvgFeedback.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/AvgFeedback.php on line 8
+[09-Feb-2026 01:43:07 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Database\Eloquent\Model" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/BaseModel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/BaseModel.php on line 8
+[09-Feb-2026 03:09:52 UTC] PHP Fatal error:  Uncaught Error: Class "App\Models\BaseModel" not found in /home/afnqtqmb/public_html/Cafrepay/app/Models/TranslationModel.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/afnqtqmb/public_html/Cafrepay/app/Models/TranslationModel.php on line 5
