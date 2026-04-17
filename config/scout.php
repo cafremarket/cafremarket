@@ -276,7 +276,8 @@ return [
             'max_expansions' => 50,
             'distance' => 2,
         ],
-        'asYouType' => false,
+        // When true, queries like "le" match "Lenovo" (prefix / as-you-type). Required for short mobile searches.
+        'asYouType' => env('TNTSEARCH_AS_YOU_TYPE', true),
         'searchBoolean' => env('TNTSEARCH_BOOLEAN', false),
     ],
 ];
