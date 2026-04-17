@@ -10,6 +10,7 @@ use App\Models\CategoryGroup;
 use App\Models\CategorySubGroup;
 use App\Models\Inventory;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 trait InventorySearch
 {
@@ -40,7 +41,15 @@ trait InventorySearch
                         ->where('parent_id', null);
                 });
 
-            $items = config('scout.driver') == 'tntsearch' ? $query->paginate(0) : $query->get();
+            if (config('scout.driver') === 'tntsearch') {
+                $items = $query->paginate(0)->getCollection();
+                // Supplement Scout: TNTSearch often misses phrases or prefixes; LIKE matches each word on title/brand/sku/name.
+                $likeItems = $this->inventorySearchLikeSubstring($term);
+                $seen = $items->pluck('id')->all();
+                $items = $items->merge($likeItems->whereNotIn('id', $seen)->values());
+            } else {
+                $items = $query->get();
+            }
         }
 
         $items->load([
@@ -233,5 +242,43 @@ trait InventorySearch
         ]);
 
         return view('theme::search_results', compact('products', 'category', 'brands', 'priceRange', 'searchCountries', 'searchStates'));
+    }
+
+    /**
+     * Case-insensitive substring match on title / brand / sku / product name (AND across words).
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Inventory>
+     */
+    private function inventorySearchLikeSubstring(string $term)
+    {
+        $words = preg_split('/\s+/u', $term, -1, PREG_SPLIT_NO_EMPTY);
+        if ($words === []) {
+            return Inventory::newCollection();
+        }
+
+        $q = Inventory::query()
+            ->whereHas('shop', function ($q2) {
+                $q2->where('active', true);
+            })
+            ->active()
+            ->whereNull('parent_id');
+
+        foreach ($words as $word) {
+            $word = trim($word);
+            if ($word === '') {
+                continue;
+            }
+            $pattern = '%'.Str::escapeLike($word).'%';
+            $q->where(function ($sub) use ($pattern) {
+                $sub->where('title', 'like', $pattern)
+                    ->orWhere('brand', 'like', $pattern)
+                    ->orWhere('sku', 'like', $pattern)
+                    ->orWhereHas('product', function ($pq) use ($pattern) {
+                        $pq->where('name', 'like', $pattern);
+                    });
+            });
+        }
+
+        return $q->limit(200)->get();
     }
 }
