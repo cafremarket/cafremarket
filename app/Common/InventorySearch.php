@@ -10,7 +10,6 @@ use App\Models\CategoryGroup;
 use App\Models\CategorySubGroup;
 use App\Models\Inventory;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
 
 trait InventorySearch
 {
@@ -268,7 +267,7 @@ trait InventorySearch
             if ($word === '') {
                 continue;
             }
-            $pattern = '%'.Str::escapeLike($word).'%';
+            $pattern = '%'.$this->escapeSqlLikeValue($word).'%';
             $q->where(function ($sub) use ($pattern) {
                 $sub->where('title', 'like', $pattern)
                     ->orWhere('brand', 'like', $pattern)
@@ -280,5 +279,10 @@ trait InventorySearch
         }
 
         return $q->limit(200)->get();
+    }
+
+    private function escapeSqlLikeValue(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
     }
 }
