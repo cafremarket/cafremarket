@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\CategoryGroup;
 use App\Models\CategorySubGroup;
 use App\Models\Inventory;
+use App\Models\State;
 use Carbon\Carbon;
 
 trait InventorySearch
@@ -202,6 +203,19 @@ trait InventorySearch
 
             $items = $items->filter(function ($item) use ($stateId) {
                 return $item->shop && shop_ships_to_state($item->shop, $stateId);
+            });
+        } elseif ($request->filled('country_id')) {
+            // Country-only zone search: show listings only from shops that ship somewhere in that country.
+            $countryId = (int) $request->input('country_id');
+            $stateIdsInCountry = State::where('country_id', $countryId)->pluck('id')->all();
+            $items->loadMissing([
+                'shop.shippingZones' => function ($q) {
+                    $q->where('active', 1);
+                },
+            ]);
+
+            $items = $items->filter(function ($item) use ($countryId, $stateIdsInCountry) {
+                return $item->shop && shop_ships_to_country($item->shop, $countryId, $stateIdsInCountry);
             });
         }
 

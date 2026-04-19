@@ -3228,3 +3228,55 @@ if (! function_exists('shop_ships_to_state')) {
         return false;
     }
 }
+
+if (! function_exists('shop_ships_to_country')) {
+    /**
+     * Whether the shop has an active shipping zone that delivers to the given country
+     * (any region in that country: whole-country zone, rest-of-world, or specific states in the country).
+     *
+     * @param  array<int>|null  $stateIdsInCountry  Optional precomputed state ids for the country (avoids repeated queries).
+     */
+    function shop_ships_to_country(Shop $shop, int $countryId, ?array $stateIdsInCountry = null): bool
+    {
+        if ($countryId < 1) {
+            return false;
+        }
+
+        $zones = $shop->relationLoaded('shippingZones')
+            ? $shop->shippingZones->where('active', 1)->values()
+            : $shop->shippingZones()->where('active', 1)->get();
+
+        if ($zones->isEmpty()) {
+            return false;
+        }
+
+        if ($stateIdsInCountry === null) {
+            $stateIdsInCountry = State::where('country_id', $countryId)->pluck('id')->all();
+        }
+
+        $countryStateIds = array_map('intval', $stateIdsInCountry);
+
+        foreach ($zones as $zone) {
+            if ($zone->rest_of_the_world) {
+                return true;
+            }
+
+            $countryIds = is_array($zone->country_ids) ? $zone->country_ids : [];
+            if ($countryIds !== [] && in_array($countryId, $countryIds, true)) {
+                return true;
+            }
+
+            $stateIds = is_array($zone->state_ids) ? $zone->state_ids : [];
+            if ($stateIds === [] || $countryStateIds === []) {
+                continue;
+            }
+
+            $zoneStateIds = array_map('intval', $stateIds);
+            if (array_intersect($zoneStateIds, $countryStateIds) !== []) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
