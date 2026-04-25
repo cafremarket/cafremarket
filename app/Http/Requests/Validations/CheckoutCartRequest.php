@@ -141,6 +141,11 @@ class CheckoutCartRequest extends Request
             $rules['mpesa_number'] = ['required', 'string', 'regex:/^[\d\s\+]+$/'];
         }
 
+        // eMola (Movitel): require msisdn (9 digits, prefix 86/87)
+        if ($this->payment_method === 'emola') {
+            $rules['emola_number'] = ['required', 'string', 'regex:/^(86|87)\d{7}$/'];
+        }
+
         // Bank transfer: require transfer proof upload/base64.
         if ($this->payment_method === 'wire') {
             $mimes = 'mimes:jpg,jpeg,png,pdf';

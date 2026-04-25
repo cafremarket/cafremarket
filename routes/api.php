@@ -11,4 +11,7 @@ Route::namespace('Api')->group(function () {
 
     // Vendor APIs
     include 'api/Vendor.php';
+
+    // eMola (USSD Push) APIs
+    include 'api/Emola.php';
 });

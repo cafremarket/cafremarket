@@ -215,6 +215,7 @@ class HttpRequest
             $headers[] = 'Authorization: Bearer ' . $this->getBearerToken();
         }
 
+        $sslVerify = config('mpesa.ssl_verify', true);
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL => $url,
@@ -222,11 +223,40 @@ class HttpRequest
             CURLOPT_POST => true,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POSTFIELDS => json_encode($body),
+            CURLOPT_CONNECTTIMEOUT => 15,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_SSL_VERIFYPEER => $sslVerify,
+            CURLOPT_SSL_VERIFYHOST => $sslVerify ? 2 : 0,
         ]);
 
         $response = curl_exec($curl);
         $response_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $curl_errno = curl_errno($curl);
+        $curl_error = curl_error($curl);
         curl_close($curl);
+
+        if ($curl_errno) {
+            Log::error('M-Pesa Mozambique cURL failed', [
+                'errno' => $curl_errno,
+                'error' => $curl_error,
+                'url' => $url,
+            ]);
+            throw new PaymentConfigInvalid(
+                'Could not connect to M-Pesa API: ' . $curl_error . ' (code ' . $curl_errno . '). Check server DNS/firewall/SSL for ' . parse_url($url, PHP_URL_HOST) . '.',
+                $curl_errno
+            );
+        }
+
+        if ($response_code == 0) {
+            Log::error('M-Pesa Mozambique no HTTP response', [
+                'url' => $url,
+                'response' => $response,
+            ]);
+            throw new PaymentConfigInvalid(
+                'No HTTP response from M-Pesa API. Check outbound access to ' . parse_url($url, PHP_URL_HOST) . ' on port 18352.',
+                0
+            );
+        }
 
         if ($response_code == 200 || $response_code == 201) {
             return $response;

@@ -447,6 +447,14 @@ if (! function_exists('get_payment_config_info')) {
                     'msg' => trans('packages.mpesa.pay_with_mpesa'),
                 ];
 
+            case 'emola':
+                $config = config('services.emola');
+
+                return [
+                    'config' => $config,
+                    'msg' => 'Pay with eMola (Movitel USSD Push)',
+                ];
+
             case 'orangemoney':
                 if ($shop) {
                     $config = $shop->config->orangeMoney ?? null;

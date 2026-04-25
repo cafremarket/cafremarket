@@ -235,6 +235,15 @@ class SystemConfig extends BaseModel
                     || (config('mpesa.api.consumer_key') && config('mpesa.api.consumer_secret'))
                 );
 
+            case 'emola':
+                return (bool) (
+                    config('services.emola.wsdl')
+                    && config('services.emola.username')
+                    && config('services.emola.password')
+                    && config('services.emola.partner_code')
+                    && config('services.emola.key')
+                );
+
             case 'orangemoney':
                 return (bool) (config('orangemoney.api') && config('orangemoney.api'));
 

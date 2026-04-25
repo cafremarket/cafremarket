@@ -142,6 +142,7 @@ class AppServiceProvider extends ServiceProvider
             'sslcommerz' => \Incevio\Package\SslCommerz\Services\SslCommerzPaymentService::class,
             'flutterwave' => \Incevio\Package\FlutterWave\Services\FlutterWavePaymentService::class,
             'mpesa' => \Incevio\Package\MPesa\Services\MPesaPaymentService::class,
+            'emola' => \App\Services\Payments\EmolaPaymentService::class,
             'payfast' => \Incevio\Package\Payfast\Services\PayfastPaymentService::class,
             'mercado-pago' => \Incevio\Package\MercadoPago\Services\MercadoPagoPaymentService::class,
             'orangemoney' => \Incevio\Package\OrangeMoney\Services\OrangeMoneyPaymentService::class,
