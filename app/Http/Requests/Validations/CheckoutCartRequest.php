@@ -186,6 +186,8 @@ class CheckoutCartRequest extends Request
         return [
             'address_validator.integer' => trans('theme.invalid_address'),
             'address_title.regex' => trans('theme.validation.address_title'),
+            'emola_number.required' => trans('theme.emola_number_required'),
+            'emola_number.regex' => trans('theme.emola_number_invalid'),
         ];
     }
 }

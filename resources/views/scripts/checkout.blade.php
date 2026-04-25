@@ -68,6 +68,13 @@
           hideMPesaForm();
         }
 
+        // eMola form
+        if ('emola' == code) {
+          showEmolaForm();
+        } else {
+          hideEmolaForm();
+        }
+
         // Bank transfer proof upload
         if ('wire' == code) {
           showWireTransferProof();
@@ -95,6 +102,8 @@
           $('#paypal-express-btn').removeClass('hide');
         } else if ('mpesa' == code) {
           showMPesaForm(); // mpesa package
+        } else if ('emola' == code) {
+          showEmolaForm();
         } else if ('wire' == code) {
           showWireTransferProof();
         }
@@ -206,6 +215,14 @@
 
     function hideMPesaForm() {
       $('#mpesa-form').hide().find('input.mpesa-request-field').removeAttr('required');
+    }
+
+    function showEmolaForm() {
+      $('#emola-form').show().find('input.emola-request-field').attr('required', 'required');
+    }
+
+    function hideEmolaForm() {
+      $('#emola-form').hide().find('input.emola-request-field').removeAttr('required');
     }
 
     function showWireTransferProof() {

@@ -73,6 +73,9 @@
   @include('mpesa::mpesa_payment_form')
 @endif
 
+{{-- eMola (Movitel USSD Push) --}}
+@include('partials.emola_payment_form')
+
 {{-- Warehouse adddress --}}
 <div id="payInPerson" class="hide">
   <h3 class="widget-title">{{ trans('theme.pickup') }}</h3>
