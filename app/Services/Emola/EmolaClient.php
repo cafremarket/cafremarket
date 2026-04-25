@@ -11,12 +11,12 @@ use SoapFault;
 class EmolaClient
 {
     public function __construct(
-        private readonly ?string $wsdl = null,
-        private readonly ?string $username = null,
-        private readonly ?string $password = null,
-        private readonly ?string $partnerCode = null,
-        private readonly ?string $key = null,
-        private readonly ?int $timeoutSeconds = null,
+        private ?string $wsdl = null,
+        private ?string $username = null,
+        private ?string $password = null,
+        private ?string $partnerCode = null,
+        private ?string $key = null,
+        private ?int $timeoutSeconds = null,
     ) {
         $this->wsdl = $this->wsdl ?? Config::get('services.emola.wsdl');
         $this->username = $this->username ?? Config::get('services.emola.username');

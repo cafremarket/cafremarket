@@ -171,8 +171,21 @@ class OrderController extends Controller
 
         // $order->load('inventories.product');
 
+        $flashKey = 'success';
+        $flashMessage = trans('theme.notify.order_placed');
+
+        // For async wallets like eMola, order exists but payment can still be pending.
+        if (
+            isset($response->status) &&
+            $response->status === PaymentService::STATUS_PENDING &&
+            optional($order->paymentMethod)->code === 'emola'
+        ) {
+            $flashKey = 'warning';
+            $flashMessage = trans('app.waiting_for_payment');
+        }
+
         return redirect()->route('order.detail.number', ['order_number' => $this->toRouteSafeOrderNumber($order->order_number)])
-            ->with('success', trans('theme.notify.order_placed'));
+            ->with($flashKey, $flashMessage);
     }
 
     /**

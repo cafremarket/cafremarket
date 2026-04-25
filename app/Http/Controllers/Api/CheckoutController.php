@@ -127,8 +127,17 @@ class CheckoutController extends Controller
             Log::warning('OrderCreated event failed: '.$e->getMessage());
         }
 
+        $message = trans('theme.notify.order_placed');
+        if (
+            isset($response->status) &&
+            $response->status === PaymentService::STATUS_PENDING &&
+            optional($order->paymentMethod)->code === 'emola'
+        ) {
+            $message = trans('app.waiting_for_payment');
+        }
+
         return response()->json([
-            'message' => trans('theme.notify.order_placed'),
+            'message' => $message,
             'order' => new OrderResource($order),
         ], 200);
     }
