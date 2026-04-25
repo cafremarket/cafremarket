@@ -19,7 +19,7 @@ return new class extends Migration
                 'split_money' => false,
                 'company_name' => 'Movitel / eMola',
                 'website' => '',
-                'help_doc_url' => '',
+                'help_doc_link' => '',
                 'admin_help_doc_link' => '',
                 'terms_conditions_link' => '',
                 'description' => 'Pay using eMola (Movitel) via USSD Push.',
