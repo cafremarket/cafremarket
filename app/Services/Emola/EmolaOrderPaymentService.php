@@ -89,7 +89,7 @@ class EmolaOrderPaymentService
             return $this->markOrderPaid($order);
         }
 
-        $this->markOrderPaymentFailed($order);
+        $this->applyPaymentFailure($order, $data['errorCode'], $data['message']);
 
         return false;
     }
@@ -143,17 +143,25 @@ class EmolaOrderPaymentService
         }
         $order->save();
 
+        $errorCode = $original['errorCode'] ?? null;
         $paid = false;
+
         if ($res->isTransactionPaid()) {
             $paid = $this->markOrderPaid($order->fresh());
+        } elseif (EmolaSpec::isPaymentFailureCode($errorCode)) {
+            $this->applyPaymentFailure($order->fresh(), (string) $errorCode, $order->emola_message);
         }
+
+        $message = $paid
+            ? trans('theme.emola_payment_confirmed')
+            : (EmolaSpec::isPaymentFailureCode($errorCode)
+                ? $res->failureMessage()
+                : trans('theme.emola_payment_pending'));
 
         return [
             'paid' => $paid,
-            'message' => $paid
-                ? trans('theme.emola_payment_confirmed')
-                : ($res->failureMessage() ?: trans('theme.emola_payment_pending')),
-            'error_code' => $original['errorCode'] ?? null,
+            'message' => $message,
+            'error_code' => $errorCode,
             'org_response_code' => $original['orgResponseCode'] ?? null,
         ];
     }
@@ -186,20 +194,35 @@ class EmolaOrderPaymentService
         return true;
     }
 
-    private function markOrderPaymentFailed(Order $order): void
+    /**
+     * PIN cancelled, timeout, or other terminal failure — keep order unpaid / revert false paid.
+     */
+    private function applyPaymentFailure(Order $order, string $errorCode, ?string $message = null): void
     {
-        if ($order->isPaid()) {
-            return;
+        if ($message) {
+            $order->emola_message = $message;
+        }
+        $order->emola_error_code = $errorCode;
+
+        if ($order->isPaid() && EmolaSpec::isPaymentFailureCode($errorCode)) {
+            Log::warning('eMola reverting order marked paid after payment failure', [
+                'order_id' => $order->id,
+                'error_code' => $errorCode,
+                'message' => $message,
+            ]);
+            $order->markAsUnpaid();
         }
 
-        $order->payment_status = Order::PAYMENT_STATUS_PENDING;
-        $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
-        $order->save();
+        if (! $order->isPaid()) {
+            $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+            $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
+            $order->save();
 
-        try {
-            event(new OrderPaymentFailed($order));
-        } catch (\Throwable $e) {
-            Log::warning('eMola OrderPaymentFailed event failed: '.$e->getMessage());
+            try {
+                event(new OrderPaymentFailed($order));
+            } catch (\Throwable $e) {
+                Log::warning('eMola OrderPaymentFailed event failed: '.$e->getMessage());
+            }
         }
     }
 

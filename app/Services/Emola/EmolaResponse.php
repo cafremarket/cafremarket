@@ -99,19 +99,15 @@ final class EmolaResponse
     }
 
     /**
-     * Paid per callback (errorCode 0) or status query (orgResponseCode 01).
+     * Payment completed — Movitel business errorCode 0 only (not 22, not orgResponseCode alone).
      */
     public function isTransactionPaid(): bool
     {
-        if ($this->isPaymentSuccess()) {
-            return true;
-        }
-
-        if (! is_array($this->originalData)) {
+        if (! $this->isGatewaySuccess()) {
             return false;
         }
 
-        return EmolaSpec::isOrgResponseSuccess($this->originalData['orgResponseCode'] ?? null);
+        return $this->isPaymentSuccess();
     }
 
     public function failureMessage(): string

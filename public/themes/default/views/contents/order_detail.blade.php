@@ -1,12 +1,12 @@
 <!-- CONTENT SECTION -->
-<section id="payment-detail-section" name="payment-detail-section" class="account-section mb-3">
+<section id="payment-detail-section" name="payment-detail-section" class="account-section order-detail-page mb-3">
   <div class="container">
     <div class="row">
-      <div class="col-md-12 p-0">
-        <h4 class="title mb-4">@lang('theme.payment_detail')</h4>
+      <div class="col-12 px-3 px-md-0">
+        <h4 class="title mb-3 mb-md-4">@lang('theme.payment_detail')</h4>
 
-        <div class="table-responsive">
-          <table class="table border" id="buyer-payment-detail-table">
+        <div class="table-responsive order-detail-table-wrap">
+          <table class="table border order-detail-stack-table" id="buyer-payment-detail-table">
             <tbody>
               <tr class="buyer-payment-info-head">
                 <td>@lang('theme.price')</td>
@@ -20,14 +20,14 @@
               </tr>
 
               <tr class="buyer-payment-info-body">
-                <td>{{ get_formated_currency($order->total, 2, $order->currency_id) }}</td>
+                <td data-label="@lang('theme.price')">{{ get_formated_currency($order->total, 2, $order->currency_id) }}</td>
                 @unless ($order->is_digital)
-                  <td>{{ get_formated_currency($order->get_shipping_cost(), 2, $order->currency_id) }}</td>
-                  <td>{{ get_formated_currency($order->packaging, 2, $order->currency_id) }}</td>
+                  <td data-label="@lang('theme.shipping_cost')">{{ get_formated_currency($order->get_shipping_cost(), 2, $order->currency_id) }}</td>
+                  <td data-label="@lang('theme.packaging_cost')">{{ get_formated_currency($order->packaging, 2, $order->currency_id) }}</td>
                 @endunless
-                <td>{{ get_formated_currency($order->taxes, 2, $order->currency_id) }}</td>
-                <td>{{ get_formated_currency($order->discount, 2, $order->currency_id) }}</td>
-                <td>{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</td>
+                <td data-label="@lang('theme.taxes')">{{ get_formated_currency($order->taxes, 2, $order->currency_id) }}</td>
+                <td data-label="@lang('theme.discount')">{{ get_formated_currency($order->discount, 2, $order->currency_id) }}</td>
+                <td data-label="@lang('theme.total')">{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</td>
               </tr>
 
               <tr>
@@ -40,10 +40,10 @@
                 <td colspan="2">@lang('theme.status')</td>
               </tr>
 
-              <tr class="buyer-payment-info-body">
-                <td colspan="2">{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</td>
-                <td colspan="2">{{ $order->paymentMethod->name }}</td>
-                <td colspan="2">{!! $order->paymentStatusName() !!}</td>
+              <tr class="buyer-payment-info-body buyer-payment-info-summary">
+                <td colspan="2" data-label="@lang('theme.amount')">{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</td>
+                <td colspan="2" data-label="@lang('theme.payment_method')">{{ $order->paymentMethod->name }}</td>
+                <td colspan="2" data-label="@lang('theme.status')">{!! $order->paymentStatusName() !!}</td>
               </tr>
 
               @if ($order->canResendEmolaPayment())
@@ -53,9 +53,10 @@
                 <tr class="buyer-payment-info-body">
                   <td colspan="6">
                     <p class="text-muted mb-3">@lang('theme.emola_resend_help')</p>
-                    {!! Form::open(['route' => ['order.emola.resend', $order], 'method' => 'POST', 'class' => 'form-inline emola-resend-form', 'id' => 'emola-resend-form']) !!}
-                    <div class="form-group mr-2 mb-2" style="display:inline-block;vertical-align:top;">
-                      <label for="emola-resend-number" class="sr-only">@lang('theme.emola_number')</label>
+                    {!! Form::open(['route' => ['order.emola.resend', $order], 'method' => 'POST', 'class' => 'emola-resend-form', 'id' => 'emola-resend-form']) !!}
+                    <div class="emola-resend-panel">
+                      <div class="form-group emola-resend-field">
+                        <label for="emola-resend-number" class="control-label">@lang('theme.emola_number')</label>
                       {!! Form::text('emola_number', old('emola_number', $order->suggestedEmolaNumber()), [
                           'id' => 'emola-resend-number',
                           'class' => 'form-control flat',
@@ -65,17 +66,20 @@
                           'required' => 'required',
                           'pattern' => '^(86|87)[0-9]{7}$',
                       ]) !!}
+                      </div>
+                      <div class="emola-resend-actions">
+                        {!! Form::button('<i class="fa fa-refresh"></i> ' . trans('theme.emola_resend_button'), [
+                            'type' => 'button',
+                            'class' => 'btn btn-primary btn-block emola-resend-submit',
+                            'data-confirm' => trans('theme.emola_resend_confirm'),
+                        ]) !!}
+                        <button type="button"
+                          class="btn btn-default btn-block emola-sync-payment"
+                          data-url="{{ route('order.emola.sync', $order) }}">
+                          <i class="fa fa-search"></i> @lang('theme.emola_check_payment')
+                        </button>
+                      </div>
                     </div>
-                    {!! Form::button('<i class="fa fa-refresh"></i> ' . trans('theme.emola_resend_button'), [
-                        'type' => 'button',
-                        'class' => 'btn btn-primary mb-2 emola-resend-submit',
-                        'data-confirm' => trans('theme.emola_resend_confirm'),
-                    ]) !!}
-                    <button type="button"
-                      class="btn btn-default mb-2 emola-sync-payment"
-                      data-url="{{ route('order.emola.sync', $order) }}">
-                      <i class="fa fa-search"></i> @lang('theme.emola_check_payment')
-                    </button>
                     {!! Form::close() !!}
                     <p class="help-block small text-muted mb-0">@lang('theme.emola_number_help')</p>
                     <p class="help-block small text-muted mb-0">@lang('theme.emola_check_payment_help')</p>
@@ -158,14 +162,14 @@
 </section>
 
 @if ($order->refunds->count())
-  <section id="refund-detail-section" name="refund-detail-section" class="account-section mb-3">
+  <section id="refund-detail-section" name="refund-detail-section" class="account-section order-detail-page mb-3">
     <div class="container">
       <div class="row">
-        <div class="col-md-12 p-0">
+        <div class="col-12 px-3 px-md-0">
           <h4 class="title mb-4">@lang('theme.refunds')</h4>
 
           <div class="table-responsive">
-            <table class="table border" id="buyer-payment-detail-table">
+            <table class="table border order-detail-stack-table" id="buyer-payment-detail-table">
               <tbody>
                 <tr class="buyer-payment-info-head">
                   <td>{{ trans('theme.return_goods') }}</td>
@@ -197,11 +201,31 @@
   @include('wallet::_order_page_credit_rewards', ['order' => $order])
 @endif
 
-<section id="order-detail-section" name="order-detail-section" class="account-section">
+<section id="order-detail-section" name="order-detail-section" class="account-section order-detail-page">
   <div class="container">
     <div class="row">
-      <div class="col-md-12 p-0">
-        <h4 class="title mb-4">
+      <div class="col-12 px-3 px-md-0">
+        <div class="order-detail-mobile-summary d-md-none">
+          <div class="order-detail-mobile-summary__row">
+            <span class="text-muted">@lang('theme.order_id')</span>
+            <strong>{{ $order->order_number }}</strong>
+          </div>
+          <div class="order-detail-mobile-summary__row">
+            <span class="text-muted">@lang('theme.status')</span>
+            <span>{!! $order->orderStatus(true) . ' ' . $order->paymentStatusName() !!}</span>
+          </div>
+          <div class="order-detail-mobile-summary__row">
+            <span class="text-muted">@lang('theme.order_amount')</span>
+            <strong>{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</strong>
+          </div>
+          @if ($order->canResendEmolaPayment())
+            <a href="#payment-detail-section" class="btn btn-warning btn-block btn-sm mt-2">
+              <i class="fa fa-refresh"></i> @lang('theme.emola_resend_button')
+            </a>
+          @endif
+        </div>
+
+        <h4 class="title mb-3 mb-md-4 d-none d-md-block">
           @lang('theme.order_detail')
 
           @if ($order->auction_bid_id)
@@ -209,26 +233,28 @@
           @endif
         </h4>
 
-        <div class="table-responsive">
-          <table class="table border" id="buyer-order-table" name="buyer-order-table">
+        <h4 class="title mb-3 d-md-none">@lang('theme.order_detail')</h4>
+
+        <div class="table-responsive order-detail-table-wrap">
+          <table class="table border order-detail-stack-table" id="buyer-order-table" name="buyer-order-table">
             <tbody>
-              <tr class="buyer-payment-info-head bg-light">
+              <tr class="buyer-payment-info-head bg-light order-detail-address-head">
                 <td>@lang('theme.shipping_address'):</td>
                 <td colspan="2">@lang('theme.billing_address'):</td>
               </tr>
-              <tr>
-                <td>
+              <tr class="order-detail-address-body">
+                <td data-label="@lang('theme.shipping_address')">
                   @if ($order->is_digital)
                     @lang('theme.donwloadable')
                   @else
                     {!! $order->shipping_address !!}
                   @endif
                 </td>
-                <td colspan="2">{!! $order->billing_address !!}</td>
+                <td colspan="2" data-label="@lang('theme.billing_address')">{!! $order->billing_address !!}</td>
               </tr>
 
-              <tr class="order-info-head">
-                <td width="40%">
+              <tr class="order-info-head order-detail-meta-row">
+                <td class="order-detail-meta-cell" width="40%">
                   <h5 class="my-1">
                     <span>@lang('theme.order_id'): </span>
                     {{ $order->order_number }}
@@ -253,7 +279,7 @@
                     <span>@lang('theme.order_time_date'): </span>{{ $order->created_at->toDayDateTimeString() }}
                   </h5>
                 </td>
-                <td width="40%" class="store-info">
+                <td class="order-detail-meta-cell store-info" width="40%">
                   <h5 class="my-1">
                     <span>@lang('theme.store'):</span>
                     @if ($order->shop->slug)
@@ -269,7 +295,7 @@
                     {!! $order->orderStatus(true) . ' &nbsp; ' . $order->paymentStatusName() !!}
                   </h5>
                 </td>
-                <td width="20%" class="order-amount">
+                <td class="order-detail-meta-cell order-amount" width="20%">
                   <h5 class="my-1">
                     <span>@lang('theme.order_amount'): </span>{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}
                   </h5>
@@ -277,8 +303,9 @@
               </tr> <!-- /.order-info-head -->
 
               @foreach ($order->inventories as $item)
-                <tr class="order-body">
-                  <td colspan="2">
+                <tr class="order-body order-detail-product-row">
+                  <td colspan="2" class="order-detail-product-cell">
+                    <div class="order-detail-product-layout">
                     <div class="product-img-wrap">
                       <img src="{{ get_product_img_src($item, 'small') }}" alt="{{ $item->slug }}" title="{{ $item->slug }}" />
                     </div>
@@ -299,7 +326,7 @@
                         <span>{{ get_formated_currency($item->pivot->unit_price, 2, $order->currency_id) }} x {{ $item->pivot->quantity }}</span>
                       </div>
 
-                      <ul class="mailbox-attachments clearfix pull-right">
+                      <ul class="mailbox-attachments clearfix order-detail-attachments">
                         @if (isset($item->attachments))
                           @foreach ($item->attachments as $attachment)
                             <li>
@@ -320,10 +347,11 @@
                         @endif
                       </ul>
                     </div>
+                    </div>
                   </td>
 
                   @if ($loop->first)
-                    <td rowspan="{{ $loop->count }}" class="order-actions">
+                    <td rowspan="{{ $loop->count }}" class="order-actions order-detail-actions-cell">
                       <a href="{{ route('order.again', $order) }}" class="btn btn-default btn-sm btn-block">
                         <i class="fas fa-shopping-cart"></i> @lang('theme.order_again')
                       </a>
@@ -409,16 +437,16 @@
   </div><!-- /.container -->
 </section>
 
-<section id="message-section" name="message-section" class="account-section">
+<section id="message-section" name="message-section" class="account-section order-detail-page">
   <div class="container mb-3">
     <div class="row">
-      <div class="col-md-12 p-0">
+      <div class="col-12 px-3 px-md-0">
         <h4 class="title mb-3">@lang('theme.section_headings.contact_seller')</h4>
 
         <div class="message-list">
           <div class="row">
-            {!! Form::open(['route' => ['order.conversation', $order], 'files' => true, 'id' => 'conversation-form', 'data-toggle' => 'validator']) !!}
-            <div class="col-md-6">
+            {!! Form::open(['route' => ['order.conversation', $order], 'files' => true, 'id' => 'conversation-form', 'data-toggle' => 'validator', 'class' => 'order-detail-message-form w-100']) !!}
+            <div class="col-12 col-md-6">
               <div class="form-group">
                 {!! Form::label('message', trans('theme.write_your_message')) !!}
                 {!! Form::textarea('message', null, ['class' => 'form-control form-control flat', 'placeholder' => trans('theme.leave_message_to_seller'), 'rows' => '4', 'maxlength' => 500, 'required']) !!}
@@ -426,7 +454,7 @@
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
               <div class="form-group">
                 {!! Form::label('photoInput', trans('theme.button.upload_photo')) !!}
                 {!! Form::file('photo') !!}
@@ -440,7 +468,7 @@
                   </label>
                 </div>
               @endunless
-              {!! Form::button(trans('theme.button.send_message'), ['type' => 'submit', 'class' => 'btn btn-info py-2 px-5']) !!}
+              {!! Form::button(trans('theme.button.send_message'), ['type' => 'submit', 'class' => 'btn btn-info btn-block btn-md-inline py-2 px-5 order-detail-send-btn']) !!}
             </div>
             {!! Form::close() !!}
           </div> <!-- /.row -->
@@ -517,6 +545,65 @@
 <!-- END CONTENT SECTION -->
 
 <style>
+  .order-detail-page .title {
+    text-align: left;
+  }
+
+  .order-detail-mobile-summary {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+
+  .order-detail-mobile-summary__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 6px 0;
+    font-size: 14px;
+  }
+
+  .order-detail-mobile-summary__row + .order-detail-mobile-summary__row {
+    border-top: 1px solid #e9ecef;
+  }
+
+  .emola-resend-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 420px;
+  }
+
+  .emola-resend-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .emola-resend-actions .btn {
+    margin: 0;
+  }
+
+  .order-detail-product-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .order-detail-product-layout .product-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .order-detail-attachments {
+    float: none !important;
+    margin-top: 10px;
+    padding-left: 0;
+  }
+
   .wire-proof-list {
     display: flex;
     flex-direction: column;
@@ -550,6 +637,221 @@
     max-width: 100%;
     max-height: 70vh;
     object-fit: contain;
+  }
+
+  @media (max-width: 767px) {
+    .order-detail-page .account-section,
+    .order-detail-page.account-section {
+      margin-bottom: 1rem;
+    }
+
+    .order-detail-table-wrap {
+      margin-left: -4px;
+      margin-right: -4px;
+    }
+
+    .order-detail-stack-table {
+      border: 0;
+    }
+
+    .order-detail-stack-table tbody,
+    .order-detail-stack-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .order-detail-stack-table td {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      border: none !important;
+      border-bottom: 1px solid #eee !important;
+      padding: 10px 12px;
+      box-sizing: border-box;
+    }
+
+    .order-detail-stack-table tr.buyer-payment-info-head,
+    .order-detail-stack-table tr.order-detail-address-head {
+      display: none;
+    }
+
+    .order-detail-stack-table tr.buyer-payment-info-body td,
+    .order-detail-stack-table tr.order-detail-address-body td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      text-align: right;
+    }
+
+    .order-detail-stack-table tr.buyer-payment-info-body td::before,
+    .order-detail-stack-table tr.order-detail-address-body td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: #555;
+      text-align: left;
+      flex: 0 0 42%;
+    }
+
+    .order-detail-stack-table tr.buyer-payment-info-summary td {
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .order-detail-stack-table tr.buyer-payment-info-summary td::before {
+      margin-bottom: 4px;
+    }
+
+    .order-detail-stack-table tr.order-info-head.order-detail-meta-row {
+      background: #f8f9fa;
+    }
+
+    .order-detail-stack-table .order-detail-meta-cell {
+      border-bottom: 1px solid #e9ecef !important;
+    }
+
+    .order-detail-stack-table .order-detail-meta-cell h5 {
+      font-size: 14px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .order-detail-stack-table .order-detail-meta-cell h5 span {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #777;
+      margin-bottom: 2px;
+    }
+
+    .order-detail-stack-table .order-detail-product-cell {
+      padding-top: 14px;
+    }
+
+    .order-detail-stack-table .order-detail-product-layout {
+      flex-direction: column;
+    }
+
+    .order-detail-stack-table .order-body .product-img-wrap {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .order-detail-stack-table .order-body .product-img-wrap img {
+      max-width: 72px;
+      height: auto;
+    }
+
+    .order-detail-stack-table td.order-detail-actions-cell {
+      display: block !important;
+      width: 100% !important;
+      padding: 12px;
+      background: #fafafa;
+      border-top: 2px solid #e9ecef !important;
+    }
+
+    .order-detail-stack-table td.order-detail-actions-cell .btn {
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+
+    .order-detail-stack-table tr.message_from_seller td,
+    .order-detail-stack-table tr.order-info-footer td {
+      display: block;
+      text-align: left;
+    }
+
+    .emola-resend-panel {
+      max-width: none;
+    }
+
+    .wire-proof-item {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .wire-proof-actions {
+      width: 100%;
+    }
+
+    .wire-proof-actions .btn {
+      flex: 1 1 auto;
+    }
+
+    .order-detail-message-form .order-detail-send-btn {
+      width: 100%;
+    }
+
+    .message-list .message-list-item {
+      margin-bottom: 12px;
+    }
+
+    .message-list .message-list-item > [class*="col-"] {
+      width: 100%;
+      max-width: 100%;
+      flex: 0 0 100%;
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    .message-list .message-list-item .col-8 {
+      order: 2;
+    }
+
+    .message-list .message-list-item .col-2 {
+      order: 1;
+      margin-bottom: 6px;
+    }
+
+    .message-list .message-list-item .message-content-wrapper {
+      text-align: left;
+    }
+
+    .message-list .message-list-item.message-me .message-content-wrapper {
+      text-align: right;
+    }
+
+    .message-list .message-attachment {
+      float: none !important;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .page-header .breadcrumb {
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .emola-resend-panel {
+      flex-direction: row;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      max-width: none;
+    }
+
+    .emola-resend-field {
+      flex: 1 1 200px;
+      min-width: 180px;
+      margin-bottom: 0;
+    }
+
+    .emola-resend-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .emola-resend-actions .btn {
+      width: auto;
+    }
+
+    .order-detail-send-btn.btn-block {
+      display: inline-block;
+      width: auto;
+    }
   }
 </style>
 

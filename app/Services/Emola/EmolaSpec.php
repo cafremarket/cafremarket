@@ -128,7 +128,7 @@ final class EmolaSpec
         return config('emola.business_errors.'.$code);
     }
 
-    /** Callback / query success — errorCode 0 (accepts 0, 00, 000). */
+    /** Callback / query — payment completed (spec §C: errorCode 0 only). */
     public static function isPaymentSuccessCode(?string $code): bool
     {
         if ($code === null || $code === '') {
@@ -140,7 +140,29 @@ final class EmolaSpec
         return $normalized === '0' || $normalized === '00' || (ctype_digit($normalized) && (int) $normalized === 0);
     }
 
-    /** pushUssdQueryTrans — orgResponseCode 01 means origin transaction successful (spec §B.2). */
+    /** USSD dispatched, awaiting customer PIN (spec §C: 22). */
+    public static function isPaymentPendingCode(?string $code): bool
+    {
+        return in_array(trim((string) $code), ['22'], true);
+    }
+
+    /**
+     * Terminal failure / cancellation — must not show paid (e.g. 11 = PIN cancelled).
+     */
+    public static function isPaymentFailureCode(?string $code): bool
+    {
+        if ($code === null || $code === '') {
+            return false;
+        }
+
+        if (self::isPaymentSuccessCode($code) || self::isPaymentPendingCode($code)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /** pushUssdQueryTrans — informational; never treat as paid without errorCode 0. */
     public static function isOrgResponseSuccess(?string $code): bool
     {
         $normalized = trim((string) $code);

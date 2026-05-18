@@ -178,6 +178,7 @@ return [
     'emola_amount_limit' => 'Order total :amount MZN exceeds the eMola USSD limit of :max MZN per transaction. Use another payment method or contact Movitel to raise your limit.',
     'emola_amount_too_long' => 'Order amount is too large for eMola (maximum 5 digits).',
     'emola_error_10' => 'This eMola number is not allowed for payments yet. Ask Movitel to whitelist it for your merchant account (partner code), or use a number they have already registered for testing.',
+    'emola_error_11' => 'Payment was cancelled on your phone (PIN not entered). The order is not paid — you can try again.',
     'emola_check_payment' => 'Check payment status',
     'emola_check_payment_help' => 'Paid on your phone but the order still shows pending? Click to refresh status from Movitel.',
     'emola_payment_confirmed' => 'Payment confirmed. Your order is now marked as paid.',
