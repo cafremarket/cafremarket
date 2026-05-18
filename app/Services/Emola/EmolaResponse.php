@@ -123,6 +123,11 @@ final class EmolaResponse
         $message = $this->businessMessage();
 
         if ($code !== null) {
+            $themeKey = 'theme.emola_error_'.$code;
+            if (trans()->has($themeKey)) {
+                return trans($themeKey);
+            }
+
             $mapped = EmolaSpec::businessErrorMessage($code);
 
             return $mapped

@@ -53,7 +53,7 @@
                 <tr class="buyer-payment-info-body">
                   <td colspan="6">
                     <p class="text-muted mb-3">@lang('theme.emola_resend_help')</p>
-                    {!! Form::open(['route' => ['order.emola.resend', $order], 'method' => 'POST', 'class' => 'form-inline emola-resend-form']) !!}
+                    {!! Form::open(['route' => ['order.emola.resend', $order], 'method' => 'POST', 'class' => 'form-inline emola-resend-form', 'id' => 'emola-resend-form']) !!}
                     <div class="form-group mr-2 mb-2" style="display:inline-block;vertical-align:top;">
                       <label for="emola-resend-number" class="sr-only">@lang('theme.emola_number')</label>
                       {!! Form::text('emola_number', old('emola_number', $order->suggestedEmolaNumber()), [
@@ -67,8 +67,8 @@
                       ]) !!}
                     </div>
                     {!! Form::button('<i class="fa fa-refresh"></i> ' . trans('theme.emola_resend_button'), [
-                        'type' => 'submit',
-                        'class' => 'btn btn-primary mb-2 confirm',
+                        'type' => 'button',
+                        'class' => 'btn btn-primary mb-2 emola-resend-submit',
                         'data-confirm' => trans('theme.emola_resend_confirm'),
                     ]) !!}
                     {!! Form::close() !!}
@@ -564,6 +564,105 @@
 </div>
 
 <script>
+  (function($) {
+    'use strict';
+    if (!$) return;
+
+    function emolaResendToast(type, message) {
+      if (typeof toastr === 'undefined') return;
+      toastr.options = {
+        closeButton: true,
+        debug: false,
+        newestOnTop: false,
+        progressBar: false,
+        positionClass: 'toast-bottom-center',
+        preventDuplicates: false,
+        onclick: null,
+        showEasing: 'swing',
+        hideEasing: 'linear',
+        showMethod: 'fadeIn',
+        hideMethod: 'fadeOut'
+      };
+      toastr[type](message);
+    }
+
+    function emolaResendErrorMessage(xhr) {
+      var data = xhr.responseJSON;
+      if (!data) {
+        return @json(trans('theme.notify.failed'));
+      }
+      if (data.errors && data.errors.emola_number && data.errors.emola_number[0]) {
+        return data.errors.emola_number[0];
+      }
+      return data.message || @json(trans('theme.notify.failed'));
+    }
+
+    $('body').on('submit', 'form.emola-resend-form', function(e) {
+      e.preventDefault();
+      $(this).find('.emola-resend-submit').trigger('click');
+    });
+
+    $('body').on('click', '.emola-resend-submit', function(e) {
+      e.preventDefault();
+
+      var $btn = $(this);
+      var $form = $btn.closest('form.emola-resend-form');
+      if (!$form.length) return;
+
+      var msg = $btn.data('confirm') || @json(trans('theme.notify.are_you_sure'));
+
+      $.confirm({
+        title: @json(trans('theme.confirmation')),
+        content: msg,
+        type: 'red',
+        icon: 'fas fa-question-circle',
+        class: 'flat',
+        animation: 'scale',
+        closeAnimation: 'scale',
+        opacity: 0.5,
+        buttons: {
+          confirm: {
+            text: @json(trans('theme.button.proceed')),
+            keys: ['enter'],
+            btnClass: 'btn-primary flat',
+            action: function() {
+              var originalHtml = $btn.html();
+              $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+              $('body').css('cursor', 'wait');
+
+              $.ajax({
+                url: $form.attr('action'),
+                method: 'POST',
+                data: $form.serialize(),
+                dataType: 'json',
+                headers: {
+                  'Accept': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(res) {
+                  emolaResendToast(res.type || 'warning', res.message);
+                },
+                error: function(xhr) {
+                  emolaResendToast('error', emolaResendErrorMessage(xhr));
+                },
+                complete: function() {
+                  $btn.prop('disabled', false).html(originalHtml);
+                  $('body').css('cursor', 'default');
+                }
+              });
+
+              return true;
+            }
+          },
+          cancel: {
+            text: @json(trans('theme.button.cancel')),
+            btnClass: 'btn-default flat'
+          }
+        }
+      });
+    });
+  })(window.jQuery);
+
   (function() {
     'use strict';
     document.addEventListener('click', function(e) {

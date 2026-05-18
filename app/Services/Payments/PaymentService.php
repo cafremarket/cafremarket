@@ -61,6 +61,9 @@ class PaymentService implements PaymentServiceContract
     // public $success;
     public $status;
 
+    /** Optional message when payment is pending but gateway reported an issue (e.g. eMola USSD not sent). */
+    public ?string $paymentNotice = null;
+
     public $base_url;
 
     /**

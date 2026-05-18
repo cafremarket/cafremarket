@@ -35,8 +35,11 @@ class EmolaPaymentService extends PaymentService
             return $this;
         }
 
-        $this->status = self::STATUS_ERROR;
-        throw new PaymentFailedException($res->failureMessage());
+        // Keep the order so the customer can resend USSD from the order page.
+        $this->status = self::STATUS_PENDING;
+        $this->paymentNotice = $res->failureMessage();
+
+        return $this;
     }
 
     public function setConfig()

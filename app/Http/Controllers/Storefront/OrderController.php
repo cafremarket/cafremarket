@@ -18,6 +18,7 @@ use App\Models\Order;
 use App\Services\Payments\PaymentService;
 use App\Services\Payments\PaypalPaymentService;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -144,6 +145,7 @@ class OrderController extends Controller
                 case PaymentService::STATUS_ERROR:
                     $order->payment_status = Order::PAYMENT_STATUS_PENDING;
                     $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
+                    break;
 
                 default:
                     throw new PaymentFailedException(trans('theme.notify.payment_failed'));
@@ -151,11 +153,18 @@ class OrderController extends Controller
 
             // Save the order
             $order->save();
-        } catch (Exception $e) {
-            DB::rollback(); // Rollback the transaction and log the error
+        } catch (PaymentFailedException $e) {
+            DB::rollback();
 
-            Log::error($request->payment_method.' payment failed:: '.$e->getMessage());
-            Log::error($e);
+            Log::warning($request->payment_method.' payment failed: '.$e->getMessage());
+
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+        } catch (Exception $e) {
+            DB::rollback();
+
+            Log::error($request->payment_method.' payment failed: '.$e->getMessage(), [
+                'exception' => $e,
+            ]);
 
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
@@ -179,8 +188,10 @@ class OrderController extends Controller
         $flashKey = 'success';
         $flashMessage = trans('theme.notify.order_placed');
 
-        // For async wallets like eMola, order exists but payment can still be pending.
-        if (
+        if (! empty($response->paymentNotice)) {
+            $flashKey = 'error';
+            $flashMessage = $response->paymentNotice;
+        } elseif (
             isset($response->status) &&
             $response->status === PaymentService::STATUS_PENDING &&
             optional($order->paymentMethod)->code === 'emola'
@@ -322,7 +333,7 @@ class OrderController extends Controller
     /**
      * Resend eMola USSD payment request for a pending order.
      */
-    public function resendEmolaPayment(Request $request, Order $order, EmolaOrderPaymentService $emolaOrders)
+    public function resendEmolaPayment(Request $request, Order $order, EmolaOrderPaymentService $emolaOrders): RedirectResponse|JsonResponse
     {
         $customer = auth('customer')->user();
         if (! $customer || (int) $order->customer_id !== (int) $customer->id) {
@@ -330,7 +341,11 @@ class OrderController extends Controller
         }
 
         if (! $order->canResendEmolaPayment()) {
-            return redirect()->back()->with('error', trans('theme.emola_resend_not_allowed'));
+            $message = trans('theme.emola_resend_not_allowed');
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $message], 403)
+                : redirect()->back()->with('error', $message);
         }
 
         $request->validate([
@@ -343,10 +358,16 @@ class OrderController extends Controller
         try {
             $emolaOrders->resendPaymentRequest($order, $request->input('emola_number'));
         } catch (PaymentFailedException $e) {
-            return redirect()->back()->with('error', $e->getMessage())->withInput();
+            return $request->expectsJson()
+                ? response()->json(['message' => $e->getMessage()], 422)
+                : redirect()->back()->with('error', $e->getMessage())->withInput();
         }
 
-        return redirect()->back()->with('warning', trans('theme.emola_resend_success'));
+        $message = trans('theme.emola_resend_success');
+
+        return $request->expectsJson()
+            ? response()->json(['message' => $message, 'type' => 'warning'])
+            : redirect()->back()->with('warning', $message);
     }
 
     /**

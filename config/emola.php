@@ -89,6 +89,7 @@ return [
         '07' => 'Invalid MSISDN',
         '08' => 'Invalid SMS content length',
         '09' => 'Transaction ID too long',
+        '10' => 'ISDN not in whitelist',
         '11' => 'Customer did not enter PIN',
         '12' => 'Customer does not have eMola account',
         '14' => 'Transaction ID already exists',

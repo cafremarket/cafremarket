@@ -93,17 +93,28 @@ class CheckoutController extends Controller
                 case PaymentService::STATUS_ERROR:
                     $order->payment_status = Order::PAYMENT_STATUS_PENDING;
                     $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
+                    break;
 
                 default:
                     throw new PaymentFailedException(trans('theme.notify.payment_failed'));
             }
 
             // throw new \Exception("Error Payment Processing Request");
-        } catch (\Exception $e) {
-            DB::rollback(); // rollback the transaction and log the error
+        } catch (PaymentFailedException $e) {
+            DB::rollback();
 
-            Log::error($request->payment_method.' Payment failed:: '.$e->getMessage());
-            Log::error($e);
+            Log::warning($request->payment_method.' payment failed: '.$e->getMessage());
+
+            return response()->json([
+                'error' => $e->getMessage(),
+                'cart' => new CartResource($cart),
+            ], 403);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            Log::error($request->payment_method.' payment failed: '.$e->getMessage(), [
+                'exception' => $e,
+            ]);
 
             return response()->json([
                 'error' => $e->getMessage(),
@@ -132,7 +143,9 @@ class CheckoutController extends Controller
         }
 
         $message = trans('theme.notify.order_placed');
-        if (
+        if (! empty($response->paymentNotice)) {
+            $message = $response->paymentNotice;
+        } elseif (
             isset($response->status) &&
             $response->status === PaymentService::STATUS_PENDING &&
             optional($order->paymentMethod)->code === 'emola'
@@ -142,6 +155,7 @@ class CheckoutController extends Controller
 
         return response()->json([
             'message' => $message,
+            'payment_notice' => $response->paymentNotice ?? null,
             'order' => new OrderResource($order),
         ], 200);
     }
