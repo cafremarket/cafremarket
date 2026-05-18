@@ -568,22 +568,33 @@
     'use strict';
     if (!$) return;
 
-    function emolaResendToast(type, message) {
-      if (typeof toastr === 'undefined') return;
-      toastr.options = {
-        closeButton: true,
-        debug: false,
-        newestOnTop: false,
-        progressBar: false,
-        positionClass: 'toast-bottom-center',
-        preventDuplicates: false,
-        onclick: null,
-        showEasing: 'swing',
-        hideEasing: 'linear',
-        showMethod: 'fadeIn',
-        hideMethod: 'fadeOut'
-      };
-      toastr[type](message);
+    function emolaResendPopup(title, message, type) {
+      if (typeof $.alert === 'function') {
+        $.alert({
+          title: title,
+          content: message,
+          type: type || 'green',
+          icon: type === 'red' ? 'fas fa-times-circle' : 'fas fa-check-circle',
+          class: 'flat',
+          animation: 'scale',
+          closeAnimation: 'scale',
+          buttons: {
+            ok: {
+              text: @json(trans('theme.button.ok')),
+              btnClass: 'btn-primary flat'
+            }
+          }
+        });
+        return;
+      }
+
+      if (typeof toastr !== 'undefined') {
+        toastr.options = {
+          closeButton: true,
+          positionClass: 'toast-bottom-center'
+        };
+        toastr[type === 'red' ? 'error' : 'success'](message);
+      }
     }
 
     function emolaResendErrorMessage(xhr) {
@@ -606,8 +617,26 @@
       e.preventDefault();
 
       var $btn = $(this);
+      if ($btn.prop('disabled')) return;
+
       var $form = $btn.closest('form.emola-resend-form');
       if (!$form.length) return;
+
+      var $input = $form.find('#emola-resend-number');
+      var number = ($input.val() || '').replace(/\D/g, '');
+
+      if (!/^(86|87)\d{7}$/.test(number)) {
+        emolaResendPopup(@json(trans('theme.error')), @json(trans('theme.emola_number_invalid')), 'red');
+        $input.focus();
+        return;
+      }
+
+      $input.val(number);
+
+      if (typeof $.confirm !== 'function') {
+        $form.trigger('submit');
+        return;
+      }
 
       var msg = $btn.data('confirm') || @json(trans('theme.notify.are_you_sure'));
 
@@ -640,10 +669,28 @@
                   'X-Requested-With': 'XMLHttpRequest'
                 },
                 success: function(res) {
-                  emolaResendToast(res.type || 'warning', res.message);
+                  if (res && res.success) {
+                    $input.val('');
+                    emolaResendPopup(
+                      @json(trans('theme.success')),
+                      res.message || @json(trans('theme.emola_resend_success')),
+                      'green'
+                    );
+                    return;
+                  }
+
+                  emolaResendPopup(
+                    @json(trans('theme.error')),
+                    (res && res.message) ? res.message : @json(trans('theme.emola_resend_failed')),
+                    'red'
+                  );
                 },
                 error: function(xhr) {
-                  emolaResendToast('error', emolaResendErrorMessage(xhr));
+                  emolaResendPopup(
+                    @json(trans('theme.error')),
+                    emolaResendErrorMessage(xhr),
+                    'red'
+                  );
                 },
                 complete: function() {
                   $btn.prop('disabled', false).html(originalHtml);

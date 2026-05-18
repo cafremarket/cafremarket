@@ -366,7 +366,7 @@ class OrderController extends Controller
         $message = trans('theme.emola_resend_success');
 
         return $request->expectsJson()
-            ? response()->json(['message' => $message, 'type' => 'warning'])
+            ? response()->json(['success' => true, 'message' => $message])
             : redirect()->back()->with('warning', $message);
     }
 
