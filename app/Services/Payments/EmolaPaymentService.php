@@ -74,14 +74,7 @@ class EmolaPaymentService extends PaymentService
         $this->order->payment_status = Order::PAYMENT_STATUS_PENDING;
         $this->order->save();
 
-        // If synchronous mode returns success immediately.
-        if ($res->ok() && $detailCode === '0') {
-            $this->status = self::STATUS_PAID;
-
-            return $this;
-        }
-
-        // Async mode returns "22 Push message done" or a pending-like response.
+        // USSD push accepted — payment is confirmed only via eMola callback, never here.
         if ($res->ok()) {
             $this->status = self::STATUS_PENDING;
 

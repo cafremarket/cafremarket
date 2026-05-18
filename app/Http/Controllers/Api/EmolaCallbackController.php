@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\Order\OrderCreated;
+use App\Events\Order\OrderPaymentFailed;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -54,11 +56,25 @@ class EmolaCallbackController extends Controller
             $order->save();
 
             if ($data['errorCode'] === '0') {
-                $order->markAsPaid();
+                if (! $order->isPaid()) {
+                    $order->markAsPaid();
+
+                    try {
+                        event(new OrderCreated($order));
+                    } catch (\Throwable $e) {
+                        Log::warning('eMola callback OrderCreated failed: '.$e->getMessage());
+                    }
+                }
             } else {
                 $order->payment_status = Order::PAYMENT_STATUS_PENDING;
                 $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
                 $order->save();
+
+                try {
+                    event(new OrderPaymentFailed($order));
+                } catch (\Throwable $e) {
+                    Log::warning('eMola callback OrderPaymentFailed failed: '.$e->getMessage());
+                }
             }
         } else {
             Log::warning('eMola callback: order not found', [
@@ -74,4 +90,3 @@ class EmolaCallbackController extends Controller
         ]);
     }
 }
-

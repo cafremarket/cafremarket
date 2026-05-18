@@ -75,7 +75,9 @@ class CheckoutController extends Controller
 
             switch ($response->status) {
                 case PaymentService::STATUS_PAID:
-                    $order->markAsPaid();     // Order has been paid
+                    if (optional($order->paymentMethod)->code !== 'emola') {
+                        $order->markAsPaid();
+                    }
                     break;
 
                 case PaymentService::STATUS_PENDING:
@@ -109,8 +111,8 @@ class CheckoutController extends Controller
             ], 403);
         }
 
-        // Order confirmed – only mark as paid when payment gateway returned STATUS_PAID (e.g. M-Pesa returns STATUS_PENDING until user completes on phone)
-        if ($response->status === PaymentService::STATUS_PAID) {
+        // Order confirmed – only mark as paid when payment gateway returned STATUS_PAID (eMola uses callback instead).
+        if ($response->status === PaymentService::STATUS_PAID && optional($order->paymentMethod)->code !== 'emola') {
             $order->markAsPaid();
         }
 
@@ -120,11 +122,13 @@ class CheckoutController extends Controller
         // Delete the cart
         $cart->forceDelete();
 
-        // Trigger the Event
-        try {
-            event(new OrderCreated($order));
-        } catch (\Exception $e) {
-            Log::warning('OrderCreated event failed: '.$e->getMessage());
+        // eMola: defer order-placed notifications until Movitel callback confirms payment.
+        if (! $this->shouldDeferEmolaConfirmation($order, $response)) {
+            try {
+                event(new OrderCreated($order));
+            } catch (\Exception $e) {
+                Log::warning('OrderCreated event failed: '.$e->getMessage());
+            }
         }
 
         $message = trans('theme.notify.order_placed');

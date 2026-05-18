@@ -125,7 +125,9 @@ class OrderController extends Controller
 
             switch ($response->status) {
                 case PaymentService::STATUS_PAID:
-                    $order->markAsPaid();     // Order has been paid
+                    if (optional($order->paymentMethod)->code !== 'emola') {
+                        $order->markAsPaid();
+                    }
                     break;
 
                 case PaymentService::STATUS_PENDING:
@@ -160,11 +162,13 @@ class OrderController extends Controller
         // Everything is fine. Now commit the transaction
         DB::commit();
 
-        // Trigger the Event (do not fail checkout when SMTP is unavailable)
-        try {
-            event(new OrderCreated($order));
-        } catch (Exception $e) {
-            Log::warning('OrderCreated event failed: '.$e->getMessage());
+        // eMola: defer order-placed notifications until Movitel callback confirms payment.
+        if (! $this->shouldDeferEmolaConfirmation($order, $response)) {
+            try {
+                event(new OrderCreated($order));
+            } catch (Exception $e) {
+                Log::warning('OrderCreated event failed: '.$e->getMessage());
+            }
         }
 
         $cart_item_count = cart_item_count();               // Update the cart count

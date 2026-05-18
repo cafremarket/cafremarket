@@ -593,4 +593,14 @@ trait ShoppingCart
 
         setcookie('cart_ids', $cookieValue, time() + (60 * 24 * 30), '/');
     }
+
+    /**
+     * eMola: order stays unconfirmed until Movitel callback confirms payment.
+     */
+    protected function shouldDeferEmolaConfirmation(Order $order, object $response): bool
+    {
+        return isset($response->status)
+            && $response->status === \App\Services\Payments\PaymentService::STATUS_PENDING
+            && optional($order->paymentMethod)->code === 'emola';
+    }
 }
