@@ -65,7 +65,9 @@
                         @if (in_array($payment_provider->id, $active_payment_methods))
                           @if ($can_update)
                             @php
-                              $has_config = !empty($config->{$payment_provider->code}) && in_array($payment_provider->code, (array) $config);
+                              $has_config = $payment_provider->code === 'emola'
+                                  ? \App\Models\SystemConfig::isPaymentConfigured('emola')
+                                  : (!empty($config->{$payment_provider->code}) && in_array($payment_provider->code, (array) $config));
                             @endphp
 
                             @unless ($has_config)

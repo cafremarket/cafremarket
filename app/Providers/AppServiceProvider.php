@@ -91,6 +91,8 @@ class AppServiceProvider extends ServiceProvider
             $this->app->bind(PaymentServiceContract::class, $className);
         }
 
+        $this->app->singleton(\App\Services\Emola\EmolaClient::class);
+
         // On demand Image manipulation
         $this->app->singleton(
             \League\Glide\Server::class,

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Config;
 // use App\Common\Authorizable;
 use App\Models\PaymentMethod;
+use App\Models\SystemConfig;
 use Illuminate\Http\Request;
 
 class PaymentMethodController extends Controller
@@ -54,8 +55,17 @@ class PaymentMethodController extends Controller
             return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
         }
 
-        return $this->getActivationRedirect($paymentMethod->code) ??
-            back()->with('error', trans('messages.failed', ['model' => $this->model_name]));
+        $redirect = $this->getActivationRedirect($paymentMethod->code);
+
+        if ($redirect) {
+            return $redirect;
+        }
+
+        if (SystemConfig::isPaymentConfigured($paymentMethod->code)) {
+            return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+        }
+
+        return back()->with('error', trans('messages.failed', ['model' => $this->model_name]));
     }
 
     /**

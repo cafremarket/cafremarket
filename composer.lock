@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "61606894d3b2aa5b510b4ac3da04309d",
+    "content-hash": "7e95f83a100afbadc1ade8a5ab83fa31",
     "packages": [
         {
             "name": "algolia/algoliasearch-client-php",
@@ -447,6 +447,47 @@
                 }
             ],
             "time": "2025-02-13T15:07:54+00:00"
+        },
+        {
+            "name": "blutekic/emola-sdk",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bluteki/emola-sdk.git",
+                "reference": "f5933a02c483bdcee1174d2e52ca8563b03cd191"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bluteki/emola-sdk/zipball/f5933a02c483bdcee1174d2e52ca8563b03cd191",
+                "reference": "f5933a02c483bdcee1174d2e52ca8563b03cd191",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.0",
+                "php": ">=8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Bluteki\\Sdk\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Rafael Munguambe",
+                    "email": "rafael.munguambe@bluteki.com"
+                }
+            ],
+            "description": "online payment manager using emola gateway",
+            "support": {
+                "issues": "https://github.com/bluteki/emola-sdk/issues",
+                "source": "https://github.com/bluteki/emola-sdk/tree/v1.0.1"
+            },
+            "time": "2024-10-21T12:21:40+00:00"
         },
         {
             "name": "brick/math",
@@ -17721,5 +17762,5 @@
         "php": "^8.2"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

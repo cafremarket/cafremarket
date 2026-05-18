@@ -39,8 +39,10 @@ class EmolaCallbackController extends Controller
         ]);
 
         $order = Order::query()
-            ->where('emola_trans_id', $data['transId'])
-            ->orWhere('emola_ref_no', $data['refNo'])
+            ->where(function ($q) use ($data) {
+                $q->where('emola_trans_id', $data['transId'])
+                    ->orWhere('emola_ref_no', $data['refNo']);
+            })
             ->latest('id')
             ->first();
 

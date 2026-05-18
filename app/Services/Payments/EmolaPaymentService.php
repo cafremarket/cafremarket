@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\Services\Emola\EmolaClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class EmolaPaymentService extends PaymentService
 {
@@ -24,11 +23,9 @@ class EmolaPaymentService extends PaymentService
 
         $msisdn = (string) $this->request->input('emola_number');
 
-        // eMola requires a unique transId per transaction (15-30 in doc). We use deterministic + random suffix.
-        $transId = (string) ($this->order->id.'-'.Str::upper(Str::random(10)));
-        $transId = substr(preg_replace('/[^A-Za-z0-9\-]/', '', $transId), 0, 30);
+        $transId = $this->client->generateTransId();
 
-        $refNo = (string) $this->order->id;
+        $refNo = 'REF'.(string) $this->order->id;
         $refNo = substr(preg_replace('/[^A-Za-z0-9]/', '', $refNo), 0, 20);
 
         $amount = (string) intval($this->amount);
@@ -59,9 +56,10 @@ class EmolaPaymentService extends PaymentService
         $this->order->emola_gateway_error = $res->gatewayError;
         $this->order->emola_gateway_description = $res->gatewayDescription;
 
-        $detailCode = $res->originalData['errorCode'] ?? null;
-        $detailMsg = $res->originalData['message'] ?? null;
-        $requestId = $res->originalData['reqeustId'] ?? null; // spec misspelling
+        $original = $res->originalData ?? [];
+        $detailCode = $original['errorCode'] ?? null;
+        $detailMsg = $original['message'] ?? null;
+        $requestId = $original['reqeustId'] ?? null; // spec misspelling
 
         $this->order->emola_error_code = $detailCode;
         $this->order->emola_message = $detailMsg;

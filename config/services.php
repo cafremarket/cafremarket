@@ -114,12 +114,6 @@ return [
         'pixel_id' => env('PINTEREST_PIXEL_ID'),
     ],
 
-    'emola' => [
-        'wsdl' => env('EMOLA_WSDL'),
-        'username' => env('EMOLA_USERNAME'),
-        'password' => env('EMOLA_PASSWORD'),
-        'partner_code' => env('EMOLA_PARTNER_CODE'),
-        'key' => env('EMOLA_KEY'),
-        'timeout_seconds' => (int) env('EMOLA_TIMEOUT_SECONDS', 70),
-    ],
+    // eMola (Movitel) — canonical config in config/emola.php
+    'emola' => require __DIR__.'/emola.php',
 ];

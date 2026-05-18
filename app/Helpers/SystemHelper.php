@@ -448,10 +448,10 @@ if (! function_exists('get_payment_config_info')) {
                 ];
 
             case 'emola':
-                $config = config('services.emola');
+                $configured = SystemConfig::isPaymentConfigured('emola');
 
                 return [
-                    'config' => $config,
+                    'config' => $configured ? config('emola') : null,
                     'msg' => 'Pay with eMola (Movitel USSD Push)',
                 ];
 

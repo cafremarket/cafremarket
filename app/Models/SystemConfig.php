@@ -237,11 +237,12 @@ class SystemConfig extends BaseModel
 
             case 'emola':
                 return (bool) (
-                    config('services.emola.wsdl')
-                    && config('services.emola.username')
-                    && config('services.emola.password')
-                    && config('services.emola.partner_code')
-                    && config('services.emola.key')
+                    config('emola.wsdl')
+                    && config('emola.endpoint')
+                    && config('emola.username')
+                    && config('emola.password')
+                    && config('emola.partner_code')
+                    && config('emola.key')
                 );
 
             case 'orangemoney':
