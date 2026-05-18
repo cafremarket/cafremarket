@@ -152,7 +152,8 @@ class EmolaClient
             $xml .= '<param name="'.htmlspecialchars((string) $name, ENT_XML1).'" value="'.htmlspecialchars((string) $value, ENT_XML1).'"/>';
         }
 
-        $xml .= '<rawData></rawData>';
+        // Spec §A.1 / partner SDK — rawData is mandatory (placeholder when unused).
+        $xml .= '<rawData>?</rawData>';
 
         return $xml;
     }

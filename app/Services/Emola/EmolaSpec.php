@@ -3,6 +3,7 @@
 namespace App\Services\Emola;
 
 use App\Exceptions\PaymentFailedException;
+use App\Models\Order;
 
 /**
  * Movitel USSD Push API v1.5 — input validation and constants.
@@ -50,16 +51,48 @@ final class EmolaSpec
         return $refNo;
     }
 
-    public static function sanitizeAmount(float|int|string $amount): string
+    /**
+     * transAmount for pushUssdMessage — whole meticals, 1–5 digits (spec §B.1).
+     */
+    public static function formatTransAmount(float|int|string $amount): string
     {
-        $value = (int) $amount;
-        $max = (int) config('emola.limits.trans_amount_max', 99999);
+        $value = (int) round((float) $amount);
+        $max = (int) config('emola.limits.trans_amount_max', 9999);
+        $min = 1;
 
-        if ($value < 1 || $value > $max) {
-            throw new PaymentFailedException('eMola amount must be between 1 and '.$max.'.');
+        if ($value < $min || $value > $max) {
+            throw new PaymentFailedException(
+                trans('theme.emola_amount_limit', [
+                    'amount' => number_format($value, 0, '.', ','),
+                    'max' => number_format($max, 0, '.', ','),
+                ])
+            );
         }
 
-        return (string) $value;
+        $formatted = (string) $value;
+
+        if (strlen($formatted) > (int) config('emola.limits.trans_amount_digits', 5)) {
+            throw new PaymentFailedException(trans('theme.emola_amount_too_long'));
+        }
+
+        return $formatted;
+    }
+
+    public static function transAmountFromOrder(Order $order): string
+    {
+        $amount = (float) $order->grand_total;
+
+        if (is_incevio_package_loaded('dynamic-currency') && $order->currency_id) {
+            $amount = (float) get_system_currency_value($amount, $order->currency_id);
+        }
+
+        return self::formatTransAmount($amount);
+    }
+
+    /** @deprecated Use formatTransAmount() */
+    public static function sanitizeAmount(float|int|string $amount): string
+    {
+        return self::formatTransAmount($amount);
     }
 
     public static function sanitizeSmsContent(string $content): string

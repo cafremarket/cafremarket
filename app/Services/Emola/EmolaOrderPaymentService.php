@@ -24,7 +24,7 @@ class EmolaOrderPaymentService
         $res = $this->client->pushUssdMessage([
             'msisdn' => $msisdn,
             'transId' => $transId,
-            'transAmount' => EmolaSpec::sanitizeAmount($order->grand_total),
+            'transAmount' => EmolaSpec::transAmountFromOrder($order),
             'smsContent' => $smsContent ?: trans('app.purchase_from', ['marketplace' => get_platform_title()]),
             'language' => EmolaSpec::sanitizeLanguage(app()->getLocale() === 'en' ? 'en' : 'pt'),
             'refNo' => $refNo,

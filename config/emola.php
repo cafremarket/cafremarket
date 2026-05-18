@@ -41,7 +41,9 @@ return [
         'msisdn' => 9,
         'trans_id_min' => 15,
         'trans_id_max' => 30,
-        'trans_amount_max' => 99999,
+        // Spec §B.1 allows 1–5 digits; many Movitel USSD merchants cap at 9999 MZN (override via EMOLA_MAX_TRANS_AMOUNT).
+        'trans_amount_max' => (int) env('EMOLA_MAX_TRANS_AMOUNT', 9999),
+        'trans_amount_digits' => 5,
         'ref_no_max' => 20,
         'sms_content_max' => 180,
         'partner_code_max' => 30,

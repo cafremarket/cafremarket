@@ -175,6 +175,8 @@ return [
     'emola_resend_success' => 'Payment request sent. Check your phone and approve the USSD prompt.',
     'emola_resend_failed' => 'Could not send the eMola payment request. Please try again.',
     'emola_resend_not_allowed' => 'This order cannot receive another eMola payment request.',
+    'emola_amount_limit' => 'Order total :amount MZN exceeds the eMola USSD limit of :max MZN per transaction. Use another payment method or contact Movitel to raise your limit.',
+    'emola_amount_too_long' => 'Order amount is too large for eMola (maximum 5 digits).',
     'empty_cart' => 'Your Cart is Empty!',
     'empty_wishlist' => 'Your Wishlist is Empty! What are you doing?',
     'error' => 'ERROR!',

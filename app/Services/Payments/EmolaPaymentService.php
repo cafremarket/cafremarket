@@ -4,6 +4,7 @@ namespace App\Services\Payments;
 
 use App\Exceptions\PaymentFailedException;
 use App\Services\Emola\EmolaOrderPaymentService;
+use App\Services\Emola\EmolaSpec;
 use Illuminate\Http\Request;
 
 class EmolaPaymentService extends PaymentService
@@ -41,9 +42,11 @@ class EmolaPaymentService extends PaymentService
     public function setConfig()
     {
         // Client is configured through config/services.php + .env
-        if (! $this->amount || ! is_numeric($this->amount) || intval($this->amount) < 1) {
+        if (! $this->amount || ! is_numeric($this->amount)) {
             throw new PaymentFailedException('Invalid amount.');
         }
+
+        EmolaSpec::formatTransAmount($this->amount);
 
         if (! $this->request->filled('emola_number')) {
             throw new PaymentFailedException('Invalid eMola number.');
