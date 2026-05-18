@@ -46,6 +46,37 @@
                 <td colspan="2">{!! $order->paymentStatusName() !!}</td>
               </tr>
 
+              @if ($order->canResendEmolaPayment())
+                <tr class="buyer-payment-info-head">
+                  <td colspan="6">@lang('theme.emola_resend_title')</td>
+                </tr>
+                <tr class="buyer-payment-info-body">
+                  <td colspan="6">
+                    <p class="text-muted mb-3">@lang('theme.emola_resend_help')</p>
+                    {!! Form::open(['route' => ['order.emola.resend', $order], 'method' => 'POST', 'class' => 'form-inline emola-resend-form']) !!}
+                    <div class="form-group mr-2 mb-2" style="display:inline-block;vertical-align:top;">
+                      <label for="emola-resend-number" class="sr-only">@lang('theme.emola_number')</label>
+                      {!! Form::text('emola_number', old('emola_number', $order->suggestedEmolaNumber()), [
+                          'id' => 'emola-resend-number',
+                          'class' => 'form-control flat',
+                          'placeholder' => trans('theme.emola_number_placeholder'),
+                          'inputmode' => 'numeric',
+                          'maxlength' => 9,
+                          'required' => 'required',
+                          'pattern' => '^(86|87)[0-9]{7}$',
+                      ]) !!}
+                    </div>
+                    {!! Form::button('<i class="fa fa-refresh"></i> ' . trans('theme.emola_resend_button'), [
+                        'type' => 'submit',
+                        'class' => 'btn btn-primary mb-2 confirm',
+                        'data-confirm' => trans('theme.emola_resend_confirm'),
+                    ]) !!}
+                    {!! Form::close() !!}
+                    <p class="help-block small text-muted mb-0">@lang('theme.emola_number_help')</p>
+                  </td>
+                </tr>
+              @endif
+
               @if (optional($order->paymentMethod)->code === 'wire')
                 <tr class="buyer-payment-info-head">
                   <td colspan="6">@lang('theme.payment_detail') - @lang('theme.payment_proof')</td>
@@ -307,6 +338,12 @@
                         @if ($order->canTrack())
                           <a href="{{ route('order.track', $order) }}" class="btn btn-black btn-sm btn-block">
                             <i class="fas fa-map-marker"></i> @lang('theme.button.track_order')
+                          </a>
+                        @endif
+
+                        @if ($order->canResendEmolaPayment())
+                          <a href="#payment-detail-section" class="btn btn-warning btn-sm btn-block">
+                            <i class="fa fa-refresh"></i> @lang('theme.emola_resend_button')
                           </a>
                         @endif
 

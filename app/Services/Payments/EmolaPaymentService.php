@@ -3,15 +3,15 @@
 namespace App\Services\Payments;
 
 use App\Exceptions\PaymentFailedException;
-use App\Models\Order;
-use App\Services\Emola\EmolaClient;
+use App\Services\Emola\EmolaOrderPaymentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class EmolaPaymentService extends PaymentService
 {
-    public function __construct(Request $request, private readonly EmolaClient $client)
-    {
+    public function __construct(
+        Request $request,
+        private readonly EmolaOrderPaymentService $emolaOrders,
+    ) {
         parent::__construct($request);
     }
 
@@ -21,58 +21,11 @@ class EmolaPaymentService extends PaymentService
             throw new PaymentFailedException('Order not found for eMola payment.');
         }
 
-        $msisdn = (string) $this->request->input('emola_number');
-
-        $transId = $this->client->generateTransId();
-
-        $refNo = 'REF'.(string) $this->order->id;
-        $refNo = substr(preg_replace('/[^A-Za-z0-9]/', '', $refNo), 0, 20);
-
-        $amount = (string) intval($this->amount);
-
-        $sms = $this->description ?: 'Pagamento';
-
-        $res = $this->client->pushUssdMessage([
-            'msisdn' => $msisdn,
-            'transId' => $transId,
-            'transAmount' => $amount,
-            'smsContent' => $sms,
-            'language' => app()->getLocale() === 'en' ? 'en' : 'pt',
-            'refNo' => $refNo,
-        ]);
-
-        Log::info('eMola pushUssdMessage result', [
-            'order_id' => $this->order->id,
-            'gateway_ok' => $res->ok(),
-            'gateway_error' => $res->gatewayError,
-            'gwtransid' => $res->gwtransid,
-            'original' => $res->originalData,
-        ]);
-
-        // Persist tracking fields on the order (even if gateway errors).
-        $this->order->emola_trans_id = $transId;
-        $this->order->emola_ref_no = $refNo;
-        $this->order->emola_gwtransid = $res->gwtransid;
-        $this->order->emola_gateway_error = $res->gatewayError;
-        $this->order->emola_gateway_description = $res->gatewayDescription;
-
-        $original = $res->originalData ?? [];
-        $detailCode = $original['errorCode'] ?? null;
-        $detailMsg = $original['message'] ?? null;
-        $requestId = $original['reqeustId'] ?? null; // spec misspelling
-
-        $this->order->emola_error_code = $detailCode;
-        $this->order->emola_message = $detailMsg;
-        $this->order->emola_request_id = $requestId;
-
-        // Keep existing generic reference column populated for admin/support.
-        if ($requestId) {
-            $this->order->payment_ref_id = $requestId;
-        }
-
-        $this->order->order_status_id = Order::STATUS_WAITING_FOR_PAYMENT;
-        $this->order->payment_status = Order::PAYMENT_STATUS_PENDING;
-        $this->order->save();
+        $res = $this->emolaOrders->pushPaymentForOrder(
+            $this->order,
+            (string) $this->request->input('emola_number'),
+            $this->description ?: 'Pagamento',
+        );
 
         // USSD push accepted — payment is confirmed only via eMola callback, never here.
         if ($res->ok()) {

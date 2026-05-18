@@ -6,6 +6,7 @@ use App\Common\ShoppingCart;
 use App\Contracts\PaymentServiceContract as PaymentGateway;
 use App\Events\Order\OrderCreated;
 use App\Exceptions\PaymentFailedException;
+use App\Services\Emola\EmolaOrderPaymentService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CheckoutCartRequest;
 use App\Http\Requests\Validations\ConfirmGoodsReceivedRequest;
@@ -313,9 +314,39 @@ class OrderController extends Controller
      */
     public function detail(OrderDetailRequest $request, Order $order)
     {
-        $order->load(['inventories.image', 'conversation.replies.attachments']);
+        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod']);
 
         return view('theme::order_detail', compact('order'));
+    }
+
+    /**
+     * Resend eMola USSD payment request for a pending order.
+     */
+    public function resendEmolaPayment(Request $request, Order $order, EmolaOrderPaymentService $emolaOrders)
+    {
+        $customer = auth('customer')->user();
+        if (! $customer || (int) $order->customer_id !== (int) $customer->id) {
+            abort(403);
+        }
+
+        if (! $order->canResendEmolaPayment()) {
+            return redirect()->back()->with('error', trans('theme.emola_resend_not_allowed'));
+        }
+
+        $request->validate([
+            'emola_number' => ['required', 'string', 'regex:/^(86|87)\d{7}$/'],
+        ], [
+            'emola_number.required' => trans('theme.emola_number_required'),
+            'emola_number.regex' => trans('theme.emola_number_invalid'),
+        ]);
+
+        try {
+            $emolaOrders->resendPaymentRequest($order, $request->input('emola_number'));
+        } catch (PaymentFailedException $e) {
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+        }
+
+        return redirect()->back()->with('warning', trans('theme.emola_resend_success'));
     }
 
     /**
@@ -336,7 +367,7 @@ class OrderController extends Controller
             ->latest('id')
             ->firstOrFail();
 
-        $order->load(['inventories.image', 'conversation.replies.attachments']);
+        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod']);
 
         return view('theme::order_detail', compact('order'));
     }

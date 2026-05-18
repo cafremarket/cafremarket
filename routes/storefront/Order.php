@@ -49,6 +49,10 @@ Route::middleware(['auth:customer', 'xssSanitizer'])->group(function () {
         OrderController::class, 'again',
     ])->name('order.again');
 
+    Route::post('order/emola/resend/{order}', [
+        OrderController::class, 'resendEmolaPayment',
+    ])->name('order.emola.resend');
+
     // Order cancel
     Route::get('order/cancel/{order}/{action?}', [
         OrderCancelController::class, 'showForm',

@@ -599,6 +599,43 @@ class Order extends BaseModel
     }
 
     /**
+     * Whether the customer can resend an eMola USSD payment request for this order.
+     */
+    public function canResendEmolaPayment(): bool
+    {
+        if ($this->isPaid() || $this->isCanceled()) {
+            return false;
+        }
+
+        if (optional($this->paymentMethod)->code !== 'emola') {
+            return false;
+        }
+
+        return in_array($this->order_status_id, [
+            static::STATUS_WAITING_FOR_PAYMENT,
+            static::STATUS_PAYMENT_ERROR,
+        ], true);
+    }
+
+    /**
+     * Best-effort eMola MSISDN from the order phone field (86/87 + 7 digits).
+     */
+    public function suggestedEmolaNumber(): ?string
+    {
+        $digits = preg_replace('/\D/', '', (string) $this->customer_phone_number);
+
+        if (preg_match('/^(86|87)\d{7}$/', $digits)) {
+            return $digits;
+        }
+
+        if (preg_match('/(?:258)?((86|87)\d{7})$/', $digits, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
      * Check if the order has been Fulfilled
      *
      * @return bool
