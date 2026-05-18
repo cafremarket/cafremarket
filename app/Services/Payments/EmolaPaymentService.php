@@ -27,15 +27,15 @@ class EmolaPaymentService extends PaymentService
             $this->description ?: 'Pagamento',
         );
 
-        // USSD push accepted — payment is confirmed only via eMola callback, never here.
-        if ($res->ok()) {
+        // USSD must be accepted by Movitel (errorCode 0 or 22) — payment confirmed only via callback.
+        if ($res->isUssdPushAccepted()) {
             $this->status = self::STATUS_PENDING;
 
             return $this;
         }
 
         $this->status = self::STATUS_ERROR;
-        throw new PaymentFailedException($res->gatewayDescription ?: 'eMola payment request failed.');
+        throw new PaymentFailedException($res->failureMessage());
     }
 
     public function setConfig()

@@ -165,29 +165,63 @@ class EmolaClient
         ];
     }
 
+    /**
+     * Inner XML string for gateways that expect literal Input (RPC/Literal).
+     *
+     * @param  array<string, string>  $params
+     */
+    protected function buildInputXml(string $wscode, array $params): string
+    {
+        $xml = '<username>'.htmlspecialchars($this->username, ENT_XML1).'</username>';
+        $xml .= '<password>'.htmlspecialchars($this->password, ENT_XML1).'</password>';
+        $xml .= '<wscode>'.htmlspecialchars($wscode, ENT_XML1).'</wscode>';
+
+        foreach ($params as $name => $value) {
+            $xml .= '<param name="'.htmlspecialchars((string) $name, ENT_XML1).'" value="'.htmlspecialchars((string) $value, ENT_XML1).'"/>';
+        }
+
+        $xml .= '<rawData></rawData>';
+
+        return $xml;
+    }
+
     private function gwOperation(string $wscode, array $params): EmolaResponse
     {
         $this->assertConfigured();
 
         if (Config::get('emola.fake')) {
-            Log::info('eMola gwOperation (fake mode)', ['wscode' => $wscode]);
+            Log::warning('eMola gwOperation skipped (EMOLA_FAKE=true)', ['wscode' => $wscode]);
 
             return new EmolaResponse(
-                gatewayError: '0',
-                gatewayDescription: 'Fake mode — SOAP call skipped',
-                gwtransid: 'FAKE-'.uniqid(),
+                gatewayError: 'FAKE_MODE',
+                gatewayDescription: 'EMOLA_FAKE=true — no SOAP call made',
+                gwtransid: null,
                 originalXml: null,
-                originalData: ['errorCode' => '0', 'message' => 'OK (fake)'],
+                originalData: null,
             );
         }
 
         try {
-            $client = $this->soapClient();
-            $result = $client->gwOperation(['Input' => $this->buildInput($wscode, $params)]);
+            $response = $this->callGwOperationStructured($wscode, $params);
 
-            Log::info('eMola gwOperation', ['wscode' => $wscode]);
+            if ($wscode === 'pushUssdMessage' && ! $response->isUssdPushAccepted()) {
+                Log::info('eMola push: retrying with XML Input encoding', [
+                    'gateway_error' => $response->gatewayError,
+                    'business_code' => $response->businessErrorCode(),
+                ]);
 
-            return $this->parseGwOperationResult($result);
+                $xmlResponse = $this->callGwOperationXml($wscode, $params);
+
+                if ($xmlResponse->isUssdPushAccepted()) {
+                    return $xmlResponse;
+                }
+
+                if ($xmlResponse->businessErrorCode() !== null) {
+                    return $xmlResponse;
+                }
+            }
+
+            return $response;
         } catch (SoapFault $e) {
             Log::error('eMola SOAP fault', [
                 'wscode' => $wscode,
@@ -205,7 +239,31 @@ class EmolaClient
         }
     }
 
-    private function parseGwOperationResult(mixed $result): EmolaResponse
+    /**
+     * @param  array<string, string>  $params
+     */
+    private function callGwOperationStructured(string $wscode, array $params): EmolaResponse
+    {
+        $client = $this->soapClient();
+        $result = $client->gwOperation(['Input' => $this->buildInput($wscode, $params)]);
+
+        return $this->parseGwOperationResult($result, $wscode);
+    }
+
+    /**
+     * @param  array<string, string>  $params
+     */
+    private function callGwOperationXml(string $wscode, array $params): EmolaResponse
+    {
+        $client = $this->soapClient();
+        $xml = $this->buildInputXml($wscode, $params);
+        $input = new \SoapVar($xml, XSD_ANYXML);
+        $result = $client->__soapCall('gwOperation', [['Input' => $input]]);
+
+        return $this->parseGwOperationResult($result, $wscode);
+    }
+
+    private function parseGwOperationResult(mixed $result, string $wscode = ''): EmolaResponse
     {
         $res = null;
 
@@ -217,12 +275,10 @@ class EmolaClient
 
         if (is_string($res)) {
             $originalXml = $this->extractXmlFromCdata($res);
-            $originalData = $this->parseOriginalData($res);
+            $originalData = $this->parseOriginalData($res) ?? $this->parseLooseOriginalData($res);
 
             return new EmolaResponse(
-                gatewayError: is_array($originalData)
-                    ? (string) ($originalData['error'] ?? $originalData['errorCode'] ?? '0')
-                    : '0',
+                gatewayError: $this->resolveGatewayError($originalData, null),
                 gatewayDescription: is_array($originalData)
                     ? ($originalData['description'] ?? $originalData['message'] ?? null)
                     : null,
@@ -233,19 +289,25 @@ class EmolaClient
         }
 
         if (is_object($res)) {
-            $gatewayError = (string) ($res->error ?? $res->errorCode ?? '');
+            $gatewayError = (string) ($res->error ?? '');
             $gatewayDescription = isset($res->description) ? (string) $res->description : null;
             $gwtransid = isset($res->gwtransid) ? (string) $res->gwtransid : null;
             $original = isset($res->original) ? (string) $res->original : null;
+            $originalData = $this->parseOriginalData($original) ?? $this->parseLooseOriginalData($original ?? '');
 
             return new EmolaResponse(
-                gatewayError: $gatewayError,
+                gatewayError: $this->resolveGatewayError($originalData, $gatewayError !== '' ? $gatewayError : null),
                 gatewayDescription: $gatewayDescription,
                 gwtransid: $gwtransid,
                 originalXml: $this->extractXmlFromCdata($original),
-                originalData: $this->parseOriginalData($original),
+                originalData: $originalData,
             );
         }
+
+        Log::warning('eMola unexpected gwOperation response', [
+            'wscode' => $wscode,
+            'result_type' => get_debug_type($result),
+        ]);
 
         return new EmolaResponse(
             gatewayError: 'UNKNOWN_RESPONSE',
@@ -254,6 +316,40 @@ class EmolaClient
             originalXml: null,
             originalData: null,
         );
+    }
+
+    /**
+     * @param  array<string, string>|null  $originalData
+     */
+    private function resolveGatewayError(?array $originalData, ?string $gatewayError): string
+    {
+        if ($gatewayError !== null && $gatewayError !== '') {
+            return $gatewayError;
+        }
+
+        if (is_array($originalData) && isset($originalData['error']) && $originalData['error'] !== '') {
+            return (string) $originalData['error'];
+        }
+
+        return '';
+    }
+
+    /**
+     * Fallback parser when SOAP envelope shape differs.
+     *
+     * @return array<string, string>|null
+     */
+    private function parseLooseOriginalData(string $payload): ?array
+    {
+        $data = [];
+
+        foreach (['errorCode', 'error', 'message', 'description', 'gwtransid', 'reqeustId'] as $field) {
+            if (preg_match('/<'.$field.'>([^<]*)<\/'.$field.'>/i', $payload, $m)) {
+                $data[$field] = trim($m[1]);
+            }
+        }
+
+        return $data ?: null;
     }
 
     private function soapClient(): SoapClient

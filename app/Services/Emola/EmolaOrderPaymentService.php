@@ -39,8 +39,12 @@ class EmolaOrderPaymentService
         Log::info('eMola USSD push for order', [
             'order_id' => $order->id,
             'trans_id' => $transId,
+            'msisdn' => $msisdn,
             'gateway_ok' => $res->ok(),
             'gateway_error' => $res->gatewayError,
+            'business_code' => $res->businessErrorCode(),
+            'business_message' => $res->businessMessage(),
+            'ussd_push_accepted' => $res->isUssdPushAccepted(),
         ]);
 
         $this->syncOrderFromResponse($order, $res, $transId, $refNo);
@@ -52,10 +56,8 @@ class EmolaOrderPaymentService
     {
         $res = $this->pushPaymentForOrder($order, $msisdn);
 
-        if (! $res->ok()) {
-            throw new PaymentFailedException(
-                $res->gatewayDescription ?: trans('theme.emola_resend_failed')
-            );
+        if (! $res->isUssdPushAccepted()) {
+            throw new PaymentFailedException($res->failureMessage());
         }
     }
 

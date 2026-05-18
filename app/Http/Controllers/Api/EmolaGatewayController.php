@@ -56,15 +56,16 @@ class EmolaGatewayController extends Controller
                 $order->save();
             }
 
-            $status = $res->ok() ? 200 : 502;
+            $accepted = $res->isUssdPushAccepted();
+            $status = $accepted ? 200 : 502;
 
             return response()->json([
-                'message' => $res->ok()
+                'message' => $accepted
                     ? 'Payment request sent. Customer will receive USSD prompt.'
-                    : ($res->gatewayDescription ?: 'eMola gateway returned an error.'),
+                    : $res->failureMessage(),
                 'trans_id' => $transId,
                 'ref_no' => $refNo,
-                'ok' => $res->ok(),
+                'ok' => $accepted,
                 'gateway_error' => $res->gatewayError,
                 'gateway_description' => $res->gatewayDescription,
                 'original' => $res->originalData,
