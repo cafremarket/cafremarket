@@ -15,12 +15,12 @@ class EmolaCallbackController extends Controller
     public function __invoke(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // Note: spec field is misspelled as "reqeustId"
-            'reqeustId' => ['required', 'string'],
-            'transId' => ['required', 'string'],
-            'refNo' => ['required', 'string'],
+            // Spec §B.4 — field name is misspelled "reqeustId" in Movitel docs.
+            'reqeustId' => ['required', 'string', 'max:64'],
+            'transId' => ['required', 'string', 'min:15', 'max:30'],
+            'refNo' => ['required', 'string', 'max:20'],
             'errorCode' => ['required', 'string'],
-            'message' => ['required', 'string'],
+            'message' => ['required', 'string', 'max:255'],
         ]);
 
         if ($validator->fails()) {
@@ -55,6 +55,7 @@ class EmolaCallbackController extends Controller
             $order->emola_message = $data['message'];
             $order->save();
 
+            // Spec §B.4 — errorCode 0: customer approved / payment successful.
             if ($data['errorCode'] === '0') {
                 if (! $order->isPaid()) {
                     $order->markAsPaid();

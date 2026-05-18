@@ -33,6 +33,12 @@ class AppServiceProvider extends ServiceProvider
 
         $this->ensureStorageFrameworkDirectoriesExist();
 
+        if ($this->app->environment('production') && filter_var(env('EMOLA_FAKE', false), FILTER_VALIDATE_BOOLEAN)) {
+            \Illuminate\Support\Facades\Log::warning(
+                'EMOLA_FAKE=true in .env on production is ignored — set EMOLA_FAKE=false and run php artisan config:clear so real USSD pushes are sent.'
+            );
+        }
+
         if (
             isset($_SERVER['HTTPS']) &&
             ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ||

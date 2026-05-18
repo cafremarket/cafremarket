@@ -13,26 +13,20 @@ class EmolaOrderPaymentService
     }
 
     /**
-     * Send (or resend) USSD push for an existing order. Payment is confirmed only via callback.
+     * Send (or resend) USSD push (pushUssdMessage). Payment confirmed only via callback (spec §B.4).
      */
     public function pushPaymentForOrder(Order $order, string $msisdn, ?string $smsContent = null): EmolaResponse
     {
-        $msisdn = preg_replace('/\D/', '', $msisdn);
-
-        if (! preg_match('/^(86|87)\d{7}$/', $msisdn)) {
-            throw new PaymentFailedException(trans('theme.emola_number_invalid'));
-        }
-
+        $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
         $transId = $this->client->generateTransId();
-        $refNo = substr(preg_replace('/[^A-Za-z0-9]/', '', 'REF'.(string) $order->id), 0, 20);
-        $amount = (string) intval($order->grand_total);
+        $refNo = EmolaSpec::sanitizeRefNo('REF'.(string) $order->id);
 
         $res = $this->client->pushUssdMessage([
             'msisdn' => $msisdn,
             'transId' => $transId,
-            'transAmount' => $amount,
+            'transAmount' => EmolaSpec::sanitizeAmount($order->grand_total),
             'smsContent' => $smsContent ?: trans('app.purchase_from', ['marketplace' => get_platform_title()]),
-            'language' => app()->getLocale() === 'en' ? 'en' : 'pt',
+            'language' => EmolaSpec::sanitizeLanguage(app()->getLocale() === 'en' ? 'en' : 'pt'),
             'refNo' => $refNo,
         ]);
 
@@ -40,10 +34,10 @@ class EmolaOrderPaymentService
             'order_id' => $order->id,
             'trans_id' => $transId,
             'msisdn' => $msisdn,
-            'gateway_ok' => $res->ok(),
             'gateway_error' => $res->gatewayError,
             'business_code' => $res->businessErrorCode(),
             'business_message' => $res->businessMessage(),
+            'request_id' => $res->requestId(),
             'ussd_push_accepted' => $res->isUssdPushAccepted(),
         ]);
 
@@ -72,10 +66,10 @@ class EmolaOrderPaymentService
         $order->emola_gateway_description = $res->gatewayDescription;
         $order->emola_error_code = $original['errorCode'] ?? null;
         $order->emola_message = $original['message'] ?? null;
-        $order->emola_request_id = $original['reqeustId'] ?? null;
+        $order->emola_request_id = $res->requestId();
 
-        if (! empty($original['reqeustId'])) {
-            $order->payment_ref_id = $original['reqeustId'];
+        if ($order->emola_request_id) {
+            $order->payment_ref_id = $order->emola_request_id;
         }
 
         $order->order_status_id = Order::STATUS_WAITING_FOR_PAYMENT;

@@ -4,11 +4,14 @@ namespace App\Services\Emola;
 
 final class EmolaResponse
 {
-    /** Movitel: USSD push dispatched to handset (async). */
+    /** Spec §C — push accepted, async USSD sent. */
     public const CODE_PUSH_SENT = '22';
 
-    /** Movitel: operation accepted / completed at business layer. */
+    /** Spec §C — business operation successful. */
     public const CODE_SUCCESS = '0';
+
+    /** Spec §B.2 — origin transaction successful. */
+    public const ORG_SUCCESS = '01';
 
     public function __construct(
         public readonly string $gatewayError,
@@ -19,12 +22,16 @@ final class EmolaResponse
     ) {
     }
 
-    /**
-     * Gateway transport layer OK (BCCS gateway error field = 0).
-     */
-    public function ok(): bool
+    /** Spec §A.2 — Result.error = 0. */
+    public function isGatewaySuccess(): bool
     {
         return $this->gatewayError === '0';
+    }
+
+    /** @deprecated Use isGatewaySuccess() */
+    public function ok(): bool
+    {
+        return $this->isGatewaySuccess();
     }
 
     public function businessErrorCode(): ?string
@@ -33,7 +40,7 @@ final class EmolaResponse
             return null;
         }
 
-        $code = $this->originalData['errorCode'] ?? $this->originalData['error'] ?? null;
+        $code = $this->originalData['errorCode'] ?? null;
 
         return ($code !== null && $code !== '') ? (string) $code : null;
     }
@@ -44,13 +51,29 @@ final class EmolaResponse
             return $this->gatewayDescription;
         }
 
-        return $this->originalData['message']
-            ?? $this->originalData['description']
-            ?? $this->gatewayDescription;
+        return $this->originalData['message'] ?? $this->gatewayDescription;
+    }
+
+    public function requestId(): ?string
+    {
+        if (! is_array($this->originalData)) {
+            return null;
+        }
+
+        return $this->originalData['reqeustId'] ?? null;
+    }
+
+    public function balance(): ?string
+    {
+        if (! is_array($this->originalData)) {
+            return null;
+        }
+
+        return $this->originalData['balance'] ?? null;
     }
 
     /**
-     * USSD push was actually accepted by Movitel (not just gateway HTTP/SOAP OK).
+     * pushUssdMessage accepted (spec §B.1 + §C): gateway OK and errorCode 0 or 22.
      */
     public function isUssdPushAccepted(): bool
     {
@@ -58,16 +81,21 @@ final class EmolaResponse
             return false;
         }
 
-        if ($this->gatewayError !== '0' && $this->gatewayError !== '') {
+        if (! $this->isGatewaySuccess()) {
             return false;
         }
 
         $code = $this->businessErrorCode();
-        if ($code === null) {
-            return false;
-        }
 
         return in_array($code, [self::CODE_SUCCESS, self::CODE_PUSH_SENT], true);
+    }
+
+    /**
+     * Callback / sync payment success (spec §B.4).
+     */
+    public function isPaymentSuccess(): bool
+    {
+        return $this->businessErrorCode() === self::CODE_SUCCESS;
     }
 
     public function failureMessage(): string
@@ -80,18 +108,26 @@ final class EmolaResponse
             return $this->gatewayDescription ?: 'eMola SOAP connection failed.';
         }
 
-        if ($this->gatewayError !== '0') {
-            return $this->gatewayDescription
-                ?: ('eMola gateway error: '.$this->gatewayError);
+        if ($this->gatewayError === 'HTTP_ERROR') {
+            return $this->gatewayDescription ?: 'eMola HTTP request failed.';
+        }
+
+        if (! $this->isGatewaySuccess()) {
+            $mapped = EmolaSpec::gatewayErrorMessage($this->gatewayError);
+
+            return $mapped
+                ?: ($this->gatewayDescription ?: ('eMola gateway error '.$this->gatewayError));
         }
 
         $code = $this->businessErrorCode();
         $message = $this->businessMessage();
 
         if ($code !== null) {
-            return $message
-                ? ($message.' (code: '.$code.')')
-                : ('eMola rejected the request (code: '.$code.')');
+            $mapped = EmolaSpec::businessErrorMessage($code);
+
+            return $mapped
+                ? ($mapped.' (code: '.$code.')')
+                : ($message ? ($message.' (code: '.$code.')') : ('eMola error code '.$code));
         }
 
         return 'eMola did not confirm the USSD push. Check gateway logs or try again.';
