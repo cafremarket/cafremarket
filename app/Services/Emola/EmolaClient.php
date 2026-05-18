@@ -141,21 +141,28 @@ class EmolaClient
     }
 
     /**
-     * Build gwOperation Input XML (RPC/Literal — confirmed live WSDL format).
+     * Build gwOperation Input payload (WSDL complex type: username, password, wscode, param, rawData).
+     *
+     * @param  array<string, string>  $params
+     * @return array<string, mixed>
      */
-    protected function buildXml(string $wscode, array $params): string
+    protected function buildInput(string $wscode, array $params): array
     {
-        $xml = '<username>'.htmlspecialchars($this->username, ENT_XML1).'</username>';
-        $xml .= '<password>'.htmlspecialchars($this->password, ENT_XML1).'</password>';
-        $xml .= '<wscode>'.htmlspecialchars($wscode, ENT_XML1).'</wscode>';
-
+        $paramItems = [];
         foreach ($params as $name => $value) {
-            $xml .= '<param name="'.htmlspecialchars((string) $name, ENT_XML1).'" value="'.htmlspecialchars((string) $value, ENT_XML1).'"/>';
+            $paramItems[] = [
+                'name' => (string) $name,
+                'value' => (string) $value,
+            ];
         }
 
-        $xml .= '<rawData></rawData>';
-
-        return $xml;
+        return [
+            'username' => $this->username,
+            'password' => $this->password,
+            'wscode' => $wscode,
+            'param' => $paramItems,
+            'rawData' => '',
+        ];
     }
 
     private function gwOperation(string $wscode, array $params): EmolaResponse
@@ -174,11 +181,9 @@ class EmolaClient
             );
         }
 
-        $xml = $this->buildXml($wscode, $params);
-
         try {
             $client = $this->soapClient();
-            $result = $client->gwOperation(['Input' => $xml]);
+            $result = $client->gwOperation(['Input' => $this->buildInput($wscode, $params)]);
 
             Log::info('eMola gwOperation', ['wscode' => $wscode]);
 
@@ -264,6 +269,7 @@ class EmolaClient
             'location' => $this->endpoint,
             'uri' => 'http://webservice.bccsgw.viettel.com/',
             'cache_wsdl' => WSDL_CACHE_BOTH,
+            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
         ]);
 
         return $this->soapClient;
