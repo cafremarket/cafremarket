@@ -53,6 +53,10 @@ Route::middleware(['auth:customer', 'xssSanitizer'])->group(function () {
         OrderController::class, 'resendEmolaPayment',
     ])->name('order.emola.resend');
 
+    Route::post('order/emola/sync/{order}', [
+        OrderController::class, 'syncEmolaPaymentStatus',
+    ])->name('order.emola.sync');
+
     // Order cancel
     Route::get('order/cancel/{order}/{action?}', [
         OrderCancelController::class, 'showForm',

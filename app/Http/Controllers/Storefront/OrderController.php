@@ -371,6 +371,40 @@ class OrderController extends Controller
     }
 
     /**
+     * Query Movitel for payment status and update the order (when callback is delayed).
+     */
+    public function syncEmolaPaymentStatus(Request $request, Order $order, EmolaOrderPaymentService $emolaOrders): RedirectResponse|JsonResponse
+    {
+        $customer = auth('customer')->user();
+        if (! $customer || (int) $order->customer_id !== (int) $customer->id) {
+            abort(403);
+        }
+
+        if (optional($order->paymentMethod)->code !== 'emola') {
+            $message = trans('theme.emola_resend_not_allowed');
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $message], 403)
+                : redirect()->back()->with('error', $message);
+        }
+
+        $result = $emolaOrders->syncPaymentStatusFromGateway($order);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'paid' => $result['paid'],
+                'message' => $result['message'],
+                'payment_status' => $order->fresh()->payment_status,
+            ], $result['paid'] ? 200 : 202);
+        }
+
+        return redirect()->back()->with(
+            $result['paid'] ? 'success' : 'warning',
+            $result['message']
+        );
+    }
+
+    /**
      * Display order detail by order number to avoid cart-id confusion.
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse

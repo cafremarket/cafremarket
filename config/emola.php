@@ -11,7 +11,9 @@ return [
     'partner_code' => env('EMOLA_PARTNER_CODE'),
     'key' => env('EMOLA_KEY'),
     'language' => env('EMOLA_LANGUAGE', 'pt'),
+    // Register this exact URL with Movitel (must match your live domain + HTTPS).
     'callback_url' => env('EMOLA_CALLBACK_URL', 'https://cafremarket.co.mz/api/emola/callback'),
+    'callback_url_alt' => env('EMOLA_CALLBACK_URL_ALT', 'https://cafremarket.co.mz/payment/callback/emola'),
     'timeout_seconds' => (int) env('EMOLA_TIMEOUT_SECONDS', 60),
     'soap_namespace' => 'http://webservice.bccsgw.viettel.com/',
     'fake' => env('APP_ENV') === 'production'

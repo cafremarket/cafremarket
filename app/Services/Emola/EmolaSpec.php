@@ -127,4 +127,24 @@ final class EmolaSpec
     {
         return config('emola.business_errors.'.$code);
     }
+
+    /** Callback / query success — errorCode 0 (accepts 0, 00, 000). */
+    public static function isPaymentSuccessCode(?string $code): bool
+    {
+        if ($code === null || $code === '') {
+            return false;
+        }
+
+        $normalized = trim($code);
+
+        return $normalized === '0' || $normalized === '00' || (ctype_digit($normalized) && (int) $normalized === 0);
+    }
+
+    /** pushUssdQueryTrans — orgResponseCode 01 means origin transaction successful (spec §B.2). */
+    public static function isOrgResponseSuccess(?string $code): bool
+    {
+        $normalized = trim((string) $code);
+
+        return in_array($normalized, ['01', '1'], true);
+    }
 }

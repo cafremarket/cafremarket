@@ -2,88 +2,36 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\Order\OrderCreated;
-use App\Events\Order\OrderPaymentFailed;
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Services\Emola\EmolaCallbackPayload;
+use App\Services\Emola\EmolaOrderPaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 
 class EmolaCallbackController extends Controller
 {
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, EmolaOrderPaymentService $emolaOrders)
     {
-        $validator = Validator::make($request->all(), [
-            // Spec §B.4 — field name is misspelled "reqeustId" in Movitel docs.
-            'reqeustId' => ['required', 'string', 'max:64'],
-            'transId' => ['required', 'string', 'min:15', 'max:30'],
-            'refNo' => ['required', 'string', 'max:20'],
-            'errorCode' => ['required', 'string'],
-            'message' => ['required', 'string', 'max:255'],
+        Log::info('eMola callback received', [
+            'content_type' => $request->header('Content-Type'),
+            'ip' => $request->ip(),
+            'keys' => array_keys($request->all()),
         ]);
 
-        if ($validator->fails()) {
+        $data = EmolaCallbackPayload::fromRequest($request);
+
+        if ($data === null) {
+            Log::warning('eMola callback: invalid payload', [
+                'body_preview' => substr((string) $request->getContent(), 0, 500),
+            ]);
+
             return response()->json([
                 'ResponseCode' => '1',
                 'ResponseMessage' => 'Invalid payload',
-                'errors' => $validator->errors(),
             ], 422);
         }
 
-        $data = $validator->validated();
-
-        Log::info('eMola callback received', [
-            'reqeustId' => $data['reqeustId'],
-            'transId' => $data['transId'],
-            'refNo' => $data['refNo'],
-            'errorCode' => $data['errorCode'],
-        ]);
-
-        $order = Order::query()
-            ->where(function ($q) use ($data) {
-                $q->where('emola_trans_id', $data['transId'])
-                    ->orWhere('emola_ref_no', $data['refNo']);
-            })
-            ->latest('id')
-            ->first();
-
-        if ($order) {
-            $order->emola_request_id = $data['reqeustId'];
-            $order->payment_ref_id = $order->payment_ref_id ?: $data['reqeustId'];
-            $order->emola_error_code = $data['errorCode'];
-            $order->emola_message = $data['message'];
-            $order->save();
-
-            // Spec §B.4 — errorCode 0: customer approved / payment successful.
-            if ($data['errorCode'] === '0') {
-                if (! $order->isPaid()) {
-                    $order->markAsPaid();
-
-                    try {
-                        event(new OrderCreated($order));
-                    } catch (\Throwable $e) {
-                        Log::warning('eMola callback OrderCreated failed: '.$e->getMessage());
-                    }
-                }
-            } else {
-                $order->payment_status = Order::PAYMENT_STATUS_PENDING;
-                $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
-                $order->save();
-
-                try {
-                    event(new OrderPaymentFailed($order));
-                } catch (\Throwable $e) {
-                    Log::warning('eMola callback OrderPaymentFailed failed: '.$e->getMessage());
-                }
-            }
-        } else {
-            Log::warning('eMola callback: order not found', [
-                'reqeustId' => $data['reqeustId'],
-                'transId' => $data['transId'],
-                'refNo' => $data['refNo'],
-            ]);
-        }
+        $emolaOrders->processCallbackPayload($data);
 
         return response()->json([
             'ResponseCode' => '0',

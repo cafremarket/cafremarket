@@ -95,7 +95,23 @@ final class EmolaResponse
      */
     public function isPaymentSuccess(): bool
     {
-        return $this->businessErrorCode() === self::CODE_SUCCESS;
+        return EmolaSpec::isPaymentSuccessCode($this->businessErrorCode());
+    }
+
+    /**
+     * Paid per callback (errorCode 0) or status query (orgResponseCode 01).
+     */
+    public function isTransactionPaid(): bool
+    {
+        if ($this->isPaymentSuccess()) {
+            return true;
+        }
+
+        if (! is_array($this->originalData)) {
+            return false;
+        }
+
+        return EmolaSpec::isOrgResponseSuccess($this->originalData['orgResponseCode'] ?? null);
     }
 
     public function failureMessage(): string
