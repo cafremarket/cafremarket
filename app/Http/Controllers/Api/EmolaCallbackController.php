@@ -5,13 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\Emola\EmolaCallbackPayload;
 use App\Services\Emola\EmolaOrderPaymentService;
+use App\Services\Emola\EmolaWalletDepositService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class EmolaCallbackController extends Controller
 {
-    public function __invoke(Request $request, EmolaOrderPaymentService $emolaOrders)
-    {
+    public function __invoke(
+        Request $request,
+        EmolaOrderPaymentService $emolaOrders,
+        EmolaWalletDepositService $emolaWallet,
+    ) {
         Log::info('eMola callback received', [
             'content_type' => $request->header('Content-Type'),
             'ip' => $request->ip(),
@@ -31,7 +35,9 @@ class EmolaCallbackController extends Controller
             ], 422);
         }
 
-        $emolaOrders->processCallbackPayload($data);
+        if (! $emolaWallet->processCallbackPayload($data)) {
+            $emolaOrders->processCallbackPayload($data);
+        }
 
         return response()->json([
             'ResponseCode' => '0',

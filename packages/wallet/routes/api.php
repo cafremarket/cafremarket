@@ -14,4 +14,6 @@ Route::namespace('Api')->middleware(['api', 'auth:api'])->prefix('api')->group(f
     Route::post('wallet/deposit', [DepositController::class, 'deposit']);
     // M-Pesa wallet deposit: poll until paid (same as order mpesa/order/{order}/status)
     Route::get('wallet/deposit/mpesa/status', [DepositController::class, 'mpesaDepositStatus']);
+    Route::get('wallet/deposit/emola/status', [DepositController::class, 'emolaDepositStatus']);
+    Route::post('wallet/deposit/emola/resend', [DepositController::class, 'emolaResendDeposit']);
 });

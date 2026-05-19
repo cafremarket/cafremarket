@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use App\Exceptions\PaymentFailedException;
+use App\Services\Emola\EmolaWalletDepositService;
 use Incevio\Package\MPesa\Services\MPesaPaymentService;
 use Incevio\Package\Wallet\Http\Requests\DepositRequest;
 use Incevio\Package\Wallet\Jobs\SendNotificationJob;
@@ -416,6 +418,103 @@ class DepositController extends Controller
 
         // Another request or callback may have credited the wallet (e.g. first poll got 200, second got 403)
         if (Cache::has($paidKey)) {
+            return response()->json(['paid' => true]);
+        }
+
+        if (! $forceCheck) {
+            Cache::put($statusCheckKey, 1, now()->addSeconds(10));
+        }
+
+        return response()->json(['paid' => false]);
+    }
+
+    /**
+     * eMola wallet deposit: waiting page (USSD on phone).
+     */
+    public function emolaDepositComplete(Request $request, EmolaWalletDepositService $emolaWallet)
+    {
+        $ref = $request->query('ref');
+        if (! $ref) {
+            return redirect()->route(self::getRouteName())
+                ->with('error', trans('packages.wallet.payment_failed'));
+        }
+
+        $holder = null;
+        if (Auth::guard('customer')->check() || (Auth::guard('web')->check() && Auth::user()->isMerchant())) {
+            $holder = self::getWallet();
+        }
+
+        $canResend = $holder && $emolaWallet->canResendDeposit($ref, $holder);
+
+        return view('wallet::deposit_emola_complete', [
+            'ref' => $ref,
+            'canResend' => $canResend,
+        ]);
+    }
+
+    /**
+     * Resend eMola USSD for a pending wallet deposit.
+     */
+    public function emolaResendDeposit(Request $request, EmolaWalletDepositService $emolaWallet)
+    {
+        if (! Auth::guard('customer')->check() && ! (Auth::guard('web')->check() && Auth::user()->isMerchant())) {
+            abort(403);
+        }
+
+        $request->validate([
+            'ref' => 'required|string',
+            'emola_number' => ['required', 'string', 'regex:/^(86|87)\d{7}$/'],
+        ], [
+            'emola_number.required' => trans('theme.emola_number_required'),
+            'emola_number.regex' => trans('theme.emola_number_invalid'),
+        ]);
+
+        try {
+            $result = $emolaWallet->resendDeposit(
+                $request->input('ref'),
+                $request->input('emola_number'),
+                self::getWallet(),
+            );
+        } catch (PaymentFailedException $e) {
+            return redirect()->route('wallet.deposit.emola.complete', ['ref' => $request->input('ref')])
+                ->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('wallet.deposit.emola.complete', ['ref' => $result['transId']])
+            ->with('warning', trans('theme.emola_resend_success'));
+    }
+
+    /**
+     * eMola wallet deposit: JSON status for polling (callback or Movitel query).
+     */
+    public function emolaDepositStatus(Request $request, EmolaWalletDepositService $emolaWallet)
+    {
+        $ref = $request->query('ref');
+        if (! $ref) {
+            return response()->json(['paid' => false]);
+        }
+
+        if (Cache::has(EmolaWalletDepositService::CACHE_KEY_WALLET_PAID.$ref)) {
+            return response()->json(['paid' => true]);
+        }
+
+        $cacheKey = EmolaWalletDepositService::CACHE_KEY_WALLET_DEPOSIT.$ref;
+        if (! Cache::has($cacheKey)) {
+            return response()->json(['paid' => false]);
+        }
+
+        $statusCheckKey = 'emola_wallet_status_check_'.$ref;
+        $forceCheck = $request->query('force') === '1' || $request->query('force') === 'true';
+
+        if (! $forceCheck && Cache::has($statusCheckKey)) {
+            return response()->json(['paid' => false]);
+        }
+
+        if ($emolaWallet->syncAndCreditDeposit($ref)) {
+            return response()->json(['paid' => true]);
+        }
+
+        if (Cache::has(EmolaWalletDepositService::CACHE_KEY_WALLET_PAID.$ref)) {
             return response()->json(['paid' => true]);
         }
 

@@ -452,7 +452,7 @@ if (! function_exists('get_payment_config_info')) {
 
                 return [
                     'config' => $configured ? config('emola') : null,
-                    'msg' => 'Pay with eMola (Movitel USSD Push)',
+                    'msg' => trans('theme.emola_resend_help'),
                 ];
 
             case 'orangemoney':

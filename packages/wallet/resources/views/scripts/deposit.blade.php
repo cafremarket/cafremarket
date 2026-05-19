@@ -50,14 +50,7 @@
           $('#pay-now-btn').removeClass('hide');
         }
 
-        // M-Pesa wallet deposit: show/hide mpesa number field
-        if (typeof $('#mpesa-form').show === 'function') {
-          if ('mpesa' == code) {
-            $('#mpesa-form').show().find('input.mpesa-request-field').attr('required', 'required');
-          } else {
-            $('#mpesa-form').hide().find('input.mpesa-request-field').removeAttr('required');
-          }
-        }
+        toggleWalletMobileFields(code);
       });
 
       // Submit the form
@@ -80,11 +73,7 @@
           $('#pay-now-btn').addClass('hide');
           $('#paypal-express-btn').removeClass('hide');
         }
-        if (code == 'mpesa' && $('#mpesa-form').length) {
-          $('#mpesa-form').show().find('input.mpesa-request-field').attr('required', 'required');
-        } else if ($('#mpesa-form').length) {
-          $('#mpesa-form').hide().find('input.mpesa-request-field').removeAttr('required');
-        }
+        toggleWalletMobileFields(code);
       }
 
       // Stripe code, create a token
@@ -165,6 +154,23 @@
 
     function hideSimpleCardForm() {
       $('#authorize-net-cc-form').hide().find('input, select').removeAttr('required');
+    }
+
+    function toggleWalletMobileFields(code) {
+      if ($('#mpesa-form').length) {
+        if ('mpesa' == code) {
+          $('#mpesa-form').show().find('input.mpesa-request-field').attr('required', 'required');
+        } else {
+          $('#mpesa-form').hide().find('input.mpesa-request-field').removeAttr('required');
+        }
+      }
+      if ($('#emola-form').length) {
+        if ('emola' == code) {
+          $('#emola-form').show().find('input.emola-request-field').attr('required', 'required');
+        } else {
+          $('#emola-form').hide().find('input.emola-request-field').removeAttr('required');
+        }
+      }
     }
   }(window.jQuery, window, document));
 </script>

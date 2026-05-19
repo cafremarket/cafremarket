@@ -52,10 +52,14 @@ class DepositController extends Controller
             parse_str($query ?? '', $params);
             $ref = $params['ref'] ?? null;
             if ($ref) {
+                $message = str_contains($url, 'emola')
+                    ? trans('packages.wallet.emola_redirect_when_paid')
+                    : trans('mpesa::lang.payment_confirmation');
+
                 return response()->json([
                     'pending' => true,
                     'ref' => $ref,
-                    'message' => trans('mpesa::lang.payment_confirmation'),
+                    'message' => $message,
                 ], 200);
             }
         }
@@ -90,6 +94,44 @@ class DepositController extends Controller
     {
         return app(\Incevio\Package\Wallet\Http\Controllers\DepositController::class)
             ->mpesaDepositStatus($request);
+    }
+
+    /**
+     * eMola wallet deposit: JSON status for polling (same as web).
+     */
+    public function emolaDepositStatus(Request $request)
+    {
+        return app(\Incevio\Package\Wallet\Http\Controllers\DepositController::class)
+            ->emolaDepositStatus($request, app(\App\Services\Emola\EmolaWalletDepositService::class));
+    }
+
+    /**
+     * eMola wallet deposit: resend USSD push.
+     */
+    public function emolaResendDeposit(Request $request)
+    {
+        $web = app(\Incevio\Package\Wallet\Http\Controllers\DepositController::class);
+        $response = $web->emolaResendDeposit($request, app(\App\Services\Emola\EmolaWalletDepositService::class));
+
+        if ($request->expectsJson()) {
+            if ($response->isRedirect()) {
+                $target = $response->getTargetUrl();
+                parse_str(parse_url($target, PHP_URL_QUERY) ?? '', $params);
+                $ref = $params['ref'] ?? null;
+
+                return response()->json([
+                    'success' => true,
+                    'ref' => $ref,
+                    'message' => session('warning') ?: trans('theme.emola_resend_success'),
+                ]);
+            }
+
+            return response()->json([
+                'message' => session('error') ?: trans('theme.emola_resend_failed'),
+            ], 422);
+        }
+
+        return $response;
     }
 
     /**

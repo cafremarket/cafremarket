@@ -246,5 +246,18 @@ Route::middleware(['web'])->group(function () {
         Route::get('wallet/deposit/mpesa/status', [
             DepositController::class, 'mpesaDepositStatus',
         ])->name('deposit.mpesa.status');
+
+        // eMola wallet deposit: complete page + status polling
+        Route::get('wallet/deposit/emola/complete', [
+            DepositController::class, 'emolaDepositComplete',
+        ])->name('deposit.emola.complete');
+
+        Route::get('wallet/deposit/emola/status', [
+            DepositController::class, 'emolaDepositStatus',
+        ])->name('deposit.emola.status');
+
+        Route::post('wallet/deposit/emola/resend', [
+            DepositController::class, 'emolaResendDeposit',
+        ])->name('deposit.emola.resend');
     });
 });

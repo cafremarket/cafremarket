@@ -60,11 +60,20 @@
 
             @php
               $has_mpesa = is_incevio_package_loaded('mpesa') && $paymentMethods->contains('code', 'mpesa');
+              $has_emola = $paymentMethods->contains('code', 'emola');
             @endphp
             @if ($has_mpesa)
-              <div class="form-group mpesa-wallet-field">
+              <div id="mpesa-form" class="form-group mpesa-wallet-field" style="display: none;">
                 <label for="mpesa-number-wallet">{{ trans('mpesa::lang.mpesa_number') }} <span class="text-muted">({{ trans('packages.wallet.required_when_mpesa') }})</span></label>
                 {!! Form::text('mpesa_number', old('mpesa_number'), ['id' => 'mpesa-number-wallet', 'class' => 'form-control mpesa-request-field', 'placeholder' => trans('mpesa::lang.mpesa_number')]) !!}
+                <div class="help-block with-errors"></div>
+              </div>
+            @endif
+            @if ($has_emola)
+              <div id="emola-form" class="form-group emola-wallet-field" style="display: none;">
+                <label for="emola-number-wallet">{{ trans('theme.emola_number') }} <span class="text-muted">({{ trans('packages.wallet.required_when_emola') }})</span></label>
+                {!! Form::text('emola_number', old('emola_number'), ['id' => 'emola-number-wallet', 'class' => 'form-control emola-request-field', 'placeholder' => trans('theme.emola_number_placeholder'), 'pattern' => '^(86|87)\d{7}$', 'maxlength' => 9]) !!}
+                <p class="help-block small text-muted">{{ trans('theme.emola_number_help') }}</p>
                 <div class="help-block with-errors"></div>
               </div>
             @endif

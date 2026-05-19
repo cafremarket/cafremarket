@@ -47,6 +47,10 @@ class DepositRequest extends Request
             $rules['mpesa_number'] = 'required|string|regex:/^[\d\s\+]+$/';
         }
 
+        if ($this->input('payment_method') === 'emola') {
+            $rules['emola_number'] = ['required', 'string', 'regex:/^(86|87)\d{7}$/'];
+        }
+
         return $rules;
     }
 }

@@ -45,6 +45,8 @@
           $('#paypal-express-btn').addClass('hide');
           $('#pay-now-btn').removeClass('hide');
         }
+
+        toggleWalletMobileFields(code);
       });
 
       // Submit the form
@@ -67,6 +69,8 @@
           $('#pay-now-btn').addClass('hide');
           $('#paypal-express-btn').removeClass('hide');
         }
+
+        toggleWalletMobileFields(code);
       }
 
       // Stripe code, create a token
@@ -148,6 +152,23 @@
 
     function hideSimpleCardForm() {
       $('#authorize-net-cc-form').hide().find('input, select').removeAttr('required');
+    }
+
+    function toggleWalletMobileFields(code) {
+      if ($('#mpesa-form').length) {
+        if ('mpesa' == code) {
+          $('#mpesa-form').show().find('input.mpesa-request-field').attr('required', 'required');
+        } else {
+          $('#mpesa-form').hide().find('input.mpesa-request-field').removeAttr('required');
+        }
+      }
+      if ($('#emola-form').length) {
+        if ('emola' == code) {
+          $('#emola-form').show().find('input.emola-request-field').attr('required', 'required');
+        } else {
+          $('#emola-form').hide().find('input.emola-request-field').removeAttr('required');
+        }
+      }
     }
   }(window.jQuery, window, document));
 </script>
