@@ -159,6 +159,10 @@ Route::middleware('customerApp')->group(function () {
         Route::post('order/{order}/feedback', [FeedbackController::class, 'save_product_feedbacks']);
         Route::post('order/{order}/goodsReceived', [OrderController::class, 'goods_received']);
 
+        // eMola order status + resend (mobile app polling)
+        Route::get('order/{order}/emola/status', [OrderController::class, 'emolaPaymentStatus']);
+        Route::post('order/{order}/emola/resend', [OrderController::class, 'resendEmolaPayment']);
+
         // invoice
         Route::get('download/invoice/{order}', [OrderController::class, 'invoice']);
 

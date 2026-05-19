@@ -9,8 +9,10 @@ use App\Http\Resources\ConversationResource;
 use App\Http\Resources\OrderLightResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Message;
+use App\Exceptions\PaymentFailedException;
 use App\Models\Order;
 use App\Models\Reply;
+use App\Services\Emola\EmolaOrderPaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -171,5 +173,71 @@ class OrderController extends Controller
     public function invoice(Order $order)
     {
         return $order->invoice('download');
+    }
+
+    /**
+     * Poll eMola payment status for an order (same idea as M-Pesa order status).
+     */
+    public function emolaPaymentStatus(Request $request, Order $order, EmolaOrderPaymentService $emolaOrders)
+    {
+        $customer = Auth::guard('api')->user();
+        if (! $customer || (int) $order->customer_id !== (int) $customer->id) {
+            return response()->json(['message' => trans('responses.unauthorized')], 403);
+        }
+
+        $order->refresh();
+
+        if ($order->isPaid()) {
+            return response()->json(['paid' => true]);
+        }
+
+        if (optional($order->paymentMethod)->code !== 'emola') {
+            return response()->json([
+                'paid' => false,
+                'message' => trans('theme.emola_resend_not_allowed'),
+            ], 400);
+        }
+
+        $result = $emolaOrders->syncPaymentStatusFromGateway($order);
+
+        return response()->json([
+            'paid' => $result['paid'],
+            'message' => $result['message'],
+        ]);
+    }
+
+    /**
+     * Resend eMola USSD payment request for a pending order.
+     */
+    public function resendEmolaPayment(Request $request, Order $order, EmolaOrderPaymentService $emolaOrders)
+    {
+        $customer = Auth::guard('api')->user();
+        if (! $customer || (int) $order->customer_id !== (int) $customer->id) {
+            return response()->json(['message' => trans('responses.unauthorized')], 403);
+        }
+
+        if (! $order->canResendEmolaPayment()) {
+            return response()->json([
+                'message' => trans('theme.emola_resend_not_allowed'),
+            ], 403);
+        }
+
+        $request->validate([
+            'emola_number' => ['required', 'string', 'regex:/^(86|87)\d{7}$/'],
+        ], [
+            'emola_number.required' => trans('theme.emola_number_required'),
+            'emola_number.regex' => trans('theme.emola_number_invalid'),
+        ]);
+
+        try {
+            $emolaOrders->resendPaymentRequest($order, $request->input('emola_number'));
+        } catch (PaymentFailedException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => trans('theme.emola_resend_success'),
+        ]);
     }
 }
