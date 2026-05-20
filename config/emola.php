@@ -38,14 +38,22 @@ return [
         'query_ben' => 'QUERY_BEN',
     ],
 
-    // Field limits (spec §B).
+    // Field limits (spec §B) + Movitel merchant caps (MZN / MT).
     'limits' => [
         'msisdn' => 9,
         'trans_id_min' => 15,
         'trans_id_max' => 30,
-        // Spec §B.1 allows 1–5 digits; many Movitel USSD merchants cap at 9999 MZN (override via EMOLA_MAX_TRANS_AMOUNT).
-        'trans_amount_max' => (int) env('EMOLA_MAX_TRANS_AMOUNT', 9999),
+        'trans_amount_min' => (int) env('EMOLA_MIN_TRANS_AMOUNT', 1),
+        // USSD transAmount field: spec §B.1 allows up to 5 digits (max single push 99,999).
         'trans_amount_digits' => 5,
+        // Order / checkout payments (C2B).
+        'order_transaction_max' => (int) env('EMOLA_ORDER_TRANSACTION_MAX', 50_000),
+        // Wallet top-up deposits.
+        'deposit_transaction_max' => (int) env('EMOLA_DEPOSIT_TRANSACTION_MAX', 1_000),
+        // Total paid per customer MSISDN per calendar day (orders + deposits).
+        'customer_daily_max' => (int) env('EMOLA_CUSTOMER_DAILY_MAX', 500_000),
+        // @deprecated Use order_transaction_max — kept for backward compatibility.
+        'trans_amount_max' => (int) env('EMOLA_MAX_TRANS_AMOUNT', 50_000),
         'ref_no_max' => 20,
         'sms_content_max' => 180,
         'partner_code_max' => 30,

@@ -34,9 +34,11 @@ class EmolaWalletDepositService
     public function pushDeposit(object $payee, float|int|string $amount, string $msisdn, ?string $smsContent = null): array
     {
         $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
+        $amountMzn = EmolaSpec::parseMeticalAmount($amount);
+        EmolaDailyLimit::assertCanPay($msisdn, $amountMzn);
         $transId = $this->client->generateTransId();
         $refNo = self::refNoForPayee($payee);
-        $transAmount = EmolaSpec::formatTransAmount($amount);
+        $transAmount = EmolaSpec::formatTransAmount($amountMzn, EmolaSpec::CONTEXT_DEPOSIT);
 
         $res = $this->client->pushUssdMessage([
             'msisdn' => $msisdn,
@@ -59,7 +61,8 @@ class EmolaWalletDepositService
         ]);
 
         if ($res->isUssdPushAccepted()) {
-            $this->rememberPendingDeposit($transId, $payee, (float) $amount, $refNo);
+            EmolaDailyLimit::recordAcceptedPush($msisdn, $amountMzn);
+            $this->rememberPendingDeposit($transId, $payee, (float) $amountMzn, $refNo);
         }
 
         return [

@@ -3,12 +3,16 @@
 namespace App\Http\Requests\Validations;
 
 use App\Common\CanCreateStripeCustomer;
+use App\Exceptions\PaymentFailedException;
 use App\Http\Requests\Request;
 use App\Models\Address;
 use App\Models\Customer;
+use App\Services\Emola\EmolaDailyLimit;
+use App\Services\Emola\EmolaSpec;
 use App\Services\NewCustomer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Validation\Validator;
 
 class CheckoutCartRequest extends Request
 {
@@ -168,6 +172,41 @@ class CheckoutCartRequest extends Request
         }
 
         return $rules;
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($this->input('payment_method') !== 'emola') {
+                return;
+            }
+
+            $cart = $this->route('cart');
+
+            if (! $cart) {
+                return;
+            }
+
+            $totalMzn = EmolaSpec::parseMeticalAmount($cart->grand_total);
+            $orderMax = EmolaSpec::transactionMax(EmolaSpec::CONTEXT_ORDER);
+
+            if ($totalMzn > $orderMax) {
+                $validator->errors()->add(
+                    'payment_method',
+                    trans('theme.emola_order_max_exceeded', [
+                        'max' => number_format($orderMax, 0, '.', ','),
+                    ])
+                );
+            }
+
+            if ($this->filled('emola_number')) {
+                try {
+                    EmolaDailyLimit::assertCanPay((string) $this->input('emola_number'), $totalMzn);
+                } catch (PaymentFailedException $e) {
+                    $validator->errors()->add('emola_number', $e->getMessage());
+                }
+            }
+        });
     }
 
     /** Check if the user is registered customer */

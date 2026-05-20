@@ -10,6 +10,10 @@ use App\Models\Order;
  */
 final class EmolaSpec
 {
+    public const CONTEXT_ORDER = 'order';
+
+    public const CONTEXT_DEPOSIT = 'deposit';
+
     public static function normalizeMsisdn(string $msisdn): string
     {
         $digits = preg_replace('/\D/', '', $msisdn);
@@ -52,19 +56,60 @@ final class EmolaSpec
     }
 
     /**
-     * transAmount for pushUssdMessage — whole meticals, 1–5 digits (spec §B.1).
+     * Parse a monetary value into whole Meticals for Movitel USSD (no decimals, no separators).
      */
-    public static function formatTransAmount(float|int|string $amount): string
+    public static function parseMeticalAmount(float|int|string $amount): int
     {
-        $value = (int) round((float) $amount);
-        $max = (int) config('emola.limits.trans_amount_max', 9999);
-        $min = 1;
+        if (is_int($amount)) {
+            return $amount;
+        }
+
+        $normalized = trim((string) $amount);
+        $normalized = str_replace([' ', "\u{00A0}"], '', $normalized);
+
+        // European-style decimals: 1.234,56 → 1234.56
+        if (preg_match('/^\d{1,3}(\.\d{3})+,\d{1,2}$/', $normalized)) {
+            $normalized = str_replace('.', '', $normalized);
+            $normalized = str_replace(',', '.', $normalized);
+        } elseif (str_contains($normalized, ',') && ! str_contains($normalized, '.')) {
+            $normalized = str_replace(',', '.', $normalized);
+        } else {
+            $normalized = str_replace(',', '', $normalized);
+        }
+
+        return (int) round((float) $normalized);
+    }
+
+    public static function transactionMax(string $context = self::CONTEXT_ORDER): int
+    {
+        if ($context === self::CONTEXT_DEPOSIT) {
+            return (int) config('emola.limits.deposit_transaction_max', 1_000);
+        }
+
+        return (int) config('emola.limits.order_transaction_max', 50_000);
+    }
+
+    /**
+     * transAmount for pushUssdMessage — whole meticals, 1–5 digits (spec §B.1).
+     *
+     * @param  self::CONTEXT_*  $context
+     */
+    public static function formatTransAmount(float|int|string $amount, string $context = self::CONTEXT_ORDER): string
+    {
+        $value = self::parseMeticalAmount($amount);
+        $max = self::transactionMax($context);
+        $min = (int) config('emola.limits.trans_amount_min', 1);
 
         if ($value < $min || $value > $max) {
+            $messageKey = $context === self::CONTEXT_DEPOSIT
+                ? 'theme.emola_deposit_amount_limit'
+                : 'theme.emola_amount_limit';
+
             throw new PaymentFailedException(
-                trans('theme.emola_amount_limit', [
+                trans($messageKey, [
                     'amount' => number_format($value, 0, '.', ','),
                     'max' => number_format($max, 0, '.', ','),
+                    'min' => number_format($min, 0, '.', ','),
                 ])
             );
         }
@@ -80,19 +125,15 @@ final class EmolaSpec
 
     public static function transAmountFromOrder(Order $order): string
     {
-        $amount = (float) $order->grand_total;
-
-        if (is_incevio_package_loaded('dynamic-currency') && $order->currency_id) {
-            $amount = (float) get_system_currency_value($amount, $order->currency_id);
-        }
-
-        return self::formatTransAmount($amount);
+        // grand_total is stored in platform (Metical) units at checkout — do not divide by FX
+        // (get_system_currency_value sends wrong totals and Movitel returns business error 06).
+        return self::formatTransAmount($order->grand_total, self::CONTEXT_ORDER);
     }
 
     /** @deprecated Use formatTransAmount() */
     public static function sanitizeAmount(float|int|string $amount): string
     {
-        return self::formatTransAmount($amount);
+        return self::formatTransAmount($amount, self::CONTEXT_ORDER);
     }
 
     public static function sanitizeSmsContent(string $content): string

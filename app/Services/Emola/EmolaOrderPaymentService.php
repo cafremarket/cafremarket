@@ -20,13 +20,16 @@ class EmolaOrderPaymentService
     public function pushPaymentForOrder(Order $order, string $msisdn, ?string $smsContent = null): EmolaResponse
     {
         $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
+        $amountMzn = EmolaSpec::parseMeticalAmount($order->grand_total);
+        EmolaDailyLimit::assertCanPay($msisdn, $amountMzn);
         $transId = $this->client->generateTransId();
         $refNo = EmolaSpec::sanitizeRefNo('REF'.(string) $order->id);
+        $transAmount = EmolaSpec::formatTransAmount($amountMzn, EmolaSpec::CONTEXT_ORDER);
 
         $res = $this->client->pushUssdMessage([
             'msisdn' => $msisdn,
             'transId' => $transId,
-            'transAmount' => EmolaSpec::transAmountFromOrder($order),
+            'transAmount' => $transAmount,
             'smsContent' => $smsContent ?: trans('app.purchase_from', ['marketplace' => get_platform_title()]),
             'language' => EmolaSpec::sanitizeLanguage(app()->getLocale() === 'en' ? 'en' : 'pt'),
             'refNo' => $refNo,
@@ -34,6 +37,8 @@ class EmolaOrderPaymentService
 
         Log::info('eMola USSD push for order', [
             'order_id' => $order->id,
+            'grand_total' => $order->grand_total,
+            'trans_amount' => $transAmount,
             'trans_id' => $transId,
             'msisdn' => $msisdn,
             'gateway_error' => $res->gatewayError,
@@ -44,6 +49,10 @@ class EmolaOrderPaymentService
         ]);
 
         $this->syncOrderFromResponse($order, $res, $transId, $refNo);
+
+        if ($res->isUssdPushAccepted()) {
+            EmolaDailyLimit::recordAcceptedPush($msisdn, $amountMzn);
+        }
 
         return $res;
     }
