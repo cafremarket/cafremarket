@@ -169,6 +169,23 @@ final class EmolaSpec
         return config('emola.business_errors.'.$code);
     }
 
+    /** Map Movitel business errorCode → theme.php translation key (no numeric suffixes). */
+    public static function businessErrorThemeKey(?string $code): ?string
+    {
+        if ($code === null || trim($code) === '') {
+            return null;
+        }
+
+        $normalized = str_pad(ltrim(trim($code), '0') ?: '0', 2, '0', STR_PAD_LEFT);
+
+        return match ($normalized) {
+            '06' => 'theme.emola_code_invalid_amount',
+            '10' => 'theme.emola_code_msisdn_not_whitelisted',
+            '11' => 'theme.emola_code_pin_cancelled',
+            default => null,
+        };
+    }
+
     /** Callback / query — payment completed (spec §C: errorCode 0 only). */
     public static function isPaymentSuccessCode(?string $code): bool
     {

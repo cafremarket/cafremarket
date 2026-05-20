@@ -135,8 +135,8 @@ final class EmolaResponse
         $message = $this->businessMessage();
 
         if ($code !== null) {
-            $themeKey = 'theme.emola_error_'.$code;
-            if (trans()->has($themeKey)) {
+            $themeKey = EmolaSpec::businessErrorThemeKey($code);
+            if ($themeKey !== null && trans()->has($themeKey)) {
                 return trans($themeKey, [
                     'max' => number_format((int) config('emola.limits.order_transaction_max', 50_000), 0, '.', ','),
                 ]);
