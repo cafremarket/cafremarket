@@ -12,6 +12,7 @@ Route::namespace('Api')->middleware(['api', 'auth:api'])->prefix('api')->group(f
     Route::post('wallet/transfer', [TransferController::class, 'transfer']);
     Route::get('wallet/get_payment_methods', [DepositController::class, 'getPaymentMethods']);
     Route::post('wallet/deposit', [DepositController::class, 'deposit']);
+    Route::get('wallet/deposit/platform-fee', [\Incevio\Package\Wallet\Http\Controllers\DepositController::class, 'platformFeePreview']);
     // M-Pesa wallet deposit: poll until paid (same as order mpesa/order/{order}/status)
     Route::get('wallet/deposit/mpesa/status', [DepositController::class, 'mpesaDepositStatus']);
     Route::get('wallet/deposit/emola/status', [DepositController::class, 'emolaDepositStatus']);

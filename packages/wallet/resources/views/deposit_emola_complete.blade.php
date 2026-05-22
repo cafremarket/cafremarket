@@ -20,6 +20,7 @@
             @endif
           </p>
           <p class="lead mt-4">{{ trans('packages.wallet.emola_complete_on_phone') }}</p>
+          @include('wallet::partials.wallet_deposit_complete_summary', ['depositSummary' => $depositSummary ?? null])
           <p class="text-muted" id="wait-msg">
             <span class="fa fa-spinner fa-spin"></span> {{ trans('packages.wallet.emola_redirect_when_paid') }}
           </p>

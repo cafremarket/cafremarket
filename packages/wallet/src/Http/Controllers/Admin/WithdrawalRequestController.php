@@ -32,7 +32,9 @@ class WithdrawalRequestController extends Controller
     public function approve(WithdrawalActionsRequest $request, Transaction $transaction)
     {
         try {
-            $transaction->approve($request->fee);
+            $withdrawalAmount = abs((float) $transaction->amount);
+            $fee = resolve_platform_payout_fee($withdrawalAmount, $request->fee);
+            $transaction->approve($fee);
 
             // Dispatch Job
             SendNotificationJob::dispatch($transaction, Approve::class);

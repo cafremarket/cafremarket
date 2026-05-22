@@ -118,6 +118,31 @@ class PaymentService implements PaymentServiceContract
     }
 
     /**
+     * Set charge amount including platform fee for M-Pesa / eMola (base amount stays in meta).
+     */
+    public function setAmountWithPlatformFee(float|int|string $baseAmount, ?string $paymentMethod = null): self
+    {
+        $method = $paymentMethod
+            ?? $this->request?->input('payment_method')
+            ?? (optional($this->order)->paymentMethod ? $this->order->paymentMethod->code : null)
+            ?? '';
+
+        $breakdown = \App\Services\PlatformGatewayFeeService::paymentFee((string) $method, $baseAmount);
+
+        $this->fee = $breakdown['fee'];
+        $this->amount = strtolower((string) $method) === 'mpesa'
+            ? (int) round($breakdown['total'])
+            : $breakdown['total'];
+
+        $this->meta = array_merge($this->meta ?? [], [
+            'platform_payment_fee' => $breakdown['fee'],
+            'payment_base_amount' => $breakdown['base'],
+        ]);
+
+        return $this;
+    }
+
+    /**
      * Set the description
      * return $this
      */

@@ -47,6 +47,7 @@
         }
 
         toggleWalletMobileFields(code);
+        refreshWalletTopupFeePreview();
       });
 
       // Submit the form
@@ -71,7 +72,11 @@
         }
 
         toggleWalletMobileFields(code);
+        refreshWalletTopupFeePreview();
       }
+
+      $('#amount').on('input change', refreshWalletTopupFeePreview);
+      refreshWalletTopupFeePreview();
 
       // Stripe code, create a token
       Stripe.setPublishableKey("{{ config('services.stripe.key') }}");
@@ -169,6 +174,35 @@
           $('#emola-form').hide().find('input.emola-request-field').removeAttr('required');
         }
       }
+    }
+
+    var walletFeePreviewUrl = $('#wallet-topup-fee-box').data('fee-url') || '{{ url('account/wallet/deposit/platform-fee') }}';
+
+    function refreshWalletTopupFeePreview() {
+      var box = $('#wallet-topup-fee-box');
+      if (!box.length) return;
+
+      var method = $('input[name=payment_method]:checked').val();
+      var amount = parseFloat($('#amount').val());
+
+      if (!method || (method !== 'mpesa' && method !== 'emola') || !amount || amount < 1) {
+        box.hide();
+        return;
+      }
+
+      $.get(walletFeePreviewUrl, { payment_method: method, amount: amount }, function(data) {
+        if (!data || !data.enabled || data.fee <= 0) {
+          box.hide();
+          return;
+        }
+        $('#wallet-fee-base').text(data.formatted.base);
+        $('#wallet-fee-amount').text(data.formatted.fee);
+        $('#wallet-fee-total').text(data.formatted.total);
+        $('#wallet-fee-row').show();
+        box.show();
+      }).fail(function() {
+        box.hide();
+      });
     }
   }(window.jQuery, window, document));
 </script>

@@ -28,8 +28,15 @@ class DepositController extends Controller
             if ($request->input('payment_status') == 'paid' && $request->has('payment_meta')) {
                 $response = $paymentService->verifyPaidPayment();
             } else {
-                $response = $paymentService->setReceiver('platform')
-                    ->setAmount($request->amount)
+                $paymentMethod = (string) $request->input('payment_method', '');
+                $paymentBuilder = $paymentService->setReceiver('platform');
+                if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                    $paymentBuilder->setAmountWithPlatformFee($request->amount, $paymentMethod);
+                } else {
+                    $paymentBuilder->setAmount($request->amount);
+                }
+
+                $response = $paymentBuilder
                     ->setDescription(trans('packages.wallet.deposit_description', [
                         'marketplace' => get_platform_title(),
                     ]))
@@ -56,10 +63,18 @@ class DepositController extends Controller
                     ? trans('packages.wallet.emola_redirect_when_paid')
                     : trans('mpesa::lang.payment_confirmation');
 
+                $paymentMethod = (string) $request->input('payment_method', '');
+                $feeBreakdown = in_array($paymentMethod, ['mpesa', 'emola'], true)
+                    ? get_platform_payment_fee($paymentMethod, $request->amount)
+                    : ['base' => (float) $request->amount, 'fee' => 0, 'total' => (float) $request->amount, 'enabled' => false];
+
                 return response()->json([
                     'pending' => true,
                     'ref' => $ref,
                     'message' => $message,
+                    'amount' => $feeBreakdown['base'],
+                    'platform_fee' => $feeBreakdown['fee'],
+                    'total_charge' => $feeBreakdown['total'],
                 ], 200);
             }
         }

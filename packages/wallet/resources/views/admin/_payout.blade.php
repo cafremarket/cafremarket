@@ -39,7 +39,8 @@
               {{ get_currency_prefix() }}
             </span>
           @endif
-          {!! Form::number('fee', 0, ['class' => 'form-control', 'step' => 'any', 'min' => 0, 'placeholder' => trans('packages.wallet.payout_fee'), 'required']) !!}
+          {!! Form::number('fee', 0, ['class' => 'form-control platform-payout-fee-input', 'step' => 'any', 'min' => 0, 'placeholder' => trans('packages.wallet.payout_fee'), 'required', 'data-auto-fee' => get_platform_payout_fee(1) > 0 ? '1' : '0']) !!}
+          <p class="help-block small text-muted">{{ trans('packages.wallet.payout_fee_auto_help') }}</p>
           @if (get_currency_suffix())
             <span class="input-group-addon">
               {{ get_currency_suffix() }}

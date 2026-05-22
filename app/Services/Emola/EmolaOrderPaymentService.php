@@ -20,11 +20,18 @@ class EmolaOrderPaymentService
     public function pushPaymentForOrder(Order $order, string $msisdn, ?string $smsContent = null): EmolaResponse
     {
         $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
-        $amountMzn = EmolaSpec::parseMeticalAmount($order->grand_total);
-        EmolaDailyLimit::assertCanPay($msisdn, $amountMzn);
+        $baseMzn = EmolaSpec::parseMeticalAmount($order->grand_total);
+        $feeBreakdown = \App\Services\PlatformGatewayFeeService::paymentFee('emola', $baseMzn);
+        $chargeMzn = EmolaSpec::parseMeticalAmount($feeBreakdown['total']);
+        if ($feeBreakdown['fee'] > 0) {
+            $order->platform_payment_fee = $feeBreakdown['fee'];
+            $order->save();
+        }
+        EmolaDailyLimit::assertCanPay($msisdn, $chargeMzn);
         $transId = $this->client->generateTransId();
         $refNo = EmolaSpec::sanitizeRefNo('REF'.(string) $order->id);
-        $transAmount = EmolaSpec::formatTransAmount($amountMzn, EmolaSpec::CONTEXT_ORDER);
+        $transAmount = EmolaSpec::formatTransAmount($chargeMzn, EmolaSpec::CONTEXT_ORDER);
+        $amountMzn = $chargeMzn;
 
         $res = $this->client->pushUssdMessage([
             'msisdn' => $msisdn,

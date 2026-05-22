@@ -65,6 +65,8 @@
                 <div class="help-block with-errors"></div>
               </div>
             @endif
+            @include('wallet::partials.wallet_deposit_fee_box')
+
             @if ($has_emola)
               <div id="emola-form" class="form-group emola-wallet-field" style="display: none;">
                 <label for="emola-number-wallet">{{ trans('theme.emola_number') }} <span class="text-muted">({{ trans('packages.wallet.required_when_emola') }})</span></label>

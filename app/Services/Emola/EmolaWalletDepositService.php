@@ -34,11 +34,14 @@ class EmolaWalletDepositService
     public function pushDeposit(object $payee, float|int|string $amount, string $msisdn, ?string $smsContent = null): array
     {
         $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
-        $amountMzn = EmolaSpec::parseMeticalAmount($amount);
-        EmolaDailyLimit::assertCanPay($msisdn, $amountMzn);
+        $baseMzn = EmolaSpec::parseMeticalAmount($amount);
+        $feeBreakdown = \App\Services\PlatformGatewayFeeService::paymentFee('emola', $baseMzn);
+        $chargeMzn = EmolaSpec::parseMeticalAmount($feeBreakdown['total']);
+        EmolaDailyLimit::assertCanPay($msisdn, $chargeMzn);
         $transId = $this->client->generateTransId();
         $refNo = self::refNoForPayee($payee);
-        $transAmount = EmolaSpec::formatTransAmount($amountMzn, EmolaSpec::CONTEXT_DEPOSIT);
+        $transAmount = EmolaSpec::formatTransAmount($chargeMzn, EmolaSpec::CONTEXT_DEPOSIT);
+        $amountMzn = $baseMzn;
 
         $res = $this->client->pushUssdMessage([
             'msisdn' => $msisdn,
@@ -61,8 +64,8 @@ class EmolaWalletDepositService
         ]);
 
         if ($res->isUssdPushAccepted()) {
-            EmolaDailyLimit::recordAcceptedPush($msisdn, $amountMzn);
-            $this->rememberPendingDeposit($transId, $payee, (float) $amountMzn, $refNo);
+            EmolaDailyLimit::recordAcceptedPush($msisdn, $chargeMzn);
+            $this->rememberPendingDeposit($transId, $payee, (float) $amountMzn, $refNo, (float) $feeBreakdown['fee']);
         }
 
         return [
@@ -160,6 +163,9 @@ class EmolaWalletDepositService
                 'payment_method' => 'eMola',
             ]),
         ];
+        if (! empty($deposit['platform_fee'])) {
+            $meta['platform_fee'] = $deposit['platform_fee'];
+        }
 
         $trans = $holder->deposit($deposit['amount'], $meta, true);
         SendNotificationJob::dispatch($trans, Deposit::class);
@@ -264,7 +270,7 @@ class EmolaWalletDepositService
         Cache::forget('emola_wallet_status_check_'.$transId);
     }
 
-    private function rememberPendingDeposit(string $transId, object $payee, float $amount, string $refNo): void
+    private function rememberPendingDeposit(string $transId, object $payee, float $amount, string $refNo, float $platformFee = 0): void
     {
         $ttl = now()->addHours(24);
 
@@ -272,6 +278,8 @@ class EmolaWalletDepositService
             'holder_type' => $payee::class,
             'holder_id' => $payee->id,
             'amount' => $amount,
+            'platform_fee' => $platformFee,
+            'charge_amount' => $amount + $platformFee,
             'ref_no' => $refNo,
         ], $ttl);
 

@@ -99,6 +99,9 @@ class ResponseController extends Controller
                 'payment_method' => 'M-Pesa',
             ]),
         ];
+        if (! empty($data['platform_fee'])) {
+            $meta['platform_fee'] = $data['platform_fee'];
+        }
 
         $trans = $holder->deposit($data['amount'], $meta, true);
         SendNotificationJob::dispatch($trans, Deposit::class);

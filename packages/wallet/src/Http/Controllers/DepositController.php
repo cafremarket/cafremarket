@@ -66,8 +66,12 @@ class DepositController extends Controller
     public function deposit(DepositRequest $request, PaymentServiceContract $paymentService)
     {
         try {
-            $result = $paymentService
-                ->setAmount($request->amount)
+            $paymentMethod = (string) $request->input('payment_method', '');
+            $amountSetter = in_array($paymentMethod, ['mpesa', 'emola'], true)
+                ? fn ($p) => $p->setAmountWithPlatformFee($request->amount, $paymentMethod)
+                : fn ($p) => $p->setAmount($request->amount);
+
+            $result = $amountSetter($paymentService)
                 ->setDescription(trans('packages.wallet.deposit_description', [
                     'marketplace' => get_platform_title(),
                     'payment_method' => $request->payment_method,
@@ -338,7 +342,10 @@ class DepositController extends Controller
                 ->with('error', trans('packages.wallet.payment_failed'));
         }
 
-        return view('wallet::deposit_mpesa_complete', ['ref' => $ref]);
+        return view('wallet::deposit_mpesa_complete', [
+            'ref' => $ref,
+            'depositSummary' => $this->pendingDepositSummary(MPesaPaymentService::CACHE_KEY_WALLET_DEPOSIT.$ref),
+        ]);
     }
 
     /**
@@ -399,6 +406,9 @@ class DepositController extends Controller
                                     'payment_method' => 'M-Pesa',
                                 ]),
                             ];
+                            if (! empty($data['platform_fee'])) {
+                                $meta['platform_fee'] = $data['platform_fee'];
+                            }
                             $trans = $holder->deposit($data['amount'], $meta, true);
                             SendNotificationJob::dispatch($trans, Deposit::class);
                             Cache::forget($cacheKey);
@@ -447,6 +457,7 @@ class DepositController extends Controller
         $canResend = $holder && $emolaWallet->canResendDeposit($ref, $holder);
 
         return view('wallet::deposit_emola_complete', [
+            'depositSummary' => $this->pendingDepositSummary(EmolaWalletDepositService::CACHE_KEY_WALLET_DEPOSIT.$ref),
             'ref' => $ref,
             'canResend' => $canResend,
         ]);
@@ -523,6 +534,56 @@ class DepositController extends Controller
         }
 
         return response()->json(['paid' => false]);
+    }
+
+    /**
+     * Preview platform fee for wallet top-up (M-Pesa / eMola).
+     */
+    public function platformFeePreview(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'payment_method' => 'required|in:mpesa,emola',
+        ]);
+
+        $breakdown = get_platform_payment_fee(
+            (string) $request->input('payment_method'),
+            $request->input('amount')
+        );
+
+        return response()->json([
+            'base' => $breakdown['base'],
+            'fee' => $breakdown['fee'],
+            'total' => $breakdown['total'],
+            'enabled' => $breakdown['enabled'],
+            'formatted' => [
+                'base' => get_formated_currency($breakdown['base']),
+                'fee' => get_formated_currency($breakdown['fee']),
+                'total' => get_formated_currency($breakdown['total']),
+            ],
+        ]);
+    }
+
+    /**
+     * @return array{base: float, fee: float, total: float}|null
+     */
+    private function pendingDepositSummary(string $cacheKey): ?array
+    {
+        $data = Cache::get($cacheKey);
+
+        if (! is_array($data) || ! isset($data['amount'])) {
+            return null;
+        }
+
+        $base = (float) $data['amount'];
+        $fee = (float) ($data['platform_fee'] ?? 0);
+        $total = (float) ($data['charge_amount'] ?? ($base + $fee));
+
+        return [
+            'base' => $base,
+            'fee' => $fee,
+            'total' => $total,
+        ];
     }
 
     /**

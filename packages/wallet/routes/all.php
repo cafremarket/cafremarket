@@ -148,6 +148,10 @@ Route::middleware(['web'])->group(function () {
                 DepositController::class, 'deposit',
             ])->name('wallet.deposit');
 
+            Route::get('wallet/deposit/platform-fee', [
+                DepositController::class, 'platformFeePreview',
+            ])->name('wallet.deposit.platform_fee');
+
             // Transfers
             Route::get('wallet/transfer', [
                 TransferController::class, 'show_form',
@@ -176,6 +180,10 @@ Route::middleware(['web'])->group(function () {
             Route::post('account/wallet/deposit', [
                 DepositController::class, 'deposit',
             ])->name('wallet.deposit');
+
+            Route::get('account/wallet/deposit/platform-fee', [
+                DepositController::class, 'platformFeePreview',
+            ])->name('wallet.deposit.platform_fee');
 
             // Transfer
             Route::get('account/wallet/transfer/form', [

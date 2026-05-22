@@ -114,6 +114,7 @@ class Order extends BaseModel
         'handling',
         'taxes',
         'grand_total',
+        'platform_payment_fee',
         'billing_address',
         'shipping_address',
         'shipping_date',

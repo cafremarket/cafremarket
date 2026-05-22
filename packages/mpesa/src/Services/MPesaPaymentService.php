@@ -69,10 +69,13 @@ class MPesaPaymentService extends PaymentService
             // Wallet deposit: store pending deposit and redirect to wallet complete page
             $payee = $this->payee;
             if ($payee) {
-                Cache::put(self::CACHE_KEY_WALLET_DEPOSIT . $refId, [
+                $baseAmount = $this->meta['payment_base_amount'] ?? $this->amount;
+                Cache::put(self::CACHE_KEY_WALLET_DEPOSIT.$refId, [
                     'holder_type' => get_class($payee),
                     'holder_id' => $payee->id,
-                    'amount' => $this->amount,
+                    'amount' => $baseAmount,
+                    'platform_fee' => (float) ($this->meta['platform_payment_fee'] ?? 0),
+                    'charge_amount' => (float) $this->amount,
                 ], now()->addHours(24));
 
                 return redirect()->to(url('wallet/deposit/mpesa/complete?ref=' . urlencode($refId)));

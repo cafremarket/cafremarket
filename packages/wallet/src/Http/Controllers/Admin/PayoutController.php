@@ -39,13 +39,14 @@ class PayoutController extends Controller
     public function payout(PayoutRequest $request, Transaction $transaction)
     {
         try {
+            $fee = resolve_platform_payout_fee($request->amount, $request->fee);
             $meta = [
                 'type' => $transaction::TYPE_PAYOUT,
                 'description' => trans('packages.wallet.payout_desc', ['platform' => get_platform_title()]),
-                'fee' => $request->fee,
+                'fee' => $fee,
             ];
 
-            $amount = ($request->amount + $request->fee);
+            $amount = ($request->amount + $fee);
             $trans = Shop::find($request->shop_id)->withdraw($amount, $meta, true, true);
 
             // Dispatch Job

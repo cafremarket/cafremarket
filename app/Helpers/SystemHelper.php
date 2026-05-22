@@ -1014,9 +1014,7 @@ if (! function_exists('updateOptionTable')) {
         foreach ($request->except('_token') as $field => $value) {
             $value = is_array($value) ? serialize($value) : $value;
 
-            DB::table('options')->where('option_name', $field)->update([
-                'option_value' => $value,
-            ]);
+            update_or_create_option_table_record($field, $value);
 
             Cache::forget($field);  // Clear cached value
         }

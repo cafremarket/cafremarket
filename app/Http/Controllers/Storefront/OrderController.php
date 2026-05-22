@@ -109,9 +109,21 @@ class OrderController extends Controller
 
             $receiver = vendor_get_paid_directly() ? PaymentService::RECEIVER_MERCHANT : PaymentService::RECEIVER_PLATFORM;
 
-            $response = $payment->setReceiver($receiver)
-                ->setOrderInfo($order)
-                ->setAmount($order->grand_total)
+            $paymentMethod = (string) $request->input('payment_method', '');
+            if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                $feeBreakdown = get_platform_payment_fee($paymentMethod, $order->grand_total);
+                $order->platform_payment_fee = $feeBreakdown['fee'];
+                $order->save();
+            }
+
+            $paymentBuilder = $payment->setReceiver($receiver)->setOrderInfo($order);
+            if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                $paymentBuilder->setAmountWithPlatformFee($order->grand_total, $paymentMethod);
+            } else {
+                $paymentBuilder->setAmount($order->grand_total);
+            }
+
+            $response = $paymentBuilder
                 ->setDescription(trans('app.purchase_from', [
                     'marketplace' => get_platform_title(),
                 ]))

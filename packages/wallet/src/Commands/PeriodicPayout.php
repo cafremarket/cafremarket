@@ -33,14 +33,19 @@ class PeriodicPayout extends Command
     public function handle(): void
     {
         if (is_incevio_package_loaded('wallet')) {            // Check approved balance
-            $meta = ['type' => Transaction::TYPE_PAYOUT, 'description' => trans('packages.wallet.periodic_payout_created', ['period' => config('system.order.vendor_get_paid')])];
-
             $shops = Shop::active()->get();
 
-            $shops->each(function ($shop) use ($meta) {
+            $shops->each(function ($shop) {
                 if ($shop->wallet->balance >= get_min_withdrawal_limit()) {
                     try {
-                        $trans = $shop->withdraw($shop->wallet->balance, $meta, true, false);
+                        $balance = $shop->wallet->balance;
+                        $fee = get_platform_payout_fee($balance);
+                        $meta = [
+                            'type' => Transaction::TYPE_PAYOUT,
+                            'description' => trans('packages.wallet.periodic_payout_created', ['period' => config('system.order.vendor_get_paid')]),
+                            'fee' => $fee,
+                        ];
+                        $trans = $shop->withdraw($balance, $meta, true, false);
 
                         if (
                             is_incevio_package_loaded('dynamicCommission')

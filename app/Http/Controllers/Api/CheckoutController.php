@@ -58,9 +58,19 @@ class CheckoutController extends Controller
             if ($request->input('payment_status') == 'paid' && $request->has('payment_meta')) {
                 $response = $payment->verifyPaidPayment();
             } else {
-                $response = $payment->setReceiver($receiver)
-                    ->setOrderInfo($order)
-                    ->setAmount($order->grand_total)
+                $paymentMethod = (string) $request->input('payment_method', '');
+                if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                    $feeBreakdown = get_platform_payment_fee($paymentMethod, $order->grand_total);
+                    $order->platform_payment_fee = $feeBreakdown['fee'];
+                    $order->save();
+                }
+
+                $amountSetter = in_array($paymentMethod, ['mpesa', 'emola'], true)
+                    ? fn ($p) => $p->setAmountWithPlatformFee($order->grand_total, $paymentMethod)
+                    : fn ($p) => $p->setAmount($order->grand_total);
+
+                $response = $amountSetter($payment->setReceiver($receiver)
+                    ->setOrderInfo($order))
                     ->setDescription(trans('app.purchase_from', [
                         'marketplace' => get_platform_title(),
                     ]))

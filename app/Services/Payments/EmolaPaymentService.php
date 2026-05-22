@@ -54,9 +54,10 @@ class EmolaPaymentService extends PaymentService
 
     private function chargeWalletDeposit()
     {
+        $baseAmount = $this->meta['payment_base_amount'] ?? $this->amount;
         $result = $this->emolaWallet->pushDeposit(
             $this->payee,
-            $this->amount,
+            $baseAmount,
             (string) $this->request->input('emola_number'),
             $this->description ?: null,
         );
@@ -82,6 +83,9 @@ class EmolaPaymentService extends PaymentService
 
         $context = $this->order ? EmolaSpec::CONTEXT_ORDER : EmolaSpec::CONTEXT_DEPOSIT;
         EmolaSpec::formatTransAmount($this->amount, $context);
+        if (! empty($this->meta['payment_base_amount'])) {
+            EmolaSpec::formatTransAmount($this->meta['payment_base_amount'], $context);
+        }
 
         if ($this->request->filled('emola_number')) {
             EmolaDailyLimit::assertCanPay(

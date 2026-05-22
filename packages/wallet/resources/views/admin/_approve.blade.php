@@ -20,7 +20,10 @@
               {{ get_currency_prefix() }}
             </span>
           @endif
-          {!! Form::number('fee', 0, ['class' => 'form-control input-lg', 'step' => 'any', 'min' => 0, 'placeholder' => trans('packages.wallet.fee'), 'required']) !!}
+          @php
+            $defaultPayoutFee = get_platform_payout_fee(abs($transaction->amount));
+          @endphp
+          {!! Form::number('fee', $defaultPayoutFee, ['class' => 'form-control input-lg', 'step' => 'any', 'min' => 0, 'placeholder' => trans('packages.wallet.fee'), 'required']) !!}
           @if (get_currency_suffix())
             <span class="input-group-addon" id="basic-addon1">
               {{ get_currency_suffix() }}
