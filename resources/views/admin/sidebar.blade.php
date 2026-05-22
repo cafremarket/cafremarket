@@ -630,6 +630,7 @@
 
           @if (is_incevio_package_loaded('wallet'))
             @include('wallet::admin.sidebar._setting_option')
+            @include('wallet::admin.sidebar._platform_fees_option')
           @endif
 
           {{-- @if (is_incevio_package_loaded('aiAssistant'))

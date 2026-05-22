@@ -28,7 +28,7 @@
         {!! Form::select($typeKey, [
           'flat' => trans('packages.wallet.platform_fee_type_flat'),
           'percent' => trans('packages.wallet.platform_fee_type_percent'),
-        ], $type, ['class' => 'form-control']) !!}
+        ], $type, ['class' => 'form-control platform-fee-type-select']) !!}
       </div>
     </div>
     <div class="form-group">
@@ -36,8 +36,15 @@
         {!! Form::label($valueKey, trans('packages.wallet.platform_fee_value') . ':', ['class' => 'control-label']) !!}
       </div>
       <div class="col-sm-7 nopadding-left">
+        @php
+          $flatSymbol = config('system_settings.currency.symbol', 'MT');
+        @endphp
         <div class="input-group">
-          <span class="input-group-addon">{{ config('system_settings.currency.symbol', 'MT') }}</span>
+          <span
+            class="input-group-addon platform-fee-value-addon"
+            data-flat-symbol="{{ $flatSymbol }}"
+            data-percent-symbol="%"
+          >{{ $type === 'percent' ? '%' : $flatSymbol }}</span>
           {!! Form::number($valueKey, $value, ['class' => 'form-control', 'min' => 0, 'step' => 'any']) !!}
         </div>
         <p class="help-block small text-muted">{{ trans('packages.wallet.platform_fee_type_percent') }}: use 2.5 for 2.5%. {{ trans('packages.wallet.platform_fee_type_flat') }}: fixed MZN per transaction.</p>

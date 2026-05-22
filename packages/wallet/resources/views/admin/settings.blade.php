@@ -123,26 +123,6 @@
             </div>
           </div>
 
-          <div class="col-sm-12">
-            <h4 class="text-primary">{{ trans('packages.wallet.platform_fees_section') }}</h4>
-            <p class="text-muted">{{ trans('packages.wallet.platform_fees_section_help') }}</p>
-          </div>
-
-          <div class="col-sm-12">
-            @include('wallet::admin.partials.platform_fee_fields', [
-              'prefix' => 'platform_fee_mpesa',
-              'title' => trans('packages.wallet.platform_fee_mpesa_customer'),
-            ])
-            @include('wallet::admin.partials.platform_fee_fields', [
-              'prefix' => 'platform_fee_emola',
-              'title' => trans('packages.wallet.platform_fee_emola_customer'),
-            ])
-            @include('wallet::admin.partials.platform_fee_fields', [
-              'prefix' => 'platform_fee_payout',
-              'title' => trans('packages.wallet.platform_fee_payout_vendor'),
-            ])
-          </div>
-
           <div class="form-group">
             <div class="col-sm-5 text-right">
               {!! Form::label('wallet_payment_info_cod', trans('packages.wallet.manual_payment_info_cod') . ':*', ['class' => 'with-help text-right control-label']) !!}
