@@ -18,6 +18,7 @@
             <th>{{ trans('packages.wallet.remaining_balance') }}</th>
             <th>{{ trans('packages.wallet.amount') }}</th>
             <th>{{ trans('packages.wallet.status') }}</th>
+            <th>{{ trans('packages.wallet.payout_payment_proof') }}</th>
             <th>{{ trans('packages.wallet.option') }}</th>
           </tr>
         </thead>
@@ -44,6 +45,9 @@
                   {!! $transaction->statusName() !!}
                 </td>
                 <td>
+                  @include('wallet::admin.partials._payout_payment_proof', ['transaction' => $transaction])
+                </td>
+                <td class="text-nowrap">
                   @if ($transaction->isApproved())
                     <a href="{{ route('wallet.transaction.invoice', $transaction) }}" class="btn btn-default btn-sm btn-flat">
                       <i class="fa fa-file-o"></i> {{ trans('app.invoice') }}

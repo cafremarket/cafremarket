@@ -32,10 +32,12 @@ class WithdrawalRequestController extends Controller
     public function approve(WithdrawalActionsRequest $request, Transaction $transaction)
     {
         try {
-            // Marketplace commission is deducted per sale; withdrawals have no extra fee.
-            $transaction->approve(0);
+            $extraMeta = Transaction::metaFromPayoutPaymentProof(
+                $request->file('payout_payment_proof')
+            );
 
-            // Dispatch Job
+            $transaction->approve(0, $extraMeta);
+
             SendNotificationJob::dispatch($transaction, Approve::class);
 
             return back()->with('success', trans('packages.wallet.payout_approved'));
@@ -49,7 +51,6 @@ class WithdrawalRequestController extends Controller
         try {
             $transaction->decline();
 
-            // Dispatch Job
             SendNotificationJob::dispatch($transaction, Declined::class);
 
             return back()->with('success', trans('packages.wallet.payout_declined'));

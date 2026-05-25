@@ -26,6 +26,7 @@ class PayoutRequest extends Request
         return [
             'shop_id' => 'required',
             'amount' => 'required|numeric|min:0.01',
+            'payout_payment_proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
         ];
     }
 
@@ -37,7 +38,8 @@ class PayoutRequest extends Request
     public function messages()
     {
         return [
-            // 'amount.min' => trans('packages.wallet.composite_unique'),
+            'payout_payment_proof.required' => trans('packages.wallet.payout_payment_proof_required'),
+            'payout_payment_proof.mimes' => trans('packages.wallet.payout_payment_proof_mimes'),
         ];
     }
 }

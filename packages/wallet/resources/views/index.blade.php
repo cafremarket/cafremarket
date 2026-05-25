@@ -182,6 +182,7 @@
             <th>{{ trans('packages.wallet.description') }}</th>
             <th>{{ trans('packages.wallet.amount') }}</th>
             <th>{{ trans('packages.wallet.status') }}</th>
+            <th>{{ trans('packages.wallet.payout_payment_proof') }}</th>
             <th>{{ trans('packages.wallet.option') }}</th>
           </tr>
         </thead>
@@ -197,6 +198,9 @@
                 {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
               </td>
               <td>{!! $transaction->statusName() !!}</td>
+              <td>
+                @include('wallet::admin.partials._payout_payment_proof', ['transaction' => $transaction])
+              </td>
               <td>
                 @if ($transaction->approved)
                   <a href="{{ route('wallet.transaction.invoice', $transaction) }}" class="btn btn-default btn-sm btn-flat">
@@ -237,7 +241,7 @@
         ],
         columnDefs: [{
           orderable: false,
-          targets: [5]
+          targets: [5, 6]
         }],
         language: {
           info: '_START_ to _END_ of _TOTAL_ entries',
@@ -251,6 +255,22 @@
         },
         dom: 'lfrtip',
       });
+    });
+
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('.wire-proof-preview');
+      if (!trigger) return;
+      e.preventDefault();
+      var src = trigger.getAttribute('data-src');
+      if (!src) return;
+      var name = trigger.getAttribute('data-name') || '{{ trans('packages.wallet.payout_payment_proof') }}';
+      var html = '<div class="text-center"><p><strong>' + name + '</strong></p>' +
+        '<img src="' + src + '" class="img-responsive" style="max-height:70vh;margin:0 auto;"></div>';
+      if (typeof bootbox !== 'undefined') {
+        bootbox.alert({ message: html, size: 'large' });
+      } else {
+        window.open(src, '_blank');
+      }
     });
   </script>
 @endsection

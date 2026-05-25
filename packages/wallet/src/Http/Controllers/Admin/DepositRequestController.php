@@ -32,9 +32,12 @@ class DepositRequestController extends Controller
     public function approve(WithdrawalActionsRequest $request, Transaction $transaction)
     {
         try {
-            $transaction->approve(0);
+            $extraMeta = Transaction::metaFromPayoutPaymentProof(
+                $request->file('payout_payment_proof')
+            );
 
-            // Dispatch Job
+            $transaction->approve(0, $extraMeta);
+
             SendNotificationJob::dispatch($transaction, Approve::class);
 
             return back()->with('success', trans('packages.wallet.payout_approved'));
@@ -48,7 +51,6 @@ class DepositRequestController extends Controller
         try {
             $transaction->decline();
 
-            // Dispatch Job
             SendNotificationJob::dispatch($transaction, Declined::class);
 
             return back()->with('success', trans('packages.wallet.payout_declined'));

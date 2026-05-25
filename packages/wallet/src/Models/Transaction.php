@@ -5,11 +5,14 @@ namespace Incevio\Package\Wallet\Models;
 use App\Models\Customer;
 use App\Models\PdfTemplate;
 use App\Models\Shop;
+use Illuminate\Support\Facades\Auth;
 use App\Services\PdfGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Incevio\Package\Wallet\Interfaces\Mathable;
 use Incevio\Package\Wallet\Services\CommonService;
 use Incevio\Package\Wallet\Services\WalletService;
@@ -223,10 +226,12 @@ class Transaction extends Model
 
     /**
      * Approve the pending payout transactions.
+     *
+     * @param  array<string, mixed>  $extraMeta  e.g. payout_payment_proof_path from admin upload
      */
-    public function approve($fee = null)
+    public function approve($fee = null, array $extraMeta = [])
     {
-        $meta['description'] = trans('packages.wallet.payout_approved');
+        $meta = ['description' => trans('packages.wallet.payout_approved')];
         if ($fee && $fee > 0) {
             $meta['fee'] = $fee;
             $this->amount = ($this->amount + (-$fee));
@@ -235,7 +240,7 @@ class Transaction extends Model
         $amount = $this->amount * -1;
         app(CommonService::class)->verifyWithdraw($this->wallet, $amount);
 
-        $this->meta = array_merge($this->meta, $meta);
+        $this->meta = array_merge($this->meta ?? [], $meta, $extraMeta);
         $this->confirmed = true;
         $this->approved = true;
 
@@ -303,6 +308,77 @@ class Transaction extends Model
     public function getFromMetaData($attr)
     {
         return is_array($this->meta) && array_key_exists($attr, $this->meta) ? $this->meta[$attr] : '';
+    }
+
+    public function hasPayoutPaymentProof(): bool
+    {
+        return (bool) $this->getFromMetaData('payout_payment_proof_path');
+    }
+
+    public function payoutPaymentProofName(): string
+    {
+        $name = (string) $this->getFromMetaData('payout_payment_proof_name');
+
+        return $name !== ''
+            ? $name
+            : basename((string) $this->getFromMetaData('payout_payment_proof_path'));
+    }
+
+    public function payoutPaymentProofUrl(): ?string
+    {
+        $path = (string) $this->getFromMetaData('payout_payment_proof_path');
+
+        return $path !== '' ? Storage::url($path) : null;
+    }
+
+    public function payoutPaymentProofIsImage(): bool
+    {
+        $ext = strtolower(pathinfo($this->payoutPaymentProofName(), PATHINFO_EXTENSION));
+
+        return in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true);
+    }
+
+    /**
+     * @return array{payout_payment_proof_path: string, payout_payment_proof_name: string}
+     */
+    public static function metaFromPayoutPaymentProof(UploadedFile $file): array
+    {
+        $path = $file->store('payout-proofs', 'public');
+
+        return [
+            'payout_payment_proof_path' => $path,
+            'payout_payment_proof_name' => $file->getClientOriginalName(),
+        ];
+    }
+
+    public function userCanDownloadPayoutPaymentProof(): bool
+    {
+        if (! $this->hasPayoutPaymentProof()) {
+            return false;
+        }
+
+        $user = Auth::user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->isFromPlatform() || $user->isAdmin()) {
+            return true;
+        }
+
+        if ($user->isMerchant() && $this->payable_type === Shop::class) {
+            return (int) $this->payable_id === (int) $user->merchantId();
+        }
+
+        return false;
+    }
+
+    public function payoutPaymentProofStoragePath(): ?string
+    {
+        $path = (string) $this->getFromMetaData('payout_payment_proof_path');
+
+        return $path !== '' ? $path : null;
     }
 
     /**

@@ -27,6 +27,19 @@ class WithdrawalActionsRequest extends Request
             return [];
         }
 
-        return [];
+        return [
+            'payout_payment_proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages()
+    {
+        return [
+            'payout_payment_proof.required' => trans('packages.wallet.payout_payment_proof_required'),
+            'payout_payment_proof.mimes' => trans('packages.wallet.payout_payment_proof_mimes'),
+        ];
     }
 }

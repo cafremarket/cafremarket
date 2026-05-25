@@ -39,11 +39,13 @@ class PayoutController extends Controller
     public function payout(PayoutRequest $request, Transaction $transaction)
     {
         try {
-            $meta = [
+            $meta = array_merge([
                 'type' => $transaction::TYPE_PAYOUT,
                 'description' => trans('packages.wallet.payout_desc', ['platform' => get_platform_title()]),
                 'fee' => 0,
-            ];
+            ], Transaction::metaFromPayoutPaymentProof(
+                $request->file('payout_payment_proof')
+            ));
 
             $amount = (float) $request->amount;
             $trans = Shop::find($request->shop_id)->withdraw($amount, $meta, true, true);

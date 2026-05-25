@@ -209,6 +209,10 @@ Route::middleware(['web'])->group(function () {
             WalletController::class, 'invoice',
         ])->name('transaction.invoice');
 
+        Route::get('wallet/{transaction}/payout-proof', [
+            WalletController::class, 'downloadPayoutPaymentProof',
+        ])->name('transaction.payout_proof.download');
+
         // Paypal and Paystack redirect routes
         Route::get('wallet/depositFailed', [
             DepositController::class, 'paymentFailed',

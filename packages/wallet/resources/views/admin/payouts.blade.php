@@ -19,6 +19,7 @@
             <th>{{ trans('packages.wallet.remaining_balance') }}</th>
             <th>{{ trans('packages.wallet.amount') }}</th>
             <th>{{ trans('packages.wallet.status') }}</th>
+            <th>{{ trans('packages.wallet.payout_payment_proof') }}</th>
             <th>{{ trans('packages.wallet.option') }}</th>
           </tr>
         </thead>
@@ -45,9 +46,17 @@
                   {!! $transaction->statusName() !!}
                 </td>
                 <td>
+                  @include('wallet::admin.partials._payout_payment_proof', ['transaction' => $transaction])
+                </td>
+                <td class="text-nowrap">
                   @if ($transaction->isApproved())
                     <a href="{{ route('wallet.transaction.invoice', $transaction) }}" class="btn btn-default btn-sm btn-flat">
                       <i class="fa fa-file-o"></i> {{ trans('app.invoice') }}
+                    </a>
+                  @endif
+                  @if ($transaction->hasPayoutPaymentProof())
+                    <a href="{{ route('wallet.transaction.payout_proof.download', $transaction) }}" class="btn btn-default btn-sm btn-flat">
+                      <i class="fa fa-download"></i> {{ trans('packages.wallet.payout_payment_proof_download') }}
                     </a>
                   @endif
                 </td>
@@ -58,4 +67,24 @@
       </table>
     </div> <!-- /.box-body -->
   </div> <!-- /.box -->
+@endsection
+
+@section('page-script')
+  <script>
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('.wire-proof-preview');
+      if (!trigger) return;
+      e.preventDefault();
+      var src = trigger.getAttribute('data-src');
+      if (!src) return;
+      var name = trigger.getAttribute('data-name') || 'Payment proof';
+      var html = '<div class="text-center"><p><strong>' + name + '</strong></p>' +
+        '<img src="' + src + '" class="img-responsive" style="max-height:70vh;margin:0 auto;"></div>';
+      if (typeof bootbox !== 'undefined') {
+        bootbox.alert({ message: html, size: 'large' });
+      } else {
+        window.open(src, '_blank');
+      }
+    });
+  </script>
 @endsection

@@ -1,11 +1,11 @@
-<div class="modal-dialog modal-sm">
+<div class="modal-dialog">
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       {{ trans('packages.wallet.payout') }}
     </div>
 
-    {!! Form::open(['route' => 'admin.wallet.payout.submit', 'id' => 'form', 'data-toggle' => 'validator']) !!}
+    {!! Form::open(['route' => 'admin.wallet.payout.submit', 'id' => 'form', 'data-toggle' => 'validator', 'files' => true]) !!}
     <div class="modal-body">
       <div class="form-group">
         <label>{{ trans('app.shop') }}</label>
@@ -28,6 +28,20 @@
             </span>
           @endif
         </div>
+        <div class="help-block with-errors"></div>
+      </div>
+
+      <div class="form-group">
+        {!! Form::label('payout_payment_proof', trans('packages.wallet.payout_payment_proof') . '*') !!}
+        <input
+          type="file"
+          name="payout_payment_proof"
+          id="payout_payment_proof_manual"
+          class="form-control"
+          accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+          required
+        >
+        <p class="help-block small text-muted">{!! trans('packages.wallet.payout_payment_proof_help') !!}</p>
         <div class="help-block with-errors"></div>
       </div>
 

@@ -7,14 +7,20 @@
   $withdrawAmount = abs((float) $transaction->amount);
 @endphp
 
-<div class="modal-dialog modal-sm">
+<div class="modal-dialog">
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       {{ trans('packages.wallet.approval') }}
     </div>
 
-    {!! Form::open(['route' => ['admin.payout.approve', $transaction], 'method' => 'post', 'class' => 'action-form', 'data-toggle' => 'validator']) !!}
+    {!! Form::open([
+      'route' => ['admin.payout.approve', $transaction],
+      'method' => 'post',
+      'class' => 'action-form',
+      'data-toggle' => 'validator',
+      'files' => true,
+    ]) !!}
     <div class="modal-body">
       <div class="form-group mt-2 mb-3">
         <label>{{ trans('packages.wallet.payout_method') }}:</label>
@@ -37,6 +43,20 @@
       <div class="form-group mt-2 mb-3">
         <label>{{ trans('packages.wallet.payout_amount') }}:</label>
         <p class="lead mb-0">{{ get_formated_currency($withdrawAmount) }}</p>
+      </div>
+
+      <div class="form-group">
+        {!! Form::label('payout_payment_proof', trans('packages.wallet.payout_payment_proof') . '*') !!}
+        <input
+          type="file"
+          name="payout_payment_proof"
+          id="payout_payment_proof"
+          class="form-control"
+          accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+          required
+        >
+        <p class="help-block small text-muted">{!! trans('packages.wallet.payout_payment_proof_help') !!}</p>
+        <div class="help-block with-errors"></div>
       </div>
 
       <p class="text-muted small mb-0">

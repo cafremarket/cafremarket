@@ -4,7 +4,9 @@ namespace Incevio\Package\Wallet\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Incevio\Package\Wallet\Models\Transaction;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class WalletController extends Controller
 {
@@ -58,5 +60,24 @@ class WalletController extends Controller
         }
 
         return redirect()->back()->with('warning', trans('messages.session_expired'));
+    }
+
+    /**
+     * Download payout payment proof (admin or owning vendor).
+     */
+    public function downloadPayoutPaymentProof(Transaction $transaction): StreamedResponse
+    {
+        abort_unless($transaction->userCanDownloadPayoutPaymentProof(), 403);
+
+        $path = $transaction->payoutPaymentProofStoragePath();
+
+        if (! $path || ! Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
+
+        return Storage::disk('public')->download(
+            $path,
+            $transaction->payoutPaymentProofName()
+        );
     }
 }
