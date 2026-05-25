@@ -156,9 +156,13 @@ return [
 
     'inventory_limit' => 'Número total de listagens. Uma variante do mesmo produto será considerada como um item diferente.',
 
-    'marketplace_commission' => 'Percentagem do valor do item da encomenda cobrada pelo marketplace.',
+    'marketplace_commission' => 'Taxa deduzida do pagamento ao vendedor por encomenda (valor fixo ou percentagem do total).',
 
-    'transaction_fee' => 'Se desejar cobrar uma taxa fixa por cada transação.',
+    'transaction_fee' => 'Taxa cobrada ao cliente no checkout M-Pesa/eMola (valor fixo ou percentagem do total).',
+
+    'subscription_marketplace_commission_type' => 'Escolha <strong>Percentagem</strong> para cobrar % do total da encomenda, ou <strong>Valor fixo</strong> por encomenda.',
+
+    'subscription_transaction_fee_type' => 'Escolha <strong>Valor fixo</strong> por checkout, ou <strong>Percentagem</strong> do total da encomenda.',
 
     'subscription_best_for' => 'Cliente alvo para este pacote. Isto será visível para o cliente.',
 

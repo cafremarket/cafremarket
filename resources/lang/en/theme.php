@@ -595,12 +595,12 @@ return [
 
     'plan' => [
         'inventory_limit' => ':limit Products',
-        'marketplace_commission' => ':commission% Marketplace Commission',
+        'marketplace_commission' => ':commission marketplace commission',
         'no_transaction_fee' => 'No Transaction Fees',
         'no_marketplace_commission' => 'No Marketplace Commission',
         'team_size' => ':size Staff Users',
-        'transaction_and_commission' => ':commission% + :fee Per Transaction',
-        'transaction_fee' => ':fee Per Transaction',
+        'transaction_and_commission' => ':commission + :fee per transaction',
+        'transaction_fee' => ':fee per transaction',
     ],
 
     'how_it_work_steps' => [

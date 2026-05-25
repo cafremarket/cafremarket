@@ -8,34 +8,45 @@ use Illuminate\Support\Facades\Log;
 class OrderWalletService
 {
     /**
-     * make the order payemnt to vendor
+     * Credit vendor wallet for a paid order (net of marketplace commission).
      *
      * @param  array|null  $meta
-     * @return void
+     * @return \Incevio\Package\Wallet\Models\Transaction
      */
     public function payVendor(Order $order, bool $confirmed = true, array $meta = [])
     {
         $confirmed = get_order_escrow_holding_duration() == 0 ? true : false;
 
-        $fee = getPlatformFeeForOrder($order);
+        $settlement = get_vendor_settlement_for_order($order);
 
-        return $order->shop->deposit($order->grand_total - $fee, array_merge([
+        return $order->shop->deposit($settlement['net'], array_merge([
             'type' => trans('app.sale'),
-            'description' => trans('app.for_sale_of', ['order' => $order->order_number]),
-            'fee' => $fee,
+            'description' => trans('packages.wallet.sale_credit_after_commission', [
+                'order' => $order->order_number,
+                'commission' => get_formated_currency($settlement['total_deductions']),
+            ]),
+            'fee' => $settlement['total_deductions'],
+            'sales_commission' => $settlement['marketplace_commission'],
+            'marketplace_commission' => $settlement['marketplace_commission'],
+            'gross_sale_amount' => $settlement['gross'],
+            'net_vendor_amount' => $settlement['net'],
             'order_id' => $order->id,
         ], $meta), $confirmed);
     }
 
     public function reversal(Order $order, bool $confirmed = true, array $meta = [])
     {
-        $fee = getPlatformFeeForOrder($order);
+        $settlement = get_vendor_settlement_for_order($order);
 
-        // Take the order amount from vendor's wallet
-        $transection = $order->shop->forceWithdraw($order->grand_total - $fee, array_merge([
+        // Take the net order amount from vendor's wallet
+        $transection = $order->shop->forceWithdraw($settlement['net'], array_merge([
             'type' => trans('app.reversal'),
             'description' => trans('app.reversal_for_sale_of', ['order' => $order->order_number]),
-            'fee' => $fee,
+            'fee' => $settlement['total_deductions'],
+            'sales_commission' => $settlement['marketplace_commission'],
+            'marketplace_commission' => $settlement['marketplace_commission'],
+            'gross_sale_amount' => $settlement['gross'],
+            'net_vendor_amount' => $settlement['net'],
             'order_id' => $order->id,
         ], $meta));
 

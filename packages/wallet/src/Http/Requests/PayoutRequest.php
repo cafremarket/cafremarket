@@ -25,8 +25,7 @@ class PayoutRequest extends Request
     {
         return [
             'shop_id' => 'required',
-            'fee' => 'required|numeric',
-            'amount' => 'required|numeric',
+            'amount' => 'required|numeric|min:0.01',
         ];
     }
 

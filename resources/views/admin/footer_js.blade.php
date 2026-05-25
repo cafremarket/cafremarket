@@ -652,28 +652,41 @@
       ]
     });
 
-    $(".table-no-sort").DataTable({
-      // "bSort": false,
-      "aaSorting": [],
-      "iDisplayLength": {{ getPaginationValue() }},
-      "oLanguage": {
-        "sInfo": "_START_ to _END_ of _TOTAL_ entries",
-        "sLengthMenu": "Show _MENU_",
-        "sSearch": "",
-        "sEmptyTable": "No data found!",
-        "oPaginate": {
-          "sNext": '<i class="fa fa-hand-o-right"></i>',
-          "sPrevious": '<i class="fa fa-hand-o-left"></i>',
+    var defaultTablePageLength = {{ getPaginationValue() }};
+
+    $(".table-no-sort").each(function() {
+      var $table = $(this);
+
+      if ($.fn.DataTable.isDataTable(this)) {
+        $table.DataTable().destroy();
+      }
+
+      $table.DataTable({
+        order: [],
+        pageLength: defaultTablePageLength,
+        lengthMenu: [
+          [10, 25, 50, 100, -1],
+          ['10 rows', '25 rows', '50 rows', '100 rows', 'Show all']
+        ],
+        columnDefs: [{
+          orderable: false,
+          targets: [0, -1]
+        }],
+        language: {
+          info: '_START_ to _END_ of _TOTAL_ entries',
+          lengthMenu: 'Show _MENU_',
+          search: '',
+          emptyTable: 'No data found!',
+          paginate: {
+            next: '<i class="fa fa-hand-o-right"></i>',
+            previous: '<i class="fa fa-hand-o-left"></i>',
+          },
         },
-      },
-      "aoColumnDefs": [{
-        "bSortable": false,
-        "aTargets": [0, -1]
-      }],
-      dom: 'Bfrtip',
-      buttons: [
-        'copy', 'csv', 'excel', 'pdf', 'print'
-      ]
+        dom: 'Bfrtip',
+        buttons: [
+          'pageLength', 'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+      });
     });
 
     $(".table-2nd-no-sort").DataTable({

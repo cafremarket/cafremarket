@@ -392,6 +392,12 @@ return [
     'otp_send' => [
       'subject' => 'Um OTP enviado pelo entregador',
 'message' => 'O seu OTP é :message',
-    ]
+    ],
+
+    'mail_delivery_failed' => [
+        'title' => 'O e-mail (SMTP) não está a funcionar',
+        'message' => 'Não foi possível enviar e-mails de encomendas. Verifique as definições de correio (servidor, porta, SSL/TLS, certificado). As encomendas continuam a ser registadas.',
+        'order' => 'Encomenda',
+    ],
 
 ];

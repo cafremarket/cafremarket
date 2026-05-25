@@ -81,4 +81,30 @@ class SubscriptionPlan extends BaseModel
     {
         $this->attributes['featured'] = (bool) $value;
     }
+
+    public function isPercentTransactionFee(): bool
+    {
+        return strtolower((string) ($this->transaction_fee_type ?? 'flat')) === 'percent';
+    }
+
+    public function isPercentMarketplaceCommission(): bool
+    {
+        return strtolower((string) ($this->marketplace_commission_type ?? 'percent')) === 'percent';
+    }
+
+    public function formattedTransactionFee(): string
+    {
+        return format_subscription_plan_fee(
+            (float) $this->transaction_fee,
+            $this->transaction_fee_type ?? 'flat'
+        );
+    }
+
+    public function formattedMarketplaceCommission(): string
+    {
+        return format_subscription_plan_fee(
+            (float) $this->marketplace_commission,
+            $this->marketplace_commission_type ?? 'percent'
+        );
+    }
 }

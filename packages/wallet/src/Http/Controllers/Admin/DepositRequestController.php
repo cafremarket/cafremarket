@@ -32,7 +32,7 @@ class DepositRequestController extends Controller
     public function approve(WithdrawalActionsRequest $request, Transaction $transaction)
     {
         try {
-            $transaction->approve($request->fee);
+            $transaction->approve(0);
 
             // Dispatch Job
             SendNotificationJob::dispatch($transaction, Approve::class);

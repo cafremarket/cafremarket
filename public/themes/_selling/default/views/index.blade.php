@@ -167,16 +167,16 @@
                       <li class='pricing-feature'>{{ __('theme.plan.inventory_limit', ['limit' => $plan->inventory_limit]) }}</li>
 
                       @if ($plan->transaction_fee > 0 && $plan->marketplace_commission > 0)
-                        <li class='pricing-feature'>{{ __('theme.plan.transaction_and_commission', ['commission' => $plan->marketplace_commission, 'fee' => get_formated_currency($plan->transaction_fee)]) }}</li>
+                        <li class='pricing-feature'>{{ __('theme.plan.transaction_and_commission', ['commission' => $plan->formattedMarketplaceCommission(), 'fee' => $plan->formattedTransactionFee()]) }}</li>
                       @else
                         @if ($plan->transaction_fee > 0)
-                          <li class='pricing-feature'>{{ __('theme.plan.transaction_fee', ['fee' => get_formated_currency($plan->transaction_fee)]) }}</li>
+                          <li class='pricing-feature'>{{ __('theme.plan.transaction_fee', ['fee' => $plan->formattedTransactionFee()]) }}</li>
                         @else
                           <li class='pricing-feature'>{{ __('theme.plan.no_transaction_fee') }}</li>
                         @endif
 
                         @if ($plan->marketplace_commission > 0)
-                          <li class='pricing-feature'>{{ __('theme.plan.marketplace_commission', ['commission' => $plan->marketplace_commission]) }}</li>
+                          <li class='pricing-feature'>{{ __('theme.plan.marketplace_commission', ['commission' => $plan->formattedMarketplaceCommission()]) }}</li>
                         @else
                           <li class='pricing-feature'>{{ __('theme.plan.no_marketplace_commission') }}</li>
                         @endif

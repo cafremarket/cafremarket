@@ -28,6 +28,9 @@ return [
          * Available options are 'stripe','wallet'
          */
         'billing' => env('SUBSCRIPTION_BILLING', 'stripe'),
+
+        /** Vendor marketplace commission % when subscriptions are disabled globally. */
+        'default_marketplace_commission' => (float) env('DEFAULT_MARKETPLACE_COMMISSION', 10),
     ],
 
     /*

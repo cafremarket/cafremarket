@@ -608,30 +608,14 @@ class Shop extends ShopWallet
             return $query;
         }
 
-        $query = $query->where(function ($q) {
-            $q->whereNotNull('current_billing_plan')
-                ->where(
-                    function ($x) {
-                        $x->doesntHave('subscriptions')
-                            ->whereNull('trial_ends_at')
-                            ->orWhere('trial_ends_at', '>', Carbon::now());
-                    }
-                )
-                ->orWhere(
-                    function ($r) {
-                        $r->whereHas('subscriptions', function ($s) {
-                            $s->whereNested(function ($t) {
-                                $t->whereNull('ends_at')
-                                    ->orWhere('ends_at', '>', Carbon::now())
-                                    ->orWhereNotNull('trial_ends_at')
-                                    ->where('trial_ends_at', '>', Carbon::today());
-                            });
-                        });
-                    }
-                );
-        });
-
-        return $query;
+        return $query
+            ->whereNotNull('current_billing_plan')
+            ->whereExists(function ($sub) {
+                $sub->selectRaw('1')
+                    ->from('subscription_plans')
+                    ->whereColumn('subscription_plans.plan_id', 'shops.current_billing_plan')
+                    ->whereNull('subscription_plans.deleted_at');
+            });
     }
 
     /**

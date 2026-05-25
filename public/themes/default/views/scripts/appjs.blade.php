@@ -560,27 +560,15 @@
     return parseFloat(value).toFixed(dec);
   }
 
-  function shorten(number) {
-    const suffix = ["", "K", "M", "B"]; 
-    const precision = 2; 
-    for (let i = 0; i < suffix.length; i++) { 
-      const divide = number / Math.pow(1000, i); 
-
-      if (divide < 1000) { 
-        const factor = 10 ** precision;
-        const shortenedNumber = Math.round(divide.toFixed(precision) * factor) / factor;
-
-        return shortenedNumber + suffix[i]; 
-      } 
-    } 
-  }
-
   function getFormatedPrice(value = 0, trim = false) {
+    var dec = {{ $dec }};
+    var decMark = @json(config('system_settings.currency.decimal_mark', '.'));
+    var thousandsSep = @json(config('system_settings.currency.thousands_separator', ','));
     var value = getFormatedValue(value);
+    var parts = value.split('.');
 
-    if(value > 9999 && trim) {
-      value = shorten(value);
-    }
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
+    value = dec > 0 ? parts.join(decMark) : parts[0];
 
     return "{{ get_currency_prefix() }}" + value + "{{ get_currency_suffix() }}";
   }

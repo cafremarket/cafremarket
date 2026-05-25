@@ -34,11 +34,11 @@
             </tr>
             <tr>
               <th class="text-right">{{ trans('app.transaction_fee') }}:</th>
-              <td>{{ get_formated_currency($subscriptionPlan->transaction_fee, 2, config('system_settings.currency.id')) }}</td>
+              <td>{{ $subscriptionPlan->formattedTransactionFee() }} ({{ $subscriptionPlan->isPercentTransactionFee() ? trans('packages.wallet.platform_fee_type_percent') : trans('packages.wallet.platform_fee_type_flat') }})</td>
             </tr>
             <tr>
               <th class="text-right">{{ trans('app.marketplace_commission') }}:</th>
-              <td>{{ $subscriptionPlan->marketplace_commission . trans('app.percent') }}</td>
+              <td>{{ $subscriptionPlan->formattedMarketplaceCommission() }} ({{ $subscriptionPlan->isPercentMarketplaceCommission() ? trans('packages.wallet.platform_fee_type_percent') : trans('packages.wallet.platform_fee_type_flat') }})</td>
             </tr>
             <tr>
               <th class="text-right">{{ trans('app.available_from') }}:</th>

@@ -482,12 +482,7 @@ class ListingController extends Controller
 
         // Keep results only from active shops
         $products = $products->filter(function ($product) {
-            if (is_subscription_enabled()) {
-                return ($product->shop->current_billing_plan !== null) &&
-                    ($product->shop->active == 1);
-            }
-
-            return $product->shop->active == 1;
+            return shop_can_accept_sales($product->shop);
         });
 
         if ($request->has('free_shipping')) {

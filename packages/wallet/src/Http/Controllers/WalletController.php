@@ -26,8 +26,10 @@ class WalletController extends Controller
         }
 
         $wallet = Auth::user()->shop;
+        $wallet->load('wallet');
+        $transactions = $wallet->transactions()->get();
 
-        return view('wallet::index', compact('wallet'));
+        return view('wallet::index', compact('wallet', 'transactions'));
     }
 
     /**

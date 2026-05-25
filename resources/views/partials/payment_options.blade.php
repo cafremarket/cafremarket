@@ -76,6 +76,10 @@
 {{-- eMola (Movitel USSD Push) --}}
 @include('partials.emola_payment_form')
 
+@if (is_incevio_package_loaded('wallet') || is_incevio_package_loaded('mpesa'))
+  @include('partials.checkout_platform_fee_box')
+@endif
+
 {{-- Warehouse adddress --}}
 <div id="payInPerson" class="hide">
   <h3 class="widget-title">{{ trans('theme.pickup') }}</h3>

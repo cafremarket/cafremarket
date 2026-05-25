@@ -47,7 +47,7 @@ class LowInventoryCheck implements ShouldQueue
             }
             // \Log::info($items);
             if ($low) {
-                $event->order->shop->notify(new LowInventory);
+                safe_notify($event->order->shop, new LowInventory, 'low inventory');
             }
         }
     }

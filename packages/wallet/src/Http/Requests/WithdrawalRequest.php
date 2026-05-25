@@ -28,9 +28,22 @@ class WithdrawalRequest extends Request
             ? Auth::guard('affiliate')->user()->wallet->balance
             : Auth::user()->shop->balance;
 
-        return [
+        $rules = [
             'amount' => 'required|numeric|min:'.get_min_withdrawal_limit().'|max:'.$max_withdrawal,
+            'payout_method' => 'required|in:bank_transfer,mpesa,emola',
         ];
+
+        if ($this->input('payout_method') === 'bank_transfer') {
+            $rules['payout_bank_name'] = 'required|string|max:255';
+            $rules['payout_account_holder'] = 'required|string|max:255';
+            $rules['payout_account_number'] = 'required|string|max:255';
+        }
+
+        if (in_array($this->input('payout_method'), ['mpesa', 'emola'], true)) {
+            $rules['payout_mobile'] = 'required|string|max:32';
+        }
+
+        return $rules;
     }
 
     /**
@@ -40,8 +53,6 @@ class WithdrawalRequest extends Request
      */
     public function messages()
     {
-        return [
-            // 'amount.min' => trans('packages.wallet.composite_unique'),
-        ];
+        return [];
     }
 }

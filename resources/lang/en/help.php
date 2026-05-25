@@ -156,9 +156,13 @@ return [
 
     'inventory_limit' => 'The number of total listing. A variant of the same product will be considered as a different item.',
 
-    'marketplace_commission' => 'Percentage of order item value charge by the marketplace',
+    'marketplace_commission' => 'Fee deducted from vendor payout per order (flat amount or percentage of order total).',
 
-    'transaction_fee' => 'If you want to charge a flat fee for every single transaction',
+    'transaction_fee' => 'Fee charged to the customer on M-Pesa/eMola checkout (flat amount or percentage of order total).',
+
+    'subscription_marketplace_commission_type' => 'Choose <strong>Percentage</strong> to charge a % of the order total, or <strong>Flat</strong> for a fixed amount per order.',
+
+    'subscription_transaction_fee_type' => 'Choose <strong>Flat</strong> for a fixed fee per checkout, or <strong>Percentage</strong> of the order total.',
 
     'subscription_best_for' => 'Target customer for this package. This\'ll be visible to customer.',
 

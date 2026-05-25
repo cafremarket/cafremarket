@@ -109,14 +109,6 @@ Route::middleware(['web'])->group(function () {
                 WalletSettingsController::class, 'index',
             ])->name('admin.wallet.settings');
 
-            Route::get('setting/platform-fees', [
-                WalletSettingsController::class, 'platformFees',
-            ])->name('wallet.platform_fees');
-
-            Route::post('setting/platform-fees', [
-                WalletSettingsController::class, 'updatePlatformFees',
-            ])->name('wallet.platform_fees.update');
-
             // Reports
             Route::get('report/payout', [
                 PayoutReportController::class, 'report',
@@ -209,6 +201,10 @@ Route::middleware(['web'])->group(function () {
 
     // Common Routes
     Route::name('wallet.')->group(function () {
+        Route::get('wallet/checkout/platform-fee', [
+            DepositController::class, 'platformFeePreview',
+        ])->name('checkout.platform_fee');
+
         Route::get('wallet/{transaction}/invoice', [
             WalletController::class, 'invoice',
         ])->name('transaction.invoice');

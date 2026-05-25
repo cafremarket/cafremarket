@@ -27,8 +27,6 @@ class WithdrawalActionsRequest extends Request
             return [];
         }
 
-        return [
-            'fee' => 'required|numeric',
-        ];
+        return [];
     }
 }

@@ -93,6 +93,12 @@ class OrderController extends Controller
     {
         $cart = crosscheckAndUpdateOldCartInfo($request, $cart);
 
+        $cart->loadMissing('shop');
+        if (! shop_can_accept_sales($cart->shop)) {
+            return redirect()->route('cart.checkout', $cart)
+                ->with('error', trans('packages.wallet.vendor_sales_require_subscription'));
+        }
+
         DB::beginTransaction();
 
         try {
@@ -111,9 +117,7 @@ class OrderController extends Controller
 
             $paymentMethod = (string) $request->input('payment_method', '');
             if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
-                $feeBreakdown = get_platform_payment_fee($paymentMethod, $order->grand_total);
-                $order->platform_payment_fee = $feeBreakdown['fee'];
-                $order->save();
+                persist_order_checkout_fees($order, $paymentMethod);
             }
 
             $paymentBuilder = $payment->setReceiver($receiver)->setOrderInfo($order);
@@ -186,11 +190,7 @@ class OrderController extends Controller
 
         // eMola: defer order-placed notifications until Movitel callback confirms payment.
         if (! $this->shouldDeferEmolaConfirmation($order, $response)) {
-            try {
-                event(new OrderCreated($order));
-            } catch (Exception $e) {
-                Log::warning('OrderCreated event failed: '.$e->getMessage());
-            }
+            safe_dispatch_order_event(new OrderCreated($order), 'OrderCreated');
         }
 
         $cart_item_count = cart_item_count();               // Update the cart count
@@ -276,12 +276,7 @@ class OrderController extends Controller
             $order->markAsPaid();
         }
 
-        // Trigger the Event (do not fail redirect if mail server is down)
-        try {
-            event(new OrderCreated($order));
-        } catch (Exception $e) {
-            Log::warning('OrderCreated event failed: '.$e->getMessage());
-        }
+        safe_dispatch_order_event(new OrderCreated($order), 'OrderCreated (payment return)');
 
         return redirect()->route('order.detail.number', ['order_number' => $this->toRouteSafeOrderNumber($order->order_number)])
             ->with('success', trans('theme.notify.order_placed'));

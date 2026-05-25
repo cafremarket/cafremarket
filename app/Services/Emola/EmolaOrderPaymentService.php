@@ -21,10 +21,11 @@ class EmolaOrderPaymentService
     {
         $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
         $baseMzn = EmolaSpec::parseMeticalAmount($order->grand_total);
-        $feeBreakdown = \App\Services\PlatformGatewayFeeService::paymentFee('emola', $baseMzn);
+        $feeBreakdown = get_customer_transaction_fee_for_order($order, 'emola');
         $chargeMzn = EmolaSpec::parseMeticalAmount($feeBreakdown['total']);
-        if ($feeBreakdown['fee'] > 0) {
-            $order->platform_payment_fee = $feeBreakdown['fee'];
+        if ($feeBreakdown['subscription_fee'] > 0) {
+            $order->platform_payment_fee = 0;
+            $order->subscription_transaction_fee = $feeBreakdown['subscription_fee'];
             $order->save();
         }
         EmolaDailyLimit::assertCanPay($msisdn, $chargeMzn);
@@ -201,11 +202,7 @@ class EmolaOrderPaymentService
 
         $order->markAsPaid();
 
-        try {
-            event(new OrderCreated($order));
-        } catch (\Throwable $e) {
-            Log::warning('eMola OrderCreated event failed: '.$e->getMessage());
-        }
+        safe_dispatch_order_event(new OrderCreated($order), 'OrderCreated (eMola)');
 
         return true;
     }

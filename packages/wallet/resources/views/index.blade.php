@@ -174,7 +174,7 @@
       </div>
     </div> <!-- /.box-header -->
     <div class="box-body">
-      <table class="table table-hover table-no-sort">
+      <table class="table table-hover" id="merchant-wallet-transactions-table" width="100%">
         <thead>
           <tr>
             <th>{{ trans('packages.wallet.date') }}</th>
@@ -186,36 +186,71 @@
           </tr>
         </thead>
         <tbody>
-          @if ($wallet->transactions)
-            @foreach ($wallet->transactions as $transaction)
-              <tr>
-                <td>
-                  {{ $transaction->updated_at->toFormattedDateString() }}
-                </td>
-                <td>
-                  {{ $transaction->type }}
-                </td>
-                <td>
-                  {!! $transaction->getFromMetaData('description') !!}
-                </td>
-                <td>
-                  {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
-                </td>
-                <td>
-                  {!! $transaction->statusName() !!}
-                </td>
-                <td>
-                  @if ($transaction->approved)
-                    <a href="{{ route('wallet.transaction.invoice', $transaction) }}" class="btn btn-default btn-sm btn-flat">
-                      <i class="fa fa-file-o"></i> {{ trans('app.invoice') }}
-                    </a>
-                  @endif
-                </td>
-              </tr>
-            @endforeach
-          @endif
+          @forelse ($transactions ?? $wallet->transactions as $transaction)
+            <tr>
+              <td data-order="{{ $transaction->updated_at?->timestamp ?? 0 }}">
+                {{ $transaction->updated_at?->toFormattedDateString() }}
+              </td>
+              <td>{{ $transaction->type }}</td>
+              <td>{!! $transaction->getFromMetaData('description') !!}</td>
+              <td data-order="{{ $transaction->amount }}">
+                {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
+              </td>
+              <td>{!! $transaction->statusName() !!}</td>
+              <td>
+                @if ($transaction->approved)
+                  <a href="{{ route('wallet.transaction.invoice', $transaction) }}" class="btn btn-default btn-sm btn-flat">
+                    <i class="fa fa-file-o"></i> {{ trans('app.invoice') }}
+                  </a>
+                @endif
+              </td>
+            </tr>
+          @empty
+          @endforelse
         </tbody>
       </table>
     </div> <!-- /.box-body -->
   </div> <!-- /.box -->
+@endsection
+
+@section('page-script')
+  <script type="text/javascript">
+    $(function() {
+      var $table = $('#merchant-wallet-transactions-table');
+
+      if (!$table.length) {
+        return;
+      }
+
+      if ($.fn.DataTable.isDataTable($table[0])) {
+        $table.DataTable().destroy();
+      }
+
+      var pageLength = {{ getPaginationValue() }};
+
+      $table.DataTable({
+        order: [[0, 'desc']],
+        pageLength: pageLength,
+        lengthMenu: [
+          [10, 25, 50, 100, -1],
+          ['10 rows', '25 rows', '50 rows', '100 rows', 'Show all']
+        ],
+        columnDefs: [{
+          orderable: false,
+          targets: [5]
+        }],
+        language: {
+          info: '_START_ to _END_ of _TOTAL_ entries',
+          lengthMenu: 'Show _MENU_',
+          search: '',
+          emptyTable: '{{ trans('packages.wallet.no_transaction_found') }}',
+          paginate: {
+            next: '<i class="fa fa-hand-o-right"></i>',
+            previous: '<i class="fa fa-hand-o-left"></i>',
+          },
+        },
+        dom: 'lfrtip',
+      });
+    });
+  </script>
 @endsection

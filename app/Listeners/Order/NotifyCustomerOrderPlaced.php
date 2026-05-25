@@ -43,9 +43,9 @@ class NotifyCustomerOrderPlaced implements ShouldQueue
         }
 
         if ($event->order->customer_id) {
-            $event->order->customer->notify(new OrderCreatedNotification($event->order));
+            safe_notify($event->order->customer, new OrderCreatedNotification($event->order), 'order placed — customer');
         } elseif ($event->order->email) {
-            Notification::route('mail', $event->order->email)->notify(new OrderCreatedNotification($event->order));
+            safe_mail_route_notify($event->order->email, new OrderCreatedNotification($event->order), 'order placed — guest');
         }
     }
 }

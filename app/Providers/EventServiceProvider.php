@@ -255,6 +255,13 @@ class EventServiceProvider extends ServiceProvider
                 'Queue Connection' => $event->connectionName,
                 'Exception' => $event->exception,
             ]);
+
+            if ($event->exception && is_mail_transport_error($event->exception)) {
+                notify_super_admin_mail_failure(
+                    $event->exception->getMessage(),
+                    'queued job: '.$event->job->resolveName()
+                );
+            }
         });
 
         // Log all job precess except the UpdateVisitorTable

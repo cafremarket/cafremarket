@@ -16,6 +16,7 @@
             <th>{{ trans('packages.wallet.wallet_owner') }}</th>
             <th>{{ trans('packages.wallet.description') }}</th>
             <th>{{ trans('packages.wallet.payout_amount') }}</th>
+            <th>{{ trans('packages.wallet.payout_method') }}</th>
             <th>{{ trans('app.options') }}</th>
           </tr>
         </thead>
@@ -34,6 +35,18 @@
                 </td>
                 <td>
                   {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
+                </td>
+                <td>
+                  @php $pm = $transaction->getFromMetaData('payout_method'); @endphp
+                  @if ($pm === 'mpesa')
+                    {{ trans('packages.wallet.payout_method_mpesa') }}
+                  @elseif ($pm === 'emola')
+                    {{ trans('packages.wallet.payout_method_emola') }}
+                  @elseif ($pm === 'bank_transfer')
+                    {{ trans('packages.wallet.payout_method_bank_transfer') }}
+                  @else
+                    —
+                  @endif
                 </td>
                 <td class="row-options">
                   @if (Auth::user()->isAdmin())

@@ -44,11 +44,9 @@ class OrderBeenPaid implements ShouldQueue
         }
 
         if ($event->order->customer_id) {
-            $event->order->customer->notify(new OrderBeenPaidNotification($event->order));
+            safe_notify($event->order->customer, new OrderBeenPaidNotification($event->order), 'order paid — customer');
         } elseif ($event->order->email) {
-            Notification::route('mail', $event->order->email)
-                // ->route('nexmo', '5555555555')
-                ->notify(new OrderBeenPaidNotification($event->order));
+            safe_mail_route_notify($event->order->email, new OrderBeenPaidNotification($event->order), 'order paid — guest');
         }
     }
 }

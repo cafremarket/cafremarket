@@ -39,11 +39,10 @@ class PeriodicPayout extends Command
                 if ($shop->wallet->balance >= get_min_withdrawal_limit()) {
                     try {
                         $balance = $shop->wallet->balance;
-                        $fee = get_platform_payout_fee($balance);
                         $meta = [
                             'type' => Transaction::TYPE_PAYOUT,
                             'description' => trans('packages.wallet.periodic_payout_created', ['period' => config('system.order.vendor_get_paid')]),
-                            'fee' => $fee,
+                            'fee' => 0,
                         ];
                         $trans = $shop->withdraw($balance, $meta, true, false);
 

@@ -75,6 +75,8 @@
           hideEmolaForm();
         }
 
+        refreshCheckoutPlatformFeePreview();
+
         // Bank transfer proof upload
         if ('wire' == code) {
           showWireTransferProof();
@@ -107,7 +109,13 @@
         } else if ('wire' == code) {
           showWireTransferProof();
         }
+
+        refreshCheckoutPlatformFeePreview();
       }
+
+      setTimeout(function() {
+        refreshCheckoutPlatformFeePreview();
+      }, 400);
 
       // Stripe code, create a token
       Stripe.setPublishableKey("{{ config('services.stripe.key') }}");
@@ -224,6 +232,76 @@
     function hideEmolaForm() {
       $('#emola-form').hide().find('input.emola-request-field').removeAttr('required');
     }
+
+    var checkoutFeePreviewUrl = $('#checkout-platform-fee-box').attr('data-fee-url') || '{{ url('wallet/checkout/platform-fee') }}';
+
+    function refreshCheckoutPlatformFeePreview(cartId, grandAmount) {
+      var box = $('#checkout-platform-fee-box');
+      if (!box.length) {
+        return;
+      }
+
+      cartId = cartId || $('#checkout-id').val();
+      var selected = $('input[name=payment_method]:checked');
+      var method = selected.data('code') || selected.val();
+
+      if (!method || (method !== 'mpesa' && method !== 'emola')) {
+        box.hide();
+        $('#checkout-summary-customer-fee-li' + cartId).hide();
+        $('#checkout-summary-pay-total-li' + cartId).hide();
+        return;
+      }
+
+      var amount = grandAmount;
+      if (amount === undefined || amount === null) {
+        var raw = $('#summary-grand-total' + cartId).text().replace(/[^\d.-]/g, '');
+        amount = parseFloat(raw);
+      }
+
+      if (!amount || amount <= 0 || isNaN(amount)) {
+        box.hide();
+        $('#checkout-summary-customer-fee-li' + cartId).hide();
+        $('#checkout-summary-pay-total-li' + cartId).hide();
+        return;
+      }
+
+      var shopId = $('#shop-id' + cartId).val();
+      var previewParams = { payment_method: method, amount: amount };
+      if (shopId) {
+        previewParams.shop_id = shopId;
+      }
+
+      $.getJSON(checkoutFeePreviewUrl, previewParams, function(data) {
+        if (!data) {
+          box.hide();
+          $('#checkout-summary-customer-fee-li' + cartId).hide();
+          $('#checkout-summary-pay-total-li' + cartId).hide();
+          return;
+        }
+
+        $('#checkout-fee-base').text(data.formatted.base);
+        $('#checkout-fee-amount').text(data.formatted.fee);
+        $('#checkout-fee-total').text(data.formatted.total);
+
+        if (data.fee > 0) {
+          $('#checkout-fee-row').show();
+        } else {
+          $('#checkout-fee-row').hide();
+        }
+
+        box.show();
+        $('#checkout-summary-customer-fee' + cartId).text(data.formatted.fee);
+        $('#checkout-summary-pay-total' + cartId).text(data.formatted.total);
+        $('#checkout-summary-customer-fee-li' + cartId).show();
+        $('#checkout-summary-pay-total-li' + cartId).show();
+      }).fail(function() {
+        box.hide();
+        $('#checkout-summary-customer-fee-li' + cartId).hide();
+        $('#checkout-summary-pay-total-li' + cartId).hide();
+      });
+    }
+
+    window.refreshCheckoutPlatformFeePreview = refreshCheckoutPlatformFeePreview;
 
     function showWireTransferProof() {
       $('#wire-transfer-proof-wrap').removeClass('hide');

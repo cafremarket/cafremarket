@@ -537,29 +537,52 @@ class DepositController extends Controller
     }
 
     /**
-     * Preview platform fee for wallet top-up (M-Pesa / eMola).
+     * Preview transaction fee (checkout) or gateway fee (wallet top-up) for M-Pesa / eMola.
      */
     public function platformFeePreview(Request $request)
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'payment_method' => 'required|in:mpesa,emola',
+            'shop_id' => 'nullable|integer|exists:shops,id',
         ]);
 
-        $breakdown = get_platform_payment_fee(
-            (string) $request->input('payment_method'),
-            $request->input('amount')
-        );
+        $method = (string) $request->input('payment_method');
+        $amount = $request->input('amount');
+        $shopId = $request->input('shop_id');
+
+        if ($shopId) {
+            $customer = get_customer_transaction_fee($method, $amount, (int) $shopId);
+
+            return response()->json([
+                'base' => $customer['base'],
+                'fee' => $customer['fee'],
+                'subscription_fee' => $customer['subscription_fee'],
+                'total' => $customer['total'],
+                'enabled' => true,
+                'formatted' => [
+                    'base' => get_formated_currency($customer['base']),
+                    'fee' => get_formated_currency($customer['fee']),
+                    'subscription_fee' => get_formated_currency($customer['subscription_fee']),
+                    'total' => get_formated_currency($customer['total']),
+                ],
+            ]);
+        }
+
+        $breakdown = get_platform_payment_fee($method, $amount);
+        $vendorNet = max(0, round((float) $breakdown['base'] - (float) $breakdown['fee'], 2));
 
         return response()->json([
             'base' => $breakdown['base'],
             'fee' => $breakdown['fee'],
             'total' => $breakdown['total'],
+            'vendor_net' => $vendorNet,
             'enabled' => $breakdown['enabled'],
             'formatted' => [
                 'base' => get_formated_currency($breakdown['base']),
                 'fee' => get_formated_currency($breakdown['fee']),
                 'total' => get_formated_currency($breakdown['total']),
+                'vendor_net' => get_formated_currency($vendorNet),
             ],
         ]);
     }

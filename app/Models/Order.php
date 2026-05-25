@@ -115,6 +115,7 @@ class Order extends BaseModel
         'taxes',
         'grand_total',
         'platform_payment_fee',
+        'subscription_transaction_fee',
         'billing_address',
         'shipping_address',
         'shipping_date',
@@ -1004,7 +1005,11 @@ class Order extends BaseModel
         $this->shop->total_sold_amount += $this->total;
         $this->shop->save();
 
-        event(new OrderPaid($this));
+        // Defer email listeners until after DB commit so SMTP errors never roll back paid orders.
+        $order = $this;
+        \Illuminate\Support\Facades\DB::afterCommit(function () use ($order) {
+            safe_dispatch_order_event(new \App\Events\Order\OrderPaid($order), 'OrderPaid');
+        });
 
         return $this;
     }

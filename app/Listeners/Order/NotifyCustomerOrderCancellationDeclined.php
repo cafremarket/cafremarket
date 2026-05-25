@@ -42,7 +42,7 @@ class NotifyCustomerOrderCancellationDeclined implements ShouldQueue
         }
 
         if ($event->order->customer_id) {
-            $event->order->customer->notify(new OrderCancellationDeclined($event->order));
+            safe_notify($event->order->customer, new OrderCancellationDeclined($event->order), 'cancellation declined');
         }
     }
 }

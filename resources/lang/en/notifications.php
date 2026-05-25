@@ -394,4 +394,10 @@ return [
         'message' => 'Your otp is :message',
     ],
 
+    'mail_delivery_failed' => [
+        'title' => 'Email (SMTP) is not working',
+        'message' => 'Order emails could not be sent. Check mail settings (host, port, SSL/TLS, certificate). Orders are still being placed.',
+        'order' => 'Order',
+    ],
+
 ];

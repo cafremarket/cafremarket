@@ -451,11 +451,15 @@ if (! function_exists('getGeocode')) {
 if (! function_exists('getPaginationValue')) {
     function getPaginationValue()
     {
-        if (Auth::user()->isFromPlatform()) {
-            return config('system_settings.pagination') ?? 10;
+        $default = 10;
+
+        if (Auth::check() && Auth::user()->isFromPlatform()) {
+            $value = (int) (config('system_settings.pagination') ?? $default);
+        } else {
+            $value = (int) (config('shop_settings.pagination') ?? $default);
         }
 
-        return config('shop_settings.pagination') ?? 10;
+        return $value > 0 ? $value : $default;
     }
 }
 
@@ -1258,9 +1262,7 @@ if (! function_exists('get_formated_currency')) {
             $decimal = 0;
         }
 
-        if (config('system.shorten') && $value > 9999) {
-            $value = shorten($value);
-        } elseif ($value < 0) {
+        if ($value < 0) {
             $value = get_formated_decimal($value * -1, $decimal ? false : true, $decimal);
 
             return '-'.$prefix.$value.$suffix;

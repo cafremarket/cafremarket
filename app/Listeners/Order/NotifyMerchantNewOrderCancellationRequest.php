@@ -37,7 +37,7 @@ class NotifyMerchantNewOrderCancellationRequest implements ShouldQueue
         // }
 
         // if (config('shop_settings.notify_order_cancellation_request')) {
-        $event->order->shop->notify(new OrderCancellationRequest($event->order));
+        safe_notify($event->order->shop, new OrderCancellationRequest($event->order), 'cancellation request — merchant');
         // }
     }
 }

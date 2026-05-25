@@ -181,6 +181,16 @@
               <span id="summary-grand-total{{ $cart->id }}">{{ number_format($cart->calculate_grand_total(), $dec, '.', '') }}</span>{{ get_currency_suffix() }}
             </span>
           </li>
+
+          <li id="checkout-summary-customer-fee-li{{ $cart->id }}" style="display: none;">
+            <span>{{ trans('packages.wallet.checkout_customer_platform_fee') }}</span>
+            <span id="checkout-summary-customer-fee{{ $cart->id }}">—</span>
+          </li>
+
+          <li id="checkout-summary-pay-total-li{{ $cart->id }}" style="display: none;">
+            <span><strong>{{ trans('packages.wallet.checkout_you_will_pay') }}</strong></span>
+            <span><strong id="checkout-summary-pay-total{{ $cart->id }}">—</strong></span>
+          </li>
         </ul>
 
         @if ($trust_badge = get_trust_badge_url())

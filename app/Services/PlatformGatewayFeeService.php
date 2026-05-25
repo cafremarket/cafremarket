@@ -3,8 +3,9 @@
 namespace App\Services;
 
 /**
- * Platform fees for mobile-money payments (M-Pesa / eMola) and vendor payouts.
- * Configured via Admin → Wallet settings (options table).
+ * Wallet top-up fees (M-Pesa / eMola deposits).
+ * Order sale fees use subscription plans — see OrderCheckoutFeeService.
+ * Vendor payout / withdrawal fees are disabled (commission is taken per sale).
  */
 final class PlatformGatewayFeeService
 {
@@ -39,16 +40,24 @@ final class PlatformGatewayFeeService
 
     public static function payoutFee(float|int|string $withdrawalAmount): float
     {
-        $base = round(abs((float) $withdrawalAmount), 2);
+        return 0.0;
+    }
 
-        if (! self::isEnabled('platform_fee_payout_enabled')) {
-            return 0.0;
-        }
+    /**
+     * @return array{base: float, fee: float, total: float, enabled: bool, method: string}
+     */
+    public static function payoutFeeForMethod(string $payoutMethod, float|int|string $withdrawalAmount): array
+    {
+        $base = max(0, round(abs((float) $withdrawalAmount), 2));
+        $method = strtolower(trim($payoutMethod)) ?: 'bank_transfer';
 
-        $type = self::feeType('platform_fee_payout_type');
-        $rate = self::feeValue('platform_fee_payout_value');
-
-        return self::calculate($base, $type, $rate);
+        return [
+            'base' => $base,
+            'fee' => 0.0,
+            'total' => $base,
+            'enabled' => false,
+            'method' => $method,
+        ];
     }
 
     public static function isPaymentFeeEnabled(string $paymentMethod): bool
@@ -61,7 +70,7 @@ final class PlatformGatewayFeeService
 
     public static function isPayoutFeeEnabled(): bool
     {
-        return self::isEnabled('platform_fee_payout_enabled');
+        return false;
     }
 
     /**

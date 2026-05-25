@@ -37,7 +37,7 @@ class NotifyMerchantNewOrderPlaced implements ShouldQueue
         }
 
         if (config('shop_settings.notify_new_order')) {
-            $event->order->shop->notify(new OrderCreatedNotification($event->order));
+            safe_notify($event->order->shop, new OrderCreatedNotification($event->order), 'order placed — merchant');
         }
     }
 }

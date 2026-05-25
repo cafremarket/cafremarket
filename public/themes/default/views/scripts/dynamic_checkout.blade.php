@@ -600,6 +600,9 @@
       function calculateOrderSummary(cart) {
         var grand = getTotalAmount(cart) + getTax(cart);
         $("#summary-grand-total" + cart).text(getFormatedValue(grand));
+        if (typeof refreshCheckoutPlatformFeePreview === 'function') {
+          refreshCheckoutPlatformFeePreview(cart, grand);
+        }
         return;
       }
 

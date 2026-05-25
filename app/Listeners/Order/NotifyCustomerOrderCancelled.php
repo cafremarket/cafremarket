@@ -43,11 +43,9 @@ class NotifyCustomerOrderCancelled implements ShouldQueue
         }
 
         if ($event->order->customer_id) {
-            $event->order->customer->notify(new OrderCancelledNotification($event->order));
+            safe_notify($event->order->customer, new OrderCancelledNotification($event->order), 'order cancelled — customer');
         } elseif ($event->order->email) {
-            Notification::route('mail', $event->order->email)
-                // ->route('nexmo', '5555555555')
-                ->notify(new OrderCancelledNotification($event->order));
+            safe_mail_route_notify($event->order->email, new OrderCancelledNotification($event->order), 'order cancelled — guest');
         }
     }
 }

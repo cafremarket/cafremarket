@@ -32,9 +32,8 @@ class WithdrawalRequestController extends Controller
     public function approve(WithdrawalActionsRequest $request, Transaction $transaction)
     {
         try {
-            $withdrawalAmount = abs((float) $transaction->amount);
-            $fee = resolve_platform_payout_fee($withdrawalAmount, $request->fee);
-            $transaction->approve($fee);
+            // Marketplace commission is deducted per sale; withdrawals have no extra fee.
+            $transaction->approve(0);
 
             // Dispatch Job
             SendNotificationJob::dispatch($transaction, Approve::class);

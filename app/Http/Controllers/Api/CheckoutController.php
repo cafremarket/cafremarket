@@ -40,6 +40,13 @@ class CheckoutController extends Controller
     {
         $cart = crosscheckAndUpdateOldCartInfo($request, $cart);
 
+        $cart->loadMissing('shop');
+        if (! shop_can_accept_sales($cart->shop)) {
+            return response()->json([
+                'message' => trans('packages.wallet.vendor_sales_require_subscription'),
+            ], 422);
+        }
+
         DB::beginTransaction();
 
         try {
@@ -60,17 +67,14 @@ class CheckoutController extends Controller
             } else {
                 $paymentMethod = (string) $request->input('payment_method', '');
                 if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
-                    $feeBreakdown = get_platform_payment_fee($paymentMethod, $order->grand_total);
-                    $order->platform_payment_fee = $feeBreakdown['fee'];
-                    $order->save();
+                    persist_order_checkout_fees($order, $paymentMethod);
                 }
 
                 $amountSetter = in_array($paymentMethod, ['mpesa', 'emola'], true)
                     ? fn ($p) => $p->setAmountWithPlatformFee($order->grand_total, $paymentMethod)
                     : fn ($p) => $p->setAmount($order->grand_total);
 
-                $response = $amountSetter($payment->setReceiver($receiver)
-                    ->setOrderInfo($order))
+                $response = $amountSetter($payment->setReceiver($receiver)->setOrderInfo($order))
                     ->setDescription(trans('app.purchase_from', [
                         'marketplace' => get_platform_title(),
                     ]))
@@ -145,11 +149,7 @@ class CheckoutController extends Controller
 
         // eMola: defer order-placed notifications until Movitel callback confirms payment.
         if (! $this->shouldDeferEmolaConfirmation($order, $response)) {
-            try {
-                event(new OrderCreated($order));
-            } catch (\Exception $e) {
-                Log::warning('OrderCreated event failed: '.$e->getMessage());
-            }
+            safe_dispatch_order_event(new OrderCreated($order), 'OrderCreated');
         }
 
         $message = trans('theme.notify.order_placed');

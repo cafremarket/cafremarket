@@ -594,11 +594,11 @@ return [
 
     'plan' => [
         'inventory_limit' => ':limit Products',
-        'marketplace_commission' => ':commission% Comissão do Marketplace',
+        'marketplace_commission' => ':commission comissão do marketplace',
         'no_transaction_fee' => 'Sem taxas de transação',
         'no_marketplace_commission' => 'Sem comissão do Marketplace',
         'team_size' => ':size Utilizador da equipes',
-        'transaction_and_commission' => ':commission% + :fpor transação',
+        'transaction_and_commission' => ':commission + :fee por transação',
         'transaction_fee' => ':fee por transação',
     ],
 
