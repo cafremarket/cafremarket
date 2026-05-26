@@ -82,7 +82,7 @@
           {!! $transaction->getFromMetaData('description') !!}
         </td>
         <td>
-          {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
+          @include('wallet::partials.transaction_amount_cell', ['transaction' => $transaction])
         </td>
         <td>
           {!! $transaction->statusName() !!}

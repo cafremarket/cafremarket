@@ -25,6 +25,12 @@ return [
     'payment_status' => 'Payment status',
     'payment_instruction' => 'Payment instruction',
     'platform_fee' => 'Platform fee',
+    'transaction_fee' => 'Transaction fee',
+    'total_paid_mobile' => 'Total paid (M-Pesa / eMola)',
+    'wallet_credit' => 'Wallet credit',
+    'gross_sale' => 'Order total (gross)',
+    'marketplace_commission' => 'Marketplace commission',
+    'vendor_net' => 'Net credited to seller',
     'additional_info' => 'Additional info',
     'footer_note' => 'This is a computer generated invoice and requires no signature.',
 ];

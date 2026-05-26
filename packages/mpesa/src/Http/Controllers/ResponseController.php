@@ -102,6 +102,9 @@ class ResponseController extends Controller
         if (! empty($data['platform_fee'])) {
             $meta['platform_fee'] = $data['platform_fee'];
         }
+        if (! empty($data['charge_amount'])) {
+            $meta['charge_amount'] = $data['charge_amount'];
+        }
 
         $trans = $holder->deposit($data['amount'], $meta, true);
         SendNotificationJob::dispatch($trans, Deposit::class);

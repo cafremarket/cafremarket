@@ -95,17 +95,25 @@
       </tr>
     </thead>
     <tbody>
-      {{-- Enter transaction details here --}}
+      @php
+        $meta = is_array($transaction->meta ?? null) ? $transaction->meta : [];
+        $type = strtolower((string) ($meta['type'] ?? ''));
+        $isDeposit = $type === \Incevio\Package\Wallet\Models\Transaction::TYPE_DEPOSIT;
+        $platformFee = (float) ($meta['platform_fee'] ?? $meta['fee'] ?? 0);
+        $showAmountOnMainRow = ! ($isDeposit && $platformFee > 0);
+      @endphp
       <tr>
-        <td>{{ $transaction->meta['description'] }}</td>
-        <td>{{ get_formated_currency($transaction->amount, 2) }}</td>
+        <td>{{ $meta['description'] ?? '' }}</td>
+        <td>
+          @if ($showAmountOnMainRow)
+            {{ get_formated_currency($transaction->amount, 2) }}
+          @endif
+        </td>
       </tr>
-      @isset($transaction->meta['fee'])
-        <tr>
-          <td>@lang('invoice.platform_fee')</td>
-          <td>{{ get_formated_currency($transaction->meta['fee'], 2) }}</td>
-        </tr>
-      @endisset
+      @include('pdf_templates.partials.wallet_invoice_fees', [
+          'transaction' => $transaction,
+          'data' => $data,
+      ])
     </tbody>
   </table>
 

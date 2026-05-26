@@ -14,17 +14,33 @@ class TransactionResource extends JsonResource
      */
     public function toArray($request)
     {
+        $currencyId = config('system_settings.currency.id');
+        $walletCredit = $this->depositWalletCredit();
+        $paymentTotal = $this->depositPaymentTotal();
+        $platformFee = $this->depositPlatformFee();
+
         return [
             'id' => $this->id,
             'date' => $this->created_at->toDayDateTimeString(),
-            'description' => $this->meta['description'],
+            'description' => $this->meta['description'] ?? null,
             'type' => $this->type,
-            'amount' => get_formated_currency($this->amount, 2, config('system_settings.currency.id')),
+            'amount' => get_formated_currency($this->amount, 2, $currencyId),
             'amount_raw' => $this->amount,
-            'balance' => get_formated_currency($this->balance, 2, config('system_settings.currency.id')),
+            'balance' => get_formated_currency($this->balance, 2, $currencyId),
             'balance_raw' => $this->balance,
-            // 'status' => $this->confirmed ? trans('packages.wallet.confirmed') : trans('packages.wallet.pending'),
-            // 'approved' => (bool) $this->approved,
+            'wallet_credit' => $walletCredit !== null
+                ? get_formated_currency($walletCredit, 2, $currencyId)
+                : null,
+            'wallet_credit_raw' => $walletCredit,
+            'payment_total' => $paymentTotal !== null
+                ? get_formated_currency($paymentTotal, 2, $currencyId)
+                : null,
+            'payment_total_raw' => $paymentTotal,
+            'platform_fee' => $platformFee > 0
+                ? get_formated_currency($platformFee, 2, $currencyId)
+                : null,
+            'platform_fee_raw' => $platformFee > 0 ? $platformFee : null,
+            'shows_deposit_breakdown' => $this->showsDepositPaymentBreakdown(),
         ];
     }
 }

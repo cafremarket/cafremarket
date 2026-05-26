@@ -195,7 +195,7 @@
               <td>{{ $transaction->type }}</td>
               <td>{!! $transaction->getFromMetaData('description') !!}</td>
               <td data-order="{{ $transaction->amount }}">
-                {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
+                @include('wallet::partials.transaction_amount_cell', ['transaction' => $transaction])
               </td>
               <td>{!! $transaction->statusName() !!}</td>
               <td>

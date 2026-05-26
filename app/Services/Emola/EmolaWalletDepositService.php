@@ -190,6 +190,9 @@ class EmolaWalletDepositService
         if (! empty($deposit['platform_fee'])) {
             $meta['platform_fee'] = $deposit['platform_fee'];
         }
+        if (! empty($deposit['charge_amount'])) {
+            $meta['charge_amount'] = $deposit['charge_amount'];
+        }
 
         $trans = $holder->deposit($deposit['amount'], $meta, true);
         SendNotificationJob::dispatch($trans, Deposit::class);

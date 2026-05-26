@@ -170,6 +170,7 @@
         <td colspan="2">@lang('app.grand_total')</td>
         <td>{{ get_formated_currency($order->grand_total, 2) }}</td>
       </tr>
+      @include('pdf_templates.partials.order_invoice_fees', ['order' => $order, 'invoiceTableColumns' => 3])
     </tbody>
   </table>
 

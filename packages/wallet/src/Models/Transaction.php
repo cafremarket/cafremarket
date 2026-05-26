@@ -310,6 +310,77 @@ class Transaction extends Model
         return is_array($this->meta) && array_key_exists($attr, $this->meta) ? $this->meta[$attr] : '';
     }
 
+    public function isWalletDeposit(): bool
+    {
+        $type = strtolower((string) $this->getFromMetaData('type'));
+
+        if ($type === self::TYPE_DEPOSIT) {
+            return true;
+        }
+
+        if ((float) $this->amount <= 0) {
+            return false;
+        }
+
+        $description = strtolower((string) $this->getFromMetaData('description'));
+
+        return str_contains($description, 'deposit')
+            || str_contains($description, 'carreg')
+            || str_contains($description, 'top up')
+            || str_contains($description, 'recarregar');
+    }
+
+    public function depositPlatformFee(): float
+    {
+        $fee = $this->getFromMetaData('platform_fee');
+
+        if ($fee === '' || $fee === null) {
+            $fee = $this->getFromMetaData('fee');
+        }
+
+        return max(0, (float) $fee);
+    }
+
+    /** Wallet credit amount for deposit transactions. */
+    public function depositWalletCredit(): ?float
+    {
+        if (! $this->isWalletDeposit()) {
+            return null;
+        }
+
+        return round((float) $this->amount, 2);
+    }
+
+    /** Total paid via M-Pesa / eMola (credit + gateway fee). */
+    public function depositPaymentTotal(): ?float
+    {
+        if (! $this->isWalletDeposit()) {
+            return null;
+        }
+
+        $charge = $this->getFromMetaData('charge_amount');
+        if ($charge !== '' && $charge !== null) {
+            return round((float) $charge, 2);
+        }
+
+        $fee = $this->depositPlatformFee();
+        if ($fee <= 0) {
+            return null;
+        }
+
+        return round((float) $this->amount + $fee, 2);
+    }
+
+    public function showsDepositPaymentBreakdown(): bool
+    {
+        $credit = $this->depositWalletCredit();
+        $paid = $this->depositPaymentTotal();
+
+        return $credit !== null
+            && $paid !== null
+            && abs($paid - $credit) > 0.001;
+    }
+
     public function hasPayoutPaymentProof(): bool
     {
         return (bool) $this->getFromMetaData('payout_payment_proof_path');

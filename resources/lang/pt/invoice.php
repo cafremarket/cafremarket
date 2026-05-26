@@ -25,6 +25,12 @@ return [
     'payment_status' => 'Status do Pagamento',
     'payment_instruction' => 'Instruções de Pagamento',
     'platform_fee' => 'Taxa da Plataforma',
+    'transaction_fee' => 'Taxa de transação',
+    'total_paid_mobile' => 'Total pago (M-Pesa / eMola)',
+    'wallet_credit' => 'Crédito na carteira',
+    'gross_sale' => 'Total do pedido (bruto)',
+    'marketplace_commission' => 'Comissão do marketplace',
+    'vendor_net' => 'Líquido creditado ao vendedor',
     'additional_info' => 'Informações Adicionais',
     'footer_note' => 'Esta é uma fatura gerada automaticamente e não requer assinatura.',
     ];
