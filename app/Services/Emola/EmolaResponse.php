@@ -126,39 +126,42 @@ final class EmolaResponse
 
         if (! $this->isGatewaySuccess()) {
             $mapped = EmolaSpec::gatewayErrorMessage($this->gatewayError);
+            $detail = trim((string) ($this->gatewayDescription ?: $mapped ?: ''));
 
-            return $mapped
-                ?: ($this->gatewayDescription ?: ('eMola gateway error '.$this->gatewayError));
+            return trans('theme.emola_movitel_gateway_failed', [
+                'code' => $this->gatewayError,
+                'detail' => $detail !== '' ? $detail : trans('theme.emola_movitel_no_detail'),
+            ]);
         }
 
         $code = $this->businessErrorCode();
-        $message = $this->businessMessage();
+        $message = trim((string) ($this->businessMessage() ?? ''));
+        $mapped = $code !== null ? EmolaSpec::businessErrorMessage($code) : null;
+        $detail = $message !== '' ? $message : trim((string) ($mapped ?? ''));
 
         if ($code !== null) {
             $themeKey = EmolaSpec::businessErrorThemeKey($code);
             if ($themeKey !== null && trans()->has($themeKey)) {
                 $attempted = EmolaSpec::lastTransAmountMzn();
-                $text = trans($themeKey, [
+
+                return trans($themeKey, [
                     'amount' => $attempted !== null
                         ? number_format($attempted, 0, '.', ',')
                         : '—',
-                    'movitel_max' => number_format(EmolaSpec::movitelUssdMaxMzn(), 0, '.', ','),
+                    'code' => $code,
+                    'detail' => $detail !== '' ? $detail : trans('theme.emola_movitel_no_detail'),
                 ]);
-
-                if ($message && trim($message) !== '') {
-                    $text .= ' '.trans('theme.emola_gateway_detail', ['detail' => trim($message)]);
-                }
-
-                return $text;
             }
 
-            $mapped = EmolaSpec::businessErrorMessage($code);
-
-            return $mapped
-                ? ($mapped.' (code: '.$code.')')
-                : ($message ? ($message.' (code: '.$code.')') : ('eMola error code '.$code));
+            return trans('theme.emola_movitel_rejected_amount', [
+                'amount' => EmolaSpec::lastTransAmountMzn() !== null
+                    ? number_format(EmolaSpec::lastTransAmountMzn(), 0, '.', ',')
+                    : '—',
+                'code' => $code,
+                'detail' => $detail !== '' ? $detail : trans('theme.emola_movitel_no_detail'),
+            ]);
         }
 
-        return 'eMola did not confirm the USSD push. Check gateway logs or try again.';
+        return trans('theme.emola_movitel_no_ussd_confirm');
     }
 }

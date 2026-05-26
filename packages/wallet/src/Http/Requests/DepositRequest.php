@@ -3,7 +3,10 @@
 namespace Incevio\Package\Wallet\Http\Requests;
 
 use App\Common\CanCreateStripeCustomer;
+use App\Exceptions\PaymentFailedException;
 use App\Http\Requests\Request;
+use App\Services\Emola\EmolaSpec;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class DepositRequest extends Request
@@ -53,5 +56,21 @@ class DepositRequest extends Request
         }
 
         return $rules;
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($this->input('payment_method') !== 'emola') {
+                return;
+            }
+
+            try {
+                $breakdown = get_platform_payment_fee('emola', $this->input('amount'));
+                EmolaSpec::assertDepositChargeAllowed((int) round((float) $breakdown['total']));
+            } catch (PaymentFailedException $e) {
+                $validator->errors()->add('amount', $e->getMessage());
+            }
+        });
     }
 }

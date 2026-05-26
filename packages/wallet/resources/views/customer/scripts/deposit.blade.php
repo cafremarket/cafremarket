@@ -191,7 +191,12 @@
       }
 
       $.get(walletFeePreviewUrl, { payment_method: method, amount: amount }, function(data) {
+        var limitEl = $('#wallet-fee-emola-limit');
+        var payBtn = $('#pay-now-btn');
+
         if (!data || !data.enabled || data.fee <= 0) {
+          limitEl.hide().text('');
+          payBtn.prop('disabled', false);
           box.hide();
           return;
         }
@@ -200,7 +205,17 @@
         $('#wallet-fee-total').text(data.formatted.total);
         $('#wallet-fee-row').show();
         box.show();
+
+        if (method === 'emola' && data.exceeds_emola_limit && data.exceeds_message) {
+          limitEl.text(data.exceeds_message).show();
+          payBtn.prop('disabled', true);
+        } else {
+          limitEl.hide().text('');
+          payBtn.prop('disabled', false);
+        }
       }).fail(function() {
+        $('#wallet-fee-emola-limit').hide();
+        $('#pay-now-btn').prop('disabled', false);
         box.hide();
       });
     }

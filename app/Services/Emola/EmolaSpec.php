@@ -82,6 +82,71 @@ final class EmolaSpec
     }
 
     /**
+     * Max MZN per wallet deposit USSD (total incl. gateway fee).
+     * Uses deposit_transaction_max, else partner_deposit_max, else USSD spec max.
+     */
+    public static function depositChargeMaxMzn(): int
+    {
+        $candidates = [];
+
+        $appMax = self::transactionMax(self::CONTEXT_DEPOSIT);
+        if ($appMax > 0) {
+            $candidates[] = $appMax;
+        }
+
+        $partnerMax = max(0, (int) config('emola.limits.partner_deposit_max', 10_000));
+        if ($partnerMax > 0) {
+            $candidates[] = $partnerMax;
+        }
+
+        $candidates[] = self::movitelUssdMaxMzn();
+
+        return min($candidates);
+    }
+
+    /**
+     * Largest wallet credit (base) so base + gateway fee still fits depositChargeMaxMzn().
+     */
+    public static function maxWalletDepositBaseMzn(string $paymentMethod = 'emola'): int
+    {
+        $maxCharge = self::depositChargeMaxMzn();
+
+        if (! \App\Services\PlatformGatewayFeeService::isPaymentFeeEnabled($paymentMethod)) {
+            return $maxCharge;
+        }
+
+        $type = strtolower((string) get_from_option_table("platform_fee_{$paymentMethod}_type", 'flat'));
+        $rate = max(0, (float) get_from_option_table("platform_fee_{$paymentMethod}_value", 0));
+
+        if ($rate <= 0) {
+            return $maxCharge;
+        }
+
+        if ($type === 'percent') {
+            return max(0, (int) floor($maxCharge / (1 + ($rate / 100))));
+        }
+
+        return max(0, $maxCharge - (int) ceil($rate));
+    }
+
+    public static function assertDepositChargeAllowed(int $chargeMzn): void
+    {
+        $max = self::depositChargeMaxMzn();
+
+        if ($chargeMzn <= $max) {
+            return;
+        }
+
+        throw new PaymentFailedException(
+            trans('theme.emola_deposit_charge_exceeds_partner', [
+                'amount' => number_format($chargeMzn, 0, '.', ','),
+                'max' => number_format($max, 0, '.', ','),
+                'max_base' => number_format(self::maxWalletDepositBaseMzn('emola'), 0, '.', ','),
+            ])
+        );
+    }
+
+    /**
      * Parse a monetary value into whole Meticals for Movitel USSD (no decimals, no separators).
      */
     public static function parseMeticalAmount(float|int|string $amount): int
@@ -137,12 +202,7 @@ final class EmolaSpec
 
     public static function invalidAmountException(?int $amountMzn = null): PaymentFailedException
     {
-        return new PaymentFailedException(trans('theme.emola_code_invalid_amount', [
-            'amount' => $amountMzn !== null
-                ? number_format($amountMzn, 0, '.', ',')
-                : '—',
-            'movitel_max' => number_format(self::movitelUssdMaxMzn(), 0, '.', ','),
-        ]));
+        return new PaymentFailedException(trans('theme.emola_amount_parse_invalid'));
     }
 
     /** 0 means no application-side maximum. */
@@ -198,6 +258,10 @@ final class EmolaSpec
                     'movitel_max' => number_format($movitelMax, 0, '.', ','),
                 ])
             );
+        }
+
+        if ($context === self::CONTEXT_DEPOSIT) {
+            self::assertDepositChargeAllowed($value);
         }
 
         return (string) $value;
@@ -289,7 +353,7 @@ final class EmolaSpec
         $normalized = str_pad(ltrim(trim($code), '0') ?: '0', 2, '0', STR_PAD_LEFT);
 
         return match ($normalized) {
-            '06' => 'theme.emola_code_invalid_amount',
+            '06' => 'theme.emola_movitel_rejected_amount',
             '10' => 'theme.emola_code_msisdn_not_whitelisted',
             '11' => 'theme.emola_code_pin_cancelled',
             default => null,

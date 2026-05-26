@@ -584,11 +584,31 @@ class DepositController extends Controller
 
         $breakdown = get_platform_payment_fee($method, $amount);
         $vendorNet = max(0, round((float) $breakdown['base'] - (float) $breakdown['fee'], 2));
+        $chargeTotal = (int) round((float) $breakdown['total']);
+        $maxCharge = $method === 'emola'
+            ? \App\Services\Emola\EmolaSpec::depositChargeMaxMzn()
+            : \App\Services\Emola\EmolaSpec::movitelUssdMaxMzn();
+        $exceedsLimit = $method === 'emola' && $chargeTotal > $maxCharge;
+        $maxBase = $method === 'emola'
+            ? \App\Services\Emola\EmolaSpec::maxWalletDepositBaseMzn('emola')
+            : null;
+        $exceedsMessage = $exceedsLimit
+            ? trans('theme.emola_deposit_charge_exceeds_partner', [
+                'amount' => number_format($chargeTotal, 0, '.', ','),
+                'max' => number_format($maxCharge, 0, '.', ','),
+                'max_base' => number_format((int) $maxBase, 0, '.', ','),
+            ])
+            : null;
 
         return response()->json([
             'base' => $breakdown['base'],
             'fee' => $breakdown['fee'],
             'total' => $breakdown['total'],
+            'charge_total' => $chargeTotal,
+            'max_charge_mzn' => $maxCharge,
+            'max_base_mzn' => $maxBase,
+            'exceeds_emola_limit' => $exceedsLimit,
+            'exceeds_message' => $exceedsMessage,
             'vendor_net' => $vendorNet,
             'enabled' => $breakdown['enabled'],
             'formatted' => [
@@ -596,6 +616,8 @@ class DepositController extends Controller
                 'fee' => get_formated_currency($breakdown['fee']),
                 'total' => get_formated_currency($breakdown['total']),
                 'vendor_net' => get_formated_currency($vendorNet),
+                'max_charge_mzn' => get_formated_currency($maxCharge),
+                'max_base_mzn' => $maxBase !== null ? get_formated_currency($maxBase) : null,
             ],
         ]);
     }

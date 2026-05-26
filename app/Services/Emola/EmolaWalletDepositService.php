@@ -42,6 +42,7 @@ class EmolaWalletDepositService
         $baseMzn = EmolaSpec::parseMeticalAmount($amount);
 
         if ($chargeMzn !== null) {
+            EmolaSpec::assertDepositChargeAllowed($chargeMzn);
             $transAmount = EmolaSpec::formatTransAmount($chargeMzn, EmolaSpec::CONTEXT_DEPOSIT);
             $platformFee = max(0.0, (float) ((int) $transAmount - $baseMzn));
         } else {
@@ -70,8 +71,13 @@ class EmolaWalletDepositService
             'holder_id' => $payee->id ?? null,
             'trans_id' => $transId,
             'ref_no' => $refNo,
-            'amount' => $transAmount,
+            'base_mzn' => $baseMzn,
+            'trans_amount' => $transAmount,
+            'gateway_error' => $res->gatewayError,
+            'business_code' => $res->businessErrorCode(),
+            'business_message' => $res->businessMessage(),
             'ussd_push_accepted' => $res->isUssdPushAccepted(),
+            'movitel_issue' => ! $res->isUssdPushAccepted(),
         ]);
 
         if ($res->isUssdPushAccepted()) {

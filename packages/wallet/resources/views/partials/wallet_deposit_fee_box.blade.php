@@ -20,4 +20,5 @@
     </tr>
   </table>
   <p class="small text-muted mb-0">{{ trans('packages.wallet.wallet_topup_fee_help') }}</p>
+  <p id="wallet-fee-emola-limit" class="small text-danger mb-0" style="display: none;"></p>
 </div>
