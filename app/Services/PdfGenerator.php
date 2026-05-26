@@ -94,32 +94,15 @@ class PdfGenerator
         $bladeRelativePaths = array_values(array_unique(array_filter($bladeRelativePaths)));
 
         foreach ($bladeRelativePaths as $relative) {
-            if (Storage::exists($relative)) {
-                $absolute = Storage::path($relative);
-                if (is_readable($absolute)) {
-                    $html = view()->file($absolute, $viewData)->render();
-
-                    return Pdf::loadHTML($this->sanitizeDompdfHtmlWebpImgSources($html));
+            foreach ($this->absolutePathsForBladeTemplate($relative) as $absolute) {
+                if (! is_readable($absolute)) {
+                    continue;
                 }
-            }
-        }
 
-        foreach ($bladeRelativePaths as $relative) {
-            $full = resource_path('views'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $relative));
-            if (is_file($full)) {
-                $viewName = str_replace('/', '.', preg_replace('/\.blade\.php$/i', '', $relative));
-                $html = view($viewName, $viewData)->render();
+                $html = view()->file($absolute, $viewData)->render();
 
                 return Pdf::loadHTML($this->sanitizeDompdfHtmlWebpImgSources($html));
             }
-        }
-
-        if ($path !== '' && str_ends_with(strtolower($path), '.blade.php')) {
-            $relative = str_replace('\\', '/', $path);
-            $viewName = str_replace('/', '.', preg_replace('/\.blade\.php$/i', '', $relative));
-            $html = view($viewName, $viewData)->render();
-
-            return Pdf::loadHTML($this->sanitizeDompdfHtmlWebpImgSources($html));
         }
 
         throw new \InvalidArgumentException(
@@ -127,6 +110,24 @@ class PdfGenerator
             .'path=['.$path.'] file_name=['.$fileName.']. '
             .'Fix the template in Admin or set the shop invoice template to a valid default.'
         );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function absolutePathsForBladeTemplate(string $relative): array
+    {
+        $relative = str_replace('\\', '/', $relative);
+        $candidates = [];
+
+        if (Storage::exists($relative)) {
+            $candidates[] = Storage::path($relative);
+        }
+
+        $candidates[] = resource_path('views'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $relative));
+        $candidates[] = public_path(str_replace('/', DIRECTORY_SEPARATOR, $relative));
+
+        return array_values(array_unique($candidates));
     }
 
     /**
