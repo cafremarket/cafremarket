@@ -131,7 +131,7 @@ class PaymentService implements PaymentServiceContract
         $breakdown = get_customer_transaction_fee((string) $method, $baseAmount, $shop);
 
         $this->fee = $breakdown['fee'];
-        $this->amount = strtolower((string) $method) === 'mpesa'
+        $this->amount = in_array(strtolower((string) $method), ['mpesa', 'emola'], true)
             ? (int) round($breakdown['total'])
             : $breakdown['total'];
 

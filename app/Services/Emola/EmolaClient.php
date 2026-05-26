@@ -63,7 +63,7 @@ class EmolaClient
             'partnerCode' => $this->partnerCode,
             'msisdn' => EmolaSpec::normalizeMsisdn($msisdn),
             'smsContent' => EmolaSpec::sanitizeSmsContent($smsContent),
-            'transAmount' => EmolaSpec::sanitizeAmount($amount),
+            'transAmount' => EmolaSpec::formatTransAmount($amount),
             'transId' => EmolaSpec::sanitizeTransId($transId),
             'language' => EmolaSpec::sanitizeLanguage($language),
             'refNo' => EmolaSpec::sanitizeRefNo($refNo),
@@ -94,7 +94,7 @@ class EmolaClient
             'partnerCode' => $this->partnerCode,
             'msisdn' => EmolaSpec::normalizeMsisdn((string) Arr::get($input, 'msisdn')),
             'smsContent' => EmolaSpec::sanitizeSmsContent((string) Arr::get($input, 'smsContent', '')),
-            'transAmount' => EmolaSpec::sanitizeAmount(Arr::get($input, 'transAmount')),
+            'transAmount' => EmolaSpec::formatTransAmount(Arr::get($input, 'transAmount')),
             'transId' => EmolaSpec::sanitizeTransId((string) Arr::get($input, 'transId')),
             'key' => $this->key,
         ]);

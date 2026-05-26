@@ -137,11 +137,9 @@ final class EmolaResponse
         if ($code !== null) {
             $themeKey = EmolaSpec::businessErrorThemeKey($code);
             if ($themeKey !== null && trans()->has($themeKey)) {
-                $max = (int) config('emola.limits.order_transaction_max', 0);
-
-                return trans($themeKey, $max > 0 ? [
-                    'max' => number_format($max, 0, '.', ','),
-                ] : []);
+                return trans($themeKey, [
+                    'movitel_max' => number_format(EmolaSpec::movitelUssdMaxMzn(), 0, '.', ','),
+                ]);
             }
 
             $mapped = EmolaSpec::businessErrorMessage($code);

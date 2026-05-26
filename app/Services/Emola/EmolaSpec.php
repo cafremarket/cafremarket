@@ -55,29 +55,60 @@ final class EmolaSpec
         return $refNo;
     }
 
+    /** Movitel USSD maximum per push (spec §B.1 — 5-digit transAmount). */
+    public static function movitelUssdMaxMzn(): int
+    {
+        $digits = (int) config('emola.limits.trans_amount_digits', 5);
+
+        if ($digits <= 0) {
+            return 99_999;
+        }
+
+        return (int) str_repeat('9', min($digits, 9));
+    }
+
     /**
      * Parse a monetary value into whole Meticals for Movitel USSD (no decimals, no separators).
      */
     public static function parseMeticalAmount(float|int|string $amount): int
     {
         if (is_int($amount)) {
-            return $amount;
+            return max(0, $amount);
+        }
+
+        if (is_float($amount)) {
+            return max(0, (int) round($amount));
         }
 
         $normalized = trim((string) $amount);
         $normalized = str_replace([' ', "\u{00A0}"], '', $normalized);
 
-        // European-style decimals: 1.234,56 → 1234.56
-        if (preg_match('/^\d{1,3}(\.\d{3})+,\d{1,2}$/', $normalized)) {
+        if ($normalized === '' || ! preg_match('/[\d]/', $normalized)) {
+            throw new PaymentFailedException(trans('theme.emola_code_invalid_amount', [
+                'movitel_max' => number_format(self::movitelUssdMaxMzn(), 0, '.', ','),
+            ]));
+        }
+
+        // European: 1.234,56 or 1.234 (thousands with dot)
+        if (preg_match('/^\d{1,3}(\.\d{3})+(,\d{1,2})?$/', $normalized)) {
             $normalized = str_replace('.', '', $normalized);
             $normalized = str_replace(',', '.', $normalized);
+        } elseif (preg_match('/^\d{1,3}(,\d{3})+(\.\d{1,2})?$/', $normalized)) {
+            // US thousands: 1,234.56
+            $normalized = str_replace(',', '', $normalized);
         } elseif (str_contains($normalized, ',') && ! str_contains($normalized, '.')) {
             $normalized = str_replace(',', '.', $normalized);
         } else {
             $normalized = str_replace(',', '', $normalized);
         }
 
-        return (int) round((float) $normalized);
+        if (! is_numeric($normalized)) {
+            throw new PaymentFailedException(trans('theme.emola_code_invalid_amount', [
+                'movitel_max' => number_format(self::movitelUssdMaxMzn(), 0, '.', ','),
+            ]));
+        }
+
+        return max(0, (int) round((float) $normalized));
     }
 
     /** 0 means no application-side maximum. */
@@ -124,14 +155,18 @@ final class EmolaSpec
             );
         }
 
-        $formatted = (string) $value;
-        $digitCap = (int) config('emola.limits.trans_amount_digits', 0);
+        $movitelMax = self::movitelUssdMaxMzn();
 
-        if ($digitCap > 0 && strlen($formatted) > $digitCap) {
-            throw new PaymentFailedException(trans('theme.emola_amount_too_long'));
+        if ($value > $movitelMax) {
+            throw new PaymentFailedException(
+                trans('theme.emola_movitel_max_exceeded', [
+                    'amount' => number_format($value, 0, '.', ','),
+                    'movitel_max' => number_format($movitelMax, 0, '.', ','),
+                ])
+            );
         }
 
-        return $formatted;
+        return (string) $value;
     }
 
     public static function transAmountFromOrder(Order $order): string
@@ -141,10 +176,20 @@ final class EmolaSpec
         return self::formatTransAmount($order->grand_total, self::CONTEXT_ORDER);
     }
 
-    /** @deprecated Use formatTransAmount() */
-    public static function sanitizeAmount(float|int|string $amount): string
+    /**
+     * Whole-MZN charge for an order (grand total + subscription transaction fee).
+     */
+    public static function chargeMznForOrder(Order $order, ?string $paymentMethod = null): int
     {
-        return self::formatTransAmount($amount, self::CONTEXT_ORDER);
+        $breakdown = get_customer_transaction_fee_for_order($order, $paymentMethod);
+
+        return (int) self::formatTransAmount($breakdown['total'], self::CONTEXT_ORDER);
+    }
+
+    /** @deprecated Use formatTransAmount() */
+    public static function sanitizeAmount(float|int|string $amount, string $context = self::CONTEXT_ORDER): string
+    {
+        return self::formatTransAmount($amount, $context);
     }
 
     public static function sanitizeSmsContent(string $content): string

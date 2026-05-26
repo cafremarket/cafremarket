@@ -44,8 +44,8 @@ return [
         'trans_id_min' => 15,
         'trans_id_max' => 30,
         'trans_amount_min' => (int) env('EMOLA_MIN_TRANS_AMOUNT', 1),
-        // USSD transAmount digit cap (0 = no app-side cap; Movitel may still reject oversized values).
-        'trans_amount_digits' => (int) env('EMOLA_TRANS_AMOUNT_DIGITS', 0),
+        // Movitel USSD transAmount field width (spec §B.1 — max 99,999 MZN per push). 0 = skip app check only.
+        'trans_amount_digits' => (int) env('EMOLA_TRANS_AMOUNT_DIGITS', 5),
         // Order / checkout payments (C2B). 0 = unlimited.
         'order_transaction_max' => (int) env('EMOLA_ORDER_TRANSACTION_MAX', 0),
         // Wallet top-up deposits. 0 = unlimited.

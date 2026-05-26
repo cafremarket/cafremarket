@@ -36,11 +36,10 @@ class EmolaWalletDepositService
         $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
         $baseMzn = EmolaSpec::parseMeticalAmount($amount);
         $feeBreakdown = \App\Services\PlatformGatewayFeeService::paymentFee('emola', $baseMzn);
-        $chargeMzn = EmolaSpec::parseMeticalAmount($feeBreakdown['total']);
+        $transAmount = EmolaSpec::formatTransAmount($feeBreakdown['total'], EmolaSpec::CONTEXT_DEPOSIT);
+        $amountMzn = $baseMzn;
         $transId = $this->client->generateTransId();
         $refNo = self::refNoForPayee($payee);
-        $transAmount = EmolaSpec::formatTransAmount($chargeMzn, EmolaSpec::CONTEXT_DEPOSIT);
-        $amountMzn = $baseMzn;
 
         $res = $this->client->pushUssdMessage([
             'msisdn' => $msisdn,
@@ -63,7 +62,7 @@ class EmolaWalletDepositService
         ]);
 
         if ($res->isUssdPushAccepted()) {
-            EmolaDailyLimit::recordAcceptedPush($msisdn, $chargeMzn);
+            EmolaDailyLimit::recordAcceptedPush($msisdn, (int) $transAmount);
             $this->rememberPendingDeposit($transId, $payee, (float) $amountMzn, $refNo, (float) $feeBreakdown['fee']);
         }
 
