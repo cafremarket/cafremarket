@@ -43,6 +43,10 @@ final class EmolaDailyLimit
     /** Record an accepted USSD push against the customer's daily total. */
     public static function recordAcceptedPush(string $msisdn, int $amountMzn): void
     {
+        if ((int) config('emola.limits.customer_daily_max', 0) <= 0) {
+            return;
+        }
+
         $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
         $amountMzn = max(0, $amountMzn);
 

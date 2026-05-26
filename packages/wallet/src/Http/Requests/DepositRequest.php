@@ -49,8 +49,6 @@ class DepositRequest extends Request
 
         if ($this->input('payment_method') === 'emola') {
             $rules['emola_number'] = ['required', 'string', 'regex:/^(86|87)\d{7}$/'];
-            $max = (int) config('emola.limits.deposit_transaction_max', 1_000);
-            $rules['amount'] = 'required|numeric|min:1|max:'.$max;
         }
 
         return $rules;

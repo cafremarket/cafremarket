@@ -37,7 +37,6 @@ class EmolaWalletDepositService
         $baseMzn = EmolaSpec::parseMeticalAmount($amount);
         $feeBreakdown = \App\Services\PlatformGatewayFeeService::paymentFee('emola', $baseMzn);
         $chargeMzn = EmolaSpec::parseMeticalAmount($feeBreakdown['total']);
-        EmolaDailyLimit::assertCanPay($msisdn, $chargeMzn);
         $transId = $this->client->generateTransId();
         $refNo = self::refNoForPayee($payee);
         $transAmount = EmolaSpec::formatTransAmount($chargeMzn, EmolaSpec::CONTEXT_DEPOSIT);

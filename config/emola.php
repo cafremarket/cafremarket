@@ -44,16 +44,16 @@ return [
         'trans_id_min' => 15,
         'trans_id_max' => 30,
         'trans_amount_min' => (int) env('EMOLA_MIN_TRANS_AMOUNT', 1),
-        // USSD transAmount field: spec §B.1 allows up to 5 digits (max single push 99,999).
-        'trans_amount_digits' => 5,
-        // Order / checkout payments (C2B).
-        'order_transaction_max' => (int) env('EMOLA_ORDER_TRANSACTION_MAX', 50_000),
-        // Wallet top-up deposits.
-        'deposit_transaction_max' => (int) env('EMOLA_DEPOSIT_TRANSACTION_MAX', 1_000),
-        // Total paid per customer MSISDN per calendar day (orders + deposits).
-        'customer_daily_max' => (int) env('EMOLA_CUSTOMER_DAILY_MAX', 500_000),
+        // USSD transAmount digit cap (0 = no app-side cap; Movitel may still reject oversized values).
+        'trans_amount_digits' => (int) env('EMOLA_TRANS_AMOUNT_DIGITS', 0),
+        // Order / checkout payments (C2B). 0 = unlimited.
+        'order_transaction_max' => (int) env('EMOLA_ORDER_TRANSACTION_MAX', 0),
+        // Wallet top-up deposits. 0 = unlimited.
+        'deposit_transaction_max' => (int) env('EMOLA_DEPOSIT_TRANSACTION_MAX', 0),
+        // Total paid per customer MSISDN per calendar day (orders + deposits). 0 = unlimited.
+        'customer_daily_max' => (int) env('EMOLA_CUSTOMER_DAILY_MAX', 0),
         // @deprecated Use order_transaction_max — kept for backward compatibility.
-        'trans_amount_max' => (int) env('EMOLA_MAX_TRANS_AMOUNT', 50_000),
+        'trans_amount_max' => (int) env('EMOLA_MAX_TRANS_AMOUNT', 0),
         'ref_no_max' => 20,
         'sms_content_max' => 180,
         'partner_code_max' => 30,

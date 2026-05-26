@@ -28,7 +28,6 @@ class EmolaOrderPaymentService
             $order->subscription_transaction_fee = $feeBreakdown['subscription_fee'];
             $order->save();
         }
-        EmolaDailyLimit::assertCanPay($msisdn, $chargeMzn);
         $transId = $this->client->generateTransId();
         $refNo = EmolaSpec::sanitizeRefNo('REF'.(string) $order->id);
         $transAmount = EmolaSpec::formatTransAmount($chargeMzn, EmolaSpec::CONTEXT_ORDER);

@@ -17,6 +17,8 @@ use App\Exceptions\PaymentFailedException;
 use App\Services\Emola\EmolaWalletDepositService;
 use Incevio\Package\MPesa\Services\MPesaPaymentService;
 use Incevio\Package\Wallet\Http\Requests\DepositRequest;
+use App\Models\Shop;
+use App\Services\OrderCheckoutFeeService;
 use Incevio\Package\Wallet\Jobs\SendNotificationJob;
 use Incevio\Package\Wallet\Models\Transaction;
 use Incevio\Package\Wallet\Notifications\Deposit;
@@ -553,18 +555,29 @@ class DepositController extends Controller
 
         if ($shopId) {
             $customer = get_customer_transaction_fee($method, $amount, (int) $shopId);
+            $shop = Shop::find((int) $shopId);
+            $settlement = OrderCheckoutFeeService::vendorSettlementPreview(
+                (float) $amount,
+                $shop
+            );
+            $marketplaceCommission = (float) ($settlement['marketplace_commission'] ?? 0);
+            $vendorNet = (float) ($settlement['net'] ?? 0);
 
             return response()->json([
                 'base' => $customer['base'],
                 'fee' => $customer['fee'],
                 'subscription_fee' => $customer['subscription_fee'],
                 'total' => $customer['total'],
+                'marketplace_commission' => $marketplaceCommission,
+                'vendor_net' => $vendorNet,
                 'enabled' => true,
                 'formatted' => [
                     'base' => get_formated_currency($customer['base']),
                     'fee' => get_formated_currency($customer['fee']),
                     'subscription_fee' => get_formated_currency($customer['subscription_fee']),
                     'total' => get_formated_currency($customer['total']),
+                    'marketplace_commission' => get_formated_currency($marketplaceCommission),
+                    'vendor_net' => get_formated_currency($vendorNet),
                 ],
             ]);
         }

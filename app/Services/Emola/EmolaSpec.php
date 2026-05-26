@@ -80,13 +80,14 @@ final class EmolaSpec
         return (int) round((float) $normalized);
     }
 
+    /** 0 means no application-side maximum. */
     public static function transactionMax(string $context = self::CONTEXT_ORDER): int
     {
-        if ($context === self::CONTEXT_DEPOSIT) {
-            return (int) config('emola.limits.deposit_transaction_max', 1_000);
-        }
+        $key = $context === self::CONTEXT_DEPOSIT
+            ? 'emola.limits.deposit_transaction_max'
+            : 'emola.limits.order_transaction_max';
 
-        return (int) config('emola.limits.order_transaction_max', 50_000);
+        return max(0, (int) config($key, 0));
     }
 
     /**
@@ -100,7 +101,16 @@ final class EmolaSpec
         $max = self::transactionMax($context);
         $min = (int) config('emola.limits.trans_amount_min', 1);
 
-        if ($value < $min || $value > $max) {
+        if ($value < $min) {
+            throw new PaymentFailedException(
+                trans('theme.emola_amount_below_min', [
+                    'amount' => number_format($value, 0, '.', ','),
+                    'min' => number_format($min, 0, '.', ','),
+                ])
+            );
+        }
+
+        if ($max > 0 && $value > $max) {
             $messageKey = $context === self::CONTEXT_DEPOSIT
                 ? 'theme.emola_deposit_amount_limit'
                 : 'theme.emola_amount_limit';
@@ -115,8 +125,9 @@ final class EmolaSpec
         }
 
         $formatted = (string) $value;
+        $digitCap = (int) config('emola.limits.trans_amount_digits', 0);
 
-        if (strlen($formatted) > (int) config('emola.limits.trans_amount_digits', 5)) {
+        if ($digitCap > 0 && strlen($formatted) > $digitCap) {
             throw new PaymentFailedException(trans('theme.emola_amount_too_long'));
         }
 

@@ -3,7 +3,6 @@
 namespace App\Services\Payments;
 
 use App\Exceptions\PaymentFailedException;
-use App\Services\Emola\EmolaDailyLimit;
 use App\Services\Emola\EmolaOrderPaymentService;
 use App\Services\Emola\EmolaSpec;
 use App\Services\Emola\EmolaWalletDepositService;
@@ -85,13 +84,6 @@ class EmolaPaymentService extends PaymentService
         EmolaSpec::formatTransAmount($this->amount, $context);
         if (! empty($this->meta['payment_base_amount'])) {
             EmolaSpec::formatTransAmount($this->meta['payment_base_amount'], $context);
-        }
-
-        if ($this->request->filled('emola_number')) {
-            EmolaDailyLimit::assertCanPay(
-                (string) $this->request->input('emola_number'),
-                EmolaSpec::parseMeticalAmount($this->amount),
-            );
         }
 
         if (! $this->request->filled('emola_number')) {
