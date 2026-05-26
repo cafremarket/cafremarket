@@ -15,9 +15,10 @@ class TransactionResource extends JsonResource
     public function toArray($request)
     {
         $currencyId = config('system_settings.currency.id');
-        $walletCredit = $this->depositWalletCredit();
-        $paymentTotal = $this->depositPaymentTotal();
-        $platformFee = $this->depositPlatformFee();
+        $showBreakdown = $this->showsDepositPaymentBreakdown();
+        $walletCredit = $showBreakdown ? $this->depositWalletCredit() : null;
+        $paymentTotal = $showBreakdown ? $this->depositPaymentTotal() : null;
+        $platformFee = $showBreakdown ? $this->depositPlatformFee() : 0.0;
 
         return [
             'id' => $this->id,
@@ -40,7 +41,7 @@ class TransactionResource extends JsonResource
                 ? get_formated_currency($platformFee, 2, $currencyId)
                 : null,
             'platform_fee_raw' => $platformFee > 0 ? $platformFee : null,
-            'shows_deposit_breakdown' => $this->showsDepositPaymentBreakdown(),
+            'shows_deposit_breakdown' => $showBreakdown,
         ];
     }
 }

@@ -332,10 +332,14 @@ class Transaction extends Model
 
     public function depositPlatformFee(): float
     {
+        if (! $this->isWalletDeposit()) {
+            return 0.0;
+        }
+
         $fee = $this->getFromMetaData('platform_fee');
 
         if ($fee === '' || $fee === null) {
-            $fee = $this->getFromMetaData('fee');
+            return 0.0;
         }
 
         return max(0, (float) $fee);
@@ -373,6 +377,10 @@ class Transaction extends Model
 
     public function showsDepositPaymentBreakdown(): bool
     {
+        if ($this->depositPlatformFee() <= 0) {
+            return false;
+        }
+
         $credit = $this->depositWalletCredit();
         $paid = $this->depositPaymentTotal();
 
