@@ -137,9 +137,19 @@ final class EmolaResponse
         if ($code !== null) {
             $themeKey = EmolaSpec::businessErrorThemeKey($code);
             if ($themeKey !== null && trans()->has($themeKey)) {
-                return trans($themeKey, [
+                $attempted = EmolaSpec::lastTransAmountMzn();
+                $text = trans($themeKey, [
+                    'amount' => $attempted !== null
+                        ? number_format($attempted, 0, '.', ',')
+                        : '—',
                     'movitel_max' => number_format(EmolaSpec::movitelUssdMaxMzn(), 0, '.', ','),
                 ]);
+
+                if ($message && trim($message) !== '') {
+                    $text .= ' '.trans('theme.emola_gateway_detail', ['detail' => trim($message)]);
+                }
+
+                return $text;
             }
 
             $mapped = EmolaSpec::businessErrorMessage($code);

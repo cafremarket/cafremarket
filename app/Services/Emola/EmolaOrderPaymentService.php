@@ -43,6 +43,8 @@ class EmolaOrderPaymentService
         Log::info('eMola USSD push for order', [
             'order_id' => $order->id,
             'grand_total' => $order->grand_total,
+            'fee_total' => $feeBreakdown['total'],
+            'subscription_fee' => $feeBreakdown['subscription_fee'],
             'trans_amount' => $transAmount,
             'trans_id' => $transId,
             'msisdn' => $msisdn,

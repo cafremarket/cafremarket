@@ -59,6 +59,7 @@ class EmolaPaymentService extends PaymentService
             $baseAmount,
             (string) $this->request->input('emola_number'),
             $this->description ?: null,
+            (int) $this->amount,
         );
 
         $res = $result['response'];
@@ -81,10 +82,7 @@ class EmolaPaymentService extends PaymentService
         }
 
         $context = $this->order ? EmolaSpec::CONTEXT_ORDER : EmolaSpec::CONTEXT_DEPOSIT;
-        EmolaSpec::formatTransAmount($this->amount, $context);
-        if (! empty($this->meta['payment_base_amount'])) {
-            EmolaSpec::formatTransAmount($this->meta['payment_base_amount'], $context);
-        }
+        EmolaSpec::formatTransAmount((int) $this->amount, $context);
 
         if (! $this->request->filled('emola_number')) {
             throw new PaymentFailedException(trans('theme.emola_number_required'));

@@ -59,11 +59,14 @@ class EmolaClient
         string $smsContent = 'Pagamento CafreMarket',
         ?string $language = null,
     ): EmolaResponse {
+        $transAmount = EmolaSpec::transAmountForSoap($amount);
+        EmolaSpec::rememberTransAmountAttempt($transAmount);
+
         return $this->gwOperation(config('emola.wscode.push', 'pushUssdMessage'), [
             'partnerCode' => $this->partnerCode,
             'msisdn' => EmolaSpec::normalizeMsisdn($msisdn),
             'smsContent' => EmolaSpec::sanitizeSmsContent($smsContent),
-            'transAmount' => EmolaSpec::formatTransAmount($amount),
+            'transAmount' => $transAmount,
             'transId' => EmolaSpec::sanitizeTransId($transId),
             'language' => EmolaSpec::sanitizeLanguage($language),
             'refNo' => EmolaSpec::sanitizeRefNo($refNo),
@@ -94,7 +97,7 @@ class EmolaClient
             'partnerCode' => $this->partnerCode,
             'msisdn' => EmolaSpec::normalizeMsisdn((string) Arr::get($input, 'msisdn')),
             'smsContent' => EmolaSpec::sanitizeSmsContent((string) Arr::get($input, 'smsContent', '')),
-            'transAmount' => EmolaSpec::formatTransAmount(Arr::get($input, 'transAmount')),
+            'transAmount' => EmolaSpec::transAmountForSoap(Arr::get($input, 'transAmount')),
             'transId' => EmolaSpec::sanitizeTransId((string) Arr::get($input, 'transId')),
             'key' => $this->key,
         ]);

@@ -14,6 +14,20 @@ final class EmolaSpec
 
     public const CONTEXT_DEPOSIT = 'deposit';
 
+    private static ?int $lastTransAmountMzn = null;
+
+    public static function rememberTransAmountAttempt(int|string $amountMzn): void
+    {
+        self::$lastTransAmountMzn = is_int($amountMzn)
+            ? $amountMzn
+            : (int) preg_replace('/\D/', '', (string) $amountMzn);
+    }
+
+    public static function lastTransAmountMzn(): ?int
+    {
+        return self::$lastTransAmountMzn;
+    }
+
     public static function normalizeMsisdn(string $msisdn): string
     {
         $digits = preg_replace('/\D/', '', $msisdn);
@@ -84,9 +98,22 @@ final class EmolaSpec
         $normalized = str_replace([' ', "\u{00A0}"], '', $normalized);
 
         if ($normalized === '' || ! preg_match('/[\d]/', $normalized)) {
-            throw new PaymentFailedException(trans('theme.emola_code_invalid_amount', [
-                'movitel_max' => number_format(self::movitelUssdMaxMzn(), 0, '.', ','),
-            ]));
+            throw self::invalidAmountException();
+        }
+
+        // Whole meticals only: "1500"
+        if (preg_match('/^\d+$/', $normalized)) {
+            return (int) $normalized;
+        }
+
+        // Decimal from DB/API: "1500.50" (not European thousands)
+        if (preg_match('/^\d+\.\d{1,2}$/', $normalized)) {
+            return max(0, (int) round((float) $normalized));
+        }
+
+        // Mis-formatted whole amount: "500.000" → 500 MZN (not five hundred thousand)
+        if (preg_match('/^(\d+)\.0+$/', $normalized, $m)) {
+            return (int) $m[1];
         }
 
         // European: 1.234,56 or 1.234 (thousands with dot)
@@ -94,7 +121,6 @@ final class EmolaSpec
             $normalized = str_replace('.', '', $normalized);
             $normalized = str_replace(',', '.', $normalized);
         } elseif (preg_match('/^\d{1,3}(,\d{3})+(\.\d{1,2})?$/', $normalized)) {
-            // US thousands: 1,234.56
             $normalized = str_replace(',', '', $normalized);
         } elseif (str_contains($normalized, ',') && ! str_contains($normalized, '.')) {
             $normalized = str_replace(',', '.', $normalized);
@@ -103,12 +129,20 @@ final class EmolaSpec
         }
 
         if (! is_numeric($normalized)) {
-            throw new PaymentFailedException(trans('theme.emola_code_invalid_amount', [
-                'movitel_max' => number_format(self::movitelUssdMaxMzn(), 0, '.', ','),
-            ]));
+            throw self::invalidAmountException();
         }
 
         return max(0, (int) round((float) $normalized));
+    }
+
+    public static function invalidAmountException(?int $amountMzn = null): PaymentFailedException
+    {
+        return new PaymentFailedException(trans('theme.emola_code_invalid_amount', [
+            'amount' => $amountMzn !== null
+                ? number_format($amountMzn, 0, '.', ',')
+                : '—',
+            'movitel_max' => number_format(self::movitelUssdMaxMzn(), 0, '.', ','),
+        ]));
     }
 
     /** 0 means no application-side maximum. */
@@ -167,6 +201,26 @@ final class EmolaSpec
         }
 
         return (string) $value;
+    }
+
+    /** USSD transAmount param — already validated digits or raw value to parse. */
+    public static function transAmountForSoap(float|int|string $amount, string $context = self::CONTEXT_ORDER): string
+    {
+        $trimmed = trim((string) $amount);
+
+        if (preg_match('/^\d+$/', $trimmed)) {
+            $value = (int) $trimmed;
+            $movitelMax = self::movitelUssdMaxMzn();
+            $min = (int) config('emola.limits.trans_amount_min', 1);
+
+            if ($value < $min || $value > $movitelMax) {
+                return self::formatTransAmount($value, $context);
+            }
+
+            return $trimmed;
+        }
+
+        return self::formatTransAmount($amount, $context);
     }
 
     public static function transAmountFromOrder(Order $order): string

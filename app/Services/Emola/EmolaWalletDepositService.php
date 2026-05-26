@@ -31,12 +31,25 @@ class EmolaWalletDepositService
      *
      * @return array{transId: string, refNo: string, response: EmolaResponse}
      */
-    public function pushDeposit(object $payee, float|int|string $amount, string $msisdn, ?string $smsContent = null): array
-    {
+    public function pushDeposit(
+        object $payee,
+        float|int|string $amount,
+        string $msisdn,
+        ?string $smsContent = null,
+        ?int $chargeMzn = null,
+    ): array {
         $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
         $baseMzn = EmolaSpec::parseMeticalAmount($amount);
-        $feeBreakdown = \App\Services\PlatformGatewayFeeService::paymentFee('emola', $baseMzn);
-        $transAmount = EmolaSpec::formatTransAmount($feeBreakdown['total'], EmolaSpec::CONTEXT_DEPOSIT);
+
+        if ($chargeMzn !== null) {
+            $transAmount = EmolaSpec::formatTransAmount($chargeMzn, EmolaSpec::CONTEXT_DEPOSIT);
+            $platformFee = max(0.0, (float) ((int) $transAmount - $baseMzn));
+        } else {
+            $feeBreakdown = \App\Services\PlatformGatewayFeeService::paymentFee('emola', $baseMzn);
+            $transAmount = EmolaSpec::formatTransAmount($feeBreakdown['total'], EmolaSpec::CONTEXT_DEPOSIT);
+            $platformFee = (float) $feeBreakdown['fee'];
+        }
+
         $amountMzn = $baseMzn;
         $transId = $this->client->generateTransId();
         $refNo = self::refNoForPayee($payee);
@@ -63,7 +76,14 @@ class EmolaWalletDepositService
 
         if ($res->isUssdPushAccepted()) {
             EmolaDailyLimit::recordAcceptedPush($msisdn, (int) $transAmount);
-            $this->rememberPendingDeposit($transId, $payee, (float) $amountMzn, $refNo, (float) $feeBreakdown['fee']);
+            $this->rememberPendingDeposit(
+                $transId,
+                $payee,
+                (float) $amountMzn,
+                $refNo,
+                $platformFee,
+                (int) $transAmount,
+            );
         }
 
         return [
@@ -223,7 +243,11 @@ class EmolaWalletDepositService
 
         $this->forgetPendingDeposit($transId);
 
-        $result = $this->pushDeposit($payee, $deposit['amount'], $msisdn);
+        $chargeMzn = isset($deposit['charge_amount'])
+            ? (int) round((float) $deposit['charge_amount'])
+            : null;
+
+        $result = $this->pushDeposit($payee, $deposit['amount'], $msisdn, null, $chargeMzn);
 
         if (! $result['response']->isUssdPushAccepted()) {
             throw new PaymentFailedException($result['response']->failureMessage());
@@ -268,8 +292,14 @@ class EmolaWalletDepositService
         Cache::forget('emola_wallet_status_check_'.$transId);
     }
 
-    private function rememberPendingDeposit(string $transId, object $payee, float $amount, string $refNo, float $platformFee = 0): void
-    {
+    private function rememberPendingDeposit(
+        string $transId,
+        object $payee,
+        float $amount,
+        string $refNo,
+        float $platformFee = 0,
+        ?int $chargeMzn = null,
+    ): void {
         $ttl = now()->addHours(24);
 
         Cache::put(self::CACHE_KEY_WALLET_DEPOSIT.$transId, [
@@ -277,7 +307,7 @@ class EmolaWalletDepositService
             'holder_id' => $payee->id,
             'amount' => $amount,
             'platform_fee' => $platformFee,
-            'charge_amount' => $amount + $platformFee,
+            'charge_amount' => $chargeMzn ?? (int) round($amount + $platformFee),
             'ref_no' => $refNo,
         ], $ttl);
 

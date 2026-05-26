@@ -49,6 +49,7 @@ class DepositRequest extends Request
 
         if ($this->input('payment_method') === 'emola') {
             $rules['emola_number'] = ['required', 'string', 'regex:/^(86|87)\d{7}$/'];
+            $rules['amount'] = 'required|integer|min:1';
         }
 
         return $rules;

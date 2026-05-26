@@ -118,26 +118,42 @@ class PaymentService implements PaymentServiceContract
     }
 
     /**
-     * Set charge amount including transaction fee for M-Pesa / eMola (gateway + subscription plan).
+     * Set charge amount for M-Pesa / eMola.
+     * Orders: subscription plan transaction fee. Wallet top-up: gateway fee only.
      */
     public function setAmountWithPlatformFee(float|int|string $baseAmount, ?string $paymentMethod = null): self
     {
-        $method = $paymentMethod
+        $method = strtolower(trim((string) (
+            $paymentMethod
             ?? $this->request?->input('payment_method')
             ?? (optional($this->order)->paymentMethod ? $this->order->paymentMethod->code : null)
-            ?? '';
+            ?? ''
+        )));
 
-        $shop = optional($this->order)->shop;
-        $breakdown = get_customer_transaction_fee((string) $method, $baseAmount, $shop);
+        if ($this->order) {
+            $breakdown = get_customer_transaction_fee($method, $baseAmount, $this->order->shop);
+            $subscriptionFee = (float) $breakdown['subscription_fee'];
+        } else {
+            $gateway = get_platform_payment_fee($method, $baseAmount);
+            $breakdown = [
+                'base' => $gateway['base'],
+                'subscription_fee' => 0.0,
+                'fee' => $gateway['fee'],
+                'total' => $gateway['total'],
+                'enabled' => $gateway['enabled'],
+            ];
+            $subscriptionFee = 0.0;
+        }
 
         $this->fee = $breakdown['fee'];
-        $this->amount = in_array(strtolower((string) $method), ['mpesa', 'emola'], true)
+        $this->amount = in_array($method, ['mpesa', 'emola'], true)
             ? (int) round($breakdown['total'])
             : $breakdown['total'];
 
         $this->meta = array_merge($this->meta ?? [], [
-            'subscription_transaction_fee' => $breakdown['subscription_fee'],
+            'subscription_transaction_fee' => $subscriptionFee,
             'customer_transaction_fee' => $breakdown['fee'],
+            'platform_payment_fee' => $breakdown['fee'],
             'payment_base_amount' => $breakdown['base'],
         ]);
 
