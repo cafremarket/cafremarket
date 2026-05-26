@@ -86,59 +86,26 @@
 </div>
 
 
-<h4 style="width:100%; text-align:center; background-color:lightgrey;">Delivered Products</h4>
+<h4 style="width:100%; text-align:center; background-color:lightgrey;">{{ trans('app.product') }}</h4>
 <table>
   <thead>
     <tr>
       <th>{{ trans('app.product') }}</th>
       <th>{{ trans('app.quantity') }}</th>
-      <th>{{ trans('app.price') }}</th>
     </tr>
   </thead>
   <tbody>
-    @php
-      $total_price = 0;
-    @endphp
     @foreach ($order->inventories as $item)
-      @php
-        $total_price += $item->pivot->unit_price * $item->pivot->quantity;
-      @endphp
       <tr>
         <td>{{ $item->title }}</td>
         <td>{{ $item->pivot->quantity }}</td>
-        <td>{{ get_formated_currency($item->pivot->unit_price, 2) }}</td>
       </tr>
     @endforeach
-    <tr>
-      <td colspan="2" style="text-align: right;">{{ trans('app.total') }}</td>
-      <td>{{ get_formated_currency($total_price, 2) }}</td>
-    </tr>
   </tbody>
 </table>
-
-
-<h4 style="width:100%; text-align:center; background-color:lightgrey;">Cost Distribution</h4>
-<table class="table">
-  <tbody>
-    <tr>
-      <td>{{ trans('app.total') }}</td>
-      <td>{{ get_formated_currency($order->total, 2) }}</td>
-    </tr>
-    <tr>
-      <td>{{ trans('app.tax') }}</td>
-      <td>{{ get_formated_currency($order->taxes, 2) }}</td>
-    </tr>
-    <tr>
-      <td>{{ trans('app.shipping') }}</td>
-      <td>{{ get_formated_currency($order->shipping, 2) }}</td>
-    </tr>
-    <tr>
-      <td style="border: 2px solid black;"><b>{{ trans('app.grand_total') }}</b></td>
-      <td style="border: 2px solid black;"><b>{{ get_formated_currency($order->grand_total, 2) }}</b></td>
-    </tr>
-    <tr>
-      <td>{{ trans('app.shipping_weight') }}</td>
-      <td>{{ number_format((float) $order->shipping_weight, 2, '.', '') . config('system_settings.weight_unit') }}</td>
-    </tr>
-  </tbody>
-</table>
+@if ((float) $order->shipping_weight > 0)
+  <p style="margin-top: 12px;">
+    <strong>{{ trans('app.shipping_weight') }}:</strong>
+    {{ number_format((float) $order->shipping_weight, 2, '.', '') . config('system_settings.weight_unit') }}
+  </p>
+@endif
