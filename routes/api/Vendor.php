@@ -30,6 +30,9 @@ use App\Http\Controllers\Api\Vendor\SupplierController;
 use App\Http\Controllers\Api\Vendor\TaxController;
 use App\Http\Controllers\Api\Vendor\UserController;
 use App\Http\Controllers\Api\Vendor\WarehouseController;
+use App\Http\Controllers\Api\Vendor\WalletController;
+use App\Http\Controllers\Api\Vendor\WalletDepositController;
+use App\Http\Controllers\Api\Vendor\WalletWithdrawController;
 use App\Http\Controllers\FormDataController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -303,6 +306,17 @@ Route::prefix('vendor')->group(function () {
         // Messages
 
         // Wallet  (Addon)
+        Route::get('wallet', [WalletController::class, 'index']);
+        Route::get('wallet/transactions', [WalletController::class, 'transactions']);
+        Route::get('wallet/transaction/{transaction}/invoice', [WalletController::class, 'invoice']);
+        Route::get('wallet/transaction/{transaction}/payout-proof', [WalletController::class, 'payoutProof']);
+        Route::get('wallet/get_payment_methods', [WalletDepositController::class, 'getPaymentMethods']);
+        Route::get('wallet/deposit/platform-fee', [WalletDepositController::class, 'platformFeePreview']);
+        Route::post('wallet/deposit', [WalletDepositController::class, 'deposit']);
+        Route::get('wallet/deposit/mpesa/status', [WalletDepositController::class, 'mpesaDepositStatus']);
+        Route::get('wallet/deposit/emola/status', [WalletDepositController::class, 'emolaDepositStatus']);
+        Route::post('wallet/deposit/emola/resend', [WalletDepositController::class, 'emolaResendDeposit']);
+        Route::post('wallet/withdraw', [WalletWithdrawController::class, 'withdraw']);
 
         // Dashboard
         Route::get('statistics/basic', [DashboardController::class, 'basicStatistics']);

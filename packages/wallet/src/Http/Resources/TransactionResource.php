@@ -19,6 +19,8 @@ class TransactionResource extends JsonResource
         $walletCredit = $showBreakdown ? $this->depositWalletCredit() : null;
         $paymentTotal = $showBreakdown ? $this->depositPaymentTotal() : null;
         $platformFee = $showBreakdown ? $this->depositPlatformFee() : 0.0;
+        $marketplaceCommission = (float) ($this->getFromMetaData('marketplace_commission') ?: 0);
+        $grossSaleAmount = (float) ($this->getFromMetaData('gross_sale_amount') ?: 0);
 
         return [
             'id' => $this->id,
@@ -42,6 +44,14 @@ class TransactionResource extends JsonResource
                 : null,
             'platform_fee_raw' => $platformFee > 0 ? $platformFee : null,
             'shows_deposit_breakdown' => $showBreakdown,
+            'marketplace_commission' => $marketplaceCommission > 0
+                ? get_formated_currency($marketplaceCommission, 2, $currencyId)
+                : null,
+            'marketplace_commission_raw' => $marketplaceCommission > 0 ? $marketplaceCommission : null,
+            'gross_sale_amount' => $grossSaleAmount > 0
+                ? get_formated_currency($grossSaleAmount, 2, $currencyId)
+                : null,
+            'gross_sale_amount_raw' => $grossSaleAmount > 0 ? $grossSaleAmount : null,
         ];
     }
 }
