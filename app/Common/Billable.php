@@ -66,11 +66,6 @@ trait Billable
      */
     public function hasActiveSubscription()
     {
-        return $this->currentSubscription &&
-            ($this->currentSubscription->ends_at === null ||
-                $this->currentSubscription->ends_at->isFuture() ||
-                $this->currentSubscription->trial_ends_at !== null &&
-                $this->currentSubscription->trial_ends_at->isFuture()
-            );
+        return $this->currentSubscription && $this->currentSubscription->valid();
     }
 }

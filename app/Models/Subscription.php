@@ -88,9 +88,9 @@ class Subscription extends CashierSubscription
                 return true;
             }
 
-            // Wallet billing uses ends_at as the paid-through date (not Stripe cancel grace).
+            // Paid wallet subscriptions always set ends_at; null means trial-only (handled above).
             if ($this->ends_at === null) {
-                return true;
+                return false;
             }
 
             return $this->ends_at->isFuture();

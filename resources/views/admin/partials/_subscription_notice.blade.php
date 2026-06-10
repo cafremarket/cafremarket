@@ -3,13 +3,13 @@
     $subscription = Auth::user()->getCurrentPlan();
   @endphp
 
-  @if (Auth::user()->isOnTrial())
+  @if ($subscription && $subscription->onTrial())
     <div class="alert alert-warning alert-dismissible">
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
       <strong><i class="icon fa fa-info-circle"></i>{{ trans('app.notice') }}</strong>
       {{ trans('messages.trial_ends_at', ['ends' => number_format(\Carbon\Carbon::now()->diffInDays($subscription->trial_ends_at), 2)]) }}
     </div>
-  @elseif(Auth::user()->isOnGracePeriod())
+  @elseif($subscription && Auth::user()->isOnGracePeriod())
     <div class="alert alert-danger alert-dismissible">
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
       <strong><i class="icon fa fa-info-circle"></i>{{ trans('app.notice') }}</strong>
@@ -21,11 +21,11 @@
         </span>
       @endif
     </div>
-  @elseif($subscription && $subscription->provider == 'wallet' && $subscription->active())
+  @elseif($subscription && $subscription->provider == 'wallet' && $subscription->active() && $subscription->ends_at)
     <div class="alert alert-success alert-dismissible">
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
       <strong><i class="icon fa fa-info-circle"></i>{{ trans('app.notice') }}</strong>
-      {!! trans('messages.next_billing_date', ['date' => $subscription->ends_at->toRfc7231String()]) !!}
+      {!! trans('messages.next_billing_date', ['date' => $subscription->ends_at->toDayDateTimeString()]) !!}
 
       @if (Auth::user()->isMerchant())
         <span class="pull-right">
