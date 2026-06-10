@@ -128,7 +128,7 @@
 
         {{-- Listings Notice --}}
         @if (Auth::user()->isFromMerchant())
-          @if (Auth::user()->hasBillingInfo() || !is_billing_info_required())
+          @if (Auth::user()->hasBillingInfo() || !requires_stripe_card_for_subscription())
             @unless (Auth::user()->isVerified())
               <div class="alert alert-info alert-dismissible no-print">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

@@ -37,6 +37,7 @@ class EmolaWalletDepositService
         string $msisdn,
         ?string $smsContent = null,
         ?int $chargeMzn = null,
+        array $extra = [],
     ): array {
         $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
         $baseMzn = EmolaSpec::parseMeticalAmount($amount);
@@ -89,6 +90,7 @@ class EmolaWalletDepositService
                 $refNo,
                 $platformFee,
                 (int) $transAmount,
+                $extra,
             );
         }
 
@@ -197,6 +199,11 @@ class EmolaWalletDepositService
         $trans = $holder->deposit($deposit['amount'], $meta, true);
         SendNotificationJob::dispatch($trans, Deposit::class);
         Cache::forget(self::CACHE_KEY_WALLET_DEPOSIT.$transId);
+
+        if (! empty($deposit['subscription_plan_id']) && $holder instanceof Shop) {
+            app(\App\Services\Subscription\SubscriptionPaymentCompletionService::class)
+                ->completeAfterDeposit($holder, (string) $deposit['subscription_plan_id']);
+        }
 
         return true;
     }
@@ -308,17 +315,18 @@ class EmolaWalletDepositService
         string $refNo,
         float $platformFee = 0,
         ?int $chargeMzn = null,
+        array $extra = [],
     ): void {
         $ttl = now()->addHours(24);
 
-        Cache::put(self::CACHE_KEY_WALLET_DEPOSIT.$transId, [
+        Cache::put(self::CACHE_KEY_WALLET_DEPOSIT.$transId, array_merge([
             'holder_type' => $payee::class,
             'holder_id' => $payee->id,
             'amount' => $amount,
             'platform_fee' => $platformFee,
             'charge_amount' => $chargeMzn ?? (int) round($amount + $platformFee),
             'ref_no' => $refNo,
-        ], $ttl);
+        ], $extra), $ttl);
 
         Cache::put(self::CACHE_KEY_WALLET_REF.$refNo, $transId, $ttl);
     }

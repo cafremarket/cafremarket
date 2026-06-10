@@ -54,12 +54,18 @@ class EmolaPaymentService extends PaymentService
     private function chargeWalletDeposit()
     {
         $baseAmount = $this->meta['payment_base_amount'] ?? $this->amount;
+        $extra = [];
+        if ($this->request->filled('subscription_plan_id')) {
+            $extra['subscription_plan_id'] = (string) $this->request->input('subscription_plan_id');
+        }
+
         $result = $this->emolaWallet->pushDeposit(
             $this->payee,
             $baseAmount,
             (string) $this->request->input('emola_number'),
             $this->description ?: null,
             (int) $this->amount,
+            $extra,
         );
 
         $res = $result['response'];

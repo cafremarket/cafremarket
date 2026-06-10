@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\Vendor\PackageController;
 use App\Http\Controllers\Api\Vendor\ProductController;
 use App\Http\Controllers\Api\Vendor\RefundController;
 use App\Http\Controllers\Api\Vendor\RoleController;
+use App\Http\Controllers\Api\Vendor\SubscriptionController;
 use App\Http\Controllers\Api\Vendor\SupplierController;
 use App\Http\Controllers\Api\Vendor\TaxController;
 use App\Http\Controllers\Api\Vendor\UserController;
@@ -304,6 +305,13 @@ Route::prefix('vendor')->group(function () {
         Route::get('notifications', [NotificationController::class, 'getNotifications']);
 
         // Messages
+
+        // Subscription
+        Route::get('subscription', [SubscriptionController::class, 'index']);
+        Route::get('subscription/payment/status', [SubscriptionController::class, 'paymentStatus']);
+        Route::post('subscription/{plan}/subscribe', [SubscriptionController::class, 'subscribe']);
+        Route::post('subscription/cancel', [SubscriptionController::class, 'cancel']);
+        Route::post('subscription/resume', [SubscriptionController::class, 'resume']);
 
         // Wallet  (Addon)
         Route::get('wallet', [WalletController::class, 'index']);

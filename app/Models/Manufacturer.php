@@ -126,4 +126,21 @@ class Manufacturer extends BaseModel
     {
         return ['admin.catalog.manufacturer.edit'];
     }
+
+    /**
+     * Scope a query to search manufacturers by name, slug, or contact info.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeVendorSearch(Builder $query, string $term)
+    {
+        $like = '%'.$term.'%';
+
+        return $query->where(function ($q) use ($like) {
+            $q->where('name', 'like', $like)
+                ->orWhere('slug', 'like', $like)
+                ->orWhere('email', 'like', $like)
+                ->orWhere('phone', 'like', $like);
+        });
+    }
 }

@@ -283,4 +283,24 @@ class Product extends Inspectable
     {
         return $query->where('downloadable', 1);
     }
+
+    /**
+     * Scope a query to search products by name, slug, brand, or identifiers.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeVendorSearch($query, string $term)
+    {
+        $like = '%'.$term.'%';
+
+        return $query->where(function ($q) use ($like) {
+            $q->where('name', 'like', $like)
+                ->orWhere('slug', 'like', $like)
+                ->orWhere('brand', 'like', $like)
+                ->orWhere('model_number', 'like', $like)
+                ->orWhere('mpn', 'like', $like)
+                ->orWhere('gtin', 'like', $like);
+        });
+    }
 }

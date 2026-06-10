@@ -70,13 +70,19 @@ class MPesaPaymentService extends PaymentService
             $payee = $this->payee;
             if ($payee) {
                 $baseAmount = $this->meta['payment_base_amount'] ?? $this->amount;
-                Cache::put(self::CACHE_KEY_WALLET_DEPOSIT.$refId, [
+                $pending = [
                     'holder_type' => get_class($payee),
                     'holder_id' => $payee->id,
                     'amount' => $baseAmount,
                     'platform_fee' => (float) ($this->meta['platform_payment_fee'] ?? 0),
                     'charge_amount' => (float) $this->amount,
-                ], now()->addHours(24));
+                ];
+
+                if ($this->request->filled('subscription_plan_id')) {
+                    $pending['subscription_plan_id'] = (string) $this->request->input('subscription_plan_id');
+                }
+
+                Cache::put(self::CACHE_KEY_WALLET_DEPOSIT.$refId, $pending, now()->addHours(24));
 
                 return redirect()->to(url('wallet/deposit/mpesa/complete?ref=' . urlencode($refId)));
             }

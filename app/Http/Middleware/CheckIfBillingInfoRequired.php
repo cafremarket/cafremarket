@@ -15,7 +15,7 @@ class CheckIfBillingInfoRequired
     public function handle($request, Closure $next)
     {
         if (
-            ! is_billing_info_required() ||
+            ! requires_stripe_card_for_subscription() ||
             $request->user()->isFromPlatform() ||
             $request->user()->hasBillingInfo() ||
             ($request->user()->shop->stripe_id && $request->user()->shop->pm_last_four)
@@ -25,6 +25,6 @@ class CheckIfBillingInfoRequired
 
         return $request->ajax() || $request->wantsJson() ?
             response(trans('messages.no_card_added'), 402)
-            : redirect()->route('admin.account.billing')->with('success', trans('messages.no_card_added'));
+            : redirect()->route('admin.account.billing')->with('error', trans('messages.no_card_added'));
     }
 }

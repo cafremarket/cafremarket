@@ -17,6 +17,13 @@
         }
       };
 
+    const cardElementContainer = document.getElementById('card-element');
+    const cardButton = document.getElementById('card-button');
+
+    if (!cardElementContainer || !cardButton) {
+      return;
+    }
+
     const stripe = Stripe("{{ config('services.stripe.key') }}");
     const elements = stripe.elements();
     const cardElement = elements.create('card', { style: style });
@@ -24,7 +31,6 @@
     cardElement.mount('#card-element');
 
     const cardHolderName = document.getElementById('card-holder-name');
-    const cardButton = document.getElementById('card-button');
     const clientSecret = cardButton.dataset.secret;
 
     cardButton.addEventListener('click', async (e) => {

@@ -112,6 +112,76 @@ if (! function_exists('is_billing_info_required')) {
     }
 }
 
+if (! function_exists('requires_stripe_card_for_subscription')) {
+    /**
+     * Whether merchants must add a Stripe card before subscribing.
+     */
+    function requires_stripe_card_for_subscription()
+    {
+        return is_billing_info_required()
+            && ! \App\Models\SystemConfig::isBillingThroughWallet()
+            && \App\Models\SystemConfig::isPaymentConfigured('stripe');
+    }
+}
+
+if (! function_exists('get_subscription_payment_methods')) {
+    /**
+     * Payment methods allowed for vendor subscription billing (wallet balance, M-Pesa, eMola).
+     *
+     * @return array<int, array{code: string, name: string}>
+     */
+    function get_subscription_payment_methods(): array
+    {
+        $allowed = ['wallet', 'mpesa', 'emola'];
+        $methods = [
+            [
+                'code' => 'wallet',
+                'name' => trans('messages.subscription_pay_wallet'),
+            ],
+        ];
+
+        $walletMethodIds = get_from_option_table('wallet_payment_methods', []);
+        $configured = \App\Models\PaymentMethod::find($walletMethodIds);
+
+        foreach ($configured as $paymentMethod) {
+            if (! in_array($paymentMethod->code, $allowed, true)) {
+                continue;
+            }
+
+            if (! \App\Models\SystemConfig::isPaymentConfigured($paymentMethod->code)) {
+                continue;
+            }
+
+            $methods[] = [
+                'code' => $paymentMethod->code,
+                'name' => $paymentMethod->name,
+            ];
+        }
+
+        return $methods;
+    }
+}
+
+if (! function_exists('subscription_charges_immediately')) {
+    /**
+     * Whether the shop must pay the plan fee now (no active trial).
+     */
+    function subscription_charges_immediately(\App\Models\User $merchant, \App\Models\SubscriptionPlan $plan): bool
+    {
+        $shop = $merchant->shop;
+
+        if ($shop->onGenericTrial() && $shop->trial_ends_at && now()->lt($shop->trial_ends_at)) {
+            return false;
+        }
+
+        if ((bool) config('system_settings.trial_days')) {
+            return false;
+        }
+
+        return (float) $plan->cost > 0;
+    }
+}
+
 if (! function_exists('get_currency_symbol')) {
     function get_currency_symbol($currency_id = null)
     {

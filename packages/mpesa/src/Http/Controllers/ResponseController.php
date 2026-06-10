@@ -110,5 +110,10 @@ class ResponseController extends Controller
         SendNotificationJob::dispatch($trans, Deposit::class);
 
         Cache::forget($cacheKey);
+
+        if (! empty($data['subscription_plan_id']) && $holder instanceof \App\Models\Shop) {
+            app(\App\Services\Subscription\SubscriptionPaymentCompletionService::class)
+                ->completeAfterDeposit($holder, (string) $data['subscription_plan_id']);
+        }
     }
 }

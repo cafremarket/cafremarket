@@ -34,12 +34,20 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $filter = $request->get('filter');
+        $search = trim((string) $request->get('q', ''));
 
         if ($filter == 'trash') {
-            $products = $this->product->trashonly();
+            $products = Product::mine()->onlyTrashed()
+                ->with('featureImage', 'image', 'categories');
         } else {
-            $products = Product::mine()->with('featureImage', 'image', 'categories')->paginate();
+            $products = Product::mine()->with('featureImage', 'image', 'categories');
         }
+
+        if ($search !== '') {
+            $products = $products->vendorSearch($search);
+        }
+
+        $products = $products->paginate();
 
         return ProductLightResource::collection($products);
     }

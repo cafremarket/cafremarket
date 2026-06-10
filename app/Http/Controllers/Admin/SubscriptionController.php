@@ -9,6 +9,7 @@ use App\Jobs\SubscribeShopToNewPlan;
 use App\Models\Shop;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Services\Subscription\SubscriptionMobilePaymentService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,40 +42,54 @@ class SubscriptionController extends Controller
         }
 
         $merchant = $merchant ? User::findOrFail($merchant) : Auth::user();
+        $paymentMethod = (string) $request->input('payment_method', 'wallet');
 
-        if (is_billing_info_required() && ! $merchant->hasBillingToken()) {
+        if (requires_stripe_card_for_subscription() && ! $merchant->hasBillingToken()) {
             return redirect()->route('admin.account.billing')
                 ->with('error', trans('messages.no_card_added'));
         }
 
-        // create the subscription
         try {
             $subscription = SubscriptionPlan::findOrFail($plan);
-
-            // If the merchant already has any subscription then just swap to new plan
             $currentPlan = $merchant->getCurrentPlan();
 
-            if ($currentPlan) {
-                if (! $this->validateSubscriptionSwap($subscription)) {
-                    $msg = trans('messages.using_more_resource', ['plan' => $subscription->name]);
+            if ($currentPlan && ! $this->validateSubscriptionSwap($subscription)) {
+                return redirect()->route('admin.account.billing')->with(
+                    'error',
+                    trans('messages.using_more_resource', ['plan' => $subscription->name])
+                );
+            }
 
-                    return redirect()->route('admin.account.billing')->with('error', $msg);
+            if (
+                in_array($paymentMethod, ['mpesa', 'emola'], true)
+                && subscription_charges_immediately($merchant, $subscription)
+            ) {
+                $pending = app(SubscriptionMobilePaymentService::class)
+                    ->initiate($merchant, $subscription, $paymentMethod, $request);
+
+                if ($pending && ! empty($pending['ref'])) {
+                    $path = $paymentMethod === 'emola'
+                        ? 'wallet/deposit/emola/complete'
+                        : 'wallet/deposit/mpesa/complete';
+
+                    return redirect()->to(url($path.'?ref='.urlencode($pending['ref'])));
                 }
 
-                $currentPlan->swap($plan)->update(['type' => $subscription->name]);
+                return redirect()->route('admin.account.billing')
+                    ->with('error', trans('messages.subscription_payment_failed'));
+            }
 
-                $merchant->shop->forceFill([
-                    'current_billing_plan' => $plan,
-                ])->save();
+            if ($currentPlan) {
+                $currentPlan->swap($plan)->update(['type' => $subscription->name]);
+                $merchant->shop->forceFill(['current_billing_plan' => $plan])->save();
             } else {
-                // Subscribe the merchant to the given plan
                 SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
             }
         } catch (\Exception $e) {
             Log::error('Subscription Failed: '.$e->getMessage());
 
             return redirect()->route('admin.account.billing')
-                ->with('error', trans('messages.subscription_error'));
+                ->with('error', $e->getMessage() ?: trans('messages.subscription_error'));
         }
 
         return redirect()->route('admin.account.billing')

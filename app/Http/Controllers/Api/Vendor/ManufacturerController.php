@@ -32,12 +32,19 @@ class ManufacturerController extends Controller
     public function index(Request $request)
     {
         $filter = $request->get('filter');
+        $search = trim((string) $request->get('q', ''));
 
         if ($filter == 'trash') {
-            $manufacturers = $this->manufacturer->trashOnly();
+            $manufacturers = Manufacturer::mine()->onlyTrashed()->with('logoImage');
         } else {
-            $manufacturers = Manufacturer::mine()->with('logoImage')->paginate();
+            $manufacturers = Manufacturer::mine()->with('logoImage');
         }
+
+        if ($search !== '') {
+            $manufacturers = $manufacturers->vendorSearch($search);
+        }
+
+        $manufacturers = $manufacturers->paginate();
 
         return ManufacturerLightResource::collection($manufacturers);
     }
