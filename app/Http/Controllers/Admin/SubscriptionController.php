@@ -98,6 +98,8 @@ class SubscriptionController extends Controller
 
             if (SystemConfig::isBillingThroughWallet()) {
                 app(WalletSubscriptionService::class)->activate($merchant, $plan);
+                $merchant->unsetRelation('shop');
+                $merchant->unsetRelation('owns');
             } elseif ($currentPlan) {
                 $currentPlan->swap($plan);
 
@@ -113,17 +115,20 @@ class SubscriptionController extends Controller
                 $merchant->shop->unsetRelation('currentSubscription');
             }
 
-            $merchant->unsetRelation('shop');
-            $merchant->load('shop');
-
-            if (! $merchant->isSubscribed()) {
-                throw new \RuntimeException(trans('messages.subscription_error'));
-            }
         } catch (\Throwable $e) {
-            Log::error('Subscription Failed: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Subscription Failed: '.$e->getMessage(), [
+                'exception' => $e,
+                'merchant_id' => $merchant->id ?? null,
+                'shop_id' => optional($merchant->merchantShop())->id,
+                'plan' => $plan,
+            ]);
+
+            $message = $e instanceof \Incevio\Package\Wallet\Exceptions\InsufficientFunds
+                ? trans('packages.wallet.insufficient_funds')
+                : ($e->getMessage() ?: trans('messages.subscription_error'));
 
             return redirect()->route('admin.account.billing')
-                ->with('error', $e->getMessage() ?: trans('messages.subscription_error'));
+                ->with('error', $message);
         }
 
         return redirect()->route('admin.account.billing')

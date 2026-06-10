@@ -274,7 +274,33 @@ class User extends Authenticatable
      */
     public function merchantId()
     {
-        return $this->shop_id;
+        return $this->shop_id ?: optional($this->merchantShop())->id;
+    }
+
+    /**
+     * Resolve the merchant's shop (shop_id or owned shop).
+     */
+    public function merchantShop(): ?Shop
+    {
+        if ($this->shop_id) {
+            $shop = $this->relationLoaded('shop') ? $this->shop : $this->shop()->first();
+
+            if ($shop && $shop->getKey()) {
+                return $shop;
+            }
+        }
+
+        $owned = $this->relationLoaded('owns') ? $this->owns : $this->owns()->first();
+
+        if ($owned && $owned->getKey()) {
+            if (! $this->shop_id) {
+                $this->forceFill(['shop_id' => $owned->getKey()])->saveQuietly();
+            }
+
+            return $owned;
+        }
+
+        return null;
     }
 
     /**
@@ -284,11 +310,13 @@ class User extends Authenticatable
      */
     public function getCurrentPlan()
     {
-        if (! $this->merchantId()) {
+        $shop = $this->merchantShop();
+
+        if (! $shop) {
             return null;
         }
 
-        return $this->shop->activeSubscription();
+        return $shop->activeSubscription();
     }
 
     /**
@@ -378,7 +406,9 @@ class User extends Authenticatable
      */
     public function hasExpiredPlan()
     {
-        if (! $this->merchantId()) {
+        $shop = $this->merchantShop();
+
+        if (! $shop) {
             return false;
         }
 
@@ -386,7 +416,7 @@ class User extends Authenticatable
             return false;
         }
 
-        $subscription = $this->shop->currentSubscription;
+        $subscription = $shop->currentSubscription;
 
         return $subscription && $subscription->ends_at && $subscription->ends_at->isPast();
     }
@@ -420,7 +450,9 @@ class User extends Authenticatable
      */
     public function isOnGenericTrial()
     {
-        return $this->shop->onGenericTrial();
+        $shop = $this->merchantShop();
+
+        return $shop ? $shop->onGenericTrial() : false;
     }
 
     /**

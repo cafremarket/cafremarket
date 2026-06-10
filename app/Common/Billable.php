@@ -28,10 +28,16 @@ trait Billable
      */
     public function activeSubscription()
     {
+        $walletBilling = SystemConfig::isBillingThroughWallet();
+
         return $this->subscriptions()
             ->orderByDesc('id')
             ->get()
-            ->first(function (Subscription $subscription) {
+            ->first(function (Subscription $subscription) use ($walletBilling) {
+                if ($walletBilling && $subscription->stripe_id) {
+                    return false;
+                }
+
                 return $subscription->valid();
             });
     }

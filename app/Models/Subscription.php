@@ -7,6 +7,13 @@ use Laravel\Cashier\Subscription as CashierSubscription;
 class Subscription extends CashierSubscription
 {
     /**
+     * Wallet subscriptions do not use Cashier subscription items.
+     *
+     * @var array
+     */
+    protected $with = [];
+
+    /**
      * The accessors to append to the model's array form.
      *
      * @var array
