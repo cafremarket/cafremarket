@@ -1594,7 +1594,7 @@ return [
     'deny' => 'Negar',
     'available_packages' => 'Plugins disponíveis',
     'package' => 'Plugin',
-    // 'wallet' => 'Carteira',
+    'wallet' => 'Carteira',
     'withdrawal_requests' => 'Pedidos de levantamento',
     'select_payment_option' => 'Selecionar opção de pagamento',
     'credit_card' => 'Cartão de crédito',

@@ -214,44 +214,53 @@
     </div>
   </div>
 
-  <script>
-    (function () {
-      var selectedPlan = null;
-      var selectedMethod = null;
+  @push('script')
+    <script>
+      $(document).ready(function () {
+        var selectedPlan = null;
+        var selectedMethod = null;
+        var subscribeBaseUrl = @json(url('admin/account/subscribe'));
 
-      $('.subscription-plan-select').on('click', function () {
-        selectedPlan = $(this).data('plan-id');
-        $('#subscription-plan-summary').text($(this).data('plan-name') + ' — ' + $(this).data('plan-cost'));
-        selectedMethod = null;
-        $('#subscription-pay-confirm').prop('disabled', true);
-        $('#subscription-mobile-fields').hide();
-        $('.subscription-pay-option').removeClass('active');
-        $('#subscriptionPaymentModal').modal('show');
-      });
+        $('body').on('click', '.subscription-plan-select', function () {
+          selectedPlan = $(this).data('plan-id');
+          $('#subscription-plan-summary').text($(this).data('plan-name') + ' — ' + $(this).data('plan-cost'));
+          selectedMethod = null;
+          $('#subscription-pay-confirm').prop('disabled', true);
+          $('#subscription-mobile-fields').hide();
+          $('.subscription-pay-option').removeClass('active');
+          $('#subscriptionPaymentModal').modal('show');
+        });
 
-      $('.subscription-pay-option').on('click', function (e) {
-        e.preventDefault();
-        selectedMethod = $(this).data('method');
-        $('.subscription-pay-option').removeClass('active');
-        $(this).addClass('active');
-        $('#subscription-pay-confirm').prop('disabled', false);
-        var showMobile = selectedMethod === 'mpesa' || selectedMethod === 'emola';
-        $('#subscription-mobile-fields').toggle(showMobile);
-        $('.mpesa-sub-field').toggle(selectedMethod === 'mpesa');
-        $('.emola-sub-field').toggle(selectedMethod === 'emola');
-      });
+        $('body').on('click', '.subscription-pay-option', function (e) {
+          e.preventDefault();
+          selectedMethod = $(this).data('method');
+          $('.subscription-pay-option').removeClass('active');
+          $(this).addClass('active');
+          $('#subscription-pay-confirm').prop('disabled', false);
+          var showMobile = selectedMethod === 'mpesa' || selectedMethod === 'emola';
+          $('#subscription-mobile-fields').toggle(showMobile);
+          $('.mpesa-sub-field').toggle(selectedMethod === 'mpesa');
+          $('.emola-sub-field').toggle(selectedMethod === 'emola');
+        });
 
-      $('#subscription-pay-confirm').on('click', function () {
-        if (!selectedPlan || !selectedMethod) return;
-        var url = '{{ url('admin/account/subscribe') }}/' + selectedPlan + '?payment_method=' + selectedMethod;
-        if (selectedMethod === 'mpesa') {
-          url += '&mpesa_number=' + encodeURIComponent($('#subscription-mpesa-number').val());
-        }
-        if (selectedMethod === 'emola') {
-          url += '&emola_number=' + encodeURIComponent($('#subscription-emola-number').val());
-        }
-        window.location.href = url;
+        $('body').on('click', '#subscription-pay-confirm', function () {
+          if (!selectedPlan || !selectedMethod) {
+            return;
+          }
+
+          var url = subscribeBaseUrl + '/' + encodeURIComponent(selectedPlan) + '?payment_method=' + encodeURIComponent(selectedMethod);
+
+          if (selectedMethod === 'mpesa') {
+            url += '&mpesa_number=' + encodeURIComponent($('#subscription-mpesa-number').val());
+          }
+
+          if (selectedMethod === 'emola') {
+            url += '&emola_number=' + encodeURIComponent($('#subscription-emola-number').val());
+          }
+
+          window.location.href = url;
+        });
       });
-    })();
-  </script>
+    </script>
+  @endpush
 @endif

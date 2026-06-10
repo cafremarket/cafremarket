@@ -1595,7 +1595,7 @@ return [
     'deny' => 'Deny',
     'available_packages' => 'Available Plugins',
     'package' => 'Plugin',
-    // 'wallet' => 'Wallet',
+    'wallet' => 'Wallet',
     'withdrawal_requests' => 'Withdrawals',
     'select_payment_option' => 'Select payment option',
     'credit_card' => 'Credit card',
