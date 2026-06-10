@@ -162,6 +162,30 @@ if (! function_exists('get_subscription_payment_methods')) {
     }
 }
 
+if (! function_exists('subscription_plan_label')) {
+    /**
+     * Human-readable subscription plan name for a plan_id.
+     */
+    function subscription_plan_label($planId): ?string
+    {
+        if ($planId === null || $planId === '') {
+            return null;
+        }
+
+        static $labels = [];
+
+        if (! array_key_exists($planId, $labels)) {
+            $name = \App\Models\SubscriptionPlan::query()
+                ->where('plan_id', $planId)
+                ->value('name');
+
+            $labels[$planId] = $name ?: (string) $planId;
+        }
+
+        return $labels[$planId];
+    }
+}
+
 if (! function_exists('subscription_charges_immediately')) {
     /**
      * Whether the shop must pay the plan fee now (no active trial).

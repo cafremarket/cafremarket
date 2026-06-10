@@ -878,7 +878,7 @@ return [
         'added' => 'Updated <strong>:key</strong>: <strong>:value</strong>',
         'updated' => 'Changed <strong>:key</strong> from <strong>:from</strong> to <strong>:to</strong>',
         'subscribed' => 'Subscribed to the <strong>:plan</strong> plan.',
-        'subscription_changed' => 'Subscription migrated from <strong>:from</strong> to <strong>:to</strong>',
+        'subscription_changed' => 'Subscription changed from <strong>:from</strong> to <strong>:to</strong>.',
         'billing_info_added' => 'Billing information added successfully.',
         'billing_info_changed' => 'Billing information has been updated.',
         'trial_started' => 'The trial period just started.',

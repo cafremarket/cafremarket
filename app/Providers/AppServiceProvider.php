@@ -91,9 +91,9 @@ class AppServiceProvider extends ServiceProvider
         // Cashier::ignoreMigrations();
         Cashier::useCustomerModel('App\\Models\\Shop');
 
-        // Payment method binding for wallet deposit
-        if (Request::has('payment_method')) {
-            $className = $this->resolvePaymentDependency(Request::get('payment_method'));
+        // Payment method binding for wallet deposit / checkout (not subscription billing)
+        if ($this->shouldResolvePaymentBinding()) {
+            $className = $this->resolvePaymentDependency((string) Request::get('payment_method'));
             $this->app->bind(PaymentServiceContract::class, $className);
         }
 
@@ -116,6 +116,27 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
         );
+    }
+
+    /**
+     * Whether the current request should bind PaymentServiceContract from payment_method.
+     * Subscription billing uses wallet/mpesa/emola as a billing choice, not a checkout gateway.
+     */
+    private function shouldResolvePaymentBinding(): bool
+    {
+        if (! Request::has('payment_method')) {
+            return false;
+        }
+
+        $path = Request::path();
+
+        foreach (['account/subscribe', 'api/vendor/subscription'] as $segment) {
+            if (stripos($path, $segment) !== false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

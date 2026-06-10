@@ -608,11 +608,17 @@ if (! function_exists('get_activity_str')) {
                 break;
 
             case 'current_billing_plan':
-                if (is_null($old)) {
-                    return trans('app.activities.subscribed', ['plan' => $new]);
+                $fromPlan = subscription_plan_label($old);
+                $toPlan = subscription_plan_label($new);
+
+                if (is_null($old) || $old === $new) {
+                    return trans('app.activities.subscribed', ['plan' => $toPlan ?? $new]);
                 }
 
-                return trans('app.activities.subscription_changed', ['from' => $old, 'to' => $new]);
+                return trans('app.activities.subscription_changed', [
+                    'from' => $fromPlan ?? $old,
+                    'to' => $toPlan ?? $new,
+                ]);
                 break;
 
             case 'card_last_four':

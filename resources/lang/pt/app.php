@@ -878,7 +878,7 @@ return [
         'added'     => 'Atualizado <strong>:key</strong>: <strong>:value</strong>',
         'updated'   => 'Alterado <strong>:key</strong> de <strong>:from</strong> para <strong>:to</strong>',
         'subscribed' => 'Assinou o plano <strong>:plan</strong>.',
-        'subscription_changed'   => 'Assinatura migrada de <strong>:from</strong> para <strong>:to</strong>',
+        'subscription_changed'   => 'Assinatura alterada de <strong>:from</strong> para <strong>:to</strong>.',
         'billing_info_added' => 'Informações de faturamento adicionadas com sucesso.',
         'billing_info_changed'   => 'Informações de faturamento atualizadas.',
         'trial_started' => 'O período de teste começou.',

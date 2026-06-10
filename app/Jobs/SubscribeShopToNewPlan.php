@@ -66,11 +66,16 @@ class SubscribeShopToNewPlan
                 'email' => $this->merchant->email,
             ]);
 
-            // Update shop model
-            $shop->forceFill([
-                'current_billing_plan' => $this->plan,
+            // Update shop model (skip plan log when unchanged — e.g. selected at registration)
+            $updates = [
                 'trial_ends_at' => $subscription->trial_ends_at,
-            ])->save();
+            ];
+
+            if ($shop->current_billing_plan !== $this->plan) {
+                $updates['current_billing_plan'] = $this->plan;
+            }
+
+            $shop->forceFill($updates)->save();
         } catch (IncompletePayment $e) {
             return redirect()->route('cashier.payment', [$e->payment->id, 'redirect' => route('home')]);
         } catch (\Throwable $e) {
