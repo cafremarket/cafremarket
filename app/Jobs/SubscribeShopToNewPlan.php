@@ -69,6 +69,9 @@ class SubscribeShopToNewPlan
                 'email' => $this->merchant->email,
             ]);
 
+            $shop->unsetRelation('subscriptions');
+            $shop->unsetRelation('currentSubscription');
+
             $previousPlan = $shop->current_billing_plan;
             $updates = [
                 'trial_ends_at' => $subscription->trial_ends_at,

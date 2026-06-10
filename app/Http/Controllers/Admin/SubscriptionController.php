@@ -96,13 +96,18 @@ class SubscriptionController extends Controller
             }
 
             if ($currentPlan) {
-                $currentPlan->swap($plan)->update(['type' => $subscription->name]);
+                $currentPlan->swap($plan);
 
                 if ($merchant->shop->current_billing_plan !== $plan) {
                     $merchant->shop->forceFill(['current_billing_plan' => $plan])->save();
                 }
+
+                $merchant->shop->unsetRelation('subscriptions');
+                $merchant->shop->unsetRelation('currentSubscription');
             } else {
                 SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
+                $merchant->shop->unsetRelation('subscriptions');
+                $merchant->shop->unsetRelation('currentSubscription');
             }
         } catch (\Throwable $e) {
             Log::error('Subscription Failed: '.$e->getMessage(), ['exception' => $e]);

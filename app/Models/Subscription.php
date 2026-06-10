@@ -47,8 +47,26 @@ class Subscription extends CashierSubscription
     {
         // Local subscription
         if (SystemConfig::isBillingThroughWallet()) {
+            $subscriptionPlan = SubscriptionPlan::findOrFail($plan);
+
+            if (
+                $this->stripe_price !== $plan
+                && (float) $subscriptionPlan->cost > 0
+                && ! $this->onTrial()
+            ) {
+                $meta = [
+                    'type' => trans('app.subscription_fee'),
+                    'description' => trans('packages.subscription.subscription_fee', [
+                        'subscription' => $subscriptionPlan->name,
+                    ]),
+                ];
+
+                $this->owner->forceWithdraw((float) $subscriptionPlan->cost, $meta);
+            }
+
             $this->fill([
                 'stripe_price' => $plan,
+                'type' => $subscriptionPlan->name,
                 'ends_at' => now()->addMonth(),
                 'trial_ends_at' => null,
             ])->save();
@@ -69,11 +87,35 @@ class Subscription extends CashierSubscription
     {
         // Local subscription
         if ($this->provider == 'wallet') {
-            return $this->active();
+            return $this->active() || $this->onTrial();
         }
 
         // Stripe
         return parent::valid();
+    }
+
+    /**
+     * Wallet subs use ends_at as paid-through date, not Stripe cancellation.
+     */
+    public function canceled()
+    {
+        if ($this->provider == 'wallet') {
+            return $this->ends_at !== null && $this->ends_at->isPast();
+        }
+
+        return ! is_null($this->ends_at);
+    }
+
+    /**
+     * Wallet billing has no cancel grace period.
+     */
+    public function onGracePeriod()
+    {
+        if ($this->provider == 'wallet') {
+            return false;
+        }
+
+        return parent::onGracePeriod();
     }
 
     /**

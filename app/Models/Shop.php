@@ -769,11 +769,17 @@ class Shop extends ShopWallet
      */
     public function hasExpiredPlan()
     {
-        if ($subscription = $this->currentSubscription) {
-            return $subscription->ends_at && $subscription->ends_at->isPast();
+        if ($this->activeSubscription()) {
+            return false;
         }
 
-        return null;
+        if ($this->onGenericTrial()) {
+            return false;
+        }
+
+        $subscription = $this->currentSubscription;
+
+        return $subscription && $subscription->ends_at && $subscription->ends_at->isPast();
     }
 
     /**

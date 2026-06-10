@@ -288,13 +288,7 @@ class User extends Authenticatable
             return null;
         }
 
-        foreach ($this->shop->subscriptions as $subscription) {
-            if ($subscription->valid()) {
-                return $subscription;
-            }
-        }
-
-        return null;
+        return $this->shop->activeSubscription();
     }
 
     /**
@@ -388,13 +382,13 @@ class User extends Authenticatable
             return false;
         }
 
-        $subscription = $this->shop->currentSubscription;
-
-        if ($subscription && ! is_null($subscription->ends_at)) {
-            return \Carbon\Carbon::now()->gt($subscription->ends_at);
+        if ($this->isSubscribed() || $this->isOnGenericTrial()) {
+            return false;
         }
 
-        return false;
+        $subscription = $this->shop->currentSubscription;
+
+        return $subscription && $subscription->ends_at && $subscription->ends_at->isPast();
     }
 
     /**
@@ -416,9 +410,7 @@ class User extends Authenticatable
             return false;
         }
 
-        $subscription = $this->shop->currentSubscription;
-
-        return $subscription && $subscription->valid() || $this->isOnGenericTrial();
+        return $this->getCurrentPlan() !== null || $this->isOnGenericTrial();
     }
 
     /**
@@ -438,7 +430,7 @@ class User extends Authenticatable
      */
     public function isOnTrial()
     {
-        $subscription = $this->shop->currentSubscription;
+        $subscription = $this->getCurrentPlan();
 
         return $subscription && $subscription->onTrial();
     }
@@ -450,7 +442,7 @@ class User extends Authenticatable
      */
     public function isOnGracePeriod()
     {
-        $subscription = $this->shop->currentSubscription;
+        $subscription = $this->getCurrentPlan();
 
         // Wallet subscription doesn't have GracePeriod
         if ($subscription && $subscription->provider == 'wallet') {

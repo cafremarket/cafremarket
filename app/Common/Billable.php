@@ -20,7 +20,21 @@ trait Billable
      */
     public function currentSubscription()
     {
-        return $this->hasOne(Subscription::class)->orderBy('created_at', 'desc');
+        return $this->hasOne(Subscription::class)->latestOfMany();
+    }
+
+    /**
+     * First valid subscription for this shop (newest first).
+     */
+    public function activeSubscription()
+    {
+        foreach ($this->subscriptions as $subscription) {
+            if ($subscription->valid()) {
+                return $subscription;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -66,6 +80,6 @@ trait Billable
      */
     public function hasActiveSubscription()
     {
-        return $this->currentSubscription && $this->currentSubscription->valid();
+        return (bool) $this->activeSubscription();
     }
 }

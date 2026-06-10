@@ -238,15 +238,20 @@ class SubscriptionController extends Controller
             }
 
             if ($currentPlan) {
-                $currentPlan->swap($plan)->update(['type' => $subscriptionPlan->name]);
+                $currentPlan->swap($plan);
 
                 if ($merchant->shop->current_billing_plan !== $plan) {
                     $merchant->shop->forceFill([
                         'current_billing_plan' => $plan,
                     ])->save();
                 }
+
+                $merchant->shop->unsetRelation('subscriptions');
+                $merchant->shop->unsetRelation('currentSubscription');
             } else {
                 SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
+                $merchant->shop->unsetRelation('subscriptions');
+                $merchant->shop->unsetRelation('currentSubscription');
             }
         } catch (\Throwable $e) {
             Log::error('Vendor API subscription failed: '.$e->getMessage(), ['exception' => $e]);
