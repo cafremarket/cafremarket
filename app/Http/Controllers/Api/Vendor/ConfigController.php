@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
+use App\Http\Controllers\Api\Vendor\Concerns\ResolvesVendorShop;
 use App\Events\Shop\ConfigUpdated;
 use App\Events\Shop\DownForMaintainace;
 // use App\Common\Authorizable;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfigController extends Controller
 {
+    use ResolvesVendorShop;
+
     // use Authorizable;
 
     private $model_name;
@@ -41,9 +44,7 @@ class ConfigController extends Controller
      */
     public function index(Request $request)
     {
-        $shop = Auth::user()->shop;
-
-        return new ShopSettingResource($shop);
+        return new ShopSettingResource($this->shop());
     }
 
     /**
@@ -53,9 +54,7 @@ class ConfigController extends Controller
      */
     public function configs()
     {
-        // Check permission
-
-        $config = Config::findOrFail(Auth::user()->merchantId());
+        $config = Config::findOrFail($this->merchantShopId());
 
         return response()->json($config);
     }
@@ -69,7 +68,7 @@ class ConfigController extends Controller
      */
     public function update(UpdateBasicConfigRequest $request, $shop_id)
     {
-        // Check permission
+        $this->assertOwnsShop((int) $shop_id);
 
         $shop = Shop::findOrFail($shop_id);
 
@@ -113,6 +112,8 @@ class ConfigController extends Controller
      */
     public function updateConfigs(Request $request, $config)
     {
+        $this->assertOwnsShop((int) $config);
+
         $settings = Config::findOrFail($config);
 
         // Check permission

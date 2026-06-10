@@ -512,6 +512,25 @@ class Order extends BaseModel
     }
 
     /**
+     * Scope a query to search orders by number, tracking id, or customer name.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearch($query, string $term)
+    {
+        $like = '%'.$term.'%';
+
+        return $query->where(function ($q) use ($like) {
+            $q->where('order_number', 'like', $like)
+                ->orWhere('tracking_id', 'like', $like)
+                ->orWhereHas('customer', function ($customer) use ($like) {
+                    $customer->where('name', 'like', $like)
+                        ->orWhere('nice_name', 'like', $like);
+                });
+        });
+    }
+
+    /**
      * Return all the orders which are not delivered yet
      *
      * @return [not delivered orders]

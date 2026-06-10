@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
+use App\Http\Controllers\Api\Vendor\Concerns\ResolvesVendorShop;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\VendorWalletWithdrawRequest;
 use App\Models\Shop;
@@ -13,13 +14,7 @@ use Incevio\Package\Wallet\Notifications\Pending;
 
 class WalletWithdrawController extends Controller
 {
-    protected function shop(): Shop
-    {
-        $shop = Auth::guard('vendor_api')->user()->shop;
-        abort_unless($shop, 403, trans('packages.wallet.owner_invalid'));
-
-        return $shop;
-    }
+    use ResolvesVendorShop;
 
     public function withdraw(VendorWalletWithdrawRequest $request)
     {

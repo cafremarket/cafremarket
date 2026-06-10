@@ -9,6 +9,7 @@ use App\Http\Resources\ProductLightResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Image;
 use App\Models\Product;
+use App\Repositories\Inventory\InventoryRepository;
 use App\Repositories\Product\ProductRepository;
 use Illuminate\Http\Request;
 
@@ -16,10 +17,13 @@ class ProductController extends Controller
 {
     private $product;
 
-    public function __construct(ProductRepository $product)
+    private $inventory;
+
+    public function __construct(ProductRepository $product, InventoryRepository $inventory)
     {
         parent::__construct();
         $this->product = $product;
+        $this->inventory = $inventory;
     }
 
     /**
@@ -49,7 +53,27 @@ class ProductController extends Controller
     public function store(CreateProductRequest $request)
     {
         try {
-            $this->product->store($request);
+            $storedProduct = $this->product->store($request);
+
+            $inventoryData = [
+                'title' => $request->name,
+                'brand' => $request->brand,
+                'sku' => $request->sku,
+                'description' => $request->description,
+                'stock_quantity' => $request->input('stock_quantity', 1),
+                'sale_price' => $request->sale_price,
+                'active' => $request->active,
+                'slug' => $request->slug,
+                'user_id' => $request->user_id,
+                'shop_id' => $request->shop_id,
+                'product_id' => $storedProduct->id,
+            ];
+
+            if ($request->filled('warehouse_id')) {
+                $inventoryData['warehouse_id'] = $request->warehouse_id;
+            }
+
+            $this->inventory->store(new Request($inventoryData));
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }

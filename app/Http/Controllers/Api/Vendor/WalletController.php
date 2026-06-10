@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
+use App\Http\Controllers\Api\Vendor\Concerns\ResolvesVendorShop;
 use App\Http\Controllers\Controller;
 use App\Models\Shop;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Incevio\Package\Wallet\Http\Resources\TransactionResource;
 use Incevio\Package\Wallet\Http\Resources\WalletResource;
@@ -13,13 +13,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class WalletController extends Controller
 {
-    protected function shop(): Shop
-    {
-        $shop = Auth::guard('vendor_api')->user()->shop;
-        abort_unless($shop, 403, trans('packages.wallet.owner_invalid'));
-
-        return $shop;
-    }
+    use ResolvesVendorShop;
 
     protected function assertOwnsTransaction(Transaction $transaction): void
     {
@@ -34,7 +28,18 @@ class WalletController extends Controller
 
     public function index()
     {
-        return new WalletResource($this->shop());
+        $shop = $this->shop();
+
+        try {
+            return new WalletResource($shop);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'data' => [
+                    'balance'     => get_formated_currency(0),
+                    'balance_raw' => 0,
+                ],
+            ]);
+        }
     }
 
     public function transactions()

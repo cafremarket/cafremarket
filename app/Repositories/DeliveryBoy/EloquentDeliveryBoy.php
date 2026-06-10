@@ -4,12 +4,15 @@ namespace App\Repositories\DeliveryBoy;
 
 use App\Models\DeliveryBoy;
 use App\Repositories\BaseRepository;
+use App\Repositories\Concerns\ScopesMerchantShop;
 use App\Repositories\EloquentRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EloquentDeliveryBoy extends EloquentRepository implements BaseRepository, DeliveryBoyRepository
 {
+    use ScopesMerchantShop;
+
     protected $model;
 
     public function __construct(DeliveryBoy $deliveryBoy)

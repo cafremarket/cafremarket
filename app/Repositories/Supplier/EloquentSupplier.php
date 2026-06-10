@@ -4,12 +4,15 @@ namespace App\Repositories\Supplier;
 
 use App\Models\Supplier;
 use App\Repositories\BaseRepository;
+use App\Repositories\Concerns\ScopesMerchantShop;
 use App\Repositories\EloquentRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EloquentSupplier extends EloquentRepository implements BaseRepository, SupplierRepository
 {
+    use ScopesMerchantShop;
+
     protected $model;
 
     public function __construct(Supplier $supplier)

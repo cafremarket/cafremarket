@@ -23,6 +23,8 @@ class OrderController extends Controller
         $orders = Order::mine()->withCount(['inventories'])->with('deliveryBoy');
 
         $filter = $request->get('filter');
+        $payment = $request->get('payment');
+        $search = trim((string) $request->get('q', ''));
 
         // When the orders need to filter
         $orders = match ($filter) {
@@ -34,7 +36,15 @@ class OrderController extends Controller
             default => $orders,
         };
 
-        $orders = $orders->paginate(config('mobile_app.view_listing_per_page', 8));
+        if (in_array($payment, ['paid', 'unpaid'], true)) {
+            $orders = $payment === 'paid' ? $orders->paid() : $orders->unpaid();
+        }
+
+        if ($search !== '') {
+            $orders = $orders->search($search);
+        }
+
+        $orders = $orders->latest()->paginate(config('mobile_app.view_listing_per_page', 8));
 
         return OrderLightResource::collection($orders);
     }

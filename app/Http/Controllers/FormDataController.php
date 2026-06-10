@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Helpers\ListHelper;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Shop;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FormDataController extends Controller
 {
@@ -185,6 +187,19 @@ class FormDataController extends Controller
      */
     public function shops()
     {
+        if (Auth::guard('vendor_api')->check()) {
+            $shopId = (int) Auth::guard('vendor_api')->user()->merchantId();
+
+            if ($shopId <= 0) {
+                return [];
+            }
+
+            return Shop::where('id', $shopId)
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id')
+                ->toArray();
+        }
+
         return ListHelper::shops();
     }
 

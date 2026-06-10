@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateUserRequest extends Request
 {
@@ -13,6 +14,13 @@ class UpdateUserRequest extends Request
      */
     public function authorize()
     {
+        $user = $this->route('user');
+
+        if (Auth::guard('vendor_api')->check() && $user) {
+            return (int) $user->shop_id
+                === (int) Auth::guard('vendor_api')->user()->merchantId();
+        }
+
         return true;
     }
 

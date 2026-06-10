@@ -9,13 +9,15 @@ class VendorWalletWithdrawRequest extends Request
 {
     public function authorize()
     {
-        return Auth::guard('vendor_api')->check()
-            && Auth::guard('vendor_api')->user()->shop !== null;
+        $user = Auth::guard('vendor_api')->user();
+
+        return $user !== null && (int) $user->merchantId() > 0;
     }
 
     public function rules()
     {
-        $shop = Auth::guard('vendor_api')->user()->shop;
+        $shopId = (int) Auth::guard('vendor_api')->user()->merchantId();
+        $shop = \App\Models\Shop::find($shopId);
         $maxWithdrawal = $shop ? (float) $shop->balance : 0;
 
         $rules = [

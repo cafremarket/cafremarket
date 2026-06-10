@@ -4,12 +4,15 @@ namespace App\Repositories\Warehouse;
 
 use App\Models\Warehouse;
 use App\Repositories\BaseRepository;
+use App\Repositories\Concerns\ScopesMerchantShop;
 use App\Repositories\EloquentRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EloquentWarehouse extends EloquentRepository implements BaseRepository, WarehouseRepository
 {
+    use ScopesMerchantShop;
+
     protected $model;
 
     public function __construct(Warehouse $warehouse)

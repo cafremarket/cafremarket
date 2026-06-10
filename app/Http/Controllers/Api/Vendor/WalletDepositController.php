@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
+use App\Http\Controllers\Api\Vendor\Concerns\ResolvesVendorShop;
 use App\Contracts\PaymentServiceContract;
 use App\Exceptions\PaymentFailedException;
 use App\Http\Controllers\Controller;
@@ -22,13 +23,7 @@ use Incevio\Package\Wallet\Notifications\Deposit;
 
 class WalletDepositController extends Controller
 {
-    protected function shop(): Shop
-    {
-        $shop = Auth::guard('vendor_api')->user()->shop;
-        abort_unless($shop, 403, trans('packages.wallet.owner_invalid'));
-
-        return $shop;
-    }
+    use ResolvesVendorShop;
 
     public function getPaymentMethods()
     {

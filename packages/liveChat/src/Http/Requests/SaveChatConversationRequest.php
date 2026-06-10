@@ -14,6 +14,11 @@ class SaveChatConversationRequest extends Request
      */
     public function authorize()
     {
+        if (Auth::guard('vendor_api')->check() && $this->route('chat')) {
+            return (int) $this->route('chat')->shop_id
+                === (int) Auth::guard('vendor_api')->user()->merchantId();
+        }
+
         return true;
     }
 

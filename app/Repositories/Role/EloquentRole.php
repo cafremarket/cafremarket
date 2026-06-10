@@ -6,12 +6,15 @@ use App\Models\Module;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Repositories\BaseRepository;
+use App\Repositories\Concerns\ScopesMerchantShop;
 use App\Repositories\EloquentRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EloquentRole extends EloquentRepository implements BaseRepository, RoleRepository
 {
+    use ScopesMerchantShop;
+
     protected $model;
 
     public function __construct(Role $role)

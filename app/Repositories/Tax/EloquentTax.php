@@ -4,11 +4,14 @@ namespace App\Repositories\Tax;
 
 use App\Models\Tax;
 use App\Repositories\BaseRepository;
+use App\Repositories\Concerns\ScopesMerchantShop;
 use App\Repositories\EloquentRepository;
 use Illuminate\Support\Facades\Auth;
 
 class EloquentTax extends EloquentRepository implements BaseRepository, TaxRepository
 {
+    use ScopesMerchantShop;
+
     protected $model;
 
     public function __construct(Tax $tax)

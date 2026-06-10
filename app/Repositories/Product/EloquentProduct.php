@@ -30,13 +30,15 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
 
     public function find($id)
     {
-        return $this->model->with([
-            // 'inventories' => function ($q) {
-            //     $q->available();
-            // },
-            // 'inventories',
+        $query = $this->model->with([
             'inventories.shop',
-        ])->find($id);
+        ]);
+
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
+        }
+
+        return $query->findOrFail($id);
     }
 
     public function trashOnly()

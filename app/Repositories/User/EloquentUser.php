@@ -4,12 +4,15 @@ namespace App\Repositories\User;
 
 use App\Models\User;
 use App\Repositories\BaseRepository;
+use App\Repositories\Concerns\ScopesMerchantShop;
 use App\Repositories\EloquentRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EloquentUser extends EloquentRepository implements BaseRepository, UserRepository
 {
+    use ScopesMerchantShop;
+
     protected $model;
 
     public function __construct(User $user)
@@ -17,23 +20,23 @@ class EloquentUser extends EloquentRepository implements BaseRepository, UserRep
         $this->model = $user;
     }
 
-    // public function all()
-    // {
-    //     if (!Auth::user()->isFromPlatform()) {
-    //         return $this->model->level()->mine()->with('role', 'avatarImage:path,imageable_id,imageable_type', 'primaryAddress')->get();
-    //     }
+    public function all()
+    {
+        if (! Auth::user()->isFromPlatform()) {
+            return $this->model->level()->mine()->with('role', 'avatarImage:path,imageable_id,imageable_type', 'primaryAddress')->get();
+        }
 
-    //     return $this->model->level()->fromPlatform()->with('role', 'avatarImage:path,imageable_id,imageable_type', 'primaryAddress')->get();
-    // }
+        return $this->model->level()->fromPlatform()->with('role', 'avatarImage:path,imageable_id,imageable_type', 'primaryAddress')->get();
+    }
 
-    // public function trashOnly()
-    // {
-    //     if (!Auth::user()->isFromPlatform()) {
-    //         return $this->model->level()->mine()->onlyTrashed()->with('avatarImage:path,imageable_id,imageable_type')->get();
-    //     }
+    public function trashOnly()
+    {
+        if (! Auth::user()->isFromPlatform()) {
+            return $this->model->level()->mine()->onlyTrashed()->with('avatarImage:path,imageable_id,imageable_type')->get();
+        }
 
-    //     return $this->model->level()->fromPlatform()->onlyTrashed()->with('avatarImage:path,imageable_id,imageable_type')->get();
-    // }
+        return $this->model->level()->fromPlatform()->onlyTrashed()->with('avatarImage:path,imageable_id,imageable_type')->get();
+    }
 
     public function addresses($user)
     {

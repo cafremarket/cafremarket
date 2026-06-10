@@ -9,7 +9,8 @@ class VendorWalletDepositRequest extends DepositRequest
 {
     public function authorize()
     {
-        return Auth::guard('vendor_api')->check()
-            && Auth::guard('vendor_api')->user()->shop !== null;
+        $user = Auth::guard('vendor_api')->user();
+
+        return $user !== null && (int) $user->merchantId() > 0;
     }
 }

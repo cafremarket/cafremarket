@@ -7,6 +7,7 @@ use App\Models\AttributeValue;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Repositories\BaseRepository;
+use App\Repositories\Concerns\ScopesMerchantShop;
 use App\Repositories\EloquentRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,8 @@ use Illuminate\Support\Str;
 
 class EloquentInventory extends EloquentRepository implements BaseRepository, InventoryRepository
 {
+    use ScopesMerchantShop;
+
     protected $model;
 
     public function __construct(Inventory $inventory)
