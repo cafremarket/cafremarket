@@ -38,6 +38,11 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'available_from' => date('F j, Y', strtotime($this->created_at)),
             'images' => ImageResource::collection($this->images),
+            'tag_list' => $this->tags->pluck('id')->values()->all(),
+            'tags' => $this->tags->map(fn ($tag) => [
+                'id' => $tag->id,
+                'name' => $tag->name,
+            ])->values()->all(),
         ];
     }
 }

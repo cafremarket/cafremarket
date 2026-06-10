@@ -231,11 +231,20 @@ class SubscriptionController extends Controller
                 ], 400);
             }
 
+            if ($currentPlan && $currentPlan->stripe_price === $plan) {
+                return response()->json([
+                    'message' => trans('messages.subscribed'),
+                ]);
+            }
+
             if ($currentPlan) {
                 $currentPlan->swap($plan)->update(['type' => $subscriptionPlan->name]);
-                $merchant->shop->forceFill([
-                    'current_billing_plan' => $plan,
-                ])->save();
+
+                if ($merchant->shop->current_billing_plan !== $plan) {
+                    $merchant->shop->forceFill([
+                        'current_billing_plan' => $plan,
+                    ])->save();
+                }
             } else {
                 SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
             }

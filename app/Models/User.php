@@ -288,10 +288,10 @@ class User extends Authenticatable
             return null;
         }
 
-        $subscription = optional($this->shop->subscriptions)->first();
-
-        if ($subscription && $subscription->valid()) {
-            return $subscription;
+        foreach ($this->shop->subscriptions as $subscription) {
+            if ($subscription->valid()) {
+                return $subscription;
+            }
         }
 
         return null;

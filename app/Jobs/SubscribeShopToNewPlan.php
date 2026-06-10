@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Shop;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
 use Carbon\Carbon;
@@ -41,6 +42,8 @@ class SubscribeShopToNewPlan
     {
         $shop = $this->merchant->shop;
 
+        $this->endOpenWalletSubscriptions($shop);
+
         // Create subscription intance
         $subscriptionPlan = SubscriptionPlan::findOrFail($this->plan);
 
@@ -66,20 +69,35 @@ class SubscribeShopToNewPlan
                 'email' => $this->merchant->email,
             ]);
 
-            // Update shop model (skip plan log when unchanged — e.g. selected at registration)
+            $previousPlan = $shop->current_billing_plan;
             $updates = [
                 'trial_ends_at' => $subscription->trial_ends_at,
             ];
 
-            if ($shop->current_billing_plan !== $this->plan) {
+            if ($previousPlan !== $this->plan) {
                 $updates['current_billing_plan'] = $this->plan;
+                $shop->forceFill($updates)->save();
+            } else {
+                $shop->forceFill($updates)->saveQuietly();
             }
-
-            $shop->forceFill($updates)->save();
         } catch (IncompletePayment $e) {
             return redirect()->route('cashier.payment', [$e->payment->id, 'redirect' => route('home')]);
         } catch (\Throwable $e) {
             throw new \Exception($e->getMessage() ?: trans('messages.subscription_error'));
         }
+    }
+
+    /**
+     * Close any open local (wallet) subscriptions before starting a new one.
+     */
+    protected function endOpenWalletSubscriptions(Shop $shop): void
+    {
+        $shop->subscriptions()
+            ->whereNull('stripe_id')
+            ->where(function ($query) {
+                $query->whereNull('ends_at')
+                    ->orWhere('ends_at', '>', now());
+            })
+            ->update(['ends_at' => now()]);
     }
 }

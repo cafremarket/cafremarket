@@ -48,6 +48,11 @@ class InventoryResource extends JsonResource
             'active' => $this->active,
             'listed_at' => date('F j, Y', strtotime($this->available_from)),
             'images' => ImageResource::collection($this->images),
+            'tag_list' => $this->tags->pluck('id')->values()->all(),
+            'tags' => $this->tags->map(fn ($tag) => [
+                'id' => $tag->id,
+                'name' => $tag->name,
+            ])->values()->all(),
         ];
     }
 }

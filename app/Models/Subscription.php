@@ -47,7 +47,11 @@ class Subscription extends CashierSubscription
     {
         // Local subscription
         if (SystemConfig::isBillingThroughWallet()) {
-            $this->fill(['stripe_price' => $plan])->save();
+            $this->fill([
+                'stripe_price' => $plan,
+                'ends_at' => now()->addMonth(),
+                'trial_ends_at' => null,
+            ])->save();
 
             return $this;
         }
@@ -80,7 +84,16 @@ class Subscription extends CashierSubscription
     public function active()
     {
         if ($this->provider == 'wallet') {
-            return $this->onTrial() || $this->onGracePeriod();
+            if ($this->onTrial()) {
+                return true;
+            }
+
+            // Wallet billing uses ends_at as the paid-through date (not Stripe cancel grace).
+            if ($this->ends_at === null) {
+                return true;
+            }
+
+            return $this->ends_at->isFuture();
         }
 
         return parent::active();

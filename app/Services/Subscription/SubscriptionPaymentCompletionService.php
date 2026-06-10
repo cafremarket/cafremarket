@@ -35,7 +35,10 @@ class SubscriptionPaymentCompletionService
             if ($currentPlan) {
                 $subscriptionPlan = SubscriptionPlan::findOrFail($planId);
                 $currentPlan->swap($planId)->update(['type' => $subscriptionPlan->name]);
-                $shop->forceFill(['current_billing_plan' => $planId])->save();
+
+                if ($shop->current_billing_plan !== $planId) {
+                    $shop->forceFill(['current_billing_plan' => $planId])->save();
+                }
             } else {
                 SubscribeShopToNewPlan::dispatchSync($merchant, $planId);
             }

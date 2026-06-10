@@ -611,7 +611,11 @@ if (! function_exists('get_activity_str')) {
                 $fromPlan = subscription_plan_label($old);
                 $toPlan = subscription_plan_label($new);
 
-                if (is_null($old) || $old === $new) {
+                if (is_null($old) || $old === '' || $old === $new) {
+                    return trans('app.activities.subscribed', ['plan' => $toPlan ?? $new]);
+                }
+
+                if ($fromPlan === $toPlan) {
                     return trans('app.activities.subscribed', ['plan' => $toPlan ?? $new]);
                 }
 
