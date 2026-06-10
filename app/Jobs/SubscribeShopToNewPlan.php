@@ -39,7 +39,7 @@ class SubscribeShopToNewPlan
      */
     public function handle()
     {
-        $shop = $this->merchant->owns;
+        $shop = $this->merchant->shop;
 
         // Create subscription intance
         $subscriptionPlan = SubscriptionPlan::findOrFail($this->plan);
@@ -73,8 +73,8 @@ class SubscribeShopToNewPlan
             ])->save();
         } catch (IncompletePayment $e) {
             return redirect()->route('cashier.payment', [$e->payment->id, 'redirect' => route('home')]);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+        } catch (\Throwable $e) {
+            throw new \Exception($e->getMessage() ?: trans('messages.subscription_error'));
         }
     }
 }

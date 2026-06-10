@@ -8,6 +8,7 @@ use App\Http\Requests\Validations\UpdateTrialPeriodRequest;
 use App\Jobs\SubscribeShopToNewPlan;
 use App\Models\Shop;
 use App\Models\SubscriptionPlan;
+use App\Models\SystemConfig;
 use App\Models\User;
 use App\Services\Subscription\SubscriptionMobilePaymentService;
 use Carbon\Carbon;
@@ -61,6 +62,16 @@ class SubscriptionController extends Controller
             }
 
             if (
+                $paymentMethod === 'wallet'
+                && SystemConfig::isBillingThroughWallet()
+                && subscription_charges_immediately($merchant, $subscription)
+                && (float) ($merchant->shop->balance ?? 0) < (float) $subscription->cost
+            ) {
+                return redirect()->route('admin.account.billing')
+                    ->with('error', trans('packages.wallet.insufficient_funds'));
+            }
+
+            if (
                 in_array($paymentMethod, ['mpesa', 'emola'], true)
                 && subscription_charges_immediately($merchant, $subscription)
             ) {
@@ -85,8 +96,8 @@ class SubscriptionController extends Controller
             } else {
                 SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
             }
-        } catch (\Exception $e) {
-            Log::error('Subscription Failed: '.$e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error('Subscription Failed: '.$e->getMessage(), ['exception' => $e]);
 
             return redirect()->route('admin.account.billing')
                 ->with('error', $e->getMessage() ?: trans('messages.subscription_error'));

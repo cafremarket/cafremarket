@@ -13,9 +13,21 @@ class SubscriptionBuilder extends CashierSubscriptionBuilder
     /**
      * The subscription fee
      *
-     * @var int
+     * @var float|int
      */
     protected $subscriptionFee = 0;
+
+    /**
+     * @param  mixed  $owner
+     * @param  string  $name
+     * @param  string  $plan
+     */
+    public function __construct($owner, $name, $plan)
+    {
+        parent::__construct($owner, $name, $plan);
+
+        $this->plan = $plan;
+    }
 
     public function setSubscriptionFee($price)
     {
@@ -31,7 +43,7 @@ class SubscriptionBuilder extends CashierSubscriptionBuilder
      */
     public function create($paymentMethod = null, array $customerOptions = [], array $subscriptionOptions = [])
     {
-        $trialEndsAt = $this->skipTrial ? Null : $this->trialExpires;
+        $trialEndsAt = $this->skipTrial ? null : $this->trialExpires;
 
         try {
             $subscription = $this->owner->subscriptions()
@@ -39,27 +51,24 @@ class SubscriptionBuilder extends CashierSubscriptionBuilder
                     'type' => $this->type,
                     'stripe_price' => $this->plan,
                     'quantity' => 1,
-                    'trial_ends_at' => $this->getTrialEndForPayload(),
-                    // 'trial_ends_at' => $trialEndsAt,
-                    'ends_at' => $trialEndsAt ? Null : Carbon::now()->addMonth(),
+                    'trial_ends_at' => $trialEndsAt,
+                    'ends_at' => $trialEndsAt ? null : Carbon::now()->addMonth(),
                 ]);
 
-            if (
-                $this->skipTrial || !$trialEndsAt ||
-                !$subscription->trial_ends_at->isFuture() &&
-                $this->subscriptionFee > 0
-            ) {
+            $trialActive = $subscription->trial_ends_at && $subscription->trial_ends_at->isFuture();
+
+            if (! $trialActive && $this->subscriptionFee > 0) {
                 $meta = [
                     'type' => trans('app.subscription_fee'),
-                    'description' => trans('packages.subscription.subscription_fee', ['subscription' => $this->name]),
+                    'description' => trans('packages.subscription.subscription_fee', ['subscription' => $this->type]),
                 ];
 
                 $this->owner->forceWithdraw($this->subscriptionFee, $meta);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error($e);
 
-            throw new \Exception($e->getMessage());
+            throw new \Exception($e->getMessage() ?: trans('messages.subscription_error'));
         }
 
         return $subscription;

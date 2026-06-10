@@ -239,8 +239,8 @@ class SubscriptionController extends Controller
             } else {
                 SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
             }
-        } catch (\Exception $e) {
-            Log::error('Vendor API subscription failed: '.$e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error('Vendor API subscription failed: '.$e->getMessage(), ['exception' => $e]);
 
             return response()->json([
                 'message' => $e->getMessage() ?: trans('messages.subscription_error'),
