@@ -128,9 +128,21 @@ class AppServiceProvider extends ServiceProvider
             return false;
         }
 
+        $paymentMethod = strtolower((string) Request::get('payment_method'));
+
+        // Vendor subscription billing — not a checkout gateway binding.
+        if (in_array($paymentMethod, ['wallet', 'mpesa', 'emola'], true)) {
+            return false;
+        }
+
         $path = Request::path();
 
-        foreach (['account/subscribe', 'api/vendor/subscription'] as $segment) {
+        foreach ([
+            'account/subscribe',
+            'admin/account/subscribe',
+            'api/vendor/subscription',
+            '/subscribe/',
+        ] as $segment) {
             if (stripos($path, $segment) !== false) {
                 return false;
             }

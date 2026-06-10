@@ -66,7 +66,7 @@ class SubscriptionController extends Controller
                 $paymentMethod === 'wallet'
                 && SystemConfig::isBillingThroughWallet()
                 && subscription_charges_immediately($merchant, $subscription)
-                && (float) ($merchant->shop->balance ?? 0) < (float) $subscription->cost
+                && (float) (optional($merchant->merchantShop())->balance ?? 0) < (float) $subscription->cost
             ) {
                 return redirect()->route('admin.account.billing')
                     ->with('error', trans('packages.wallet.insufficient_funds'));
@@ -207,11 +207,29 @@ class SubscriptionController extends Controller
                 ->with('warning', trans('messages.demo_restriction'));
         }
 
+        $isWallet = false;
+
         try {
-            $plan = $request->user()->getCurrentPlan();
+            $merchant = $request->user();
+            $plan = $merchant->getCurrentPlan();
 
             if ($plan) {
+                $isWallet = $plan->provider === 'wallet';
+
                 $plan->cancel();
+
+                if ($isWallet) {
+                    $shop = $merchant->merchantShop();
+
+                    if ($shop) {
+                        $shop->forceFill(['current_billing_plan' => null])->saveQuietly();
+                        $shop->unsetRelation('subscriptions');
+                        $shop->unsetRelation('currentSubscription');
+                    }
+                }
+
+                $merchant->unsetRelation('shop');
+                $merchant->unsetRelation('owns');
             } else {
                 throw new \Exception(trans('responses.subscription_404'));
             }
@@ -226,7 +244,9 @@ class SubscriptionController extends Controller
         }
 
         return redirect()->route('admin.account.billing')
-            ->with('success', trans('messages.subscription_cancelled'));
+            ->with('success', $isWallet
+                ? trans('messages.subscription_removed')
+                : trans('messages.subscription_cancelled'));
     }
 
     /**

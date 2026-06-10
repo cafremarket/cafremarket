@@ -25,6 +25,7 @@ return [
     'card_updated' => 'Cartão de crédito atualizado com sucesso!',
     'demo_restriction' => 'Esta ação é restrita no modo demo!',
     'subscription_cancelled' => 'Assinatura cancelada!',
+    'subscription_removed' => 'Assinatura removida.',
     'subscription_resumed' => 'Assinatura retomada com sucesso!',
     'subscribed' => 'Parabéns! Assinatura realizada com sucesso!',
     'subscription_error' => 'Erro ao criar assinatura. Entre em contato com o suporte ao cliente.',

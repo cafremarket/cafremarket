@@ -25,6 +25,7 @@ return [
     'card_updated' => 'Credit card updated successfully!',
     'demo_restriction' => 'This action is restricted for the demo mode!',
     'subscription_cancelled' => 'Subscription has been cancelled!',
+    'subscription_removed' => 'Subscription has been removed.',
     'subscription_resumed' => 'Subscription resumed successfully!',
     'subscribed' => 'Congratulation! Subscribed successfully!!',
     'subscription_error' => 'Error creating subscription. Please contact customer support.',

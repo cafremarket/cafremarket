@@ -672,6 +672,7 @@ return [
     'choose_plan' => 'Escolher um plano',
     'resource_uses' => 'Uso de recursos',
     'resume_subscription' => 'Retomar assinatura',
+    'remove_subscription' => 'Remover assinatura',
     'apply' => 'Aplicar',
     'cancel' => 'Cancelar',
     'cancel_plan' => 'Cancelar assinatura',

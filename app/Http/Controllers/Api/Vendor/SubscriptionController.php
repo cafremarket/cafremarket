@@ -99,7 +99,7 @@ class SubscriptionController extends Controller
             } elseif ($subscription->valid()) {
                 $status = 'active';
                 $endsAt = optional($subscription->ends_at)->toIso8601String();
-                $canCancel = $subscription->provider === 'stripe';
+                $canCancel = $subscription->provider === 'stripe' || $walletBilling;
             } else {
                 $status = 'expired';
             }
@@ -305,8 +305,11 @@ class SubscriptionController extends Controller
             return response()->json(['message' => trans('messages.subscription_disabled')], 403);
         }
 
+        $isWallet = false;
+
         try {
-            $plan = $request->user()->getCurrentPlan();
+            $merchant = $request->user();
+            $plan = $merchant->getCurrentPlan();
 
             if (! $plan) {
                 return response()->json([
@@ -314,13 +317,28 @@ class SubscriptionController extends Controller
                 ], 404);
             }
 
+            $isWallet = $plan->provider === 'wallet';
+
             $plan->cancel();
+
+            if ($isWallet) {
+                $shop = $merchant->merchantShop();
+
+                if ($shop) {
+                    $shop->forceFill(['current_billing_plan' => null])->saveQuietly();
+                    $shop->unsetRelation('subscriptions');
+                    $shop->unsetRelation('currentSubscription');
+                }
+            }
+
+            $merchant->unsetRelation('shop');
+            $merchant->unsetRelation('owns');
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
 
         return response()->json([
-            'message' => trans('messages.subscription_cancelled'),
+            'message' => trans($isWallet ? 'messages.subscription_removed' : 'messages.subscription_cancelled'),
         ]);
     }
 

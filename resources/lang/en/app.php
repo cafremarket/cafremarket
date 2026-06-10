@@ -672,6 +672,7 @@ return [
     'choose_plan' => 'Choose a plan',
     'resource_uses' => 'Resource uses',
     'resume_subscription' => 'Resume subscription',
+    'remove_subscription' => 'Remove subscription',
     'apply' => 'Apply',
     'cancel' => 'Cancel',
     'cancel_plan' => 'Cancel subscription',

@@ -148,6 +148,34 @@ class Subscription extends CashierSubscription
         return parent::active();
     }
 
+    public function cancel()
+    {
+        if ($this->provider == 'wallet') {
+            $this->forceFill([
+                'ends_at' => now(),
+                'trial_ends_at' => null,
+            ])->save();
+
+            return $this;
+        }
+
+        return parent::cancel();
+    }
+
+    /**
+     * Cancel the subscription immediately.
+     *
+     * @return $this
+     */
+    public function cancelNow()
+    {
+        if ($this->provider == 'wallet') {
+            return $this->cancel();
+        }
+
+        return parent::cancelNow();
+    }
+
     public function getProviderAttribute()
     {
         return $this->stripe_id ? 'stripe' : 'wallet';

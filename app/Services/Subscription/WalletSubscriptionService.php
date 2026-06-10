@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+
 class WalletSubscriptionService
 {
     /**
@@ -18,9 +19,7 @@ class WalletSubscriptionService
      */
     public function activate(User $merchant, string $planId): Subscription
     {
-        if (! SystemConfig::isBillingThroughWallet()) {
-            throw new \RuntimeException(trans('messages.subscription_error'));
-        }
+        $this->assertWalletBillingEnabled();
 
         $shop = $merchant->merchantShop();
 
@@ -42,6 +41,28 @@ class WalletSubscriptionService
         return $this->createPlan($shop, $merchant, $plan, $planId);
     }
 
+    protected function assertWalletBillingEnabled(): void
+    {
+        $billing = (string) config('system.subscription.billing', 'stripe');
+
+        if ($billing !== 'wallet') {
+            Log::error('Wallet subscription blocked: billing mode is not wallet', [
+                'billing' => $billing,
+                'env' => app()->environment(),
+            ]);
+
+            throw new \RuntimeException(trans('messages.subscription_error'));
+        }
+
+        if (! is_incevio_package_loaded(['wallet', 'subscription'])) {
+            Log::error('Wallet subscription blocked: wallet or subscription package not loaded');
+
+            throw new \RuntimeException(
+                trans('messages.dependent_package_failed', ['dependency' => 'wallet,subscription'])
+            );
+        }
+    }
+
     protected function swapPlan(Shop $shop, User $merchant, Subscription $subscription, SubscriptionPlan $plan, string $planId): Subscription
     {
         return DB::transaction(function () use ($shop, $merchant, $subscription, $plan, $planId) {
@@ -53,18 +74,19 @@ class WalletSubscriptionService
                 $this->chargeShop($shop, (float) $plan->cost, $plan->name);
             }
 
-            $subscription->fill([
-                'stripe_price' => $planId,
-                'type' => $plan->name,
-                'ends_at' => Carbon::now()->addMonth(),
-                'trial_ends_at' => null,
-                'stripe_id' => null,
-                'stripe_status' => null,
-            ])->save();
+            $subscription->fill(array_merge(
+                $this->planColumnPayload($plan, $planId),
+                [
+                    'ends_at' => Carbon::now()->addMonth(),
+                    'trial_ends_at' => null,
+                    'stripe_id' => null,
+                    'stripe_status' => null,
+                ]
+            ))->save();
 
             $this->syncShopBilling($shop, $planId, null);
 
-            return $this->verifySubscription($subscription->fresh(), $planId);
+            return $this->verifySubscription($subscription->fresh(), $planId, $shop->id);
         });
     }
 
@@ -87,7 +109,17 @@ class WalletSubscriptionService
                 }
             }
 
-            $subscription = $shop->subscriptions()->create($this->subscriptionPayload($plan, $planId, $trialEndsAt, $endsAt));
+            $subscription = $shop->subscriptions()->create(array_merge(
+                $this->planColumnPayload($plan, $planId),
+                [
+                    'stripe_price' => $planId,
+                    'quantity' => 1,
+                    'trial_ends_at' => $trialEndsAt,
+                    'ends_at' => $endsAt,
+                    'stripe_id' => null,
+                    'stripe_status' => null,
+                ]
+            ));
 
             try {
                 if ($chargeNow && (float) $plan->cost > 0) {
@@ -100,24 +132,27 @@ class WalletSubscriptionService
 
             $this->syncShopBilling($shop, $planId, $trialEndsAt);
 
-            return $this->verifySubscription($subscription->fresh(), $planId);
+            return $this->verifySubscription($subscription->fresh(), $planId, $shop->id);
         });
     }
 
-    protected function subscriptionPayload(SubscriptionPlan $plan, string $planId, $trialEndsAt, $endsAt): array
+    /**
+     * Support both legacy (name) and current (type) subscription table schemas.
+     */
+    protected function planColumnPayload(SubscriptionPlan $plan, string $planId): array
     {
-        $payload = [
-            'type' => $plan->name,
-            'stripe_price' => $planId,
-            'quantity' => 1,
-            'trial_ends_at' => $trialEndsAt,
-            'ends_at' => $endsAt,
-            'stripe_id' => null,
-            'stripe_status' => null,
-        ];
+        $payload = [];
+
+        if (Schema::hasColumn('subscriptions', 'type')) {
+            $payload['type'] = $plan->name;
+        }
 
         if (Schema::hasColumn('subscriptions', 'name')) {
             $payload['name'] = $plan->name;
+        }
+
+        if (Schema::hasColumn('subscriptions', 'stripe_price')) {
+            $payload['stripe_price'] = $planId;
         }
 
         return $payload;
@@ -163,32 +198,42 @@ class WalletSubscriptionService
             ->update(['ends_at' => now()]);
     }
 
-    protected function verifySubscription(?Subscription $subscription, string $planId): Subscription
+    protected function verifySubscription(?Subscription $subscription, string $planId, int $shopId): Subscription
     {
-        if (! $subscription || ! $subscription->valid()) {
-            Log::error('Wallet subscription activation verification failed', [
-                'subscription_id' => $subscription?->id,
-                'shop_id' => $subscription?->shop_id,
-                'plan_id' => $planId,
-                'stripe_price' => $subscription?->stripe_price,
-                'ends_at' => $subscription?->ends_at,
-                'trial_ends_at' => $subscription?->trial_ends_at,
-                'stripe_id' => $subscription?->stripe_id,
-            ]);
+        if (! $subscription) {
+            $this->logVerificationFailure(null, $planId, $shopId, 'subscription_row_missing');
 
             throw new \RuntimeException(trans('messages.subscription_error'));
         }
 
         if ($subscription->stripe_price !== $planId) {
-            Log::error('Wallet subscription plan mismatch after activation', [
-                'subscription_id' => $subscription->id,
-                'expected_plan' => $planId,
-                'actual_plan' => $subscription->stripe_price,
-            ]);
+            $this->logVerificationFailure($subscription, $planId, $shopId, 'plan_mismatch');
+
+            throw new \RuntimeException(trans('messages.subscription_error'));
+        }
+
+        if (! $subscription->valid()) {
+            $this->logVerificationFailure($subscription, $planId, $shopId, 'not_valid');
 
             throw new \RuntimeException(trans('messages.subscription_error'));
         }
 
         return $subscription;
+    }
+
+    protected function logVerificationFailure(?Subscription $subscription, string $planId, int $shopId, string $reason): void
+    {
+        Log::error('Wallet subscription activation verification failed', [
+            'reason' => $reason,
+            'shop_id' => $shopId,
+            'plan_id' => $planId,
+            'subscription_id' => $subscription?->id,
+            'stripe_price' => $subscription?->stripe_price,
+            'ends_at' => $subscription?->ends_at?->toIso8601String(),
+            'trial_ends_at' => $subscription?->trial_ends_at?->toIso8601String(),
+            'stripe_id' => $subscription?->stripe_id,
+            'billing' => config('system.subscription.billing'),
+            'environment' => app()->environment(),
+        ]);
     }
 }

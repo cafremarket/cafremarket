@@ -61,10 +61,12 @@
                               <i class="fa fa-play"></i> {{ trans('app.resume_subscription') }}
                             </a>
                           @elseif($current_plan->provider == 'stripe')
-                            {!! Form::open(['route' => ['admin.account.subscription.cancel', $current_plan], 'method' => 'delete', 'class' => 'inline']) !!}
-                            <button type="submit" class="confirm ajax-silent btn btn-lg btn-danger">
-                              <i class="fa fa-times-circle-o"></i> {{ trans('app.cancel') }}
-                            </button>
+                            {!! Form::open(['route' => 'admin.account.subscription.cancel', 'method' => 'delete', 'class' => 'inline']) !!}
+                            {!! Form::button('<i class="fa fa-times-circle-o"></i> '.trans('app.cancel'), ['type' => 'submit', 'class' => 'confirm ajax-silent btn btn-lg btn-danger']) !!}
+                            {!! Form::close() !!}
+                          @elseif($current_plan->valid())
+                            {!! Form::open(['route' => 'admin.account.subscription.cancel', 'method' => 'delete', 'class' => 'inline']) !!}
+                            {!! Form::button('<i class="fa fa-times-circle-o"></i> '.trans('app.remove_subscription'), ['type' => 'submit', 'class' => 'confirm ajax-silent btn btn-lg btn-danger']) !!}
                             {!! Form::close() !!}
                           @else
                             <button class="btn btn-lg btn-new disabled">
