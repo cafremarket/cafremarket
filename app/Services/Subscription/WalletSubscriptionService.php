@@ -100,12 +100,14 @@ class WalletSubscriptionService
             $endsAt = Carbon::now()->addMonth();
 
             if (! $chargeNow) {
-                if ($shop->onGenericTrial() && $shop->trial_ends_at && $shop->trial_ends_at->isFuture()) {
-                    $trialEndsAt = $shop->trial_ends_at;
+                $trialEndsAt = $this->resolveTrialEndsAt($shop);
+
+                if ($trialEndsAt) {
                     $endsAt = null;
-                } elseif ($trialDays = (int) config('system_settings.trial_days')) {
-                    $trialEndsAt = Carbon::now()->addDays($trialDays);
-                    $endsAt = null;
+                } else {
+                    // No active trial to apply — treat as paid activation.
+                    $chargeNow = (float) $plan->cost > 0;
+                    $endsAt = Carbon::now()->addMonth();
                 }
             }
 
@@ -156,6 +158,24 @@ class WalletSubscriptionService
         }
 
         return $payload;
+    }
+
+    /**
+     * Trial end for a new subscription row (never reuse an expired shop trial date).
+     */
+    protected function resolveTrialEndsAt(Shop $shop): ?Carbon
+    {
+        if ($shop->onGenericTrial() && $shop->trial_ends_at && $shop->trial_ends_at->isFuture()) {
+            return $shop->trial_ends_at->copy();
+        }
+
+        $trialDays = (int) config('system_settings.trial_days');
+
+        if ($trialDays > 0) {
+            return Carbon::now()->addDays($trialDays);
+        }
+
+        return null;
     }
 
     protected function chargeShop(Shop $shop, float $amount, string $planName): void
@@ -213,6 +233,21 @@ class WalletSubscriptionService
         }
 
         if (! $subscription->valid()) {
+            $planCost = (float) (SubscriptionPlan::find($planId)?->cost ?? 0);
+            $missingPaidPeriod = $subscription->ends_at === null
+                && ($subscription->trial_ends_at === null || $subscription->trial_ends_at->isPast());
+
+            // Paid row missing ends_at (or stuck on expired trial) — repair once before failing.
+            if ($missingPaidPeriod && $planCost > 0) {
+                $subscription->forceFill([
+                    'ends_at' => Carbon::now()->addMonth(),
+                    'trial_ends_at' => null,
+                ])->save();
+                $subscription = $subscription->fresh();
+            }
+        }
+
+        if (! $subscription || ! $subscription->valid()) {
             $this->logVerificationFailure($subscription, $planId, $shopId, 'not_valid');
 
             throw new \RuntimeException(trans('messages.subscription_error'));

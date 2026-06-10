@@ -188,21 +188,28 @@ if (! function_exists('subscription_plan_label')) {
 
 if (! function_exists('subscription_charges_immediately')) {
     /**
-     * Whether the shop must pay the plan fee now (no active trial).
+     * Whether the shop must pay the plan fee now (no active shop generic trial).
      */
     function subscription_charges_immediately(\App\Models\User $merchant, \App\Models\SubscriptionPlan $plan): bool
     {
-        $shop = $merchant->shop;
-
-        if ($shop->onGenericTrial() && $shop->trial_ends_at && now()->lt($shop->trial_ends_at)) {
+        if ((float) $plan->cost <= 0) {
             return false;
         }
 
-        if ((bool) config('system_settings.trial_days')) {
+        $shop = method_exists($merchant, 'merchantShop')
+            ? ($merchant->merchantShop() ?? $merchant->shop)
+            : $merchant->shop;
+
+        if (
+            $shop
+            && $shop->onGenericTrial()
+            && $shop->trial_ends_at
+            && $shop->trial_ends_at->isFuture()
+        ) {
             return false;
         }
 
-        return (float) $plan->cost > 0;
+        return true;
     }
 }
 

@@ -21,7 +21,7 @@
         </span>
       @endif
     </div>
-  @elseif($subscription && $subscription->provider == 'wallet' && $subscription->active() && $subscription->ends_at)
+  @elseif($subscription && $subscription->provider == 'wallet' && $subscription->active() && optional($subscription->ends_at))
     <div class="alert alert-success alert-dismissible">
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
       <strong><i class="icon fa fa-info-circle"></i>{{ trans('app.notice') }}</strong>
