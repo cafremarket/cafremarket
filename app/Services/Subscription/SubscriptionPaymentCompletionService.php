@@ -2,10 +2,11 @@
 
 namespace App\Services\Subscription;
 
-use App\Jobs\SubscribeShopToNewPlan;
 use App\Models\Shop;
 use App\Models\SubscriptionPlan;
+use App\Models\SystemConfig;
 use App\Models\User;
+use App\Jobs\SubscribeShopToNewPlan;
 use Illuminate\Support\Facades\Log;
 
 class SubscriptionPaymentCompletionService
@@ -26,28 +27,22 @@ class SubscriptionPaymentCompletionService
         }
 
         try {
-            $currentPlan = $merchant->getCurrentPlan();
+            if (SystemConfig::isBillingThroughWallet()) {
+                app(WalletSubscriptionService::class)->activate($merchant, $planId);
+            } else {
+                $currentPlan = $merchant->getCurrentPlan();
 
-            if ($currentPlan && $currentPlan->stripe_price === $planId) {
-                return true;
-            }
-
-            if ($currentPlan) {
-                $currentPlan->swap($planId);
-
-                if ($shop->current_billing_plan !== $planId) {
-                    $shop->forceFill(['current_billing_plan' => $planId])->save();
+                if ($currentPlan && $currentPlan->stripe_price === $planId) {
+                    return true;
                 }
 
-                $shop->unsetRelation('subscriptions');
-                $shop->unsetRelation('currentSubscription');
-            } else {
                 SubscribeShopToNewPlan::dispatchSync($merchant, $planId);
-                $shop->unsetRelation('subscriptions');
-                $shop->unsetRelation('currentSubscription');
             }
 
-            return true;
+            $merchant->unsetRelation('shop');
+            $merchant->load('shop');
+
+            return $merchant->isSubscribed();
         } catch (\Exception $e) {
             Log::error('Subscription auto-complete after deposit failed: '.$e->getMessage(), [
                 'shop_id' => $shop->id,

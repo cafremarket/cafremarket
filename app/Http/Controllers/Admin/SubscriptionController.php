@@ -11,6 +11,7 @@ use App\Models\SubscriptionPlan;
 use App\Models\SystemConfig;
 use App\Models\User;
 use App\Services\Subscription\SubscriptionMobilePaymentService;
+use App\Services\Subscription\WalletSubscriptionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -95,7 +96,9 @@ class SubscriptionController extends Controller
                     ->with('success', trans('messages.subscribed'));
             }
 
-            if ($currentPlan) {
+            if (SystemConfig::isBillingThroughWallet()) {
+                app(WalletSubscriptionService::class)->activate($merchant, $plan);
+            } elseif ($currentPlan) {
                 $currentPlan->swap($plan);
 
                 if ($merchant->shop->current_billing_plan !== $plan) {
@@ -108,6 +111,13 @@ class SubscriptionController extends Controller
                 SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
                 $merchant->shop->unsetRelation('subscriptions');
                 $merchant->shop->unsetRelation('currentSubscription');
+            }
+
+            $merchant->unsetRelation('shop');
+            $merchant->load('shop');
+
+            if (! $merchant->isSubscribed()) {
+                throw new \RuntimeException(trans('messages.subscription_error'));
             }
         } catch (\Throwable $e) {
             Log::error('Subscription Failed: '.$e->getMessage(), ['exception' => $e]);

@@ -9,6 +9,7 @@ use App\Jobs\SubscribeShopToNewPlan;
 use App\Models\SubscriptionPlan;
 use App\Models\SystemConfig;
 use App\Services\Subscription\SubscriptionMobilePaymentService;
+use App\Services\Subscription\WalletSubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -237,7 +238,9 @@ class SubscriptionController extends Controller
                 ]);
             }
 
-            if ($currentPlan) {
+            if (SystemConfig::isBillingThroughWallet()) {
+                app(WalletSubscriptionService::class)->activate($merchant, $plan);
+            } elseif ($currentPlan) {
                 $currentPlan->swap($plan);
 
                 if ($merchant->shop->current_billing_plan !== $plan) {
@@ -252,6 +255,13 @@ class SubscriptionController extends Controller
                 SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
                 $merchant->shop->unsetRelation('subscriptions');
                 $merchant->shop->unsetRelation('currentSubscription');
+            }
+
+            $merchant->unsetRelation('shop');
+            $merchant->load('shop');
+
+            if (! $merchant->isSubscribed()) {
+                throw new \RuntimeException(trans('messages.subscription_error'));
             }
         } catch (\Throwable $e) {
             Log::error('Vendor API subscription failed: '.$e->getMessage(), ['exception' => $e]);

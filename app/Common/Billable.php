@@ -28,13 +28,12 @@ trait Billable
      */
     public function activeSubscription()
     {
-        foreach ($this->subscriptions as $subscription) {
-            if ($subscription->valid()) {
-                return $subscription;
-            }
-        }
-
-        return null;
+        return $this->subscriptions()
+            ->orderByDesc('id')
+            ->get()
+            ->first(function (Subscription $subscription) {
+                return $subscription->valid();
+            });
     }
 
     /**
