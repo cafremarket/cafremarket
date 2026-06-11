@@ -48,7 +48,7 @@ class ProductController extends Controller
             $products = $products->vendorSearch($search);
         }
 
-        $products = $products->paginate();
+        $products = $products->latest('id')->paginate();
 
         return ProductLightResource::collection($products);
     }
@@ -61,9 +61,15 @@ class ProductController extends Controller
      */
     public function store(CreateProductRequest $request)
     {
+        $storedProduct = null;
+
         try {
-            DB::transaction(function () use ($request) {
+            DB::transaction(function () use ($request, &$storedProduct) {
                 $storedProduct = $this->product->store($request);
+
+                if ($request->shop_id && (int) $storedProduct->shop_id !== (int) $request->shop_id) {
+                    $storedProduct->forceFill(['shop_id' => $request->shop_id])->saveQuietly();
+                }
 
                 $inventoryData = [
                     'title' => $request->name,
@@ -89,7 +95,10 @@ class ProductController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
 
-        return response()->json(['message' => trans('api.product_created_successfully')], 200);
+        return response()->json([
+            'message' => trans('api.product_created_successfully'),
+            'product_id' => $storedProduct?->id,
+        ], 200);
     }
 
     /**

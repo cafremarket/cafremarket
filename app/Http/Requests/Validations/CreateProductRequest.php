@@ -42,7 +42,6 @@ class CreateProductRequest extends Request
             'category_list' => 'required',
             'name' => 'required',
             'slug' => 'required|unique:products',
-            'skus.*' => 'required|distinct|unique:inventories,sku',
             'description' => 'required',
             'active' => 'required',
             'min_price' => 'nullable|numeric|min:0',

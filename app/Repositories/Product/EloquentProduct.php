@@ -32,6 +32,10 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
     {
         $query = $this->model->with([
             'inventories.shop',
+            'manufacturer',
+            'categories',
+            'images',
+            'tags',
         ]);
 
         if (! Auth::user()->isFromPlatform()) {

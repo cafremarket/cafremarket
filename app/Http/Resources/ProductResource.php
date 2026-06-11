@@ -26,11 +26,13 @@ class ProductResource extends JsonResource
             'mpn' => $this->mpn,
             'brand' => $this->brand,
             'downloadable' => $this->downloadable,
-            'manufacturer' => [
-                'id' => $this->manufacturer->id,
-                'name' => $this->manufacturer->name,
-                'slug' => $this->manufacturer->slug,
-            ],
+            'manufacturer' => $this->manufacturer
+                ? [
+                    'id' => $this->manufacturer->id,
+                    'name' => $this->manufacturer->name,
+                    'slug' => $this->manufacturer->slug,
+                ]
+                : null,
             'requirement_shipping' => $this->requires_shipping,
             'categories' => CategoryLightResource::collection($this->categories),
             'origin' => optional($this->origin)->name,

@@ -29,6 +29,7 @@ class QuickInventoryUpdateRequest extends Request
         $rules = [
             // 'sku' => 'bail|required|composite_unique:inventories,sku,shop_id:' .  $shop_id . ',' . $id,
             'title' => 'required',
+            'stock_quantity' => 'nullable|integer|min:0',
             'sale_price' => 'required|numeric',
             'active' => 'required',
         ];
