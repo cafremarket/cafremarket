@@ -13,7 +13,6 @@ class UpdateDealOfTheDayRequest extends Request
      */
     public function authorize()
     {
-        incevioAutoloadHelpers(getMysqliConnection());
         return true;
     }
 

@@ -13,7 +13,6 @@ class UpdateFeaturedItemsRequest extends Request
      */
     public function authorize()
     {
-        incevioAutoloadHelpers(getMysqliConnection());
         return true;
     }
 

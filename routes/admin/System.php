@@ -56,16 +56,6 @@ Route::name('system.')->prefix('system')->group(function () {
         'backup',
     ])->name('backup');
 
-    // License
-    Route::get('license/uninstall', [
-        SystemController::class,
-        'uninstallLicense',
-    ])->name('license.uninstall')->middleware('ajax');
-
-    Route::post('license/uninstall', [
-        SystemController::class,
-        'uninstallLicense',
-    ])->name('license.reset');
 });
 
 // Application key for mobile app

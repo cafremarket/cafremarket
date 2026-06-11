@@ -14,7 +14,6 @@ class UpdateFeaturedCategories extends Request
      */
     public function authorize()
     {
-        incevioAutoloadHelpers(getMysqliConnection());
         return Auth::user()->isFromPlatform();
     }
 

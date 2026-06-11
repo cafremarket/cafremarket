@@ -6,15 +6,11 @@
       {{ trans('app.install') }}
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        {!! Form::label('license_key', trans('app.license_key') . '*', ['class' => 'with-help']) !!}
-        {!! Form::text('license_key', null, ['class' => 'form-control input-lg', 'placeholder' => trans('app.enter_license_key'), 'required']) !!}
-        <div class="help-block with-errors"><small class="text-primary"><i class="fa fa-question-circle"></i> {{ trans('help.verify_license_key') }}</small> </div>
-      </div>
+      <p>{{ trans('app.install') }}: <strong>{{ $theme }}</strong></p>
     </div>
     <div class="modal-footer">
-      {!! Form::submit(trans('app.verify'), ['class' => 'btn btn-flat btn-lg btn-primary']) !!}
+      {!! Form::submit(trans('app.install'), ['class' => 'btn btn-flat btn-lg btn-primary']) !!}
     </div>
     {!! Form::close() !!}
-  </div> <!-- / .modal-content -->
-</div> <!-- / .modal-dialog -->
+  </div>
+</div>

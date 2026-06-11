@@ -3,8 +3,6 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
-use App\Rules\License;
-
 class ThemeInstallationRequest extends Request
 {
     /**
@@ -24,20 +22,6 @@ class ThemeInstallationRequest extends Request
      */
     public function rules()
     {
-        return [
-            'license_key' => ['bail', 'required', 'alpha_dash', new License],
-        ];
-    }
-
-    /**
-     * Get the error messages for the defined validation rules.
-     *
-     * @return array
-     */
-    public function messages()
-    {
-        return [
-            'license_key.alpha_dash' => trans('app.invalid_license_key'),
-        ];
+        return [];
     }
 }

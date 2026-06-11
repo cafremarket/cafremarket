@@ -29,12 +29,6 @@
           </a>
         </li>
 
-        <li>
-          <a href="#license_tab" data-toggle="tab">
-            <i class="fa fa-key hidden-sm"></i>
-            {{ trans('app.license') }}
-          </a>
-        </li>
       </ul>
 
       <div class="tab-content">
@@ -361,18 +355,6 @@
           <div class="row">
             @if (Auth::guard('web')->user()->isSuperAdmin())
               @unless (config('app.demo') == true)
-                {{-- <div class="col-sm-4 text-justify">
-                  <a href="javascript:void(0)" data-link="{{ route('admin.setting.license.reset') }}" class="ajax-modal-btn btn btn-danger btn-lg">
-                    {{ trans('app.reset_app_license') }}
-                  </a>
-
-                  <div class="spacer10"></div>
-
-                  <p class="text-danger">
-                    <i class="fa fa-info-circle"></i> {!! trans('help.reset_app_license') !!}
-                  </p>
-                </div><!-- /.col-sm-4 --> --}}
-
                 <div class="col-sm-6 col-sm-offset-3 text-justify">
                   <h3> <i class="fa fa-exclamation-triangle"></i> {{ trans('help.warning') }}!</h3>
                   <p class="text-danger lead">
@@ -425,63 +407,6 @@
           <div class="spacer50"></div>
         </div><!-- /.tab-pane -->
 
-        <div class="tab-pane" id="license_tab">
-          <div class="row">
-            @if (Auth::guard('web')->user()->isSuperAdmin())
-              @unless (config('app.demo') == true)
-                {{-- <div class="col-sm-4 text-justify">
-                  <a href="javascript:void(0)" data-link="{{ route('admin.setting.license.reset') }}" class="ajax-modal-btn btn btn-danger btn-lg">
-                    {{ trans('app.reset_app_license') }}
-                  </a>
-
-                  <div class="spacer10"></div>
-
-                  <p class="text-danger">
-                    <i class="fa fa-info-circle"></i> {!! trans('help.reset_app_license') !!}
-                  </p>
-                </div><!-- /.col-sm-4 --> --}}
-
-                <div class="col-sm-4 col-sm-offset-4 text-justify">
-                  <h3> <i class="fa fa-exclamation-triangle"></i> {{ trans('help.warning') }}!</h3>
-                  <p class="text-danger lead">
-                    {!! trans('help.uninstall_license_incevio') !!}</br>
-                    <small><a href="https://incevio.com/page/guidelines_of_incevio_self_support_portal" target="_blank" rel="nofollow noindex noopener">{{ trans('help.need_help') }}</a></small>
-                  </p>
-
-                  <a href="javascript:void(0)" data-link="{{ route('admin.setting.system.license.uninstall') }}" class="ajax-modal-btn btn btn-danger btn-lg">
-                    {{ trans('app.uninstall_app_license') }}
-                  </a>
-                  <div class="spacer10"></div>
-
-                  <p class="text-danger lead">
-                    <i class="fa fa-exclamation-triangle"></i>
-                    {!! trans('help.cant_revert_action') !!}
-                  </p>
-
-                  <div class="spacer10"></div>
-
-                  <p class="text-danger">
-                    {!! trans('help.uninstall_app_license') !!}
-                  </p>
-                </div><!-- /.col-sm-4 -->
-
-                <div class="col-sm-4 text-justify">
-                  {{-- <a href="{{ route('admin.setting.license.update') }}" class="btn btn-default btn-lg confirm">
-                    {{ trans('app.update_app_license') }}
-                  </a>
-
-                  <div class="spacer10"></div>
-
-                  <p class="text-info">
-                    <i class="fa fa-info-circle"></i>
-                    {!! trans('help.update_app_license') !!}
-                  </p> --}}
-                </div><!-- /.col-sm-4 -->
-              @endunless
-            @endif
-          </div><!-- /.row -->
-          <div class="spacer50"></div>
-        </div><!-- /.tab-pane -->
       </div><!-- /.tab-content -->
     </div> <!-- /.nav-tabs-custom -->
   </div> <!-- /.box -->

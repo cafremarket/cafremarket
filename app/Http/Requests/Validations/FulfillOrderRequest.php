@@ -25,8 +25,6 @@ class FulfillOrderRequest extends Request
     {
         Request::merge(['order_status_id' => 4]);
 
-        incevioAutoloadHelpers(getMysqliConnection());
-
         return [
             // 'cart.*.inventory_id' => 'required',
             // 'cart.*.item_description' => 'required',

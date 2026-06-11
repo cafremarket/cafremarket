@@ -12,10 +12,6 @@
     <!-- Home tab content -->
     <div class="tab-pane active" id="control-sidebar-home-tab">
 
-      {{-- License Settings --}}
-      <h3 class="control-sidebar-heading"><i class="fa fa-key"></i> {{ trans('app.license') }}</h3>
-      <a href="" class="btn btn-warning btn-block">{{ trans('app.license_reset') }}</a>
-
       <h3 class="control-sidebar-heading"><i class="fa fa-key"></i> {{ trans('app.system') }}</h3>
       <a href="{{ route('admin.incevio.clear') }}" class="btn btn-default btn-block btn-lg confirm">
         <i class="fa fa-info-circle" data-toggle="tooltip" title="{!! trans('help.help_clear_cache') !!}" data-placement="left"></i>

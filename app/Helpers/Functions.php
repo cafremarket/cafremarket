@@ -3138,18 +3138,6 @@ if (! function_exists('get_flash_deals')) {
     }
 }
 
-if (! function_exists('get_license_reset_url')) {
-    /**
-     * Get the license reset url
-     *
-     * @return string url
-     */
-    function get_license_reset_url()
-    {
-        return url('admin/setting/system/general#license_tab');
-    }
-}
-
 if (! function_exists('get_custom_css')) {
     /**
      * Get custom css
