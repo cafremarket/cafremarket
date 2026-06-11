@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Repositories\Inventory\InventoryRepository;
 use App\Repositories\Product\ProductRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -61,27 +62,29 @@ class ProductController extends Controller
     public function store(CreateProductRequest $request)
     {
         try {
-            $storedProduct = $this->product->store($request);
+            DB::transaction(function () use ($request) {
+                $storedProduct = $this->product->store($request);
 
-            $inventoryData = [
-                'title' => $request->name,
-                'brand' => $request->brand,
-                'sku' => $request->sku,
-                'description' => $request->description,
-                'stock_quantity' => $request->input('stock_quantity', 1),
-                'sale_price' => $request->sale_price,
-                'active' => $request->active,
-                'slug' => $request->slug,
-                'user_id' => $request->user_id,
-                'shop_id' => $request->shop_id,
-                'product_id' => $storedProduct->id,
-            ];
+                $inventoryData = [
+                    'title' => $request->name,
+                    'brand' => $request->brand,
+                    'sku' => $request->sku,
+                    'description' => $request->description,
+                    'stock_quantity' => $request->input('stock_quantity', 1),
+                    'sale_price' => $request->sale_price,
+                    'active' => $request->active,
+                    'slug' => $request->slug,
+                    'user_id' => $request->user_id,
+                    'shop_id' => $request->shop_id,
+                    'product_id' => $storedProduct->id,
+                ];
 
-            if ($request->filled('warehouse_id')) {
-                $inventoryData['warehouse_id'] = $request->warehouse_id;
-            }
+                if ($request->filled('warehouse_id')) {
+                    $inventoryData['warehouse_id'] = $request->warehouse_id;
+                }
 
-            $this->inventory->store(new Request($inventoryData));
+                $this->inventory->store(new Request($inventoryData));
+            });
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }

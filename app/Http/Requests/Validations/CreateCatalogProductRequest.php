@@ -21,11 +21,19 @@ class CreateCatalogProductRequest extends Request
      *
      * @return array
      */
+    protected function prepareForValidation()
+    {
+        $shop = $this->user()->merchantShop();
+
+        $this->merge([
+            'shop_id' => $shop?->id,
+        ]);
+    }
+
     public function rules()
     {
-        Request::merge(['shop_id' => $this->user()->merchantId()]); // Set shop_id
-
         return [
+            'shop_id' => 'required|exists:shops,id',
             'category_list' => 'required',
             'name' => 'required|unique:products',
             'slug' => 'required|unique:products',

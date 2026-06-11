@@ -52,6 +52,14 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
 
     public function store(Request $request)
     {
+        if (! $request->filled('shop_id') && Auth::check()) {
+            $shopId = Auth::user()->merchantId();
+
+            if ($shopId) {
+                $request->merge(['shop_id' => $shopId]);
+            }
+        }
+
         $product = parent::store($request);
 
         if ($request->has('category_list')) {

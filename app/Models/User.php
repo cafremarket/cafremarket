@@ -274,30 +274,30 @@ class User extends Authenticatable
      */
     public function merchantId()
     {
-        return $this->shop_id ?: optional($this->merchantShop())->id;
+        return optional($this->merchantShop())->id;
     }
 
     /**
-     * Resolve the merchant's shop (shop_id or owned shop).
+     * Resolve the merchant's shop (owned shop first, then assigned shop_id).
      */
     public function merchantShop(): ?Shop
     {
+        $owned = $this->relationLoaded('owns') ? $this->owns : $this->owns()->first();
+
+        if ($owned && $owned->getKey()) {
+            if ((int) $this->shop_id !== (int) $owned->getKey()) {
+                $this->forceFill(['shop_id' => $owned->getKey()])->saveQuietly();
+            }
+
+            return $owned;
+        }
+
         if ($this->shop_id) {
             $shop = $this->relationLoaded('shop') ? $this->shop : $this->shop()->first();
 
             if ($shop && $shop->getKey()) {
                 return $shop;
             }
-        }
-
-        $owned = $this->relationLoaded('owns') ? $this->owns : $this->owns()->first();
-
-        if ($owned && $owned->getKey()) {
-            if (! $this->shop_id) {
-                $this->forceFill(['shop_id' => $owned->getKey()])->saveQuietly();
-            }
-
-            return $owned;
         }
 
         return null;

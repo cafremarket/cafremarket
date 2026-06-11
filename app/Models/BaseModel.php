@@ -77,6 +77,12 @@ abstract class BaseModel extends Model
      */
     public function scopeMine($query)
     {
-        return $query->where('shop_id', Auth::user()->merchantId());
+        $shopId = Auth::user()?->merchantId();
+
+        if (! $shopId) {
+            return $query->whereRaw('0 = 1');
+        }
+
+        return $query->where('shop_id', $shopId);
     }
 }

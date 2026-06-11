@@ -22,20 +22,23 @@ class CreateProductRequest extends Request
      *
      * @return array
      */
-    public function rules()
+    protected function prepareForValidation()
     {
-        $user = $this->user(); // Get current user
-        Request::merge([
-            'shop_id' => $user->merchantId(),
+        $user = $this->user();
+        $shop = $user->merchantShop();
+
+        $this->merge([
+            'shop_id' => $shop?->id,
             'user_id' => $user->id,
         ]);
+    }
 
-        // Set slug
-        // if (!$this->has('slug')) {
-        //     Request::merge(['slug' => convertToSlugString($this->input('name'), $this->input('gtin'))]);
-        // }
+    public function rules()
+    {
+        $user = $this->user();
 
         return [
+            'shop_id' => 'required|exists:shops,id',
             'category_list' => 'required',
             'name' => 'required',
             'slug' => 'required|unique:products',

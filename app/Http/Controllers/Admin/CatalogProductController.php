@@ -36,9 +36,9 @@ class CatalogProductController extends Controller
     {
         if (Auth::user()->isFromPlatform()) {
             $trashes = Product::onlyTrashed()->with('categories', 'featureImage')->get();
+        } else {
+            $trashes = Product::mine()->onlyTrashed()->with('categories', 'featureImage')->get();
         }
-
-        $trashes = Product::mine()->onlyTrashed()->with('categories', 'featureImage')->get();
 
         return view('admin.product.index', compact('trashes'));
     }

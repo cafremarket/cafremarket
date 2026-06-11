@@ -101,7 +101,27 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
             }
         }
 
+        $this->syncProductShopId($inventory);
+
         return $inventory;
+    }
+
+    /**
+     * Keep product.shop_id aligned with inventory when the catalog row was saved without it.
+     */
+    private function syncProductShopId(Inventory $inventory): void
+    {
+        if (! $inventory->product_id || ! $inventory->shop_id) {
+            return;
+        }
+
+        Product::query()
+            ->whereKey($inventory->product_id)
+            ->where(function ($query) use ($inventory) {
+                $query->whereNull('shop_id')
+                    ->orWhere('shop_id', '!=', $inventory->shop_id);
+            })
+            ->update(['shop_id' => $inventory->shop_id]);
     }
 
     public function storeWithVariant(Request $request)
