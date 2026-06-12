@@ -139,7 +139,7 @@ return [
             'balance' => $bcLoaded ? 'string' : 'int',
         ],
         'default' => [
-            'name' => 'Default Wallet',
+            'name' => 'Cafrepay',
             'slug' => 'default',
         ],
     ],

@@ -37,9 +37,7 @@ class DepositController extends Controller
                 }
 
                 $response = $paymentBuilder
-                    ->setDescription(trans('packages.wallet.deposit_description', [
-                        'marketplace' => get_platform_title(),
-                    ]))
+                    ->setDescription(Transaction::depositDescriptionFor($paymentMethod))
                     ->setConfig()
                     ->charge();
             }
@@ -83,7 +81,10 @@ class DepositController extends Controller
         if ($response->status == PaymentService::STATUS_PAID) {
             $meta = [
                 'type' => Transaction::TYPE_DEPOSIT,
-                'description' => trans('packages.wallet.deposit_description', ['marketplace' => get_platform_title(), 'payment' => $request->payment_method]),
+                'payment_method' => (string) $request->payment_method,
+                'description' => Transaction::depositDescriptionFor(
+                    (string) $request->payment_method
+                ),
             ];
 
             $wallet = Auth::guard('api')->user();

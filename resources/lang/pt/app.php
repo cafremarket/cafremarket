@@ -824,7 +824,7 @@ return [
             'admin_description' => 'Enabling offline payment options will allow vendors to change their customer in more traditional ways. The vendor will be asked for instructions and additional information when they activate manual payment methods.',
         ],
         'mobile_wallet' => [
-            'name' => 'Cafre-Pay',
+            'name' => 'Cafrepay',
             'description' => 'Offer customers more payment options.',
             'admin_description' => 'Enable mobile payment options to allow vendors to charge their customers in a more mobile friendly ways.',
         ]
@@ -1819,7 +1819,7 @@ return [
     'security' => 'Segurança',
     'template' => 'Modelo',
     'is_default' => 'É padrão',
-    'wallet_transaction' => 'Transação da Cafre-Pay',
+    'wallet_transaction' => 'Transação Cafrepay',
     'affiliate_transaction' => 'Transação de afiliado',
     'details' => 'Detalhes',
     'billing_starts_at' => 'Início',

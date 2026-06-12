@@ -1820,7 +1820,7 @@ return [
     'security' => 'Security',
     'template' => 'Template',
     'is_default' => 'Is default',
-    'wallet_transaction' => 'Wallet transaction',
+    'wallet_transaction' => 'Cafrepay transaction',
     'affiliate_transaction' => 'Affiliate transaction',
     'details' => 'Details',
     'billing_starts_at' => 'Starts',

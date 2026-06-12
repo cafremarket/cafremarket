@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\Vendor\UserController;
 use App\Http\Controllers\Api\Vendor\WarehouseController;
 use App\Http\Controllers\Api\Vendor\WalletController;
 use App\Http\Controllers\Api\Vendor\WalletDepositController;
+use App\Http\Controllers\Api\Vendor\WalletTransferController;
 use App\Http\Controllers\Api\Vendor\WalletWithdrawController;
 use App\Http\Controllers\FormDataController;
 use App\Http\Controllers\SearchController;
@@ -326,6 +327,8 @@ Route::prefix('vendor')->group(function () {
         Route::get('wallet/deposit/emola/status', [WalletDepositController::class, 'emolaDepositStatus']);
         Route::post('wallet/deposit/emola/resend', [WalletDepositController::class, 'emolaResendDeposit']);
         Route::post('wallet/withdraw', [WalletWithdrawController::class, 'withdraw']);
+        Route::get('wallet/transfer/vendors', [WalletTransferController::class, 'vendors']);
+        Route::post('wallet/transfer', [WalletTransferController::class, 'transfer']);
 
         // Dashboard
         Route::get('statistics/basic', [DashboardController::class, 'basicStatistics']);

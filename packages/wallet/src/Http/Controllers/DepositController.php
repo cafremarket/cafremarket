@@ -403,10 +403,8 @@ class DepositController extends Controller
                         if ($holder && method_exists($holder, 'deposit')) {
                             $meta = [
                                 'type' => Transaction::TYPE_DEPOSIT,
-                                'description' => trans('packages.wallet.deposit_description', [
-                                    'marketplace' => get_platform_title(),
-                                    'payment_method' => 'M-Pesa',
-                                ]),
+                                'payment_method' => 'mpesa',
+                                'description' => Transaction::depositDescriptionFor('mpesa'),
                             ];
                             if (! empty($data['platform_fee'])) {
                                 $meta['platform_fee'] = $data['platform_fee'];
@@ -660,10 +658,8 @@ class DepositController extends Controller
     private function getMetaInfo($payment)
     {
         return [
-            'description' => trans('packages.wallet.deposit_description', [
-                'marketplace' => get_platform_title(),
-                'payment_method' => $payment,
-            ]),
+            'payment_method' => (string) $payment,
+            'description' => Transaction::depositDescriptionFor((string) $payment),
         ];
     }
 }

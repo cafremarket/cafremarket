@@ -389,6 +389,69 @@ class Transaction extends Model
             && abs($paid - $credit) > 0.001;
     }
 
+    public static function walletBrandName(): string
+    {
+        return (string) config('wallet.wallet.default.name', 'Cafrepay');
+    }
+
+    public static function depositPaymentMethodLabel(string $method): string
+    {
+        $method = strtolower(trim($method));
+
+        if ($method === 'mpesa') {
+            return 'M-Pesa';
+        }
+
+        if ($method === 'emola') {
+            return 'eMola';
+        }
+
+        if ($method === '') {
+            return self::walletBrandName();
+        }
+
+        return ucfirst($method);
+    }
+
+    public static function depositDescriptionFor(?string $paymentMethod): string
+    {
+        return trans('packages.wallet.deposit_description', [
+            'payment_method' => self::depositPaymentMethodLabel((string) $paymentMethod),
+        ]);
+    }
+
+    public function displayDescription(): ?string
+    {
+        $stored = (string) $this->getFromMetaData('description');
+
+        if (! $this->isWalletDeposit()) {
+            return $stored !== '' ? $stored : null;
+        }
+
+        $paymentMethod = (string) $this->getFromMetaData('payment_method');
+
+        if ($paymentMethod === '') {
+            $paymentMethod = $this->guessPaymentMethodFromDescription($stored);
+        }
+
+        return self::depositDescriptionFor($paymentMethod);
+    }
+
+    private function guessPaymentMethodFromDescription(string $description): string
+    {
+        $description = strtolower($description);
+
+        if (str_contains($description, 'm-pesa') || str_contains($description, 'mpesa')) {
+            return 'mpesa';
+        }
+
+        if (str_contains($description, 'emola')) {
+            return 'emola';
+        }
+
+        return '';
+    }
+
     public function hasPayoutPaymentProof(): bool
     {
         return (bool) $this->getFromMetaData('payout_payment_proof_path');
@@ -481,7 +544,7 @@ class Transaction extends Model
         $transaction_invoice_generator = new PdfGenerator;
         $pdfTemplate = PdfTemplate::where('type', PdfTemplate::TYPE_WALLET_TRANSACTION)->where('is_default', true)->first();
 
-        return $transaction_invoice_generator->setGeneratedFileName(get_platform_title().' - '.$this->unique_id)
+        return $transaction_invoice_generator->setGeneratedFileName(self::walletBrandName().' - '.$this->unique_id)
             ->generatePdfFromTemplate($dataForInvoice, $pdfTemplate, 'a4', $action, $file_path);
     }
 
@@ -548,7 +611,7 @@ class Transaction extends Model
         $pdfGenerator = new PdfGenerator;
         $pdfTemplate = PdfTemplate::where('type', PdfTemplate::TYPE_WALLET_TRANSACTION)->where('is_default', true)->first();
 
-        return $pdfGenerator->setGeneratedFileName(get_platform_title().' - '.$this->unique_id)
+        return $pdfGenerator->setGeneratedFileName(self::walletBrandName().' - '.$this->unique_id)
             ->generatePdfFromTemplate($dataForInvoice, $pdfTemplate, 'a4', 'stream');
     }
 
@@ -614,7 +677,7 @@ class Transaction extends Model
     {
         $platform_address = multi_tag_explode([',', '<br/>'], strip_tags(get_platform_address(), '<br>'));
         $platform_address = array_filter(array_map('trim', $platform_address));
-        array_unshift($platform_address, get_platform_title());
+        array_unshift($platform_address, self::walletBrandName());
         unset($platform_address[1]);
         $platform_address = array_values($platform_address);
 

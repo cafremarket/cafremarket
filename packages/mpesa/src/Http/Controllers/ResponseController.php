@@ -94,10 +94,8 @@ class ResponseController extends Controller
         Cache::put($paidKey, 1, now()->addHours(24));
         $meta = [
             'type' => Transaction::TYPE_DEPOSIT,
-            'description' => trans('packages.wallet.deposit_description', [
-                'marketplace' => get_platform_title(),
-                'payment_method' => 'M-Pesa',
-            ]),
+            'payment_method' => 'mpesa',
+            'description' => Transaction::depositDescriptionFor('mpesa'),
         ];
         if (! empty($data['platform_fee'])) {
             $meta['platform_fee'] = $data['platform_fee'];

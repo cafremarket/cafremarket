@@ -54,7 +54,7 @@
     $transaction = $data['transaction'] ?? $data;
     $invoice_from = $data['invoice_from'] ?? '';
     $invoice_to = $data['invoice_to'] ?? '';
-    $footer_string = get_platform_title() . ' | ' . url('/') . ' | ' . trans('invoice.footer_note');
+    $footer_string = \Incevio\Package\Wallet\Models\Transaction::walletBrandName() . ' | ' . url('/') . ' | ' . trans('invoice.footer_note');
   @endphp
   <div style="width:100%">
     <div style="float:left; margin-top: 20px;">
@@ -103,7 +103,7 @@
         $showAmountOnMainRow = ! ($isDeposit && $platformFee > 0);
       @endphp
       <tr>
-        <td>{{ $meta['description'] ?? '' }}</td>
+        <td>{{ $transaction->displayDescription() ?? ($meta['description'] ?? '') }}</td>
         <td>
           @if ($showAmountOnMainRow)
             {{ get_formated_currency($transaction->amount, 2) }}

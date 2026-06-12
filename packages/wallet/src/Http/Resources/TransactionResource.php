@@ -25,7 +25,7 @@ class TransactionResource extends JsonResource
         return [
             'id' => $this->id,
             'date' => $this->created_at->toDayDateTimeString(),
-            'description' => $this->meta['description'] ?? null,
+            'description' => $this->displayDescription(),
             'type' => $this->type,
             'amount' => get_formated_currency($this->amount, 2, $currencyId),
             'amount_raw' => $this->amount,

@@ -184,10 +184,8 @@ class EmolaWalletDepositService
 
         $meta = [
             'type' => Transaction::TYPE_DEPOSIT,
-            'description' => trans('packages.wallet.deposit_description', [
-                'marketplace' => get_platform_title(),
-                'payment_method' => 'eMola',
-            ]),
+            'payment_method' => 'emola',
+            'description' => Transaction::depositDescriptionFor('emola'),
         ];
         if (! empty($deposit['platform_fee'])) {
             $meta['platform_fee'] = $deposit['platform_fee'];
