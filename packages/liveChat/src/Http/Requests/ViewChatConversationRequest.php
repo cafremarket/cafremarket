@@ -3,6 +3,7 @@
 namespace Incevio\Package\LiveChat\Http\Requests;
 
 use App\Http\Requests\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ViewChatConversationRequest extends Request
 {
@@ -13,11 +14,14 @@ class ViewChatConversationRequest extends Request
      */
     public function authorize()
     {
-        if ($this->user() && ($this->user()->merchantId() == $this->chat->shop_id)) {
-            return true;
+        $chat = $this->route('chat');
+        $user = Auth::guard('vendor_api')->user() ?? $this->user();
+
+        if (! $user || ! $chat) {
+            return false;
         }
 
-        return false;
+        return (int) $user->merchantId() === (int) $chat->shop_id;
     }
 
     /**

@@ -211,6 +211,7 @@ class ConversationController extends Controller
 
         $chats = \Incevio\Package\LiveChat\Models\ChatConversation::query()
             ->where('shop_id', $shopId)
+            ->with(['customer', 'shop'])
             ->get();
 
         return ConversationResource::collection($chats);
