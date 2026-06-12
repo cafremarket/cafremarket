@@ -275,10 +275,18 @@ class ConversationController extends Controller
             'reply' => $replyText,
         ]);
 
-        if ($request->hasFile('photo')) {
-            $reply->saveAttachments($request->file('photo'));
-        } elseif ($request->filled('photo')) {
-            $reply->saveAttachments(create_file_from_base64($request->get('photo')));
+        try {
+            if ($request->hasFile('photo')) {
+                $reply->saveAttachments($request->file('photo'));
+            } elseif ($request->filled('photo')) {
+                $reply->saveAttachments(create_file_from_base64($request->get('photo')));
+            }
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'message' => $e->getMessage() ?: 'Could not store attachment.',
+            ], 422);
         }
 
         $attachmentsPayload = livechat_socket_attachments_payload($reply);

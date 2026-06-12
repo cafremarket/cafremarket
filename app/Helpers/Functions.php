@@ -834,16 +834,8 @@ if (! function_exists('pdf_dompdf_storage_image_src')) {
 if (! function_exists('get_placeholder_img')) {
     function get_placeholder_img($size = 'small', $txt = null)
     {
-        $size = config("image.sizes.{$size}");
-
-        $txt = $txt ?? get_platform_title();
-
-        if ($size && is_array($size)) {
-            return "https://placehold.co/{$size['w']}x{$size['h']}?font=roboto&text=".$txt;
-            // return "https://via.placeholder.com/{$size['w']}x{$size['h']}/eee?text=" . $txt;
-        }
-
-        return url('images/placeholders/no_img.png');
+        // Local PNG — external placehold.co URLs fail in Flutter/Android image decoders.
+        return asset('images/placeholders/no_img.png');
     }
 }
 

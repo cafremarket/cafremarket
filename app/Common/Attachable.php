@@ -56,9 +56,18 @@ trait Attachable
         $dir = attachment_storage_dir();
 
         $ownable = [];
-        if (Auth::check()) {
+        if (Auth::guard('vendor_api')->check()) {
+            $ownable['ownable_id'] = Auth::guard('vendor_api')->id();
+            $ownable['ownable_type'] = \App\Models\User::class;
+        } elseif (Auth::guard('customer')->check()) {
+            $ownable['ownable_id'] = Auth::guard('customer')->id();
+            $ownable['ownable_type'] = \App\Models\Customer::class;
+        } elseif (Auth::guard('api')->check()) {
+            $ownable['ownable_id'] = Auth::guard('api')->id();
+            $ownable['ownable_type'] = \App\Models\Customer::class;
+        } elseif (Auth::check()) {
             $ownable['ownable_id'] = Auth::user()->id;
-            $ownable['ownable_type'] = Auth::guard('customer')->check() ? \App\Models\Customer::class : \App\Models\User::class;
+            $ownable['ownable_type'] = \App\Models\User::class;
         }
 
         if (is_array($attachments)) {

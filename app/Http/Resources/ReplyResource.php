@@ -21,7 +21,9 @@ class ReplyResource extends JsonResource
             'customer' => $this->when($this->customer_id, new CustomerLightResource($this->customer)),
             'read' => $this->read,
             'updated_at' => $this->updated_at->diffForHumans(),
-            'attachments' => $this->when($this->attachments, AttachmentResource::collection($this->attachments)),
+            'attachments' => AttachmentResource::collection(
+                $this->whenLoaded('attachments', $this->attachments ?? collect())
+            ),
         ];
     }
 }

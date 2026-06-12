@@ -277,7 +277,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('settings', [ConfigController::class, 'index']);
         Route::match(['post', 'put'], 'settings/{shop}/update', [ConfigController::class, 'update']);
         Route::get('configs', [ConfigController::class, 'configs']);
-        Route::put('configs/{config}/update', [ConfigController::class, 'updateConfigs']);
+        Route::match(['put', 'post'], 'configs/{config}/update', [ConfigController::class, 'updateConfigs']);
 
         // Taxes
         Route::get('taxes', [TaxController::class, 'index']);

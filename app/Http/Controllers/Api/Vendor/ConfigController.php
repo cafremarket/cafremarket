@@ -110,23 +110,24 @@ class ConfigController extends Controller
      * @param  int  $config
      * @return void
      */
-    public function updateConfigs(Request $request, $config)
+    public function updateConfigs(UpdateConfigRequest $request, $config)
     {
         $this->assertOwnsShop((int) $config);
 
         $settings = Config::findOrFail($config);
+        $user = Auth::guard('vendor_api')->user() ?? Auth::user();
 
-        // Check permission
-
-        if ($settings->update($request->all())) {
-            event(new ConfigUpdated($settings->shop, Auth::user()));
+        if ($settings->update($request->only($settings->getFillable()))) {
+            if ($user) {
+                event(new ConfigUpdated($settings->shop, $user));
+            }
 
             clearShopConfigCache($settings->shop_id); // Clear cached values
 
             return response()->json(['message' => trans('api.config_updated_successfully')]);
         }
 
-        return response('error', 405);
+        return response()->json(['message' => trans('responses.error')], 405);
     }
 
     /**

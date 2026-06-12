@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateConfigRequest extends Request
 {
@@ -13,7 +14,13 @@ class UpdateConfigRequest extends Request
      */
     public function authorize()
     {
-        return Request::user()->merchantId() == Request::route('config');
+        $user = Auth::guard('vendor_api')->user() ?? $this->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return (int) $user->merchantId() === (int) $this->route('config');
     }
 
     /**

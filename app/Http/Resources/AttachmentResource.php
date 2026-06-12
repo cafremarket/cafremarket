@@ -20,6 +20,7 @@ class AttachmentResource extends JsonResource
             'path' => $this->path,
             'extension' => $this->extension,
             'size' => $this->size,
+            'url' => $this->path ? get_storage_file_url($this->path, 'medium') : null,
         ];
     }
 }
