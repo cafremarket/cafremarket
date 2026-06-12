@@ -14,6 +14,7 @@ use App\Http\Requests\Validations\ToggleMaintenanceModeRequest;
 use App\Http\Requests\Validations\UpdateBasicConfigRequest;
 use App\Http\Requests\Validations\UpdateConfigRequest;
 use App\Http\Resources\ShopSettingResource;
+use App\Http\Resources\VendorShopConfigResource;
 use App\Models\Config;
 use App\Models\Shop;
 use Illuminate\Http\Request;
@@ -54,9 +55,15 @@ class ConfigController extends Controller
      */
     public function configs()
     {
-        $config = Config::findOrFail($this->merchantShopId());
+        $shopId = $this->merchantShopId();
 
-        return response()->json($config);
+        abort_unless($shopId > 0, 404, trans('responses.not_found', ['model' => $this->model_name]));
+
+        $config = Config::findOrFail($shopId);
+
+        return response()->json(
+            (new VendorShopConfigResource($config))->resolve(request())
+        );
     }
 
     /**

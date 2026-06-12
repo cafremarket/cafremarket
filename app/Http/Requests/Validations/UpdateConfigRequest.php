@@ -20,10 +20,7 @@ class UpdateConfigRequest extends Request
             return false;
         }
 
-        $shopId = (int) $user->merchantId();
-        $configId = (int) $this->route('config');
-
-        return $shopId > 0 && $shopId === $configId;
+        return (int) $user->merchantId() > 0;
     }
 
     /**
