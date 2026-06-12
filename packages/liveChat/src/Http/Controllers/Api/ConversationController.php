@@ -202,7 +202,16 @@ class ConversationController extends Controller
      */
     public function index(Request $request)
     {
-        $chats = \Incevio\Package\LiveChat\Models\ChatConversation::mine()->get();
+        $user = Auth::guard('vendor_api')->user() ?? Auth::user();
+        $shopId = $user ? (int) $user->merchantId() : 0;
+
+        if (! $shopId) {
+            return ConversationResource::collection(collect());
+        }
+
+        $chats = \Incevio\Package\LiveChat\Models\ChatConversation::query()
+            ->where('shop_id', $shopId)
+            ->get();
 
         return ConversationResource::collection($chats);
     }
@@ -238,7 +247,7 @@ class ConversationController extends Controller
     {
         $chat->markAsRead();
 
-        $chat->load('replies');
+        $chat->load(['replies.attachments']);
 
         return new ConversationResource($chat);
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Vendor;
 
 use App\Helpers\ListHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Validations\FulfillOrderRequest;
 use App\Http\Requests\Validations\OrderDetailRequest;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class OrderFulfillmentController extends Controller
      * @param  App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function fulfill(OrderDetailRequest $request, Order $order)
+    public function fulfill(FulfillOrderRequest $request, Order $order)
     {
         // Check permission
 

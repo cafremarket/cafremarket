@@ -214,6 +214,7 @@ Route::prefix('vendor')->group(function () {
         Route::post('order/{order}/add_note', [OrderController::class, 'add_note']);
         Route::delete('order/{order}', [OrderController::class, 'delete']);
         Route::get('order/{order}/invoice', [OrderController::class, 'invoice']);
+        Route::get('order/{order}/shipping_label', [OrderController::class, 'shippingLabel']);
 
         // Fulfillment
         Route::post('order/{order}/fulfill', [OrderFulfillmentController::class, 'fulfill']);

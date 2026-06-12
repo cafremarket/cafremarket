@@ -145,6 +145,14 @@ class OrderController extends Controller
     }
 
     /**
+     * Download shipping label PDF for an order.
+     */
+    public function shippingLabel(OrderDetailRequest $request, Order $order)
+    {
+        return $order->shippingLabelPdf();
+    }
+
+    /**
      * Add admin notes to an order
      *
      * @return void

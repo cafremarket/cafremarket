@@ -39,9 +39,8 @@ class WalletDepositController extends Controller
 
     public function deposit(VendorWalletDepositRequest $request, PaymentServiceContract $paymentService)
     {
-        $shop = $this->shop();
-
         try {
+            $shop = $this->shop();
             if ($request->input('payment_status') == 'paid' && $request->has('payment_meta')) {
                 $paymentService->setPayee($shop, PaymentService::PAYEE_TYPE_SHOP);
                 $response = $paymentService->verifyPaidPayment();
@@ -64,12 +63,16 @@ class WalletDepositController extends Controller
                     ->setConfig()
                     ->charge();
             }
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            return response()->json([
+                'message' => $e->getMessage() ?: trans('responses.error'),
+            ], $e->getStatusCode());
         } catch (\Exception $e) {
             Log::error('Vendor wallet deposit failed');
             Log::info($e);
 
             return response()->json([
-                'message' => $e->getMessage(),
+                'message' => $e->getMessage() ?: trans('packages.wallet.payment_failed'),
             ], 400);
         }
 
