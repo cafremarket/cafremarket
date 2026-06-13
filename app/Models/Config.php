@@ -38,6 +38,7 @@ class Config extends BaseModel
     protected $casts = [
         'maintenance_mode' => 'boolean',
         'pending_verification' => 'boolean',
+        'verification_rejected_at' => 'datetime',
         'auto_archive_order' => 'boolean',
         'digital_goods_only' => 'boolean',
         'notify_new_disput' => 'boolean',
@@ -111,6 +112,8 @@ class Config extends BaseModel
         'notify_new_chat',
         'maintenance_mode',
         'pending_verification',
+        'verification_rejection_reason',
+        'verification_rejected_at',
         'active_ecommerce',
         'pay_online',
         'pay_in_person',
@@ -125,6 +128,32 @@ class Config extends BaseModel
     public function shop()
     {
         return $this->belongsTo(Shop::class);
+    }
+
+    public function verificationRequestStatus(): string
+    {
+        if ($this->pending_verification) {
+            return 'pending';
+        }
+
+        if ($this->verification_rejected_at) {
+            return 'rejected';
+        }
+
+        if ($this->shop && $this->shop->isVerified()) {
+            return 'verified';
+        }
+
+        return 'none';
+    }
+
+    public function canSubmitVerificationRequest(): bool
+    {
+        if ($this->shop && $this->shop->isVerified()) {
+            return false;
+        }
+
+        return ! $this->pending_verification;
     }
 
     /**

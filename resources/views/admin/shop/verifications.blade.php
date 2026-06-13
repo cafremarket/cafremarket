@@ -4,71 +4,105 @@
   <div class="box">
     <div class="box-header with-border">
       <h3 class="box-title">{{ trans('app.pending_verifications') }}</h3>
-    </div> <!-- /.box-header -->
+    </div>
     <div class="box-body">
-      <table class="table table-hover table-option">
-        <thead>
-          <tr>
-            <th>{{ trans('app.shop_name') }}</th>
-            <th>{{ trans('app.current_billing_plan') }}</th>
-            <th>{{ trans('app.uploaded_documents') }}</th>
-            <th>{{ trans('app.option') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach ($merchants as $merchant)
-            @continue(!$merchant->shop) {{-- Skip if shop not avilable --}}
-
+      @if ($merchants->isEmpty())
+        <p class="text-muted">{{ trans('app.no_pending_verification_requests') }}</p>
+      @else
+        <table class="table table-hover table-option">
+          <thead>
             <tr>
-              <td>
-                <img src="{{ get_storage_file_url(optional($merchant->shop->logo)->path, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.logo') }}">
-
-                <p class="indent10">
-                  @can('view', $merchant->shop)
-                    <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.show', $merchant->shop->id) }}" class="ajax-modal-btn">{{ $merchant->shop->name }}</a>
-                  @else
-                    {{ $merchant->shop->name }}
-                  @endcan
-
-                  @if ($merchant->shop->isDown())
-                    <span class="label label-default indent10">{{ trans('app.maintenance_mode') }}</span>
-                  @endif
-                </p>
-              </td>
-              <td>
-                {{ $merchant->shop->plan->name }}
-              </td>
-              <td>
-                @foreach ($merchant->attachments as $attachment)
-                  <a href="{{ route('attachment.download', $attachment) }}">
-                    <i class="fa fa-cloud-download"></i>
-                    {{ $attachment->name }}
-                  </a>
-                  <small class="indent10">
-                    ({{ get_formated_file_size($attachment->size) }})
-                    {{ $attachment->updated_at->diffForHumans() }}
-                  </small>
-
-                  @can('delete', $attachment)
-                    {!! Form::open(['route' => ['attachment.delete', $attachment], 'method' => 'delete', 'class' => 'data-form']) !!}
-                    {!! Form::button('<i class="fa fa-trash-o"></i>', ['type' => 'submit', 'class' => 'confirm ajax-silent text-muted indent10', 'title' => trans('app.delete'), 'data-toggle' => 'tooltip', 'data-placement' => 'top']) !!}
-                    {!! Form::close() !!}
-                  @endcan
-
-                  @if (!$loop->last)
-                    <br />
-                  @endif
-                @endforeach
-              </td>
-              <td class="row-options">
-                @if (auth()->user()->isAdmin())
-                  <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.verify', $merchant->shop) }}" class="ajax-modal-btn btn btn-default btn-sm btn-flat">{{ trans('app.verify') }}</a>&nbsp;&nbsp;&nbsp;
-                @endif
-              </td>
+              <th>{{ trans('app.shop_name') }}</th>
+              <th>{{ trans('app.owner') }}</th>
+              <th>{{ trans('app.uploaded_documents') }}</th>
+              <th>{{ trans('app.requested_at') }}</th>
+              <th>{{ trans('app.option') }}</th>
             </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+          </thead>
+          <tbody>
+            @foreach ($merchants as $merchant)
+              @continue(!$merchant->shop)
+
+              <tr>
+                <td>
+                  <img src="{{ get_storage_file_url(optional($merchant->shop->logo)->path, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.logo') }}">
+                  <p class="indent10">
+                    @can('view', $merchant->shop)
+                      <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.show', $merchant->shop->id) }}" class="ajax-modal-btn">{{ $merchant->shop->name }}</a>
+                    @else
+                      {{ $merchant->shop->name }}
+                    @endcan
+                  </p>
+                </td>
+                <td>{{ optional($merchant->shop->owner)->getName() }}</td>
+                <td>
+                  @forelse ($merchant->attachments as $attachment)
+                    <a href="{{ route('attachment.download', $attachment) }}">
+                      <i class="fa fa-cloud-download"></i> {{ $attachment->name }}
+                    </a>
+                    @if (!$loop->last)
+                      <br />
+                    @endif
+                  @empty
+                    <span class="text-muted">{{ trans('app.not_available') }}</span>
+                  @endforelse
+                </td>
+                <td>{{ optional($merchant->updated_at)->diffForHumans() }}</td>
+                <td class="row-options">
+                  @can('update', $merchant->shop)
+                    <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.verify', $merchant->shop) }}" class="ajax-modal-btn btn btn-success btn-sm btn-flat">{{ trans('app.review_verification_request') }}</a>
+                  @endcan
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      @endif
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="box-header with-border">
+      <h3 class="box-title">{{ trans('app.all_stores_verification_status') }}</h3>
+    </div>
+    <div class="box-body responsive-table">
+      @if ($unverifiedShops->isEmpty())
+        <p class="text-muted">{{ trans('app.all_stores_verified') }}</p>
+      @else
+        <table class="table table-hover table-option">
+          <thead>
+            <tr>
+              <th>{{ trans('app.shop_name') }}</th>
+              <th>{{ trans('app.verification') }}</th>
+              <th>{{ trans('app.option') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach ($unverifiedShops as $shop)
+              <tr>
+                <td>
+                  <img src="{{ get_logo_url($shop, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.logo') }}">
+                  <span class="indent10">{{ $shop->name }}</span>
+                </td>
+                <td>
+                  @if (optional($shop->config)->pending_verification)
+                    <span class="label label-warning">{{ trans('app.verification_pending') }}</span>
+                  @elseif (optional($shop->config)->verification_rejected_at)
+                    <span class="label label-danger">{{ trans('app.verification_rejected') }}</span>
+                  @else
+                    <span class="label label-default">{{ $shop->getVerificationStatus() }}</span>
+                  @endif
+                </td>
+                <td class="row-options">
+                  @can('update', $shop)
+                    <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.verify', $shop) }}" class="ajax-modal-btn btn btn-default btn-sm btn-flat">{{ trans('app.review_verification_request') }}</a>
+                  @endcan
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      @endif
+    </div>
+  </div>
 @endsection

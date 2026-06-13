@@ -1,68 +1,72 @@
-<div class="modal-dialog modal-sm">
+<div class="modal-dialog modal-md">
   <div class="modal-content">
-    {!! Form::model($shop, ['method' => 'PUT', 'route' => ['admin.vendor.shop.update', $shop->id], 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
+    {!! Form::open(['method' => 'POST', 'route' => ['admin.vendor.shop.verify.approve', $shop->id], 'id' => 'form', 'data-toggle' => 'validator']) !!}
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      {{ trans('app.verification') }}
+      {{ trans('app.review_verification_request') }} - {{ $shop->name }}
     </div>
     <div class="modal-body">
+      @if (optional($shop->config)->pending_verification)
+        <div class="alert alert-info">
+          {{ trans('messages.verification_request_pending_review') }}
+        </div>
+      @endif
+
+      @if (optional($shop->config)->attachments && $shop->config->attachments->count())
+        <div class="form-group">
+          <label>{{ trans('app.uploaded_documents') }}</label>
+          <ul class="list-group">
+            @foreach ($shop->config->attachments as $attachment)
+              <li class="list-group-item">
+                <a href="{{ route('attachment.download', $attachment) }}">
+                  <i class="fa fa-cloud-download"></i> {{ $attachment->name }}
+                </a>
+                <small class="text-muted">({{ get_formated_file_size($attachment->size) }})</small>
+              </li>
+            @endforeach
+          </ul>
+        </div>
+      @else
+        <p class="text-muted">{{ trans('messages.no_verification_documents_uploaded') }}</p>
+      @endif
+
       <div class="form-group">
         <div class="input-group">
           {{ Form::hidden('id_verified', 0) }}
-          {!! Form::checkbox('id_verified', null, $shop->id_verified, ['id' => 'id_verified', 'class' => 'icheckbox_line']) !!}
+          {!! Form::checkbox('id_verified', 1, $shop->id_verified, ['id' => 'id_verified', 'class' => 'icheckbox_line']) !!}
           {!! Form::label('id_verified', trans('app.id_verified')) !!}
-          <span class="input-group-addon" id="">
-            <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.mark_id_verified') }}"></i>
-          </span>
         </div>
       </div>
 
       <div class="form-group">
         <div class="input-group">
           {{ Form::hidden('address_verified', 0) }}
-          {!! Form::checkbox('address_verified', null, $shop->address_verified, ['id' => 'address_verified', 'class' => 'icheckbox_line']) !!}
+          {!! Form::checkbox('address_verified', 1, $shop->address_verified, ['id' => 'address_verified', 'class' => 'icheckbox_line']) !!}
           {!! Form::label('address_verified', trans('app.address_verified')) !!}
-          <span class="input-group-addon" id="">
-            <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.mark_address_verified') }}"></i>
-          </span>
         </div>
       </div>
 
       <div class="form-group">
         <div class="input-group">
           {{ Form::hidden('phone_verified', 0) }}
-          {!! Form::checkbox('phone_verified', null, $shop->phone_verified, ['id' => 'phone_verified', 'class' => 'icheckbox_line']) !!}
+          {!! Form::checkbox('phone_verified', 1, $shop->phone_verified, ['id' => 'phone_verified', 'class' => 'icheckbox_line']) !!}
           {!! Form::label('phone_verified', trans('app.phone_verified')) !!}
-          <span class="input-group-addon" id="">
-            <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.mark_phone_verified') }}"></i>
-          </span>
         </div>
       </div>
 
       <div class="form-group">
         <div class="input-group">
           {{ Form::hidden('active', 0) }}
-          {!! Form::checkbox('active', null, $shop->active, ['id' => 'active', 'class' => 'icheckbox_line']) !!}
+          {!! Form::checkbox('active', 1, $shop->active, ['id' => 'active', 'class' => 'icheckbox_line']) !!}
           {!! Form::label('active', trans('app.active')) !!}
-          <span class="input-group-addon" id="">
-            <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.shop_status') }}"></i>
-          </span>
         </div>
       </div>
     </div>
 
-    <div class="form-group">
-      <label>
-        <span style="margin-left: 10px;">
-          {{ Form::hidden('remove_from_pending_verification_list', null) }}
-          {!! Form::checkbox('remove_from_pending_verification_list', 1, 1, ['class' => 'icheck']) !!} {{ trans('app.remove_from_pending_verification_list') }}
-        </span>
-      </label>
-    </div>
-
     <div class="modal-footer">
-      {!! Form::submit(trans('app.update'), ['class' => 'btn btn-flat btn-new']) !!}
+      <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.verify.reject.form', $shop) }}" class="ajax-modal-btn btn btn-danger btn-flat pull-left">{{ trans('app.reject_verification') }}</a>
+      {!! Form::submit(trans('app.approve_verification'), ['class' => 'btn btn-success btn-flat']) !!}
     </div>
     {!! Form::close() !!}
-  </div> <!-- / .modal-content -->
-</div> <!-- / .modal-dialog -->
+  </div>
+</div>

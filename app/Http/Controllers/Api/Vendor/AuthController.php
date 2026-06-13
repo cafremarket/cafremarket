@@ -9,6 +9,7 @@ use App\Http\Resources\MerchantRegistrationResource;
 use App\Http\Resources\MerchantResource;
 use App\Jobs\CreateShopForMerchant;
 use App\Jobs\SubscribeShopToNewPlan;
+use App\Models\Role;
 use App\Models\System;
 use App\Models\User;
 use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
@@ -145,10 +146,11 @@ class AuthController extends Controller
     protected function create(array $request_data)
     {
         $data = [
-            'name' => $request_data['name'],
+            'name' => $request_data['name'] ?? $request_data['shop_name'],
             'email' => $request_data['email'],
             'password' => bcrypt($request_data['password']),
             'verification_token' => Str::random(40),
+            'role_id' => Role::MERCHANT,
         ];
 
         if (is_incevio_package_loaded('otp-login')) {

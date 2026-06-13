@@ -391,7 +391,7 @@ class Transaction extends Model
 
     public static function walletBrandName(): string
     {
-        return (string) config('wallet.wallet.default.name', 'Cafrepay');
+        return (string) config('wallet.wallet.default.name', 'Cafre-pay');
     }
 
     public static function depositPaymentMethodLabel(string $method): string

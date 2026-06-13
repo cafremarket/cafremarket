@@ -70,6 +70,9 @@
                     <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.show', $merchant->owns->id) }}" class="ajax-modal-btn">
                       {{ $merchant->owns->name }}
                     </a>
+                    @if ($merchant->owns->isVerified())
+                      <img src="{{ get_verified_badge() }}" class="verified-badge img-xs" data-toggle="tooltip" data-placement="top" title="{{ trans('help.verified_seller') }}" alt="verified-badge">
+                    @endif
                   </p>
 
                   @if ($merchant->owns->deleted_at)

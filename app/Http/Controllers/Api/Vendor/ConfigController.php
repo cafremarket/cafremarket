@@ -59,7 +59,7 @@ class ConfigController extends Controller
 
         abort_unless($shopId > 0, 404, trans('responses.not_found', ['model' => $this->model_name]));
 
-        $config = Config::findOrFail($shopId);
+        $config = Config::with('shop')->findOrFail($shopId);
 
         return response()->json(
             (new VendorShopConfigResource($config))->resolve(request())
@@ -135,6 +135,67 @@ class ConfigController extends Controller
         }
 
         return response()->json(['message' => trans('responses.error')], 405);
+    }
+
+    public function verificationStatus(Request $request)
+    {
+        $shopId = $this->merchantShopId();
+        abort_unless($shopId > 0, 404, trans('responses.not_found', ['model' => $this->model_name]));
+
+        $shop = Shop::with('config.attachments')->findOrFail($shopId);
+        $config = $shop->config;
+
+        return response()->json([
+            'data' => [
+                'verified' => $shop->isVerified(),
+                'verification_status' => $shop->getVerificationStatus(),
+                'verification_request_status' => $config?->verificationRequestStatus(),
+                'pending_verification' => (bool) optional($config)->pending_verification,
+                'verification_rejection_reason' => optional($config)->verification_rejection_reason,
+                'verification_rejected_at' => optional($config?->verification_rejected_at)->toIso8601String(),
+                'can_submit_request' => (bool) optional($config)->canSubmitVerificationRequest(),
+                'documents' => $config?->attachments?->map(function ($attachment) {
+                    return [
+                        'id' => $attachment->id,
+                        'name' => $attachment->name,
+                        'size' => $attachment->size,
+                        'url' => url('api/vendor/attachment/'.$attachment->id.'/download'),
+                    ];
+                }) ?? [],
+            ],
+        ]);
+    }
+
+    public function submitVerification(Request $request)
+    {
+        $shopId = $this->merchantShopId();
+        abort_unless($shopId > 0, 404, trans('responses.not_found', ['model' => $this->model_name]));
+
+        $config = Config::findOrFail($shopId);
+
+        if (! $config->canSubmitVerificationRequest()) {
+            return response()->json([
+                'message' => trans('messages.verification_request_not_allowed'),
+            ], 422);
+        }
+
+        $request->validate([
+            'documents' => 'required|array|min:1',
+            'documents.*' => 'file|max:'.(config('system_settings.max_img_size_limit_kb') * 4),
+        ]);
+
+        $config->saveAttachments($request->file('documents'));
+        $config->update([
+            'pending_verification' => 1,
+            'verification_rejection_reason' => null,
+            'verification_rejected_at' => null,
+        ]);
+
+        clearShopConfigCache($shopId);
+
+        return response()->json([
+            'message' => trans('messages.verification_request_submitted'),
+        ]);
     }
 
     /**

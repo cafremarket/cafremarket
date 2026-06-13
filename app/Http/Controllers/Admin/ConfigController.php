@@ -177,11 +177,15 @@ class ConfigController extends Controller
             $config->saveAttachments($request->file('documents'));
         }
 
-        $config->update(['pending_verification' => 1]);
+        $config->update([
+            'pending_verification' => 1,
+            'verification_rejection_reason' => null,
+            'verification_rejected_at' => null,
+        ]);
 
         clearShopConfigCache($shop_id); // Clear cached values
 
-        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+        return back()->with('success', trans('messages.verification_request_submitted'));
     }
 
     /**

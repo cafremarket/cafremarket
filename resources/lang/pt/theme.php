@@ -723,7 +723,7 @@ return [
     'more_from_shop' => 'Mais Produtos desta Loja',
     'welcome' => 'Bem-vindo ao',
     'support' => 'Suporte',
-    'wallet' => 'Carteira',
+    'wallet' => 'Cafre-pay',
     'new_item' => 'Novo',
     'stock' => ':stock Em Estoque',
     'hot' => 'Quente',

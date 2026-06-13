@@ -279,6 +279,9 @@ Route::prefix('vendor')->group(function () {
         Route::match(['post', 'put'], 'settings/{shop}/update', [ConfigController::class, 'update']);
         Route::get('configs', [ConfigController::class, 'configs']);
         Route::match(['put', 'post'], 'configs/{config}/update', [ConfigController::class, 'updateConfigs']);
+        Route::get('shop/verification', [ConfigController::class, 'verificationStatus']);
+        Route::post('shop/verification', [ConfigController::class, 'submitVerification']);
+        Route::get('attachment/{attachment}/download', [\App\Http\Controllers\Api\AttachmentController::class, 'download']);
 
         // Taxes
         Route::get('taxes', [TaxController::class, 'index']);

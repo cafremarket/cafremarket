@@ -24,6 +24,10 @@ class RegisterMerchantRequest extends Request
      */
     public function rules()
     {
+        if (! $this->filled('name') && $this->filled('shop_name')) {
+            $this->merge(['name' => $this->shop_name]);
+        }
+
         $this->merge(['role_id' => Role::MERCHANT]);
 
         $rules = [

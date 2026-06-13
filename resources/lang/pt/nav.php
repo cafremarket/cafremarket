@@ -20,6 +20,7 @@ return [
     'customers' => 'Clientes',
     'currencies' => 'Moedas',
     'shops' => 'Lojas',
+    'store_verifications' => 'Verificação de lojas',
     'shipping_zones' => 'Zonas de envio',
     'suppliers' => 'Fornecedores',
     'vendors' => 'Vendedores',

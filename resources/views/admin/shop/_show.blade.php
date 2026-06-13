@@ -12,6 +12,9 @@
             <th class="text-right">{{ trans('app.name') }}:</th>
             <td style="width: 75%;">
               {{ $shop->name }}
+              @if ($shop->isVerified())
+                <img src="{{ get_verified_badge() }}" class="verified-badge img-xs" data-toggle="tooltip" data-placement="top" title="{{ trans('help.verified_seller') }}" alt="verified-badge">
+              @endif
               @if ($shop->onTrial())
                 <span class="label label-info indent10">{{ trans('app.trialing') }}</span>
               @endif
@@ -29,6 +32,26 @@
               @else
                 {{ $shop->active ? trans('app.active') : trans('app.inactive') }}
               @endif
+            </td>
+          </tr>
+          <tr>
+            <th class="text-right">{{ trans('app.verification') }}:</th>
+            <td style="width: 75%;">
+              <span class="label label-{{ $shop->isVerified() ? 'success' : 'default' }}">{{ $shop->getVerificationStatus() }}</span>
+              <ul class="list-unstyled indent10" style="margin-top: 8px;">
+                <li class="{{ $shop->id_verified ? 'text-success' : 'text-muted' }}">
+                  <i class="fa fa-{{ $shop->id_verified ? 'check' : 'times' }}-circle-o"></i> {{ trans('app.id_verified') }}
+                </li>
+                <li class="{{ $shop->phone_verified ? 'text-success' : 'text-muted' }}">
+                  <i class="fa fa-{{ $shop->phone_verified ? 'check' : 'times' }}-circle-o"></i> {{ trans('app.phone_verified') }}
+                </li>
+                <li class="{{ $shop->address_verified ? 'text-success' : 'text-muted' }}">
+                  <i class="fa fa-{{ $shop->address_verified ? 'check' : 'times' }}-circle-o"></i> {{ trans('app.address_verified') }}
+                </li>
+              </ul>
+              @can('update', $shop)
+                <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.verify', $shop) }}" class="ajax-modal-btn btn btn-success btn-sm btn-flat">{{ trans('app.verify_store') }}</a>
+              @endcan
             </td>
           </tr>
           <tr>

@@ -269,11 +269,25 @@
             @endcan
 
             @can('index', \App\Models\Shop::class)
-              <li class="{{ Request::is('admin/seller/shop*') ? 'active' : '' }}">
+              <li class="{{ Request::is('admin/seller/shop*') && !Request::is('admin/seller/shop/verifications*') ? 'active' : '' }}">
                 <a href="{{ url('admin/seller/shop') }}">
                   <i class="fa fa-angle-double-right"></i> {{ trans('nav.shops') }}
                 </a>
               </li>
+            @endcan
+
+            @can('index', \App\Models\Shop::class)
+              @if (Auth::user()->isFromPlatform())
+                <li class="{{ Request::is('admin/seller/shop/verifications*') ? 'active' : '' }}">
+                  <a href="{{ route('admin.vendor.shop.verifications') }}">
+                    <i class="fa fa-angle-double-right"></i> {{ trans('nav.store_verifications') }}
+                    @php($pendingStoreVerifications = \App\Helpers\Statistics::pending_verification_count())
+                    @if ($pendingStoreVerifications > 0)
+                      <span class="label label-warning pull-right">{{ $pendingStoreVerifications }}</span>
+                    @endif
+                  </a>
+                </li>
+              @endif
             @endcan
           </ul>
         </li>

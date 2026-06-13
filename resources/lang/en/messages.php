@@ -205,6 +205,17 @@ return [
 
     'pending_verifications' => '[0,1] :count Pending verification need action|[2,*] :count Pending verifications need action',
 
+    'verification_request_submitted' => 'Your verification request has been submitted. An admin will review your documents soon.',
+    'verification_approved' => 'Store verification has been approved.',
+    'verification_rejected' => 'Store verification request has been rejected.',
+    'verification_request_not_allowed' => 'You cannot submit a verification request at this time.',
+    'verification_request_pending_notice' => 'Your verification request is pending admin review.',
+    'verification_request_rejected_notice' => 'Your verification request was rejected. You may upload new documents and submit again.',
+    'verification_request_pending_review' => 'This store has submitted documents and is waiting for your review.',
+    'store_verification_approved_notice' => 'Your store is verified. The verified badge is shown on your store profile.',
+    'no_verification_documents_uploaded' => 'No verification documents have been uploaded yet.',
+    'verification_rejection_help' => 'Please tell :shop why the verification request is being rejected. The vendor can upload new documents and submit again.',
+
     'verification_intro' => 'Once you are verified, we will show the <strong>verified</strong> badge on your business and on your store profile page. This lets your business build trust on the marketplace.',
 
     'verification_process' => '<ul>

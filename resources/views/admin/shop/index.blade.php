@@ -57,6 +57,9 @@
             @if (is_incevio_package_loaded('dynamicCommission'))
               <th>{{ trans('packages.dynamicCommission.periodic_sold_amount') }}</th>
             @endif
+            @if (Auth::user()->isFromPlatform())
+              <th>{{ trans('app.verification') }}</th>
+            @endif
             <th>{{ trans('app.owner') }}</th>
             <th>{{ trans('app.option') }}</th>
           </tr>
@@ -118,6 +121,12 @@
                 <td>{{ get_formated_currency($shop->periodic_sold_amount, 2, config('system_settings.currency.id')) }}</td>
               @endif
 
+              @if (Auth::user()->isFromPlatform())
+                <td>
+                  <span class="label label-{{ $shop->isVerified() ? 'success' : 'default' }}">{{ $shop->getVerificationStatus() }}</span>
+                </td>
+              @endif
+
               <td>
                 <img src="{{ get_avatar_src($shop->owner, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
 
@@ -147,6 +156,9 @@
 
                 @can('update', $shop)
                   <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.edit', $shop->id) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.edit') }}" class="fa fa-edit"></i></a>&nbsp;
+                  @if (Auth::user()->isFromPlatform())
+                    <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.verify', $shop) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.verify_store') }}" class="fa fa-check-circle text-green"></i></a>&nbsp;
+                  @endif
                   <a href="{{ route('admin.vendor.shop.translate.form', ['shop' => $shop, 'language' => $translation_language]) }}">
                     <em class="fa fa-language" data-toggle="tooltip" data-placement="top" title="{{ trans('app.manage_translations') }}"></em>
                   </a>&nbsp;

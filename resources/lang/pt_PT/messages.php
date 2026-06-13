@@ -195,6 +195,17 @@ return [
 
     'pending_verifications' => '[0,1] :count verificação pendente precisa de ação|[2,*] :count verificações pendentes precisam de ação',
 
+    'verification_request_submitted' => 'O seu pedido de verificação foi enviado. Um administrador irá rever os seus documentos em breve.',
+    'verification_approved' => 'A verificação da loja foi aprovada.',
+    'verification_rejected' => 'O pedido de verificação da loja foi rejeitado.',
+    'verification_request_not_allowed' => 'Não pode enviar um pedido de verificação neste momento.',
+    'verification_request_pending_notice' => 'O seu pedido de verificação está aguardando revisão do administrador.',
+    'verification_request_rejected_notice' => 'O seu pedido de verificação foi rejeitado. Pode carregar novos documentos e enviar novamente.',
+    'verification_request_pending_review' => 'Esta loja enviou documentos e aguarda a sua revisão.',
+    'store_verification_approved_notice' => 'A sua loja está verificada. O selo verificado é exibido no perfil da sua loja.',
+    'no_verification_documents_uploaded' => 'Ainda não foram carregados documentos de verificação.',
+    'verification_rejection_help' => 'Indique a :shop o motivo da rejeição do pedido de verificação. O vendedor pode carregar novos documentos e enviar novamente.',
+
     'verification_intro' => 'Uma vez verificado, exibiremos o selo <strong>verificado</strong> no seu negócio e na página do perfil da sua loja. Isso ajuda seu negócio a construir confiança no Cafremarket.',
 
     'verification_process' => '<ul>

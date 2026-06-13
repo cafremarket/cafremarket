@@ -151,7 +151,16 @@ class ShopController extends Controller
                 $query->orderBy('updated_at', 'desc');
             }])->get();
 
-        return view('admin.shop.verifications', compact('merchants'));
+        $unverifiedShops = Shop::with(['owner', 'logo', 'config'])
+            ->where(function ($query) {
+                $query->where('id_verified', 0)
+                    ->orWhere('phone_verified', 0)
+                    ->orWhere('address_verified', 0);
+            })
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.shop.verifications', compact('merchants', 'unverifiedShops'));
     }
 
     /**
@@ -162,7 +171,76 @@ class ShopController extends Controller
      */
     public function showVerificationForm(Request $request, Shop $shop)
     {
+        $shop->load(['config.attachments', 'owner']);
+
         return view('admin.shop._verify', compact('shop'));
+    }
+
+    public function showRejectVerificationForm(Request $request, Shop $shop)
+    {
+        return view('admin.shop._reject_verification', compact('shop'));
+    }
+
+    public function approveVerification(Request $request, Shop $shop)
+    {
+        if (config('app.demo') == true && $shop->id <= config('system.demo.shops', 2)) {
+            return back()->with('warning', trans('messages.demo_restriction'));
+        }
+
+        $shop->update([
+            'id_verified' => $request->boolean('id_verified', true),
+            'phone_verified' => $request->boolean('phone_verified', true),
+            'address_verified' => $request->boolean('address_verified', true),
+            'active' => $request->has('active') ? $request->boolean('active') : $shop->active,
+        ]);
+
+        if ($shop->config) {
+            $shop->config->update([
+                'pending_verification' => null,
+                'verification_rejection_reason' => null,
+                'verification_rejected_at' => null,
+            ]);
+        }
+
+        clearShopConfigCache($shop->id);
+        event(new ShopUpdated($shop));
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => trans('messages.verification_approved'),
+            ]);
+        }
+
+        return back()->with('success', trans('messages.verification_approved'));
+    }
+
+    public function rejectVerification(Request $request, Shop $shop)
+    {
+        if (config('app.demo') == true && $shop->id <= config('system.demo.shops', 2)) {
+            return back()->with('warning', trans('messages.demo_restriction'));
+        }
+
+        $request->validate([
+            'verification_rejection_reason' => 'required|string|max:1000',
+        ]);
+
+        if ($shop->config) {
+            $shop->config->update([
+                'pending_verification' => null,
+                'verification_rejection_reason' => $request->verification_rejection_reason,
+                'verification_rejected_at' => now(),
+            ]);
+        }
+
+        clearShopConfigCache($shop->id);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => trans('messages.verification_rejected'),
+            ]);
+        }
+
+        return back()->with('success', trans('messages.verification_rejected'));
     }
 
     /**

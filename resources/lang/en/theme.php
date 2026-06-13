@@ -731,7 +731,7 @@ return [
     'more_from_shop' => 'More Products from this Shop',
     'welcome' => 'Welcome To',
     'support' => 'Support',
-    'wallet' => 'Wallet',
+    'wallet' => 'Cafre-pay',
     'new_item' => 'New',
     'stock' => ':stock In Stock',
     'hot' => 'Hot',

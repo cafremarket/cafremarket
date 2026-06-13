@@ -36,6 +36,23 @@
           <h3 class="box-title">{{ trans('app.verification_status') }}</h3>
         </div> <!-- /.box-header -->
         <div class="box-body">
+          @if ($config->shop->isVerified())
+            <div class="alert alert-success">
+              <i class="fa fa-check-circle"></i> {{ trans('messages.store_verification_approved_notice') }}
+            </div>
+          @elseif ($config->pending_verification)
+            <div class="alert alert-warning">
+              <i class="fa fa-clock-o"></i> {{ trans('messages.verification_request_pending_notice') }}
+            </div>
+          @elseif ($config->verification_rejected_at)
+            <div class="alert alert-danger">
+              <i class="fa fa-times-circle"></i> {{ trans('messages.verification_request_rejected_notice') }}
+              @if ($config->verification_rejection_reason)
+                <p class="mt-2"><strong>{{ trans('app.rejection_reason') }}:</strong> {{ $config->verification_rejection_reason }}</p>
+              @endif
+            </div>
+          @endif
+
           <div class="form-group">
             {{-- <label>{{ $config->shop->getVerificationStatus() }}</label> --}}
             <ul class="list-unstyled lead">
@@ -80,26 +97,30 @@
             </div>
           @endif
 
-          {!! Form::open(['route' => 'admin.setting.verify', 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
-          <span class="spacer10"></span>
+          @if ($config->canSubmitVerificationRequest())
+            {!! Form::open(['route' => 'admin.setting.verify', 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
+            <span class="spacer10"></span>
 
-          <div class="row">
-            <div class="col-md-9 nopadding-right">
-              <input id="uploadFile" placeholder="{{ trans('app.upload_documents') }}" class="form-control" disabled="disabled" style="height: 28px;" />
-              <div class="help-block with-errors"><i class="fa fa-info"></i> {{ trans('help.select_all_verification_documents') }}</div>
-            </div>
-            <div class="col-md-3 nopadding-left">
-              <div class="fileUpload btn btn-primary btn-block btn-flat">
-                <span>{{ trans('app.form.upload') }} </span>
-                <input type="file" name="documents[]" multiple="true" id="uploadBtn" class="upload" />
+            <div class="row">
+              <div class="col-md-9 nopadding-right">
+                <input id="uploadFile" placeholder="{{ trans('app.upload_documents') }}" class="form-control" disabled="disabled" style="height: 28px;" />
+                <div class="help-block with-errors"><i class="fa fa-info"></i> {{ trans('help.select_all_verification_documents') }}</div>
+              </div>
+              <div class="col-md-3 nopadding-left">
+                <div class="fileUpload btn btn-primary btn-block btn-flat">
+                  <span>{{ trans('app.form.upload') }} </span>
+                  <input type="file" name="documents[]" multiple="true" id="uploadBtn" class="upload" required />
+                </div>
               </div>
             </div>
-          </div>
 
-          <span class="spacer10"></span>
+            <span class="spacer10"></span>
 
-          {!! Form::submit(trans('app.submit'), ['class' => 'btn btn-flat btn-lg btn-block btn-new']) !!}
-          {!! Form::close() !!}
+            {!! Form::submit(trans('app.submit_verification_request'), ['class' => 'btn btn-flat btn-lg btn-block btn-new']) !!}
+            {!! Form::close() !!}
+          @elseif ($config->pending_verification)
+            <p class="text-muted">{{ trans('messages.verification_request_pending_notice') }}</p>
+          @endif
           <span class="spacer30"></span>
         </div> <!-- /.box-body -->
       </div> <!-- /.box -->

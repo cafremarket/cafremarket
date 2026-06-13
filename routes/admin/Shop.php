@@ -15,6 +15,12 @@ Route::get('shop/verifications', [ShopController::class, 'verifications'])->name
 
 Route::get('shop/{shop}/verify', [ShopController::class, 'showVerificationForm'])->name('shop.verify');
 
+Route::get('shop/{shop}/verification/reject', [ShopController::class, 'showRejectVerificationForm'])->name('shop.verify.reject.form');
+
+Route::post('shop/{shop}/verification/approve', [ShopController::class, 'approveVerification'])->name('shop.verify.approve');
+
+Route::post('shop/{shop}/verification/reject', [ShopController::class, 'rejectVerification'])->name('shop.verify.reject');
+
 Route::get('subscription/{shop}/editTrial', [SubscriptionController::class, 'editTrial'])->name('subscription.editTrial');
 
 Route::put('subscription/{shop}/updateTrial', [SubscriptionController::class, 'updateTrial'])->name('subscription.updateTrial');

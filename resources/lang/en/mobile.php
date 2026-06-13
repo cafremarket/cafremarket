@@ -269,7 +269,7 @@ return [
     'clear_cache_subtitle' => 'This will delete all of your local data and signed you out if you are signed in.',
     'clearing_cache' => 'Clearing cache...',
     'clear_cache_success' => 'Cache cleared successfully',
-    'wallet' => 'Wallet',
+    'wallet' => 'Cafre-pay',
     'wallet_balance' => 'Wallet Balance',
     'wallet_deposit' => 'Wallet Deposit',
     'amount' => 'Amount',

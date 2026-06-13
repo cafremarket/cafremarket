@@ -90,7 +90,7 @@
   </div>
 
   <div class="col-md-3">
-    @if ($profile->isFromMerchant())
+    @if ($profile->isFromMerchant() && optional($profile->shop)->config)
       <div class="form-group mb-5">
         <label>{{ trans('app.merchant') }}</label>
         <p class="lead">{{ optional($profile->shop)->name }}</p>
@@ -121,7 +121,7 @@
       </div>
     @endif
 
-    @if ($profile->isFromMerchant())
+    @if ($profile->isFromMerchant() && optional($profile->shop)->config)
       <div class="form-group mb-5">
         <label>{{ trans('app.form.logo') }}</label>
         <img src="{{ get_storage_file_url(optional($profile->shop->image)->path, 'small') }}" class="thumbnail" alt="{{ trans('app.logo') }}">
@@ -146,9 +146,13 @@
 
         <span class="spacer30"></span>
 
-        @can('update', $profile->shop->config)
+        @if ($profile->shop->isVerified())
+          <div class="alert alert-success">
+            <i class="fa fa-check-circle"></i> {{ trans('messages.store_verification_approved_notice') }}
+          </div>
+        @else
           <a href="{{ route('admin.setting.verify') }}" class="btn btn-block btn-flat btn-success">{{ trans('app.get_verified') }}</a>
-        @endcan
+        @endif
       </div>
     @endif
   </div>

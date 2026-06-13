@@ -20,6 +20,7 @@ return [
     'customers' => 'Customers',
     'currencies' => 'Currencies',
     'shops' => 'Shops',
+    'store_verifications' => 'Store Verifications',
     'shipping_zones' => 'Shipping zones',
     'suppliers' => 'Suppliers',
     'vendors' => 'Vendors',
