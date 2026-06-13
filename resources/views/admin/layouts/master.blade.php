@@ -138,6 +138,22 @@
               </div>
             @endunless
 
+            @if (optional(Auth::user()->shop)->config && ! Auth::user()->shop->isVerified())
+              <div class="alert alert-warning alert-dismissible no-print">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <strong><i class="icon fa fa-shield"></i>{{ trans('app.verification') }}</strong>
+                @if (Auth::user()->shop->config->pending_verification)
+                  {{ trans('messages.verification_request_pending_notice') }}
+                @elseif (Auth::user()->shop->config->verification_rejected_at)
+                  {{ trans('messages.verification_request_rejected_notice') }}
+                  <a href="{{ route('admin.setting.verify') }}">{{ trans('app.get_verified') }}</a>
+                @else
+                  {{ trans('messages.verification_intro') }}
+                  <a href="{{ route('admin.setting.verify') }}">{{ trans('app.get_verified') }}</a>
+                @endif
+              </div>
+            @endif
+
             @include('admin.partials._listings_notice')
           @endif
         @endif

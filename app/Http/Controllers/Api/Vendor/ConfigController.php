@@ -15,10 +15,12 @@ use App\Http\Requests\Validations\UpdateBasicConfigRequest;
 use App\Http\Requests\Validations\UpdateConfigRequest;
 use App\Http\Resources\ShopSettingResource;
 use App\Http\Resources\VendorShopConfigResource;
+use App\Models\Attachment;
 use App\Models\Config;
 use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ConfigController extends Controller
 {
@@ -196,6 +198,25 @@ class ConfigController extends Controller
         return response()->json([
             'message' => trans('messages.verification_request_submitted'),
         ]);
+    }
+
+    public function downloadVerificationAttachment(Request $request, Attachment $attachment)
+    {
+        $shopId = $this->merchantShopId();
+        abort_unless($shopId > 0, 404, trans('responses.not_found', ['model' => $this->model_name]));
+
+        $config = Config::findOrFail($shopId);
+        abort_unless(
+            $config->attachments()->where('attachments.id', $attachment->id)->exists(),
+            403,
+            trans('responses.unauthorized')
+        );
+
+        if (Storage::exists($attachment->path)) {
+            return Storage::download($attachment->path, $attachment->name);
+        }
+
+        return response()->json(['message' => trans('messages.file_not_exist')], 404);
     }
 
     /**
