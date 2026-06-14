@@ -860,10 +860,28 @@ if (! function_exists('get_product_img_src')) {
 
         $images_count = $item->images->count();
 
-        // If the listing has no images then pick the product images
-        if (! $images_count) {
-            $item = $item->product;
-            $images_count = $item->images->count();
+        // If the listing has no gallery images, use the product catalog images
+        if (! $images_count && $item instanceof Inventory) {
+            $product = $item->product;
+            if ($product) {
+                if ($type === 'alt') {
+                    $gallery = $product->images;
+                    if ($gallery->count() > 1) {
+                        return url("image/{$gallery->get(1)->path}?p={$size}");
+                    }
+                }
+
+                if ($product->featureImage?->path) {
+                    return url("image/{$product->featureImage->path}?p={$size}");
+                }
+
+                if ($product->image?->path) {
+                    return url("image/{$product->image->path}?p={$size}");
+                }
+
+                $item = $product;
+                $images_count = $item->images->count();
+            }
         }
 
         if ($images_count) {
@@ -884,8 +902,29 @@ if (! function_exists('get_product_img_src')) {
 if (! function_exists('get_inventory_img_src')) {
     function get_inventory_img_src($item, $size = 'medium')
     {
-        if ($item->image) {
+        if ($item->image?->path) {
             return get_storage_file_url($item->image->path, $size);
+        }
+
+        if ($item->images?->isNotEmpty()) {
+            return get_storage_file_url($item->images->first()->path, $size);
+        }
+
+        if ($item->product_id) {
+            $product = $item->relationLoaded('product') ? $item->product : $item->product()->first();
+            if ($product) {
+                if ($product->featureImage?->path) {
+                    return get_storage_file_url($product->featureImage->path, $size);
+                }
+
+                if ($product->image?->path) {
+                    return get_storage_file_url($product->image->path, $size);
+                }
+
+                if ($product->images?->isNotEmpty()) {
+                    return get_storage_file_url($product->images->first()->path, $size);
+                }
+            }
         }
 
         return asset('images/placeholders/no_img.png');

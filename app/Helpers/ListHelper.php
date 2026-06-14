@@ -1122,6 +1122,28 @@ class ListHelper
     }
 
     /**
+     * Clear cached "recently added" / latest listing blocks after catalog changes.
+     */
+    public static function clearLatestItemsCache(?int $shopId = null, ?string $shopSlug = null): void
+    {
+        $limits = [10, 20];
+
+        if ($shopSlug) {
+            Cache::forget('latest_items_'.$shopSlug);
+        }
+
+        if ($shopId) {
+            foreach ($limits as $limit) {
+                Cache::forget('latest_available_items_'.$shopId.'_'.$limit);
+            }
+        }
+
+        foreach ($limits as $limit) {
+            Cache::forget('latest_available_items_all_'.$limit);
+        }
+    }
+
+    /**
      * Get latest products that has live listing
      *
      * @return array
@@ -1140,6 +1162,9 @@ class ListHelper
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                     'image:path,imageable_id,imageable_type',
+                    'product.featureImage:path,imageable_id,imageable_type,type',
+                    'product.image:path,imageable_id,imageable_type',
+                    'product.images:path,imageable_id,imageable_type,order',
                 ]);
 
             if ($shop_id) {
@@ -1205,6 +1230,9 @@ class ListHelper
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                     'image:path,imageable_id,imageable_type',
+                    'product.featureImage:path,imageable_id,imageable_type,type',
+                    'product.image:path,imageable_id,imageable_type',
+                    'product.images:path,imageable_id,imageable_type,order',
                 ])
                 ->groupBy('product_id')
                 ->latest()->limit($limit)->get();
@@ -1829,8 +1857,24 @@ class ListHelper
      */
     public static function subscriptionPlans()
     {
-        return DB::table('subscription_plans')->orderBy('order', 'asc')
-            ->pluck('plan_id', 'name')->toArray();
+        $plans = DB::table('subscription_plans')
+            ->whereNull('deleted_at')
+            ->orderBy('order', 'asc')
+            ->select('plan_id', 'name', 'cost')
+            ->get();
+
+        $result = [];
+        foreach ($plans as $plan) {
+            $label = $plan->name;
+            if ((float) $plan->cost > 0) {
+                $label .= ' — '.get_formated_currency($plan->cost, 2).trans('app.per_month');
+            } else {
+                $label .= ' — '.trans('app.free');
+            }
+            $result[$label] = $plan->plan_id;
+        }
+
+        return $result;
     }
 
     /**

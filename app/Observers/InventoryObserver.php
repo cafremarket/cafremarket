@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Helpers\ListHelper;
 use App\Models\Inventory;
 
 class InventoryObserver
@@ -20,6 +21,8 @@ class InventoryObserver
      */
     public function created(Inventory $inventory)
     {
+        $this->clearListingCaches($inventory);
+
         if (is_incevio_package_loaded('ebay')) {
             \Incevio\Package\Ebay\Jobs\UpdateInventory::dispatch($inventory);
         }
@@ -32,6 +35,8 @@ class InventoryObserver
      */
     public function updated(Inventory $inventory)
     {
+        $this->clearListingCaches($inventory);
+
         if (is_incevio_package_loaded('ebay')) {
             \Incevio\Package\Ebay\Jobs\UpdateInventory::dispatch($inventory);
         }
@@ -44,7 +49,7 @@ class InventoryObserver
      */
     public function deleted(Inventory $inventory)
     {
-        //
+        $this->clearListingCaches($inventory);
     }
 
     /**
@@ -64,8 +69,19 @@ class InventoryObserver
      */
     public function forceDeleted(Inventory $inventory)
     {
+        $this->clearListingCaches($inventory);
+
         if (is_incevio_package_loaded('ebay')) {
             \Incevio\Package\Ebay\Jobs\DeleteInventory::dispatch($inventory->sku);
         }
+    }
+
+    private function clearListingCaches(Inventory $inventory): void
+    {
+        $shopSlug = $inventory->relationLoaded('shop')
+            ? $inventory->shop?->slug
+            : $inventory->shop()->value('slug');
+
+        ListHelper::clearLatestItemsCache($inventory->shop_id, $shopSlug);
     }
 }

@@ -97,9 +97,9 @@
               </ul> <!-- /.product-info-labels -->
 
               <div class="product-img-wrap">
-                <img class="product-img-primary lazy" src="{{ get_storage_file_url(optional($item->image)->path, 'tiny_thumb') }}" data-src="{{ get_storage_file_url(optional($item->image)->path, 'full') }}" alt="{{ $item->title }}" title="{{ $item->title }}" />
+                <img class="product-img-primary lazy" src="{{ get_product_img_src($item, 'tiny_thumb') }}" data-src="{{ get_product_img_src($item, 'full') }}" alt="{{ $item->title }}" title="{{ $item->title }}" />
 
-                <img class="product-img-alt lazy" src="{{ get_storage_file_url(optional($item->image)->path, 'tiny_thumb', 'alt') }}" data-src="{{ get_storage_file_url(optional($item->image)->path, 'full', 'alt') }}" alt="{{ $item->title }}" title="{{ $item->title }}" />
+                <img class="product-img-alt lazy" src="{{ get_product_img_src($item, 'tiny_thumb', 'alt') }}" data-src="{{ get_product_img_src($item, 'full', 'alt') }}" alt="{{ $item->title }}" title="{{ $item->title }}" />
 
                 <a class="product-link" href="{{ route('show.product', $item->slug) }}"></a>
               </div> <!-- /.product-img-wrap -->

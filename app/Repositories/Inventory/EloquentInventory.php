@@ -4,6 +4,7 @@ namespace App\Repositories\Inventory;
 
 use App\Models\Attribute;
 use App\Models\AttributeValue;
+use App\Models\Image;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Repositories\BaseRepository;
@@ -103,7 +104,51 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
 
         $this->syncProductShopId($inventory);
 
+        $this->syncImagesFromProductIfEmpty($inventory);
+
         return $inventory;
+    }
+
+    /**
+     * Copy product images onto a new inventory listing when none were uploaded directly.
+     */
+    private function syncImagesFromProductIfEmpty(Inventory $inventory): void
+    {
+        if (! $inventory->product_id || $inventory->image()->exists()) {
+            return;
+        }
+
+        $product = Product::with(['featureImage', 'image', 'images'])->find($inventory->product_id);
+        if (! $product) {
+            return;
+        }
+
+        $sourceImages = collect();
+        if ($product->featureImage) {
+            $sourceImages->push($product->featureImage);
+        }
+        if ($product->image && $sourceImages->where('id', $product->image->id)->isEmpty()) {
+            $sourceImages->push($product->image);
+        }
+        foreach ($product->images as $img) {
+            if ($sourceImages->where('id', $img->id)->isEmpty()) {
+                $sourceImages->push($img);
+            }
+        }
+
+        foreach ($sourceImages->values() as $order => $img) {
+            Image::create([
+                'name' => $img->name,
+                'type' => $img->type,
+                'path' => $img->path,
+                'extension' => $img->extension,
+                'size' => $img->size,
+                'order' => $order,
+                'featured' => $img->featured,
+                'imageable_id' => $inventory->id,
+                'imageable_type' => Inventory::class,
+            ]);
+        }
     }
 
     /**

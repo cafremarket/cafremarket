@@ -79,6 +79,7 @@ class ProductController extends Controller
                     'stock_quantity' => $request->input('stock_quantity', 1),
                     'sale_price' => $request->sale_price,
                     'active' => $request->active,
+                    'available_from' => now(),
                     'slug' => $request->slug,
                     'user_id' => $request->user_id,
                     'shop_id' => $request->shop_id,

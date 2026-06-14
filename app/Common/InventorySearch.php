@@ -58,6 +58,9 @@ trait InventorySearch
             'shop.currentSubscription',
             'shop.address.state',
             'image:path,imageable_id,imageable_type',
+            'product.featureImage:path,imageable_id,imageable_type,type',
+            'product.image:path,imageable_id,imageable_type',
+            'product.images:path,imageable_id,imageable_type,order',
         ]);
 
         // Keep results only from active shops
@@ -245,6 +248,9 @@ trait InventorySearch
         $products->load([
             'product' => function ($q) {
                 $q->select('id')->with([
+                    'featureImage:path,imageable_id,imageable_type,type',
+                    'image:path,imageable_id,imageable_type',
+                    'images:path,imageable_id,imageable_type,order',
                     'categories:id,name,slug,category_sub_group_id',
                     'categories.subGroup:id,name,slug,category_group_id',
                     'categories.subGroup.group:id,name,slug',
@@ -252,6 +258,7 @@ trait InventorySearch
             },
             'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
             'images:path,imageable_id,imageable_type',
+            'image:path,imageable_id,imageable_type',
         ]);
 
         return view('theme::search_results', compact('products', 'category', 'brands', 'priceRange', 'searchCountries', 'searchStates'));
