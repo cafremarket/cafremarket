@@ -661,22 +661,58 @@ class Inventory extends Inspectable
 
     public function setAvailableFromAttribute($value)
     {
-        if ($value) {
-            $this->attributes['available_from'] = Carbon::createFromFormat('Y-m-d h:i a', $value);
+        if (! $value) {
+            return;
+        }
+
+        if ($value instanceof \Carbon\Carbon) {
+            $this->attributes['available_from'] = $value;
+
+            return;
+        }
+
+        try {
+            $this->attributes['available_from'] = \Carbon\Carbon::createFromFormat('Y-m-d h:i a', $value);
+        } catch (\Exception $e) {
+            $this->attributes['available_from'] = \Carbon\Carbon::parse($value);
         }
     }
 
     public function setOfferStartAttribute($value)
     {
-        if ($value) {
-            $this->attributes['offer_start'] = Carbon::createFromFormat('Y-m-d h:i a', $value);
+        if (! $value) {
+            return;
+        }
+
+        if ($value instanceof \Carbon\Carbon) {
+            $this->attributes['offer_start'] = $value;
+
+            return;
+        }
+
+        try {
+            $this->attributes['offer_start'] = \Carbon\Carbon::createFromFormat('Y-m-d h:i a', $value);
+        } catch (\Exception $e) {
+            $this->attributes['offer_start'] = \Carbon\Carbon::parse($value);
         }
     }
 
     public function setOfferEndAttribute($value)
     {
-        if ($value) {
-            $this->attributes['offer_end'] = Carbon::createFromFormat('Y-m-d h:i a', $value);
+        if (! $value) {
+            return;
+        }
+
+        if ($value instanceof \Carbon\Carbon) {
+            $this->attributes['offer_end'] = $value;
+
+            return;
+        }
+
+        try {
+            $this->attributes['offer_end'] = \Carbon\Carbon::createFromFormat('Y-m-d h:i a', $value);
+        } catch (\Exception $e) {
+            $this->attributes['offer_end'] = \Carbon\Carbon::parse($value);
         }
     }
 
