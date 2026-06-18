@@ -12,9 +12,6 @@
     var startDate;
     var endDate;
     ;(function ($, window, document) {
-        // var sorter = $('#sortable').rowSorter({
-        var startDate;
-        var endDate;
         var jsonData = '<?php echo json_encode($chartDataArray);?>';
         var chartData =  JSON.parse(jsonData);
         var paymentStatusJson = '<?php echo json_encode($paymentStatus);?>';
@@ -33,8 +30,6 @@
          methodGenerate = new Chart(paymentMethodChart, paymentMethodData);
          statusGenerate = new Chart(paymentStatusChart, paymentStatusData);
 
-        //let dataString = "fromDate=&toDate=";
-        //dateToDateSearch(dataString);
         $(document).ready(function () {
             $('#daterangepicker').daterangepicker(
                 {
@@ -100,16 +95,53 @@
 
                     });
 
+                    paymentsTableResetting(dataString);
+
                 }
             );
             //Set the initial state of the picker label
             $('#daterangepicker span').html(moment().subtract('days', 29).format('D MMMM YYYY') + ' - ' + moment().format('D MMMM YYYY'));
             $('#getFromDate').val(moment().subtract('days', 7).format('YYYY-MM-DD'));
             $('#getToDate').val(moment().format('YYYY-MM-DD'));
+
+            let initialDataString = "fromDate=" + $('#getFromDate').val() + "&toDate=" + $('#getToDate').val() +
+                "&paymentMethod=" + $('#paymentMethod').val() + "&paymentStatus=" + $('#paymentStatus').val();
+            paymentsTableResetting(initialDataString);
         });
         ///Calling Chart Function to manipulate:
 
     }(window.jQuery, window, document));
+
+    function paymentsTableResetting(dataString)
+    {
+        var table = $('.payments-report-table');
+        if ($.fn.dataTable.isDataTable(table)) {
+            table.DataTable().destroy();
+        }
+
+        let url = '{{ route('admin.sales.payments.getMore') }}';
+
+        table.DataTable({
+            "responsive": true,
+            "iDisplayLength": {{ getPaginationValue() }},
+            "ajax": url + '/?' + dataString,
+            "columns": [
+                {'data': 'date', 'name': 'date', 'exportable': true, 'printable': true},
+                {'data': 'order_number', 'name': 'order_number', 'exportable': true, 'printable': true},
+                {'data': 'customer', 'name': 'customer', 'exportable': true, 'printable': true},
+                {'data': 'shop', 'name': 'shop', 'exportable': true, 'printable': true},
+                {'data': 'payment_method', 'name': 'payment_method', 'exportable': true, 'printable': true},
+                {'data': 'payment_status_name', 'name': 'payment_status', 'exportable': true, 'printable': true},
+                {'data': 'item', 'name': 'item', 'exportable': true, 'printable': true},
+                {'data': 'total', 'name': 'total', 'exportable': true, 'printable': true},
+                {'data': 'grand_total', 'name': 'grand_total', 'exportable': true, 'printable': true},
+            ],
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+    }
 
     //This function Will Return Data Configuration:
     function chartDataFormat(chartData){
@@ -317,6 +349,8 @@
             statusGenerate = new Chart(paymentStatusChart, paymentStatusData);
 
         });
+
+        paymentsTableResetting(dataString);
 
     }
 

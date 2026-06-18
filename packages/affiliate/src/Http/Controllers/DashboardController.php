@@ -71,8 +71,9 @@ class DashboardController extends Controller
   {
     $wallet = Auth::guard('affiliate')->user();
     $pending_commissions = $wallet->commissions()->unpaid()->sum('total_commission');
+    $transactions = $wallet->transactions()->latest('updated_at')->get();
 
-    return view('affiliate::frontend.wallet_index', compact('wallet', 'pending_commissions'));
+    return view('affiliate::frontend.wallet_index', compact('wallet', 'pending_commissions', 'transactions'));
   }
 
   public function showCommissions()

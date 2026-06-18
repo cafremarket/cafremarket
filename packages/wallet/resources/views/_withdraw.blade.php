@@ -75,7 +75,11 @@
 
         <p class="text-info">
           <i class="fa fa-info-circle"></i>
-          {!! trans('packages.wallet.payout_sales_commission_already_deducted', ['platform' => get_platform_title()]) !!}
+          @if (auth()->guard('affiliate')->check())
+            {{ trans('packages.wallet.payout_request_review_notice') }}
+          @else
+            {!! trans('packages.wallet.payout_sales_commission_already_deducted', ['platform' => get_platform_title()]) !!}
+          @endif
         </p>
 
         {!! Form::submit(trans('packages.wallet.submit'), ['class' => 'btn btn-flat btn-new pull-right']) !!}

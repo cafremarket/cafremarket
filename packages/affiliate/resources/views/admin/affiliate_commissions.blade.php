@@ -27,16 +27,20 @@
                 {{ $commission->created_at->toFormattedDateString() }}
               </td>
               <td>
-                @can('view', $commission->order)
-                  <a href="{{ route('admin.order.order.show', $commission->order_id) }}" data-toggle="tooltip" data-placement="top" title="{{ trans('app.view_detail') }}">
+                @if ($commission->order)
+                  @can('view', $commission->order)
+                    <a href="{{ route('admin.order.order.show', $commission->order_id) }}" data-toggle="tooltip" data-placement="top" title="{{ trans('app.view_detail') }}">
+                      {!! $commission->order->order_number !!}
+                    </a>
+                  @else
                     {!! $commission->order->order_number !!}
-                  </a>
+                  @endcan
                 @else
-                  {!! $commission->order->order_number !!}
-                @endcan
+                  —
+                @endif
               </td>
               <td>
-                {!! $commission->affiliate->getName() !!}
+                {!! $commission->affiliate ? $commission->affiliate->getName() : '—' !!}
               </td>
               <td>
                 {{ get_formated_currency($commission->total_commission, 2, config('system_settings.currency.id')) }}

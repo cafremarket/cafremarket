@@ -49,28 +49,36 @@ class AffiliateCommission extends Model
     public function markAsPaid()
     {
         if ($this->isPaid()) {
-            return $this;
+            return true;
         }
 
-        try {
-            $this->paid = true;
-            
-            $this->affiliate->wallet->deposit($this->total_commission, [
-                'type' => 'affiliate_commission',
-                'description' => trans('packages.affiliate.commission_for_order', ['order' => $this->order->order_number]),
-                'fee' => 0,
-                'commission_id' => $this->id,
-                'order_id' => $this->order->id,
-            ], true);
-
-            $this->save();
-
-            return $this;
-        } catch (Exception $e) {
-            \Log::error('Commission couldn\'t be paid. '. $e);
-
-            return $this;
+        if (! is_incevio_package_loaded('wallet')) {
+            throw new Exception(trans('packages.wallet.wallet_module_not_active'));
         }
+
+        $affiliate = $this->affiliate;
+        $order = $this->order;
+
+        if (! $affiliate) {
+            throw new Exception('Affiliate not found for commission #'.$this->id);
+        }
+
+        if (! $order) {
+            throw new Exception('Order not found for commission #'.$this->id);
+        }
+
+        $affiliate->deposit($this->total_commission, [
+            'type' => 'affiliate_commission',
+            'description' => trans('packages.affiliate.commission_for_order', ['order' => $order->order_number]),
+            'fee' => 0,
+            'commission_id' => $this->id,
+            'order_id' => $order->id,
+        ], true);
+
+        $this->paid = true;
+        $this->save();
+
+        return true;
     }
 
     public function getQuantityAttribute()

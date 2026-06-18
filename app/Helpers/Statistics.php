@@ -111,12 +111,31 @@ class Statistics
 
     public static function sales_data_by_period(Carbon $startTime, Carbon $endTime)
     {
-        return Order::select('total', 'discount', 'created_at')
-            ->mine()->withTrashed() // Include the archived orders also
+        return Order::mine()->withTrashed()
+            ->with('shop')
             ->where('created_at', '<=', $startTime)
             ->where('created_at', '>=', $endTime)
             ->orderBy('created_at', 'DESC')
             ->get();
+    }
+
+    public static function merchant_net_sales_total($orders)
+    {
+        return collect($orders)->sum(function ($order) {
+            return get_vendor_settlement_for_order($order)['net'];
+        });
+    }
+
+    public static function platform_marketplace_sales($days = 30)
+    {
+        return Order::whereDate('created_at', '>=', Carbon::today()->subDays($days))
+            ->where('payment_status', Order::PAYMENT_STATUS_PAID)
+            ->sum('grand_total');
+    }
+
+    public static function platform_marketplace_orders_count($days = 30)
+    {
+        return Order::whereDate('created_at', '>=', Carbon::today()->subDays($days))->count();
     }
 
     public static function latest_refund_total($period = 15)

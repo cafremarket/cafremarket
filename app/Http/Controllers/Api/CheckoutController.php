@@ -136,11 +136,6 @@ class CheckoutController extends Controller
             ], 403);
         }
 
-        // Order confirmed – only mark as paid when payment gateway returned STATUS_PAID (eMola uses callback instead).
-        if ($response->status === PaymentService::STATUS_PAID && optional($order->paymentMethod)->code !== 'emola') {
-            $order->markAsPaid();
-        }
-
         // Everything is fine. Now commit the transaction
         DB::commit();
 

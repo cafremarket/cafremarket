@@ -5,12 +5,12 @@
   <div class="row">
     <div class="col-md-3 col-sm-6 col-xs-12 nopadding-right">
       <div class="info-box">
-        <span class="info-box-icon bg-yellow"><i class="fa fa-credit-card"></i></span>
+        <span class="info-box-icon bg-yellow"><i class="fa fa-shopping-cart"></i></span>
 
         <div class="info-box-content">
-          <span class="info-box-text">{{ trans('app.monthly_recurring_revenue') }}</span>
+          <span class="info-box-text">{{ trans('app.marketplace_sales') }}</span>
           <span class="info-box-number">
-            {{ get_formated_currency($monthly_recurring_revenue, 2, config('system_settings.currency.id')) }}
+            {{ get_formated_currency($marketplace_sales_30_days, 2, config('system_settings.currency.id')) }}
           </span>
           <div class="progress" style="background: transparent;"></div>
           <span class="progress-description text-muted">
@@ -23,12 +23,12 @@
 
     <div class="col-md-3 col-sm-6 col-xs-12 nopadding-right nopadding-left">
       <div class="info-box">
-        <span class="info-box-icon bg-aqua"><i class="fa fa-percent"></i></span>
+        <span class="info-box-icon bg-aqua"><i class="fa fa-file-text-o"></i></span>
 
         <div class="info-box-content">
-          <span class="info-box-text">{{ trans('app.last_30_days_commission') }}</span>
+          <span class="info-box-text">{{ trans('app.orders') }}</span>
           <span class="info-box-number">
-            {{ get_formated_currency($last_30_days_commission, 2, config('system_settings.currency.id')) }}
+            {{ $marketplace_orders_30_days }}
           </span>
           <div class="progress" style="background: transparent;"></div>
           <span class="progress-description text-muted">
@@ -96,6 +96,8 @@
     <div class="box-header with-border">
       <h3 class="box-title">{{ trans('app.subscription_plans') }}</h3>
       <div class="box-tools pull-right">
+        <span class="label label-default">{{ trans('app.monthly_recurring_revenue') }}:
+          {{ get_formated_currency($monthly_recurring_revenue, 2, config('system_settings.currency.id')) }}</span>
         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
         <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
       </div>
@@ -103,7 +105,7 @@
     <div class="box-body">
       <div class="row">
         <div class="col-sm-7 nopadding-right">
-          <table class="table table-striped">
+          <table class="table table-striped kpi-export-table">
             <thead>
               <tr>
                 <th>{{ trans('app.name') }}</th>
@@ -134,4 +136,18 @@
   @include('plugins.chart')
 
   {!! $chartSubscribers->script() !!}
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if ($.fn.dataTable && $('.kpi-export-table').length) {
+        $('.kpi-export-table').DataTable({
+          dom: 'Bfrtip',
+          paging: false,
+          searching: false,
+          info: false,
+          buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+        });
+      }
+    });
+  </script>
 @endsection

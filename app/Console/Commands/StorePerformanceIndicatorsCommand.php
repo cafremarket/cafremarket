@@ -42,7 +42,10 @@ class StorePerformanceIndicatorsCommand extends Command
     {
         DB::table('performance_indicators')->insert([
             'monthly_recurring_revenue' => $indicators->monthlyRecurringRevenue(),
-            'daily_volume' => DB::table('invoices')->whereDate('created_at', '=', Carbon::today())->sum('total'),
+            'daily_volume' => DB::table('orders')
+                ->whereDate('created_at', '=', Carbon::today())
+                ->where('payment_status', \App\Models\Order::PAYMENT_STATUS_PAID)
+                ->sum('grand_total'),
             'new_customers' => DB::table('customers')->whereDate('created_at', '=', Carbon::today())->count(),
             'new_merchants' => DB::table('users')->where('role_id', \App\Models\Role::MERCHANT)->whereDate('created_at', '=', Carbon::today())->count(),
             'created_at' => Carbon::today(),

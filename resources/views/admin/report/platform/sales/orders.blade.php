@@ -96,6 +96,8 @@
               <th>{{ trans('app.shop') }}</th>
             @endif
             <th>{{ trans('app.quantity') }}</th>
+            <th>{{ trans('app.payment_method') }}</th>
+            <th>{{ trans('app.payment_status') }}</th>
             <th>{{ trans('app.total') }}</th>
 
           </tr>
@@ -116,8 +118,12 @@
                   @endcan
                 </td>
                 <td>{{ $item->customer }}</td>
-                <td>{{ $item->shop }}</td>
+                @if (!Auth::user()->isMerchant())
+                  <td>{{ $item->shop }}</td>
+                @endif
                 <td>{{ $item->quantity }}</td>
+                <td>{{ $item->payment_method }}</td>
+                <td>{{ $item->payment_status_name ?? get_payment_status_name($item->payment_status ?? null) }}</td>
                 <td>{{ get_formated_currency($item->grand_total, 2, config('system_settings.currency.id')) }}</td>
               </tr>
             @endforeach

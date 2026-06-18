@@ -15,7 +15,9 @@ class CommissionController extends Controller
      */
     public function index()
     {
-        $commissions = AffiliateCommission::all();
+        $commissions = AffiliateCommission::with(['order', 'affiliate'])
+            ->latest()
+            ->get();
 
         return view('affiliate::admin.affiliate_commissions', compact('commissions'));
     }
@@ -28,8 +30,18 @@ class CommissionController extends Controller
      */
     public function releaseCommission(AffiliateCommission $commission)
     {
-        $commission->markAsPaid();
+        try {
+            $commission->loadMissing(['order', 'affiliate']);
 
-        return back()->with(['success' => trans('packages.affiliate.commission_is_released')]);
+            if (! $commission->markAsPaid()) {
+                return back()->with('error', trans('app.failed'));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Affiliate commission release failed: '.$e->getMessage());
+
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', trans('packages.affiliate.commission_is_released'));
     }
 }

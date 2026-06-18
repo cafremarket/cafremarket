@@ -982,6 +982,18 @@ class Order extends BaseModel
      */
     public function markAsPaid(array $params = [])
     {
+        if ($this->isPaid()) {
+            if (! empty($params)) {
+                foreach ($params as $field => $value) {
+                    $this->{$field} = $value;
+                }
+
+                $this->save();
+            }
+
+            return $this;
+        }
+
         $this->payment_status = static::PAYMENT_STATUS_PAID;
 
         if ($this->order_status_id < static::STATUS_CONFIRMED) {

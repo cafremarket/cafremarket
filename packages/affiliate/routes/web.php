@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Incevio\Package\Affiliate\Console\Commands\ReleaseCommissions;
 use Incevio\Package\Affiliate\Http\Controllers\FrontController;
 use Incevio\Package\Affiliate\Http\Controllers\LoginController;
 use Incevio\Package\Wallet\Http\Controllers\WithdrawalController;

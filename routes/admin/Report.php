@@ -30,6 +30,8 @@ Route::get('report/sales/payments/getStatus', [SalesReportController::class, 'ge
 
 Route::get('report/sales/payments/getMoreForChart', [SalesReportController::class, 'getMorePaymentForChart'])->name('sales.payments.getMoreForChart');
 
+Route::get('report/sales/payments/getMore', [SalesReportController::class, 'getMorePayments'])->name('sales.payments.getMore')->middleware('ajax');
+
 // #Product Wise Report
 Route::get('report/sales/products', [SalesReportController::class, 'products'])->name('sales.products');
 

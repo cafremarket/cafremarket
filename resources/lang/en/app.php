@@ -257,6 +257,7 @@ return [
     'decrease' => 'Decrease',
     'discounts' => 'Discounts',
     'revenue' => 'Revenue',
+    'marketplace_sales' => 'Marketplace sales',
     'sold' => 'Sold',
     'sold_units' => ':units Units',
     'units_sold' => 'Units sold',

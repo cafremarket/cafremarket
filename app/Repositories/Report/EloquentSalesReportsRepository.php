@@ -86,6 +86,7 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
         return DB::table($this->orders)
             ->leftJoin($this->customers, $this->customers.'.id', $this->orders.'.customer_id')
             ->leftJoin($this->shops, $this->shops.'.id', $this->orders.'.shop_id')
+            ->leftJoin($this->paymentMethod, $this->paymentMethod.'.id', $this->orders.'.payment_method_id')
             ->select(
                 $this->orders.'.id',
                 $this->orders.'.order_number',
@@ -95,6 +96,8 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
                 $this->orders.'.quantity',
                 $this->orders.'.grand_total',
                 $this->orders.'.delivery_date',
+                $this->orders.'.payment_status',
+                $this->paymentMethod.'.name as payment_method',
                 $this->customers.'.name as customer'
             );
     }
@@ -300,16 +303,55 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
     public function commonQueryByPaymentMethods()
     {
         try {
-            return DB::table($this->paymentMethod)
-                ->leftJoin($this->orders, $this->orders.'.payment_method_id', $this->paymentMethod.'.id')
+            return DB::table($this->orders)
+                ->join($this->paymentMethod, $this->orders.'.payment_method_id', '=', $this->paymentMethod.'.id')
                 ->select(
                     $this->paymentMethod.'.name',
+                    DB::raw('COUNT(DISTINCT '.$this->orders.'.id) as order_count'),
                     DB::raw('SUM('.$this->orders.'.grand_total) as total')
                 )
-                ->groupBy($this->orders.'.payment_method_id');
+                ->groupBy($this->paymentMethod.'.id', $this->paymentMethod.'.name')
+                ->orderBy($this->paymentMethod.'.name', 'asc');
         } catch (\Exception $exception) {
             return get_exception_message($exception);
         }
+    }
+
+    // #Payment orders detail query
+    public function paymentsCommonDataQuery()
+    {
+        return DB::table($this->orders)
+            ->leftJoin($this->customers, $this->customers.'.id', $this->orders.'.customer_id')
+            ->leftJoin($this->shops, $this->shops.'.id', $this->orders.'.shop_id')
+            ->leftJoin($this->paymentMethod, $this->paymentMethod.'.id', $this->orders.'.payment_method_id')
+            ->select(
+                $this->orders.'.id',
+                $this->orders.'.order_number',
+                DB::raw('DATE('.$this->orders.'.created_at) as date'),
+                $this->customers.'.name as customer',
+                $this->shops.'.name as shop',
+                $this->orders.'.payment_status',
+                $this->paymentMethod.'.name as payment_method',
+                $this->orders.'.quantity as item',
+                $this->orders.'.total',
+                $this->orders.'.grand_total'
+            );
+    }
+
+    public function payments($date = null)
+    {
+        return self::paymentsCommonDataQuery()
+            ->whereDate($this->orders.'.created_at', '>', $date ?? Carbon::today()->subDays(config('report.sales.default', 7)))
+            ->get();
+    }
+
+    public function paymentSearch(Carbon $fromDate, Carbon $toDate, array $packet)
+    {
+        $data = self::paymentsCommonDataQuery();
+        $data = self::commonSearchQuery($data, $packet);
+        $data = $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate]);
+
+        return $data->get();
     }
 
     /**
@@ -359,7 +401,7 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
                 $this->products.'.model_number',
                 $this->products.'.gtin',
                 $this->products.'.gtin_type',
-                DB::raw('SUM('.$this->orders.'.grand_total) as totalSale')
+                DB::raw('SUM('.$this->orderItems.'.unit_price * '.$this->orderItems.'.quantity) as totalSale')
             )
             ->groupBy($this->products.'.id');
     }

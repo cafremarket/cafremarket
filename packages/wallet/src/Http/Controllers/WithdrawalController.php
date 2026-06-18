@@ -49,6 +49,10 @@ class WithdrawalController extends Controller
         $balance = $this->wallet->balance;
         $existing_instruction = $this->shop?->pay_to;
 
+        if (Auth::guard('affiliate')->check()) {
+            $existing_instruction = Auth::guard('affiliate')->user()->pay_to;
+        }
+
         return view('wallet::_withdraw', compact('balance', 'minimum', 'existing_instruction'));
     }
 
@@ -73,6 +77,10 @@ class WithdrawalController extends Controller
         if ($this->shop instanceof Shop) {
             $this->shop->pay_to = $instruction;
             $this->shop->save();
+        } elseif (Auth::guard('affiliate')->check()) {
+            $affiliate = Auth::guard('affiliate')->user();
+            $affiliate->pay_to = $instruction;
+            $affiliate->save();
         }
 
         $transaction = $this->wallet->withdraw($request->amount, $meta, false, false);

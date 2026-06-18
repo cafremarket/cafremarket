@@ -27,6 +27,7 @@ class SalesReportController extends Controller
     public function orders(Request $request)
     {
         $data = $this->reports->orders();
+        $data = $this->appendPaymentLabels($data);
         $chartData = $this->reports->orderChart();
         $chartDataArray = json_decode(json_encode($chartData), true);
 
@@ -50,6 +51,8 @@ class SalesReportController extends Controller
         $toDate = Carbon::createFromDate($request->get('toDate'));
 
         $salesReport = $this->reports->orderSearch($fromDate, $toDate, $status);
+
+        $salesReport = $this->appendPaymentLabels($salesReport);
 
         return response()->json(['data' => $salesReport]);
     }
@@ -82,6 +85,9 @@ class SalesReportController extends Controller
     {
         $paymentMethods = PaymentMethod::all();
 
+        $data = $this->reports->payments(Carbon::today()->subDays(7));
+        $data = $this->appendPaymentLabels($data);
+
         $chartData = $this->reports->paymentChart(Carbon::today()->subDays(7));
         $paymentMethod = $this->reports->paymentChartByPaymentMethod(Carbon::today()->subDays(7));
         $paymentStatus = $this->reports->paymentChartByPaymentStatus(Carbon::today()->subDays(7));
@@ -90,8 +96,28 @@ class SalesReportController extends Controller
         $paymentMethod = json_decode(json_encode($paymentMethod), true);
         $paymentStatus = json_decode(json_encode($paymentStatus), true);
 
-        return view('admin.report.platform.sales.payments', compact('chartDataArray',
-            'paymentMethods', 'paymentMethod', 'paymentStatus'));
+        return view('admin.report.platform.sales.payments', compact(
+            'data',
+            'chartDataArray',
+            'paymentMethods',
+            'paymentMethod',
+            'paymentStatus'
+        ));
+    }
+
+    public function getMorePayments(Request $request)
+    {
+        $fromDate = Carbon::createFromDate($request->get('fromDate'));
+        $toDate = Carbon::createFromDate($request->get('toDate'));
+        $packet = [
+            'payment_status' => $request->get('paymentStatus'),
+            'payment_method' => $request->get('paymentMethod'),
+        ];
+
+        $payments = $this->reports->paymentSearch($fromDate, $toDate, $packet);
+        $payments = $this->appendPaymentLabels($payments);
+
+        return response()->json(['data' => $payments]);
     }
 
     // #ajax call for date to date payment Data:
@@ -161,5 +187,17 @@ class SalesReportController extends Controller
         $data = $this->reports->productsSearch($fromDate, $toDate, $packet);
 
         return response()->json(['data' => $data]);
+    }
+
+    /**
+     * Append human-readable payment status labels to report rows.
+     */
+    private function appendPaymentLabels($rows)
+    {
+        return collect($rows)->map(function ($row) {
+            $row->payment_status_name = get_payment_status_name($row->payment_status ?? null);
+
+            return $row;
+        });
     }
 }

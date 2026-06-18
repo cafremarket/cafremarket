@@ -28,6 +28,10 @@ interface SalesReportsRepository
 
     public function getMoreByStatus(Carbon $fromDate, Carbon $toDate, $packet);
 
+    public function payments($date = null);
+
+    public function paymentSearch(Carbon $fromDate, Carbon $toDate, array $packet);
+
     // #Products
     public function products(Carbon $date);
 

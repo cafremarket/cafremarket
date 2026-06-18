@@ -499,6 +499,14 @@ class Transaction extends Model
             return false;
         }
 
+        if (is_incevio_package_loaded('affiliate') && Auth::guard('affiliate')->check()) {
+            $affiliateClass = \Incevio\Package\Affiliate\Models\Affiliate::class;
+
+            if ($this->payable_type === $affiliateClass) {
+                return (int) $this->payable_id === (int) Auth::guard('affiliate')->id();
+            }
+        }
+
         $user = Auth::user();
 
         if (! $user) {

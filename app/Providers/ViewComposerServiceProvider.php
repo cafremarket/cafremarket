@@ -884,11 +884,15 @@ class ViewComposerServiceProvider extends ServiceProvider
 
                 $view->with([
                     'new_vendor_count' => $new_vendor_count,
-                    'monthly_recurring_revenue' => 0,
-                    'last_30_days_commission' => 0,
-                    // 'chartReferrers' => $chartReferrers,
-                    // 'chartVisitorTypes' => $chartVisitorTypes,
-                    // 'chartDevices' => $chartDevices,
+                    'marketplace_sales_30_days' => Cache::remember('marketplace_sales_30_days', config('cache.remember.todays_stats', 3600), function () {
+                        return Statistics::platform_marketplace_sales(30);
+                    }),
+                    'marketplace_orders_30_days' => Cache::remember('marketplace_orders_30_days', config('cache.remember.todays_stats', 3600), function () {
+                        return Statistics::platform_marketplace_orders_count(30);
+                    }),
+                    'monthly_recurring_revenue' => Cache::remember('monthly_recurring_revenue', config('cache.remember.todays_stats', 3600), function () {
+                        return app(\App\Repositories\PerformanceIndicatorsRepository::class)->monthlyRecurringRevenue();
+                    }),
                 ]);
             }
         );
@@ -912,9 +916,15 @@ class ViewComposerServiceProvider extends ServiceProvider
 
                 $salesData = Statistics::sales_data_by_period($start, $end);
 
+                // Preparing net sales amount dataset (excludes marketplace commission)
+                $salesTotal = [];
+                foreach ($salesData->groupBy(function ($item) {
+                    return $item->created_at->format('F');
+                }) as $label => $orders) {
+                    $salesTotal[$label] = Statistics::merchant_net_sales_total($orders);
+                }
+
                 $dataset = [];
-                // Preparing Sales amount dataset
-                $salesTotal = ChartHelper::prepareSaleTotal($salesData, 'M');
                 foreach ($chart->labels as $key => $label) {
                     $dataset[$key] = array_key_exists($label, $salesTotal) ? round($salesTotal[$label]) : 0;
                 }
@@ -956,6 +966,8 @@ class ViewComposerServiceProvider extends ServiceProvider
                     return ListHelper::returning_customers(10);
                 });
 
+                $netSalesTotal = Statistics::merchant_net_sales_total($salesData);
+
                 $view->with([
                     'chart' => $chart,
                     'top_listings' => $top_listings,
@@ -966,7 +978,7 @@ class ViewComposerServiceProvider extends ServiceProvider
                     'orders_count' => $orders_count,
                     'abandoned_carts_count' => $abandoned_carts,
                     'latest_refund_total' => $refund_total,
-                    'sales_total' => $salesData->sum('total'),
+                    'sales_total' => $netSalesTotal,
                     'discount_total' => $salesData->sum('discount'),
                 ]);
             }

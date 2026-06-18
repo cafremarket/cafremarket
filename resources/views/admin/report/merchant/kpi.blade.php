@@ -406,4 +406,22 @@
   @include('plugins.chart')
 
   {!! $chart->script() !!}
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if ($.fn.dataTable) {
+        $('.table-no-sort, .table-default').each(function () {
+          if (!$.fn.dataTable.isDataTable(this)) {
+            $(this).DataTable({
+              dom: 'Bfrtip',
+              paging: false,
+              searching: false,
+              info: false,
+              buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+            });
+          }
+        });
+      }
+    });
+  </script>
 @endsection

@@ -4,6 +4,7 @@ namespace Incevio\Package\Wallet\Services;
 
 use App\Models\Order;
 use Illuminate\Support\Facades\Log;
+use Incevio\Package\Wallet\Models\Transaction;
 
 class OrderWalletService
 {
@@ -15,6 +16,10 @@ class OrderWalletService
      */
     public function payVendor(Order $order, bool $confirmed = true, array $meta = [])
     {
+        if ($existing = $this->findVendorSaleCredit($order)) {
+            return $existing;
+        }
+
         $confirmed = get_order_escrow_holding_duration() == 0 ? true : false;
 
         $settlement = get_vendor_settlement_for_order($order);
@@ -110,4 +115,19 @@ class OrderWalletService
     }
 
     public function releaseReward(Order $order, bool $confirmed = true, array $meta = []) {}
+
+    /**
+     * Whether this order already has a vendor wallet sale credit.
+     */
+    protected function findVendorSaleCredit(Order $order): ?Transaction
+    {
+        if (! $order->shop) {
+            return null;
+        }
+
+        return $order->shop->transactions()
+            ->where('type', Transaction::TYPE_DEPOSIT)
+            ->where('meta->order_id', $order->id)
+            ->first();
+    }
 }

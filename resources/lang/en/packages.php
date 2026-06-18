@@ -148,6 +148,7 @@ return [
         'payouts' => 'Payouts',
         'select' => 'Select',
         'payout_request' => 'Payout request',
+        'payout_request_review_notice' => 'Your payout request will be reviewed by the platform. You can view the payment receipt here after it is processed.',
         'payout_requests' => 'Payout requests',
         'payout_approved' => 'The payout has been approved',
         'payout_declined' => 'The payout has been declined',

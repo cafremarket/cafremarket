@@ -10,8 +10,8 @@
               <div class="row">
                 <div class="col-md-2 nopadding-right">
                   <div class="form-group">
-                    <label>{{ trans('app.payment_status') }}</label>
-                    <select id="paymentMethod" class="form-control" name="payment_status" onchange="fireEventOnFilter(this.value)">
+                    <label>{{ trans('app.payment_method') }}</label>
+                    <select id="paymentMethod" class="form-control" name="payment_method" onchange="fireEventOnFilter(this.value)">
                       <option value="">{{ trans('app.select') }}</option>
                       @foreach ($paymentMethods as $payment)
                         <option value="{{ $payment->id }}">{{ $payment->name }}</option>
@@ -79,45 +79,40 @@
         </div>
       </div>
 
-      {{-- <table class="table table-hover table-no-sort table-responsive" style="overflow-x: scroll">
-            <thead>
-            <tr>
-                <th>{{ trans('app.date') }}</th>
-                <th>{{ trans('app.order_number') }}</th>
-                <th>{{ trans('app.customer') }}</th>
-                <th>{{ trans('app.shop') }}</th>
-                <th>{{ trans('app.payment_status') }}</th>
-                <th>{{ trans('app.items') }}</th>
-                <th>{{ trans('app.total') }}</th>
-                <th>{{ trans('app.grand_total') }}</th>
+      <span class="spacer30"></span>
 
-            </tr>
-            </thead>
-            <tbody>
-            @if (count($data) > 0)
-            @foreach ($data as $key => $item)
-                <tr>
-                    <td>{{$item->date}}</td>
-                    <td>
-                       @can('view', $item)
-                            <a href="{{ route('admin.order.order.show', $item->id) }}" title="view order">
-                                {{ $item->order_number }}
-                            </a>
-                        @else
-                            {{ $item->order_number }}
-                        @endcan
-                    </td>
-                    <td>{{ $item->customer }}</td>
-                    <td>{{ $item->shop }}</td>
-                    <td>{{ get_payment_status_name($item->payment_status)}}</td>
-                    <td>{{ $item->item }}</td>
-                    <td>{{ get_formated_currency($item->total, 2, config('system_settings.currency.id')) }}</td>
-                    <td>{{ get_formated_currency($item->grand_total, 2, config('system_settings.currency.id')) }}</td>
-                </tr>
+      <table class="table table-hover table-no-sort table-responsive payments-report-table" style="overflow-x: scroll">
+        <thead>
+          <tr>
+            <th>{{ trans('app.date') }}</th>
+            <th>{{ trans('app.order_number') }}</th>
+            <th>{{ trans('app.customer') }}</th>
+            <th>{{ trans('app.shop') }}</th>
+            <th>{{ trans('app.payment_method') }}</th>
+            <th>{{ trans('app.payment_status') }}</th>
+            <th>{{ trans('app.items') }}</th>
+            <th>{{ trans('app.total') }}</th>
+            <th>{{ trans('app.grand_total') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (count($data) > 0)
+            @foreach ($data as $item)
+              <tr>
+                <td>{{ $item->date }}</td>
+                <td>{{ $item->order_number }}</td>
+                <td>{{ $item->customer }}</td>
+                <td>{{ $item->shop }}</td>
+                <td>{{ $item->payment_method }}</td>
+                <td>{{ $item->payment_status_name ?? get_payment_status_name($item->payment_status) }}</td>
+                <td>{{ $item->item }}</td>
+                <td>{{ get_formated_currency($item->total, 2, config('system_settings.currency.id')) }}</td>
+                <td>{{ get_formated_currency($item->grand_total, 2, config('system_settings.currency.id')) }}</td>
+              </tr>
             @endforeach
-            @endif
-            </tbody>
-        </table> --}}
+          @endif
+        </tbody>
+      </table>
     </div> <!-- /.box-body -->
   </div> <!-- /.box -->
 @endsection

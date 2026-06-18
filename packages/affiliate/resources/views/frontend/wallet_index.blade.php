@@ -56,7 +56,14 @@
       </div>
     </div> <!-- /.box-header -->
     <div class="box-body">
-      <table class="table table-hover table-no-sort">
+      @if (!empty($wallet->pay_to))
+        <p class="text-muted small">
+          <i class="fa fa-info-circle"></i>
+          {{ trans('packages.wallet.payout_saved_instruction') }}: {{ $wallet->pay_to }}
+        </p>
+      @endif
+
+      <table class="table table-hover" id="affiliate-wallet-transactions-table" width="100%">
         <thead>
           <tr>
             <th>{{ trans('packages.wallet.date') }}</th>
@@ -64,40 +71,97 @@
             <th>{{ trans('packages.wallet.description') }}</th>
             <th>{{ trans('packages.wallet.amount') }}</th>
             <th>{{ trans('packages.wallet.status') }}</th>
+            <th>{{ trans('packages.wallet.payout_payment_proof') }}</th>
             <th>{{ trans('packages.wallet.option') }}</th>
           </tr>
         </thead>
         <tbody>
-          @if ($wallet->transactions)
-            @foreach ($wallet->transactions as $transaction)
-              <tr>
-                <td>
-                  {{ $transaction->updated_at->toFormattedDateString() }}
-                </td>
-                <td>
-                  {{ $transaction->type }}
-                </td>
-                <td>
-                  {!! $transaction->getFromMetaData('description') !!}
-                </td>
-                <td>
-                  {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
-                </td>
-                <td>
-                  {!! $transaction->statusName() !!}
-                </td>
-                <td>
-                  @if ($transaction->approved)
-                    <a href="{{ route('wallet.transaction.invoice', $transaction) }}" class="btn btn-default btn-sm btn-flat">
-                      <i class="fa fa-file-o"></i> {{ trans('app.invoice') }}
-                    </a>
-                  @endif
-                </td>
-              </tr>
-            @endforeach
-          @endif
+          @forelse ($transactions as $transaction)
+            <tr>
+              <td data-order="{{ $transaction->updated_at?->timestamp ?? 0 }}">
+                {{ $transaction->updated_at?->toFormattedDateString() }}
+              </td>
+              <td>{{ $transaction->type }}</td>
+              <td>
+                @include('wallet::partials.transaction_description_cell', ['transaction' => $transaction])
+              </td>
+              <td data-order="{{ $transaction->amount }}">
+                {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
+              </td>
+              <td>{!! $transaction->statusName() !!}</td>
+              <td>
+                @include('wallet::admin.partials._payout_payment_proof', ['transaction' => $transaction])
+              </td>
+              <td>
+                @if ($transaction->approved)
+                  <a href="{{ route('wallet.transaction.invoice', $transaction) }}" class="btn btn-default btn-sm btn-flat" target="_blank">
+                    <i class="fa fa-file-o"></i> {{ trans('app.invoice') }}
+                  </a>
+                @endif
+              </td>
+            </tr>
+          @empty
+          @endforelse
         </tbody>
       </table>
     </div> <!-- /.box-body -->
   </div> <!-- /.box -->
+@endsection
+
+@section('page-script')
+  <script type="text/javascript">
+    $(function() {
+      var $table = $('#affiliate-wallet-transactions-table');
+
+      if (!$table.length) {
+        return;
+      }
+
+      if ($.fn.DataTable.isDataTable($table[0])) {
+        $table.DataTable().destroy();
+      }
+
+      var pageLength = {{ getPaginationValue() }};
+
+      $table.DataTable({
+        order: [[0, 'desc']],
+        pageLength: pageLength,
+        lengthMenu: [
+          [10, 25, 50, 100, -1],
+          ['10 rows', '25 rows', '50 rows', '100 rows', 'Show all']
+        ],
+        columnDefs: [{
+          orderable: false,
+          targets: [5, 6]
+        }],
+        language: {
+          info: '_START_ to _END_ of _TOTAL_ entries',
+          lengthMenu: 'Show _MENU_',
+          search: '',
+          emptyTable: '{{ trans('packages.wallet.no_transaction_found') }}',
+          paginate: {
+            next: '<i class="fa fa-hand-o-right"></i>',
+            previous: '<i class="fa fa-hand-o-left"></i>',
+          },
+        },
+        dom: 'lfrtip',
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('.wire-proof-preview');
+      if (!trigger) return;
+      e.preventDefault();
+      var src = trigger.getAttribute('data-src');
+      if (!src) return;
+      var name = trigger.getAttribute('data-name') || '{{ trans('packages.wallet.payout_payment_proof') }}';
+      var html = '<div class="text-center"><p><strong>' + name + '</strong></p>' +
+        '<img src="' + src + '" class="img-responsive" style="max-height:70vh;margin:0 auto;"></div>';
+      if (typeof bootbox !== 'undefined') {
+        bootbox.alert({ message: html, size: 'large' });
+      } else {
+        window.open(src, '_blank');
+      }
+    });
+  </script>
 @endsection

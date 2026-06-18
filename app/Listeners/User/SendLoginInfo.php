@@ -5,6 +5,8 @@ namespace App\Listeners\User;
 use App\Events\User\UserCreated;
 use App\Notifications\User\SendLoginInfo as UserCreatedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class SendLoginInfo implements ShouldQueue
 {
@@ -32,6 +34,14 @@ class SendLoginInfo implements ShouldQueue
      */
     public function handle(UserCreated $event)
     {
-        $event->user->notify(new UserCreatedNotification($event->user, $event->admin, $event->password));
+        try {
+            $event->user->notify(new UserCreatedNotification($event->user, $event->admin, $event->password));
+        } catch (Throwable $e) {
+            Log::warning('User created but login email could not be sent.', [
+                'user_id' => $event->user->id,
+                'email' => $event->user->email,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

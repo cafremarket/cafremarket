@@ -193,7 +193,9 @@
                 {{ $transaction->updated_at?->toFormattedDateString() }}
               </td>
               <td>{{ $transaction->type }}</td>
-              <td>{!! $transaction->getFromMetaData('description') !!}</td>
+              <td>
+                @include('wallet::partials.transaction_description_cell', ['transaction' => $transaction])
+              </td>
               <td data-order="{{ $transaction->amount }}">
                 @include('wallet::partials.transaction_amount_cell', ['transaction' => $transaction])
               </td>

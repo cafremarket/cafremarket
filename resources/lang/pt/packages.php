@@ -145,6 +145,7 @@ return [
         'payouts' => 'Pagamentos',
         'select' => 'Selecionar',
         'payout_request' => 'Pedido de pagamento',
+        'payout_request_review_notice' => 'O seu pedido de pagamento será analisado pela plataforma. Poderá ver o comprovativo aqui após o processamento.',
         'payout_requests' => 'Pedidos de pagamento',
         'payout_approved' => 'O pagamento foi aprovado',
         'payout_declined' => 'O pagamento foi recusado',

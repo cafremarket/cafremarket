@@ -245,6 +245,14 @@
           </li>
         @endcan
 
+        @can('index', \App\Models\User::class)
+          <li class="{{ Request::is('admin/admin/user*') ? 'active' : '' }}">
+            <a href="{{ url('admin/admin/user') }}">
+              <i class="fa fa-user-plus"></i> <span>{{ trans('nav.users') }}</span>
+            </a>
+          </li>
+        @endcan
+
         <li class="{{ Request::is('admin/admin/deliveryboys*') ? 'active' : '' }}">
           <a href="{{ route('admin.admin.deliveryboy.index') }}">
             <i class="fa fa-motorcycle"></i> <span>{{ trans('nav.delivery_boys') }}</span>

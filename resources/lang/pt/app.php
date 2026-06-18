@@ -257,6 +257,7 @@ return [
         'decrease' => 'Diminuir',
         'discounts' => 'Descontos',
         'revenue' => 'Receita',
+        'marketplace_sales' => 'Vendas do marketplace',
         'sold' => 'Vendido',
         'sold_units' => ':units unidades',
         'units_sold' => 'Unidades vendidas',

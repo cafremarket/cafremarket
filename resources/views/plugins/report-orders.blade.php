@@ -57,9 +57,9 @@
                     let shop = $('#shopId').val();
                     let orderNumber = $('#orderNumber').val();
                     let orderStatus = $('#orderStatus').val();
-                    //console.log(window.location.hostname)
+                    let paymentStatus = $('#paymentStatus').val();
                     let dataString = "customerId=" + customer + "&shopId=" + shop + "&orderNumber=" + orderNumber +
-                        "&orderStatus=" + orderStatus + "&fromDate=" + startDate + "&toDate=" + endDate;
+                        "&orderStatus=" + orderStatus + "&paymentStatus=" + paymentStatus + "&fromDate=" + startDate + "&toDate=" + endDate;
                     //Data Table Reset After Ajax:
                     dataTableResetting(dataString);
                     //Get Chart Data Via Ajax:
@@ -84,18 +84,11 @@
             $('#getFromDate').val(moment().subtract('days', 7).format('YYYY-MM-DD'));
             $('#getToDate').val(moment().format('YYYY-MM-DD'));
 
-
-            /*Chart to Image Download*/
-            /*document.getElementById("downloadOrder").addEventListener('click', function(){
-                /!*Get image of canvas element*!/
-                var url_base64jp = document.getElementById("salesReport").toDataURL("image/jpg");
-                /!*get download button (tag: <a></a>) *!/
-                var a =  document.getElementById("downloadOrder");
-                /!*insert chart image url to download button (tag: <a></a>) *!/
-                a.href = url_base64jp;
-            });*/
-
-
+            let initialDataString = "&paymentStatus=" + $('#paymentStatus').val() +
+                "&customerId=" + $('#customerId').val() + "&shopId=" + $('#shopId').val() +
+                "&orderNumber=" + $('#orderNumber').val() + "&orderStatus=" + $('#orderStatus').val() +
+                "&fromDate=" + $('#getFromDate').val() + "&toDate=" + $('#getToDate').val();
+            dataTableResetting(initialDataString);
         });
         ///Calling Chart Function to manipulate:
 
@@ -154,6 +147,20 @@
                 },{
                     'data': 'quantity',
                     'name': 'quantity',
+                    'orderable': true,
+                    'searchable': true,
+                    'exportable': true,
+                    'printable': true
+                },{
+                    'data': 'payment_method',
+                    'name': 'payment_method',
+                    'orderable': true,
+                    'searchable': true,
+                    'exportable': true,
+                    'printable': true
+                },{
+                    'data': 'payment_status_name',
+                    'name': 'payment_status',
                     'orderable': true,
                     'searchable': true,
                     'exportable': true,

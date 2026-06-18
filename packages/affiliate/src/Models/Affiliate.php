@@ -32,6 +32,7 @@ class Affiliate extends Authenticatable
         'username',
         'email',
         'phone',
+        'pay_to',
         'password',
         'last_visited_at',
         'last_visited_from',
