@@ -28,7 +28,7 @@ class SalesByPeriod extends Chart
             $end = $end ? Carbon::parse($end) : $start->copy()->subMonths(config('charts.default.months'));
             $grp_by = 'F';
             $period = $start->diffInMonths($end);
-            $dates = ChartHelper::Months($period, $grp_by);
+            $dates = ChartHelper::Months($period, $grp_by, $start->copy()->startOfMonth());
         }
 
         $this->displayLegend(false)

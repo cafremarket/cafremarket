@@ -9,351 +9,252 @@
     var salesCtx;
     var paymentMethodChart;
     var paymentStatusChart;
-    var startDate;
-    var endDate;
-    ;(function ($, window, document) {
-        var jsonData = '<?php echo json_encode($chartDataArray);?>';
-        var chartData =  JSON.parse(jsonData);
-        var paymentStatusJson = '<?php echo json_encode($paymentStatus);?>';
-        var paymentStatus =  JSON.parse(paymentStatusJson);
-        var paymentMethodJson = '<?php echo json_encode($paymentMethod);?>';
-        var paymentMethod =  JSON.parse(paymentMethodJson);
-        var chartFormatData = chartDataFormat(chartData);
-        var paymentMethodData = paymentMethodPie(paymentMethod);
-        var paymentStatusData = paymentStatusPie(paymentStatus);
+    var reportDefaultDays = {{ (int) config('report.sales.default', 7) }};
 
-         salesCtx = document.getElementById('salesReport').getContext('2d');
-         paymentMethodChart = document.getElementById('paymentMethodChart').getContext('2d');
-         paymentStatusChart = document.getElementById('paymentStatusChart').getContext('2d');
+    function buildPaymentsFilterString() {
+        return "fromDate=" + encodeURIComponent($('#getFromDate').val()) +
+            "&toDate=" + encodeURIComponent($('#getToDate').val()) +
+            "&paymentMethod=" + encodeURIComponent($('#paymentMethod').val() || '') +
+            "&paymentStatus=" + encodeURIComponent($('#paymentStatus').val() || '') +
+            "&customerId=" + encodeURIComponent($('#customerId').val() || '') +
+            "&shopId=" + encodeURIComponent($('#shopId').val() || '') +
+            "&orderNumber=" + encodeURIComponent($('#orderNumber').val() || '');
+    }
 
-         generate = new Chart(salesCtx, chartFormatData);
-         methodGenerate = new Chart(paymentMethodChart, paymentMethodData);
-         statusGenerate = new Chart(paymentStatusChart, paymentStatusData);
+    function refreshPaymentsReport() {
+        var dataString = buildPaymentsFilterString();
+
+        ajaxFire('{{ route('admin.sales.payments.getMoreForChart') }}', dataString, function (output) {
+            generate.clear();
+            generate.destroy();
+            generate = new Chart(salesCtx, chartDataFormat(output));
+        });
+
+        ajaxFire('{{ route('admin.sales.payments.getMethod') }}', dataString, function (output) {
+            methodGenerate.clear();
+            methodGenerate.destroy();
+            methodGenerate = new Chart(paymentMethodChart, paymentMethodPie(output));
+        });
+
+        ajaxFire('{{ route('admin.sales.payments.getStatus') }}', dataString, function (output) {
+            statusGenerate.clear();
+            statusGenerate.destroy();
+            statusGenerate = new Chart(paymentStatusChart, paymentStatusPie(output));
+        });
+
+        paymentsTableResetting(dataString);
+    }
+
+    ;(function ($) {
+        var chartData = @json($chartDataArray);
+        var paymentMethod = @json($paymentMethod);
+        var paymentStatus = @json($paymentStatus);
+
+        salesCtx = document.getElementById('salesReport').getContext('2d');
+        paymentMethodChart = document.getElementById('paymentMethodChart').getContext('2d');
+        paymentStatusChart = document.getElementById('paymentStatusChart').getContext('2d');
+
+        generate = new Chart(salesCtx, chartDataFormat(chartData));
+        methodGenerate = new Chart(paymentMethodChart, paymentMethodPie(paymentMethod));
+        statusGenerate = new Chart(paymentStatusChart, paymentStatusPie(paymentStatus));
 
         $(document).ready(function () {
-            $('#daterangepicker').daterangepicker(
-                {
-                    startDate: moment().subtract('days', 6),
-                    endDate: moment(),
-                    showDropdowns: false,
-                    showWeekNumbers: true,
-                    timePicker: false,
-                    timePickerIncrement: 30,
-                    timePicker12Hour: false,
-                    ranges: {
-                        '{{ trans('app.today') }}': [moment(), moment()],
-                        '{{ trans('app.yesterday') }}': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                        '{{ trans('app.last_7_days') }}': [moment().subtract(6, 'days'), moment()],
-                        '{{ trans('app.last_30_day') }}': [moment().subtract(29, 'days'), moment()],
-                        '{{ trans('app.this_month') }}': [moment().startOf('month'), moment()],
-                        '{{ trans('app.last_month') }}': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                        '{{trans('app.last_12_month')}}': [moment().startOf('month').subtract(12, 'month'), moment().endOf('month')],
-                        '{{trans('app.this_year')}}': [moment().startOf('year'), moment()],
-                        '{{trans('app.last_year')}}': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
-                    },
-                    opens: 'left',
-                    buttonClasses: ['btn btn-default'],
-                    cancelClass: 'btn-small',
-                    format: 'DD/MM/YYYY',
-                    separator: ' to ',
+            var startDefault = moment().subtract(reportDefaultDays - 1, 'days');
+            var endDefault = moment();
+
+            $('#daterangepicker').daterangepicker({
+                startDate: startDefault,
+                endDate: endDefault,
+                showDropdowns: false,
+                showWeekNumbers: true,
+                ranges: {
+                    '{{ trans('app.today') }}': [moment(), moment()],
+                    '{{ trans('app.yesterday') }}': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    '{{ trans('app.last_7_days') }}': [moment().subtract(6, 'days'), moment()],
+                    '{{ trans('app.last_30_day') }}': [moment().subtract(29, 'days'), moment()],
+                    '{{ trans('app.this_month') }}': [moment().startOf('month'), moment()],
+                    '{{ trans('app.last_month') }}': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    '{{ trans('app.last_12_month') }}': [moment().startOf('month').subtract(12, 'month'), moment().endOf('month')],
+                    '{{ trans('app.this_year') }}': [moment().startOf('year'), moment()],
+                    '{{ trans('app.last_year') }}': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
                 },
-                function (start, end) {
-                    //console.log("Callback has been called!");
-                    $('#daterangepicker span').html(start.format('D MMMM YYYY') + ' - ' + end.format('D MMMM YYYY'));
-                    startDate = start.format('YYYY-MM-DD');
-                    endDate = end.format('YYYY-MM-DD');
-                    $('#getFromDate').val(start.format('YYYY-MM-DD'));
-                    $('#getToDate').val(end.format('YYYY-MM-DD'));
-                    //console.log(window.location.hostname)
-                    //Get Filter Value:
-                    let paymentMethod = $('#paymentMethod').val();
-                    let paymentStatus= $('#paymentStatus').val();
-                    let dataString = "fromDate=" + startDate + "&toDate=" + endDate+"&paymentMethod=" + paymentMethod+"&paymentStatus=" + paymentStatus;
-                    //Data Table Reset After Ajax:
-                    //Get Chart Data Via Ajax:
-                    let ajaxUrl = '{{route('admin.sales.payments.getMoreForChart')}}';
-                    ajaxFire(ajaxUrl, dataString, function (output){
-                        generate.clear();
-                        generate.destroy();
-                        chartFormatData = chartDataFormat(output);
-                        generate = new Chart(salesCtx, chartFormatData);
-                    });
-                    let urlMethod = '{{route('admin.sales.payments.getMethod')}}';
-                    ajaxFire(urlMethod, dataString, function (output){
-                        methodGenerate.clear();
-                        methodGenerate.destroy();
-                        paymentMethodData = paymentMethodPie(output);
-                        methodGenerate = new Chart(paymentMethodChart, paymentMethodData);
+                opens: 'left',
+                buttonClasses: ['btn btn-default'],
+                format: 'DD/MM/YYYY',
+                separator: ' to ',
+            }, function (start, end) {
+                $('#daterangepicker span').html(start.format('D MMMM YYYY') + ' - ' + end.format('D MMMM YYYY'));
+                $('#getFromDate').val(start.format('YYYY-MM-DD'));
+                $('#getToDate').val(end.format('YYYY-MM-DD'));
+                refreshPaymentsReport();
+            });
 
-                    });
-                    let urlStatus = '{{route('admin.sales.payments.getStatus')}}';
-                    ajaxFire(urlStatus, dataString, function (output){
-                        statusGenerate.clear();
-                        statusGenerate.destroy();
-                        paymentStatusData = paymentStatusPie(output);
-                        statusGenerate = new Chart(paymentStatusChart, paymentStatusData);
+            $('#daterangepicker span').html(startDefault.format('D MMMM YYYY') + ' - ' + endDefault.format('D MMMM YYYY'));
+            $('#getFromDate').val(startDefault.format('YYYY-MM-DD'));
+            $('#getToDate').val(endDefault.format('YYYY-MM-DD'));
 
-                    });
-
-                    paymentsTableResetting(dataString);
-
-                }
-            );
-            //Set the initial state of the picker label
-            $('#daterangepicker span').html(moment().subtract('days', 29).format('D MMMM YYYY') + ' - ' + moment().format('D MMMM YYYY'));
-            $('#getFromDate').val(moment().subtract('days', 7).format('YYYY-MM-DD'));
-            $('#getToDate').val(moment().format('YYYY-MM-DD'));
-
-            let initialDataString = "fromDate=" + $('#getFromDate').val() + "&toDate=" + $('#getToDate').val() +
-                "&paymentMethod=" + $('#paymentMethod').val() + "&paymentStatus=" + $('#paymentStatus').val();
-            paymentsTableResetting(initialDataString);
+            refreshPaymentsReport();
         });
-        ///Calling Chart Function to manipulate:
+    }(window.jQuery));
 
-    }(window.jQuery, window, document));
-
-    function paymentsTableResetting(dataString)
-    {
+    function paymentsTableResetting(dataString) {
         var table = $('.payments-report-table');
         if ($.fn.dataTable.isDataTable(table)) {
             table.DataTable().destroy();
         }
 
-        let url = '{{ route('admin.sales.payments.getMore') }}';
-
         table.DataTable({
-            "responsive": true,
-            "iDisplayLength": {{ getPaginationValue() }},
-            "ajax": url + '/?' + dataString,
-            "columns": [
-                {'data': 'date', 'name': 'date', 'exportable': true, 'printable': true},
-                {'data': 'order_number', 'name': 'order_number', 'exportable': true, 'printable': true},
-                {'data': 'customer', 'name': 'customer', 'exportable': true, 'printable': true},
-                {'data': 'shop', 'name': 'shop', 'exportable': true, 'printable': true},
-                {'data': 'payment_method', 'name': 'payment_method', 'exportable': true, 'printable': true},
-                {'data': 'payment_status_name', 'name': 'payment_status', 'exportable': true, 'printable': true},
-                {'data': 'item', 'name': 'item', 'exportable': true, 'printable': true},
-                {'data': 'total', 'name': 'total', 'exportable': true, 'printable': true},
-                {'data': 'grand_total', 'name': 'grand_total', 'exportable': true, 'printable': true},
+            responsive: true,
+            iDisplayLength: {{ getPaginationValue() }},
+            ajax: {
+                url: '{{ route('admin.sales.payments.getMore') }}/?' + dataString,
+                dataSrc: function (json) {
+                    if (json.summary) {
+                        updateReportSummary(json.summary);
+                    }
+                    return json.data;
+                }
+            },
+            columns: [
+                {data: 'date', name: 'date'},
+                {data: 'order_number', name: 'order_number'},
+                {data: 'customer', name: 'customer'},
+                {data: 'shop', name: 'shop'},
+                {data: 'payment_method', name: 'payment_method'},
+                {data: 'payment_status_name', name: 'payment_status'},
+                {data: 'item', name: 'item', render: function (data) { return formatReportInteger(data); }},
+                {
+                    data: 'total_formatted',
+                    name: 'total',
+                    className: 'text-right',
+                    render: function (data, type, row) {
+                        return data || formatReportMoney(row.total);
+                    }
+                },
+                {
+                    data: 'grand_total_formatted',
+                    name: 'grand_total',
+                    className: 'text-right',
+                    render: function (data, type, row) {
+                        return data || formatReportMoney(row.grand_total);
+                    }
+                },
             ],
             dom: 'Bfrtip',
-            buttons: [
-                'copy', 'csv', 'excel', 'pdf', 'print'
-            ]
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
         });
     }
 
-    //This function Will Return Data Configuration:
-    function chartDataFormat(chartData){
+    function chartDataFormat(chartData) {
+        var labelData = [];
+        var pending = [];
+        var paid = [];
+        var refunded = [];
 
-        let chartCount = chartData.length;
-        let labelData = [];
-        let pending = [];
-        let paid = [];
-        let refunded = [];
-
-        for(let i = 0; i < chartData.length; i++){
-            labelData.push( chartData[i].date);if(i < chartCount -1 ){','}
-            pending.push( chartData[i].pending);if(i < chartCount -1 ){','}
-            paid.push( chartData[i].paid);if(i < chartCount -1 ){','}
-            refunded.push( chartData[i].refunded);if(i < chartCount -1 ){','}
+        for (var i = 0; i < chartData.length; i++) {
+            labelData.push(chartData[i].date);
+            pending.push(roundReportAmount(chartData[i].pending));
+            paid.push(roundReportAmount(chartData[i].paid));
+            refunded.push(roundReportAmount(chartData[i].refunded));
         }
 
-        let saleReport = {
+        return {
             type: 'line',
             data: {
                 labels: labelData,
                 datasets: [
-                    {
-                        label: 'Unpaid',
-                        fill: true,
-                        backgroundColor: "rgba(0,0,255, 0.6)",
-                        borderWidth: 1,
-                        hoverBackgroundColor: "rgba(232,105,90, 6)",
-                        hoverBorderColor: "orange",
-                        data: pending,
-                    },
-                    {
-                        label: 'Paid',
-                        fill: true,
-                        backgroundColor: "rgba(0,128,0, 0.6)",
-                        borderWidth: 1,
-                        hoverBackgroundColor: "rgba(232,105,90,0.6)",
-                        hoverBorderColor: "orange",
-                        data: paid,
-                    },
-                    {
-                        label: 'Refunded',
-                        fill: true,
-                        backgroundColor: "rgba(255,0,0, 0.6)",
-                        borderWidth: 1,
-                        hoverBackgroundColor: "rgba(232,105,90,0.6)",
-                        hoverBorderColor: "orange",
-                        data: refunded,
-                    }
+                    {label: '{{ trans('app.pending') }}', fill: true, backgroundColor: 'rgba(255, 193, 7, 0.25)', borderColor: '#ffc107', data: pending},
+                    {label: '{{ trans('app.paid') }}', fill: true, backgroundColor: 'rgba(40, 167, 69, 0.25)', borderColor: '#28a745', data: paid},
+                    {label: '{{ trans('app.refunded') }}', fill: true, backgroundColor: 'rgba(220, 53, 69, 0.25)', borderColor: '#dc3545', data: refunded},
                 ]
             },
             options: {
-                responsive: true, // Instruct chart js to respond nicely.
-                maintainAspectRatio: false, // Add to prevent default behaviour of full-width/height
-                legend: {
-                    display: true,
-                },
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {position: 'bottom'},
+                tooltips: reportChartMoneyTooltip(),
+                scales: {yAxes: [{ticks: reportChartMoneyTicks()}]}
             }
         };
-        return saleReport;
     }
 
-    function paymentMethodPie(chartData){
+    function paymentMethodPie(chartData) {
+        var labelData = [];
+        var mainData = [];
 
-        let chartCount = chartData.length;
-        let labelData = [];
-        let mainData = [];
-
-        for(let i = 0; i < chartData.length; i++){
-            labelData.push( chartData[i].name);if(i < chartCount -1 ){','}
-            mainData.push( chartData[i].total);if(i < chartCount -1 ){','}
+        for (var i = 0; i < chartData.length; i++) {
+            labelData.push(chartData[i].name);
+            mainData.push(roundReportAmount(chartData[i].total));
         }
 
-        var colorArray = [
-            window.chartColors.green,
-            window.chartColors.gray,
-            window.chartColors.red,
-            window.chartColors.yellow,
-            window.chartColors.black,
-            window.chartColors.white,
-            window.chartColors.blue,
-            window.chartColors.orange
-        ];
-        let config = {
-            type: 'pie',
+        return {
+            type: 'doughnut',
             data: {
+                labels: labelData,
                 datasets: [{
                     data: mainData,
-                    backgroundColor: colorArray,
-                    label: 'Payment Method Wise Transaction'
-                }],
-                labels: labelData,
+                    backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6c757d', '#007bff', '#6610f2', '#fd7e14']
+                }]
             },
             options: {
                 responsive: true,
-                legend: {
-                    labels: {
-                        // This more specific font property overrides the global property
-                        fontSize:15,
-                    },
-                },
-            },
+                maintainAspectRatio: false,
+                legend: {position: 'bottom'},
+                tooltips: reportChartMoneyTooltip()
+            }
         };
-        return config;
-
     }
 
-    function paymentStatusPie(chartData){
+    function paymentStatusPie(chartData) {
+        var pending = 0;
+        var paid = 0;
+        var refunded = 0;
 
-        let pending = 0;
-        let paid = 0;
-        let refunded = 0;
-
-        for(let i = 0; i < chartData.length; i++) {
-            pending += parseFloat(chartData[i].pending);
-            paid += parseFloat(chartData[i].paid);
-            refunded += parseFloat(chartData[i].refunded);
+        for (var i = 0; i < chartData.length; i++) {
+            pending += roundReportAmount(chartData[i].pending);
+            paid += roundReportAmount(chartData[i].paid);
+            refunded += roundReportAmount(chartData[i].refunded);
         }
 
-        let labelData = ['Unpaid', 'Paid', 'Refunded'];
-        let mainData = [pending, paid, refunded];
-
-        var colorArray = [
-            window.chartColors.yellow,
-            window.chartColors.green,
-            window.chartColors.red,
-        ];
-        let config = {
-            type: 'pie',
+        return {
+            type: 'doughnut',
             data: {
-                datasets: [
-                    {
-                    data: mainData,
-                    backgroundColor: colorArray,
-                    label: 'Payment Status Wise Revenue'
-                }
-                ],
-                labels: labelData,
+                labels: ['{{ trans('app.pending') }}', '{{ trans('app.paid') }}', '{{ trans('app.refunded') }}'],
+                datasets: [{
+                    data: [pending, paid, refunded],
+                    backgroundColor: ['#ffc107', '#28a745', '#dc3545']
+                }]
             },
             options: {
                 responsive: true,
-                legend: {
-                    labels: {
-                        // This more specific font property overrides the global property
-                        fontSize:15,
-                    },
-                },
-            },
+                maintainAspectRatio: false,
+                legend: {position: 'bottom'},
+                tooltips: reportChartMoneyTooltip()
+            }
         };
-        return config;
-
     }
 
-    //ajaxFire:
-    function ajaxFire(ajaxUrl, params,  handleData){
-
+    function ajaxFire(ajaxUrl, params, handleData) {
         $.ajax({
-            url:ajaxUrl+'/?'+params,
-            method:'get',
+            url: ajaxUrl + '/?' + params,
+            method: 'get',
             contentType: 'application/json',
-            success:function (response){
-                //console.log(response)
+            success: function (response) {
                 handleData(response.data);
             }
         });
-
     }
 
-    //Clear All Filter:
-    function clearAllFilter(){
-        $('#paymentMethod').val("");
-        $('#paymentStatus').val("");
+    function clearAllFilter() {
+        $('#paymentMethod').val('');
+        $('#paymentStatus').val('');
+        $('#customerId').val(null).trigger('change');
+        $('#shopId').val(null).trigger('change');
+        $('#orderNumber').val('');
+        refreshPaymentsReport();
     }
 
-    function fireEventOnFilter(str) {
-
-        let paymentMethod =  $('#paymentMethod').val();
-        let paymentStatus =  $('#paymentStatus').val();
-        let fromDate = $('#getFromDate').val();
-        let toDate = $('#getToDate').val();
-
-        let dataString = "fromDate=" + fromDate + "&toDate=" + toDate + "&paymentMethod=" + paymentMethod+"&paymentStatus=" + paymentStatus;
-        //Data Table Reset After Ajax:
-        //Get Chart Data Via Ajax:
-        let ajaxUrl = '{{route('admin.sales.payments.getMoreForChart')}}';
-        ajaxFire(ajaxUrl, dataString, function (output){
-            generate.clear();
-            generate.destroy();
-            chartFormatData = chartDataFormat(output);
-            generate = new Chart(salesCtx, chartFormatData);
-        });
-        let urlMethod = '{{route('admin.sales.payments.getMethod')}}';
-        ajaxFire(urlMethod, dataString, function (output){
-            methodGenerate.clear();
-            methodGenerate.destroy();
-            paymentMethodData = paymentMethodPie(output);
-            methodGenerate = new Chart(paymentMethodChart, paymentMethodData);
-
-        });
-        let urlStatus = '{{route('admin.sales.payments.getStatus')}}';
-        ajaxFire(urlStatus, dataString, function (output){
-            statusGenerate.clear();
-            statusGenerate.destroy();
-            paymentStatusData = paymentStatusPie(output);
-            statusGenerate = new Chart(paymentStatusChart, paymentStatusData);
-
-        });
-
-        paymentsTableResetting(dataString);
-
+    function fireEventOnFilter() {
+        refreshPaymentsReport();
     }
-
-
-
 </script>

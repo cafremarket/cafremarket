@@ -15,6 +15,7 @@ use App\Models\ShippingMethod;
 use App\Models\System;
 use App\Models\SystemConfig;
 use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -878,20 +879,22 @@ class ViewComposerServiceProvider extends ServiceProvider
             'admin.report.platform.kpi',
 
             function ($view) {
-                $new_vendor_count = Cache::remember('new_vendor_count', config('cache.remember.todays_stats', 3600), function () {
+                $cacheMinutes = config('cache.remember.todays_stats', 3600);
+
+                $new_vendor_count = Cache::remember('platform_kpi_new_vendor_count', $cacheMinutes, function () {
                     return Statistics::new_vendor_count();
                 });
 
                 $view->with([
                     'new_vendor_count' => $new_vendor_count,
-                    'marketplace_sales_30_days' => Cache::remember('marketplace_sales_30_days', config('cache.remember.todays_stats', 3600), function () {
+                    'marketplace_sales_30_days' => Cache::remember('platform_kpi_marketplace_sales_30_days', $cacheMinutes, function () {
                         return Statistics::platform_marketplace_sales(30);
                     }),
-                    'marketplace_orders_30_days' => Cache::remember('marketplace_orders_30_days', config('cache.remember.todays_stats', 3600), function () {
+                    'marketplace_orders_30_days' => Cache::remember('platform_kpi_marketplace_orders_30_days', $cacheMinutes, function () {
                         return Statistics::platform_marketplace_orders_count(30);
                     }),
-                    'monthly_recurring_revenue' => Cache::remember('monthly_recurring_revenue', config('cache.remember.todays_stats', 3600), function () {
-                        return app(\App\Repositories\PerformanceIndicatorsRepository::class)->monthlyRecurringRevenue();
+                    'monthly_recurring_revenue' => Cache::remember('platform_kpi_monthly_recurring_revenue', $cacheMinutes, function () {
+                        return round(app(\App\Repositories\PerformanceIndicatorsRepository::class)->monthlyRecurringRevenue(), 2);
                     }),
                 ]);
             }
@@ -908,65 +911,60 @@ class ViewComposerServiceProvider extends ServiceProvider
             'admin.report.merchant.kpi',
 
             function ($view) {
-                // Charts
-                $start = ChartHelper::getStartDate();
-                $end = $start->copy()->subMonths(config('charts.default.months'))->startOfMonth();
+                $months = (int) config('charts.default.months', 12);
+                $rangeEnd = Carbon::today()->endOfDay();
+                $rangeStart = Carbon::today()->subMonths($months)->startOfMonth()->startOfDay();
+                $shopId = Auth::user()->merchantId();
+                $cacheMinutes = config('cache.remember.todays_stats', 3600);
+                $statsCacheMinutes = config('cache.remember.statistics', 86400);
+                $cachePrefix = 'merchant_kpi_'.$shopId.'_';
 
-                $chart = new SalesByPeriod($start, $end, 'M');
+                $chart = new SalesByPeriod(Carbon::today(), $rangeStart, 'M');
+                $chart->dataset(
+                    trans('app.sale'),
+                    'column',
+                    Statistics::merchant_sales_chart_dataset($rangeStart, $rangeEnd, $months)
+                );
 
-                $salesData = Statistics::sales_data_by_period($start, $end);
+                $salesData = Statistics::merchant_paid_orders_between($rangeStart, $rangeEnd);
 
-                // Preparing net sales amount dataset (excludes marketplace commission)
-                $salesTotal = [];
-                foreach ($salesData->groupBy(function ($item) {
-                    return $item->created_at->format('F');
-                }) as $label => $orders) {
-                    $salesTotal[$label] = Statistics::merchant_net_sales_total($orders);
-                }
-
-                $dataset = [];
-                foreach ($chart->labels as $key => $label) {
-                    $dataset[$key] = array_key_exists($label, $salesTotal) ? round($salesTotal[$label]) : 0;
-                }
-
-                $chart->dataset(trans('app.sale'), 'column', $dataset);
-
-                $period = $start->diffInDays($end);
-
-                // Statistics
-                $orders_count = Cache::remember('latest_order_count', config('cache.remember.todays_stats', 3600), function () use ($period) {
-                    return Statistics::latest_order_count($period);
+                $orders_count = Cache::remember($cachePrefix.'orders_count', $cacheMinutes, function () use ($rangeStart, $rangeEnd) {
+                    return Statistics::merchant_paid_orders_between($rangeStart, $rangeEnd)->count();
                 });
 
-                $abandoned_carts = Cache::remember('abandoned_carts', config('cache.remember.todays_stats', 3600), function () use ($period) {
-                    return Statistics::abandoned_carts_count($period);
+                $abandoned_carts = Cache::remember($cachePrefix.'abandoned_carts', $cacheMinutes, function () use ($rangeStart, $rangeEnd) {
+                    return \App\Models\Cart::mine()
+                        ->whereBetween('created_at', [$rangeStart, $rangeEnd])
+                        ->count();
                 });
 
-                $refund_total = Cache::remember('latest_refund_total', config('cache.remember.todays_stats', 3600), function () use ($period) {
-                    return Statistics::latest_refund_total($period);
+                $refund_total = Cache::remember($cachePrefix.'refund_total', $cacheMinutes, function () use ($rangeStart, $rangeEnd) {
+                    return round(\App\Models\Refund::mine()->statusOf(\App\Models\Refund::STATUS_APPROVED)
+                        ->whereBetween('updated_at', [$rangeStart, $rangeEnd])
+                        ->sum('amount'), 2);
                 });
 
-                $top_listings = Cache::remember('top_listings', config('cache.remember.statistics', 86400), function () {
+                $top_listings = Cache::remember($cachePrefix.'top_listings', $statsCacheMinutes, function () {
                     return ListHelper::top_listing_items(null, 10);
                 });
 
-                $top_suppliers = Cache::remember('top_suppliers', config('cache.remember.statistics', 86400), function () {
+                $top_suppliers = Cache::remember($cachePrefix.'top_suppliers', $statsCacheMinutes, function () {
                     return ListHelper::top_suppliers(5);
                 });
 
-                $top_categories = Cache::remember('top_categories', config('cache.remember.statistics', 86400), function () {
+                $top_categories = Cache::remember($cachePrefix.'top_categories', $statsCacheMinutes, function () {
                     return ListHelper::top_categories(5);
                 });
 
-                $top_customers = Cache::remember('top_customers', config('cache.remember.statistics', 86400), function () {
+                $top_customers = Cache::remember($cachePrefix.'top_customers', $statsCacheMinutes, function () {
                     return ListHelper::top_customers(10);
                 });
 
-                $returning_customers = Cache::remember('returning_customers', config('cache.remember.statistics', 86400), function () {
+                $returning_customers = Cache::remember($cachePrefix.'returning_customers', $statsCacheMinutes, function () {
                     return ListHelper::returning_customers(10);
                 });
 
-                $netSalesTotal = Statistics::merchant_net_sales_total($salesData);
+                $netSalesTotal = round(Statistics::merchant_net_sales_total($salesData), 2);
 
                 $view->with([
                     'chart' => $chart,
@@ -979,7 +977,7 @@ class ViewComposerServiceProvider extends ServiceProvider
                     'abandoned_carts_count' => $abandoned_carts,
                     'latest_refund_total' => $refund_total,
                     'sales_total' => $netSalesTotal,
-                    'discount_total' => $salesData->sum('discount'),
+                    'discount_total' => round($salesData->sum('discount'), 2),
                 ]);
             }
         );

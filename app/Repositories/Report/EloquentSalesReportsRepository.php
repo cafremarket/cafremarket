@@ -26,7 +26,6 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
 
     private $inventories = 'inventories';
 
-    // #Get status values from Order model:
     public function getStatusFromOrder($status)
     {
         $order = new ReflectionClass(\App\Models\Order::class);
@@ -34,53 +33,87 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
         return ! empty($status) ? $order->getConstant($status) : 0;
     }
 
-    // #get Days Diff Form Date
     public function getDaysFromDate($fromDate, $toDate)
     {
-        $diff = date_diff($fromDate, $toDate);
-
-        return $diff->days;
+        return date_diff($fromDate, $toDate)->days;
     }
 
     /**
-     *Orders all Data default show 7 days data:
+     * Date expression for chart grouping (daily vs monthly).
+     */
+    protected function dateGroupingExpression(int $days, ?string $table = null): \Illuminate\Database\Query\Expression
+    {
+        $table = $table ?? $this->orders;
+
+        if ($days > 30) {
+            return DB::raw('DATE_FORMAT('.$table.'.created_at, "%Y-%m") as date');
+        }
+
+        return DB::raw('DATE('.$table.'.created_at) as date');
+    }
+
+    protected function defaultSinceDate(): Carbon
+    {
+        return Carbon::today()->subDays(config('report.sales.default', 7));
+    }
+
+    /**
+     * Orders all Data default show 7 days data:
      */
     public function orders($date = null)
     {
         return self::commonDataQuery()
-            ->whereDate($this->orders.'.created_at', '>', $date ?? Carbon::today()->subDays(config('report.sales.default', 7)))
+            ->whereDate($this->orders.'.created_at', '>', $date ?? $this->defaultSinceDate())
+            ->orderBy($this->orders.'.created_at', 'desc')
             ->get();
     }
 
-    // #orders data search by from Date and to Date:
     public function orderSearch(Carbon $fromDate, Carbon $toDate, array $packet)
     {
-        $common = self::commonDataQuery();
-        $data = self::commonSearchQuery($common, $packet);
-        $data = $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate]);
+        $data = self::commonSearchQuery(self::commonDataQuery(), $packet);
 
-        return $data->get();
+        return $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate])
+            ->orderBy($this->orders.'.created_at', 'desc')
+            ->get();
     }
 
-    // all Chart Data default 7 days:
     public function orderChart($date = null)
     {
         return self::commonChartQuery(7)
-            ->whereDate($this->orders.'.created_at', '>', $date ?? Carbon::today()->subDays(config('report.sales.default', 7)))
+            ->whereDate($this->orders.'.created_at', '>', $date ?? $this->defaultSinceDate())
             ->get();
     }
 
-    // Date to Date Data For Chart:
     public function orderChartSearch(Carbon $fromDate, Carbon $toDate, array $packet)
     {
-        $common = self::commonChartQuery(self::getDaysFromDate($fromDate, $toDate));
-        $data = self::commonSearchQuery($common, $packet);
-        $data = $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate]);
+        $days = self::getDaysFromDate($fromDate, $toDate);
+        $data = self::commonSearchQuery(self::commonChartQuery($days), $packet);
 
-        return $data->get();
+        return $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate])
+            ->orderBy('date')
+            ->get();
     }
 
-    // #Common Query For All Sales Report
+    public function ordersSummary(Carbon $fromDate, Carbon $toDate, array $packet = []): object
+    {
+        $query = self::commonSearchQuery(DB::table($this->orders), $packet);
+
+        return $query->whereBetween($this->orders.'.created_at', [$fromDate, $toDate])
+            ->selectRaw('
+                COUNT('.$this->orders.'.id) as total_orders,
+                ROUND(COALESCE(SUM('.$this->orders.'.grand_total), 0), 2) as total_revenue,
+                SUM(CASE WHEN '.$this->orders.'.payment_status >= ? THEN 1 ELSE 0 END) as paid_orders,
+                ROUND(COALESCE(SUM(CASE WHEN '.$this->orders.'.payment_status >= ? THEN '.$this->orders.'.grand_total ELSE 0 END), 0), 2) as paid_revenue,
+                ROUND(COALESCE(SUM(CASE WHEN '.$this->orders.'.payment_status IN (?, ?) THEN '.$this->orders.'.grand_total ELSE 0 END), 0), 2) as pending_revenue
+            ', [
+                Order::PAYMENT_STATUS_PAID,
+                Order::PAYMENT_STATUS_PAID,
+                Order::PAYMENT_STATUS_UNPAID,
+                Order::PAYMENT_STATUS_PENDING,
+            ])
+            ->first();
+    }
+
     public function commonDataQuery()
     {
         return DB::table($this->orders)
@@ -102,31 +135,27 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
             );
     }
 
-    // #Common Query For Chart:
     public function commonChartQuery($days)
     {
-        $query = DB::table($this->orders)->select(
-            DB::raw('(CASE WHEN order_status_id = '.Order::STATUS_AWAITING_DELIVERY.' THEN COUNT(*) ELSE 0 END)  as awaiting_delivery'),
-            DB::raw('(CASE WHEN order_status_id = '.Order::STATUS_WAITING_FOR_PAYMENT.' THEN COUNT(*) ELSE 0 END)  as awaiting_payment'),
-            DB::raw('(CASE WHEN order_status_id = '.Order::STATUS_CANCELED.' THEN COUNT(*) ELSE 0 END)  as canceled'),
-            DB::raw('(CASE WHEN order_status_id = '.Order::STATUS_CONFIRMED.' THEN COUNT(*) ELSE 0 END)  as confirmed'),
-            DB::raw('(CASE WHEN order_status_id = '.Order::STATUS_DELIVERED.' THEN COUNT(*) ELSE 0 END)  as delivered'),
-            DB::raw('(CASE WHEN order_status_id = '.Order::STATUS_FULFILLED.' THEN COUNT(*) ELSE 0 END)  as fulfilled'),
-            DB::raw('(CASE WHEN order_status_id = '.Order::STATUS_PAYMENT_ERROR.' THEN COUNT(*) ELSE 0 END)  as payment_error'),
-            DB::raw('(CASE WHEN order_status_id = '.Order::STATUS_RETURNED.' THEN COUNT(*) ELSE 0 END)  as returned'),
-            DB::raw('(CASE WHEN order_status_id = '.Order::STATUS_DISPUTED.' THEN COUNT(*) ELSE 0 END)  as disputed')
-        );
+        $dateExpr = $this->dateGroupingExpression((int) $days);
 
-        if ($days > 30) {
-            $query->addSelect(DB::raw('DATE_FORMAT('.$this->orders.'.created_at, "%Y-%m") as date'));
-        } else {
-            $query->addSelect(DB::raw('DATE('.$this->orders.'.created_at) as date'));
-        }
-
-        return $query->groupBy('date', 'order_status_id');
+        return DB::table($this->orders)
+            ->select(
+                $dateExpr,
+                DB::raw('SUM(CASE WHEN order_status_id = '.Order::STATUS_AWAITING_DELIVERY.' THEN 1 ELSE 0 END) as awaiting_delivery'),
+                DB::raw('SUM(CASE WHEN order_status_id = '.Order::STATUS_WAITING_FOR_PAYMENT.' THEN 1 ELSE 0 END) as awaiting_payment'),
+                DB::raw('SUM(CASE WHEN order_status_id = '.Order::STATUS_CANCELED.' THEN 1 ELSE 0 END) as canceled'),
+                DB::raw('SUM(CASE WHEN order_status_id = '.Order::STATUS_CONFIRMED.' THEN 1 ELSE 0 END) as confirmed'),
+                DB::raw('SUM(CASE WHEN order_status_id = '.Order::STATUS_DELIVERED.' THEN 1 ELSE 0 END) as delivered'),
+                DB::raw('SUM(CASE WHEN order_status_id = '.Order::STATUS_FULFILLED.' THEN 1 ELSE 0 END) as fulfilled'),
+                DB::raw('SUM(CASE WHEN order_status_id = '.Order::STATUS_PAYMENT_ERROR.' THEN 1 ELSE 0 END) as payment_error'),
+                DB::raw('SUM(CASE WHEN order_status_id = '.Order::STATUS_RETURNED.' THEN 1 ELSE 0 END) as returned'),
+                DB::raw('SUM(CASE WHEN order_status_id = '.Order::STATUS_DISPUTED.' THEN 1 ELSE 0 END) as disputed')
+            )
+            ->groupBy('date')
+            ->orderBy('date');
     }
 
-    // #Common Query For Search By Customer, Shop, Order number and Order Status
     public function commonSearchQuery($data, array $packet)
     {
         $statusId = self::getStatusFromOrder($packet['order_status'] ?? null);
@@ -153,171 +182,137 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
         }
 
         if (! empty($packet['payment_method'])) {
-            $data = $data->where($this->orders.'.payment_method_id', $packet['payment_method']);
+            $data = $data->where($this->orders.'.payment_method_id', (int) $packet['payment_method']);
         }
 
         return $data;
     }
 
     /**
-     ** End Orders Report Functions
-     *
-     *
-     * Start Of Payments Report Functions
+     ** Payments Report
      **/
 
-    // #Payment Chart
     public function paymentChart($date = null)
     {
         return self::paymentChartCommonQuery(7)
-            ->whereDate('created_at', '>', $date ?? Carbon::today()->subDays(config('report.sales.default', 7)))
+            ->whereDate($this->orders.'.created_at', '>', $date ?? $this->defaultSinceDate())
             ->get();
     }
 
-    // #Payment Methods
     public function paymentChartByPaymentMethod($date = null)
     {
         try {
             return self::commonQueryByPaymentMethods()
-                ->whereDate($this->orders.'.created_at', '>', $date ?? Carbon::today()->subDays(config('report.sales.default', 7)))
+                ->whereDate($this->orders.'.created_at', '>', $date ?? $this->defaultSinceDate())
                 ->get();
         } catch (\Exception $exception) {
-            return get_exception_message($exception);
+            return collect();
         }
     }
 
-    // #Payment Status
     public function paymentChartByPaymentStatus($date = null)
     {
         try {
-            return self::commonQueryByPaymentStatus()
-                ->whereDate('created_at', '>', $date ?? Carbon::today()->subDays(config('report.sales.default', 7)))
-                ->get();
+            $row = self::commonQueryByPaymentStatus()
+                ->whereDate($this->orders.'.created_at', '>', $date ?? $this->defaultSinceDate())
+                ->first();
+
+            return collect([$row ?: (object) ['pending' => 0, 'paid' => 0, 'refunded' => 0]]);
         } catch (\Exception $exception) {
-            return get_exception_message($exception);
+            return collect([(object) ['pending' => 0, 'paid' => 0, 'refunded' => 0]]);
         }
     }
 
-    // # payment data search by from date and to date:
     public function getMoreByMethod(Carbon $fromDate, Carbon $toDate, $packet)
     {
         $data = self::commonQueryByPaymentMethods();
         $data = self::commonSearchQuery($data, $packet);
-        $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate]);
 
-        return $data->get();
+        return $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate])->get();
     }
 
-    // # payment data search by from date and to date:
     public function getMoreByStatus(Carbon $fromDate, Carbon $toDate, $packet)
     {
-        $data = self::commonQueryByPaymentStatus();
-        $searchUnpaid = self::commonSearchQuery($data, $packet);
-        $result = $searchUnpaid->whereBetween(DB::raw('created_at'), [$fromDate, $toDate]);
+        $data = self::commonSearchQuery(DB::table($this->orders), $packet);
 
-        return $result->get();
+        return collect([
+            $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate])
+                ->selectRaw('
+                    ROUND(COALESCE(SUM(CASE WHEN payment_status IN (?, ?) THEN grand_total ELSE 0 END), 0), 2) AS pending,
+                    ROUND(COALESCE(SUM(CASE WHEN payment_status IN (?, ?) THEN grand_total ELSE 0 END), 0), 2) AS refunded,
+                    ROUND(COALESCE(SUM(CASE WHEN payment_status IN (?, ?) THEN grand_total ELSE 0 END), 0), 2) AS paid
+                ', [
+                    Order::PAYMENT_STATUS_UNPAID,
+                    Order::PAYMENT_STATUS_PENDING,
+                    Order::PAYMENT_STATUS_PARTIALLY_REFUNDED,
+                    Order::PAYMENT_STATUS_REFUNDED,
+                    Order::PAYMENT_STATUS_PAID,
+                    Order::PAYMENT_STATUS_INITIATED_REFUND,
+                ])
+                ->first(),
+        ]);
     }
 
-    // #Payment Chart data search by from Date and to Date:
     public function paymentChartSearch(Carbon $fromDate, Carbon $toDate, $packet)
     {
-        $data = self::paymentChartCommonQuery(self::getDaysFromDate($fromDate, $toDate));
-        $data = self::commonSearchQuery($data, $packet);
-        $data = $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate]);
+        $days = self::getDaysFromDate($fromDate, $toDate);
+        $data = self::commonSearchQuery(self::paymentChartCommonQuery($days), $packet);
 
-        return $data->get();
+        return $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate])
+            ->orderBy('date')
+            ->get();
     }
 
-    // #Common Query For Payment Chart Query:
+    public function paymentsSummary(Carbon $fromDate, Carbon $toDate, array $packet = []): object
+    {
+        return self::ordersSummary($fromDate, $toDate, $packet);
+    }
+
     public function paymentChartCommonQuery($days)
     {
-        $query = DB::table($this->orders)->select(
-            DB::raw(
-                'CASE payment_status
-                    WHEN '.Order::PAYMENT_STATUS_UNPAID.' THEN SUM(grand_total)
-                    WHEN '.Order::PAYMENT_STATUS_PENDING.' THEN SUM(grand_total)
-                    ELSE 0
-                    END AS pending'
-            ),
-            DB::raw(
-                'CASE payment_status
-                    WHEN  '.Order::PAYMENT_STATUS_PARTIALLY_REFUNDED.' THEN SUM(grand_total)
-                    WHEN  '.Order::PAYMENT_STATUS_REFUNDED.' THEN SUM(grand_total)
-                    ELSE 0
-                    END AS refunded'
-            ),
-            DB::raw(
-                'CASE payment_status
-                    WHEN '.Order::PAYMENT_STATUS_PAID.' THEN SUM(grand_total)
-                    WHEN '.Order::PAYMENT_STATUS_INITIATED_REFUND.' THEN SUM(grand_total)
-                    ELSE 0
-                    END AS paid'
+        $dateExpr = $this->dateGroupingExpression((int) $days);
+
+        return DB::table($this->orders)
+            ->select(
+                $dateExpr,
+                DB::raw('ROUND(COALESCE(SUM(CASE WHEN payment_status IN ('.Order::PAYMENT_STATUS_UNPAID.', '.Order::PAYMENT_STATUS_PENDING.') THEN grand_total ELSE 0 END), 0), 2) AS pending'),
+                DB::raw('ROUND(COALESCE(SUM(CASE WHEN payment_status IN ('.Order::PAYMENT_STATUS_PARTIALLY_REFUNDED.', '.Order::PAYMENT_STATUS_REFUNDED.') THEN grand_total ELSE 0 END), 0), 2) AS refunded'),
+                DB::raw('ROUND(COALESCE(SUM(CASE WHEN payment_status IN ('.Order::PAYMENT_STATUS_PAID.', '.Order::PAYMENT_STATUS_INITIATED_REFUND.') THEN grand_total ELSE 0 END), 0), 2) AS paid')
             )
-        );
-
-        if ($days > 30) {
-            $query = $query->addSelect(DB::raw('DATE_FORMAT('.$this->orders.'.created_at, "%Y-%m") as date'));
-        } else {
-            $query = $query->addSelect(DB::raw('DATE_FORMAT('.$this->orders.'.created_at, "%Y-%m-%d %H:%i") as date'));
-        }
-
-        return $query->groupBy('date', 'payment_status');
+            ->groupBy('date')
+            ->orderBy('date');
     }
 
-    // #Common Query For Payment Chart By Payment Status:
     public function commonQueryByPaymentStatus()
     {
-        try {
-            return DB::table($this->orders)
-                ->select(
-                    DB::raw(
-                        'CASE payment_status
-                        WHEN '.Order::PAYMENT_STATUS_UNPAID.' THEN SUM(grand_total)
-                        WHEN '.Order::PAYMENT_STATUS_PENDING.' THEN SUM(grand_total)
-                        ELSE 0
-                        END AS pending'
-                    ),
-                    DB::raw(
-                        'CASE payment_status
-                        WHEN  '.Order::PAYMENT_STATUS_PARTIALLY_REFUNDED.' THEN SUM(grand_total)
-                        WHEN  '.Order::PAYMENT_STATUS_REFUNDED.' THEN SUM(grand_total)
-                        ELSE 0
-                        END AS refunded'
-                    ),
-                    DB::raw(
-                        'CASE payment_status
-                        WHEN '.Order::PAYMENT_STATUS_PAID.' THEN SUM(grand_total)
-                        WHEN '.Order::PAYMENT_STATUS_INITIATED_REFUND.' THEN SUM(grand_total)
-                        ELSE 0
-                        END AS paid'
-                    )
-                )
-                ->groupBy('payment_status')
-                ->orderBy('payment_status', 'asc');
-        } catch (\Exception $exception) {
-            return get_exception_message($exception);
-        }
+        return DB::table($this->orders)
+            ->selectRaw('
+                ROUND(COALESCE(SUM(CASE WHEN payment_status IN (?, ?) THEN grand_total ELSE 0 END), 0), 2) AS pending,
+                ROUND(COALESCE(SUM(CASE WHEN payment_status IN (?, ?) THEN grand_total ELSE 0 END), 0), 2) AS refunded,
+                ROUND(COALESCE(SUM(CASE WHEN payment_status IN (?, ?) THEN grand_total ELSE 0 END), 0), 2) AS paid
+            ', [
+                Order::PAYMENT_STATUS_UNPAID,
+                Order::PAYMENT_STATUS_PENDING,
+                Order::PAYMENT_STATUS_PARTIALLY_REFUNDED,
+                Order::PAYMENT_STATUS_REFUNDED,
+                Order::PAYMENT_STATUS_PAID,
+                Order::PAYMENT_STATUS_INITIATED_REFUND,
+            ]);
     }
 
-    // #Common Query For Payment Chart By Payment Methods:
     public function commonQueryByPaymentMethods()
     {
-        try {
-            return DB::table($this->orders)
-                ->join($this->paymentMethod, $this->orders.'.payment_method_id', '=', $this->paymentMethod.'.id')
-                ->select(
-                    $this->paymentMethod.'.name',
-                    DB::raw('COUNT(DISTINCT '.$this->orders.'.id) as order_count'),
-                    DB::raw('SUM('.$this->orders.'.grand_total) as total')
-                )
-                ->groupBy($this->paymentMethod.'.id', $this->paymentMethod.'.name')
-                ->orderBy($this->paymentMethod.'.name', 'asc');
-        } catch (\Exception $exception) {
-            return get_exception_message($exception);
-        }
+        return DB::table($this->orders)
+            ->join($this->paymentMethod, $this->orders.'.payment_method_id', '=', $this->paymentMethod.'.id')
+            ->select(
+                $this->paymentMethod.'.name',
+                DB::raw('COUNT(DISTINCT '.$this->orders.'.id) as order_count'),
+                DB::raw('ROUND(COALESCE(SUM('.$this->orders.'.grand_total), 0), 2) as total')
+            )
+            ->groupBy($this->paymentMethod.'.id', $this->paymentMethod.'.name')
+            ->orderBy($this->paymentMethod.'.name', 'asc');
     }
 
-    // #Payment orders detail query
     public function paymentsCommonDataQuery()
     {
         return DB::table($this->orders)
@@ -341,35 +336,31 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
     public function payments($date = null)
     {
         return self::paymentsCommonDataQuery()
-            ->whereDate($this->orders.'.created_at', '>', $date ?? Carbon::today()->subDays(config('report.sales.default', 7)))
+            ->whereDate($this->orders.'.created_at', '>', $date ?? $this->defaultSinceDate())
+            ->orderBy($this->orders.'.created_at', 'desc')
             ->get();
     }
 
     public function paymentSearch(Carbon $fromDate, Carbon $toDate, array $packet)
     {
-        $data = self::paymentsCommonDataQuery();
-        $data = self::commonSearchQuery($data, $packet);
-        $data = $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate]);
+        $data = self::commonSearchQuery(self::paymentsCommonDataQuery(), $packet);
 
-        return $data->get();
-    }
-
-    /**
-     ** End Payments Report Functions
-     *
-     *
-     * Start Of Products Report Functions
-     **/
-
-    // #Products Data :
-    public function products($date = null)
-    {
-        return self::productsCommonQuery()
-            ->whereDate($this->orders.'.created_at', '>', $date ?? Carbon::today()->subDays(config('report.sales.default', 7)))
+        return $data->whereBetween($this->orders.'.created_at', [$fromDate, $toDate])
+            ->orderBy($this->orders.'.created_at', 'desc')
             ->get();
     }
 
-    // #Product search
+    /**
+     ** Products Report
+     **/
+
+    public function products($date = null)
+    {
+        return self::productsCommonQuery()
+            ->whereDate($this->orders.'.created_at', '>', $date ?? $this->defaultSinceDate())
+            ->get();
+    }
+
     public function productsSearch(Carbon $fromDate, Carbon $toDate, array $packet)
     {
         $data = self::productsCommonQuery();
@@ -386,23 +377,50 @@ class EloquentSalesReportsRepository extends EloquentRepository implements BaseR
         return $data->get();
     }
 
-    // #payment Common Query For Data Joining:
+    public function productsSummary(Carbon $fromDate, Carbon $toDate, array $packet = []): object
+    {
+        $query = DB::table($this->orderItems)
+            ->leftJoin($this->inventories, $this->inventories.'.id', $this->orderItems.'.inventory_id')
+            ->leftJoin($this->orders, $this->orders.'.id', $this->orderItems.'.order_id')
+            ->leftJoin($this->products, $this->products.'.id', $this->inventories.'.product_id')
+            ->where($this->orders.'.payment_status', '>=', Order::PAYMENT_STATUS_PAID)
+            ->whereBetween($this->orders.'.created_at', [$fromDate, $toDate]);
+
+        if (! empty($packet['product_id'])) {
+            $query->where($this->products.'.id', (int) $packet['product_id']);
+        }
+
+        if (! empty($packet['shop_id'])) {
+            $query->where($this->orders.'.shop_id', (int) $packet['shop_id']);
+        }
+
+        return $query->selectRaw('
+                COUNT(DISTINCT '.$this->products.'.id) as products_sold,
+                COALESCE(SUM('.$this->orderItems.'.quantity), 0) as units_sold,
+                COUNT(DISTINCT '.$this->orderItems.'.order_id) as order_count,
+                ROUND(COALESCE(SUM('.$this->orderItems.'.unit_price * '.$this->orderItems.'.quantity), 0), 2) as revenue
+            ')
+            ->first();
+    }
+
     public function productsCommonQuery()
     {
         return DB::table($this->orderItems)
             ->leftJoin($this->inventories, $this->inventories.'.id', $this->orderItems.'.inventory_id')
             ->leftJoin($this->orders, $this->orders.'.id', $this->orderItems.'.order_id')
             ->leftJoin($this->products, $this->products.'.id', $this->inventories.'.product_id')
+            ->where($this->orders.'.payment_status', '>=', Order::PAYMENT_STATUS_PAID)
             ->select(
-                DB::raw('COUNT('.$this->orderItems.'.order_id) as uniquePurchase'),
-                DB::raw('AVG('.$this->orders.'.total) as avgPrice'),
+                DB::raw('COUNT(DISTINCT '.$this->orderItems.'.order_id) as uniquePurchase'),
+                DB::raw('ROUND(COALESCE(SUM('.$this->orderItems.'.unit_price * '.$this->orderItems.'.quantity) / NULLIF(SUM('.$this->orderItems.'.quantity), 0), 0), 2) as avgPrice'),
                 DB::raw('SUM('.$this->orderItems.'.quantity) as quantity'),
                 $this->products.'.name',
                 $this->products.'.model_number',
                 $this->products.'.gtin',
                 $this->products.'.gtin_type',
-                DB::raw('SUM('.$this->orderItems.'.unit_price * '.$this->orderItems.'.quantity) as totalSale')
+                DB::raw('ROUND(COALESCE(SUM('.$this->orderItems.'.unit_price * '.$this->orderItems.'.quantity), 0), 2) as totalSale')
             )
-            ->groupBy($this->products.'.id');
+            ->groupBy($this->products.'.id', $this->products.'.name', $this->products.'.model_number', $this->products.'.gtin', $this->products.'.gtin_type')
+            ->orderByDesc('totalSale');
     }
 }

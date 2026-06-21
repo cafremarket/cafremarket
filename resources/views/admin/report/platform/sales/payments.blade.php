@@ -1,87 +1,90 @@
 @extends('admin.layouts.master')
 
 @section('content')
-  <div class="row">
-    <div class="col-sm-12">
-      <div id="filter-panel">
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <form action="{{ route('admin.sales.payments') }}/" method="get">
-              <div class="row">
-                <div class="col-md-2 nopadding-right">
-                  <div class="form-group">
-                    <label>{{ trans('app.payment_method') }}</label>
-                    <select id="paymentMethod" class="form-control" name="payment_method" onchange="fireEventOnFilter(this.value)">
-                      <option value="">{{ trans('app.select') }}</option>
-                      @foreach ($paymentMethods as $payment)
-                        <option value="{{ $payment->id }}">{{ $payment->name }}</option>
-                      @endforeach
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-2 nopadding-right nopadding-left">
-                  <div class="form-group">
-                    <label>{{ trans('app.payment_status') }}</label>
-                    <select id="paymentStatus" onchange="fireEventOnFilter(this.value)" class="form-control" name="payment_status">
-                      <option value="" @if (request()->get('order_status') == 'all') selected @endif>{{ trans('app.all') }}</option>
-                      <option value="PAYMENT_STATUS_PENDING" @if (request()->get('order_status') == 'PAYMENT_STATUS_PENDING') selected @endif>{{ trans('app.pending') }}</option>
-                      <option value="PAYMENT_STATUS_PAID" @if (request()->get('order_status') == 'PAYMENT_STATUS_PAID') selected @endif>{{ trans('app.paid') }}</option>
-                      <option value="PAYMENT_STATUS_REFUNDED" @if (request()->get('order_status') == 'PAYMENT_STATUS_REFUNDED') selected @endif>{{ trans('app.refunded') }}</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-2 nopadding-right nopadding-left">
-                  &nbsp;
-                </div>
-                <div class="col-md-2 nopadding-right nopadding-left">
-                  &nbsp;
-                </div>
-                <div class="col-md-2 nopadding-right nopadding-left">
-                  &nbsp;
-                </div>
-                <div class="col-md-2 nopadding-left">
-                  <div class="form-group">
-                    <label>&nbsp;</label>
-                    <button onclick="clearAllFilter()" type="button" class="btn btn-default pull-right" name="search" value="1"><i class="fa fa-caret-left"></i> {{ trans('app.clear') }}</button>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
+  @include('admin.partials.reports.sales_nav')
+  @include('admin.partials.reports.summary_orders')
+
+  <div class="report-filter-panel">
+    <div class="row">
+      <div class="col-md-2 nopadding-right">
+        <div class="form-group">
+          <label>{{ trans('app.customer') }}</label>
+          <select style="width: 100%" onchange="fireEventOnFilter()" id="customerId" name="customer_id" class="form-control searchCustomer"></select>
+        </div>
+      </div>
+      <div class="col-md-2 nopadding-right nopadding-left">
+        <div class="form-group">
+          <label>{{ trans('app.shops') }}</label>
+          <select style="width: 100%" onchange="fireEventOnFilter()" id="shopId" name="shop_id" class="form-control searchMerchant"></select>
+        </div>
+      </div>
+      <div class="col-md-2 nopadding-right nopadding-left">
+        <div class="form-group">
+          <label>{{ trans('app.order_number') }}</label>
+          <input type="text" id="orderNumber" onkeyup="fireEventOnFilter()" name="order_number" class="form-control" placeholder="{{ trans('app.order_number') }}">
+        </div>
+      </div>
+      <div class="col-md-2 nopadding-right nopadding-left">
+        <div class="form-group">
+          <label>{{ trans('app.payment_method') }}</label>
+          <select id="paymentMethod" class="form-control" name="payment_method" onchange="fireEventOnFilter()">
+            <option value="">{{ trans('app.all') }}</option>
+            @foreach ($paymentMethods as $payment)
+              <option value="{{ $payment->id }}">{{ $payment->name }}</option>
+            @endforeach
+          </select>
+        </div>
+      </div>
+      <div class="col-md-2 nopadding-right nopadding-left">
+        <div class="form-group">
+          <label>{{ trans('app.payment_status') }}</label>
+          <select id="paymentStatus" onchange="fireEventOnFilter()" class="form-control" name="payment_status">
+            <option value="">{{ trans('app.all') }}</option>
+            <option value="PAYMENT_STATUS_UNPAID">{{ trans('app.unpaid') }}</option>
+            <option value="PAYMENT_STATUS_PENDING">{{ trans('app.pending') }}</option>
+            <option value="PAYMENT_STATUS_PAID">{{ trans('app.paid') }}</option>
+            <option value="PAYMENT_STATUS_REFUNDED">{{ trans('app.refunded') }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-2 nopadding-left">
+        <div class="form-group">
+          <label>&nbsp;</label>
+          <button onclick="clearAllFilter()" type="button" class="btn btn-default btn-block"><i class="fa fa-times"></i> {{ trans('app.clear') }}</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="box margin-top-2">
+  <div class="box report-table-box">
     <div class="box-header with-border">
       <h3 class="box-title">{{ trans('app.payments') }}</h3>
       <div class="box-tools pull-right">
         @include('admin.partials.reports.timeframe')
       </div>
-    </div> <!-- /.box-header -->
+    </div>
     <div class="box-body">
-      <div class="rg-card-simple equal-height">
-        <canvas id="salesReport" style="height: 300px; min-height: 300px; max-height: 300px; width: 100%"></canvas>
+      <div class="report-chart-card">
+        <h4>{{ trans('app.payments') }} — {{ trans('app.timeframe') }}</h4>
+        <canvas id="salesReport" style="height: 280px; min-height: 280px; max-height: 280px; width: 100%"></canvas>
       </div>
 
-      <span class="spacer30"></span>
-
-      <div class="col-md-6">
-        <div class="rg-card-simple equal-height">
-          <canvas id="paymentMethodChart" style="height: 300px; min-height: 300px; max-height: 300px"></canvas>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="report-chart-card">
+            <h4>{{ trans('app.payment_method') }}</h4>
+            <canvas id="paymentMethodChart" style="height: 260px; min-height: 260px; max-height: 260px"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="report-chart-card">
+            <h4>{{ trans('app.payment_status') }}</h4>
+            <canvas id="paymentStatusChart" style="height: 260px; min-height: 260px; max-height: 260px"></canvas>
+          </div>
         </div>
       </div>
 
-      <div class="col-md-6">
-        <div class="rg-card-simple equal-height">
-          <canvas id="paymentStatusChart" style="height: 300px; min-height: 300px; max-height: 300px"></canvas>
-        </div>
-      </div>
-
-      <span class="spacer30"></span>
-
-      <table class="table table-hover table-no-sort table-responsive payments-report-table" style="overflow-x: scroll">
+      <table class="table table-hover table-no-sort table-responsive payments-report-table">
         <thead>
           <tr>
             <th>{{ trans('app.date') }}</th>
@@ -95,26 +98,10 @@
             <th>{{ trans('app.grand_total') }}</th>
           </tr>
         </thead>
-        <tbody>
-          @if (count($data) > 0)
-            @foreach ($data as $item)
-              <tr>
-                <td>{{ $item->date }}</td>
-                <td>{{ $item->order_number }}</td>
-                <td>{{ $item->customer }}</td>
-                <td>{{ $item->shop }}</td>
-                <td>{{ $item->payment_method }}</td>
-                <td>{{ $item->payment_status_name ?? get_payment_status_name($item->payment_status) }}</td>
-                <td>{{ $item->item }}</td>
-                <td>{{ get_formated_currency($item->total, 2, config('system_settings.currency.id')) }}</td>
-                <td>{{ get_formated_currency($item->grand_total, 2, config('system_settings.currency.id')) }}</td>
-              </tr>
-            @endforeach
-          @endif
-        </tbody>
+        <tbody></tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+    </div>
+  </div>
 @endsection
 
 @section('page-script')

@@ -74,7 +74,7 @@ class PerformanceIndicatorsController extends Controller
     public function subscribers()
     {
         $plans = [];
-        foreach (SubscriptionPlan::all() as $plan) {
+        foreach (SubscriptionPlan::orderBy('order')->get() as $plan) {
             $plans[] = [
                 'name' => $plan->name,
                 'cost' => $plan->cost,
@@ -87,12 +87,12 @@ class PerformanceIndicatorsController extends Controller
     }
 
     /**
-     * Get the number of users who are on a generic trial.
-     *
-     * @return Response
+     * Get the number of vendors currently on any plan trial.
      */
     public function trialUsers()
     {
-        return Shop::where('trial_ends_at', '>=', Carbon::now())->count();
+        return Shop::where('trial_ends_at', '>', Carbon::now())
+            ->whereNull('deleted_at')
+            ->count();
     }
 }

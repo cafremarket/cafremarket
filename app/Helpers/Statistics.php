@@ -113,29 +113,69 @@ class Statistics
     {
         return Order::mine()->withTrashed()
             ->with('shop')
+            ->paid()
             ->where('created_at', '<=', $startTime)
             ->where('created_at', '>=', $endTime)
             ->orderBy('created_at', 'DESC')
             ->get();
     }
 
+    /**
+     * Paid merchant orders within an inclusive datetime range.
+     */
+    public static function merchant_paid_orders_between(Carbon $from, Carbon $to)
+    {
+        return Order::mine()->withTrashed()
+            ->with('shop')
+            ->paid()
+            ->whereBetween('created_at', [$from, $to])
+            ->orderByDesc('created_at')
+            ->get();
+    }
+
+    /**
+     * Monthly net sales totals aligned with SalesByPeriod chart labels.
+     */
+    public static function merchant_sales_chart_dataset(Carbon $rangeStart, Carbon $rangeEnd, int $months): array
+    {
+        $orders = static::merchant_paid_orders_between($rangeStart, $rangeEnd);
+
+        $monthTotals = $orders->groupBy(function ($order) {
+            return $order->created_at->format('Y-m');
+        })->map(function ($group) {
+            return round(static::merchant_net_sales_total($group), 2);
+        });
+
+        $dataset = [];
+        $monthCursor = Carbon::today()->startOfMonth();
+
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $key = $monthCursor->copy()->subMonths($i)->format('Y-m');
+            $dataset[] = (float) ($monthTotals->get($key, 0));
+        }
+
+        return $dataset;
+    }
+
     public static function merchant_net_sales_total($orders)
     {
-        return collect($orders)->sum(function ($order) {
+        return round(collect($orders)->sum(function ($order) {
             return get_vendor_settlement_for_order($order)['net'];
-        });
+        }), 2);
     }
 
     public static function platform_marketplace_sales($days = 30)
     {
-        return Order::whereDate('created_at', '>=', Carbon::today()->subDays($days))
+        return round(Order::whereDate('created_at', '>=', Carbon::today()->subDays($days))
             ->where('payment_status', Order::PAYMENT_STATUS_PAID)
-            ->sum('grand_total');
+            ->sum('grand_total'), 2);
     }
 
     public static function platform_marketplace_orders_count($days = 30)
     {
-        return Order::whereDate('created_at', '>=', Carbon::today()->subDays($days))->count();
+        return Order::whereDate('created_at', '>=', Carbon::today()->subDays($days))
+            ->where('payment_status', '>=', Order::PAYMENT_STATUS_PAID)
+            ->count();
     }
 
     public static function latest_refund_total($period = 15)
