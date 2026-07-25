@@ -594,8 +594,10 @@ class DepositController extends Controller
         $maxCharge = $method === 'emola'
             ? \App\Services\Emola\EmolaSpec::depositChargeMaxMzn()
             : \App\Services\Emola\EmolaSpec::movitelUssdMaxMzn();
-        $exceedsLimit = $method === 'emola' && $chargeTotal > $maxCharge;
-        $maxBase = $method === 'emola'
+        $exceedsLimit = $method === 'emola'
+            && $maxCharge < PHP_INT_MAX
+            && $chargeTotal > $maxCharge;
+        $maxBase = $method === 'emola' && $maxCharge < PHP_INT_MAX
             ? \App\Services\Emola\EmolaSpec::maxWalletDepositBaseMzn('emola')
             : null;
         $exceedsMessage = $exceedsLimit

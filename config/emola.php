@@ -38,21 +38,21 @@ return [
         'query_ben' => 'QUERY_BEN',
     ],
 
-    // Field limits (spec §B) + Movitel merchant caps (MZN / MT).
+    // Field limits (spec §B). Amount caps default to 0 = unlimited (no app-side payment limit).
     'limits' => [
         'msisdn' => 9,
         'trans_id_min' => 15,
         'trans_id_max' => 30,
         'trans_amount_min' => (int) env('EMOLA_MIN_TRANS_AMOUNT', 1),
-        // Movitel USSD transAmount field width (spec §B.1 — max 99,999 MZN per push). 0 = skip app check only.
-        'trans_amount_digits' => (int) env('EMOLA_TRANS_AMOUNT_DIGITS', 5),
+        // Movitel USSD digit width. 0 = do not enforce a max amount in-app.
+        'trans_amount_digits' => (int) env('EMOLA_TRANS_AMOUNT_DIGITS', 0),
         // Order / checkout payments (C2B). 0 = unlimited.
         'order_transaction_max' => (int) env('EMOLA_ORDER_TRANSACTION_MAX', 0),
-        // Wallet top-up deposits (app cap). 0 = use partner_deposit_max / USSD spec only.
+        // Wallet top-up deposits (app cap). 0 = unlimited.
         'deposit_transaction_max' => (int) env('EMOLA_DEPOSIT_TRANSACTION_MAX', 0),
-        // Movitel merchant USSD cap per deposit (total incl. fees). Many partners use 10,000 MZN.
-        'partner_deposit_max' => (int) env('EMOLA_PARTNER_DEPOSIT_MAX', 10_000),
-        // Total paid per customer MSISDN per calendar day (orders + deposits). 0 = unlimited.
+        // Partner deposit cap. 0 = unlimited (disabled by default).
+        'partner_deposit_max' => (int) env('EMOLA_PARTNER_DEPOSIT_MAX', 0),
+        // Total paid per customer MSISDN per calendar day. 0 = unlimited.
         'customer_daily_max' => (int) env('EMOLA_CUSTOMER_DAILY_MAX', 0),
         // @deprecated Use order_transaction_max — kept for backward compatibility.
         'trans_amount_max' => (int) env('EMOLA_MAX_TRANS_AMOUNT', 0),

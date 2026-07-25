@@ -69,13 +69,25 @@ final class EmolaSpec
         return $refNo;
     }
 
-    /** Movitel USSD maximum per push (spec §B.1 — 5-digit transAmount). */
+    /** True when no in-app max amount is configured. */
+    public static function isAmountUnlimited(): bool
+    {
+        return self::movitelUssdMaxMzn() === PHP_INT_MAX
+            && self::transactionMax(self::CONTEXT_ORDER) <= 0
+            && self::transactionMax(self::CONTEXT_DEPOSIT) <= 0
+            && (int) config('emola.limits.partner_deposit_max', 0) <= 0;
+    }
+
+    /**
+     * Movitel USSD maximum per push (spec §B.1).
+     * digits = 0 means unlimited (no app-side cap).
+     */
     public static function movitelUssdMaxMzn(): int
     {
-        $digits = (int) config('emola.limits.trans_amount_digits', 5);
+        $digits = (int) config('emola.limits.trans_amount_digits', 0);
 
         if ($digits <= 0) {
-            return 99_999;
+            return PHP_INT_MAX;
         }
 
         return (int) str_repeat('9', min($digits, 9));
@@ -83,7 +95,7 @@ final class EmolaSpec
 
     /**
      * Max MZN per wallet deposit USSD (total incl. gateway fee).
-     * Uses deposit_transaction_max, else partner_deposit_max, else USSD spec max.
+     * Uses deposit_transaction_max / partner_deposit_max / USSD digit max when set; otherwise unlimited.
      */
     public static function depositChargeMaxMzn(): int
     {
@@ -94,12 +106,19 @@ final class EmolaSpec
             $candidates[] = $appMax;
         }
 
-        $partnerMax = max(0, (int) config('emola.limits.partner_deposit_max', 10_000));
+        $partnerMax = max(0, (int) config('emola.limits.partner_deposit_max', 0));
         if ($partnerMax > 0) {
             $candidates[] = $partnerMax;
         }
 
-        $candidates[] = self::movitelUssdMaxMzn();
+        $ussdMax = self::movitelUssdMaxMzn();
+        if ($ussdMax < PHP_INT_MAX) {
+            $candidates[] = $ussdMax;
+        }
+
+        if ($candidates === []) {
+            return PHP_INT_MAX;
+        }
 
         return min($candidates);
     }
@@ -133,7 +152,7 @@ final class EmolaSpec
     {
         $max = self::depositChargeMaxMzn();
 
-        if ($chargeMzn <= $max) {
+        if ($max === PHP_INT_MAX || $chargeMzn <= $max) {
             return;
         }
 
@@ -251,7 +270,7 @@ final class EmolaSpec
 
         $movitelMax = self::movitelUssdMaxMzn();
 
-        if ($value > $movitelMax) {
+        if ($movitelMax < PHP_INT_MAX && $value > $movitelMax) {
             throw new PaymentFailedException(
                 trans('theme.emola_movitel_max_exceeded', [
                     'amount' => number_format($value, 0, '.', ','),
@@ -277,7 +296,7 @@ final class EmolaSpec
             $movitelMax = self::movitelUssdMaxMzn();
             $min = (int) config('emola.limits.trans_amount_min', 1);
 
-            if ($value < $min || $value > $movitelMax) {
+            if ($value < $min || ($movitelMax < PHP_INT_MAX && $value > $movitelMax)) {
                 return self::formatTransAmount($value, $context);
             }
 

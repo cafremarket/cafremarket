@@ -4,7 +4,6 @@ namespace App\Services\Emola;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use SoapClient;
 use SoapFault;
@@ -155,8 +154,8 @@ class EmolaClient
             $xml .= '<param name="'.htmlspecialchars((string) $name, ENT_XML1).'" value="'.htmlspecialchars((string) $value, ENT_XML1).'"/>';
         }
 
-        // Spec §A.1 / partner SDK — rawData is mandatory (placeholder when unused).
-        $xml .= '<rawData>?</rawData>';
+        // Spec §A.1 / partner SDK — rawData is mandatory (empty placeholder when unused).
+        $xml .= '<rawData></rawData>';
 
         return $xml;
     }
@@ -241,27 +240,55 @@ class EmolaClient
     {
         $envelope = $this->buildSoapEnvelope($innerXml);
 
-        $response = Http::timeout($this->timeoutSeconds)
-            ->withHeaders([
-                'Content-Type' => 'text/xml; charset=UTF-8',
-                'SOAPAction' => '',
-            ])
-            ->withBody($envelope, 'text/xml')
-            ->post($this->endpoint);
+        Log::info('eMola request', [
+            'wscode' => $wscode,
+            'endpoint' => $this->endpoint,
+        ]);
 
-        if (! $response->successful()) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->endpoint);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $envelope);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: text/xml;charset=UTF-8',
+            'SOAPAction: ""',
+            'Content-Length: '.strlen($envelope),
+        ]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeoutSeconds);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+
+        $body = curl_exec($ch);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            Log::error('eMola cURL error', ['wscode' => $wscode, 'error' => $curlError]);
+
             return new EmolaResponse(
                 gatewayError: 'HTTP_ERROR',
-                gatewayDescription: 'HTTP '.$response->status().': '.$response->body(),
+                gatewayDescription: $curlError,
                 gwtransid: null,
                 originalXml: null,
                 originalData: null,
             );
         }
 
-        Log::info('eMola gwOperation via HTTP', ['wscode' => $wscode]);
+        if ($httpCode < 200 || $httpCode >= 300) {
+            return new EmolaResponse(
+                gatewayError: 'HTTP_ERROR',
+                gatewayDescription: 'HTTP '.$httpCode.': '.(string) $body,
+                gwtransid: null,
+                originalXml: null,
+                originalData: null,
+            );
+        }
 
-        return $this->parseSoapResponseBody($response->body(), $wscode);
+        Log::info('eMola gwOperation via cURL', ['wscode' => $wscode]);
+        Log::info('eMola raw response', ['wscode' => $wscode, 'response' => $body]);
+
+        return $this->parseSoapResponseBody((string) $body, $wscode);
     }
 
     private function callGwOperationSoapParam(string $innerXml, string $wscode): EmolaResponse
