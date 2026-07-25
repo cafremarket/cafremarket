@@ -299,12 +299,32 @@
                   </td>
                 </tr>
 
+                @php
+                  $adminOrderTransactionFee = (float) ($order->subscription_transaction_fee ?? 0) + (float) ($order->platform_payment_fee ?? 0);
+                  $adminOrderTotalPaid = round((float) $order->grand_total + $adminOrderTransactionFee, 2);
+                @endphp
+
                 <tr class="lead">
                   <td class="text-right">{{ trans('app.grand_total') }}</td>
                   <td class="text-right" width="40%">
                     {{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}
                   </td>
                 </tr>
+
+                @if ($adminOrderTransactionFee > 0)
+                  <tr>
+                    <td class="text-right">{{ trans('app.transaction_fee') }}</td>
+                    <td class="text-right" width="40%">
+                      {{ get_formated_currency($adminOrderTransactionFee, 2, $order->currency_id) }}
+                    </td>
+                  </tr>
+                  <tr class="lead">
+                    <td class="text-right">{{ trans('app.total_paid') }}</td>
+                    <td class="text-right" width="40%">
+                      {{ get_formated_currency($adminOrderTotalPaid, 2, $order->currency_id) }}
+                    </td>
+                  </tr>
+                @endif
               </table>
             </div>
           </div><!-- /.row -->

@@ -10,8 +10,9 @@
     $settlement = $isMobilePayment ? get_vendor_settlement_for_order($order) : null;
     $vendorCommission = $settlement ? (float) ($settlement['total_deductions'] ?? 0) : 0;
     $vendorNet = $settlement ? (float) ($settlement['net'] ?? 0) : 0;
+    $totalPaidLabel = $isMobilePayment ? 'invoice.total_paid_mobile' : 'invoice.total_paid';
 @endphp
-@if ($isMobilePayment && $customerTransactionFee > 0)
+@if ($customerTransactionFee > 0)
   <tr>
     @if ($invoiceTableColumns === 3)
       <td colspan="2">@lang('invoice.transaction_fee')</td>
@@ -24,11 +25,11 @@
   </tr>
   <tr>
     @if ($invoiceTableColumns === 3)
-      <td colspan="2" style="background: #e6f2ff"><strong>@lang('invoice.total_paid_mobile')</strong></td>
+      <td colspan="2" style="background: #e6f2ff"><strong>@lang($totalPaidLabel)</strong></td>
       <td style="background: #e6f2ff"><strong>{{ get_formated_currency($customerTotalPaid, 2) }}</strong></td>
     @else
       <td colspan="2" style="background-color: white;"></td>
-      <td style="background: #e6f2ff">@lang('invoice.total_paid_mobile')</td>
+      <td style="background: #e6f2ff">@lang($totalPaidLabel)</td>
       <td style="background: #e6f2ff">{{ get_formated_currency($customerTotalPaid, 2) }}</td>
     @endif
   </tr>

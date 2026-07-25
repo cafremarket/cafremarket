@@ -1,4 +1,8 @@
 <!-- CONTENT SECTION -->
+@php
+  $orderTransactionFee = (float) ($order->subscription_transaction_fee ?? 0) + (float) ($order->platform_payment_fee ?? 0);
+  $orderTotalPaid = round((float) $order->grand_total + $orderTransactionFee, 2);
+@endphp
 <section id="payment-detail-section" name="payment-detail-section" class="account-section order-detail-page mb-3">
   <div class="container">
     <div class="row">
@@ -16,6 +20,9 @@
                 @endunless
                 <td>@lang('theme.taxes')</td>
                 <td>@lang('theme.discount')</td>
+                @if ($orderTransactionFee > 0)
+                  <td>@lang('theme.transaction_fee')</td>
+                @endif
                 <td>@lang('theme.total')</td>
               </tr>
 
@@ -27,11 +34,14 @@
                 @endunless
                 <td data-label="@lang('theme.taxes')">{{ get_formated_currency($order->taxes, 2, $order->currency_id) }}</td>
                 <td data-label="@lang('theme.discount')">{{ get_formated_currency($order->discount, 2, $order->currency_id) }}</td>
-                <td data-label="@lang('theme.total')">{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</td>
+                @if ($orderTransactionFee > 0)
+                  <td data-label="@lang('theme.transaction_fee')">{{ get_formated_currency($orderTransactionFee, 2, $order->currency_id) }}</td>
+                @endif
+                <td data-label="@lang('theme.total')">{{ get_formated_currency($orderTransactionFee > 0 ? $orderTotalPaid : $order->grand_total, 2, $order->currency_id) }}</td>
               </tr>
 
               <tr>
-                <td colspan="6"></td>
+                <td colspan="7"></td>
               </tr>
 
               <tr class="buyer-payment-info-head">
@@ -41,7 +51,15 @@
               </tr>
 
               <tr class="buyer-payment-info-body buyer-payment-info-summary">
-                <td colspan="2" data-label="@lang('theme.amount')">{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</td>
+                <td colspan="2" data-label="@lang('theme.amount')">
+                  {{ get_formated_currency($orderTransactionFee > 0 ? $orderTotalPaid : $order->grand_total, 2, $order->currency_id) }}
+                  @if ($orderTransactionFee > 0)
+                    <div class="small text-muted mt-1">
+                      @lang('theme.order_amount'): {{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}
+                      + @lang('theme.transaction_fee'): {{ get_formated_currency($orderTransactionFee, 2, $order->currency_id) }}
+                    </div>
+                  @endif
+                </td>
                 <td colspan="2" data-label="@lang('theme.payment_method')">{{ $order->paymentMethod->name }}</td>
                 <td colspan="2" data-label="@lang('theme.status')">{!! $order->paymentStatusName() !!}</td>
               </tr>
@@ -218,6 +236,16 @@
             <span class="text-muted">@lang('theme.order_amount')</span>
             <strong>{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</strong>
           </div>
+          @if ($orderTransactionFee > 0)
+            <div class="order-detail-mobile-summary__row">
+              <span class="text-muted">@lang('theme.transaction_fee')</span>
+              <strong>{{ get_formated_currency($orderTransactionFee, 2, $order->currency_id) }}</strong>
+            </div>
+            <div class="order-detail-mobile-summary__row">
+              <span class="text-muted">@lang('theme.total_paid')</span>
+              <strong>{{ get_formated_currency($orderTotalPaid, 2, $order->currency_id) }}</strong>
+            </div>
+          @endif
           @if ($order->canResendEmolaPayment())
             <a href="#payment-detail-section" class="btn btn-warning btn-block btn-sm mt-2">
               <i class="fa fa-refresh"></i> @lang('theme.emola_resend_button')
@@ -299,6 +327,14 @@
                   <h5 class="my-1">
                     <span>@lang('theme.order_amount'): </span>{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}
                   </h5>
+                  @if ($orderTransactionFee > 0)
+                    <h5 class="my-1">
+                      <span>@lang('theme.transaction_fee'): </span>{{ get_formated_currency($orderTransactionFee, 2, $order->currency_id) }}
+                    </h5>
+                    <h5 class="my-1">
+                      <span>@lang('theme.total_paid'): </span>{{ get_formated_currency($orderTotalPaid, 2, $order->currency_id) }}
+                    </h5>
+                  @endif
                 </td>
               </tr> <!-- /.order-info-head -->
 

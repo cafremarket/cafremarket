@@ -353,6 +353,8 @@ return [
     'to' => 'To',
     'toll_free' => 'Toll-free',
     'total' => 'Total',
+    'total_paid' => 'Total paid',
+    'transaction_fee' => 'Transaction fee',
     'to_location' => ' to <em>:location</em>',
     'unit_price' => 'Unit Price',
     'used' => 'Used',

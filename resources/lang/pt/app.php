@@ -479,6 +479,7 @@ return [
     'total' => 'Total',
     'discount' => 'Desconto',
     'grand_total' => 'Total geral',
+    'total_paid' => 'Total pago',
     'invoice' => 'Fatura',
     'purchase_from' => 'Compra de :marketplace',
     'send_invoice_to_customer' => 'Enviar fatura',

@@ -26,6 +26,7 @@ return [
     'payment_instruction' => 'Payment instruction',
     'platform_fee' => 'Platform fee',
     'transaction_fee' => 'Transaction fee',
+    'total_paid' => 'Total paid',
     'total_paid_mobile' => 'Total paid (M-Pesa / eMola)',
     'wallet_credit' => 'Wallet credit',
     'gross_sale' => 'Order total (gross)',

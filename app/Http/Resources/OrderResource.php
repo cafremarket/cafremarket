@@ -50,6 +50,32 @@ class OrderResource extends JsonResource
             'taxes' => $this->taxes ? get_formated_currency($this->taxes, $decimal, $this->currency_id) : null,
             'discount' => $this->discount ? get_formated_currency($this->discount, $decimal, $this->currency_id) : null,
             'grand_total' => get_formated_currency($this->grand_total, $decimal, $this->currency_id),
+            'transaction_fee' => (($this->subscription_transaction_fee ?? 0) + ($this->platform_payment_fee ?? 0)) > 0
+                ? get_formated_currency(
+                    ($this->subscription_transaction_fee ?? 0) + ($this->platform_payment_fee ?? 0),
+                    $decimal,
+                    $this->currency_id
+                )
+                : null,
+            'transaction_fee_raw' => strval(round(
+                (float) ($this->subscription_transaction_fee ?? 0) + (float) ($this->platform_payment_fee ?? 0),
+                $decimal
+            )),
+            'total_paid' => (($this->subscription_transaction_fee ?? 0) + ($this->platform_payment_fee ?? 0)) > 0
+                ? get_formated_currency(
+                    (float) $this->grand_total
+                        + (float) ($this->subscription_transaction_fee ?? 0)
+                        + (float) ($this->platform_payment_fee ?? 0),
+                    $decimal,
+                    $this->currency_id
+                )
+                : get_formated_currency($this->grand_total, $decimal, $this->currency_id),
+            'total_paid_raw' => strval(round(
+                (float) $this->grand_total
+                    + (float) ($this->subscription_transaction_fee ?? 0)
+                    + (float) ($this->platform_payment_fee ?? 0),
+                $decimal
+            )),
             'taxrate' => $this->taxrate,
             'order_date' => date('F j, Y', strtotime($this->created_at)),
             'shipping_date' => $this->shipping_date ? date('F j, Y', strtotime($this->shipping_date)) : null,

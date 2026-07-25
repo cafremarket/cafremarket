@@ -26,6 +26,7 @@ return [
     'payment_instruction' => 'Instruções de Pagamento',
     'platform_fee' => 'Taxa da Plataforma',
     'transaction_fee' => 'Taxa de transação',
+    'total_paid' => 'Total pago',
     'total_paid_mobile' => 'Total pago (M-Pesa / eMola)',
     'wallet_credit' => 'Crédito na carteira',
     'gross_sale' => 'Total do pedido (bruto)',

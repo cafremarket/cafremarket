@@ -479,6 +479,7 @@ return [
     'total' => 'Total',
     'discount' => 'Discount',
     'grand_total' => 'Grand total',
+    'total_paid' => 'Total paid',
     'invoice' => 'Invoice',
     'purchase_from' => 'Purchase from :marketplace',
     'send_invoice_to_customer' => 'Send the invoice',

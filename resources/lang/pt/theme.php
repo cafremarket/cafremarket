@@ -352,6 +352,8 @@ return [
     'to' => 'Para',
     'toll_free' => 'Ligação Gratuita',
     'total' => 'Total',
+    'total_paid' => 'Total pago',
+    'transaction_fee' => 'Taxa de transação',
     'to_location' => ' para <em>:location</em>',
     'unit_price' => 'Preço Unitário',
     'used' => 'Usado',
