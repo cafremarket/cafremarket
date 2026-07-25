@@ -29,6 +29,22 @@ class OrderLightResource extends JsonResource
             'message_to_customer' => $this->message_to_customer,
             'grand_total' => get_formated_currency($this->grand_total, 2, $this->currency_id),
             'grand_total_raw' => get_formated_value($this->grand_total, $this->currency_id),
+            'transaction_fee' => (($this->subscription_transaction_fee ?? 0) + ($this->platform_payment_fee ?? 0)) > 0
+                ? get_formated_currency(
+                    ($this->subscription_transaction_fee ?? 0) + ($this->platform_payment_fee ?? 0),
+                    2,
+                    $this->currency_id
+                )
+                : null,
+            'total_paid' => (($this->subscription_transaction_fee ?? 0) + ($this->platform_payment_fee ?? 0)) > 0
+                ? get_formated_currency(
+                    (float) $this->grand_total
+                        + (float) ($this->subscription_transaction_fee ?? 0)
+                        + (float) ($this->platform_payment_fee ?? 0),
+                    2,
+                    $this->currency_id
+                )
+                : null,
             'order_date' => date('F j, Y', strtotime($this->created_at)),
             'shipping_date' => $this->shipping_date ? date('F j, Y', strtotime($this->shipping_date)) : null,
             'delivery_date' => $this->delivery_date ? date('F j, Y', strtotime($this->delivery_date)) : null,

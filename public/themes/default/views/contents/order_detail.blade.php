@@ -2,6 +2,9 @@
 @php
   $orderTransactionFee = (float) ($order->subscription_transaction_fee ?? 0) + (float) ($order->platform_payment_fee ?? 0);
   $orderTotalPaid = round((float) $order->grand_total + $orderTransactionFee, 2);
+  $paymentTableCols = 4 + ($order->is_digital ? 0 : 2) + ($orderTransactionFee > 0 ? 1 : 0);
+  $paymentSummaryColspan = max(1, intdiv($paymentTableCols, 3));
+  $paymentSummaryLastColspan = max(1, $paymentTableCols - 2 * $paymentSummaryColspan);
 @endphp
 <section id="payment-detail-section" name="payment-detail-section" class="account-section order-detail-page mb-3">
   <div class="container">
@@ -40,18 +43,14 @@
                 <td data-label="@lang('theme.total')">{{ get_formated_currency($orderTransactionFee > 0 ? $orderTotalPaid : $order->grand_total, 2, $order->currency_id) }}</td>
               </tr>
 
-              <tr>
-                <td colspan="7"></td>
-              </tr>
-
-              <tr class="buyer-payment-info-head">
-                <td colspan="2">@lang('theme.amount')</td>
-                <td colspan="2">@lang('theme.payment_method')</td>
-                <td colspan="2">@lang('theme.status')</td>
+              <tr class="buyer-payment-info-head order-detail-table-divider">
+                <td colspan="{{ $paymentSummaryColspan }}">@lang('theme.amount')</td>
+                <td colspan="{{ $paymentSummaryColspan }}">@lang('theme.payment_method')</td>
+                <td colspan="{{ $paymentSummaryLastColspan }}">@lang('theme.status')</td>
               </tr>
 
               <tr class="buyer-payment-info-body buyer-payment-info-summary">
-                <td colspan="2" data-label="@lang('theme.amount')">
+                <td colspan="{{ $paymentSummaryColspan }}" data-label="@lang('theme.amount')">
                   {{ get_formated_currency($orderTransactionFee > 0 ? $orderTotalPaid : $order->grand_total, 2, $order->currency_id) }}
                   @if ($orderTransactionFee > 0)
                     <div class="small text-muted mt-1">
@@ -60,16 +59,16 @@
                     </div>
                   @endif
                 </td>
-                <td colspan="2" data-label="@lang('theme.payment_method')">{{ $order->paymentMethod->name }}</td>
-                <td colspan="2" data-label="@lang('theme.status')">{!! $order->paymentStatusName() !!}</td>
+                <td colspan="{{ $paymentSummaryColspan }}" data-label="@lang('theme.payment_method')">{{ $order->paymentMethod->name }}</td>
+                <td colspan="{{ $paymentSummaryLastColspan }}" data-label="@lang('theme.status')">{!! $order->paymentStatusName() !!}</td>
               </tr>
 
               @if ($order->canResendEmolaPayment())
-                <tr class="buyer-payment-info-head">
-                  <td colspan="6">@lang('theme.emola_resend_title')</td>
+                <tr class="buyer-payment-info-head order-detail-table-divider">
+                  <td colspan="{{ $paymentTableCols }}">@lang('theme.emola_resend_title')</td>
                 </tr>
                 <tr class="buyer-payment-info-body">
-                  <td colspan="6">
+                  <td colspan="{{ $paymentTableCols }}">
                     <p class="text-muted mb-3">@lang('theme.emola_resend_help')</p>
                     {!! Form::open(['route' => ['order.emola.resend', $order], 'method' => 'POST', 'class' => 'emola-resend-form', 'id' => 'emola-resend-form']) !!}
                     <div class="emola-resend-panel">
@@ -106,11 +105,11 @@
               @endif
 
               @if (optional($order->paymentMethod)->code === 'wire')
-                <tr class="buyer-payment-info-head">
-                  <td colspan="6">@lang('theme.payment_detail') - @lang('theme.payment_proof')</td>
+                <tr class="buyer-payment-info-head order-detail-table-divider">
+                  <td colspan="{{ $paymentTableCols }}">@lang('theme.payment_detail') - @lang('theme.payment_proof')</td>
                 </tr>
                 <tr class="buyer-payment-info-body">
-                  <td colspan="6">
+                  <td colspan="{{ $paymentTableCols }}">
                     @php
                       $wireProofs = $order->attachments->filter(function ($attachment) {
                           return in_array(strtolower((string) $attachment->extension), ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf']);
@@ -583,6 +582,10 @@
 <style>
   .order-detail-page .title {
     text-align: left;
+  }
+
+  #buyer-payment-detail-table tr.order-detail-table-divider > td {
+    border-top: 2px solid #e0e0e0;
   }
 
   .order-detail-mobile-summary {
