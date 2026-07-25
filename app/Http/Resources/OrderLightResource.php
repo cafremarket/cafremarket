@@ -26,6 +26,7 @@ class OrderLightResource extends JsonResource
             'dispute_id' => optional($this->dispute)->id,
             'order_status' => $this->orderStatus(true),
             'payment_status' => $this->paymentStatusName(true),
+            'payment_is_paid' => $this->isPaid(),
             'message_to_customer' => $this->message_to_customer,
             'grand_total' => get_formated_currency($this->grand_total, 2, $this->currency_id),
             'grand_total_raw' => get_formated_value($this->grand_total, $this->currency_id),
