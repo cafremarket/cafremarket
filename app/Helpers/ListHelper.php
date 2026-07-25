@@ -1527,13 +1527,17 @@ class ListHelper
      */
     public static function active_business_areas()
     {
-        $countries = DB::table('countries');
+        $key = 'active_business_areas_'.(config('system_settings.worldwide_business_area') ? 'ww' : 'local');
 
-        if (! config('system_settings.worldwide_business_area')) {
-            $countries->where('active', BaseModel::ACTIVE);
-        }
+        return Cache::rememberForever($key, function () {
+            $countries = DB::table('countries');
 
-        return $countries->orderBy('name', 'asc')->pluck('name', 'id');
+            if (! config('system_settings.worldwide_business_area')) {
+                $countries->where('active', BaseModel::ACTIVE);
+            }
+
+            return $countries->orderBy('name', 'asc')->pluck('name', 'id');
+        });
     }
 
     /**
@@ -1543,7 +1547,9 @@ class ListHelper
      */
     public static function countries()
     {
-        return DB::table('countries')->orderBy('name', 'asc')->pluck('name', 'id');
+        return Cache::rememberForever('countries_pluck', function () {
+            return DB::table('countries')->orderBy('name', 'asc')->pluck('name', 'id');
+        });
     }
 
     /**
@@ -1556,8 +1562,10 @@ class ListHelper
     {
         $country_id = $country_id ?? config('system_settings.address_default_country');
 
-        return DB::table('states')->where('country_id', $country_id)
-            ->orderBy('name', 'asc')->pluck('name', 'id');
+        return Cache::rememberForever('states_pluck_'.(string) $country_id, function () use ($country_id) {
+            return DB::table('states')->where('country_id', $country_id)
+                ->orderBy('name', 'asc')->pluck('name', 'id');
+        });
     }
 
     /**

@@ -47,6 +47,11 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        // Keep Debugbar off outside local — it adds heavy per-request overhead.
+        if (! $this->app->environment('local') && class_exists(\Barryvdh\Debugbar\Facade::class)) {
+            \Barryvdh\Debugbar\Facade::disable();
+        }
+
         // Disable lazy loading to avoid n+1 problem (except on production server)
         // Model::preventLazyLoading(!$this->app->isProduction());
 

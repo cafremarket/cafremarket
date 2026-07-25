@@ -107,11 +107,7 @@ class Storefront
         }
 
         $contents = [
-            '</head>' => [
-                view('analytic_script')->render(),
-            ],
-            '</head>' => view('front_admin_topnav')->render(),
-            // '</body>' => view('cookie_consent')->render(),
+            '</head>' => view('analytic_script')->render().view('front_admin_topnav')->render(),
         ];
 
         foreach ($contents as $tag => $content) {

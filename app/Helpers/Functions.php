@@ -2235,6 +2235,12 @@ if (! function_exists('get_package_options_settings')) {
 if (! function_exists('get_from_option_table')) {
     function get_from_option_table($field, $default = null)
     {
+        $cacheKey = 'option_table_'.$field;
+
+        if (\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+            return \Illuminate\Support\Facades\Cache::get($cacheKey);
+        }
+
         $record = DB::table('options')->select('option_value')
             ->where('option_name', $field)->first();
 
@@ -2245,6 +2251,8 @@ if (! function_exists('get_from_option_table')) {
                 $value = unserialize($value);
                 $value = $value ? $value : [];
             }
+
+            \Illuminate\Support\Facades\Cache::forever($cacheKey, $value);
 
             return $value;
         }
@@ -2259,9 +2267,18 @@ if (! function_exists('get_from_option_table')) {
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
+
+            \Illuminate\Support\Facades\Cache::forever($cacheKey, $default);
         }
 
         return $default;
+    }
+}
+
+if (! function_exists('forget_option_table_cache')) {
+    function forget_option_table_cache($option): void
+    {
+        \Illuminate\Support\Facades\Cache::forget('option_table_'.$option);
     }
 }
 
@@ -2270,11 +2287,15 @@ if (! function_exists('update_option_table_record')) {
     {
         $data = is_array($data) ? serialize($data) : $data;
 
-        return DB::table('options')->where('option_name', $option)
+        $updated = DB::table('options')->where('option_name', $option)
             ->update([
                 'option_value' => $data,
                 'updated_at' => Carbon::now(),
             ]);
+
+        forget_option_table_cache($option);
+
+        return $updated;
     }
 }
 
@@ -2294,6 +2315,8 @@ if (! function_exists('update_or_create_option_table_record')) {
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
+
+            forget_option_table_cache($option);
         }
 
         return $update;
@@ -2967,9 +2990,11 @@ if (! function_exists('get_trending_categories_with_items')) {
                                 'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                                 'image:path,imageable_id,imageable_type',
                             ])
-                            ->where('parent_id', null)
-                            // ->take(config('system.popular.take.trending', 20))
-                            ->inRandomOrder()->get();
+                            ->whereNull('parent_id')
+                            // Prefer ordered listings over random (random scans are expensive).
+                            ->orderByDesc('inventories.id')
+                            ->limit(config('system.popular.take.trending', 20))
+                            ->get();
                     },
                 ])->get();
         });

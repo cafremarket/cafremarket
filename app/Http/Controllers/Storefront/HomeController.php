@@ -128,24 +128,23 @@ class HomeController extends Controller
             ])
             ->active()->firstOrFail();
 
-        $all_products = $category->listings()->available()->with([
-            'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-            'shop:id,slug,name,id_verified,phone_verified,address_verified',
-            'image:path,imageable_id,imageable_type',
-        ]);
+        // Avoid loading every listing into memory just for min/max price.
+        $listingsBase = $category->listings()->available();
+        $minRaw = (clone $listingsBase)->min('inventories.sale_price');
+        $maxRaw = (clone $listingsBase)->max('inventories.sale_price');
+        $priceRange = [
+            'min' => floor((float) ($minRaw ?? 0)),
+            'max' => ceil((float) ($maxRaw ?? 0)),
+        ];
 
-        $filter = $all_products->get();
-        $min = floor($filter->min('sale_price'));
-        $max = ceil($filter->max('sale_price'));
-        $priceRange = compact('min', 'max');
-
-        // Filtering occurs after priceRange has been extracted.
-        $products = $all_products->filter($request->all())->get();
-
-        $now = Carbon::now();
-
-        // Paginate the results
-        $products = $products->paginate(config('system.view_listing_per_page', 16))
+        $products = $listingsBase
+            ->with([
+                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'shop:id,slug,name,id_verified,phone_verified,address_verified',
+                'image:path,imageable_id,imageable_type',
+            ])
+            ->filter($request->all())
+            ->paginate(config('system.view_listing_per_page', 16))
             ->appends($request->except('page'));
 
         return view('theme::category', compact('category', 'products', 'priceRange'));
