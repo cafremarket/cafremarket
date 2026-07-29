@@ -78,4 +78,28 @@ class AccountController extends Controller
 
         return new ShopLightResource($shop);
     }
+
+    /**
+     * Permanently delete the authenticated delivery boy account.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function delete()
+    {
+        $user = Auth::guard('delivery_boy-api')->user();
+
+        if (config('app.demo') == true && $user->id <= config('system.demo.delivery_boys')) {
+            return response()->json(['message' => trans('messages.demo_restriction')], 400);
+        }
+
+        try {
+            $user->flushAddresses();
+            $user->flushImages();
+            $user->forceDelete();
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+
+        return response()->json(['message' => trans('api.account_deleted_successfully')], 200);
+    }
 }

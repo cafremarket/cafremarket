@@ -96,6 +96,10 @@ class DealController extends Controller
 
         $item = get_deal_of_the_day($shop_id);
 
+        if (! $item) {
+            return response()->json(['data' => null]);
+        }
+
         return new DealOfTheDayResource($item);
     }
 

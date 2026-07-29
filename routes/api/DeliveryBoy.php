@@ -22,6 +22,7 @@ Route::prefix('deliveryboy')->namespace('DeliveryBoy')->group(function () {
         // Profile
         Route::get('profile', [AccountController::class, 'profile']);
         Route::post('profile', [AccountController::class, 'updateProfile']);
+        Route::delete('account/delete', [AccountController::class, 'delete']);
         Route::get('vendor', [AccountController::class, 'vendor']);
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('password/update', [AuthController::class, 'updatePassword']);
