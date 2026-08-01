@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Incevio\Package\Wallet\Http\Controllers\Admin\AdminWalletController;
 use Incevio\Package\Wallet\Http\Controllers\Admin\CreditRewardController;
 use Incevio\Package\Wallet\Http\Controllers\Admin\DepositRequestController;
 use Incevio\Package\Wallet\Http\Controllers\Admin\PayoutController;
@@ -78,6 +79,23 @@ Route::middleware(['web'])->group(function () {
             // Route::post('deposit/{transaction}/decline', [
             //     DepositRequestController::class, 'decline'
             // ])->name('wallet.deposit.decline');
+
+            // Active wallets, admin top-up, transaction logs
+            Route::get('wallets', [
+                AdminWalletController::class, 'index',
+            ])->name('wallet.list');
+
+            Route::get('wallet/topup', [
+                AdminWalletController::class, 'showTopupForm',
+            ])->name('wallet.topup');
+
+            Route::post('wallet/topup', [
+                AdminWalletController::class, 'topup',
+            ])->name('wallet.topup.submit');
+
+            Route::get('wallet/transactions', [
+                AdminWalletController::class, 'transactions',
+            ])->name('wallet.transactions');
 
             // bulk upload csv
             Route::get('wallet/bulkupload', [
