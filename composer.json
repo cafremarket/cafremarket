@@ -96,6 +96,7 @@
     "psr-4": {
       "App\\": "app/",
       "Incevio\\Package\\": "packages/",
+      "Incevio\\Package\\Wallet\\": "packages/wallet/src/",
       "Database\\Factories\\": "database/factories/",
       "Database\\Seeders\\": "database/seeders/"
     },

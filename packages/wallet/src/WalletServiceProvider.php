@@ -60,6 +60,10 @@ class WalletServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Ensure newly added admin classes resolve even before composer dump-autoload
+        // (package uses classmap autoload; PSR-4 path alone is not enough until dump).
+        $this->ensureAdminWalletClassesLoaded();
+
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'wallet');
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'wallet');
@@ -92,5 +96,22 @@ class WalletServiceProvider extends ServiceProvider
         // $this->app->bind(\Incevio\Package\Wallet\Objects\Cart::class, \Incevio\Package\Wallet\Objects\Cart::class);
         // $this->app->bind(\Incevio\Package\Wallet\Objects\EmptyLock::class, \Incevio\Package\Wallet\Objects\EmptyLock::class);
         // $this->app->bind(\Incevio\Package\Wallet\Objects\Operation::class, \Incevio\Package\Wallet\Objects\Operation::class);
+    }
+
+    /**
+     * Load admin wallet management classes if Composer classmap is stale.
+     */
+    protected function ensureAdminWalletClassesLoaded(): void
+    {
+        $classes = [
+            \Incevio\Package\Wallet\Http\Controllers\Admin\AdminWalletController::class => __DIR__.'/Http/Controllers/Admin/AdminWalletController.php',
+            \Incevio\Package\Wallet\Http\Requests\AdminWalletTopupRequest::class => __DIR__.'/Http/Requests/AdminWalletTopupRequest.php',
+        ];
+
+        foreach ($classes as $class => $path) {
+            if (! class_exists($class, false) && is_file($path)) {
+                require_once $path;
+            }
+        }
     }
 }
