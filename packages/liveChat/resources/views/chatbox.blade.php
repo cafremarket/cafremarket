@@ -319,17 +319,30 @@
           MerchantChatAttachmentPreview.clear();
         }
 
-        var pendingNode = null;
+        // Optimistic UI: show text/attachment immediately (don't wait 5–10s for AJAX).
+        var pendingAtt = [];
         if (hasFile && fdFile) {
           var ext = (fdFile.name.split('.').pop() || '').toLowerCase();
-          var pendingAtt = [{
+          pendingAtt = [{
             url: URL.createObjectURL(fdFile),
             name: fdFile.name,
             extension: ext || 'file'
           }];
-          pendingNode = prepareNewChatMsg(msg || '[attachment]', 'sender', pendingAtt).attr('data-pending', '1');
-          $("#conversationBox").append(pendingNode);
-          updateScroll('conversationBox');
+        }
+        var pendingNode = prepareNewChatMsg(msg || (hasFile ? '[attachment]' : ''), 'sender', pendingAtt)
+          .attr('data-pending', '1');
+        $("#conversationBox").append(pendingNode);
+        updateScroll('conversationBox');
+        $("textarea#message").val('');
+
+        var openChatboxEarly = document.querySelector('[id^="openChatbox-"]');
+        if (openChatboxEarly && openChatboxEarly.id) {
+          var earlyCustomerId = openChatboxEarly.id.replace('openChatbox-', '');
+          var earlyChatNode = $('#chat-' + earlyCustomerId);
+          if (earlyChatNode.length) {
+            earlyChatNode.find("p.excerpt").text(getExcerptMsg(msg || (hasFile ? '[attachment]' : ''), pendingAtt));
+            earlyChatNode.find(".time span").text('{{ trans('theme.now') }}');
+          }
         }
 
         var response = '';
@@ -339,11 +352,8 @@
           type: 'POST',
           data: ajaxData,
           complete: function(xhr, textStatus) {
-            $('#conversationBox [data-pending="1"]').remove();
-
             switch (xhr.status) {
               case 200: {
-                $("textarea#message").val('');
                 if (fileInput) {
                   fileInput.value = '';
                 }
@@ -364,9 +374,26 @@
                 } catch (err) {
                   // Legacy non-JSON success body
                 }
-                response = prepareNewChatMsg(replyMsg || (hasFile ? '[attachment]' : ''), 'sender', attachments);
-                if (replyId) {
-                  response.attr('data-reply-id', replyId);
+                // Upgrade pending bubble → final (keeps message instant).
+                if (pendingNode && pendingNode.length) {
+                  if (replyId) {
+                    pendingNode.attr('data-reply-id', replyId).removeAttr('data-pending');
+                  } else {
+                    pendingNode.removeAttr('data-pending');
+                  }
+                  if (attachments && attachments.length) {
+                    var upgraded = prepareNewChatMsg(replyMsg || (hasFile ? '[attachment]' : ''), 'sender', attachments);
+                    if (replyId) {
+                      upgraded.attr('data-reply-id', replyId);
+                    }
+                    pendingNode.replaceWith(upgraded);
+                    pendingNode = upgraded;
+                  }
+                } else {
+                  response = prepareNewChatMsg(replyMsg || (hasFile ? '[attachment]' : ''), 'sender', attachments);
+                  if (replyId) {
+                    response.attr('data-reply-id', replyId);
+                  }
                 }
 
                 var openChatbox = document.querySelector('[id^="openChatbox-"]');
@@ -382,6 +409,7 @@
               }
               case 401:
                 MerchantChatAttachmentPreview.clear();
+                $('#conversationBox [data-pending="1"]').remove();
                 $("#conversationBox").html(""); //Clear the chatbox
                 response = $('<p>').addClass('text-danger').text("{!! trans('messages.session_expired') !!}");
                 $('<br/><br/>').prependTo(response);
@@ -390,12 +418,14 @@
               case 403:
               case 419:
                 MerchantChatAttachmentPreview.clear();
+                $('#conversationBox [data-pending="1"]').remove();
                 $("#conversationBox").html(""); //Clear the chatbox
                 response = $('<p>').addClass('text-danger').text("{!! trans('messages.session_expired') !!}");
                 $('<br/><br/>').prependTo(response);
                 $('<a>').attr('href', "{{ route('customer.login') }}").addClass('btn btn-primary').text("{{ trans('app.login') }}").appendTo(response);
                 break;
               default:
+                $('#conversationBox [data-pending="1"]').remove();
                 response = $('<div>').addClass('row message-body').append(
                   $('<div>').addClass('col-sm-12').append(
                     $('<p class="lead">').addClass('text-danger').text("{!! trans('messages.failed') !!}")
@@ -404,7 +434,9 @@
                 $('<br/><br/>').prependTo(response);
             }
 
-            $("#conversationBox").append(response);
+            if (response) {
+              $("#conversationBox").append(response);
+            }
 
             updateScroll('conversationBox'); //Scroll to bottom
           },
@@ -459,6 +491,16 @@
           // Merchant messages from vendor app / other tabs → sync into open web chat
           if (senderType === 'merchant') {
             if (result.reply_id && $('#conversationBox [data-reply-id="' + result.reply_id + '"]').length) {
+              return;
+            }
+
+            // Same-tab send: upgrade optimistic pending bubble instead of duplicating.
+            var pendingMine = $('#conversationBox [data-pending="1"]').last();
+            if (pendingMine.length) {
+              if (result.reply_id) {
+                pendingMine.attr('data-reply-id', result.reply_id);
+              }
+              pendingMine.removeAttr('data-pending');
               return;
             }
 

@@ -4,8 +4,9 @@ namespace App\Listeners\Chat;
 
 use App\Events\Chat\NewMessageEvent;
 use App\Notifications\Chat\NewMessage;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class NotifyAssociatedUsers
+class NotifyAssociatedUsers implements ShouldQueue
 {
     /**
      * The number of times the job may be attempted.
@@ -33,21 +34,8 @@ class NotifyAssociatedUsers
     {
         $repliable = $event->msg_obj->repliable ?? $event->msg_obj;
 
-        // if (! config('system_settings')) {
-        //     setSystemConfig($repliable->shop_id);
-        // }
-
-        // // Set shop configuration
-        // if ($repliable->shop_id && !config('shop_settings')) {
-        //     setSystemConfig($repliable->shop_id);
-        // }
-
-        // \Log::info("repliable: ");
-        // \Log::info($repliable);
-
         if ($event->msg_obj->customer_id) {
             $associate = $repliable->shop;
-            // $associate = $repliable->agent ?? $repliable->shop;
             $sender = $repliable->customer->getName();
             $receipent = $associate->getName();
 
@@ -57,14 +45,5 @@ class NotifyAssociatedUsers
                 report($e);
             }
         }
-        // else {
-        //     $associate = $repliable->customer;
-        //     $sender = $repliable->shop->getName();
-        // }
-
-        // $receipent = $associate->getName();
-        // if ($receipent) {
-        //     $associate->notify(new NewMessage($receipent, $sender, $event->text, $repliable));
-        // }
     }
 }

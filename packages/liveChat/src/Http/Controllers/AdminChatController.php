@@ -83,13 +83,6 @@ class AdminChatController extends Controller
 
         $attachmentsPayload = livechat_socket_attachments_payload($reply);
 
-        // Do not fail message sending when realtime broadcast provider is down.
-        try {
-            event(new NewMessageEvent($reply, $replyText));
-        } catch (\Throwable $e) {
-            report($e);
-        }
-
         $payload = [
             'text' => $replyText,
             'sender_type' => 'merchant',
@@ -99,6 +92,7 @@ class AdminChatController extends Controller
             'attachments' => $attachmentsPayload,
         ];
 
+        // Realtime first — ChatSocketPublisher → chat-ws-node (apps/web).
         ChatSocketPublisher::publish(
             get_chat_room_name($chat->shop_id.$chat->customer_id),
             'chat.message',
@@ -111,6 +105,13 @@ class AdminChatController extends Controller
                 'chat.message',
                 $payload
             );
+        }
+
+        // Email/push notifications (queued listener — must not block reply).
+        try {
+            event(new NewMessageEvent($reply, $replyText));
+        } catch (\Throwable $e) {
+            report($e);
         }
 
         if ($request->ajax()) {

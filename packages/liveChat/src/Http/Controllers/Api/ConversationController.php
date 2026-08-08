@@ -162,12 +162,6 @@ class ConversationController extends Controller
                 $attachmentsPayload = livechat_socket_attachments_payload($msg_object);
                 $conversation->refresh();
 
-                try {
-                    event(new NewMessageEvent($msg_object, $replyText));
-                } catch (\Throwable $e) {
-                    report($e);
-                }
-
                 ChatSocketPublisher::publish(
                     get_chat_room_name($shop->id.$request->customer_id),
                     'chat.message',
@@ -195,6 +189,12 @@ class ConversationController extends Controller
                         'attachments' => $attachmentsPayload,
                     ]
                 );
+
+                try {
+                    event(new NewMessageEvent($msg_object, $replyText));
+                } catch (\Throwable $e) {
+                    report($e);
+                }
             }
 
             $conversation->load(['replies.attachments']);
@@ -306,12 +306,6 @@ class ConversationController extends Controller
 
         $attachmentsPayload = livechat_socket_attachments_payload($reply);
 
-        try {
-            event(new NewMessageEvent($reply, $replyText));
-        } catch (\Throwable $e) {
-            report($e);
-        }
-
         $payload = [
             'text' => $replyText,
             'sender_type' => 'merchant',
@@ -321,20 +315,24 @@ class ConversationController extends Controller
             'attachments' => $attachmentsPayload,
         ];
 
-        // Customer ↔ merchant thread room
         ChatSocketPublisher::publish(
             get_chat_room_name($chat->shop_id.$chat->customer_id),
             'chat.message',
             $payload
         );
 
-        // Vendor inbox room (other merchant clients / vendor app)
         if ($chat->shop) {
             ChatSocketPublisher::publish(
                 get_vendor_chat_room_id($chat->shop),
                 'chat.message',
                 $payload
             );
+        }
+
+        try {
+            event(new NewMessageEvent($reply, $replyText));
+        } catch (\Throwable $e) {
+            report($e);
         }
 
         return response()->json([

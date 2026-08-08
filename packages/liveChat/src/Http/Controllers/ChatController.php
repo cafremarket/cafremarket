@@ -103,12 +103,6 @@ class ChatController extends Controller
         $attachmentsPayload = livechat_socket_attachments_payload($msg_object);
         $conversation->refresh();
 
-        try {
-            event(new NewMessageEvent($msg_object, $replyText));
-        } catch (\Throwable $e) {
-            report($e);
-        }
-
         $room = get_chat_room_name($shop->id.$request->customer_id);
         ChatSocketPublisher::publish($room, 'chat.message', [
             'text' => $replyText,
@@ -128,6 +122,12 @@ class ChatController extends Controller
             'time' => $conversation->updated_at->diffForHumans(),
             'attachments' => $attachmentsPayload,
         ]);
+
+        try {
+            event(new NewMessageEvent($msg_object, $replyText));
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return response()->json([
             'status' => 'ok',
