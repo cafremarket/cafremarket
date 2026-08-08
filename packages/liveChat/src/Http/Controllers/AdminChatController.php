@@ -75,6 +75,8 @@ class AdminChatController extends Controller
             'read' => false,
         ]);
 
+        $chat->bumpLastMessage($replyText, false);
+
         if ($request->hasFile('photo')) {
             $reply->saveAttachments($request->file('photo'));
         } elseif ($request->filled('photo')) {

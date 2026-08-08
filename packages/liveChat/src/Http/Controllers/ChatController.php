@@ -69,7 +69,7 @@ class ChatController extends Controller
         ])->first();
 
         if ($conversation) {
-            $conversation->markAsUnread();
+            $conversation->bumpLastMessage($replyText, true);
             $msg_object = $conversation->replies()->create([
                 'customer_id' => $request->customer_id,
                 'user_id' => $request->user_id,

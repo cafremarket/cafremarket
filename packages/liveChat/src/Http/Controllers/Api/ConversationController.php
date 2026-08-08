@@ -37,7 +37,22 @@ class ConversationController extends Controller
     public function conversations(Request $request)
     {
         if (is_incevio_package_loaded('livechat')) {
-            $conversations = ChatConversation::where('customer_id', Auth::guard('api')->id())->get();
+            $conversations = ChatConversation::query()
+                ->where('customer_id', Auth::guard('api')->id())
+                ->with(['customer', 'shop', 'lastReply'])
+                ->withCount([
+                    // Unread for customer = merchant replies (customer_id null)
+                    'replies as unread_count' => function ($q) {
+                        $q->whereNull('customer_id')
+                            ->where(function ($inner) {
+                                $inner->whereNull('read')
+                                    ->orWhere('read', false)
+                                    ->orWhere('read', 0);
+                            });
+                    },
+                ])
+                ->latest('updated_at')
+                ->get();
 
             return ConversationResource::collection($conversations);
         }
@@ -103,7 +118,7 @@ class ConversationController extends Controller
             ])->first();
 
             if ($conversation) {
-                $conversation->markAsUnread();
+                $conversation->bumpLastMessage($replyText, true);
                 $msg_object = $conversation->replies()->create([
                     'customer_id' => $request->customer_id,
                     'user_id' => $request->user_id,
@@ -221,8 +236,19 @@ class ConversationController extends Controller
 
         $chats = \Incevio\Package\LiveChat\Models\ChatConversation::query()
             ->where('shop_id', $shopId)
-            ->with(['customer', 'shop'])
-            ->latest('updated_at')
+            ->with(['customer', 'shop', 'lastReply'])
+            ->withCount([
+                'replies as unread_count' => function ($q) {
+                    $q->whereNotNull('customer_id')
+                        ->where(function ($inner) {
+                            $inner->whereNull('read')
+                                ->orWhere('read', false)
+                                ->orWhere('read', 0);
+                        });
+                },
+            ])
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
             ->get();
 
         return ConversationResource::collection($chats);
@@ -260,7 +286,12 @@ class ConversationController extends Controller
         $chat->markAsRead();
         $chat->markPeerRepliesAsRead('merchant');
 
-        $chat->load(['replies.attachments']);
+        $chat->load([
+            'replies' => function ($q) {
+                $q->orderBy('id');
+            },
+            'replies.attachments',
+        ]);
 
         return new ConversationResource($chat);
     }
@@ -289,6 +320,8 @@ class ConversationController extends Controller
             'reply' => $replyText,
             'read' => false,
         ]);
+
+        $chat->bumpLastMessage($replyText, false);
 
         try {
             if ($request->hasFile('photo')) {

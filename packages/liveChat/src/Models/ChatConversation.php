@@ -116,6 +116,52 @@ class ChatConversation extends BaseModel
     }
 
     /**
+     * Update last preview text + bump sorting timestamp.
+     * When $markUnread is true (customer message), set status to unread for merchant inbox.
+     */
+    public function bumpLastMessage(string $text, bool $markUnread = false): void
+    {
+        $this->message = $text;
+        if ($markUnread) {
+            $this->status = self::STATUS_UNREAD;
+        }
+        $this->updated_at = $this->freshTimestamp();
+        $this->save();
+    }
+
+    /**
+     * Unread replies for the current viewer.
+     * Vendor API: customer messages. Customer API: merchant messages.
+     */
+    public function unreadCustomerRepliesCount(): int
+    {
+        if (isset($this->unread_count)) {
+            return (int) $this->unread_count;
+        }
+
+        // Default count used by merchant inbox (customer-authored replies).
+        return (int) $this->replies()
+            ->whereNotNull('customer_id')
+            ->where(function ($q) {
+                $q->whereNull('read')->orWhere('read', false)->orWhere('read', 0);
+            })
+            ->count();
+    }
+
+    /**
+     * Plain last message text for API/inbox preview.
+     */
+    public function lastMessagePlain(): string
+    {
+        $reply = $this->relationLoaded('lastReply') ? $this->lastReply : $this->lastReply()->first();
+        if ($reply && filled($reply->reply)) {
+            return (string) $reply->reply;
+        }
+
+        return (string) ($this->message ?? '');
+    }
+
+    /**
      * Mark the chat as unread
      */
     public function markAsUnread()
