@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Services\ChatSocketPublisher;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Incevio\Package\LiveChat\Http\Requests\SaveChatConversationRequest;
 use Incevio\Package\LiveChat\Http\Requests\ViewChatConversationRequest;
@@ -44,6 +45,7 @@ class AdminChatController extends Controller
     public function show(ViewChatConversationRequest $request, ChatConversation $chat)
     {
         $chat->markAsRead();
+        $chat->markPeerRepliesAsRead('merchant');
 
         $chat->loadMissing(['replies.attachments']);
 
@@ -67,9 +69,10 @@ class AdminChatController extends Controller
         }
 
         $reply = $chat->replies()->create([
-            'customer_id' => $request->customer_id,
-            'user_id' => $request->user_id,
+            'customer_id' => null,
+            'user_id' => $request->user_id ?: Auth::id(),
             'reply' => $replyText,
+            'read' => false,
         ]);
 
         if ($request->hasFile('photo')) {
@@ -87,21 +90,33 @@ class AdminChatController extends Controller
             report($e);
         }
 
+        $payload = [
+            'text' => $replyText,
+            'sender_type' => 'merchant',
+            'conversation_id' => $chat->id,
+            'reply_id' => $reply->id,
+            'customer_id' => $chat->customer_id,
+            'attachments' => $attachmentsPayload,
+        ];
+
         ChatSocketPublisher::publish(
             get_chat_room_name($chat->shop_id.$chat->customer_id),
             'chat.message',
-            [
-                'text' => $replyText,
-                'sender_type' => 'merchant',
-                'conversation_id' => $chat->id,
-                'reply_id' => $reply->id,
-                'attachments' => $attachmentsPayload,
-            ]
+            $payload
         );
+
+        if ($chat->shop) {
+            ChatSocketPublisher::publish(
+                get_vendor_chat_room_id($chat->shop),
+                'chat.message',
+                $payload
+            );
+        }
 
         if ($request->ajax()) {
             return response()->json([
                 'message' => $replyText,
+                'reply_id' => $reply->id,
                 'attachments' => $attachmentsPayload,
             ], 200);
         }

@@ -95,7 +95,28 @@ class ChatConversation extends BaseModel
     }
 
     /**
-     * Mark the chat as read
+     * Mark peer replies as read for the given viewer.
+     * merchant → marks customer replies; customer → marks merchant replies.
+     */
+    public function markPeerRepliesAsRead(string $viewer = 'merchant'): int
+    {
+        $query = $this->replies()->where(function ($q) {
+            $q->whereNull('read')->orWhere('read', false);
+        });
+
+        if ($viewer === 'customer') {
+            // Merchant messages have no customer_id
+            $query->whereNull('customer_id');
+        } else {
+            // Customer messages have customer_id
+            $query->whereNotNull('customer_id');
+        }
+
+        return $query->update(['read' => true]);
+    }
+
+    /**
+     * Mark the chat as unread
      */
     public function markAsUnread()
     {

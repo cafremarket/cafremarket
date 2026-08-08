@@ -349,6 +349,7 @@
                 }
                 var replyMsg = msg;
                 var attachments = [];
+                var replyId = null;
                 try {
                   var parsed = JSON.parse(xhr.responseText);
                   if (parsed && typeof parsed === 'object') {
@@ -356,11 +357,17 @@
                       replyMsg = parsed.message;
                     }
                     attachments = parsed.attachments || [];
+                    if (parsed.reply_id) {
+                      replyId = parsed.reply_id;
+                    }
                   }
                 } catch (err) {
                   // Legacy non-JSON success body
                 }
                 response = prepareNewChatMsg(replyMsg || (hasFile ? '[attachment]' : ''), 'sender', attachments);
+                if (replyId) {
+                  response.attr('data-reply-id', replyId);
+                }
 
                 var openChatbox = document.querySelector('[id^="openChatbox-"]');
                 if (openChatbox && openChatbox.id) {
@@ -447,7 +454,44 @@
           }
 
           var result = parsed.data;
-          if (result.sender_type !== 'customer') {
+          var senderType = result.sender_type || '';
+
+          // Merchant messages from vendor app / other tabs → sync into open web chat
+          if (senderType === 'merchant') {
+            if (result.reply_id && $('#conversationBox [data-reply-id="' + result.reply_id + '"]').length) {
+              return;
+            }
+
+            var mCustomerId = result.customer_id || null;
+            var mChatNode = mCustomerId ? $('#chat-' + mCustomerId) : $();
+            if (mChatNode.length === 0 && result.conversation_id) {
+              mChatNode = $("#leftsidebar .sidebarBody a.get-content").filter(function() {
+                var link = String($(this).data('link') || '');
+                return link.indexOf('/' + result.conversation_id) !== -1;
+              }).closest('.sidebarBody');
+            }
+
+            if (mChatNode.length) {
+              var mOpenCustomerId = mCustomerId;
+              if (!mOpenCustomerId && mChatNode.attr('id')) {
+                mOpenCustomerId = String(mChatNode.attr('id')).replace('chat-', '');
+              }
+              var mOpenChatbox = mOpenCustomerId ? document.getElementById("openChatbox-" + mOpenCustomerId) : null;
+              if (mOpenChatbox) {
+                var mResponse = prepareNewChatMsg(result.text, 'sender', result.attachments || []);
+                if (result.reply_id) {
+                  mResponse.attr('data-reply-id', result.reply_id);
+                }
+                $("#conversationBox").append(mResponse);
+                updateScroll('conversationBox');
+              }
+              mChatNode.find("p.excerpt").text(getExcerptMsg(result.text, result.attachments));
+              mChatNode.find(".time span").text(result.time || '{{ trans('theme.now') }}');
+            }
+            return;
+          }
+
+          if (senderType !== 'customer') {
             return;
           }
 
@@ -471,7 +515,13 @@
           }
           var openChatbox = openCustomerId ? document.getElementById("openChatbox-" + openCustomerId) : null;
           if (openChatbox) { //The chatbox is already open
+            if (result.reply_id && $('#conversationBox [data-reply-id="' + result.reply_id + '"]').length) {
+              return;
+            }
             response = prepareNewChatMsg(result.text, 'receiver', result.attachments || []);
+            if (result.reply_id) {
+              response.attr('data-reply-id', result.reply_id);
+            }
             $("#conversationBox").append(response);
             updateScroll('conversationBox'); //Scroll to bottom
           } else { //Chatbox is not open

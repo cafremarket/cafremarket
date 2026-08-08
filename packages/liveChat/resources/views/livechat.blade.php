@@ -661,7 +661,16 @@
               return;
             }
 
-            if (parsed.data.sender_type !== 'merchant') {
+            var result = parsed.data;
+            var senderType = result.sender_type || '';
+
+            // Dedup when WS replay / multi-tab delivers the same reply again.
+            if (result.reply_id &&
+                $('#chat_conversation [data-reply-id="' + result.reply_id + '"]').length) {
+              return;
+            }
+
+            if (senderType !== 'merchant') {
               return;
             }
 
@@ -671,7 +680,10 @@
                   return $('<span>').addClass('chat_msg_item chat_msg_item_admin').text(message || '');
                 };
 
-            var response = renderer(parsed.data.text || '', true, parsed.data.attachments || []);
+            var response = renderer(result.text || '', true, result.attachments || []);
+            if (result.reply_id && response && response.attr) {
+              response.attr('data-reply-id', result.reply_id);
+            }
             $("#chat_conversation").append(response);
             if (typeof window.updateScroll === 'function') {
               window.updateScroll();

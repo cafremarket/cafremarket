@@ -61,7 +61,12 @@ class ConversationController extends Controller
             ])->with(['replies.attachments'])->first();
 
             if ($conversation) {
-                return new ConversationResource($conversation);
+                $conversation->load(['replies.attachments']);
+
+                // Customer opened thread — mark merchant replies as read (clears clock on vendor side after refresh/WS).
+                $conversation->markPeerRepliesAsRead('customer');
+
+                return new ConversationResource($conversation->fresh(['replies.attachments']));
             }
 
             return response()->json([
@@ -103,6 +108,7 @@ class ConversationController extends Controller
                     'customer_id' => $request->customer_id,
                     'user_id' => $request->user_id,
                     'reply' => $replyText,
+                    'read' => false,
                 ]);
 
                 try {
@@ -131,6 +137,7 @@ class ConversationController extends Controller
                     'customer_id' => $request->customer_id,
                     'user_id' => $request->user_id,
                     'reply' => $replyText,
+                    'read' => false,
                 ]);
 
                 try {
@@ -168,6 +175,8 @@ class ConversationController extends Controller
                         'text' => $replyText,
                         'sender_type' => 'customer',
                         'conversation_id' => $conversation->id,
+                        'reply_id' => $msg_object->id,
+                        'customer_id' => $request->customer_id,
                         'attachments' => $attachmentsPayload,
                     ]
                 );
@@ -180,6 +189,7 @@ class ConversationController extends Controller
                         'text' => $replyText,
                         'sender_type' => 'customer',
                         'conversation_id' => $conversation->id,
+                        'reply_id' => $msg_object->id,
                         'customer_id' => $request->customer_id,
                         'time' => $conversation->updated_at->diffForHumans(),
                         'attachments' => $attachmentsPayload,
@@ -248,6 +258,7 @@ class ConversationController extends Controller
     public function show(ViewChatConversationRequest $request, ChatConversation $chat)
     {
         $chat->markAsRead();
+        $chat->markPeerRepliesAsRead('merchant');
 
         $chat->load(['replies.attachments']);
 
@@ -271,10 +282,12 @@ class ConversationController extends Controller
             return response()->json(['message' => trans('validation.required', ['attribute' => 'message'])], 422);
         }
 
+        // Merchant replies must not set customer_id (match web admin behavior).
         $reply = $chat->replies()->create([
-            'customer_id' => $chat->customer_id,
+            'customer_id' => null,
             'user_id' => Auth::guard('vendor_api')->id(),
             'reply' => $replyText,
+            'read' => false,
         ]);
 
         try {
@@ -299,19 +312,36 @@ class ConversationController extends Controller
             report($e);
         }
 
+        $payload = [
+            'text' => $replyText,
+            'sender_type' => 'merchant',
+            'conversation_id' => $chat->id,
+            'reply_id' => $reply->id,
+            'customer_id' => $chat->customer_id,
+            'attachments' => $attachmentsPayload,
+        ];
+
+        // Customer ↔ merchant thread room
         ChatSocketPublisher::publish(
             get_chat_room_name($chat->shop_id.$chat->customer_id),
             'chat.message',
-            [
-                'text' => $replyText,
-                'sender_type' => 'merchant',
-                'conversation_id' => $chat->id,
-                'reply_id' => $reply->id,
-                'attachments' => $attachmentsPayload,
-            ]
+            $payload
         );
 
-        return response()->json(['message' => 'Replied successfully'], 200);
+        // Vendor inbox room (other merchant clients / vendor app)
+        if ($chat->shop) {
+            ChatSocketPublisher::publish(
+                get_vendor_chat_room_id($chat->shop),
+                'chat.message',
+                $payload
+            );
+        }
+
+        return response()->json([
+            'message' => 'Replied successfully',
+            'reply_id' => $reply->id,
+            'read' => false,
+        ], 200);
     }
 
     /**

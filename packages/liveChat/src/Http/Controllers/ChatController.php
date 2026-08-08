@@ -31,6 +31,11 @@ class ChatController extends Controller
             'shop_id' => $shop->id,
         ])->with(['replies.attachments'])->first();
 
+        if ($conversation) {
+            $conversation->markPeerRepliesAsRead('customer');
+            $conversation->load(['replies.attachments']);
+        }
+
         return response()->json($conversation);
     }
 
@@ -69,6 +74,7 @@ class ChatController extends Controller
                 'customer_id' => $request->customer_id,
                 'user_id' => $request->user_id,
                 'reply' => $replyText,
+                'read' => false,
             ]);
         } elseif ($request->customer_id) {
             $conversation = ChatConversation::create([
@@ -82,6 +88,7 @@ class ChatController extends Controller
                 'customer_id' => $request->customer_id,
                 'user_id' => $request->user_id,
                 'reply' => $replyText,
+                'read' => false,
             ]);
         } else {
             return response(trans('responses.unauthorized'), 401);
@@ -107,6 +114,8 @@ class ChatController extends Controller
             'text' => $replyText,
             'sender_type' => 'customer',
             'conversation_id' => $conversation->id,
+            'reply_id' => $msg_object->id,
+            'customer_id' => $request->customer_id,
             'attachments' => $attachmentsPayload,
         ]);
 
@@ -114,6 +123,7 @@ class ChatController extends Controller
             'text' => $replyText,
             'sender_type' => 'customer',
             'conversation_id' => $conversation->id,
+            'reply_id' => $msg_object->id,
             'customer_id' => $request->customer_id,
             'time' => $conversation->updated_at->diffForHumans(),
             'attachments' => $attachmentsPayload,
