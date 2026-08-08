@@ -39,6 +39,7 @@ return [
   'item_updated_successfully' => 'আইটেম সফলভাবে আপডেট করা হয়েছে',
   'account_updated_successfully' => 'অ্যাকাউন্ট সফলভাবে আপডেট করা হয়েছে',
   'account_deleted_successfully' => 'অ্যাকাউন্ট সফলভাবে মুছে ফেলা হয়েছে',
+  'account_deletion_temporarily_unavailable' => 'Account deletion is temporarily unavailable. Please contact support.',
   'address_created_successfully' => 'ঠিকানা সফলভাবে তৈরি করা হয়েছে',
   'address_updated_successfully' => 'ঠিকানা সফলভাবে আপডেট করা হয়েছে',
   'address_deleted_successfully' => 'ঠিকানা সফলভাবে মুছে ফেলা হয়েছে',

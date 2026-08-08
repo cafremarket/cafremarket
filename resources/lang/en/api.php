@@ -43,6 +43,7 @@ return [
     'item_updated_successfully' => 'Item updated successfully',
     'account_updated_successfully' => 'Account updated successfully',
     'account_deleted_successfully' => 'Account deleted successfully',
+    'account_deletion_temporarily_unavailable' => 'Account deletion is temporarily unavailable. Please contact support.',
     'address_created_successfully' => 'Address created successfully',
     'address_updated_successfully' => 'Address updated successfully',
     'address_deleted_successfully' => 'Address deleted successfully',

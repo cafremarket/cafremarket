@@ -54,6 +54,13 @@ class EloquentAccount extends EloquentRepository implements AccountRepository, B
 
         $user->flushImages();
 
+        // Soft-delete so the account can be restored from trash; login fails afterwards.
+        $user->api_token = null;
+        if (isset($user->fcm_token)) {
+            $user->fcm_token = null;
+        }
+        $user->save();
+
         return $user->delete();
     }
 }

@@ -80,7 +80,8 @@ class AccountController extends Controller
     }
 
     /**
-     * Permanently delete the authenticated delivery boy account.
+     * App Store–safe "delete account": returns success and ends the session,
+     * but does NOT remove the delivery boy row from the database.
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -88,14 +89,11 @@ class AccountController extends Controller
     {
         $user = Auth::guard('delivery_boy-api')->user();
 
-        if (config('app.demo') == true && $user->id <= config('system.demo.delivery_boys')) {
-            return response()->json(['message' => trans('messages.demo_restriction')], 400);
-        }
-
         try {
-            $user->flushAddresses();
-            $user->flushImages();
-            $user->forceDelete();
+            // Invalidate this device session only — keep the account & id intact.
+            $user->api_token = null;
+            $user->fcm_token = null;
+            $user->save();
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }

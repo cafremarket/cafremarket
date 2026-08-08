@@ -265,6 +265,16 @@ return [
         'slider_negative_margin' => [3, 4],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Feature flags
+    |--------------------------------------------------------------------------
+    */
+    'features' => [
+        // Reserved. Delivery self-delete currently returns success without removing the row.
+        'delivery_boy_self_delete' => env('DELIVERY_BOY_SELF_DELETE', false),
+    ],
+
     'encryption_credential' => [
         'zcart_api_key' => env('ZCART_API_KEY'),
         'zcart_encryption_key' => env('ZCART_ENCRYPTION_KEY'),

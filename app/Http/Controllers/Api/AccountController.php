@@ -108,7 +108,11 @@ class AccountController extends Controller
 
         $customer->flushImages();
 
-        $customer->forceDelete();
+        // Soft-delete so the account can be restored from trash; login fails afterwards.
+        $customer->api_token = null;
+        $customer->fcm_token = null;
+        $customer->save();
+        $customer->delete();
 
         return response()->json(['message' => trans('theme.notify.account_delete')], 200);
     }
