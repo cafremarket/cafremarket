@@ -39,6 +39,12 @@
           </a>
         </li>
         <li>
+          <a href="#websocket-tab" data-toggle="tab">
+            <i class="fa fa-plug hidden-sm"></i>
+            {{ trans('app.websocket') }}
+          </a>
+        </li>
+        <li>
           <a href="#reports_tab" data-toggle="tab">
             <i class="fa fa-line-chart hidden-sm"></i>
             {{ trans('app.reports') }}
@@ -1300,7 +1306,11 @@
             </div>
           </div>
           {!! Form::close() !!}
-        </div> <!-- /.tab-pane -->
+        </div> <!-- /.tab-pane support -->
+
+        <div class="tab-pane" id="websocket-tab">
+          @include('admin.config._websocket_status')
+        </div>
 
         <div class="tab-pane" id="reports_tab">
           {!! Form::model($system, ['method' => 'PUT', 'route' => ['admin.setting.system.update'], 'files' => true, 'id' => 'form2', 'class' => 'form-horizontal ajax-form', 'data-toggle' => 'validator']) !!}
