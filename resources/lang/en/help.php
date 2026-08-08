@@ -789,6 +789,14 @@ return [
     'enable_live_chat_on_platform' => 'If enabled, vendor will get the option to on/off the live chat on their product page and store page.',
 
     'enable_live_chat_on_shop' => 'Enable live chat on your product page and store page.',
+    'websocket_status_check' => 'Test whether this browser can reach the live chat WebSocket server. Connected means realtime chat can work.',
+    'websocket_click_test' => 'Click “Test connection”, or open this tab to run automatically.',
+    'websocket_bad_config' => 'CHAT_SOCKET_CLIENT_HOST / SCHEME is missing or invalid in .env',
+    'websocket_timeout_hint' => 'No response in 8 seconds. Check nginx SSL for ws subdomain, Upgrade headers, and that Node is running on port 6002.',
+    'websocket_connected_no_room' => 'TCP/WebSocket is up, but shop room could not be resolved.',
+    'websocket_subscribed_ok' => 'Subscribed to shop room',
+    'websocket_error_hint' => 'Browser could not complete the handshake. Check SSL certificate and nginx proxy to 127.0.0.1:6002.',
+    'websocket_closed_hint' => 'Connection closed before subscribe succeeded.',
 
     'package_dependency_not_loaded' => 'Dependency failed! This plugin depends on :dependency module(s).',
 

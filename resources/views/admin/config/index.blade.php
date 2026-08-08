@@ -24,6 +24,10 @@
             <i class="fa fa-phone hidden-sm"></i>
             {{ trans('app.support') }}
           </a></li>
+        <li><a href="#websocket-tab" data-toggle="tab">
+            <i class="fa fa-plug hidden-sm"></i>
+            {{ trans('app.websocket') }}
+          </a></li>
         <li><a href="#notifications-tab" data-toggle="tab">
             <i class="fa fa-bell-o hidden-sm"></i>
             {{ trans('app.notifications') }}
@@ -540,7 +544,11 @@
             </div>
             {!! Form::close() !!}
           </div>
-        </div> <!-- /.tab-pane -->
+        </div> <!-- /.tab-pane support -->
+
+        <div class="tab-pane" id="websocket-tab">
+          @include('admin.config._websocket_status')
+        </div> <!-- /.tab-pane websocket -->
 
         <div class="tab-pane" id="notifications-tab">
           <div class="row mb-5">

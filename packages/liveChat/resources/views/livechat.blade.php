@@ -633,6 +633,11 @@
           wsPath = '/' + wsPath;
         }
         var wsUrl = wsScheme + '://' + wsHost + (wsPath ? wsPath : (':' + wsPort));
+        if (!wsPath && (wsScheme === 'wss' || wsScheme === 'https')) {
+          wsUrl = wsScheme + '://' + wsHost;
+        } else if (!wsPath && (wsScheme === 'ws' || wsScheme === 'http') && (String(wsPort) === '80' || !wsPort)) {
+          wsUrl = wsScheme + '://' + wsHost;
+        }
         var socket = null;
         function connectSocket() {
           try {

@@ -464,6 +464,12 @@
         wsPath = '/' + wsPath;
       }
       var wsUrl = wsScheme + '://' + wsHost + (wsPath ? wsPath : (':' + wsPort));
+      // wss on subdomain (empty path) must use 443 — do not append :6002
+      if (!wsPath && (wsScheme === 'wss' || wsScheme === 'https')) {
+        wsUrl = wsScheme + '://' + wsHost;
+      } else if (!wsPath && (wsScheme === 'ws' || wsScheme === 'http') && (String(wsPort) === '80' || !wsPort)) {
+        wsUrl = wsScheme + '://' + wsHost;
+      }
       var room = '{{ get_vendor_chat_room_id() }}';
       var socket = null;
       var CHAT_WS_DEBUG = true;
@@ -477,6 +483,12 @@
 
       function connectSocket() {
         chatWsLog('connecting', wsUrl, 'room=', room);
+        if (wsHost === '127.0.0.1' || wsHost === 'localhost') {
+          console.error(
+            '[chat-ws-web] BAD CONFIG: CHAT_SOCKET_CLIENT_HOST is ' + wsHost +
+            '. Browsers connect to the visitor PC, not your server. Set CHAT_SOCKET_CLIENT_HOST=www.cafremarket.co.mz and CHAT_SOCKET_SCHEME=wss'
+          );
+        }
         var tConnect = Date.now();
         try {
           socket = new WebSocket(wsUrl);
