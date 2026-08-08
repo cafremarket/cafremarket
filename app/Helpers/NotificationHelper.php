@@ -1,15 +1,28 @@
 <?php
 
+use App\Models\EmailLog;
 use App\Models\System;
 use App\Notifications\SuperAdmin\MailDeliveryFailed;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Schema;
 
 if (! function_exists('is_mail_transport_error')) {
     function is_mail_transport_error(\Throwable $e): bool
     {
+        $class = $e::class;
         $message = strtolower($e->getMessage());
+
+        if (
+            str_contains($class, 'Mailer')
+            || str_contains($class, 'Mail')
+            || str_contains($class, 'UnexpectedResponseException')
+            || str_contains($class, 'TransportException')
+            || str_contains($class, 'RfcComplianceException')
+        ) {
+            return true;
+        }
 
         return str_contains($message, 'mail')
             || str_contains($message, 'smtp')
@@ -17,7 +30,45 @@ if (! function_exists('is_mail_transport_error')) {
             || str_contains($message, 'stream_socket')
             || str_contains($message, 'certificate')
             || str_contains($message, 'connection could not be established')
-            || str_contains($message, 'failed to authenticate');
+            || str_contains($message, 'failed to authenticate')
+            || str_contains($message, 'recipient address rejected')
+            || str_contains($message, 'user unknown')
+            || str_contains($message, 'mailbox')
+            || str_contains($message, 'expected response code')
+            || str_contains($message, '550 ')
+            || str_contains($message, '553 ')
+            || str_contains($message, '554 ');
+    }
+}
+
+if (! function_exists('email_logs_ready')) {
+    function email_logs_ready(): bool
+    {
+        try {
+            return class_exists(EmailLog::class) && Schema::hasTable('email_logs');
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+}
+
+if (! function_exists('log_email_event')) {
+    /**
+     * Persist a row in email_logs (sent / failed / pending).
+     */
+    function log_email_event(array $attributes): ?EmailLog
+    {
+        if (! email_logs_ready()) {
+            return null;
+        }
+
+        try {
+            return EmailLog::create($attributes);
+        } catch (\Throwable $e) {
+            Log::error('email_logs write failed: '.$e->getMessage());
+
+            return null;
+        }
     }
 }
 
@@ -75,6 +126,16 @@ if (! function_exists('safe_notify')) {
             ]);
 
             if (is_mail_transport_error($e)) {
+                log_email_event([
+                    'to' => is_object($notifiable) ? ($notifiable->email ?? null) : null,
+                    'notification' => is_object($notification) ? $notification::class : null,
+                    'status' => EmailLog::STATUS_FAILED,
+                    'error' => $e->getMessage(),
+                    'context' => $context ?: 'safe_notify',
+                    'related_type' => is_object($notifiable) ? $notifiable::class : null,
+                    'related_id' => is_object($notifiable) && isset($notifiable->id) ? $notifiable->id : null,
+                ]);
+
                 notify_super_admin_mail_failure($e->getMessage(), $context);
             }
 
@@ -98,6 +159,14 @@ if (! function_exists('safe_mail_route_notify')) {
             Log::warning('Mail route notification failed ('.$context.'): '.$e->getMessage());
 
             if (is_mail_transport_error($e)) {
+                log_email_event([
+                    'to' => $email,
+                    'notification' => is_object($notification) ? $notification::class : null,
+                    'status' => EmailLog::STATUS_FAILED,
+                    'error' => $e->getMessage(),
+                    'context' => $context ?: 'safe_mail_route_notify',
+                ]);
+
                 notify_super_admin_mail_failure($e->getMessage(), $context);
             }
 
@@ -116,6 +185,13 @@ if (! function_exists('safe_dispatch_order_event')) {
 
             if (is_mail_transport_error($e)) {
                 $orderId = $event->order->id ?? null;
+                log_email_event([
+                    'status' => EmailLog::STATUS_FAILED,
+                    'error' => $e->getMessage(),
+                    'context' => $context ?: 'safe_dispatch_order_event',
+                    'related_type' => isset($event->order) ? $event->order::class : null,
+                    'related_id' => $orderId,
+                ]);
                 notify_super_admin_mail_failure($e->getMessage(), $context, $orderId);
             }
         }

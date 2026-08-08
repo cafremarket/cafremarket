@@ -58,6 +58,7 @@ return [
     'payment_methods' => 'Métodos de pagamento',
     'payment_statuses' => 'Status de pagamento',
     'email_templates' => 'Modelos de e-mail',
+    'email_logs' => 'Registos de e-mail',
     'configurations' => 'Configurações',
     'general' => 'Configuração geral',
     'orders' => 'Encomendas',

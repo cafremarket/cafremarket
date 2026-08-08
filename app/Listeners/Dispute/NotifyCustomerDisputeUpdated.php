@@ -42,6 +42,6 @@ class NotifyCustomerDisputeUpdated implements ShouldQueue
             ]);
         }
 
-        $event->reply->repliable->customer->notify(new DisputeUpdatedNotification($event->reply));
+        safe_notify($event->reply->repliable->customer, new DisputeUpdatedNotification($event->reply), 'dispute updated');
     }
 }

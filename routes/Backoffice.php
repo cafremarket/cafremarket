@@ -123,6 +123,7 @@ Route::middleware('auth')->name('admin.')->prefix('admin')->group(function () {
         // Utility Routes for Admin/Merchant
         Route::name('utility.')->prefix('utility')->group(function () {
             include 'admin/EmailTemplate.php';
+            include 'admin/EmailLog.php';
             include 'admin/PdfTemplate.php';
             include 'admin/Faq.php';
             include 'admin/Page.php';

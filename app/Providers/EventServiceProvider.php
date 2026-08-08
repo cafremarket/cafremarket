@@ -257,6 +257,15 @@ class EventServiceProvider extends ServiceProvider
             ]);
 
             if ($event->exception && is_mail_transport_error($event->exception)) {
+                if (function_exists('log_email_event')) {
+                    log_email_event([
+                        'status' => \App\Models\EmailLog::STATUS_FAILED,
+                        'error' => $event->exception->getMessage(),
+                        'context' => 'queued job: '.$event->job->resolveName(),
+                        'meta' => ['exception' => $event->exception::class],
+                    ]);
+                }
+
                 notify_super_admin_mail_failure(
                     $event->exception->getMessage(),
                     'queued job: '.$event->job->resolveName()

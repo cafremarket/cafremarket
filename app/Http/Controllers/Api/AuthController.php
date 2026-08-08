@@ -48,7 +48,7 @@ class AuthController extends Controller
         $customer = Customer::create($data);
 
         // Sent email address verification notice to customer
-        $customer->notify(new EmailVerificationNotification($customer));
+        safe_notify($customer, new EmailVerificationNotification($customer), 'api register verification');
 
         $customer->generateToken();
 
@@ -142,7 +142,7 @@ class AuthController extends Controller
             );
 
         if ($customer && $passwordReset) {
-            $customer->notify(new SendPasswordResetEmail($token, $url));
+            safe_notify($customer, new SendPasswordResetEmail($token, $url), 'api password reset');
         }
 
         return response()->json(['message' => trans('api.password_reset_link_sent')], 201);
@@ -213,7 +213,7 @@ class AuthController extends Controller
 
         DB::table('password_resets')->where('token', $request->token)->delete();
 
-        $customer->notify(new PasswordResetSuccess($customer));
+        safe_notify($customer, new PasswordResetSuccess($customer), 'api password reset success');
 
         return response()->json([
             'message' => trans('api.password_reset_successful'),

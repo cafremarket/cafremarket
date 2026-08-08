@@ -32,6 +32,6 @@ class SendAcknowledgementNotification implements ShouldQueue
      */
     public function handle(DisputeCreated $event)
     {
-        $event->dispute->customer->notify(new AcknowledgementNotification($event->dispute));
+        safe_notify($event->dispute->customer, new AcknowledgementNotification($event->dispute), 'dispute acknowledgement');
     }
 }

@@ -35,7 +35,7 @@ class SendLoginInfo implements ShouldQueue
     public function handle(UserCreated $event)
     {
         try {
-            $event->user->notify(new UserCreatedNotification($event->user, $event->admin, $event->password));
+            safe_notify($event->user, new UserCreatedNotification($event->user, $event->admin, $event->password), 'user login info');
         } catch (Throwable $e) {
             Log::warning('User created but login email could not be sent.', [
                 'user_id' => $event->user->id,

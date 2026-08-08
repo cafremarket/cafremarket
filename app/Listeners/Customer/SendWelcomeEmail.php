@@ -32,6 +32,6 @@ class SendWelcomeEmail implements ShouldQueue
      */
     public function handle(Registered $event)
     {
-        $event->customer->notify(new CustomerRegister($event->customer));
+        safe_notify($event->customer, new CustomerRegister($event->customer), 'customer welcome');
     }
 }

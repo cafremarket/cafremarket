@@ -52,7 +52,7 @@ class NotifyAssociatedUsers
             $receipent = $associate->getName();
 
             try {
-                $associate->notify(new NewMessage($receipent, $sender, $event->text, $repliable));
+                safe_notify($associate, new NewMessage($receipent, $sender, $event->text, $repliable), 'chat new message');
             } catch (\Throwable $e) {
                 report($e);
             }

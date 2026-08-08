@@ -32,6 +32,6 @@ class SendAcknowledgementNotification implements ShouldQueue
      */
     public function handle(TicketCreated $event)
     {
-        $event->ticket->user->notify(new SendAcknowledgement($event->ticket));
+        safe_notify($event->ticket->user, new SendAcknowledgement($event->ticket), 'ticket acknowledgement');
     }
 }

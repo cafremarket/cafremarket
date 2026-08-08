@@ -32,6 +32,6 @@ class NotifyUserTicketUpdated implements ShouldQueue
      */
     public function handle(TicketUpdated $event)
     {
-        $event->ticket->user->notify(new TicketUpdatedNotification($event->ticket));
+        safe_notify($event->ticket->user, new TicketUpdatedNotification($event->ticket), 'ticket updated');
     }
 }

@@ -96,6 +96,12 @@ class AppServiceProvider extends ServiceProvider
         // Cashier::ignoreMigrations();
         Cashier::useCustomerModel('App\\Models\\Shop');
 
+        // Swallow SMTP / recipient errors system-wide for notification mails.
+        $this->app->bind(
+            \Illuminate\Notifications\Channels\MailChannel::class,
+            \App\Notifications\Channels\SafeMailChannel::class
+        );
+
         // Payment method binding for wallet deposit / checkout (not subscription billing)
         if ($this->shouldResolvePaymentBinding()) {
             $className = $this->resolvePaymentDependency((string) Request::get('payment_method'));

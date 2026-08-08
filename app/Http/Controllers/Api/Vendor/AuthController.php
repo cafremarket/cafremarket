@@ -82,7 +82,7 @@ class AuthController extends Controller
         // Send notification to Admin
         if (config('system_settings.notify_when_vendor_registered')) {
             $system = System::orderBy('id', 'asc')->first();
-            $system->superAdmin()->notify(new VendorRegisteredNotification($merchant));
+            safe_notify($system->superAdmin(), new VendorRegisteredNotification($merchant), 'api vendor registered');
         }
 
         return new MerchantResource($merchant);
@@ -174,7 +174,7 @@ class AuthController extends Controller
         event(new ShopCreated($merchant->owns));
 
         // Send email verification notification
-        $merchant->notify(new EmailVerificationNotification($merchant));
+        safe_notify($merchant, new EmailVerificationNotification($merchant), 'api merchant verification');
     }
 
     /**
@@ -221,7 +221,7 @@ class AuthController extends Controller
             );
 
         if ($user && $passwordReset) {
-            $user->notify(new SendPasswordResetEmail($token, $url));
+            safe_notify($user, new SendPasswordResetEmail($token, $url), 'api vendor password reset');
         }
 
         return response()->json(['message' => trans('api.password_reset_link_sent')], 201);
@@ -292,7 +292,7 @@ class AuthController extends Controller
 
         DB::table('password_resets')->where('token', $request->token)->delete();
 
-        $user->notify(new PasswordResetSuccess($user));
+        safe_notify($user, new PasswordResetSuccess($user), 'api vendor password reset success');
 
         return response()->json([
             'message' => trans('api.password_reset_successful'),

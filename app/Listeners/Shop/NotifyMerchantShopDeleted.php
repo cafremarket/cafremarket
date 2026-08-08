@@ -37,6 +37,6 @@ class NotifyMerchantShopDeleted implements ShouldQueue
         $shop = Shop::withTrashed()->find($event->shop_id);
         $merchant = User::withTrashed()->find($shop->owner_id);
 
-        $merchant->notify(new ShopDeletedNotification);
+        safe_notify($merchant, new ShopDeletedNotification, 'shop deleted');
     }
 }

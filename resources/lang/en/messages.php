@@ -22,6 +22,7 @@ return [
     'trashed' => ':model has been moved to trash!',
     'restored' => ':model has been restored successfully!',
     'deleted' => ':model has been deleted permanently!',
+    'mail_send_failed_soft' => 'The action was saved, but the email could not be delivered. Check Email logs for details.',
     'card_updated' => 'Credit card updated successfully!',
     'demo_restriction' => 'This action is restricted for the demo mode!',
     'subscription_cancelled' => 'Subscription has been cancelled!',

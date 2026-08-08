@@ -32,6 +32,6 @@ class NotifyAdminSystemIsLive implements ShouldQueue
      */
     public function handle(SystemIsLive $event)
     {
-        $event->system->superAdmin()->notify(new SystemIsLiveNotification($event->system));
+        safe_notify($event->system->superAdmin(), new SystemIsLiveNotification($event->system), 'system is live');
     }
 }

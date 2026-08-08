@@ -32,6 +32,6 @@ class NotifyMerchantShopUpdated implements ShouldQueue
      */
     public function handle(ShopUpdated $event)
     {
-        $event->shop->owner->notify(new ShopUpdatedNotification($event->shop));
+        safe_notify($event->shop->owner, new ShopUpdatedNotification($event->shop), 'shop updated');
     }
 }

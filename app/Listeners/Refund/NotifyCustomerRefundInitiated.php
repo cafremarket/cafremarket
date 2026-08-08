@@ -8,7 +8,6 @@ use App\Notifications\Refund\Approved as RefundApprovedNotification;
 use App\Notifications\Refund\Declined as RefundDeclinedNotification;
 use App\Notifications\Refund\Initiated as RefundInitiatedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Notification;
 
 class NotifyCustomerRefundInitiated implements ShouldQueue
 {
@@ -46,22 +45,18 @@ class NotifyCustomerRefundInitiated implements ShouldQueue
                 setSystemConfig($event->refund->shop_id);
             }
 
-            $notifiable = null;
-
-            if ($event->refund->customer_id) {
-                $notifiable = $event->refund->order->customer;
-            } elseif ($event->refund->order->email) {  // Customer is a guest
-                $notifiable = Notification::route('mail', $event->refund->order->email);
+            if ($event->refund->status == Refund::STATUS_APPROVED) {
+                $notification = new RefundApprovedNotification($event->refund);
+            } elseif ($event->refund->status == Refund::STATUS_DECLINED) {
+                $notification = new RefundDeclinedNotification($event->refund);
+            } else {
+                $notification = new RefundInitiatedNotification($event->refund);
             }
 
-            if ($notifiable) {
-                if ($event->refund->status == Refund::STATUS_APPROVED) {
-                    $notifiable->notify(new RefundApprovedNotification($event->refund));
-                } elseif ($event->refund->status == Refund::STATUS_DECLINED) {
-                    $notifiable->notify(new RefundDeclinedNotification($event->refund));
-                } else {
-                    $notifiable->notify(new RefundInitiatedNotification($event->refund));
-                }
+            if ($event->refund->customer_id) {
+                safe_notify($event->refund->order->customer, $notification, 'refund initiated');
+            } elseif ($event->refund->order->email) {  // Customer is a guest
+                safe_mail_route_notify($event->refund->order->email, $notification, 'refund initiated guest');
             }
         }
     }

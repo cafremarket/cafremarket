@@ -32,6 +32,6 @@ class NotifyAdminSystemIsDown implements ShouldQueue
      */
     public function handle(DownForMaintainace $event)
     {
-        $event->system->superAdmin()->notify(new SystemDownNotification($event->system));
+        safe_notify($event->system->superAdmin(), new SystemDownNotification($event->system), 'system down');
     }
 }

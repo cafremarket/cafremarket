@@ -43,6 +43,10 @@ class SubscriptionJob implements ShouldQueue
     public function handle()
     {
         // Send notifications to shop.
-        $this->shop->notify(new $this->notifiable($this->shop, $this->expire_date));
+        safe_notify(
+            $this->shop,
+            new $this->notifiable($this->shop, $this->expire_date),
+            'subscription job'
+        );
     }
 }

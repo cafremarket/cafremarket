@@ -716,12 +716,18 @@
             @endcan
 
             @if (Auth::user()->isAdmin())
+              <li class="{{ Request::is('admin/utility/emailLog*') ? 'active' : '' }}">
+                <a href="{{ route('admin.utility.emailLog.index') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.email_logs') }}
+                </a>
+              </li>
+
               <li class="{{ Request::is('admin/utility/pdfTemplate*') ? 'active' : '' }}">
                 <a href="{{ route('admin.utility.pdfTemplate.index') }}">
                   <i class="fa fa-angle-double-right"></i> {{ trans('nav.pdf_template') }}
                 </a>
               </li>
-            @endcan
+            @endif
 
             @if (Auth::user()->isAdmin() && is_incevio_package_loaded('smartForm'))
               @include('smartForm::_nav_admin_sidebar')

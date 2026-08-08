@@ -367,7 +367,7 @@ class Customer extends CustomerWallet
      */
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new CustomerResetPasswordNotification($token));
+        safe_notify($this, new CustomerResetPasswordNotification($token), 'customer password reset');
     }
 
     /**

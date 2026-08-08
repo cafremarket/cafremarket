@@ -40,8 +40,11 @@ class SendNotificationJob implements ShouldQueue
     public function handle()
     {
         if ($this->transaction->payable) {
-            // Send notifications to all active channels
-            $this->transaction->payable->notify(new $this->notifiable($this->transaction));
+            safe_notify(
+                $this->transaction->payable,
+                new $this->notifiable($this->transaction),
+                'wallet SendNotificationJob'
+            );
         }
     }
 }

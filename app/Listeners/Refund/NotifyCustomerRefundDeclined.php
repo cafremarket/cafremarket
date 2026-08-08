@@ -5,7 +5,6 @@ namespace App\Listeners\Refund;
 use App\Events\Refund\RefundDeclined;
 use App\Notifications\Refund\Declined as RefundDeclinedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Notification;
 
 class NotifyCustomerRefundDeclined implements ShouldQueue
 {
@@ -41,16 +40,12 @@ class NotifyCustomerRefundDeclined implements ShouldQueue
             setSystemConfig($event->refund->shop_id);
         }
 
-        if ($event->refund->customer_id) {
-            $notifiable = $event->refund->order->customer;
-        } elseif ($event->refund->order->email) {  // Customer is a guest
-            $notifiable = Notification::route('mail', $event->refund->order->email);
-        } else {
-            $notifiable = null;
-        }
+        $notification = new RefundDeclinedNotification($event->refund);
 
-        if ($notifiable) {
-            $notifiable->notify(new RefundDeclinedNotification($event->refund));
+        if ($event->refund->customer_id) {
+            safe_notify($event->refund->order->customer, $notification, 'refund declined');
+        } elseif ($event->refund->order->email) {  // Customer is a guest
+            safe_mail_route_notify($event->refund->order->email, $notification, 'refund declined guest');
         }
     }
 }

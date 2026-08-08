@@ -33,7 +33,7 @@ class WebhookController extends CashierController
         app(InvoiceRepository::class)->create($shop, $invoice);
 
         // Send invoice notification to shop owner
-        $shop->owner->notify(new SendsInvoiceNotifications($shop, $invoice));
+        safe_notify($shop->owner, new SendsInvoiceNotifications($shop, $invoice), 'webhook invoice');
     }
 
     /**

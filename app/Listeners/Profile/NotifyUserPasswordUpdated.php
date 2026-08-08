@@ -32,6 +32,6 @@ class NotifyUserPasswordUpdated implements ShouldQueue
      */
     public function handle(PasswordUpdated $event)
     {
-        $event->user->notify(new PasswordUpdateNotification($event->user));
+        safe_notify($event->user, new PasswordUpdateNotification($event->user), 'profile password updated');
     }
 }

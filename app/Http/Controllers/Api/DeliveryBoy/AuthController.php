@@ -124,7 +124,7 @@ class AuthController extends Controller
             ]);
 
         if ($deliveryBoy && $passwordReset) {
-            $deliveryBoy->notify(new PasswordReset($token));
+            safe_notify($deliveryBoy, new PasswordReset($token), 'delivery boy password reset');
         }
 
         return response()->json(['message' => trans('api.password_reset_email')], 201);

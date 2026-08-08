@@ -206,7 +206,7 @@ class RegisterController extends Controller
             $customer->verification_token = Str::random(40);
 
             if ($customer->save()) {
-                $customer->notify(new EmailVerificationNotification($customer));
+                safe_notify($customer, new EmailVerificationNotification($customer), 'storefront register verification');
 
                 return redirect()->back()->with('success', trans('auth.verification_link_sent'));
             }

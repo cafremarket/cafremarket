@@ -22,6 +22,7 @@ return [
     'trashed' => ':model foi movido para a lixeira!',
     'restored' => ':model foi restaurado com sucesso!',
     'deleted' => ':model foi excluído permanentemente!',
+    'mail_send_failed_soft' => 'A ação foi guardada, mas o e-mail não pôde ser enviado. Consulte os Registos de e-mail para detalhes.',
     'card_updated' => 'Cartão de crédito atualizado com sucesso!',
     'demo_restriction' => 'Esta ação é restrita no modo demo!',
     'subscription_cancelled' => 'Assinatura cancelada!',

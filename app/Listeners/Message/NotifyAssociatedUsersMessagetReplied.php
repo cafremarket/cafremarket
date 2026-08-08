@@ -6,7 +6,6 @@ use App\Events\Message\MessageReplied;
 use App\Notifications\Message\Replied as MessageRepliedNotification;
 use App\Services\FCMService;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Notification;
 
 class NotifyAssociatedUsersMessagetReplied implements ShouldQueue
 {
@@ -54,22 +53,30 @@ class NotifyAssociatedUsersMessagetReplied implements ShouldQueue
 
         if ($event->reply->user_id) {
             if ($event->reply->repliable->customer->email) {
-                $event->reply->repliable->customer->notify(
-                    new MessageRepliedNotification($event->reply, $event->reply->repliable->customer->getName())
+                safe_notify(
+                    $event->reply->repliable->customer,
+                    new MessageRepliedNotification($event->reply, $event->reply->repliable->customer->getName()),
+                    'message replied customer'
                 );
             } elseif ($event->reply->repliable->email) {
-                Notification::route('mail', $event->reply->repliable->email)
-                    // ->route('nexmo', '5555555555')
-                    ->notify(new MessageRepliedNotification($event->reply, $event->reply->repliable->name));
+                safe_mail_route_notify(
+                    $event->reply->repliable->email,
+                    new MessageRepliedNotification($event->reply, $event->reply->repliable->name),
+                    'message replied guest'
+                );
             }
         } elseif ($event->reply->customer_id) {
             if ($event->reply->repliable->user->email) {
-                $event->reply->repliable->user->notify(
-                    new MessageRepliedNotification($event->reply, $event->reply->repliable->user->getName())
+                safe_notify(
+                    $event->reply->repliable->user,
+                    new MessageRepliedNotification($event->reply, $event->reply->repliable->user->getName()),
+                    'message replied user'
                 );
             } elseif (config('shop_settings.notify_new_message')) {
-                $event->reply->repliable->shop->notify(
-                    new MessageRepliedNotification($event->reply, $event->reply->repliable->shop->name)
+                safe_notify(
+                    $event->reply->repliable->shop,
+                    new MessageRepliedNotification($event->reply, $event->reply->repliable->shop->name),
+                    'message replied shop'
                 );
             }
         }

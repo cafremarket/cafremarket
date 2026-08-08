@@ -118,7 +118,7 @@ class DisputeController extends Controller
         // Send notification to Admin
         if (config('system_settings.notify_when_dispute_appealed')) {
             $system = System::orderBy('id', 'asc')->first();
-            $system->superAdmin()->notify(new DisputeAppealedNotification($response));
+            safe_notify($system->superAdmin(), new DisputeAppealedNotification($response), 'storefront dispute appealed');
         }
 
         event(new DisputeUpdated($response));

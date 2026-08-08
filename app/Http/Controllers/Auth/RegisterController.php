@@ -115,7 +115,7 @@ class RegisterController extends Controller
             // Send notification to Admin
             if (config('system_settings.notify_when_vendor_registered')) {
                 $system = System::orderBy('id', 'asc')->first();
-                $system->superAdmin()->notify(new VendorRegisteredNotification($merchant));
+                safe_notify($system->superAdmin(), new VendorRegisteredNotification($merchant), 'vendor registered');
             }
 
             return redirect()->route('vendor.phoneverification.notice')->with(['phone_number' => $phone]);
@@ -157,7 +157,7 @@ class RegisterController extends Controller
         // Send notification to Admin
         if (config('system_settings.notify_when_vendor_registered')) {
             $system = System::orderBy('id', 'asc')->first();
-            $system->superAdmin()->notify(new VendorRegisteredNotification($merchant));
+            safe_notify($system->superAdmin(), new VendorRegisteredNotification($merchant), 'vendor registered');
         }
 
         return $this->registered($request, $merchant) ?? redirect($this->redirectPath());
@@ -200,7 +200,7 @@ class RegisterController extends Controller
         event(new ShopCreated($merchant->owns));
 
         // Send email verification notification
-        $merchant->notify(new EmailVerificationNotification($merchant));
+        safe_notify($merchant, new EmailVerificationNotification($merchant), 'merchant email verification');
     }
 
     /**
@@ -217,7 +217,7 @@ class RegisterController extends Controller
             $user->verification_token = Str::random(40);
 
             if ($user->save()) {
-                $user->notify(new EmailVerificationNotification($user));
+                safe_notify($user, new EmailVerificationNotification($user), 'user email verification');
 
                 return redirect()->back()->with('success', trans('auth.verification_link_sent'));
             }

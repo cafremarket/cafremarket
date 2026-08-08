@@ -8,7 +8,6 @@ use App\Models\System;
 use App\Notifications\Message\NewMessage as NewMessageNotification;
 use App\Services\FCMService;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Notification;
 
 class SendNewMessageNotificationToReceiver implements ShouldQueue
 {
@@ -57,19 +56,21 @@ class SendNewMessageNotificationToReceiver implements ShouldQueue
         if ($event->message->label == Message::LABEL_INBOX) {
             if ($event->message->shop_id) {
                 if (config('shop_settings.notify_new_message')) {
-                    $event->message->shop->notify(new NewMessageNotification($event->message, $event->message->shop->name));
+                    safe_notify($event->message->shop, new NewMessageNotification($event->message, $event->message->shop->name), 'new message shop');
                 }
             } elseif (config('system_settings.notify_new_message')) {
                 $system = System::orderBy('id', 'asc')->first();
-                $system->notify(new NewMessageNotification($event->message, $system->superAdmin->getName()));
+                safe_notify($system, new NewMessageNotification($event->message, $system->superAdmin->getName()), 'new message system');
             }
         } elseif ($event->message->label == Message::LABEL_SENT) {
             if ($event->message->order_id && $event->message->email) {
-                Notification::route('mail', $event->message->email)
-                    // ->route('nexmo', '5555555555')
-                    ->notify(new NewMessageNotification($event->message, trans('app.guest_customer'), true));
+                safe_mail_route_notify(
+                    $event->message->email,
+                    new NewMessageNotification($event->message, trans('app.guest_customer'), true),
+                    'new message guest'
+                );
             } else {
-                $event->message->customer->notify(new NewMessageNotification($event->message, $event->message->customer->getName()));
+                safe_notify($event->message->customer, new NewMessageNotification($event->message, $event->message->customer->getName()), 'new message customer');
             }
         }
     }

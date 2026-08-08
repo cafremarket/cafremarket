@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -41,6 +42,23 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $exception)
     {
+        if (function_exists('is_mail_transport_error') && is_mail_transport_error($exception)) {
+            Log::channel('mail')->warning('Mail transport error reported: '.$exception->getMessage());
+
+            if (function_exists('log_email_event')) {
+                log_email_event([
+                    'status' => \App\Models\EmailLog::STATUS_FAILED,
+                    'error' => $exception->getMessage(),
+                    'context' => 'ExceptionHandler',
+                    'meta' => ['exception' => $exception::class],
+                ]);
+            }
+
+            if (function_exists('notify_super_admin_mail_failure')) {
+                notify_super_admin_mail_failure($exception->getMessage(), 'ExceptionHandler');
+            }
+        }
+
         parent::report($exception);
     }
 
@@ -52,6 +70,22 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        // Never surface SMTP / recipient rejection errors as 500 pages.
+        if (function_exists('is_mail_transport_error') && is_mail_transport_error($exception)) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'mail_warning' => true,
+                    'message' => trans('messages.mail_send_failed_soft'),
+                ], 200);
+            }
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('warning', trans('messages.mail_send_failed_soft'));
+        }
+
         if ($request->expectsJson()) {
             if ($exception instanceof ModelNotFoundException) {
                 return response()->json(['error' => trans('responses.resource_not_found')], 404);

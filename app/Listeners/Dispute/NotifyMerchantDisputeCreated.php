@@ -37,7 +37,7 @@ class NotifyMerchantDisputeCreated implements ShouldQueue
         }
 
         if (config('shop_settings.notify_new_disput')) {
-            $event->dispute->shop->notify(new DisputeCreatedNotification($event->dispute));
+            safe_notify($event->dispute->shop, new DisputeCreatedNotification($event->dispute), 'dispute created merchant');
         }
     }
 }

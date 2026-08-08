@@ -33,9 +33,9 @@ class NotifyAssociatedUsersTicketReplied implements ShouldQueue
     public function handle(TicketReplied $event)
     {
         if ($event->reply->user->isFromPlatform()) {
-            $event->reply->repliable->user->notify(new TicketRepliedNotification($event->reply, $event->reply->repliable->user->getName()));
+            safe_notify($event->reply->repliable->user, new TicketRepliedNotification($event->reply, $event->reply->repliable->user->getName()), 'ticket replied user');
         } elseif ($event->reply->repliable->assignedTo) {
-            $event->reply->repliable->assignedTo->notify(new TicketRepliedNotification($event->reply, $event->reply->repliable->assignedTo->getName()));
+            safe_notify($event->reply->repliable->assignedTo, new TicketRepliedNotification($event->reply, $event->reply->repliable->assignedTo->getName()), 'ticket replied assignee');
         }
     }
 }

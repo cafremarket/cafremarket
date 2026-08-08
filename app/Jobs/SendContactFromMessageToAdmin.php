@@ -43,7 +43,7 @@ class SendContactFromMessageToAdmin implements ShouldQueue
     {
         if (config('system_settings.notify_new_message')) {
             $system = System::orderBy('id', 'asc')->first();
-            $system->notify(new NewContactUsMessage($this->message));
+            safe_notify($system, new NewContactUsMessage($this->message), 'contact us message');
         }
     }
 }

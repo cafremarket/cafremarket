@@ -32,6 +32,6 @@ class NotifyCustomerDisputeSolved implements ShouldQueue
      */
     public function handle(DisputeSolved $event)
     {
-        $event->dispute->customer->notify(new DisputeSolvedNotification($event->dispute));
+        safe_notify($event->dispute->customer, new DisputeSolvedNotification($event->dispute), 'dispute solved');
     }
 }

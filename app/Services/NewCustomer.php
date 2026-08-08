@@ -21,7 +21,7 @@ class NewCustomer
         ]);
 
         // Sent email address verification notich to customer
-        $customer->notify(new EmailVerificationNotification($customer));
+        safe_notify($customer, new EmailVerificationNotification($customer), 'new customer verification');
 
         $customer->addresses()->create($request->all()); // Save address
 

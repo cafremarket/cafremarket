@@ -103,9 +103,9 @@ class DisputeController extends Controller
             $system = System::orderBy('id', 'asc')->first();
 
             if ($current_status != $old_status) {
-                $system->superAdmin()->notify(new DisputeAppealedNotification($response));
+                safe_notify($system->superAdmin(), new DisputeAppealedNotification($response), 'admin dispute appealed');
             } else {
-                $system->superAdmin()->notify(new AppealedDisputeRepliedNotification($response));
+                safe_notify($system->superAdmin(), new AppealedDisputeRepliedNotification($response), 'admin dispute reply');
             }
         }
 

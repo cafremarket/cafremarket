@@ -32,6 +32,6 @@ class NotifyMerchantShopIsLive implements ShouldQueue
      */
     public function handle(ShopIsLive $event)
     {
-        $event->shop->owner->notify(new ShopIsLiveNotification($event->shop));
+        safe_notify($event->shop->owner, new ShopIsLiveNotification($event->shop), 'shop is live');
     }
 }

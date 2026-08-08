@@ -32,6 +32,6 @@ class NotifyAdminSystemUpdated implements ShouldQueue
      */
     public function handle(SystemInfoUpdated $event)
     {
-        $event->system->superAdmin()->notify(new SystemInfoUpdatedNotification($event->system));
+        safe_notify($event->system->superAdmin(), new SystemInfoUpdatedNotification($event->system), 'system updated');
     }
 }

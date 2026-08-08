@@ -32,6 +32,6 @@ class NotifyUserTicketAssigned implements ShouldQueue
      */
     public function handle(TicketAssigned $event)
     {
-        $event->ticket->assignedTo->notify(new TicketAssignedNotification($event->ticket));
+        safe_notify($event->ticket->assignedTo, new TicketAssignedNotification($event->ticket), 'ticket assigned');
     }
 }

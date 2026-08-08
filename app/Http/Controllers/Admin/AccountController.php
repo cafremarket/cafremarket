@@ -92,7 +92,7 @@ class AccountController extends Controller
         if (config('system_settings.notify_new_ticket')) {
             $system = System::orderBy('id', 'asc')->first();
 
-            $system->superAdmin()->notify(new TicketCreatedNotification($ticket));
+            safe_notify($system->superAdmin(), new TicketCreatedNotification($ticket), 'admin ticket created');
         }
 
         event(new TicketCreated($ticket));

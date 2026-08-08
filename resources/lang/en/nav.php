@@ -58,6 +58,7 @@ return [
     'payment_methods' => 'Payment methods',
     'payment_statuses' => 'Payment statuses',
     'email_templates' => 'Email templates',
+    'email_logs' => 'Email logs',
     'configurations' => 'Configurations',
     'general' => 'General config',
     'orders' => 'Orders',

@@ -32,6 +32,6 @@ class NotifyMerchantShopDownForMaintainace implements ShouldQueue
      */
     public function handle(DownForMaintainace $event)
     {
-        $event->shop->owner->notify(new ShopDownForMaintainace($event->shop));
+        safe_notify($event->shop->owner, new ShopDownForMaintainace($event->shop), 'shop maintenance');
     }
 }

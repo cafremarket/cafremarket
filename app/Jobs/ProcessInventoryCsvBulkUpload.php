@@ -186,7 +186,7 @@ class ProcessInventoryCsvBulkUpload implements ShouldQueue
         // When the job processing on current request cycle
         if (config('queue.default') != 'sync' && ! empty($failed_rows)) {
             $this->failed_file_path = $this->createAttachmentWithFailedRows();
-            $this->user->notify(new ProcessedCsvImport($failed_rows, $this->success_counter, $this->failed_file_path));
+            safe_notify($this->user, new ProcessedCsvImport($failed_rows, $this->success_counter, $this->failed_file_path), 'inventory csv upload');
         }
 
         return $failed_rows;
