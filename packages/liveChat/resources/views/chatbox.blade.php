@@ -334,6 +334,10 @@
         $("#conversationBox").append(pendingNode);
         updateScroll('conversationBox');
         $("textarea#message").val('');
+        var ajaxStartedAt = Date.now();
+        if (window.console && console.log) {
+          console.log('[chat-ws-web ' + new Date().toISOString() + '] AJAX reply start (optimistic shown)');
+        }
 
         var openChatboxEarly = document.querySelector('[id^="openChatbox-"]');
         if (openChatboxEarly && openChatboxEarly.id) {
@@ -352,6 +356,10 @@
           type: 'POST',
           data: ajaxData,
           complete: function(xhr, textStatus) {
+            var ajaxMs = Date.now() - ajaxStartedAt;
+            if (window.console && console.log) {
+              console.log('[chat-ws-web ' + new Date().toISOString() + '] AJAX reply done status=' + xhr.status + ' ms=' + ajaxMs);
+            }
             switch (xhr.status) {
               case 200: {
                 if (fileInput) {
@@ -458,15 +466,27 @@
       var wsUrl = wsScheme + '://' + wsHost + (wsPath ? wsPath : (':' + wsPort));
       var room = '{{ get_vendor_chat_room_id() }}';
       var socket = null;
+      var CHAT_WS_DEBUG = true;
+
+      function chatWsLog() {
+        if (!CHAT_WS_DEBUG || !window.console || !console.log) return;
+        var args = Array.prototype.slice.call(arguments);
+        args.unshift('[chat-ws-web ' + new Date().toISOString() + ']');
+        console.log.apply(console, args);
+      }
 
       function connectSocket() {
+        chatWsLog('connecting', wsUrl, 'room=', room);
+        var tConnect = Date.now();
         try {
           socket = new WebSocket(wsUrl);
         } catch (e) {
+          chatWsLog('connect ERROR', e && e.message ? e.message : e);
           return;
         }
 
         socket.onopen = function() {
+          chatWsLog('OPEN in', (Date.now() - tConnect) + 'ms → subscribe', room);
           socket.send(JSON.stringify({
             action: 'subscribe',
             room: room
@@ -474,23 +494,48 @@
         };
 
         socket.onmessage = function(event) {
+          var tRecv = Date.now();
           var parsed;
           try {
             parsed = JSON.parse(event.data);
           } catch (e) {
+            chatWsLog('bad JSON', event.data);
+            return;
+          }
+
+          if (parsed && parsed.ok && parsed.subscribed) {
+            chatWsLog('SUBSCRIBED', parsed.subscribed, parsed._debug || '', 'server_ts=', parsed.server_ts);
+            return;
+          }
+
+          if (parsed && parsed.ok && parsed.pong) {
             return;
           }
 
           if (!parsed || parsed.event !== 'chat.message' || !parsed.data) {
+            chatWsLog('ignored frame', parsed);
             return;
           }
 
           var result = parsed.data;
           var senderType = result.sender_type || '';
+          var pubMs = result._published_ms || null;
+          var clientLag = pubMs ? (tRecv - pubMs) : null;
+          var serverLag = parsed._debug && parsed._debug.lag_ms != null ? parsed._debug.lag_ms : null;
+          chatWsLog(
+            'MESSAGE',
+            'sender=' + senderType,
+            'reply_id=' + (result.reply_id || '-'),
+            'client_lag_ms=' + clientLag,
+            'server_lag_ms=' + serverLag,
+            'debug=', parsed._debug || null,
+            'text=', String(result.text || '').substring(0, 40)
+          );
 
           // Merchant messages from vendor app / other tabs → sync into open web chat
           if (senderType === 'merchant') {
             if (result.reply_id && $('#conversationBox [data-reply-id="' + result.reply_id + '"]').length) {
+              chatWsLog('dedupe merchant reply_id', result.reply_id);
               return;
             }
 
@@ -501,6 +546,7 @@
                 pendingMine.attr('data-reply-id', result.reply_id);
               }
               pendingMine.removeAttr('data-pending');
+              chatWsLog('upgraded pending bubble reply_id=', result.reply_id);
               return;
             }
 
@@ -526,14 +572,20 @@
                 }
                 $("#conversationBox").append(mResponse);
                 updateScroll('conversationBox');
+                chatWsLog('appended merchant to open chat');
+              } else {
+                chatWsLog('merchant msg but chatbox not open for customer', mOpenCustomerId);
               }
               mChatNode.find("p.excerpt").text(getExcerptMsg(result.text, result.attachments));
               mChatNode.find(".time span").text(result.time || '{{ trans('theme.now') }}');
+            } else {
+              chatWsLog('merchant msg: no sidebar node for customer_id=', mCustomerId, 'conv=', result.conversation_id);
             }
             return;
           }
 
           if (senderType !== 'customer') {
+            chatWsLog('ignored sender_type', senderType);
             return;
           }
 
@@ -550,6 +602,7 @@
           var newChat = prepareNewConversation(result);
 
           $("#leftsidebar .sidebarContent").append(newChat);
+          chatWsLog('new conversation sidebar row');
         } else { //Old customer
           var openCustomerId = customerId;
           if (!openCustomerId && chatNode.attr('id')) {
@@ -558,6 +611,7 @@
           var openChatbox = openCustomerId ? document.getElementById("openChatbox-" + openCustomerId) : null;
           if (openChatbox) { //The chatbox is already open
             if (result.reply_id && $('#conversationBox [data-reply-id="' + result.reply_id + '"]').length) {
+              chatWsLog('dedupe customer reply_id', result.reply_id);
               return;
             }
             response = prepareNewChatMsg(result.text, 'receiver', result.attachments || []);
@@ -566,8 +620,10 @@
             }
             $("#conversationBox").append(response);
             updateScroll('conversationBox'); //Scroll to bottom
+            chatWsLog('appended customer to open chat');
           } else { //Chatbox is not open
             markAsUnread(chatNode); // Mark as unread
+            chatWsLog('customer msg → mark unread');
           }
 
           chatNode.find("p.excerpt").text(getExcerptMsg(result.text, result.attachments)); // Update the excerpt on left menu
@@ -576,8 +632,13 @@
 
         };
 
-        socket.onclose = function() {
+        socket.onclose = function(ev) {
+          chatWsLog('CLOSE code=', ev.code, 'reason=', ev.reason || '', '→ reconnect 1200ms');
           setTimeout(connectSocket, 1200);
+        };
+
+        socket.onerror = function() {
+          chatWsLog('ERROR on socket');
         };
       }
 
