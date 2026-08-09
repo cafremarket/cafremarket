@@ -7,6 +7,7 @@ use App\Common\Repliable;
 use App\Models\BaseModel;
 use App\Models\Customer;
 use App\Models\Shop;
+use App\Services\ChatSocketPublisher;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ChatConversation extends BaseModel
@@ -97,6 +98,8 @@ class ChatConversation extends BaseModel
     /**
      * Mark peer replies as read for the given viewer.
      * merchant → marks customer replies; customer → marks merchant replies.
+     *
+     * Publishes `chat.read` so apps can flip blue ticks without waiting on HTTP poll.
      */
     public function markPeerRepliesAsRead(string $viewer = 'merchant'): int
     {
@@ -112,7 +115,39 @@ class ChatConversation extends BaseModel
             $query->whereNotNull('customer_id');
         }
 
-        return $query->update(['read' => true]);
+        $ids = (clone $query)->pluck('id')->all();
+        if (empty($ids)) {
+            return 0;
+        }
+
+        $updated = $query->update(['read' => true]);
+
+        if ($updated > 0) {
+            $this->loadMissing('shop');
+            $payload = [
+                'conversation_id' => $this->id,
+                'viewer' => $viewer,
+                'reply_ids' => array_values(array_map('intval', $ids)),
+                'customer_id' => $this->customer_id,
+                'shop_id' => $this->shop_id,
+            ];
+
+            ChatSocketPublisher::publish(
+                get_chat_room_name($this->shop_id.$this->customer_id),
+                'chat.read',
+                $payload
+            );
+
+            if ($this->shop) {
+                ChatSocketPublisher::publish(
+                    get_vendor_chat_room_id($this->shop),
+                    'chat.read',
+                    $payload
+                );
+            }
+        }
+
+        return $updated;
     }
 
     /**
