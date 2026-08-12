@@ -327,7 +327,7 @@ class OrderController extends Controller
             FCMService::send($deliveryBoy_token, [
                 'title' => trans('notifications.order_assigned.subject', ['order' => $order->order_number]),
                 'body' => trans('notifications.order_assigned.message'),
-            ]);
+            ], 'delivery');
         }
 
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));

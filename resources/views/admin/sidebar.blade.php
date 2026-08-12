@@ -498,7 +498,7 @@
 
       {{-- Flash deal merge into promotions --}}
       @if (Auth::user()->isAdmin() || (new \App\Helpers\Authorize(Auth::user(), 'manage_flash_deal'))->check())
-        <li class="treeview {{ Request::is('admin/promotions*') || Request::is('admin/flashdeal*') ? 'active' : '' }}">
+        <li class="treeview {{ Request::is('admin/promotions*') || Request::is('admin/flashdeal*') || Request::is('admin/promotion/push-campaign*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
             <i class="fa fa-bullhorn"></i>
             <span>{{ trans('nav.promotions') }}</span>
@@ -509,6 +509,11 @@
               <li class="{{ Request::is('admin/promotions*') ? 'active' : '' }}">
                 <a href="{{ url('admin/promotions') }}">
                   <i class="fa fa-angle-double-right"></i> <span>{{ trans('nav.promotions') }}</span>
+                </a>
+              </li>
+              <li class="{{ Request::is('admin/promotion/push-campaign*') ? 'active' : '' }}">
+                <a href="{{ route('admin.promotion.push_campaign.index') }}">
+                  <i class="fa fa-angle-double-right"></i> <span>{{ trans('nav.push_notifications') }}</span>
                 </a>
               </li>
             @endif

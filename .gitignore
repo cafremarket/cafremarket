@@ -11,6 +11,8 @@
 /storage/installed
 /storage/logs/**
 /storage/app/analytics-api.json
+/storage/app/firebase/*.json
+!/storage/app/firebase/README.md
 /storage/ebay_refresh_token
 /storage/fonts/*.*
 /vendor/**

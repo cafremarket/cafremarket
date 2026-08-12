@@ -161,6 +161,7 @@ Route::middleware('auth')->name('admin.')->prefix('admin')->group(function () {
         Route::name('promotion.')->prefix('promotion')->group(function () {
             include 'admin/Coupon.php';
             include 'admin/GiftCard.php';
+            include 'admin/PushCampaign.php';
         });
 
         // Support Routes for Admin

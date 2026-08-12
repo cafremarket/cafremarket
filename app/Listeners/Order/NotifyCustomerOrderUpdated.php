@@ -42,7 +42,7 @@ class NotifyCustomerOrderUpdated implements ShouldQueue
             FCMService::send($deliveryBoy_token, [
                 'title' => trans('notifications.order_updated.subject', ['order' => $event->order->order_number]),
                 'body' => trans('notifications.order_updated.message', ['order' => $event->order->order_number]),
-            ]);
+            ], 'delivery');
         }
 
         if ($event->notify_customer) {
@@ -53,7 +53,7 @@ class NotifyCustomerOrderUpdated implements ShouldQueue
                 FCMService::send($customer_token, [
                     'title' => trans('notifications.order_updated.subject', ['order' => $event->order->order_number]),
                     'body' => trans('notifications.order_updated.message', ['order' => $event->order->order_number]),
-                ]);
+                ], 'customer');
             }
 
             if (! config('system_settings')) {

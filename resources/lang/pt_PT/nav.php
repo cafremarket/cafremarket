@@ -66,6 +66,7 @@ return [
     'invoices' => 'Faturas',
     'payments' => 'Pagamentos',
     'promotions' => 'Promoções',
+    'push_notifications' => 'Notificações Push',
     'coupons' => 'Cupons',
     'gift_cards' => 'Cartões de oferta',
     'faqs' => 'Perguntas frequentes',

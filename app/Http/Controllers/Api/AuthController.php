@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Notifications\Auth\CustomerResetPasswordNotification as SendPasswordResetEmail;
 use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
 use App\Notifications\Customer\PasswordUpdated as PasswordResetSuccess;
+use App\Services\FCMService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,8 +93,8 @@ class AuthController extends Controller
             $customer = Auth::guard('customer')->user();
             $customer->generateToken();
 
-            if (is_null($customer->fcm_token)) {
-                $customer->fcm_token = $request->fcm_token;
+            if ($request->filled('fcm_token')) {
+                $customer->fcm_token = FCMService::normalizeToken($request->fcm_token) ?: null;
                 $customer->save();
             }
 

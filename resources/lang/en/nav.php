@@ -66,6 +66,7 @@ return [
     'invoices' => 'Invoices',
     'payments' => 'Payments',
     'promotions' => 'Promotions',
+    'push_notifications' => 'Push Notifications',
     'coupons' => 'Coupons',
     'gift_cards' => 'Gift cards',
     'faqs' => 'Faqs',

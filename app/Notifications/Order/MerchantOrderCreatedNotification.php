@@ -38,11 +38,10 @@ class MerchantOrderCreatedNotification extends Notification implements ShouldQue
         $token = optional($this->order->shop->owner)->fcm_token;
 
         if (! is_null($token)) {
-            $token = trim($token, '"');
             FCMService::send($token, [
                 'title' => trans('notifications.order_created.subject', ['order' => $this->order->order_number]),
                 'body' => trans('notifications.order_created.message', ['order' => $this->order->order_number]),
-            ]);
+            ], 'vendor');
         }
 
         if ($this->order->device_id !== null) {

@@ -47,21 +47,21 @@ class OrderCreated extends Notification implements ShouldQueue
             FCMService::send($token, [
                 'title' => trans('notifications.order_created.subject', ['order' => $this->order->order_number]),
                 'body' => trans('notifications.order_created.message', ['order' => $this->order->order_number]),
-            ]);
+            ], 'vendor');
         }
 
         if (! is_null($customer_token)) {
             FCMService::send($customer_token, [
                 'title' => trans('notifications.order_created.subject', ['order' => $this->order->order_number]),
                 'body' => trans('notifications.order_created.message', ['order' => $this->order->order_number]),
-            ]);
+            ], 'customer');
         }
 
         if (! is_null($warehouse_admin_token)) {
-            FCMService::send($token, [
+            FCMService::send($warehouse_admin_token, [
                 'title' => trans('notifications.order_created.subject', ['order' => $this->order->order_number]),
                 'body' => trans('notifications.order_created.message', ['order' => $this->order->order_number]),
-            ]);
+            ], 'vendor');
         }
 
         if ($this->order->device_id !== null) {

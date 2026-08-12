@@ -9,6 +9,7 @@ use App\Http\Requests\DeliveryBoy\UpdatePasswordRequest;
 use App\Http\Resources\DeliveryBoyResource;
 use App\Models\DeliveryBoy;
 use App\Notifications\DeliveryBoy\PasswordReset;
+use App\Services\FCMService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,8 +37,8 @@ class AuthController extends Controller
             $deliveryboys = Auth::guard('delivery_boy')->user();
             $deliveryboys->generateToken();
 
-            if (is_null($deliveryboys->fcm_token)) {
-                $deliveryboys->fcm_token = $request->fcm_token;
+            if ($request->filled('fcm_token')) {
+                $deliveryboys->fcm_token = FCMService::normalizeToken($request->fcm_token) ?: null;
                 $deliveryboys->save();
             }
 
