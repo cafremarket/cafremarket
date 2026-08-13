@@ -59,6 +59,11 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         HomeController::class, 'product',
     ])->name('show.product');
 
+    // Chat/app share used /listing/{slug}; send browsers to the product page.
+    Route::get('listing/{slug}', function ($slug) {
+        return redirect()->route('show.product', $slug);
+    });
+
     Route::get('product/{slug}/quickView', [
         HomeController::class, 'quickViewItem',
     ])->name('quickView.product')->middleware('ajax');

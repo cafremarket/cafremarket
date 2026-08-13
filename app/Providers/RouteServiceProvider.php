@@ -65,6 +65,15 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
+        Route::get('.well-known/assetlinks.json', [
+            \App\Http\Controllers\WellKnownController::class,
+            'assetLinks',
+        ]);
+        Route::get('.well-known/apple-app-site-association', [
+            \App\Http\Controllers\WellKnownController::class,
+            'appleAppSiteAssociation',
+        ]);
+
         Route::middleware('web')
             ->group(base_path('routes/web.php'));
     }

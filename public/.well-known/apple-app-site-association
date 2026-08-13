@@ -1,0 +1,30 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "W8MMGGU484.com.daimone.cafremarket",
+        "paths": [
+          "/product/*",
+          "/listing/*",
+          "/shop/*",
+          "/brand/*",
+          "/category/*",
+          "/categories/*",
+          "/categorygrp/*",
+          "/blog/*"
+        ],
+        "components": [
+          { "/": "/product/*" },
+          { "/": "/listing/*" },
+          { "/": "/shop/*" },
+          { "/": "/brand/*" },
+          { "/": "/category/*" },
+          { "/": "/categories/*" },
+          { "/": "/categorygrp/*" },
+          { "/": "/blog/*" }
+        ]
+      }
+    ]
+  }
+}

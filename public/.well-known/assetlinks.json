@@ -1,0 +1,11 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.daimone.cafremarket",
+    "sha256_cert_fingerprints": [
+      "90:8C:7F:15:22:A4:B2:B8:BB:99:75:37:CE:1C:DF:6B:34:07:3F:9D:FA:39:4D:0E:3A:DE:E5:FB:9C:8F:4F:01",
+      "BE:16:1A:73:8B:02:97:D4:31:3E:85:C6:88:A6:70:57:77:3C:9D:4D:50:94:1A:79:06:DE:C1:34:7B:00:E1:6D"
+    ]
+  }
+}]

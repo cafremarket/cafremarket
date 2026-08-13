@@ -12,6 +12,7 @@ class PreventRequestsDuringMaintenance extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        '.well-known/assetlinks.json',
+        '.well-known/apple-app-site-association',
     ];
 }
