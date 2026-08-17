@@ -76,7 +76,7 @@
           </ul>
           <div class="tab-content">
             <div class="tab-pane active" id="description_tab">
-              {!! $shop->description !!}
+              {!! clean_rich_html($shop->description) !!}
             </div> <!-- /.tab-pane -->
 
             <div class="tab-pane" id="merchant_tab">

@@ -30,8 +30,8 @@
             </span>
           @endif
 
-          <div class="header-information show-hide-content mb-0 less">
-            {!! $shop->description !!}
+            <div class="header-information show-hide-content mb-0 less">
+            {!! clean_rich_html($shop->description) !!}
           </div>
 
           <a href="javascript::void(0)" class="small show-hide-content-btn">

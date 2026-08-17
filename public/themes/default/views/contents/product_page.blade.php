@@ -429,7 +429,7 @@
 
             <div role="tabpanel" class="tab-pane fade" id="seller_desc_tab">
               <div id="seller_seller_desc">
-                {!! $item->description !!}
+                {!! clean_rich_html($item->description) !!}
               </div>
 
               @if ($item->shop->config->show_shop_desc_with_listing)
@@ -438,7 +438,7 @@
                 @endif
 
                 <h3>{{ trans('theme.seller_info') }} </h3>
-                {!! $item->shop->description !!}
+                {!! clean_rich_html($item->shop->description) !!}
               @endif
 
               @if ($item->shop->config->show_refund_policy_with_listing && $item->shop->config->return_refund)

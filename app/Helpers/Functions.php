@@ -46,6 +46,57 @@ if (! function_exists('get_platform_title')) {
     }
 }
 
+if (! function_exists('clean_rich_html')) {
+    /**
+     * Render user-pasted HTML without Word/Docs colors, fonts, or backgrounds.
+     */
+    function clean_rich_html($html)
+    {
+        if ($html === null || $html === '') {
+            return '';
+        }
+
+        $html = html_entity_decode((string) $html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        $previous = libxml_use_internal_errors(true);
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $wrapped = '<?xml encoding="UTF-8"><div id="caf-rich-root">'.$html.'</div>';
+        $dom->loadHTML($wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $xpath = new DOMXPath($dom);
+        foreach ($xpath->query('//*[@style or @color or @bgcolor or @face or @size or @class]') as $node) {
+            if ($node instanceof DOMElement) {
+                $node->removeAttribute('style');
+                $node->removeAttribute('color');
+                $node->removeAttribute('bgcolor');
+                $node->removeAttribute('face');
+                $node->removeAttribute('size');
+                $node->removeAttribute('class');
+            }
+        }
+
+        $root = $dom->getElementById('caf-rich-root');
+        $out = '';
+        if ($root) {
+            foreach ($root->childNodes as $child) {
+                $out .= $dom->saveHTML($child);
+            }
+        }
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        $plain = trim(html_entity_decode(strip_tags($out), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $plain = trim($plain, " \t\n\r\0\x0B\"“”'");
+
+        if ($plain !== '' && ! preg_match('/<(p|ul|ol|li|br|h[1-6]|table|img|a)\b/i', $out)) {
+            return e($plain);
+        }
+
+        return $out;
+    }
+}
+
 if (! function_exists('get_platform_address')) {
     /**
      * return platforms address in html formate
