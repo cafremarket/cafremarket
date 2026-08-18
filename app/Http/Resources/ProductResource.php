@@ -14,7 +14,8 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
+        $inventory = $this->inventories->first();
+
         return [
             'id' => $this->id,
             'slug' => $this->slug,
@@ -39,6 +40,15 @@ class ProductResource extends JsonResource
             'listing_count' => $this->inventories_count,
             'description' => $this->description,
             'available_from' => date('F j, Y', strtotime($this->created_at)),
+            'sku' => optional($inventory)->sku,
+            'condition' => optional($inventory)->condition,
+            'condition_note' => optional($inventory)->condition_note,
+            'stock_quantity' => optional($inventory)->stock_quantity,
+            'min_order_quantity' => optional($inventory)->min_order_quantity,
+            'sale_price' => optional($inventory)->sale_price,
+            'offer_price' => optional($inventory)->offer_price,
+            'offer_start' => optional($inventory)->offer_start,
+            'offer_end' => optional($inventory)->offer_end,
             'images' => ImageResource::collection($this->images),
             'tag_list' => $this->tags->pluck('id')->values()->all(),
             'tags' => $this->tags->map(fn ($tag) => [

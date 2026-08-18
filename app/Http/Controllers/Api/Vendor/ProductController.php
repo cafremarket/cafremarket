@@ -76,10 +76,16 @@ class ProductController extends Controller
                     'brand' => $request->brand,
                     'sku' => $request->sku,
                     'description' => $request->description,
+                    'condition' => $request->input('condition', 'New'),
+                    'condition_note' => $request->condition_note,
                     'stock_quantity' => $request->input('stock_quantity', 1),
+                    'min_order_quantity' => $request->input('min_order_quantity', 1),
                     'sale_price' => $request->sale_price,
+                    'offer_price' => $request->offer_price,
+                    'offer_start' => $request->offer_start,
+                    'offer_end' => $request->offer_end,
                     'active' => $request->active,
-                    'available_from' => now()->format('Y-m-d h:i a'),
+                    'available_from' => $request->input('available_from', now()->format('Y-m-d h:i a')),
                     'slug' => $request->slug,
                     'user_id' => $request->user_id,
                     'shop_id' => $request->shop_id,
@@ -124,6 +130,31 @@ class ProductController extends Controller
     {
         try {
             $this->product->update($request, $id);
+
+            $inventory = \App\Models\Inventory::query()
+                ->where('product_id', $id)
+                ->where('shop_id', $request->shop_id)
+                ->first();
+
+            if ($inventory) {
+                $inventory->fill([
+                    'title' => $request->name,
+                    'brand' => $request->brand,
+                    'sku' => $request->sku,
+                    'description' => $request->description,
+                    'condition' => $request->input('condition', $inventory->condition),
+                    'condition_note' => $request->condition_note,
+                    'stock_quantity' => $request->input('stock_quantity', $inventory->stock_quantity),
+                    'min_order_quantity' => $request->input('min_order_quantity', $inventory->min_order_quantity),
+                    'sale_price' => $request->sale_price,
+                    'offer_price' => $request->offer_price,
+                    'offer_start' => $request->offer_start,
+                    'offer_end' => $request->offer_end,
+                    'active' => $request->active,
+                    'available_from' => $request->input('available_from', $inventory->available_from),
+                    'slug' => $request->slug,
+                ])->save();
+            }
 
             // Delete images for app
             if ($request->input('delete_images')) {
