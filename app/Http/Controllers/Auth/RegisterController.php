@@ -103,7 +103,7 @@ class RegisterController extends Controller
                 $error = new MessageBag;
                 $error->add('errors', trans('responses.vendor_config_failed'));
 
-                return redirect()->route('vendor.register')->withErrors($error)->withInput();
+                return redirect()->to($this->vendorRegisterUrl())->withErrors($error)->withInput();
             }
 
             // Everything is fine. Now commit the transaction
@@ -145,7 +145,7 @@ class RegisterController extends Controller
             $error = new MessageBag;
             $error->add('errors', trans('responses.vendor_config_failed'));
 
-            return redirect()->route('vendor.register')->withErrors($error)->withInput();
+            return redirect()->to($this->vendorRegisterUrl())->withErrors($error)->withInput();
         }
 
         // Everything is fine. Now commit the transaction
@@ -161,6 +161,25 @@ class RegisterController extends Controller
         }
 
         return $this->registered($request, $merchant) ?? redirect($this->redirectPath());
+    }
+
+    /**
+     * Registration form URL for the current flow (selling page vs legacy /register).
+     */
+    protected function vendorRegisterUrl(?string $plan = null): string
+    {
+        if ($this->isSellingRegistrationRequest()) {
+            return $plan ? route('selling.register', $plan) : route('selling.register');
+        }
+
+        return $plan ? route('vendor.register', $plan) : route('vendor.register');
+    }
+
+    protected function isSellingRegistrationRequest(): bool
+    {
+        return request()->routeIs('selling.register', 'selling.register.submit')
+            || request()->is('selling/register')
+            || request()->is('selling/register/*');
     }
 
     /**
@@ -251,6 +270,10 @@ class RegisterController extends Controller
      */
     protected function registered($request, $user)
     {
-        //
+        if ($user->isFromMerchant() && $user->shop) {
+            return redirect()
+                ->route('merchant.verify')
+                ->with('success', trans('messages.seller_registration_complete_verify_store'));
+        }
     }
 }

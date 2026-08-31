@@ -1,5 +1,9 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('packages.wallet.transactions') }}
+@endsection
+
 @section('content')
   <!-- Info boxes -->
   {{-- <div class="row">
@@ -139,10 +143,10 @@
     </div>
   </div>
 
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.wallet.transactions') }}</h3>
-      <div class="box-tools pull-right">
+  <div class="box admin-card">
+    <div class="box-header with-border admin-card__header">
+      <h3 class="box-title admin-card__title"><span class="admin-card__icon-wrap"><i class="fa fa-user"></i></span> {{ trans('packages.wallet.transactions') }}</h3>
+      <div class="box-tools pull-right admin-card__actions">
         @if (auth()->user()->isMerchant())
           <a href="javascript:void(0)" data-link="{{ route('merchant.wallet.withdrawal') }}" class="ajax-modal-btn btn btn-new btn-flat">
             <i class="fa fa-plus"></i>
@@ -173,8 +177,8 @@
         @endif
       </div>
     </div> <!-- /.box-header -->
-    <div class="box-body">
-      <table class="table table-hover" id="merchant-wallet-transactions-table" width="100%">
+    <div class="box-body admin-card__body">
+      <table class="table table-hover admin-table" id="merchant-wallet-transactions-table" width="100%">
         <thead>
           <tr>
             <th>{{ trans('packages.wallet.date') }}</th>

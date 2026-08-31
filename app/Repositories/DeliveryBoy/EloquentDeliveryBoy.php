@@ -42,6 +42,13 @@ class EloquentDeliveryBoy extends EloquentRepository implements BaseRepository, 
 
     public function store($request)
     {
+        if (! Auth::user()->isFromPlatform()) {
+            $request->merge([
+                'shop_id' => Auth::user()->merchantId(),
+                'type' => DeliveryBoy::TYPE_SHOP,
+            ]);
+        }
+
         $deliveryBoy = parent::store($request);
 
         $deliveryBoy->saveAddress($request);

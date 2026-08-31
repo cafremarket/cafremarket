@@ -1,11 +1,15 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('DynamicPopup::lang.dynamic_popups') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('DynamicPopup::lang.dynamic_popups') }}</h3>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => {{ trans('DynamicPopup::lang.dynamic_popups') }},
+    'icon' => 'fa-user',
+  ])
+
       <div class="row">
         <div class="col-md-6 col-md-offset-3">
           <span class="spacer20"></span>
@@ -114,8 +118,8 @@
           <span class="spacer50"></span>
         </div> <!--/.col-md-6 -->
       </div> <!--/.row -->
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+
+  @include('admin.partials.ui.card_end')
 
   <!-- Dynamic Popup -->
   @include('DynamicPopup::popup_modal')

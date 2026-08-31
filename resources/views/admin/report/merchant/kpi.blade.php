@@ -1,6 +1,11 @@
 @extends('admin.layouts.master')
 
 @section('content')
+  @php
+    $widgetActions = '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>'
+      . '<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>';
+  @endphp
+
   <!-- Info boxes -->
   <div class="row">
     <div class="col-md-3 col-sm-6 col-xs-12 nopadding-right">
@@ -89,37 +94,28 @@
 
   <div class="row">
     <div class="col-sm-8 nopadding-right">
-      <div class="box box-solid">
-        <div class="box-header with-border">
-          <h3 class="box-title text-warning">
-            <i class="fa fa-calendar"></i> {{ trans('app.sales_by_months') }}
-          </h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-          </div>
-        </div><!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.sales_by_months'),
+        'icon' => 'fa-calendar',
+        'class' => 'box-solid',
+        'bodyClass' => '',
+        'actions' => $widgetActions,
+      ])
           <p class="text-muted">
             <span class="lead"> {{ trans('app.total') }}: {{ get_formated_currency($sales_total, 2, config('system_settings.currency.id')) }} </span>
             <span class="pull-right">{{ $orders_count . ' ' . trans('app.orders') }}</span>
           </p>
           <div>{!! $chart->container() !!}</div>
-        </div><!-- /.box-body -->
-      </div><!-- /.box -->
+      @include('admin.partials.ui.card_end')
     </div><!-- /.col -->
     <div class="col-sm-4">
-      <div class="box box-solid">
-        <div class="box-header with-border">
-          <h3 class="box-title text-warning">
-            <i class="fa fa-money"></i> {{ trans('app.finances') }}
-          </h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-          </div>
-        </div><!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.finances'),
+        'icon' => 'fa-money',
+        'class' => 'box-solid',
+        'bodyClass' => '',
+        'actions' => $widgetActions,
+      ])
           <table class="table table-default">
             <tbody>
               <tr>
@@ -144,23 +140,17 @@
           </table>
           <div class="clearfix spacer20"></div>
           <small class="text-muted pull-right"><i class="fa fa-info-circle"></i> {{ trans('app.latest_months', ['months' => config('charts.default.months')]) }}</small>
-        </div><!-- /.box-body -->
-      </div><!-- /.box -->
+      @include('admin.partials.ui.card_end')
     </div><!-- /.col -->
   </div><!-- /.row -->
 
-  <!--
-                            Top Selling Items
-                             -->
-  <div class="box box-solid">
-    <div class="box-header with-border">
-      <h3 class="box-title"><i class="icon ion-md-rocket"></i> {{ trans('app.top_selling_items') }}</h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-      </div>
-    </div><!-- /.box-header -->
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.top_selling_items'),
+    'icon' => 'fa-rocket',
+    'class' => 'box-solid',
+    'bodyClass' => '',
+    'actions' => $widgetActions,
+  ])
       <div class="table-responsive">
         <table class="table no-margin table-condensed table-no-sort">
           <thead>
@@ -204,27 +194,17 @@
           </tbody>
         </table>
       </div>
-    </div><!-- /.box-body -->
-  </div><!-- /.box -->
-  <!--
-                            End Top Selling Items
-                             -->
-  <!--
-                            Top Customers
-                             -->
+  @include('admin.partials.ui.card_end')
+
   <div class="row">
     <div class="col-sm-6 nopadding-right">
-      <div class="box box-solid">
-        <div class="box-header with-border">
-          <h3 class="box-title text-warning">
-            <i class="fa fa-user-secret"></i> {{ trans('app.top_customers') }}
-          </h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-          </div>
-        </div><!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.top_customers'),
+        'icon' => 'fa-users',
+        'class' => 'box-solid',
+        'bodyClass' => '',
+        'actions' => $widgetActions,
+      ])
           <div class="table-responsive">
             <table class="table no-margin table-condensed">
               <thead>
@@ -263,21 +243,16 @@
               </tbody>
             </table>
           </div><!-- /.table-responsive -->
-        </div><!-- /.box-body -->
-      </div><!-- /.box -->
+      @include('admin.partials.ui.card_end')
     </div><!-- /.col -->
     <div class="col-sm-6 nopadding-left">
-      <div class="box box-solid">
-        <div class="box-header with-border">
-          <h3 class="box-title text-warning">
-            <i class="fa fa-user-secret"></i> {{ trans('app.returning_customers') }}
-          </h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-          </div>
-        </div><!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.returning_customers'),
+        'icon' => 'fa-user-plus',
+        'class' => 'box-solid',
+        'bodyClass' => '',
+        'actions' => $widgetActions,
+      ])
           <div class="table-responsive">
             <table class="table no-margin table-condensed">
               <thead>
@@ -316,27 +291,19 @@
               </tbody>
             </table>
           </div><!-- /.table-responsive -->
-        </div><!-- /.box-body -->
-      </div><!-- /.box -->
+      @include('admin.partials.ui.card_end')
     </div><!-- /.col -->
   </div><!-- /.row -->
-  <!--
-                            End Top Customers
-                             -->
 
   <div class="row">
     <div class="col-sm-6 nopadding-right">
-      <div class="box box-solid">
-        <div class="box-header with-border">
-          <h3 class="box-title text-warning">
-            <i class="fa fa-code-fork"></i> {{ trans('app.top_categories') }}
-          </h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-          </div>
-        </div><!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.top_categories'),
+        'icon' => 'fa-sitemap',
+        'class' => 'box-solid',
+        'bodyClass' => '',
+        'actions' => $widgetActions,
+      ])
           <div class="table-responsive">
             <table class="table no-margin">
               <thead>
@@ -357,21 +324,16 @@
               </tbody>
             </table>
           </div>
-        </div><!-- /.box-body -->
-      </div><!-- /.box -->
+      @include('admin.partials.ui.card_end')
     </div><!-- /.col -->
     <div class="col-sm-6 nopadding-left">
-      <div class="box box-solid">
-        <div class="box-header with-border">
-          <h3 class="box-title text-warning">
-            <i class="fa fa-truck"></i> {{ trans('app.top_suppliers') }}
-          </h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-          </div>
-        </div><!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.top_suppliers'),
+        'icon' => 'fa-truck',
+        'class' => 'box-solid',
+        'bodyClass' => '',
+        'actions' => $widgetActions,
+      ])
           <div class="table-responsive">
             <table class="table no-margin table-condensed">
               <thead>
@@ -396,8 +358,7 @@
               </tbody>
             </table>
           </div>
-        </div><!-- /.box-body -->
-      </div><!-- /.box -->
+      @include('admin.partials.ui.card_end')
     </div><!-- /.col -->
   </div><!-- /.row -->
 @endsection

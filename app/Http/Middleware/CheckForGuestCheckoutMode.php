@@ -15,7 +15,7 @@ class CheckForGuestCheckoutMode
     public function handle($request, Closure $next)
     {
         if (! allow_checkout()) {
-            return redirect()->route('customer.login')
+            return redirect()->route('homepage', ['login' => 1])
                 ->with('error', trans('theme.notify.please_login_to_checkout'));
         }
 

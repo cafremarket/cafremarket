@@ -426,7 +426,7 @@ class AccountController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return redirect()->route('admin.admin.dashboard')
+        return redirect()->route('merchant.dashboard')
             ->with('success', trans('theme.notify.switched_to_merchant_successfully'));
     }
 }

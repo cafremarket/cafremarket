@@ -4,6 +4,7 @@ namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
 use App\Models\Role;
+use Illuminate\Validation\Rule;
 
 class RegisterMerchantRequest extends Request
 {
@@ -32,8 +33,25 @@ class RegisterMerchantRequest extends Request
 
         $rules = [
             'name' => 'required|max:255',
-            'shop_name' => 'required|string|max:255|unique:shops,name',
-            'email' => 'required|string|email|max:255|unique:users',
+            'shop_name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('shops', 'name')->whereNull('deleted_at'),
+            ],
+            'slug' => [
+                'nullable',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('shops', 'slug')->whereNull('deleted_at'),
+            ],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->whereNull('deleted_at'),
+            ],
             'password' => 'required|string|min:6|confirmed',
         ];
 
@@ -51,7 +69,11 @@ class RegisterMerchantRequest extends Request
         }
 
         if (is_incevio_package_loaded('otp-login')) {
-            $rules['phone'] = 'required|string|unique:users';
+            $rules['phone'] = [
+                'required',
+                'string',
+                Rule::unique('users', 'phone')->whereNull('deleted_at'),
+            ];
         }
 
         if (is_incevio_package_loaded('smartForm') && config('system_settings.smart_form_id_for_vendor_additional_info')) {

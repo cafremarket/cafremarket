@@ -2,17 +2,74 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
+use App\Events\Order\OrderCreated;
 use App\Events\Order\OrderUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Validations\CreateOrderRequest;
 use App\Http\Requests\Validations\OrderDetailRequest;
 use App\Http\Resources\OrderLightResource;
 use App\Http\Resources\OrderResource;
+use App\Models\Customer;
 use App\Models\Order;
+use App\Repositories\Order\OrderRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    private $order;
+
+    public function __construct(OrderRepository $order)
+    {
+        parent::__construct();
+        $this->order = $order;
+    }
+
+    /**
+     * Search customers for manual order creation.
+     */
+    public function searchCustomers(Request $request)
+    {
+        $term = trim((string) $request->get('q', ''));
+
+        if (strlen($term) < 2) {
+            return response()->json(['data' => []]);
+        }
+
+        $customers = Customer::search($term)->where('active', true)->take(10)->get();
+
+        return response()->json([
+            'data' => $customers->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'email' => $c->email,
+                'label' => get_formated_customer_str($c),
+            ]),
+        ]);
+    }
+
+    /**
+     * Create order manually (vendor).
+     */
+    public function store(CreateOrderRequest $request)
+    {
+        if (is_null($request->input('cart'))) {
+            return response()->json(['message' => trans('theme.notify.cart_empty')], 422);
+        }
+
+        try {
+            $order = $this->order->store($request);
+            event(new OrderCreated($order));
+
+            return response()->json([
+                'message' => trans('messages.created', ['model' => trans('app.model.order')]),
+                'data' => new OrderResource($order),
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *

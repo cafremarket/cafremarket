@@ -111,6 +111,10 @@ class Customer extends CustomerWallet
         'accepts_marketing',
         'fcm_token',
 
+        'preferred_latitude',
+        'preferred_longitude',
+        'preferred_address_text',
+
         // for buyer group
         'buyer_group_id',
         'buyer_group_requested_id',

@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\CategoryGroup;
 use App\Models\CategorySubGroup;
 use App\Models\Customer;
+use App\Models\DeliveryBoy;
 use App\Models\Dispute;
 use App\Models\Inventory;
 use App\Models\Language;
@@ -940,10 +941,7 @@ class ListHelper
         if ($shop_id) {
             $items = $items->where('shop_id', $shop_id);
         } else {
-            // Marketplace list keeps geolocation filtering.
-            $items = $items->whereHas('shop', function ($q) {
-                $q->approved();
-            })->zipcode();
+            $items = scope_inventory_for_buyer($items);
         }
 
         // It's a trick for the demo only to get different items
@@ -1051,9 +1049,7 @@ class ListHelper
         if ($shop_id) {
             $items = $items->where('shop_id', $shop_id);
         } else {
-            $items = $items->whereHas('shop', function ($q) {
-                $q->approved();
-            })->zipcode();
+            $items = scope_inventory_for_buyer($items);
         }
 
         return $items->inRandomOrder()->take($limit)->get();
@@ -1151,7 +1147,7 @@ class ListHelper
     public static function latest_available_items($limit = 10, $shop_id = null)
     {
         // Cache key must include shop_id; a single "latest_items" key returned marketplace-wide rows for every shop.
-        $cacheKey = 'latest_available_items_'.($shop_id ?? 'all').'_'.$limit;
+        $cacheKey = 'latest_available_items_'.($shop_id ?? 'all').'_'.$limit.hyperlocal_location_cache_suffix();
 
         return Cache::remember($cacheKey, config('cache.remember.latest_items', 0), function () use ($shop_id, $limit) {
             $items = Inventory::query()
@@ -1170,9 +1166,7 @@ class ListHelper
             if ($shop_id) {
                 $items = $items->where('shop_id', $shop_id);
             } else {
-                $items = $items->whereHas('shop', function ($q) {
-                    $q->approved();
-                })->zipcode();
+                $items = scope_inventory_for_buyer($items);
             }
 
             return $items->latest()->limit($limit)->get();
@@ -1204,9 +1198,7 @@ class ListHelper
             if ($shop_id) {
                 $items = $items->where('shop_id', $shop_id);
             } else {
-                $items = $items->whereHas('shop', function ($q) {
-                    $q->approved();
-                })->zipcode();
+                $items = scope_inventory_for_buyer($items);
             }
 
             return $items->latest()->limit($limit)->get();
@@ -1382,15 +1374,17 @@ class ListHelper
      */
     public static function random_items($limit = null)
     {
-        return Cache::remember('random_items', config('cache.remember.random_items', 0), function () use ($limit) {
-            $items = Inventory::available()
-                ->select(static::common_select_attr('inventory'))
-                ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                    'image:path,imageable_id,imageable_type',
-                ])
-                ->where('parent_id', null)
-                ->inRandomOrder('id');
+        return Cache::remember('random_items'.hyperlocal_location_cache_suffix(), config('cache.remember.random_items', 0), function () use ($limit) {
+            $items = scope_inventory_for_buyer(
+                Inventory::available()
+                    ->select(static::common_select_attr('inventory'))
+                    ->with([
+                        'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                        'image:path,imageable_id,imageable_type',
+                    ])
+                    ->where('parent_id', null)
+                    ->inRandomOrder('id')
+            );
 
             if ($limit) {
                 return $items->limit($limit)->get();
@@ -1770,6 +1764,7 @@ class ListHelper
 
         return DB::table('delivery_boys')
             ->where('shop_id', $shop_id)
+            ->where('type', DeliveryBoy::TYPE_SHOP)
             ->where('status', BaseModel::ACTIVE)
             ->orderBy('nice_name', 'asc')
             ->pluck('nice_name', 'id');

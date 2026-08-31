@@ -44,10 +44,30 @@ class EloquentAddress extends EloquentRepository implements AddressRepository, B
         $address = $this->model->findOrFail($id);
 
         if ($address->addressable_type == \App\Models\System::class) {
-            // Clear platform_address_string from cache
             Cache::forget('platform_address_string');
         }
 
         $address->update($request->all());
+
+        app(\App\Services\Geo\GeocodeService::class)->applyToAddress($address->fresh());
+    }
+
+    public function store(Request $request)
+    {
+        $model = $this->model->create($request->all());
+
+        app(\App\Services\Geo\GeocodeService::class)->applyToAddress($model);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->images as $type => $file) {
+                $model->saveImage($file, $type);
+            }
+        }
+
+        if ($request->hasFile('image')) {
+            $model->saveImage($request->image);
+        }
+
+        return $model;
     }
 }

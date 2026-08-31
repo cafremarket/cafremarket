@@ -25,6 +25,12 @@
           {{-- <a class="page-scroll" href="#services">{{ trans('theme.nav.benefits') }}</a> --}}
         </li>
         <li>
+          <a href="{{ route('selling.login') }}">{{ trans('app.form.login') }}</a>
+        </li>
+        <li>
+          <a href="{{ route('selling.register') }}">{{ trans('app.form.register_as_merchant') }}</a>
+        </li>
+        <li>
           <a class="page-scroll" href="#contact">{{ trans('theme.nav.contact_us') }}</a>
         </li>
       </ul>

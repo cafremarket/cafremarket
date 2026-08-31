@@ -1,5 +1,9 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.add_inventory') }}
+@endsection
+
 @section('content')
   @can('view', $product)
     @include('admin.partials._product_widget')
@@ -18,14 +22,13 @@
     @endphp
   @endif
 
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.add_inventory') }}</h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.add_inventory'),
+    'icon' => 'fa-cubes',
+    'class' => 'admin-form-section',
+    'bodyClass' => '',
+    'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+  ])
       {{ Form::hidden('product', $product) }}
 
       <div class="row">
@@ -144,18 +147,15 @@
         <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.seller_description') }}"></i>
         {!! Form::textarea('description', null, ['class' => 'form-control summernote', 'placeholder' => trans('app.placeholder.description')]) !!}
       </div>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 
-
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.variants') }}</h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.variants'),
+    'icon' => 'fa-cubes',
+    'class' => 'admin-form-section',
+    'bodyClass' => '',
+    'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+  ])
       <table class="table table-default" id="variantsTable">
         <thead>
           <tr>
@@ -261,8 +261,7 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 
   <fieldset id="offerDates" hidden>
     <legend>{{ trans('app.offer_dates') }}</legend>
@@ -296,14 +295,13 @@
 
   @include('admin.inventory._cross_selling_fields')
 
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.seo') }}</h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.seo'),
+    'icon' => 'fa-search',
+    'class' => 'admin-form-section',
+    'bodyClass' => '',
+    'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+  ])
       <div class="form-group">
         {!! Form::label('slug', trans('app.form.slug') . '*', ['class' => 'with-help']) !!}
         <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.slug') }}"></i>
@@ -327,16 +325,15 @@
         <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.meta_description') }}"></i>
         {!! Form::text('meta_description', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.meta_description')]) !!}
       </div>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 
   <p class="help-block">* {{ trans('app.form.required_fields') }}</p>
 
-  <div class="box">
-    <div class="box-body">
+  <div class="admin-card admin-card--footer-only admin-form-section">
+    <div class="admin-card__body">
       {!! Form::submit(trans('app.form.save'), ['class' => 'btn btn-flat btn-lg btn-new pull-right']) !!}
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+    </div>
+  </div>
   {!! Form::close() !!}
 @endsection
 

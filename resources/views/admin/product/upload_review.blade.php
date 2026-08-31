@@ -1,20 +1,16 @@
 @extends('admin.layouts.master')
 
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        {{ trans('app.preview') }} <small>({{ trans('app.total_number_of_rows', ['value' => count($rows)]) }})</small>
-      </h3>
-      <div class="box-tools pull-right">
-        @can('create', \App\Models\Product::class)
-          <a href="javascript:void(0)" data-link="{{ route('admin.catalog.product.bulk') }}" class="ajax-modal-btn btn btn-default btn-flat">{{ trans('app.bulk_import') }}</a>
-        @endcan
-      </div>
-    </div> <!-- /.box-header -->
-
-    <div class="box-body responsive-table">
-      <table class="table table-striped">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.preview'),
+    'icon' => 'fa-eye',
+    'headerExtra' => '<small class="text-muted">(' . e(trans('app.total_number_of_rows', ['value' => count($rows)])) . ')</small>',
+    'actions' => Gate::allows('create', \App\Models\Product::class)
+      ? '<a href="javascript:void(0)" data-link="' . route('admin.catalog.product.bulk') . '" class="ajax-modal-btn btn btn-default btn-flat btn-sm">' . e(trans('app.bulk_import')) . '</a>'
+      : '',
+    'bodyClass' => 'responsive-table',
+  ])
+      <table class="table table-striped admin-table">
         <thead>
           <tr>
             <th>{{ trans('app.image') }}</th>
@@ -91,19 +87,19 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
+  @include('admin.partials.ui.card_end')
 
-    <div class="box-footer">
-      <a href="{{ route('admin.catalog.product.index') }}" class="btn btn-default btn-flat">{{ trans('app.cancel') }}</a>
-      <small class="indent20">{{ trans('app.total_number_of_rows', ['value' => count($rows)]) }}</small>
-      <div class="box-tools pull-right">
-        {!! Form::open(['route' => 'admin.catalog.product.import', 'id' => 'form', 'class' => 'inline-form', 'data-toggle' => 'validator']) !!}
-        @foreach ($rows as $row)
-          {{ Form::hidden('data[]', serialize($row)) }}
-        @endforeach
-        {!! Form::button(trans('app.looks_good'), ['type' => 'submit', 'class' => 'confirm btn btn-new btn-flat']) !!}
-        {!! Form::close() !!}
-      </div>
-    </div> <!-- /.box-footer -->
-  </div> <!-- /.box -->
+  @php
+    $hiddenFields = '';
+    foreach ($rows as $row) {
+      $hiddenFields .= Form::hidden('data[]', serialize($row));
+    }
+  @endphp
+  @include('admin.partials.ui.import_footer', [
+    'cancelUrl' => route('admin.catalog.product.index'),
+    'rowCount' => count($rows),
+    'formRoute' => 'admin.catalog.product.import',
+    'hiddenFields' => $hiddenFields,
+    'submitLabel' => trans('app.looks_good'),
+  ])
 @endsection

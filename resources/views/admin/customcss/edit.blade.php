@@ -1,11 +1,14 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.custom_styling') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.custom_styling') }}</h3>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.custom_styling'),
+    'icon' => 'fa-code',
+  ])
       <div class="row">
         <div class="col-md-7">
           @if (config('app.demo') == true)
@@ -32,8 +35,6 @@
         <div class="col-md-5 nopadding-left">
           @include('admin.customcss._css_example')
         </div> <!-- /.col-md-5 -->
-      </div> <!-- /.row -->
-      <div class="spacer20"></div>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+      </div>
+  @include('admin.partials.ui.card_end')
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Services\Hyperlocal\BuyerLocationService;
 // use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -50,13 +51,15 @@ abstract class SocialiteBaseController extends Controller
 
             $msg = ['msg' => $response['error']['message'] ?? $response['error'] ?? 'Error'];
 
-            return redirect()->route('customer.login')
+            return redirect()->route('homepage', ['login' => 1])
                 ->withErrors(trans('theme.notify.authentication_failed', $msg));
         }
 
         $customer = $this->getLocalUser($socialUser);
 
         Auth::guard('customer')->login($customer);
+
+        app(BuyerLocationService::class)->syncFromSavedAddress($customer);
 
         return redirect()->intended('/')
             ->with('success', trans('theme.notify.logged_in_successfully'));

@@ -1,38 +1,40 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.notifications') }}
+@endsection
+
 @section('content')
-	<div class="box">
-	    <div class="box-header with-border">
-	      <h3 class="box-title">{{ trans('app.notifications') }}</h3>
-	      <div class="box-tools pull-right">
-			{!! Form::open(['route' => ['admin.notifications.deleteAll'], 'method' => 'delete']) !!}
-				{!! Form::button('<i class="fa fa-trash-o"></i> ' . trans('app.delete_all'), ['type' => 'submit', 'class' => 'confirm btn btn-flat btn-new']) !!}
-			{!! Form::close() !!}
-	      </div>
-	    </div> <!-- /.box-header -->
-	    <div class="box-body">
-		    <div id="menu">
-		      <div class="panel list-group">
-                @forelse(Auth::user()->notifications as $notification)
-	                <div class="list-group-item">
-	                  @php
-	                    $notification_view = 'admin.partials.notifications.' . Str::snake(class_basename($notification->type));
-	                  @endphp
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.notifications'),
+    'icon' => 'fa-bell-o',
+    'actions' => view('admin.notification._header_actions')->render(),
+    'bodyClass' => '',
+  ])
 
-	                  @include($notification_view)
-	                  {{-- @includeFirst([$notification_view, 'admin.partials.notifications.default']) --}}
+  <div class="admin-notification-list">
+    @forelse(Auth::user()->notifications as $notification)
+      @php
+        $notification_view = 'admin.partials.notifications.' . Str::snake(class_basename($notification->type));
+      @endphp
+      <div class="admin-notification-item">
+        <div class="admin-notification-item__body">
+          @include($notification_view)
+        </div>
+        <div class="admin-notification-item__meta">
+          <span class="text-muted small">{{ $notification->created_at->diffForHumans() }}</span>
+          {!! Form::open(['route' => ['admin.notifications.delete', $notification->id], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}
+          <button type="submit" class="admin-action-btn confirm ajax-silent" title="{{ trans('app.delete') }}" data-toggle="tooltip"><i class="fa fa-trash-o"></i></button>
+          {!! Form::close() !!}
+        </div>
+      </div>
+    @empty
+      <div class="admin-empty-state">
+        <i class="fa fa-bell-o"></i>
+        <p>{{ trans('app.no_data_found') }}</p>
+      </div>
+    @endforelse
+  </div>
 
-	                  <span class="pull-right text-muted">{{ $notification->created_at->diffForHumans() }}
-							{!! Form::open(['route' => ['admin.notifications.delete', $notification->id], 'method' => 'delete', 'class' => 'data-form']) !!}
-								{!! Form::button('<i class="fa fa-trash-o"></i>', ['type' => 'submit', 'class' => 'confirm ajax-silent indent20', 'title' => trans('app.delete'), 'data-toggle' => 'tooltip', 'data-placement' => 'top']) !!}
-							{!! Form::close() !!}
-	                  </span>
-	                </div>
-             	@empty
-             		<h5 class="text-center">{{ trans('app.no_data_found') }}</h5>
-                @endforelse
-	           </div>
-           </div>
-	    </div> <!-- /.box-body -->
-	</div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 @endsection

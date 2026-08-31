@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Helpers\ListHelper;
 use App\Jobs\UpdateVisitorTable;
+use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\ResponseManipulation;
 use Closure;
 use Illuminate\Http\Response;
@@ -30,6 +31,11 @@ class Storefront
         if ($request->ajax()) {
             return $next($request);
         }
+
+        app(BuyerLocationService::class)->syncFromCustomer();
+
+        View::share('buyer_has_location', buyer_has_location());
+        View::share('hyperlocal_enabled', hyperlocal_enabled());
 
         // Push an empty value of 0 to card session if not exist
         if (Session::missing('session_carts')) {

@@ -69,3 +69,10 @@
     </div>
   </div>
 </div>
+
+@if (config('services.google.place_api_key'))
+  @include('partials.map_pin_picker', [
+    'latitude' => old('latitude', isset($address) ? $address->latitude : ''),
+    'longitude' => old('longitude', isset($address) ? $address->longitude : ''),
+  ])
+@endif

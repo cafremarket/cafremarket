@@ -142,7 +142,7 @@ Route::middleware(['web'])->group(function () {
         });
 
     // Merchant routes
-    Route::middleware(['userType:merchant', 'auth'])->prefix('admin')
+    Route::middleware(['auth', 'merchantPanel'])->prefix('merchant')
         ->name('merchant.')->group(function () {
             Route::get('wallet', [
                 WalletController::class, 'index',

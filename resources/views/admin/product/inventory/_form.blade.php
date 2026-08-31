@@ -4,12 +4,12 @@
 
 <div class="row">
   <div class="col-md-8">
-    <div class="box">
-      <div class="box-header with-border">
-        <h3 class="box-title">{{ isset($product) ? trans('app.update_product') : trans('app.add_product') }}</h3>
-      </div> <!-- /.box-header -->
-
-      <div class="box-body">
+    @include('admin.partials.ui.card_start', [
+      'title' => isset($product) ? trans('app.update_product') : trans('app.add_product'),
+      'icon' => 'fa-cube',
+      'class' => 'admin-form-section',
+      'bodyClass' => '',
+    ])
         <div class="row">
           <div class="col-md-12">
             <div class="form-group">
@@ -268,19 +268,19 @@
 
         <p class="help-block">* {{ trans('app.form.required_fields') }}</p>
 
-        <div class="box-tools pull-right">
+        <div class="box-tools pull-right admin-card__actions">
           {!! Form::submit(isset($product) ? trans('app.form.update') : trans('app.form.save'), ['class' => 'btn btn-flat btn-lg btn-primary']) !!}
         </div>
-      </div>
-    </div>
+    @include('admin.partials.ui.card_end')
   </div>
 
   <div class="col-md-4 nopadding-left">
-    <div class="box">
-      <div class="box-header with-border">
-        <h3 class="box-title">{{ trans('app.organization') }}</h3>
-      </div> <!-- /.box-header -->
-      <div class="box-body">
+    @include('admin.partials.ui.card_start', [
+      'title' => trans('app.organization'),
+      'icon' => 'fa-sitemap',
+      'class' => 'admin-form-section',
+      'bodyClass' => '',
+    ])
         <div class="form-group">
           {!! Form::label('available_from', trans('app.form.available_from'), ['class' => 'with-help']) !!}
           <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.available_from') }}"></i>
@@ -531,7 +531,6 @@
             </div>
           </fieldset>
         </fieldset>
-      </div>
-    </div>
+    @include('admin.partials.ui.card_end')
   </div>
 </div>

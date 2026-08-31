@@ -1,15 +1,16 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('packages.wallet.payout_requests') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.wallet.payout_requests') }}</h3>
-      <div class="box-tools pull-right">
-        @include('wallet::admin._btn_payout')
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
-      <table class="table table-hover table-no-sort">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('packages.wallet.payout_requests'),
+    'icon' => 'fa-clock-o',
+    'actions' => view('wallet::admin._btn_payout')->render(),
+  ])
+      <table class="table table-hover admin-table table-no-sort">
         <thead>
           <tr>
             <th>{{ trans('packages.wallet.date') }}</th>
@@ -35,7 +36,7 @@
                 <td>
                   {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
                 </td>
-                <td class="row-options">
+                <td class="row-options admin-row-actions">
                   @if (Auth::user()->isAdmin())
                     <a href="javascript:void(0)" data-link="{{ route('admin.payout.approval', $transaction) }}" class="ajax-modal-btn btn btn-new btn-sm">
                       <i class="fa fa-check"></i> {{ trans('packages.wallet.approve') }}
@@ -53,6 +54,5 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 @endsection

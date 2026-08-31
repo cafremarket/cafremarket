@@ -68,7 +68,4 @@
   <div class="help-block with-errors"></div>
 </div>
 
-{{-- GOOGLE PLACE API --}}
-@if (is_address_autocomplete_on())
-  @include('scripts.google_place')
-@endif
+{{-- Address autocomplete is loaded globally via scripts.google_place --}}

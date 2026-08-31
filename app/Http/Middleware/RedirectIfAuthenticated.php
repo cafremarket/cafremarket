@@ -29,6 +29,12 @@ class RedirectIfAuthenticated
             }
 
             if (Auth::guard($guard)->check()) {
+                $user = Auth::guard($guard)->user();
+
+                if ($user && $user->isFromMerchant()) {
+                    return redirect(RouteServiceProvider::MERCHANT_DASHBOARD);
+                }
+
                 return redirect(RouteServiceProvider::DASHBOARD);
             }
         }

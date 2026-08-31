@@ -1,20 +1,22 @@
 @extends('auth.master')
 
 @section('content')
-  <div class="box">
+  <div class="admin-auth-card">
     <div class="login-section">
-      <div class="form-container">
-        <div class="image-holder"></div>
-        <div class="login-form-section">
-          <div class="login-logo">
+      <div class="form-container admin-auth-card__inner">
+        <div class="image-holder admin-auth-card__visual"></div>
+        <div class="login-form-section admin-auth-card__form">
+          <div class="login-logo admin-auth-card__logo">
             <a href="{{ url('/') }}">
-              <img src="{{ get_logo_url('system', 'full') }}" class="brand-logo" height="47px" alt="{{ trans('theme.logo') }}" title="{{ trans('theme.logo') }}">
+              <img src="{{ get_logo_url('system', 'full') }}" class="brand-logo" height="47" alt="{{ trans('theme.logo') }}">
             </a>
           </div>
 
           <div class="form-section">
-            <h3 class="text-center mt-0">{{ trans('app.form.password_reset') }}</h3>
-            {!! Form::open(['url' => 'password/reset', 'id' => 'form', 'data-toggle' => 'validator']) !!}
+            <h3 class="admin-auth-card__title">{{ trans('app.form.password_reset') }}</h3>
+            <p class="admin-auth-card__subtitle">{{ get_site_title() }}</p>
+
+            {!! Form::open(['url' => 'password/reset', 'id' => 'form', 'data-toggle' => 'validator', 'class' => 'admin-auth-form']) !!}
             {!! Form::hidden('token', $token) !!}
 
             <div class="form-group has-feedback">
@@ -35,12 +37,12 @@
               <div class="help-block with-errors"></div>
             </div>
 
-            {!! Form::submit(trans('app.form.password_reset'), ['class' => 'btn btn-lg btn-flat btn-primary']) !!}
+            {!! Form::submit(trans('app.form.password_reset'), ['class' => 'btn btn-block btn-lg btn-flat btn-new admin-auth-form__submit']) !!}
             {!! Form::close() !!}
 
-            <div class="spacer20"></div>
-
-            <a href="{{ route('login') }}" class="btn btn-link">{{ trans('app.login') }}</a>
+            <a class="admin-auth-form__register" href="{{ route('login') }}">
+              <i class="fa fa-arrow-left"></i> {{ trans('app.login') }}
+            </a>
           </div>
         </div>
       </div>

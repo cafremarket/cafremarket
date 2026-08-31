@@ -7,7 +7,7 @@
             <li><a href="{{ get_page_url($page->slug) }}" target="_blank" rel="noopener">{{ $page->title }}</a></li>
           @endforeach
 
-          <li><a href="{{ url('admin/dashboard') }}">{{ trans('theme.nav.merchant_dashboard') }}</a></li>
+          <li><a href="{{ url('merchant/dashboard') }}">{{ trans('theme.nav.merchant_dashboard') }}</a></li>
           @if (is_incevio_package_loaded('affiliate') && auth()->guard('affiliate')->check())
             <li><a href="{{ route('affiliate.dashboard')}}">{{ trans('packages.affiliate.affiliate_dashboard') }}</a></li>
           @elseif (is_incevio_package_loaded('affiliate'))

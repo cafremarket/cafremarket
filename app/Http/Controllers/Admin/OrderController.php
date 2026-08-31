@@ -10,9 +10,10 @@ use App\Helpers\ListHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateOrderRequest;
 use App\Http\Requests\Validations\FulfillOrderRequest;
+use App\Models\DeliveryBoy;
 use App\Models\Order;
 use App\Repositories\Order\OrderRepository;
-use App\Services\FCMService;
+use App\Services\Delivery\DeliveryDispatchService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
@@ -299,13 +300,15 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\View\View
      */
-    public function deliveryBoys($id)
+    public function deliveryBoys($id, DeliveryDispatchService $dispatchService)
     {
         $order = $this->order->find($id);
 
         $deliveryboys = ListHelper::deliveryBoys($order->shop_id);
+        $platformRiders = $dispatchService->findNearbyPlatformRiders($order->shop);
+        $shopRidersAvailable = $dispatchService->getAvailableShopRiders($order->shop_id)->count();
 
-        return view('admin.order._assign_delivery_boy', compact('deliveryboys', 'order'));
+        return view('admin.order._assign_delivery_boy', compact('deliveryboys', 'order', 'platformRiders', 'shopRidersAvailable'));
     }
 
     /**
@@ -314,23 +317,37 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function assignDeliveryBoy(Request $request, $id)
+    public function assignDeliveryBoy(Request $request, $id, DeliveryDispatchService $dispatchService)
     {
         $order = $this->order->find($id);
 
-        $order->delivery_boy_id = $request->delivery_boy_id;
-        $order->save();
+        if ($request->filled('delivery_boy_id')) {
+            $rider = DeliveryBoy::findOrFail($request->delivery_boy_id);
 
-        $deliveryBoy_token = optional($order->deliveryBoy)->fcm_token;
-
-        if (! is_null($deliveryBoy_token)) {
-            FCMService::send($deliveryBoy_token, [
-                'title' => trans('notifications.order_assigned.subject', ['order' => $order->order_number]),
-                'body' => trans('notifications.order_assigned.message'),
-            ], 'delivery');
+            if ($rider->isPlatform()) {
+                $dispatchService->assignPlatformRider($order, $rider);
+            } else {
+                $dispatchService->assignShopRider($order, $rider);
+            }
         }
 
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
+    }
+
+    /**
+     * Request platform delivery for an order.
+     */
+    public function requestPlatformDelivery(Request $request, $id, DeliveryDispatchService $dispatchService)
+    {
+        $order = $this->order->find($id);
+
+        try {
+            $dispatchService->requestPlatformDelivery($order, $request->input('platform_rider_id'));
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', trans('app.platform_delivery_requested'));
     }
 
     /**

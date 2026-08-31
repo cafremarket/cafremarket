@@ -89,5 +89,8 @@ class Kernel extends HttpKernel
         'xssSanitizer' => \App\Http\Middleware\XssSanitizer::class,
         'customerApp' => \App\Http\Middleware\CustomerAppMiddleware::class,
         'customerCanRegister' => \App\Http\Middleware\CheckCustomerCanRegister::class,
+        'requireMerchantVerification' => \App\Http\Middleware\RequireMerchantVerification::class,
+        'blockMerchantFromAdmin' => \App\Http\Middleware\BlockMerchantFromAdmin::class,
+        'merchantPanel' => \App\Http\Middleware\EnsureMerchantPanelAccess::class,
     ];
 }

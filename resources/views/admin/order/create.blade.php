@@ -33,11 +33,12 @@
 
     {!! Form::open(['route' => 'admin.order.order.store', 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
     <div class="col-md-9">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title"><i class="fa fa-cart-plus"></i> {{ trans('app.cart') }}</h3>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.cart'),
+        'icon' => 'fa-shopping-cart',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+      ])
           {{ Form::hidden('customer_id', $customer->id) }}
           {{ Form::hidden('discount', isset($cart->discount) ? $cart->discount : null, ['id' => 'cart-discount']) }}
           {{ Form::hidden('taxrate', null, ['id' => 'cart-taxrate']) }}
@@ -148,11 +149,10 @@
             </div>
           </div>
           <p class="help-block">* {{ trans('app.form.required_fields') }}</p>
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_end')
 
-      <div class="box">
-        <div class="box-body">
+      <div class="admin-card admin-card--footer-only admin-form-section">
+        <div class="admin-card__body">
           @if (isset($cart))
             {{ Form::hidden('cart_id', $cart->id, ['id' => 'cart_id']) }}
             @unless (isset($order_cart))
@@ -164,7 +164,7 @@
             @endunless
           @endif
 
-          <div class="box-tools pull-right">
+          <div class="box-tools pull-right admin-card__actions">
             @if (Gate::allows('create', \App\Models\Cart::class) || Gate::allows('create', \App\Models\Order::class) || Gate::allows('update', \App\Models\Cart::class))
               <button name='action' value="1" id="saveTheCart" class='btn btn-flat btn-lg btn-default'>
                 <i class="fa fa-save"></i>
@@ -184,16 +184,17 @@
               </button>
             @endif
           </div>
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+        </div>
+      </div>
     </div>
 
     <div class="col-md-3 nopadding-left">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title"> {{ trans('app.customer') }}</h3>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.customer'),
+        'icon' => 'fa-user',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+      ])
           <p>
             @if ($customer->image)
               <img src="{{ get_storage_file_url(optional($customer->image)->path, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
@@ -212,14 +213,14 @@
           @can('view', $customer)
             <a href="javascript:void(0)" data-link="{{ route('admin.admin.customer.show', $customer->id) }}" class="ajax-modal-btn btn btn-default btn-xs">{{ trans('app.view_detail') }}</a>
           @endcan
-        </div>
-      </div>
+      @include('admin.partials.ui.card_end')
 
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title"> {{ trans('app.addresses') }}</h3>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.addresses'),
+        'icon' => 'fa-map-marker',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+      ])
           <fieldset>
             <legend>{{ strtoupper(trans('app.shipping_address')) }}</legend>
           </fieldset>
@@ -256,14 +257,14 @@
               @endif
             @endif
           </div>
-        </div>
-      </div>
+      @include('admin.partials.ui.card_end')
 
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title"> {{ trans('app.payment') }}</h3>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.payment'),
+        'icon' => 'fa-credit-card',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+      ])
           <div class="form-group">
             {!! Form::label('payment_method_id', trans('app.form.payment_method') . '*') !!}
             {!! Form::select('payment_method_id', $payment_methods, isset($cart->payment_method_id) ? $cart->payment_method_id : config('shop_settings.default_payment_method_id'), ['class' => 'form-control select2-normal', 'placeholder' => trans('app.placeholder.payment'), 'required']) !!}
@@ -274,14 +275,14 @@
             {!! Form::select('payment_status', $payment_statuses, isset($cart->payment_status) ? $cart->payment_status : 1, ['class' => 'form-control select2-normal', 'required']) !!}
             <div class="help-block with-errors"></div>
           </div>
-        </div>
-      </div>
+      @include('admin.partials.ui.card_end')
 
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title"> {{ trans('app.invoice') }}</h3>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.invoice'),
+        'icon' => 'fa-file-text-o',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+      ])
           <div class="form-group">
             {!! Form::label('message_to_customer', trans('app.form.message_to_customer'), ['class' => 'with-help']) !!}
             <i class="fa fa-question-circle indent5" data-toggle="tooltip" data-placement="top" title="{{ trans('help.message_to_customer') }}"></i>
@@ -292,8 +293,7 @@
             {!! Form::label('send_invoice_to_customer', strtoupper(trans('app.send_invoice_to_customer')), ['class' => 'indent5']) !!}
             <i class="fa fa-question-circle indent5" data-toggle="tooltip" data-placement="top" title="{{ trans('help.send_invoice_to_customer') }}"></i>
           </small>
-        </div>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
     {!! Form::close() !!}
   </div>

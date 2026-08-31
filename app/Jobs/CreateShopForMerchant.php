@@ -65,7 +65,7 @@ class CreateShopForMerchant
             'legal_name' => $this->request['legal_name'] ?? null,
             'owner_id' => $this->merchant->id,
             'email' => $this->merchant->email,
-            'slug' => $this->request['slug'] ?? Str::slug($this->request['shop_name']),
+            'slug' => generate_unique_shop_slug($this->request['slug'] ?? $this->request['shop_name']),
             'external_url' => $this->request['external_url'] ?? null,
             'timezone_id' => config('system_settings.timezone_id'),
             'card_holder_name' => $this->request['name'] ?? null,
@@ -89,7 +89,7 @@ class CreateShopForMerchant
             'support_email' => $this->request['support_email'] ?? $this->merchant->email,
             'default_sender_email_address' => $this->request['default_sender_email_address'] ?? $this->request['support_email'] ?? $this->merchant->email,
             'default_email_sender_name' => $this->request['default_email_sender_name'] ?? $this->request['shop_name'],
-            'maintenance_mode' => isset($this->request['maintenance_mode']) ? $this->request['maintenance_mode'] : 1,
+            'maintenance_mode' => isset($this->request['maintenance_mode']) ? $this->request['maintenance_mode'] : 0,
         ];
         $shop->config()->create(array_merge($this->request, $supportInfo));
 
@@ -107,10 +107,16 @@ class CreateShopForMerchant
         ]);
 
         // Create address
-        $shop->addresses()->create(array_merge($this->request, [
+        $address = $shop->addresses()->create(array_merge($this->request, [
             'address_title' => $this->request['shop_name'],
             'phone' => $supportInfo['support_phone'],
+            'latitude' => $this->request['latitude'] ?? null,
+            'longitude' => $this->request['longitude'] ?? null,
         ]));
+
+        app(\App\Services\Geo\GeocodeService::class)->applyToAddress($address);
+
+        $shop->update(['primary_address_id' => $address->id]);
 
         // Save Brand logo from url
         if (isset($this->request['brand_logo']) && filter_var($this->request['brand_logo'], FILTER_VALIDATE_URL)) {

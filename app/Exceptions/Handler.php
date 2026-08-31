@@ -105,14 +105,14 @@ class Handler extends ExceptionHandler
 
         switch ($guard) {
             case 'customer':
-                $login = 'customer.login';
+                $login = route('homepage', ['login' => 1]);
                 break;
             default:
-                $login = 'login';
+                $login = route('login');
                 break;
         }
 
-        return redirect()->guest(route($login));
+        return redirect()->guest($login);
     }
 
     public function handle($request, Closure $next, $guard = null)

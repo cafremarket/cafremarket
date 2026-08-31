@@ -28,6 +28,7 @@ class Supplier extends BaseModel
         'name',
         'email',
         'contact_person',
+        'nuit',
         'url',
         'bio',
         'active',

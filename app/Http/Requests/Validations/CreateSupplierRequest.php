@@ -29,6 +29,7 @@ class CreateSupplierRequest extends Request
         return [
             'name' => 'bail|required',
             'email' => 'nullable|email',
+            'nuit' => 'nullable|string|max:64',
             'active' => 'required',
             'image' => 'max:'.config('system_settings.max_img_size_limit_kb').'|mimes:jpg,jpeg,png,gif,svg',
         ];

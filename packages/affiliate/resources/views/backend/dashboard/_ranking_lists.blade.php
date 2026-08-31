@@ -1,15 +1,15 @@
 <div class="row">
   <div class="col-md-6">
-    <div class="box">
-      <div class="box-header with-border">
+    <div class="box admin-card">
+      <div class="box-header with-border admin-card__header">
         <div class="box-title">
           {{ trans('packages.affiliate.top_links_by_visitors') }}
         </div>
-        <div class="box-tools pull-right">
+        <div class="box-tools pull-right admin-card__actions">
           <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
         </div>
       </div>
-      <div class="box-body">
+      <div class="box-body admin-card__body">
         <table class="table table-responsive">
           <thead>
             <th></th>
@@ -41,16 +41,16 @@
   </div>
 
   <div class="col-md-6">
-    <div class="box">
-      <div class="box-header with-border">
+    <div class="box admin-card">
+      <div class="box-header with-border admin-card__header">
         <div class="box-title">
           {{ trans('packages.affiliate.top_links_by_commission') }}
         </div>
-        <div class="box-tools pull-right">
+        <div class="box-tools pull-right admin-card__actions">
           <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
         </div>
       </div>
-      <div class="box-body">
+      <div class="box-body admin-card__body">
         <table class="table table-responsive">
           <thead>
             <th></th>

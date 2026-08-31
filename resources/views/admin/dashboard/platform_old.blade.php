@@ -174,7 +174,7 @@
         </div>
       </div>
 
-      <div class="box">
+      <div class="box admin-card">
         <div class="nav-tabs-custom">
           <ul class="nav nav-tabs nav-justified">
             <li class="active"><a href="#visitors_tab" data-toggle="tab">
@@ -199,7 +199,7 @@
             <!-- /.tab-pane -->
 
             <div class="tab-pane" id="latest_product_tab">
-              <div class="box-body nopadding">
+              <div class="box-body admin-card__body nopadding">
                 <div class="table-responsive">
                   <table class="table no-margin table-condensed">
                     <thead>
@@ -243,7 +243,7 @@
                 <!-- /.table-responsive -->
               </div>
               <!-- /.box-body -->
-              <div class="box-footer clearfix">
+              <div class="box admin-card-footer clearfix">
                 @can('index', \App\Models\Product::class)
                   <a href="{{ route('admin.catalog.product.index') }}" class="btn btn-default btn-flat pull-right">
                     <i class="icon ion-md-cube"></i> {{ trans('app.products') }}
@@ -254,7 +254,7 @@
             <!-- /.tab-pane -->
 
             <div class="tab-pane" id="open_ticket_tab">
-              <div class="box-body nopadding">
+              <div class="box-body admin-card__body nopadding">
                 <div class="table-responsive">
                   <table class="table no-margin table-condensed">
                     <thead>
@@ -289,7 +289,7 @@
                 <!-- /.table-responsive -->
               </div>
               <!-- /.box-body -->
-              <div class="box-footer clearfix">
+              <div class="box admin-card-footer clearfix">
                 @can('index', \App\Models\Ticket::class)
                   <a href="{{ route('admin.support.ticket.index') }}" class="btn btn-default btn-flat pull-right">
                     <i class="fa fa-ticket"></i> {{ trans('app.tickets') }}
@@ -334,7 +334,7 @@
         <!-- /.info-box-content -->
       </div>
 
-      <div class="box">
+      <div class="box admin-card">
         <div class="nav-tabs-custom">
           <ul class="nav nav-tabs nav-justified">
             <li class="active"><a href="#top_customer_tab" data-toggle="tab">
@@ -350,7 +350,7 @@
 
           <div class="tab-content nopadding">
             <div class="tab-pane active" id="top_customer_tab">
-              <div class="box-body">
+              <div class="box-body admin-card__body">
                 <div class="table-responsive">
                   <table class="table no-margin table-condensed">
                     <thead>
@@ -397,7 +397,7 @@
             <!-- /.tab-pane -->
 
             <div class="tab-pane" id="top_merchant_tab">
-              <div class="box-body">
+              <div class="box-body admin-card__body">
                 <div class="table-responsive">
                   <table class="table no-margin table-condensed">
                     <thead>

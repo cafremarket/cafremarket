@@ -5,9 +5,12 @@
 @endphp
 
 @section('content')
-  <div class="box">
-    <div class="nav-tabs-custom">
-      <ul class="nav nav-tabs nav-justified">
+  @include('admin.partials.ui.card_tabbed_start', [
+    'title' => trans('app.general_settings'),
+    'icon' => 'fa-cog',
+  ])
+
+    <ul class="nav nav-tabs nav-justified admin-tabs">
         <li class="active">
           <a href="#general_settings_tab" data-toggle="tab">
             <i class="fa fa-cubes hidden-sm"></i>
@@ -408,8 +411,7 @@
         </div><!-- /.tab-pane -->
 
       </div><!-- /.tab-content -->
-    </div> <!-- /.nav-tabs-custom -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_tabbed_end')
 @endsection
 
 @push('script')

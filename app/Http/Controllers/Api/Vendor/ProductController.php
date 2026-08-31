@@ -96,6 +96,18 @@ class ProductController extends Controller
                     $inventoryData['warehouse_id'] = $request->warehouse_id;
                 }
 
+                if ($request->filled('supplier_id')) {
+                    $inventoryData['supplier_id'] = $request->supplier_id;
+                }
+
+                if ($request->filled('purchase_price')) {
+                    $inventoryData['purchase_price'] = $request->purchase_price;
+                }
+
+                if ($request->filled('key_features')) {
+                    $inventoryData['key_features'] = $request->key_features;
+                }
+
                 $this->inventory->store(new Request($inventoryData));
             });
         } catch (\Exception $e) {
@@ -153,6 +165,9 @@ class ProductController extends Controller
                     'active' => $request->active,
                     'available_from' => $request->input('available_from', $inventory->available_from),
                     'slug' => $request->slug,
+                    'supplier_id' => $request->input('supplier_id', $inventory->supplier_id),
+                    'purchase_price' => $request->input('purchase_price', $inventory->purchase_price),
+                    'key_features' => $request->input('key_features', $inventory->key_features),
                 ])->save();
             }
 

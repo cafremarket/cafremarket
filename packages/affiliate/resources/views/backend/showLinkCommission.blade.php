@@ -1,15 +1,15 @@
 @extends('affiliate::backend.master_layout')
 
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.affiliate.affiliate_commissions') }}</h3>
-      <div class="box-tools pull-right">
+  <div class="box admin-card">
+    <div class="box-header with-border admin-card__header">
+      <h3 class="box-title admin-card__title">{{ trans('packages.affiliate.affiliate_commissions') }}</h3>
+      <div class="box-tools pull-right admin-card__actions">
       </div>
     </div> <!-- /.box-header -->
 
-    <div class="box-body">
-      <table class="table table-hover table-option">
+    <div class="box-body admin-card__body">
+      <table class="table table-hover admin-table table-option">
         <thead>
           <tr>
             <th>{{ trans('packages.affiliate.created_at') }}</th>

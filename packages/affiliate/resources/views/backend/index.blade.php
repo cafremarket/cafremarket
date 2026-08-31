@@ -5,12 +5,12 @@
 @endsection
 
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.affiliate.affiliate_links') }}</h3>
+  <div class="box admin-card">
+    <div class="box-header with-border admin-card__header">
+      <h3 class="box-title admin-card__title">{{ trans('packages.affiliate.affiliate_links') }}</h3>
     </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-no-sort">
+    <div class="box-body admin-card__body responsive-table">
+      <table class="table table-hover admin-table table-no-sort">
         <thead>
           <tr>
             <th>{{ trans('app.shop') }}</th>
@@ -63,19 +63,19 @@
     </div>
   </div> <!-- /.box -->
 
-  <div class="box collapsed-box">
-    <div class="box-header with-border">
+  <div class="box admin-card collapsed-box">
+    <div class="box-header with-border admin-card__header">
       <div class="box-title">
         {{ trans('packages.affiliate.invalid_links') }}
         <small> ({{ trans('packages.affiliate.item_not_available') }})</small>
       </div>
-      <div class="box-tools pull-right">
+      <div class="box-tools pull-right admin-card__actions">
         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
         <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
       </div>
     </div>
-    <div class="box-body">
-      <table class="table table-hover table-no-sort">
+    <div class="box-body admin-card__body">
+      <table class="table table-hover admin-table table-no-sort">
         <thead>
           <tr>
             <th>{{ trans('app.slug') }}</th>

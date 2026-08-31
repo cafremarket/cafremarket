@@ -33,7 +33,7 @@
 
             {!! Form::submit(trans('theme.password_reset'), ['class' => 'btn btn-block btn-lg btn-flat btn-primary']) !!}
             {!! Form::close() !!}
-            <a href="{{ route('customer.login') }}" class="btn btn-link">{{ trans('theme.button.login') }}</a>
+            <a href="{{ route('homepage', ['login' => 1]) }}" class="btn btn-link">{{ trans('theme.button.login') }}</a>
           </div>
         </div>
       </div>

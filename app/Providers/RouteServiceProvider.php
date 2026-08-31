@@ -25,6 +25,11 @@ class RouteServiceProvider extends ServiceProvider
     public const DASHBOARD = 'admin/dashboard';
 
     /**
+     * Merchant panel dashboard path.
+     */
+    public const MERCHANT_DASHBOARD = 'merchant/dashboard';
+
+    /**
      * The path to the "admin login" route for your application.
      *
      * @var string

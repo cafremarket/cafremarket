@@ -1,13 +1,52 @@
 {{--   Left side column. contains the logo and sidebar --}}
 <aside class="main-sidebar">
-  {{-- sidebar: style can be found in sidebar.less --}}
   <section class="sidebar">
+
+    {{-- User panel --}}
+    <div class="sidebar-user-panel">
+      <div style="display:flex;align-items:center;gap:12px;">
+        @if (Auth::user()->image)
+          <img src="{{ get_storage_file_url(Auth::user()->image->path, 'tiny') }}" class="user-avatar" alt="">
+        @else
+          <img src="{{ get_gravatar_url(Auth::user()->email, 'tiny') }}" class="user-avatar" alt="">
+        @endif
+        <div style="overflow:hidden;flex:1;">
+          <p class="user-name">{{ Auth::user()->getName() }}</p>
+          <p class="user-role">
+            @if (Auth::user()->isAdmin())
+              {{ trans('app.admin') }}
+            @elseif (Auth::user()->isMerchant())
+              {{ trans('app.merchant') }}
+            @else
+              {{ trans('app.user') }}
+            @endif
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {{-- Sidebar search --}}
+    <div class="sidebar-search">
+      <div class="sidebar-search-wrap">
+        <i class="fa fa-search search-icon"></i>
+        <input type="text" id="sidebar-menu-search" placeholder="{{ trans('app.search') ?? 'Search menu...' }}" autocomplete="off">
+      </div>
+    </div>
+
     <ul class="sidebar-menu">
+
+      {{-- ===== OVERVIEW ===== --}}
+      <li class="nav-section"><span class="nav-section-label">{{ trans('nav.dashboard') ?? 'Overview' }}</span></li>
       <li class="{{ Request::is('admin/dashboard*') ? 'active' : '' }}">
         <a href="{{ url('admin/dashboard') }}">
           <i class="fa fa-dashboard"></i> <span>{{ trans('nav.dashboard') }}</span>
         </a>
       </li>
+
+      {{-- ===== COMMERCE ===== --}}
+      @if (Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\Attribute::class) || Gate::allows('index', \App\Models\Product::class) || Gate::allows('index', \App\Models\Manufacturer::class) || Gate::allows('index', \App\Models\CategoryGroup::class) || Gate::allows('index', \App\Models\CategorySubGroup::class) || Gate::allows('index', \App\Models\Inventory::class) || Gate::allows('index', \App\Models\Warehouse::class) || Gate::allows('index', \App\Models\Supplier::class) || Gate::allows('index', \App\Models\Order::class) || Gate::allows('index', \App\Models\Cart::class) || is_incevio_package_loaded('pos'))
+        <li class="nav-section"><span class="nav-section-label">{{ trans('nav.catalog') ?? 'Commerce' }}</span></li>
+      @endif
 
       @if (Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\Attribute::class) || Gate::allows('index', \App\Models\Product::class) || Gate::allows('index', \App\Models\Manufacturer::class) || Gate::allows('index', \App\Models\CategoryGroup::class) || Gate::allows('index', \App\Models\CategorySubGroup::class))
         <li class="treeview {{ Request::is('admin/catalog*') ? 'active' : '' }}">
@@ -192,8 +231,24 @@
         </li>
       @endif
 
+      {{-- ===== PEOPLE & VENDORS ===== --}}
+      @if (Auth::user()->isFromPlatform() && (Gate::allows('index', \App\Models\User::class) || Gate::allows('index', \App\Models\Customer::class)))
+        <li class="nav-section"><span class="nav-section-label">{{ trans('nav.vendors') ?? 'People' }}</span></li>
+      @elseif (Auth::user()->isMerchant())
+        <li class="nav-section"><span class="nav-section-label">{{ trans('nav.vendors') ?? 'People' }}</span></li>
+      @elseif (Auth::user()->isFromPlatform() && (Gate::allows('index', \App\Models\Merchant::class) || Gate::allows('index', \App\Models\Shop::class)))
+        <li class="nav-section"><span class="nav-section-label">{{ trans('nav.vendors') ?? 'People' }}</span></li>
+      @endif
+
       {{-- Platform admin: Users / global customers / inspector (not shown to vendors) --}}
-      @if (Auth::user()->isFromPlatform() && (Gate::allows('index', \App\Models\User::class) || Gate::allows('index', \App\Models\Customer::class) || Gate::allows('index', \Incevio\Package\Inspector\Models\InspectorModel::class)))
+      @php
+        $showPlatformAdminMenu = Auth::user()->isFromPlatform() && (
+            Gate::allows('index', \App\Models\User::class) ||
+            Gate::allows('index', \App\Models\Customer::class) ||
+            Gate::allows('index', \Incevio\Package\Inspector\Models\InspectorModel::class)
+        );
+      @endphp
+      @if ($showPlatformAdminMenu)
         <li class="treeview {{ Request::is('admin/admin*') || Request::is('address/addresses/customer*') || Request::is('admin/inspector*') || Request::is('admin/affiliate') ? 'active' : '' }}">
           <a href="javascript:void(0)">
             <i class="fa fa-user-secret"></i>
@@ -253,10 +308,33 @@
           </li>
         @endcan
 
-        <li class="{{ Request::is('admin/admin/deliveryboys*') ? 'active' : '' }}">
+        <li class="{{ Request::is('admin/admin/deliveryboy*') ? 'active' : '' }}">
           <a href="{{ route('admin.admin.deliveryboy.index') }}">
             <i class="fa fa-motorcycle"></i> <span>{{ trans('nav.delivery_boys') }}</span>
           </a>
+        </li>
+      @endif
+
+      {{-- Platform: platform riders & dispatch (not for vendors) --}}
+      @if (Auth::user()->isFromPlatform())
+        <li class="treeview {{ Request::is('admin/admin/delivery/platform-riders*') || Request::is('admin/admin/hyperlocal*') ? 'active' : '' }}">
+          <a href="javascript:void(0)">
+            <i class="fa fa-motorcycle"></i>
+            <span>{{ trans('nav.delivery') }}</span>
+            <i class="fa fa-angle-left pull-right"></i>
+          </a>
+          <ul class="treeview-menu">
+            <li class="{{ Request::is('admin/admin/delivery/platform-riders*') ? 'active' : '' }}">
+              <a href="{{ route('admin.admin.platform_rider.index') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('app.platform_riders') }}
+              </a>
+            </li>
+            <li class="{{ Request::is('admin/admin/hyperlocal/dispatch*') ? 'active' : '' }}">
+              <a href="{{ route('admin.admin.hyperlocal.dispatch') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('app.dispatch_dashboard') }}
+              </a>
+            </li>
+          </ul>
         </li>
       @endif
 
@@ -305,6 +383,11 @@
         @include('buyerGroup::_sidebar_admin_nav')
       @endif
 
+      {{-- ===== FINANCE ===== --}}
+      @if (is_incevio_package_loaded('wallet'))
+        <li class="nav-section"><span class="nav-section-label">{{ trans('packages.wallet.wallet') ?? 'Finance' }}</span></li>
+      @endif
+
       @if (is_incevio_package_loaded('wallet'))
         @include('wallet::admin.sidebar._main_dropdowns')
       @endif
@@ -313,53 +396,11 @@
         @include('smsGateways::partials._sidebar')
       @endif
 
+      {{-- ===== MARKETING ===== --}}
       @if (Auth::user()->isFromMerchant())
-        @if (Gate::allows('index', \App\Models\Carrier::class) || Gate::allows('index', \Incevio\Package\Packaging\Models\Packaging::class))
-          <li class="treeview {{ Request::is('admin/shipping*') ? 'active' : '' }}">
-            <a href="javascript:void(0)">
-              <i class="fa fa-truck"></i>
-              <span>{{ trans('nav.shipping') }}</span>
-              <i class="fa fa-angle-left pull-right"></i>
-            </a>
-            <ul class="treeview-menu">
-              @can('index', \App\Models\Carrier::class)
-                <li class="{{ Request::is('admin/shipping/carrier*') ? 'active' : '' }}">
-                  <a href="{{ url('admin/shipping/carrier') }}">
-                    <i class="fa fa-angle-double-right"></i> {{ trans('nav.carriers') }}
-                  </a>
-                </li>
-              @endcan
-
-              @if (is_incevio_package_loaded('shippo'))
-                <li class=" {{ Request::is('admin/shipping/shippo*') ? 'active' : '' }}">
-                  <a href="{{ route('admin.shipping.shippo.index') }}">
-                    <i class="fa fa-angle-double-right"></i> {{ trans('packages.shippo.shippo') }}
-                  </a>
-                </li>
-              @endif
-
-              @if (is_incevio_package_loaded('packaging'))
-                @can('index', \Incevio\Package\Packaging\Models\Packaging::class)
-                  <li class="{{ Request::is('admin/shipping/packaging*') ? 'active' : '' }}">
-                    <a href="{{ url('admin/shipping/packaging') }}">
-                      <i class="fa fa-angle-double-right"></i> {{ trans('nav.packaging') }}
-                      @include('partials._addon_badge')
-                    </a>
-                  </li>
-                @endcan
-              @endif
-
-              @can('index', \App\Models\ShippingZone::class)
-                <li class="{{ Request::is('admin/shipping/shippingZone*') ? 'active' : '' }}">
-                  <a href="{{ url('admin/shipping/shippingZone') }}">
-                    <i class="fa fa-angle-double-right"></i> {{ trans('nav.shipping_zones') }}
-                  </a>
-                </li>
-              @endcan
-            </ul>
-          </li>
-        @endif
+        <li class="nav-section"><span class="nav-section-label">{{ trans('nav.promotions') ?? 'Marketing' }}</span></li>
       @endif
+
       {{-- temporarily hidden from super admin --}}
       @if (Auth::user()->isFromMerchant())
         <li class="treeview {{ Request::is('admin/promotion*') ? 'active' : '' }}">
@@ -393,6 +434,11 @@
                 @endcan --}}
           </ul>
         </li>
+      @endif
+
+      {{-- ===== SUPPORT ===== --}}
+      @if (Gate::allows('index', \App\Models\Message::class) || Gate::allows('index', \App\Models\Ticket::class) || Gate::allows('index', \App\Models\Dispute::class) || Gate::allows('index', \App\Models\Refund::class) || Gate::allows('index', \Incevio\Package\LiveChat\Models\ChatConversation::class))
+        <li class="nav-section"><span class="nav-section-label">{{ trans('nav.support') ?? 'Support' }}</span></li>
       @endif
 
       @if (Gate::allows('index', \App\Models\Message::class) || Gate::allows('index', \App\Models\Ticket::class) || Gate::allows('index', \App\Models\Dispute::class) || Gate::allows('index', \App\Models\Refund::class) || Gate::allows('index', \Incevio\Package\LiveChat\Models\ChatConversation::class))
@@ -451,6 +497,11 @@
         </li>
       @endif
 
+      {{-- ===== CONTENT & DESIGN ===== --}}
+      @if ((new \App\Helpers\Authorize(Auth::user(), 'customize_appearance'))->check())
+        <li class="nav-section"><span class="nav-section-label">{{ trans('nav.appearance') ?? 'Content' }}</span></li>
+      @endif
+
       @if ((new \App\Helpers\Authorize(Auth::user(), 'customize_appearance'))->check())
         <li class="treeview {{ Request::is('admin/appearance*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
@@ -487,17 +538,22 @@
               </a>
             </li>
 
+            @unless (Auth::user()->isMerchant())
             <li class="{{ Request::is('admin/appearance/custom_css*') ? 'active' : '' }}">
               <a href="{{ route('admin.appearance.custom_css') }}">
                 <i class="fa fa-angle-double-right"></i> {{ trans('nav.custom_css') }}
               </a>
             </li>
+            @endunless
           </ul>
         </li>
       @endif
 
       {{-- Flash deal merge into promotions --}}
       @if (Auth::user()->isAdmin() || (new \App\Helpers\Authorize(Auth::user(), 'manage_flash_deal'))->check())
+        @unless (Auth::user()->isFromMerchant())
+          <li class="nav-section"><span class="nav-section-label">{{ trans('nav.promotions') ?? 'Marketing' }}</span></li>
+        @endunless
         <li class="treeview {{ Request::is('admin/promotions*') || Request::is('admin/flashdeal*') || Request::is('admin/promotion/push-campaign*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
             <i class="fa fa-bullhorn"></i>
@@ -538,13 +594,8 @@
         </li>
       @endif
 
-      @if (Auth::user()->isAdmin())
-        <li class="{{ Request::is('admin/packages*') ? 'active' : '' }}">
-          <a href="{{ url('admin/packages') }}">
-            <i class="fa fa-plug"></i> <span>{{ trans('nav.packages') }}</span>
-          </a>
-        </li>
-      @endif
+      {{-- ===== SYSTEM ===== --}}
+      <li class="nav-section"><span class="nav-section-label">{{ trans('nav.settings') ?? 'System' }}</span></li>
 
       <li class="treeview {{ Request::is('admin/setting*') ? 'active' : '' }}">
         <a href="javascript:void(0)">

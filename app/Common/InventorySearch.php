@@ -10,6 +10,8 @@ use App\Models\CategoryGroup;
 use App\Models\CategorySubGroup;
 use App\Models\Inventory;
 use App\Models\State;
+use App\Services\Hyperlocal\BuyerLocationService;
+use App\Services\Hyperlocal\HyperlocalCatalogService;
 use Carbon\Carbon;
 
 trait InventorySearch
@@ -21,6 +23,30 @@ trait InventorySearch
      */
     public function search(ProductSearchRequest $request)
     {
+        $catalog = app(HyperlocalCatalogService::class);
+        $buyerLocation = app(BuyerLocationService::class);
+        $buyerLocation->syncFromCustomer();
+
+        if ($catalog->requiresLocationForBrowse() && ! $buyerLocation->hasLocation()) {
+            if ($request->is('api/*') && $request->acceptsJson()) {
+                return response()->json([
+                    'message' => trans('theme.set_location_to_shop'),
+                    'require_location' => true,
+                    'data' => [],
+                ], 422);
+            }
+
+            return view('theme::search_results', [
+                'products' => Inventory::whereRaw('1 = 0')->paginate(config('system.view_listing_per_page', 15)),
+                'category' => null,
+                'brands' => collect(),
+                'priceRange' => ['min' => 0, 'max' => 0],
+                'searchCountries' => collect(),
+                'searchStates' => collect(),
+                'require_location' => true,
+            ]);
+        }
+
         $term = trim((string) $request->input('q', ''));
 
         if ($term === '') {
@@ -67,6 +93,10 @@ trait InventorySearch
         $items = $items->filter(function ($item) {
             return $item->shop && $item->shop->canGoLive();
         });
+
+        if ($catalog->isEnabled()) {
+            $items = $catalog->filterInventories($items);
+        }
 
         $now = Carbon::now();
         $category = null;
@@ -195,31 +225,32 @@ trait InventorySearch
             });
         }
 
-        // Filter by shipping zone coverage: shops that deliver to this state/region.
-        if ($request->filled('state_id')) {
-            $stateId = (int) $request->input('state_id');
-            $items->loadMissing([
-                'shop.shippingZones' => function ($q) {
-                    $q->where('active', 1);
-                },
-            ]);
+        // Legacy country/state shipping zones — disabled when hyperlocal is active.
+        if (! config('hyperlocal.ignore_shipping_zones', true)) {
+            if ($request->filled('state_id')) {
+                $stateId = (int) $request->input('state_id');
+                $items->loadMissing([
+                    'shop.shippingZones' => function ($q) {
+                        $q->where('active', 1);
+                    },
+                ]);
 
-            $items = $items->filter(function ($item) use ($stateId) {
-                return $item->shop && shop_ships_to_state($item->shop, $stateId);
-            });
-        } elseif ($request->filled('country_id')) {
-            // Country-only zone search: show listings only from shops that ship somewhere in that country.
-            $countryId = (int) $request->input('country_id');
-            $stateIdsInCountry = State::where('country_id', $countryId)->pluck('id')->all();
-            $items->loadMissing([
-                'shop.shippingZones' => function ($q) {
-                    $q->where('active', 1);
-                },
-            ]);
+                $items = $items->filter(function ($item) use ($stateId) {
+                    return $item->shop && shop_ships_to_state($item->shop, $stateId);
+                });
+            } elseif ($request->filled('country_id')) {
+                $countryId = (int) $request->input('country_id');
+                $stateIdsInCountry = State::where('country_id', $countryId)->pluck('id')->all();
+                $items->loadMissing([
+                    'shop.shippingZones' => function ($q) {
+                        $q->where('active', 1);
+                    },
+                ]);
 
-            $items = $items->filter(function ($item) use ($countryId, $stateIdsInCountry) {
-                return $item->shop && shop_ships_to_country($item->shop, $countryId, $stateIdsInCountry);
-            });
+                $items = $items->filter(function ($item) use ($countryId, $stateIdsInCountry) {
+                    return $item->shop && shop_ships_to_country($item->shop, $countryId, $stateIdsInCountry);
+                });
+            }
         }
 
         $defaultCountryId = $request->input('country_id');

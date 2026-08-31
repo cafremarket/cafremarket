@@ -420,7 +420,7 @@ class OrderController extends Controller
     {
         $customer = auth('customer')->user();
         if (! $customer) {
-            return redirect()->route('customer.login');
+            return redirect()->route('homepage', ['login' => 1]);
         }
 
         $order = Order::withTrashed()

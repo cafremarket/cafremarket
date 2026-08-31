@@ -62,6 +62,20 @@ class AppServiceProvider extends ServiceProvider
         // Add Google recaptcha validation rule
         Validator::extend('recaptcha', 'App\\Helpers\\ReCaptcha@validate');
 
+        // Production reCAPTCHA keys are domain-restricted; skip on localhost unless explicitly enabled.
+        if (! $this->app->runningInConsole() && config('services.recaptcha.key')) {
+            $host = request()->getHost();
+            $localHosts = ['localhost', '127.0.0.1', '[::1]'];
+            $allowOnLocalhost = filter_var(env('RECAPTCHA_ON_LOCALHOST', false), FILTER_VALIDATE_BOOLEAN);
+
+            if (in_array($host, $localHosts, true) && ! $allowOnLocalhost) {
+                config([
+                    'services.recaptcha.key' => null,
+                    'services.recaptcha.secret' => null,
+                ]);
+            }
+        }
+
         // Disable encryption for gdpr cookie
         $this->app->resolving(EncryptCookies::class, function (EncryptCookies $encryptCookies) {
             $encryptCookies->disableFor(config('gdpr.cookie.name'));

@@ -1,98 +1,84 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('packages.affiliate.affiliate_links') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.affiliate.affiliate_links') }}</h3>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-no-sort">
-        <thead>
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('packages.affiliate.affiliate_links'),
+    'icon' => 'fa-link',
+    'bodyClass' => 'responsive-table',
+  ])
+
+  <table class="table table-hover admin-table table-no-sort">
+    <thead>
+      <tr>
+        <th>{{ trans('app.shop') }}</th>
+        <th>{{ trans('app.form.url') }}</th>
+        <th>{{ trans('app.price') }}</th>
+        <th>{{ trans('packages.affiliate.commission_rate') . ' (%)' }}</th>
+        <th>{{ trans('theme.total_sold_quantity') }}</th>
+        <th>{{ trans('packages.affiliate.visitors') }}</th>
+        <th class="admin-table__actions-col">{{ trans('app.options') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($links as $link)
+        @if ($link->inventory)
           <tr>
-            <th>{{ trans('app.shop') }}</th>
-            <th>{{ trans('app.form.url') }}</th>
-            <th>{{ trans('app.price') }}</th>
-            <th>{{ trans('packages.affiliate.commission_rate') . ' (%)' }}</th>
-            <th>{{ trans('theme.total_sold_quantity') }}</th>
-            <th>{{ trans('packages.affiliate.visitors') }}</th>
-            <th>{{ trans('app.options') }}</th>
+            <td>{!! $link->inventory->shop->name !!}</td>
+            <td>
+              <span class="js-affiliate-link-url">{{ $link->full_url }}</span>
+              <a href="{{ route('show.product', $link->inventory->slug) }}" target="_blank" class="admin-action-btn" title="{{ trans('packages.affiliate.go_to_product_page') }}" data-toggle="tooltip"><i class="fa fa-external-link"></i></a>
+              <a href="javascript:void(0)" class="admin-action-btn" onclick="copyAffiliateLink(this)" data-key="copy-affiliate-link" title="{{ trans('app.copy') }}" data-toggle="tooltip"><i class="fa fa-clipboard"></i></a>
+            </td>
+            <td>{{ get_formated_currency($link->inventory->sale_price, 2) }}</td>
+            <td>{{ $link->inventory->affiliates_percentage }}</td>
+            <td>{{ $link->order_count }}</td>
+            <td>{{ $link->visitor_count }}</td>
+            <td class="row-options admin-row-actions">
+              <a href="javascript:void(0)" data-link="{{ route('affiliate.link.edit', $link->id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.edit') }}" data-toggle="tooltip"><i class="fa fa-edit"></i></a>
+              {!! Form::open(['route' => ['affiliate.link.destroy', $link->id], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}
+              <button type="submit" class="admin-action-btn confirm ajax-silent" title="{{ trans('app.delete_permanently') }}" data-toggle="tooltip"><i class="fa fa-trash-o"></i></button>
+              {!! Form::close() !!}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @foreach ($links as $link)
-            @if ($link->inventory)
-              <tr>
-                <td>{!! $link->inventory->shop->name !!}</td>
-                <td>
-                  <span class="js-affiliate-link-url">{{ $link->full_url }}</span>
+        @endif
+      @endforeach
+    </tbody>
+  </table>
 
-                  <a href="{{ route('show.product', $link->inventory->slug) }}" class="ml-2" target="_blank">
-                    <i class="fa fa-external-link text-info" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.go_to_product_page') }}"></i>
-                  </a>
+  @include('admin.partials.ui.card_end')
 
-                  <a href="javascript::void(0)" class="pull-right" onclick="copyAffiliateLink(this)" data-key="copy-affiliate-link">
-                    <em class="fa fa-clipboard"></em>
-                  </a>
-                </td>
-                <td>{{ get_formated_currency($link->inventory->sale_price, 2) }}</td>
-                <td>{{ $link->inventory->affiliates_percentage }}</td>
-                <td>{{ $link->order_count }}</td>
-                <td>{{ $link->visitor_count }}</td>
-                <td>
-                  <a href="javascript:void(0)" data-link="{{ route('affiliate.link.edit', $link->id) }}" data-toggle="tooltip" title={{ trans('app.edit') }} class="ajax-modal-btn">
-                    <i class="fa fa-edit"></i>
-                  </a>&nbsp;
+  @include('admin.partials.ui.trash_start', ['title' => trans('app.trash')])
 
-                  {!! Form::open(['route' => ['affiliate.link.destroy', $link->id], 'method' => 'delete', 'class' => 'data-form']) !!}
-                  {!! Form::button('<i class="text-muted fa fa-trash"></i>', ['type' => 'submit', 'class' => 'confirm ajax-silent', 'title' => trans('app.delete_permanently'), 'data-toggle' => 'tooltip', 'data-placement' => 'top']) !!}
-                  {!! Form::close() !!}
-                </td>
-              </tr>
-            @endif
-          @endforeach
-        </tbody>
-      </table>
-    </div>
-  </div> <!-- /.box -->
-
-  <div class="box collapsed-box">
-    <div class="box-header with-border">
-      <div class="box-title">
-        {{ trans('packages.affiliate.invalid_links') }}
-        <small> ({{ trans('packages.affiliate.item_not_available') }})</small>
-      </div>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
-        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-      </div>
-    </div>
-    <div class="box-body">
-      <table class="table table-hover table-no-sort">
-        <thead>
+  <table class="table table-hover admin-table table-no-sort">
+    <thead>
+      <tr>
+        <th>{{ trans('app.slug') }}</th>
+        <th>{{ trans('theme.total_sold_quantity') }}</th>
+        <th>{{ trans('packages.affiliate.visitors') }}</th>
+        <th class="admin-table__actions-col">{{ trans('app.options') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($links as $link)
+        @unless ($link->inventory)
           <tr>
-            <th>{{ trans('app.slug') }}</th>
-            <th class="text-center">{{ trans('theme.total_sold_quantity') }}</th>
-            <th class="text-center">{{ trans('packages.affiliate.visitors') }}</th>
-            <th class="text-center">{{ trans('app.options') }}</th>
+            <td>{{ $link->slug }}</td>
+            <td>{{ $link->order_count }}</td>
+            <td>{{ $link->visitor_count }}</td>
+            <td class="row-options admin-row-actions">
+              {!! Form::open(['route' => ['affiliate.link.destroy', $link->id], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}
+              <button type="submit" class="admin-action-btn confirm ajax-silent" title="{{ trans('app.delete_permanently') }}" data-toggle="tooltip"><i class="fa fa-trash-o"></i></button>
+              {!! Form::close() !!}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @foreach ($links as $link)
-            @unless ($link->inventory)
-              <tr>
-                <td>{{ $link->slug }}</td>
-                <td class="text-center">{{ $link->order_count }}</td>
-                <td class="text-center">{{ $link->visitor_count }}</td>
-                <td class="text-center">
-                  {!! Form::open(['route' => ['affiliate.link.destroy', $link->id], 'method' => 'delete', 'class' => 'data-form']) !!}
-                  {!! Form::button('<i class="text-muted fa fa-trash"></i>', ['type' => 'submit', 'class' => 'confirm ajax-silent', 'title' => trans('app.delete_permanently'), 'data-toggle' => 'tooltip', 'data-placement' => 'top']) !!}
-                  {!! Form::close() !!}
-                </td>
-              </tr>
-            @endunless
-          @endforeach
-        </tbody>
-      </table>
-    </div>
-  </div> <!-- /.box -->
+        @endunless
+      @endforeach
+    </tbody>
+  </table>
+
+  @include('admin.partials.ui.card_end')
 @endsection

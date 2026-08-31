@@ -1,5 +1,9 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.products') }}
+@endsection
+
 @section('content')
   @include('admin.partials.reports.sales_nav')
   @include('admin.partials.reports.summary_products')
@@ -27,15 +31,15 @@
     </div>
   </div>
 
-  <div class="box report-table-box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.products') }}</h3>
-      <div class="box-tools pull-right">
-        @include('admin.partials.reports.timeframe')
-      </div>
-    </div>
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-no-sort table-responsive products-report-table">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.products'),
+    'icon' => 'fa-cube',
+    'class' => 'report-table-box',
+    'actions' => view('admin.partials.reports.timeframe')->render(),
+    'bodyClass' => 'responsive-table',
+  ])
+
+      <table class="table table-hover admin-table table-no-sort table-responsive products-report-table">
         <thead>
           <tr>
             <th>{{ trans('app.product') }}</th>
@@ -49,8 +53,8 @@
         </thead>
         <tbody></tbody>
       </table>
-    </div>
-  </div>
+
+  @include('admin.partials.ui.card_end')
 @endsection
 
 @section('page-script')

@@ -4,6 +4,7 @@ namespace App\Repositories\Shop;
 
 use App\Events\Shop\ShopDeleted;
 use App\Models\Shop;
+use App\Models\User;
 use App\Repositories\BaseRepository;
 use App\Repositories\EloquentRepository;
 use Illuminate\Http\Request;
@@ -68,11 +69,28 @@ class EloquentShop extends EloquentRepository implements BaseRepository, ShopRep
         return $shop;
     }
 
+    public function trash($id)
+    {
+        $shop = $this->model->findOrFail($id);
+
+        if ($owner = $shop->owner) {
+            $owner->delete();
+        }
+
+        $shop->staffs()->get()->each->delete();
+
+        return $shop->delete();
+    }
+
     public function destroy($id)
     {
         $shop = parent::findTrash($id);
 
         $shop->clearData();
+
+        if ($owner = User::withTrashed()->find($shop->owner_id)) {
+            $owner->forceDelete();
+        }
 
         return $shop->forceDelete();
     }
@@ -87,8 +105,11 @@ class EloquentShop extends EloquentRepository implements BaseRepository, ShopRep
         $shops = $this->model->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($shops as $shop) {
-            $shop->owner()->delete();
-            $shop->staffs()->delete();
+            if ($owner = $shop->owner) {
+                $owner->delete();
+            }
+
+            $shop->staffs()->get()->each->delete();
 
             event(new ShopDeleted($shop->id));
         }
@@ -102,6 +123,10 @@ class EloquentShop extends EloquentRepository implements BaseRepository, ShopRep
 
         foreach ($shops as $shop) {
             $shop->clearData();
+
+            if ($owner = User::withTrashed()->find($shop->owner_id)) {
+                $owner->forceDelete();
+            }
         }
 
         return parent::massDestroy($ids);

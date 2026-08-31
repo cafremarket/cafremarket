@@ -11,6 +11,7 @@ use App\Notifications\Auth\CustomerResetPasswordNotification as SendPasswordRese
 use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
 use App\Notifications\Customer\PasswordUpdated as PasswordResetSuccess;
 use App\Services\FCMService;
+use App\Services\Hyperlocal\BuyerLocationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -97,6 +98,8 @@ class AuthController extends Controller
                 $customer->fcm_token = FCMService::normalizeToken($request->fcm_token) ?: null;
                 $customer->save();
             }
+
+            app(BuyerLocationService::class)->syncFromSavedAddress($customer);
 
             return new CustomerResource($customer);
         }

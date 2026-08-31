@@ -3,13 +3,15 @@
     <div class="container">
       <div class="top-nav-inner">
         <div class="top-nav-left">
-          {{-- @if (is_incevio_package_loaded('zipcode') && Session::has('zipcode')) --}}
-          @if (is_incevio_package_loaded('zipcode') && Session::has('zipcode_default'))
-            <a class="modalAction" href="{{ route(config('zipcode.routes.shipTo')) }}">
-              <i class="fal fa-location-arrow"></i> {{ trans('theme.ship_to') . ' ' . Session::get('zipcode_default') }}
+          @if (session('buyer_address_text'))
+            <a href="javascript:void(0);" data-toggle="modal" data-target="#locationModal" class="delivery-location-chip">
+              <i class="fal fa-map-marker-alt"></i>
+              {{ trans('theme.deliver_to') }} <strong>{{ Str::limit(session('buyer_address_text'), 28) }}</strong>
             </a>
           @else
-            <h3>{{ trans('theme.welcome') . ' ' . config('app.name') }}</h3>
+            <a href="javascript:void(0);" data-toggle="modal" data-target="#locationModal" class="delivery-location-chip delivery-location-chip--empty">
+              <i class="fal fa-map-marker-alt"></i> {{ trans('theme.set_delivery_location') }}
+            </a>
           @endif
 
           {{-- @unless (empty($promotional_tagline['text']))
@@ -44,21 +46,12 @@
                 </li>
               @endif
             @else
-              @if (customer_can_register())
-                <li class="image-icon">
-                  <a href="javascript:void(0);" data-toggle="modal" data-target="#loginModal">
-                    <i class="fal fa-user"></i>
-                    <span>{{ trans('theme.sing_in') }}</span>
-                  </a>
-                </li>
-              @else
-                <li class="image-icon">
-                  <a href="/login">
-                    <i class="fal fa-user"></i>
-                    <span>{{ trans('theme.sing_in') }}</span>
-                  </a>
-                </li>
-              @endif
+              <li class="image-icon">
+                <a href="javascript:void(0);" data-toggle="modal" data-target="#loginModal">
+                  <i class="fal fa-user"></i>
+                  <span>{{ trans('theme.sing_in') }}</span>
+                </a>
+              </li>
             @endauth
 
             @if (is_wallet_configured_for('customer'))
@@ -178,6 +171,7 @@
                 </select> <!-- /.category -->
               </div> <!-- /.search-box-select -->
 
+              @if (! hyperlocal_enabled())
               <div class="search-box-zone d-none d-md-flex align-items-stretch flex-shrink-0">
                 <select name="country_id" class="search-zone-select search-zone-select--country" title="{{ trans('theme.country') }}" aria-label="{{ trans('theme.country') }}">
                   <option value="" @selected(! request()->filled('country_id'))>{{ trans('theme.all_countries') }}</option>
@@ -192,6 +186,7 @@
                   @endforeach
                 </select>
               </div> <!-- /.search-box-zone -->
+              @endif
 
               <div class="search-box-input">
                 {!! Form::text('q', Request::get('q'), ['id' => 'autoSearchInput', 'placeholder' => trans('theme.main_searchbox_placeholder'), 'autocomplete' => 'off', 'data-search']) !!}
@@ -231,10 +226,15 @@
               </li>
 
               <li>
-                <a href="{{ route('account', 'account') }}" aria-label="{{ trans('theme.your_account') }}">
-                  <i class="fal fa-user" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.your_account') }}"></i>
-                  <!-- <img src="images/big-user.svg" alt=""> -->
-                </a>
+                @auth('customer')
+                  <a href="{{ route('account', 'account') }}" aria-label="{{ trans('theme.your_account') }}">
+                    <i class="fal fa-user" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.your_account') }}"></i>
+                  </a>
+                @else
+                  <a href="javascript:void(0);" data-toggle="modal" data-target="#loginModal" aria-label="{{ trans('theme.login') }}">
+                    <i class="fal fa-user" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.login') }}"></i>
+                  </a>
+                @endauth
               </li>
 
               @if (is_incevio_package_loaded('comparison'))

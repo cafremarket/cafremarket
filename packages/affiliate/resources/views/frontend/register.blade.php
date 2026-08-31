@@ -1,7 +1,7 @@
 @extends('affiliate::auth_layout')
 
 @section('content')
-  <div class="box">
+  <div class="box admin-card">
     <div class="login-section">
       <div class="form-container">
         <div class="image-holder-affiliate"></div>

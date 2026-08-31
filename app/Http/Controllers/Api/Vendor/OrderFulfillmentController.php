@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
-use App\Helpers\ListHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\FulfillOrderRequest;
 use App\Http\Requests\Validations\OrderDetailRequest;
+use App\Models\DeliveryBoy;
 use App\Models\Order;
+use App\Services\Delivery\DeliveryDispatchService;
 use Illuminate\Http\Request;
 
 class OrderFulfillmentController extends Controller
@@ -54,9 +55,21 @@ class OrderFulfillmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function delivery_boys(Order $order)
+    public function delivery_boys(Order $order, DeliveryDispatchService $dispatchService)
     {
-        return ListHelper::deliveryBoys($order->shop_id);
+        $shopRiders = $dispatchService->getAvailableShopRiders($order->shop_id)
+            ->pluck('nice_name', 'id');
+
+        return [
+            'shop_riders' => $shopRiders,
+            'platform_riders' => $dispatchService->findNearbyPlatformRiders($order->shop)->map(function ($rider) {
+                return [
+                    'id' => $rider->id,
+                    'name' => $rider->nice_name ?: $rider->getName(),
+                    'distance_km' => round($rider->distance_km, 2),
+                ];
+            })->values(),
+        ];
     }
 
     /**
@@ -64,11 +77,19 @@ class OrderFulfillmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function assign_delivery_boy(Request $request, Order $order)
+    public function assign_delivery_boy(Request $request, Order $order, DeliveryDispatchService $dispatchService)
     {
         try {
-            $order->delivery_boy_id = $request->input('delivery_boy_id');
-            $order->save();
+            if ($request->filled('platform_rider_id') || $request->boolean('use_platform')) {
+                $dispatchService->requestPlatformDelivery($order, $request->input('platform_rider_id'));
+            } else {
+                $rider = DeliveryBoy::findOrFail($request->input('delivery_boy_id'));
+                if ($rider->isPlatform()) {
+                    $dispatchService->assignPlatformRider($order, $rider);
+                } else {
+                    $dispatchService->assignShopRider($order, $rider);
+                }
+            }
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }

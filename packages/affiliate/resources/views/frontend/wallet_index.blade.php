@@ -46,16 +46,16 @@
       </div>
     </div>
   </div>
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.wallet.transactions') }}</h3>
-      <div class="box-tools pull-right">
+  <div class="box admin-card">
+    <div class="box-header with-border admin-card__header">
+      <h3 class="box-title admin-card__title">{{ trans('packages.wallet.transactions') }}</h3>
+      <div class="box-tools pull-right admin-card__actions">
         <a href="javascript:void(0)" data-link="{{ route('affiliate.wallet.withdrawal') }}" class="ajax-modal-btn btn btn-new btn-flat">
           <i class="fa fa-plus"></i> {{ trans('packages.wallet.payout_request') }}
         </a>
       </div>
     </div> <!-- /.box-header -->
-    <div class="box-body">
+    <div class="box-body admin-card__body">
       @if (!empty($wallet->pay_to))
         <p class="text-muted small">
           <i class="fa fa-info-circle"></i>
@@ -63,7 +63,7 @@
         </p>
       @endif
 
-      <table class="table table-hover" id="affiliate-wallet-transactions-table" width="100%">
+      <table class="table table-hover admin-table" id="affiliate-wallet-transactions-table" width="100%">
         <thead>
           <tr>
             <th>{{ trans('packages.wallet.date') }}</th>

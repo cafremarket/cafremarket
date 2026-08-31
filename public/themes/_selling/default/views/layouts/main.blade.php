@@ -38,7 +38,7 @@
       <div class="intro-text">
         <div class="intro-lead-in">{{ __('theme.intro_lead') }}</div>
         <div class="intro-heading">{{ __('theme.intro_heading') }}</div>
-        <a href="{{ route('vendor.register') }}" class="btn btn-primary btn-lg selling">{{ __('theme.button.selling') }}</a>
+        <a href="{{ route('selling.register') }}" class="btn btn-primary btn-lg selling">{{ __('theme.button.selling') }}</a>
 
         @if (is_subscription_enabled())
           <p class="sellin-price-tagline">{{ __('theme.selling_price_tagline', ['price' => get_formated_currency($subscription_plans->min('cost'))]) }}</p>

@@ -7,6 +7,9 @@ use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\Inventory;
 use App\Models\Order;
+use App\Models\Shop;
+use App\Services\Hyperlocal\BuyerLocationService;
+use App\Services\Hyperlocal\HyperlocalCatalogService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,7 +72,23 @@ trait ShoppingCart
             return response()->json(trans('theme.item_not_available'), 404);
         }
 
+        $catalog = app(HyperlocalCatalogService::class);
+        $buyerLocation = app(BuyerLocationService::class);
+
+        if ($catalog->requiresLocationForBrowse() && ! $buyerLocation->hasLocation()) {
+            return response()->json([
+                'message' => trans('theme.set_location_to_shop'),
+                'require_location' => true,
+            ], 422);
+        }
+
         foreach ($items as $item) {
+            if ($catalog->isEnabled() && ! $catalog->isShopDeliverable($item->shop_id)) {
+                return response()->json([
+                    'message' => trans('app.shop_outside_delivery_radius'),
+                ], 422);
+            }
+
             // Check if the item is a downloadable one
             $downloadable = $item->product->downloadable;
 
@@ -275,6 +294,24 @@ trait ShoppingCart
      */
     private function saveOrderFromCart(Request $request, Cart $cart)
     {
+        $catalog = app(HyperlocalCatalogService::class);
+        $buyerLocation = app(BuyerLocationService::class);
+        $customerLat = $request->customer_latitude ?? $request->latitude ?? $buyerLocation->latitude();
+        $customerLng = $request->customer_longitude ?? $request->longitude ?? $buyerLocation->longitude();
+
+        if (($request->fulfilment_type ?? Order::FULFILMENT_TYPE_DELIVER) != Order::FULFILMENT_TYPE_PICKUP
+            && $catalog->isEnabled()) {
+            if (! $customerLat || ! $customerLng) {
+                throw new \Exception(trans('theme.set_location_to_shop'));
+            }
+
+            $shop = Shop::find($cart->shop_id);
+
+            if ($shop && ! app(\App\Services\Shop\NearbyShopService::class)->isShopDeliverableTo($shop, (float) $customerLat, (float) $customerLng)) {
+                throw new \Exception(trans('app.shop_outside_delivery_radius'));
+            }
+        }
+
         // Save the order
         $order = new Order;
         $order->fill(
@@ -292,6 +329,8 @@ trait ShoppingCart
                 'device_id' => $request->device_id ?? $cart->device_id,
                 'fulfilment_type' => $request->fulfilment_type ?? Order::FULFILMENT_TYPE_DELIVER,
                 'warehouse_id' => ($request->fulfilment_type == Order::FULFILMENT_TYPE_PICKUP) ? $request->warehouse_id : null,
+                'customer_latitude' => $customerLat,
+                'customer_longitude' => $customerLng,
             ])
         )->save();
 

@@ -61,7 +61,13 @@ class ValidationServiceProvider extends ServiceProvider
                 }
 
                 // Our conditional array is ready and now query the table with all the conditions
-                $result = DB::table($table)->where($wheres)->first();
+                $query = DB::table($table)->where($wheres);
+
+                if (\Illuminate\Support\Facades\Schema::hasColumn($table, 'deleted_at')) {
+                    $query->whereNull('deleted_at');
+                }
+
+                $result = $query->first();
 
                 // Return FLASE if any record found
                 return empty($result);

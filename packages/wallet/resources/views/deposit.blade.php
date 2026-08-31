@@ -1,14 +1,18 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('packages.wallet.deposit_fund') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.wallet.deposit_fund') }}</h3>
-      <div class="box-tools pull-right">
+  <div class="box admin-card">
+    <div class="box-header with-border admin-card__header">
+      <h3 class="box-title admin-card__title"><span class="admin-card__icon-wrap"><i class="fa fa-user"></i></span> {{ trans('packages.wallet.deposit_fund') }}</h3>
+      <div class="box-tools pull-right admin-card__actions">
       </div>
     </div> <!-- /.box-header -->
 
-    <div class="box-body">
+    <div class="box-body admin-card__body">
       {!! Form::open(['route' => 'merchant.wallet.deposit', 'id' => 'depositForm', 'data-toggle' => 'validator']) !!}
       <div class="col-md-6 col-md-offset-1 nopadding-left">
         <div class="panel panel-default">

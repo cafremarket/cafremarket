@@ -4,21 +4,22 @@
   @if (is_incevio_package_loaded('otp-login'))
     @include('otp-login::admin_login')
   @else
-    <div class="box">
+    <div class="admin-auth-card">
       <div class="login-section">
-        <div class="form-container">
-          <div class="image-holder"></div>
-          <div class="login-form-section">
-            <div class="login-logo">
+        <div class="form-container admin-auth-card__inner">
+          <div class="image-holder admin-auth-card__visual"></div>
+          <div class="login-form-section admin-auth-card__form">
+            <div class="login-logo admin-auth-card__logo">
               <a href="{{ url('/') }}">
-                <img src="{{ get_logo_url('system', 'logo') }}" class="brand-logo" height="47px" alt="{{ trans('theme.logo') }}" title="{{ trans('theme.logo') }}">
+                <img src="{{ get_logo_url('system', 'logo') }}" class="brand-logo" height="47" alt="{{ trans('theme.logo') }}">
               </a>
             </div>
 
             <div class="form-section">
-              <h3 class="text-center mt-0">{{ trans('app.login') }}</h3>
+              <h3 class="admin-auth-card__title">{{ trans('app.login') }}</h3>
+              <p class="admin-auth-card__subtitle">{{ get_site_title() }}</p>
 
-              {!! Form::open(['route' => 'login', 'id' => 'form', 'data-toggle' => 'validator']) !!}
+              {!! Form::open(['route' => 'login', 'id' => 'form', 'data-toggle' => 'validator', 'class' => 'admin-auth-form']) !!}
               <div class="form-group has-feedback">
                 {!! Form::email('email', null, ['id' => 'email', 'class' => 'form-control input-lg', 'placeholder' => trans('app.form.email_address'), 'required']) !!}
                 <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
@@ -26,41 +27,37 @@
               </div>
 
               <div class="form-group has-feedback">
-                {!! Form::password('password', ['id' => 'password', 'class' => 'form-control input-lg', 'id' => 'password', 'placeholder' => trans('app.form.password'), 'data-minlength' => '6', 'required']) !!}
+                {!! Form::password('password', ['class' => 'form-control input-lg', 'placeholder' => trans('app.form.password'), 'data-minlength' => '6', 'required']) !!}
                 <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                 <div class="help-block with-errors"></div>
               </div>
 
-              <div class="row">
+              <div class="row admin-auth-form__meta">
                 <div class="col-sm-6">
-                  <div class="form-group">
-                    <label>
-                      {!! Form::checkbox('remember', null, null, ['class' => 'icheck']) !!} {{ trans('app.form.remember_me') }}
-                    </label>
-                  </div>
-                </div> <!-- /.col-* -->
-
-                <div class="col-sm-6">
+                  <label class="admin-auth-form__remember">
+                    {!! Form::checkbox('remember', null, null, ['class' => 'icheck']) !!} {{ trans('app.form.remember_me') }}
+                  </label>
+                </div>
+                <div class="col-sm-6 text-right">
                   @unless (is_incevio_package_loaded('otp-login'))
-                    <a class="btn btn-link pull-right nopadding-right" href="{{ route('password.request') }}">{{ trans('app.form.forgot_password') }}</a>
+                    <a class="admin-auth-form__forgot" href="{{ route('password.request') }}">{{ trans('app.form.forgot_password') }}</a>
                   @endunless
-                </div> <!-- /.col-* -->
-              </div> <!-- /.row -->
+                </div>
+              </div>
 
-              {!! Form::submit(trans('app.form.login'), ['class' => 'btn btn-block btn-lg btn-flat btn-primary']) !!}
-
+              {!! Form::submit(trans('app.form.login'), ['class' => 'btn btn-block btn-lg btn-flat btn-new admin-auth-form__submit']) !!}
               {!! Form::close() !!}
 
-              <div class="spacer20"></div>
-
-              <a class="btn btn-link nopadding-left" href="{{ route('vendor.register') }}" class="text-center">
-                <i class="fa fa-laptop" aria-hidden="true"></i> {{ customer_can_register() ? trans('app.form.register_as_merchant') : trans('app.form.register') }}
+              <a class="admin-auth-form__register" href="{{ route('vendor.register') }}">
+                <i class="fa fa-laptop"></i>
+                {{ customer_can_register() ? trans('app.form.register_as_merchant') : trans('app.form.register') }}
               </a>
-            </div> <!-- /.form-section -->
+            </div>
+
             @include('partials._demo_admin_login')
-          </div> <!-- /.login-form-section -->
-        </div> <!-- /.form-container -->
-      </div> <!-- /.login-section -->
-    </div> <!-- /.box -->
+          </div>
+        </div>
+      </div>
+    </div>
   @endif
 @endsection

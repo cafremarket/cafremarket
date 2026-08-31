@@ -5,6 +5,24 @@
   // var jq214 = jQuery.noConflict(true);
   ;
   (function($, window, document) {
+    window.toPanelUrl = function(url) {
+      if (!url || typeof url !== 'string') {
+        return url;
+      }
+
+      if (window.__merchantPanel) {
+        if (url.indexOf('/admin/') !== -1) {
+          return url.replace('/admin/', '/merchant/');
+        }
+
+        if (url.indexOf('admin/') === 0) {
+          return url.replace(/^admin\//, 'merchant/');
+        }
+      }
+
+      return url;
+    };
+
     // console.log($().jquery);
     $(".ajax-modal-btn").hide(); // hide the ajax functional button untill the page load completely
 
@@ -43,7 +61,7 @@
 
         apply_busy_filter();
 
-        var url = $(this).data('link');
+        var url = toPanelUrl($(this).data('link'));
 
         if (url.indexOf('#') == 0) {
           $(url).modal('open');
@@ -57,6 +75,14 @@
               //Initialize application plugins after ajax load the content
               if (typeof initAppPlugins == 'function') {
                 initAppPlugins();
+              }
+
+              if (typeof initAddressAutocomplete === 'function') {
+                initAddressAutocomplete(document.getElementById('myDynamicModal'));
+              }
+
+              if (typeof initPasswordToggles === 'function') {
+                initPasswordToggles(document.getElementById('myDynamicModal'));
               }
             })
             .done(function() {
@@ -77,7 +103,7 @@
         e.preventDefault();
 
         var form = this.closest("form");
-        var url = $(this).attr("href");
+        var url = toPanelUrl($(this).attr("href"));
         var msg = $(this).data("confirm");
         if (!msg) {
           msg = "{{ trans('app.are_you_sure') }}";
@@ -121,8 +147,8 @@
 
       // Mark all Notifications As Read.
       $('#notifications-dropdown').on('click', function(e) {
-        var url = "{{ route('admin.notifications.markAllAsRead') }}";
-
+        var url = "{{ panel_route('admin.notifications.markAllAsRead') }}";
+   
         $.get(url, function(data) {}).done(function() {
           $('#notifications-dropdown').find('span.label').text('');
         });
@@ -1403,7 +1429,7 @@
 
       $.ajax({
         // url: node.attr('href'),
-        url: node.data('link'),
+        url: toPanelUrl(node.data('link')),
         type: 'POST',
         data: {
           "_token": "{{ csrf_token() }}",
@@ -1644,7 +1670,7 @@
                   notie.alert(4, "{{ trans('messages.confirmed') }}", 2);
 
                   $.ajax({
-                    url: node.data('link'),
+                    url: toPanelUrl(node.data('link')),
                     type: 'POST',
                     data: {
                       "_token": "{{ csrf_token() }}",

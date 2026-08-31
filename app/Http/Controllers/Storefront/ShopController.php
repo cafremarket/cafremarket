@@ -10,7 +10,10 @@ use App\Models\Feedback;
 use App\Models\Inventory;
 use App\Models\Shop;
 use App\Models\Slider;
+use App\Services\Hyperlocal\BuyerLocationService;
+use App\Services\Hyperlocal\HyperlocalCatalogService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class ShopController extends Controller
@@ -20,8 +23,22 @@ class ShopController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request, BuyerLocationService $buyerLocation, HyperlocalCatalogService $catalog)
     {
+        $buyerLocation->syncFromCustomer();
+        $latitude = $request->get('lat', $buyerLocation->latitude());
+        $longitude = $request->get('lng', $buyerLocation->longitude());
+
+        if ($latitude && $longitude) {
+            $buyerLocation->save((float) $latitude, (float) $longitude, $request->get('address_text'), $request);
+
+            $nearby = $catalog->nearbyShopsWithDistance();
+            $shops = $nearby->pluck('shop');
+            $distances = $nearby->mapWithKeys(fn ($row) => [$row['shop']->id => $row['distance_km']]);
+
+            return view('theme::nearby_shops', compact('shops', 'distances', 'latitude', 'longitude'));
+        }
+
         $shops = Shop::select('id', 'owner_id', 'slug', 'name', 'id_verified', 'phone_verified', 'address_verified', 'total_item_sold', 'total_sold_amount', 'created_at')
             ->with([
                 'config',

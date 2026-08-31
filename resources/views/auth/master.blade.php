@@ -9,6 +9,8 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
     <link href="/css/app.css" rel="stylesheet">
+    <link href="/css/admin-modern.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     @if(is_incevio_package_loaded('otp-login'))
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
@@ -78,9 +80,13 @@
     </div> <!-- /.login-box -->
 
     <script src="js/app.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
     <!-- Scripts -->
     @yield('scripts', '')
+
+    @include('scripts.password_toggle')
+    @include('scripts.google_place')
 
     @if(is_incevio_package_loaded('otp-login'))
       @include('otp-login::scripts')

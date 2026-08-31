@@ -1,54 +1,64 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.import_failed') }}
+@endsection
+
 @section('content')
   <div class="alert alert-danger">
-    <strong><i class="icon fa fa-info-circle"></i>{{ trans('app.notice') }}</strong>
+    <strong><i class="icon fa fa-info-circle"></i> {{ trans('app.notice') }}</strong>
     {{ trans('messages.import_ignored') }}
   </div>
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        {{ trans('app.import_failed') }} <small>({{ trans('app.total_number_of_rows', ['value' => count($failed_rows)]) }})</small>
-      </h3>
-    </div> <!-- /.box-header -->
 
-    <div class="box-body responsive-table">
-      <table class="table table-striped">
-        <thead>
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.import_failed'),
+    'icon' => 'fa-cubes',
+    'class' => 'admin-card--danger',
+    'headerExtra' => '<small class="text-muted">(' . e(trans('app.total_number_of_rows', ['value' => count($failed_rows)])) . ')</small>',
+    'bodyClass' => 'responsive-table',
+  ])
+
+  <table class="table table-striped admin-table">
+    <thead>
+      <tr>
+        <th>{{ trans('app.slug') }}</th>
+        <th>{{ trans('app.language') }}</th>
+        <th>{{ trans('app.title') }}</th>
+        <th>{{ trans('app.description') }}</th>
+        <th>{{ trans('app.key_features') }}</th>
+        <th>{{ trans('app.condition_note') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($failed_rows as $row)
         <tr>
-            <th>{{ trans('app.slug') }}</th>
-            <th>{{ trans('app.language') }}</th>
-            <th>{{ trans('app.title') }}</th>
-            <th>{{ trans('app.description') }}</th>
-            <th>{{ trans('app.key_features') }}</th>
-            <th>{{ trans('app.condition_note') }}</th>
+          <td>{{ $row['data']['slug'] }}</td>
+          <td>{{ $row['data']['lang'] }}</td>
+          <td>{{ $row['data']['title'] }}</td>
+          <td>{{ $row['data']['description'] }}</td>
+          <td>{{ $row['data']['key_features'] }}</td>
+          <td>{{ $row['data']['condition_note'] }}</td>
         </tr>
-        </thead>
-        <tbody>
-        @foreach ($rows as $row)
-            <tr>
-            <td> {{ $row['slug'] }} </td>
-            <td>{{ $row['lang'] }}</td>
-            <td>{{ $row['title'] }}</td>
-            <td>{{ $row['description'] }}</td>
-            <td>{{ $row['key_features'] }}</td>
-            <td>{{ $row['condition_note'] }}</td>
-            </tr>
-        @endforeach
-        </tbody>
-      </table>
-    </div> <!-- /.box-body -->
+      @endforeach
+    </tbody>
+  </table>
 
-    <div class="box-footer">
-      <small class="indent20">{{ trans('app.total_number_of_rows', ['value' => count($failed_rows)]) }}</small>
-      <div class="box-tools pull-right">
-        {!! Form::open(['route' => 'admin.stock.inventory.translate.download.failedRows', 'id' => 'form', 'class' => 'inline-form', 'data-toggle' => 'validator']) !!}
-        @foreach ($failed_rows as $row)
-          <input type="hidden" name="data[]" value="{{ serialize($row['data']) }}">
-        @endforeach
-        {!! Form::button(trans('app.download_failed_rows'), ['type' => 'submit', 'class' => 'btn btn-new btn-flat']) !!}
-        {!! Form::close() !!}
-      </div>
-    </div> <!-- /.box-footer -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
+
+  @php
+    $hiddenFields = '';
+    foreach ($failed_rows as $row) {
+      $hiddenFields .= '<input type="hidden" name="data[]" value="' . e(serialize($row['data'])) . '">';
+    }
+  @endphp
+  @include('admin.partials.ui.import_footer', [
+    'cancelUrl' => url()->previous(),
+    'cancelClass' => 'btn-danger',
+    'cancelLabel' => trans('app.dismiss'),
+    'rowCount' => count($failed_rows),
+    'formRoute' => 'admin.stock.inventory.translate.download.failedRows',
+    'hiddenFields' => $hiddenFields,
+    'submitLabel' => trans('app.download_failed_rows'),
+    'submitClass' => 'btn btn-new btn-flat',
+  ])
 @endsection

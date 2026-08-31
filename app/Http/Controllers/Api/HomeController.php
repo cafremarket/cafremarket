@@ -28,6 +28,7 @@ use App\Models\PaymentMethod;
 use App\Models\Shop;
 use App\Models\Slider;
 use App\Models\State;
+use App\Services\Shop\NearbyShopService;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -101,8 +102,32 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection The collection of ShopLightResource
      */
-    public function allShops()
+    public function allShops(Request $request, NearbyShopService $nearbyShopService)
     {
+        if ($request->filled('lat') && $request->filled('lng')) {
+            $results = $nearbyShopService->find(
+                (float) $request->lat,
+                (float) $request->lng,
+                $request->filled('radius_km') ? (float) $request->radius_km : null
+            );
+
+            return response()->json([
+                'data' => $results->map(function ($row) use ($request) {
+                    $address = $row['shop']->storeAddress();
+
+                    return array_merge(
+                        (new ShopLightResource($row['shop']))->toArray($request),
+                        [
+                            'distance_km' => $row['distance_km'],
+                            'deliverable' => $row['deliverable'],
+                            'latitude' => $address?->latitude ? (float) $address->latitude : null,
+                            'longitude' => $address?->longitude ? (float) $address->longitude : null,
+                        ]
+                    );
+                })->values(),
+            ]);
+        }
+
         $shops = Shop::with([
             'logoImage:path,imageable_id,imageable_type',
             'avgFeedback:rating,count,feedbackable_id,feedbackable_type',

@@ -1,22 +1,22 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.states') . ': ' . $country->name }}
+@endsection
+
 @section('content')
   @include('admin.partials.notices.worldwide_business_area')
 
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        {{ trans('app.states') . ': ' . $country->name }}
-        <i class="fa fa-question-circle indent10 small" data-toggle="tooltip" data-placement="right" title="{{ trans('help.active_business_zone') }}"></i>
-      </h3>
-      <div class="box-tools pull-right">
-        @can('update', $country)
-          <a href="javascript:void(0)" data-link="{{ route('admin.setting.state.create', $country->id) }}" class="ajax-modal-btn btn btn-new btn-flat">{{ trans('app.add_state') }}</a>
-        @endcan
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-no-sort">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.states') . ': ' . $country->name,
+    'icon' => 'fa-map',
+    'headerExtra' => '<i class="fa fa-question-circle text-muted" data-toggle="tooltip" title="' . e(trans('help.active_business_zone')) . '"></i>',
+    'actions' => Gate::allows('update', $country)
+      ? '<a href="javascript:void(0)" data-link="' . route('admin.setting.state.create', $country->id) . '" class="ajax-modal-btn btn btn-new btn-flat btn-sm"><i class="fa fa-plus"></i> ' . e(trans('app.add_state')) . '</a>'
+      : '',
+    'bodyClass' => 'responsive-table',
+  ])
+      <table class="table table-hover admin-table table-no-sort">
         <thead>
           <tr>
             @can('massDelete', \App\Models\Country::class)
@@ -39,7 +39,7 @@
 
             <th>{{ trans('app.iso_code') }}</th>
             <th>{{ trans('app.name') }}</th>
-            <th>{{ trans('app.option') }}</th>
+            <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
           </tr>
         </thead>
         <tbody id="massSelectArea">
@@ -56,7 +56,7 @@
                   <span class="indent10 label label-primary pull-right">{{ trans('app.active') }}</span>
                 @endif
               </td>
-              <td class="row-options">
+              <td class="row-options admin-row-actions">
                 @can('update', $country)
                   <a href="javascript:void(0)" data-link="{{ route('admin.setting.state.edit', $state->id) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.edit') }}" class="fa fa-edit"></i></a>&nbsp;
                 @endcan
@@ -71,6 +71,5 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 @endsection

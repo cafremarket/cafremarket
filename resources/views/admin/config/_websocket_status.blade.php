@@ -31,19 +31,17 @@
 
 <div class="row" style="padding: 20px 10px;">
   <div class="col-md-10 col-md-offset-1">
-    <div class="box box-solid" style="border: 1px solid #e5e7eb; border-radius: 6px;">
-      <div class="box-header with-border">
-        <h3 class="box-title">
-          <i class="fa fa-plug"></i>
-          {{ trans('app.websocket_status') }}
-        </h3>
-      </div>
-      <div class="box-body">
+    @include('admin.partials.ui.card_start', [
+      'title' => trans('app.websocket_status'),
+      'icon' => 'fa-plug',
+      'class' => 'box-solid admin-form-section',
+      'bodyClass' => '',
+    ])
         <p class="text-muted" style="margin-bottom: 18px;">
           {{ trans('help.websocket_status_check') }}
         </p>
 
-        <table class="table table-bordered" style="margin-bottom: 16px;">
+        <table class="table table-bordered admin-table" style="margin-bottom: 16px;">
           <tr>
             <th style="width: 28%;">{{ trans('app.websocket_url') }}</th>
             <td><code id="ws-check-url">{{ $wsUrl }}</code></td>
@@ -74,8 +72,7 @@
         </button>
 
         <pre id="ws-check-log" style="margin-top: 16px; max-height: 220px; overflow: auto; background: #111827; color: #e5e7eb; padding: 12px; border-radius: 4px; font-size: 12px; display: none;"></pre>
-      </div>
-    </div>
+    @include('admin.partials.ui.card_end')
   </div>
 </div>
 

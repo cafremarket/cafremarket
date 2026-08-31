@@ -78,6 +78,8 @@ class Order extends BaseModel
         'shipping_date' => 'datetime',
         'delivery_date' => 'datetime',
         'payment_date' => 'datetime',
+        'delivery_assigned_at' => 'datetime',
+        'delivery_dispatched_at' => 'datetime',
         'goods_received' => 'boolean',
         'is_digital' => 'boolean',
     ];
@@ -154,6 +156,12 @@ class Order extends BaseModel
         'affiliate_commission_amount',
         'affiliate_id',
         'warehouse_id', // ID of the warehouse to pickup order from
+        'delivery_boy_id',
+        'delivery_mode',
+        'delivery_assigned_at',
+        'delivery_dispatched_at',
+        'customer_latitude',
+        'customer_longitude',
     ];
 
     /**
@@ -820,9 +828,11 @@ class Order extends BaseModel
      */
     public function canTrack()
     {
-        return false; // Because the plugin not working
-
-        // return $this->isFulfilled() && $this->tracking_id && !$this->isDelivered();
+        return $this->delivery_boy_id
+            && in_array($this->order_status_id, [self::STATUS_AWAITING_DELIVERY, self::STATUS_FULFILLED])
+            && ! $this->isDelivered()
+            && optional($this->deliveryBoy)->current_latitude
+            && optional($this->deliveryBoy)->current_longitude;
     }
 
     /**

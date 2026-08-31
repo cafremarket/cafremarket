@@ -126,6 +126,8 @@
   <!-- Wrapper end -->
 
   <!-- MODALS -->
+  @include('theme::modals.location_picker')
+
   @unless (Auth::guard('customer')->check())
     @include('theme::auth.modals')
   @endunless
@@ -165,6 +167,12 @@
 
   <!-- Page Scripts -->
   @yield('scripts')
+
+  @include('theme::scripts.homepage_flow')
+
+  @include('theme::scripts.password_toggle')
+
+  @include('scripts.google_place')
 
   {{-- Purchase button popup --}}
   @if (config('app.demo') == true && \Str::contains(url()->current(), 'zcart'))

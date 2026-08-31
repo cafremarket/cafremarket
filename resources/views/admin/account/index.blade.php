@@ -1,18 +1,24 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.profile') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    @if (Auth::user()->isFromPlatform())
-      <div class="box-header with-border">
-        <h3 class="box-title"><i class="fa fa-user"></i> {{ trans('app.profile') }}</h3>
-      </div>
-      <div class="box-body">
-        @include('admin.account._profile')
-        <span class="spacer20"></span>
-      </div>
-    @else
-      <div class="nav-tabs-custom">
-        <ul class="nav nav-tabs nav-justified">
+  @if (Auth::user()->isFromPlatform())
+    @include('admin.partials.ui.card_start', [
+      'title' => trans('app.profile'),
+      'icon' => 'fa-user',
+      'bodyClass' => '',
+    ])
+      @include('admin.account._profile')
+    @include('admin.partials.ui.card_end')
+  @else
+    @include('admin.partials.ui.card_tabbed_start', [
+      'title' => trans('app.account'),
+      'icon' => 'fa-user',
+    ])
+        <ul class="nav nav-tabs nav-justified admin-tabs">
           <li class="{{ Request::is('admin/account/profile') ? 'active' : '' }}">
             <a href="#profile_tab" data-toggle="tab">
               <i class="fa fa-user hidden-sm"></i>
@@ -47,9 +53,9 @@
             @include('admin.account._ticket')
           </div>
         </div> <!-- /.tab-content -->
-      </div> <!-- /.nav-tabs-custom -->
-    @endif
-  </div> <!-- /.box -->
+
+    @include('admin.partials.ui.card_tabbed_end')
+  @endif
 @endsection
 
 @section('page-script')

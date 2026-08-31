@@ -1,17 +1,19 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.order') }} #{{ $order->order_number }}
+@endsection
+
 @section('content')
-  <div class="row">
+  <div class="row admin-order-detail">
     <div class="col-md-8">
       @if ($order->cancellation)
-        <div class="box">
-          <div class="box-header with-border">
-            <h3 class="box-title">
-              <i class="fa fa-warning"></i> {{ trans('app.' . $order->cancellation->request_type . '_request') }}
-            </h3>
-            <div class="box-tools pull-right">{!! $order->cancellation->statusName() !!}</div>
-          </div> <!-- /.box-header -->
-          <div class="box-body">
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.' . $order->cancellation->request_type . '_request'),
+          'icon' => 'fa-exclamation-triangle',
+          'class' => 'admin-card--warning',
+          'actions' => $order->cancellation->statusName(),
+        ])
             <div class="row">
               <div class="col-sm-8">
                 <p>
@@ -61,7 +63,7 @@
               <span class="spacer10"></span>
 
               <div class="col-sm-12">
-                <table class="table table-striped">
+                <table class="table table-striped admin-table">
                   <tbody id="items">
                     @if ($order->cancellation->isPartial())
                       @foreach ($order->inventories as $item)
@@ -96,8 +98,7 @@
                 </table>
               </div> <!-- /.col-* -->
             </div> <!-- /.row -->
-          </div> <!-- /.box-body -->
-        </div> <!-- /.box -->
+        @include('admin.partials.ui.card_end')
       @endif
 
       @if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled())
@@ -108,45 +109,35 @@
         @include('affiliate::admin._order_page_commission_table', ['commissions' => $commissions, 'order' => $order])
       @endif
 
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            <i class="fa fa-shopping-cart"></i> {{ trans('app.order') . ': ' . $order->order_number }}
-          </h3>
+      @php
+        $orderHeaderExtra = $order->dispute
+          ? '<span class="label label-danger">' . e(trans('app.statuses.disputed')) . '</span>'
+          : '';
+        $orderHeaderActions = $order->orderStatus();
+        if (Gate::allows('fulfill', $order)) {
+          $orderHeaderActions .= ' <a data-link="' . route('admin.order.deliveryboys', $order->id) . '" class="ajax-modal-btn btn btn-default btn-xs btn-flat"><i class="fa fa-user"></i> ' . e(trans('app.assign_deliveryboy')) . '</a>';
+        }
+      @endphp
 
-          @if ($order->dispute)
-            <span class="label label-danger indent5">{{ trans('app.statuses.disputed') }}</span>
-          @endif
-
-          @can('fulfill', $order)
-            <a data-link="{{ route('admin.order.deliveryboys', $order->id) }}" class="ajax-modal-btn btn btn-flat btn-default indent10" style="cursor: pointer;">
-              <i class="fa fa-user"></i> {{ trans('app.assign_deliveryboy') }}
-            </a>
-          @endcan
-
-          <div class="box-tools pull-right">
-            {!! $order->orderStatus() !!}
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.order') . ': ' . $order->order_number,
+        'icon' => 'fa-shopping-cart',
+        'headerExtra' => $orderHeaderExtra,
+        'actions' => $orderHeaderActions,
+        'bodyClass' => 'admin-order-detail__main',
+      ])
+          <div class="admin-order-payment-bar">
+            <span class="admin-order-payment-bar__method">
+              {{ trans('app.payment') . ': ' . $order->paymentMethod->name }}
+            </span>
+            <span class="admin-order-payment-bar__status">
+              {!! $order->paymentStatusName() !!}
+            </span>
           </div>
-        </div> <!-- /.box-header -->
-
-        <div class="box-body">
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="well well-lg">
-                <span class="lead">
-                  {{ trans('app.payment') . ': ' . $order->paymentMethod->name }}
-                </span>
-
-                <span class="pull-right lead">
-                  {!! $order->paymentStatusName() !!}
-                </span>
-              </div>
-            </div>
-          </div><!-- /.row -->
 
           <div class="row">
             <div class="col-md-12">
-              <h4>{{ trans('app.order_details') }}
+              <h4 class="admin-order-section-title">{{ trans('app.order_details') }}
 
                 @if ($order->auction_bid_id)
                   <span class="label label-primary ml-2"><i class="fa fa-gavel"></i> {{ trans('packages.auction.winner') }}</span>
@@ -154,7 +145,7 @@
               </h4>
               <span class="spacer10"></span>
 
-              <table class="table table-striped">
+              <table class="table table-striped admin-table">
                 <tbody id="items">
                   @if (count($order->inventories) > 0)
                     @foreach ($order->inventories as $item)
@@ -223,7 +214,7 @@
               @endif
             </div>
             <div class="col-md-6" id="summary-block">
-              <table class="table">
+              <table class="table admin-order-summary">
                 <tr>
                   <td class="text-right">{{ trans('app.total') }}</td>
                   <td class="text-right" width="40%">
@@ -328,8 +319,7 @@
               </table>
             </div>
           </div><!-- /.row -->
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_end')
 
       @php
         $refunded_amt = $order->refundedSum();
@@ -344,177 +334,146 @@
       @endif
 
       @can('fulfill', $order)
-        <div class="box">
-          <div class="box-body">
-            <div class="box-tools">
-              @if (Auth::user()->canManageOrderPayments())
-                {!! Form::open(['route' => ['admin.order.order.togglePaymentStatus', $order], 'method' => 'put', 'class' => 'inline']) !!}
-                <button type="submit" class="confirm ajax-silent btn btn-lg btn-danger">{{ $order->isPaid() ? trans('app.mark_as_unpaid') : trans('app.mark_as_paid') }}</button>
-                {!! Form::close() !!}
+        <div class="admin-card admin-order-actions">
+          <div class="admin-card__body admin-order-actions__bar">
+            @if (Auth::user()->canManageOrderPayments())
+              {!! Form::open(['route' => ['admin.order.order.togglePaymentStatus', $order], 'method' => 'put', 'class' => 'inline']) !!}
+              <button type="submit" class="confirm ajax-silent btn btn-lg btn-danger">{{ $order->isPaid() ? trans('app.mark_as_unpaid') : trans('app.mark_as_paid') }}</button>
+              {!! Form::close() !!}
 
-                @if ($order->isPaid() && ((Auth::user()->isFromPlatForm() && !vendor_get_paid_directly()) || (Auth::user()->isFromMerchant() && vendor_get_paid_directly())))
-                  @can('initiate', \App\Models\Refund::class)
-                    <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.form', $order) }}" class='ajax-modal-btn btn btn-flat btn-lg btn-default'>
-                      {{ trans('app.initiate_refund') }}
-                    </a>
-                  @endcan
-                @endif
+              @if ($order->isPaid() && ((Auth::user()->isFromPlatForm() && !vendor_get_paid_directly()) || (Auth::user()->isFromMerchant() && vendor_get_paid_directly())))
+                @can('initiate', \App\Models\Refund::class)
+                  <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.form', $order) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-default">
+                    {{ trans('app.initiate_refund') }}
+                  </a>
+                @endcan
               @endif
+            @endif
 
-              <div class="pull-right">
-                <a href="javascript:void(0)" data-link="{{ route('admin.order.order.edit', $order) }}" class='ajax-modal-btn btn btn-flat btn-lg btn-default'>
-                  {{ trans('app.update_status') }}
-                </a>
+            <div class="admin-order-actions__primary">
+              <a href="javascript:void(0)" data-link="{{ route('admin.order.order.edit', $order) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-default">
+                {{ trans('app.update_status') }}
+              </a>
 
-                @if ($order->isFulfilled())
-                  @unless ($order->isArchived())
-                    @can('archive', $order)
-                      {!! Form::open(['route' => ['admin.order.order.archive', $order->id], 'method' => 'delete', 'class' => 'inline']) !!}
-                      <button type="submit" class="confirm ajax-silent btn btn-lg btn-default"><i class="fa fa-archive text-muted"></i> {{ trans('app.order_archive') }}</button>
-                      {!! Form::close() !!}
-                    @endcan
-                  @endunless
-                @else
-                  @unless ($order->isCanceled() || $order->cancellation)
-                    @if (!$order->cancellationFeeApplicable())
-                      @if (Auth::user()->isFromPlatform())
-                        <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class='ajax-modal-btn btn btn-lg btn-warning'>
-                          {{ trans('app.cancel_order') }}
-                        </a>
-                      @else
-                        {!! Form::open(['route' => ['admin.order.order.cancel', $order], 'method' => 'put', 'class' => 'inline']) !!}
-                        <button type="submit" class="confirm ajax-silent btn btn-lg btn-warning">{{ trans('app.cancel_order') }}</button>
-                        {!! Form::close() !!}
-                      @endif
-                    @else
-                      <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class='ajax-modal-btn btn btn-flat btn-lg btn-warning'>
+              @if ($order->isFulfilled())
+                @unless ($order->isArchived())
+                  @can('archive', $order)
+                    {!! Form::open(['route' => ['admin.order.order.archive', $order->id], 'method' => 'delete', 'class' => 'inline']) !!}
+                    <button type="submit" class="confirm ajax-silent btn btn-lg btn-default"><i class="fa fa-archive text-muted"></i> {{ trans('app.order_archive') }}</button>
+                    {!! Form::close() !!}
+                  @endcan
+                @endunless
+              @else
+                @unless ($order->isCanceled() || $order->cancellation)
+                  @if (!$order->cancellationFeeApplicable())
+                    @if (Auth::user()->isFromPlatform())
+                      <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class="ajax-modal-btn btn btn-lg btn-warning">
                         {{ trans('app.cancel_order') }}
                       </a>
+                    @else
+                      {!! Form::open(['route' => ['admin.order.order.cancel', $order], 'method' => 'put', 'class' => 'inline']) !!}
+                      <button type="submit" class="confirm ajax-silent btn btn-lg btn-warning">{{ trans('app.cancel_order') }}</button>
+                      {!! Form::close() !!}
                     @endif
-                  @endunless
-
-                  @if ($order->deliver())
-                    <a href="javascript:void(0)" data-link="{{ route('admin.order.order.fulfillment', $order) }}" class='ajax-modal-btn btn btn-flat btn-lg btn-primary'>
-                      {{ trans('app.fulfill_order') }}
+                  @else
+                    <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-warning">
+                      {{ trans('app.cancel_order') }}
                     </a>
                   @endif
+                @endunless
+
+                @if ($order->deliver())
+                  <a href="javascript:void(0)" data-link="{{ route('admin.order.order.fulfillment', $order) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-primary">
+                    {{ trans('app.fulfill_order') }}
+                  </a>
                 @endif
-              </div>
+              @endif
             </div>
-          </div> <!-- /.box-body -->
-        </div> <!-- /.box -->
+          </div>
+        </div>
       @endcan
 
       @include('admin.partials._activity_logs', ['logger' => $order])
     </div> <!-- /.col-md-8 -->
 
-    <div class="col-md-4 nopadding-left">
+    <div class="col-md-4 admin-order-detail__sidebar">
       @if (Auth::user()->isFromPlatform())
-        <div class="box">
-          <div class="box-header with-border">
-            <h3 class="box-title"><i class="fa fa-map-marker"></i> {{ trans('app.shop') }}</h3>
-            <div class="box-tools pull-right">
-              @can('secretLogin', $order->shop->owner)
-                <a href="{{ route('admin.user.secretLogin', $order->shop->owner->id) }}" class="btn btn-link">
-                  <i class="fa fa-user-secret"></i>
-                  {{ trans('app.secret_login_merchant') }}
-                </a>
-              @endcan
-            </div>
-          </div> <!-- /.box-header -->
-
-          <div class="box-body">
-            <img src="{{ get_storage_file_url(optional($order->shop->image)->path, 'mini') }}" class="" alt="{{ trans('app.logo') }}">
-
-            <p class="indent10">
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.shop'),
+          'icon' => 'fa-store',
+          'bodyClass' => 'admin-order-sidebar-panel',
+          'actions' => Gate::allows('secretLogin', $order->shop->owner)
+            ? '<a href="' . route('admin.user.secretLogin', $order->shop->owner->id) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-user-secret"></i> ' . e(trans('app.secret_login_merchant')) . '</a>'
+            : '',
+        ])
+          <div class="admin-order-sidebar-panel__shop">
+            <img src="{{ get_storage_file_url(optional($order->shop->image)->path, 'mini') }}" class="admin-order-sidebar-panel__logo" alt="">
+            <div>
               @if (Gate::allows('view', $order->shop) && $order->shop->id)
-                <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.show', $order->shop->id) }}" class="ajax-modal-btn">
-                  {{ $order->shop->name }}
-                </a>
+                <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.show', $order->shop->id) }}" class="ajax-modal-btn admin-order-sidebar-panel__name">{{ $order->shop->name }}</a>
               @else
-                <h4>{!! trans('help.shop_not_exist') !!}</h4>
-                <span class="lead">{{ $order->shop->name }}</span>
+                <strong>{{ $order->shop->name }}</strong>
               @endif
-            </p>
-
-            @if ($order->shop->id)
-              <a href="{{ route('show.store', $order->shop->slug) }}" target="_blank" class="small pull-right">
-                <i class=" fa fa-external-link"></i> {{ trans('app.store_front') }}
-              </a>
-            @endif
+              @if ($order->shop->id)
+                <a href="{{ route('show.store', $order->shop->slug) }}" target="_blank" class="small"><i class="fa fa-external-link"></i> {{ trans('app.store_front') }}</a>
+              @endif
+            </div>
           </div>
-        </div>
+        @include('admin.partials.ui.card_end')
       @endif
 
       @if ($order->fulfilment_type == \App\Models\Order::FULFILMENT_TYPE_DELIVER)
-        <div class="box">
-          <div class="box-header with-border">
-            <h3 class="box-title"><i class="fa fa-truck"></i> {{ trans('app.deliveryboy') }}</h3>
-            <div class="box-tools pull-right">
-              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.deliveryboy'),
+          'icon' => 'fa-motorcycle',
+          'bodyClass' => 'admin-order-sidebar-panel',
+        ])
+          @if ($order->deliveryBoy)
+            <div class="admin-order-sidebar-panel__user">
+              <img src="{{ get_avatar_src($order->deliveryBoy, 'tiny') }}" class="img-circle img-sm" alt="">
+              <div>
+                <strong>{{ $order->deliveryBoy->getName() }}</strong>
+                <small class="text-muted">{{ $order->deliveryBoy->email }}</small>
+                @if ($order->delivery_mode)
+                  <br><span class="label label-info">{{ trans('app.delivery_mode_' . $order->delivery_mode) }}</span>
+                @endif
+              </div>
             </div>
-          </div> <!-- /.box-header -->
-
-          <div class="box-body">
-            <p>
-              @if ($order->deliveryBoy)
-                <img src="{{ get_avatar_src($order->deliveryBoy, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-
-                <span class="admin-user-widget-title indent5">
-                  {{ $order->deliveryBoy->getName() }}
-                </span>
-              @else
-                <span class="admin-user-widget-title indent5">
-                  {{ trans('app.delivery_boy_not_assigned') }}
-                </span>
-              @endif
-            </p>
-
-            @if ($order->deliveryBoy)
-              <span class="admin-user-widget-text text-muted">
-                {{ trans('app.email') . ': ' . $order->deliveryBoy->email }}
-              </span>
+          @else
+            <p class="text-muted">{{ trans('app.delivery_boy_not_assigned') }}</p>
+            @if ($order->shop->supportsSystemDelivery())
+              {!! Form::open(['route' => ['admin.order.platform_delivery.request', $order], 'method' => 'post']) !!}
+                <button type="submit" class="btn btn-warning btn-sm btn-flat btn-block">{{ trans('app.request_platform_delivery') }}</button>
+              {!! Form::close() !!}
             @endif
-          </div>
-        </div>
+          @endif
+        @include('admin.partials.ui.card_end')
       @endif
 
       @if (config('system_settings.vendor_can_view_customer_info'))
-        <div class="box">
-          <div class="box-header with-border">
-            <h3 class="box-title"><i class="fa fa-user-secret"></i> {{ trans('app.customer') }}</h3>
-            <div class="box-tools pull-right">
-              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            </div>
-          </div> <!-- /.box-header -->
-          <div class="box-body">
-            <p>
-              <img src="{{ get_avatar_src($order->customer, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.customer'),
+          'icon' => 'fa-user',
+          'bodyClass' => 'admin-order-sidebar-panel',
+        ])
 
-              <span class="admin-user-widget-title indent5">
+            <div class="admin-order-sidebar-panel__user">
+              <img src="{{ get_avatar_src($order->customer, 'tiny') }}" class="img-circle img-sm" alt="">
+              <div>
                 @if (config('system_settings.vendor_can_view_customer_info') && $order->customer_id)
-                  <a href="javascript:void(0)" data-link="{{ route('admin.admin.customer.show', $order->customer->id) }}" class="ajax-modal-btn">
-                    {{ $order->customer->getName() }}
-                  </a>
+                  <a href="javascript:void(0)" data-link="{{ route('admin.admin.customer.show', $order->customer->id) }}" class="ajax-modal-btn"><strong>{{ $order->customer->getName() }}</strong></a>
                 @else
-                  {{ $order->customer->getName() }}
+                  <strong>{{ $order->customer->getName() }}</strong>
                 @endif
-
                 @if ($order->email)
-                  <br /><small>{{ trans('app.email') . ': ' . $order->email }}</small>
+                  <small class="text-muted">{{ $order->email }}</small>
+                @elseif ($order->customer->email)
+                  <small class="text-muted">{{ $order->customer->email }}</small>
                 @endif
-              </span>
-            </p>
+              </div>
+            </div>
 
-            @if ($order->customer->email)
-              <span class="admin-user-widget-text text-muted">
-                {{ trans('app.email') . ': ' . $order->customer->email }}
-              </span>
-            @endif
-
-            <span class="spacer10"></span>
-
-            <div class="btn-group btn-group-justified" role="group" aria-label="...">
+            <div class="admin-order-sidebar-panel__actions btn-group btn-group-justified">
               @if ($order->conversation)
                 <a href="{{ route('admin.support.message.show', $order->conversation) }}" class="btn btn-sm btn-info btn-flat">{{ trans('app.view_conversations') }}</a>
               @else
@@ -616,70 +575,59 @@
                 {!! address_str_to_html($order->billing_address) !!}
               @endif
             @endif
-          </div>
-        </div>
+        @include('admin.partials.ui.card_end')
       @endif
 
       @if ($order->refunds->count())
-        <div class="box">
-          <div class="box-header with-border">
-            <h3 class="box-title"> {{ trans('app.refunds') }}</h3>
-            <div class="box-tools pull-right">
-              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            </div>
-          </div> <!-- /.box-header -->
-          <div class="box-body">
-            <table class="table table-border">
-              <tbody>
-                @foreach ($order->refunds as $refund)
-                  <tr>
-                    <td>{{ $refund->created_at->diffForHumans() }}</td>
-                    <td>{{ get_formated_currency($refund->amount, 2, $order->currency_id) }}</td>
-                    <td>{!! $refund->statusName() !!}</td>
-                    <td>
-                      @if ($refund->isOpen())
-                        @can('approve', $refund)
-                          <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.response', $refund) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.response') }}" class="fa fa-random"></i></a>&nbsp;
-                        @endcan
-                      @endif
-                    </td>
-                  </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.refunds'),
+          'icon' => 'fa-undo',
+          'bodyClass' => 'admin-order-sidebar-panel',
+        ])
+          <table class="table table-hover admin-table admin-table--compact">
+            <tbody>
+              @foreach ($order->refunds as $refund)
+                <tr>
+                  <td class="small">{{ $refund->created_at->diffForHumans() }}</td>
+                  <td>{{ get_formated_currency($refund->amount, 2, $order->currency_id) }}</td>
+                  <td>{!! $refund->statusName() !!}</td>
+                  <td class="row-options admin-row-actions">
+                    @if ($refund->isOpen())
+                      @can('approve', $refund)
+                        <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.response', $refund) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.response') }}" data-toggle="tooltip"><i class="fa fa-random"></i></a>
+                      @endcan
+                    @endif
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        @include('admin.partials.ui.card_end')
       @endif
 
       @if ($order->deliver())
-        <div class="box">
-          <div class="box-header with-border">
-            <h3 class="box-title"> {{ trans('app.shipping') }}</h3>
-            <div class="box-tools pull-right">
-              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            </div>
-          </div> <!-- /.box-header -->
-
-          <div class="box-body">
-            <div>
-              <a href="{{ route('order.shipping.label.download', $order) }}" class="btn btn-sm btn-default btn-flat pull-right">
-                <i class="fa fa-file"></i> {{ trans('app.download_shipping_label') }}
-              </a>
-            </div>
-
-            <span>{{ trans('app.tracking_id') }}: {{ $order->tracking_id }}</span><br />
-            <span>{{ trans('app.carrier') }}: <strong>{{ $order->carrier ? $order->carrier->name : ($order->shippingRate ? optional($order->shippingRate->carrier)->name : '') }}</strong></span><br />
-            <span>{{ trans('app.total_weight') }}: <strong>{{ get_formated_weight($order->shipping_weight) }}</strong></span><br />
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.shipping'),
+          'icon' => 'fa-truck',
+          'bodyClass' => 'admin-order-sidebar-panel',
+          'actions' => '<a href="' . route('order.shipping.label.download', $order) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-file"></i> ' . e(trans('app.download_shipping_label')) . '</a>',
+        ])
+          <dl class="admin-order-sidebar-panel__meta">
+            <dt>{{ trans('app.tracking_id') }}</dt>
+            <dd>{{ $order->tracking_id ?: '—' }}</dd>
+            <dt>{{ trans('app.carrier') }}</dt>
+            <dd><strong>{{ $order->carrier ? $order->carrier->name : ($order->shippingRate ? optional($order->shippingRate->carrier)->name : '—') }}</strong></dd>
+            <dt>{{ trans('app.total_weight') }}</dt>
+            <dd><strong>{{ get_formated_weight($order->shipping_weight) }}</strong></dd>
             @if ($order->carrier && $order->tracking_id)
-              @php
-                $tracking_url = getTrackingUrl($order->tracking_id, $order->carrier_id);
-              @endphp
-              <span><a href="{{ $tracking_url }}">{{ trans('app.tracking_url') }}</a>: {{ $tracking_url }}</span>
+              @php $tracking_url = getTrackingUrl($order->tracking_id, $order->carrier_id); @endphp
+              <dt>{{ trans('app.tracking_url') }}</dt>
+              <dd><a href="{{ $tracking_url }}" target="_blank">{{ $tracking_url }}</a></dd>
             @endif
-          </div>
-        </div>
+          </dl>
+        @include('admin.partials.ui.card_end')
       @endif
-    </div> <!-- /.col-md-4 -->
+    </div>
   </div> <!-- /.row -->
 
   <div class="modal fade" id="wireProofPreviewModal" tabindex="-1" role="dialog" aria-hidden="true">

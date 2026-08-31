@@ -45,7 +45,7 @@
         </div>
 
         <div class="modal-footer">
-          <div class="signup-section d-flex justify-content-center">
+          <div class="signup-section d-flex justify-content-center flex-wrap">
             @if (!is_incevio_package_loaded('otp-login'))
               <a href="javascript:void(0);" class="mr-4" data-dismiss="modal" data-toggle="modal" data-target="#passwordResetModal">{{ trans('theme.forgot_password') }}</a>
             @endif
@@ -57,12 +57,20 @@
             @endif
           </div>
 
+          <div class="text-center mt-3 w-100">
+            <button type="button" class="btn btn-link btn-sm" id="continueAsGuestBtn">
+              {{ trans('theme.continue_as_guest') }}
+            </button>
+          </div>
+
           @include('partials._demo_customer_login')
         </div>
       </div> <!-- /.modal-content -->
     @endif
   </div>
 </div> <!-- /#loginModal -->
+
+<div class="modal fade" id="guestContinueModal" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;"></div>
 
 <div class="modal fade auth-modal" id="createAccountModal" tabindex="-1" role="dialog" aria-labelledby="createAccountModal" aria-hidden="true">
   <div class="modal-dialog auth-modal modal-md modal-dialog-centered" role="document">
@@ -126,14 +134,7 @@
             </div>
           @endif
 
-          <div class="form-group text-left pb-2">
-            <label>
-              <input name="agree" class="i-check-blue" type="checkbox" required /> {!! trans('theme.input_label.i_agree_with_terms', ['url' => route('page.open', \App\Models\Page::PAGE_TNC_FOR_CUSTOMER)]) !!}
-            </label>
-            <div class="help-block with-errors"></div>
-          </div>
-
-          @if(config('system_settings.show_customer_terms_and_conditions'))
+          @if (config('system_settings.show_customer_terms_and_conditions'))
             <div class="form-group text-left pb-2">
               <label>
                 <input name="agree" class="i-check-blue" type="checkbox" required /> {!! trans('theme.input_label.i_agree_with_terms', ['url' => route('page.open', \App\Models\Page::PAGE_TNC_FOR_CUSTOMER)]) !!}

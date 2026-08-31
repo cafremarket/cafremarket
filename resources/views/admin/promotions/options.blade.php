@@ -1,12 +1,16 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.promotions') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.promotions') }}</h3>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-striped">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.promotions'),
+    'icon' => 'fa-bullhorn',
+    'bodyClass' => 'responsive-table',
+  ])
+      <table class="table table-striped admin-table">
         <thead>
           <tr>
             <th width="45%">@lang('app.options')</th>
@@ -238,6 +242,5 @@
           @endisset
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 @endsection

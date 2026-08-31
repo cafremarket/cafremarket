@@ -1,11 +1,10 @@
-<div class="box collapsed-box">
-  <div class="box-header with-bcart">
-    <h3 class="box-title"><i class="fa fa-filter"></i> </h3>
-    <div class="box-tools pull-right">
-      <button type="button" class="btn bg-orange btn-flat" data-widget="collapse"><i class="fa fa-plus"></i> {{ trans('app.filter') }}</button>
-    </div>
-  </div> <!-- /.box-header -->
-  <div class="box-body">
+@include('admin.partials.ui.card_start', [
+  'title' => trans('app.filter'),
+  'icon' => 'fa-filter',
+  'class' => 'admin-form-section collapsed-box',
+  'bodyClass' => '',
+  'actions' => '<button type="button" class="btn bg-orange btn-flat btn-sm" data-widget="collapse"><i class="fa fa-plus"></i> ' . e(trans('app.filter')) . '</button>',
+])
     {!! Form::open(['route' => 'admin.order.order.create', 'method' => 'get', 'id' => 'form', 'data-toggle' => 'validator']) !!}
     <div class="row">
       <div class="col-md-4 nopadding-right">
@@ -28,5 +27,4 @@
     </div>
     {!! Form::submit(trans('app.form.proceed'), ['class' => 'btn btn-flat btn-new']) !!}
     {!! Form::close() !!}
-  </div> <!-- /.box-body -->
-</div> <!-- /.box -->
+@include('admin.partials.ui.card_end')

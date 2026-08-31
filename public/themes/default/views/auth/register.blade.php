@@ -85,7 +85,7 @@
               </div>
             </div>
             {!! Form::close() !!}
-            <a href="{{ route('customer.login') }}" class="btn btn-link">{{ trans('theme.have_an_account') }}</a>
+            <a href="{{ route('homepage', ['login' => 1]) }}" class="btn btn-link">{{ trans('theme.have_an_account') }}</a>
 
             @include('theme::auth._social_login')
           </div> <!-- /.form-section -->

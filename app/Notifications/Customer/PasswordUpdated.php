@@ -49,7 +49,7 @@ class PasswordUpdated extends Notification implements ShouldQueue
                 'marketplace' => get_platform_title(),
             ]))
             ->markdown('admin.mail.auth.password_updated', [
-                'url' => route('customer.login'),
+                'url' => route('homepage', ['login' => 1]),
                 'user' => $this->customer->getName(),
             ]);
     }

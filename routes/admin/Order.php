@@ -52,4 +52,6 @@ Route::get('{order}/deliveryboys', [OrderController::class, 'deliveryBoys'])->na
 
 Route::post('{order}/deliveryboy/assign', [OrderController::class, 'assignDeliveryBoy'])->name('deliveryboy.assign');
 
+Route::post('{order}/platform-delivery', [OrderController::class, 'requestPlatformDelivery'])->name('platform_delivery.request');
+
 Route::resource('order', OrderController::class)->except('update'); // order resource routes

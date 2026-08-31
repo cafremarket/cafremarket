@@ -1,29 +1,24 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.general_settings') }}
+@endsection
+
 @php
   $can_update = Gate::allows('update', $shop->config) ?? null;
   $translation_language = app()->getLocale();
 @endphp
 
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        {{ trans('app.general_settings') }}
-      </h3>
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.general_settings'),
+    'icon' => 'fa-cog',
+    'actions' => view('admin.config._general_header_actions', compact('can_update', 'shop', 'translation_language'))->render(),
+    'bodyClass' => '',
+  ])
 
-      @if ($can_update)
-        <div class="box-tools pull-right">
-          <a href="{{ route('admin.vendor.shop.translate.form', ['shop' => $shop, 'language' => $translation_language]) }}" class="btn btn-default btn-flat">
-            <em class="fa fa-language"></em> {{ trans('app.manage_translations') }}
-          </a>
-        </div>
-      @endif
-    </div> <!-- /.box-header -->
-
-    <div class="box-body">
       <div class="row mt-4">
-        {!! Form::model($shop, ['method' => 'PUT', 'route' => ['admin.setting.basic.config.update', $shop->id], 'files' => true, 'id' => 'form', 'class' => 'form-horizontal', 'data-toggle' => 'validator']) !!}
+        {!! Form::model($shop, ['method' => 'PUT', 'route' => [panel_route_name('admin.setting.basic.config.update'), $shop->id], 'files' => true, 'id' => 'form', 'class' => 'form-horizontal', 'data-toggle' => 'validator']) !!}
         <div class="col-sm-8">
           <div class="form-group">
             <div class="row">
@@ -206,6 +201,44 @@
             </div>
           @endif
 
+          <div class="form-group">
+            <div class="row">
+              <div class="col-sm-4 text-right">
+                {!! Form::label('service_radius_km', trans('app.service_radius_km') . ':', ['class' => 'with-help control-label']) !!}
+                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.service_radius_km') }}"></i>
+              </div>
+              <div class="col-sm-8 nopadding-left">
+                @if ($can_update)
+                  {!! Form::number('service_radius_km', $shop->service_radius_km ?? config('hyperlocal.default_shop_service_radius_km', 5), ['class' => 'form-control', 'min' => 1, 'max' => 100, 'step' => '0.5']) !!}
+                @else
+                  <span>{{ $shop->service_radius_km ?? config('hyperlocal.default_shop_service_radius_km', 5) }} km</span>
+                @endif
+              </div>
+            </div>
+          </div>
+
+          @if (Auth::user()->isFromPlatform())
+          <div class="form-group">
+            <div class="row">
+              <div class="col-sm-4 text-right">
+                {!! Form::label('delivery_capability', trans('app.delivery_capability') . ':', ['class' => 'with-help control-label']) !!}
+                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.delivery_capability') }}"></i>
+              </div>
+              <div class="col-sm-8 nopadding-left">
+                @if ($can_update)
+                  {!! Form::select('delivery_capability', [
+                    'both' => trans('app.delivery_capability_both'),
+                    'shop_only' => trans('app.delivery_capability_shop_only'),
+                    'system_only' => trans('app.delivery_capability_system_only'),
+                  ], $shop->delivery_capability ?? 'both', ['class' => 'form-control select2-normal']) !!}
+                @else
+                  <span>{{ trans('app.delivery_capability_' . ($shop->delivery_capability ?? 'both') . '_label') }}</span>
+                @endif
+              </div>
+            </div>
+          </div>
+          @endif
+
           @if ($can_update)
             <div class="row">
               <div class="col-md-4 text-right">
@@ -226,7 +259,7 @@
               {!! Form::label('maintenance_mode', trans('app.form.maintenance_mode'), ['class' => 'control-label with-help']) !!}
               <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.shop_maintenance_mode_handle') }}"></i>
               <div class="handle">
-                <a href="javascript:void(0)" data-link="{{ route('admin.setting.config.maintenanceMode.toggle', $shop) }}" type="button" class="toggle-confirm btn btn-lg btn-secondary btn-toggle {{ $shop->config->maintenance_mode == 1 ? 'active' : '' }}" data-toggle="button" aria-pressed="{{ $shop->config->maintenance_mode == 1 ? 'true' : 'false' }}" autocomplete="off">
+                <a href="javascript:void(0)" data-link="{{ panel_route('admin.setting.config.maintenanceMode.toggle', $shop) }}" type="button" class="toggle-confirm btn btn-lg btn-secondary btn-toggle {{ $shop->config->maintenance_mode == 1 ? 'active' : '' }}" data-toggle="button" aria-pressed="{{ $shop->config->maintenance_mode == 1 ? 'true' : 'false' }}" autocomplete="off">
                   <div class="btn-handle"></div>
                 </a>
               </div>
@@ -347,6 +380,6 @@
         </div>
         {!! Form::close() !!}
       </div>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+
+  @include('admin.partials.ui.card_end')
 @endsection

@@ -7,6 +7,7 @@ use App\Common\ApiAuthTokens;
 use App\Common\Attachable;
 use App\Common\HasHumanAttributes;
 use App\Common\Imageable;
+use App\Common\ReleasesUniqueIdentifiers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 // use Laravel\Passport\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Hash;
 // class User extends Authenticatable implements MustVerifyEmail
 class User extends Authenticatable
 {
-    use Addressable, ApiAuthTokens, Attachable, HasFactory, HasHumanAttributes, Imageable, Notifiable, SoftDeletes;
+    use Addressable, ApiAuthTokens, Attachable, HasFactory, HasHumanAttributes, Imageable, Notifiable, ReleasesUniqueIdentifiers, SoftDeletes;
 
     /**
      * The database table used by the model.

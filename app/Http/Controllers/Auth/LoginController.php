@@ -33,6 +33,27 @@ class LoginController extends Controller
     protected $redirectTo = RouteServiceProvider::DASHBOARD;
 
     /**
+     * Where to redirect users after login.
+     */
+    protected function redirectTo()
+    {
+        $user = auth()->user();
+
+        if ($user && $user->isFromMerchant() && $user->shop && $user->shop->config) {
+            $shop = $user->shop;
+            $config = $shop->config;
+
+            if (! $shop->isVerified()) {
+                return route('merchant.verify');
+            }
+
+            return route('merchant.dashboard');
+        }
+
+        return RouteServiceProvider::DASHBOARD;
+    }
+
+    /**
      * Create a new controller instance.
      *
      * @return void

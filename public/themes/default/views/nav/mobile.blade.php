@@ -53,7 +53,7 @@
         </div>
       @else
         <div class="main-menu-top-item mm-log">
-          <a href="{{ route('account', 'dashboard') }}" class="flex-center-y">
+          <a href="javascript:void(0);" data-toggle="modal" data-target="#loginModal" class="flex-center-y">
             <i class="fa fa-sign-in"></i>
             <p>{{ Str::upper(trans('theme.login')) }}</p>
           </a>

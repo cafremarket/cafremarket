@@ -1,72 +1,55 @@
 @extends('admin.layouts.master')
 
-@section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.wallet.payouts') }}</h3>
-      <div class="box-tools pull-right">
-        @include('wallet::admin._btn_payout')
-      </div>
-    </div> <!-- /.box-header -->
+@section('page_title')
+  {{ trans('packages.wallet.payouts') }}
+@endsection
 
-    <div class="box-body">
-      <table class="table table-hover table-no-sort">
-        <thead>
+@section('content')
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('packages.wallet.payouts'),
+    'icon' => 'fa-money',
+    'actions' => view('wallet::admin._btn_payout')->render(),
+  ])
+
+  <table class="table table-hover admin-table table-no-sort">
+    <thead>
+      <tr>
+        <th>{{ trans('packages.wallet.date') }}</th>
+        <th>{{ trans('packages.wallet.shop') }}</th>
+        <th>{{ trans('packages.wallet.description') }}</th>
+        <th>{{ trans('packages.wallet.remaining_balance') }}</th>
+        <th>{{ trans('packages.wallet.amount') }}</th>
+        <th>{{ trans('packages.wallet.status') }}</th>
+        <th>{{ trans('packages.wallet.payout_payment_proof') }}</th>
+        <th class="admin-table__actions-col">{{ trans('packages.wallet.option') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($payouts as $transaction)
+        @if ($transaction->isTypeOf(\Incevio\Package\Wallet\Models\Transaction::TYPE_PAYOUT))
           <tr>
-            <th>{{ trans('packages.wallet.date') }}</th>
-            <th>{{ trans('packages.wallet.shop') }}</th>
-            <th>{{ trans('packages.wallet.description') }}</th>
-            <th>{{ trans('packages.wallet.remaining_balance') }}</th>
-            <th>{{ trans('packages.wallet.amount') }}</th>
-            <th>{{ trans('packages.wallet.status') }}</th>
-            <th>{{ trans('packages.wallet.payout_payment_proof') }}</th>
-            <th>{{ trans('packages.wallet.option') }}</th>
+            <td class="small">{{ $transaction->created_at->toFormattedDateString() }}</td>
+            <td>{{ optional($transaction->payable)->getName() }}</td>
+            <td class="small">{!! $transaction->getFromMetaData('description') !!}</td>
+            <td>{{ get_formated_currency($transaction->balance, 2, config('system_settings.currency.id')) }}</td>
+            <td>{{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}</td>
+            <td>{!! $transaction->statusName() !!}</td>
+            <td>@include('wallet::admin.partials._payout_payment_proof', ['transaction' => $transaction])</td>
+            <td class="row-options admin-row-actions">
+              @if ($transaction->isApproved())
+                <a href="{{ route('wallet.transaction.invoice', $transaction) }}" class="admin-action-btn" title="{{ trans('app.invoice') }}" data-toggle="tooltip"><i class="fa fa-file-o"></i></a>
+              @endif
+              @if ($transaction->hasPayoutPaymentProof())
+                <a href="{{ route('wallet.transaction.payout_proof.download', $transaction) }}" class="admin-action-btn" title="{{ trans('packages.wallet.payout_payment_proof_download') }}" data-toggle="tooltip"><i class="fa fa-download"></i></a>
+              @endif
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @foreach ($payouts as $transaction)
-            @if ($transaction->isTypeOf(\Incevio\Package\Wallet\Models\Transaction::TYPE_PAYOUT))
-              <tr>
-                <td>
-                  {{ $transaction->created_at->toFormattedDateString() }}
-                </td>
-                <td>
-                  {{ optional($transaction->payable)->getName() }}
-                </td>
-                <td>
-                  {!! $transaction->getFromMetaData('description') !!}
-                </td>
-                <td>
-                  {{ get_formated_currency($transaction->balance, 2, config('system_settings.currency.id')) }}
-                </td>
-                <td>
-                  {{ get_formated_currency($transaction->amount, 2, config('system_settings.currency.id')) }}
-                </td>
-                <td>
-                  {!! $transaction->statusName() !!}
-                </td>
-                <td>
-                  @include('wallet::admin.partials._payout_payment_proof', ['transaction' => $transaction])
-                </td>
-                <td class="text-nowrap">
-                  @if ($transaction->isApproved())
-                    <a href="{{ route('wallet.transaction.invoice', $transaction) }}" class="btn btn-default btn-sm btn-flat">
-                      <i class="fa fa-file-o"></i> {{ trans('app.invoice') }}
-                    </a>
-                  @endif
-                  @if ($transaction->hasPayoutPaymentProof())
-                    <a href="{{ route('wallet.transaction.payout_proof.download', $transaction) }}" class="btn btn-default btn-sm btn-flat">
-                      <i class="fa fa-download"></i> {{ trans('packages.wallet.payout_payment_proof_download') }}
-                    </a>
-                  @endif
-                </td>
-              </tr>
-            @endif
-          @endforeach
-        </tbody>
-      </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+        @endif
+      @endforeach
+    </tbody>
+  </table>
+
+  @include('admin.partials.ui.card_end')
 @endsection
 
 @section('page-script')

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Vendor\AccountController;
 use App\Http\Controllers\Api\Vendor\AddressController;
+use App\Http\Controllers\Api\Vendor\AffiliateController;
 use App\Http\Controllers\Api\Vendor\AttributeController;
 use App\Http\Controllers\Api\Vendor\AttributeValueController;
 use App\Http\Controllers\Api\Vendor\AuthController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Api\Vendor\OrderFulfillmentController;
 use App\Http\Controllers\Api\Vendor\PackageController;
 use App\Http\Controllers\Api\Vendor\ProductController;
 use App\Http\Controllers\Api\Vendor\RefundController;
+use App\Http\Controllers\Api\Vendor\ReportController;
 use App\Http\Controllers\Api\Vendor\RoleController;
 use App\Http\Controllers\Api\Vendor\SubscriptionController;
 use App\Http\Controllers\Api\Vendor\SupplierController;
@@ -197,13 +199,22 @@ Route::prefix('vendor')->group(function () {
 
         // Shipping
         Route::get('carriers', [CarrierController::class, 'index']);
+        Route::post('carrier/create', [CarrierController::class, 'store']);
+        Route::get('carrier/{carrier}', [CarrierController::class, 'show']);
+        Route::put('carrier/{carrier}/update', [CarrierController::class, 'update']);
+        Route::delete('carrier/{carrier}/trash', [CarrierController::class, 'trash']);
+        Route::put('carrier/{carrier_id}/restore', [CarrierController::class, 'restore']);
+        Route::delete('carrier/{carrier_id}/delete', [CarrierController::class, 'destroy']);
 
         // Promotion
 
         // Carts
         Route::get('carts', [CartController::class, 'index']);
+        Route::get('cart/{cart}', [CartController::class, 'show']);
 
         // Orders
+        Route::get('data/customers', [OrderController::class, 'searchCustomers']);
+        Route::post('order/create', [OrderController::class, 'store']);
         Route::get('orders', [OrderController::class, 'index']);
         Route::get('order/{order}', [OrderController::class, 'show']);
         Route::put('order/{order}/update_status', [OrderController::class, 'update_status']);
@@ -279,6 +290,9 @@ Route::prefix('vendor')->group(function () {
         Route::match(['post', 'put'], 'settings/{shop}/update', [ConfigController::class, 'update']);
         Route::get('configs', [ConfigController::class, 'configs']);
         Route::match(['put', 'post'], 'configs/{config}/update', [ConfigController::class, 'updateConfigs']);
+        Route::put('configs/{config}/maintenance/toggle', [ConfigController::class, 'toggleMaintenanceMode']);
+        Route::put('configs/{config}/ecommerce/toggle', [ConfigController::class, 'toggleActiveEcommerce']);
+        Route::put('settings/{shop}/toggle', [ConfigController::class, 'toggleShopActive']);
         Route::get('shop/verification', [ConfigController::class, 'verificationStatus']);
         Route::post('shop/verification', [ConfigController::class, 'submitVerification']);
         Route::get('attachment/{attachment}/download', [ConfigController::class, 'downloadVerificationAttachment']);
@@ -338,6 +352,14 @@ Route::prefix('vendor')->group(function () {
         Route::get('latest_orders', [DashboardController::class, 'latestOrders']);
         Route::get('inventories/top_selling', [DashboardController::class, 'topSellingItems']);
         Route::get('inventories/out_of_stocks', [DashboardController::class, 'outOfStocksItems']);
+
+        // Reports
+        Route::get('reports', [ReportController::class, 'index']);
+        Route::get('reports/sales-chart', [ReportController::class, 'salesChart']);
+
+        // Affiliate
+        Route::get('affiliate', [AffiliateController::class, 'index']);
+        Route::put('affiliate/update', [AffiliateController::class, 'update']);
 
         // Form data
         Route::get('data/{category_id}/category_attributes', [FormDataController::class, 'category_attributes']);

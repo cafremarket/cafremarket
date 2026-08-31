@@ -1,21 +1,18 @@
 @extends('admin.layouts.master')
 
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        {{ trans('app.preview') }} <small>({{ trans('app.total_number_of_rows', ['value' => count($rows)]) }})</small>
-      </h3>
-      <div class="box-tools pull-right">
-        @if (Auth::user()->isAdmin())
-          <a href="javascript:void(0)" data-link="{{ route('admin.vendor.merchant.bulk') }}" class="ajax-modal-btn btn btn-default btn-flat">{{ trans('app.bulk_import') }}</a>
-        @endif
-      </div>
-    </div> <!-- /.box-header -->
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.preview'),
+    'icon' => 'fa-eye',
+    'headerExtra' => '<small class="text-muted">(' . e(trans('app.total_number_of_rows', ['value' => count($rows)])) . ')</small>',
+    'actions' => Auth::user()->isAdmin()
+      ? '<a href="javascript:void(0)" data-link="' . route('admin.vendor.merchant.bulk') . '" class="ajax-modal-btn btn btn-default btn-flat btn-sm">' . e(trans('app.bulk_import')) . '</a>'
+      : '',
+  ])
 
-    {!! Form::open(['route' => 'admin.vendor.merchant.import', 'id' => 'form', 'class' => 'inline-form', 'data-toggle' => 'validator']) !!}
-    <div class="box-body responsive-table">
-      <table class="table table-striped">
+  {!! Form::open(['route' => 'admin.vendor.merchant.import', 'id' => 'form', 'class' => 'inline-form', 'data-toggle' => 'validator']) !!}
+  <div class="responsive-table">
+      <table class="table table-striped admin-table">
         <thead>
           <tr>
             <th>{{ trans('app.logo') }}</th>
@@ -162,17 +159,17 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
+  </div>
+  @include('admin.partials.ui.card_end')
 
-    <div class="box-footer my-4">
+  <div class="admin-card admin-card--footer-only">
+    <div class="admin-card__footer">
       <a href="{{ route('admin.vendor.merchant.index') }}" class="btn btn-default btn-flat">{{ trans('app.cancel') }}</a>
-
-      <small class="indent20">{{ trans('app.total_number_of_rows', ['value' => count($rows)]) }}</small>
-
-      <div class="box-tools pull-right">
+      <small class="text-muted indent20">{{ trans('app.total_number_of_rows', ['value' => count($rows)]) }}</small>
+      <div class="pull-right">
         {!! Form::button(trans('app.looks_good'), ['type' => 'submit', 'class' => 'confirm btn btn-new btn-flat']) !!}
       </div>
-    </div> <!-- /.box-footer -->
-    {!! Form::close() !!}
-  </div> <!-- /.box -->
+    </div>
+  </div>
+  {!! Form::close() !!}
 @endsection

@@ -21,6 +21,10 @@ Route::post('shop/{shop}/verification/approve', [ShopController::class, 'approve
 
 Route::post('shop/{shop}/verification/reject', [ShopController::class, 'rejectVerification'])->name('shop.verify.reject');
 
+Route::get('shop/{shop}/verification/revert', [ShopController::class, 'showRevertVerificationForm'])->name('shop.verify.revert.form');
+
+Route::post('shop/{shop}/verification/revert', [ShopController::class, 'revertVerification'])->name('shop.verify.revert')->middleware('demoCheck');
+
 Route::get('subscription/{shop}/editTrial', [SubscriptionController::class, 'editTrial'])->name('subscription.editTrial');
 
 Route::put('subscription/{shop}/updateTrial', [SubscriptionController::class, 'updateTrial'])->name('subscription.updateTrial');

@@ -1,9 +1,15 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.themes') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="nav-tabs-custom">
-      <ul class="nav nav-tabs nav-justified">
+  @include('admin.partials.ui.card_tabbed_start', [
+    'title' => trans('app.themes'),
+    'icon' => 'fa-paint-brush',
+  ])
+      <ul class="nav nav-tabs nav-justified admin-tabs">
         <li class="active">
           <a href="#storeFrontThemes_tab" data-toggle="tab">
             <i class="fa fa-paint-brush hidden-sm"></i>
@@ -97,15 +103,12 @@
           </div>
         </div> <!-- /.tab-pane -->
       </div> <!-- /.tab-content -->
-    </div> <!-- /.nav-tabs-custom -->
-  </div> <!-- /.box -->
 
-  <div class="panel panel-success">
-    <div class="panel-heading">
-      <i class="fa fa-rocket"></i>
-      Looking for more personalized theme?
-    </div>
-    <div class="panel-body">
+  @include('admin.partials.ui.card_tabbed_end')
+
+  <div class="admin-promo-card admin-promo-card--success" style="margin-top:20px;">
+    <div class="admin-promo-card__head"><i class="fa fa-rocket"></i> Looking for more personalized theme?</div>
+    <div class="admin-promo-card__body">
       Send us an email for any kind of modification or custom work as we know the code better than everyone.
     </div>
   </div>

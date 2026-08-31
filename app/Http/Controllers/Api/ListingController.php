@@ -18,6 +18,8 @@ use App\Models\Manufacturer;
 use App\Models\Product;
 use App\Models\Shop;
 use App\Models\State;
+use App\Services\Hyperlocal\BuyerLocationService;
+use App\Services\Hyperlocal\HyperlocalCatalogService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -30,6 +32,18 @@ class ListingController extends Controller
      */
     public function index(Request $request, $list = 'latest')
     {
+        $catalog = app(HyperlocalCatalogService::class);
+        $buyerLocation = app(BuyerLocationService::class);
+        $buyerLocation->syncFromCustomer();
+
+        if ($catalog->requiresLocationForBrowse() && ! $buyerLocation->hasLocation()) {
+            return response()->json([
+                'message' => trans('theme.set_location_to_shop'),
+                'require_location' => true,
+                'data' => [],
+            ], 422);
+        }
+
         $shop_id = null;
 
         if ($request->has('shop_id')) {
@@ -78,6 +92,10 @@ class ListingController extends Controller
             default:
                 $listings = ListHelper::latest_available_items(8, $shop_id);
                 break;
+        }
+
+        if ($catalog->isEnabled() && ! $shop_id) {
+            $listings = $catalog->filterInventories(collect($listings))->values();
         }
 
         return ListingResource::collection($listings);

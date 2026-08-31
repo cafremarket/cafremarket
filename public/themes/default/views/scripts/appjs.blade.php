@@ -349,7 +349,11 @@
               @include('theme::layouts.notification', ['message' => trans('theme.item_added_to_wishlist'), 'type' => 'success', 'icon' => 'check-circle'])
               increaseWishlistItem(1);
             } else if (401 == xhr.status) {
-              location.href = '{{ route('customer.login') }}';
+              if (typeof window.openCustomerLoginModal === 'function') {
+                window.openCustomerLoginModal();
+              } else {
+                location.href = @json(route('homepage', ['login' => 1]));
+              }
             } else if (404 == xhr.status) {
               @include('theme::layouts.notification', ['message' => trans('theme.item_not_available'), 'type' => 'warning', 'icon' => 'info-circle'])
             } else if (409 == xhr.status) {

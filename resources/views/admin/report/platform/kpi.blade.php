@@ -1,5 +1,9 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.earnings') }}
+@endsection
+
 @section('content')
   <!-- Info boxes -->
   <div class="row">
@@ -80,32 +84,16 @@
     </div> <!-- /.col -->
   </div> <!-- /.row -->
 
-  {{-- <div class="box">
-		<div class="box-header with-border">
-			<h3 class="box-title">{{ trans('app.earnings') }}</h3>
-			<div class="box-tools pull-right">
-				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-				<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-			</div>
-		</div> <!-- /.box-header -->
-		<div class="box-body">
-      <div>{!! $chartVisitors->container() !!}</div>
-		</div> <!-- /.box-body -->
-	</div> <!-- /.box --> --}}
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.subscription_plans') }}</h3>
-      <div class="box-tools pull-right">
-        <span class="label label-default">{{ trans('app.monthly_recurring_revenue') }}:
-          {{ get_formated_currency($monthly_recurring_revenue, 2, config('system_settings.currency.id')) }}</span>
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.subscription_plans'),
+    'icon' => 'fa-credit-card',
+    'headerExtra' => '<span class="label label-default admin-card__badge">' . trans('app.monthly_recurring_revenue') . ': ' . get_formated_currency($monthly_recurring_revenue, 2, config('system_settings.currency.id')) . '</span>',
+    'bodyClass' => '',
+  ])
+
       <div class="row">
         <div class="col-sm-7 nopadding-right">
-          <table class="table table-striped kpi-export-table">
+          <table class="table table-striped admin-table kpi-export-table">
             <thead>
               <tr>
                 <th>{{ trans('app.name') }}</th>
@@ -128,8 +116,8 @@
           {!! $chartSubscribers->container() !!}
         </div>
       </div> <!-- /.row -->
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+
+  @include('admin.partials.ui.card_end')
 @endsection
 
 @section('page-script')

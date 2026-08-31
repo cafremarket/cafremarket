@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="csrf-token" content="KqDWWqbxBW0LvV0dHrLW6LgOWo4YELtF1ePbZjU6">
+    <title>Cafremarket</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <link href="/css/app.css" rel="stylesheet">
+    <link href="/css/admin-modern.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+      .select2-selection__arrow{
+        display: none;
+      }
+      .form-control-feedback{
+        width: 46px;
+        height: 46px;
+        line-height: 46px;
+      }
+      .select2-container--default .select2-selection--single {
+          height: 46px !important;
+          padding: 10px 16px;
+          font-size: 18px;
+          line-height: 1.33;
+      }
+      .select2-container--default .select2-selection--single .select2-selection__rendered {
+          line-height: 31px !important;
+      }
+
+      .iti {
+          display: block;
+      }
+    </style>
+  </head>
+
+  <body class="hold-transition login-page">
+    <div class="login-box">
+      
+      
+
+
+
+
+      <!-- Loading overlay -->
+        <div id="loading-overlay">
+          <div class="spinner"></div>
+        </div>
+
+        <div class="admin-auth-card">
+    <div class="login-section">
+      <div class="form-container admin-auth-card__inner">
+        <div class="image-holder admin-auth-card__visual"></div>
+        <div class="login-form-section admin-auth-card__form">
+          <div class="login-logo admin-auth-card__logo">
+            <a href="http://127.0.0.1:8000">
+              <img src="http://127.0.0.1:8000/images/placeholders/no_img.png" class="brand-logo" height="47" alt="Logo">
+            </a>
+          </div>
+
+          <div class="form-section">
+            <h3 class="admin-auth-card__title">Registrar</h3>
+            <p class="admin-auth-card__subtitle">Cafremarket</p>
+
+            <form method="POST" action="http://127.0.0.1:8000/register" accept-charset="UTF-8" id="stripe-form" data-toggle="validator" class="admin-auth-form" enctype="multipart/form-data"><input name="_token" type="hidden" value="KqDWWqbxBW0LvV0dHrLW6LgOWo4YELtF1ePbZjU6">
+
+                          <div class="form-group has-feedback">
+                <select id="plans" class="form-control input-lg" required name="plan"><option value="Paddle">Individual (349,00 MT/mês)</option><option value="Paddle 22">Business (649,00 MT/mês)</option><option value="Paddle3">Professional (1.200,00 MT/mês)</option><option value="Paddle 2">PRO-PLUGS (1.500,00 MT/mês)</option></select>
+                <i class="glyphicon glyphicon-dashboard form-control-feedback"></i>
+                <div class="help-block with-errors">
+                                      Será cobrado após o período de teste de 3 dias.
+                                  </div>
+              </div>
+            
+            <div class="form-group has-feedback">
+              <input class="form-control input-lg" placeholder="Nome completo" required name="name" type="text">
+              <span class="glyphicon glyphicon-user form-control-feedback"></span>
+              <div class="help-block with-errors"></div>
+            </div>
+
+            <div class="form-group has-feedback">
+              <input class="form-control input-lg" placeholder="Insira um endereço de e-mail válido" required name="email" type="email">
+              <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+              <div class="help-block with-errors"></div>
+            </div>
+
+            <div class="form-group has-feedback">
+              <input class="form-control input-lg" id="password" placeholder="Senha" data-minlength="6" required name="password" type="password" value="">
+              <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+              <div class="help-block with-errors"></div>
+            </div>
+
+            <div class="form-group has-feedback">
+              <input class="form-control input-lg" placeholder="Confirme a senha" data-match="#password" required name="password_confirmation" type="password" value="">
+              <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+              <div class="help-block with-errors"></div>
+            </div>
+
+                          <div class="form-group has-feedback">
+                <input class="form-control input-lg" placeholder="Telefone" name="phone" type="text">
+                <i class="glyphicon glyphicon-phone form-control-feedback"></i>
+                <div class="help-block with-errors"></div>
+              </div>
+            
+            <div class="form-group has-feedback">
+              <input class="form-control input-lg" placeholder="Nome da loja" required name="shop_name" type="text">
+              <i class="glyphicon glyphicon-equalizer form-control-feedback"></i>
+              <div class="help-block with-errors"></div>
+            </div>
+
+            
+            
+                          <div class="form-group">
+                <label class="admin-auth-form__remember">
+                  <input class="icheck" required name="agree" type="checkbox">
+                  Concordo com os <u><a href="http://127.0.0.1:8000/page/terms-of-use-merchant" target="_blank"> termos</a></u>
+                </label>
+                <div class="help-block with-errors"></div>
+              </div>
+            
+            <input id="card-button" class="btn btn-block btn-lg btn-flat btn-new admin-auth-form__submit" type="submit" value="Registrar">
+            </form>
+
+            <a class="admin-auth-form__register" href="http://127.0.0.1:8000/login">
+              <i class="fa fa-sign-in"></i> Já tenho uma conta — Entrar
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.google.com/recaptcha/api.js"></script>
+    </div> <!-- /.login-box -->
+
+    <script src="js/app.js"></script>
+
+    <!-- Scripts -->
+    
+    
+    <script type="text/javascript">
+      // ;(function($, window, document) {
+        $("#plans").select2({
+          minimumResultsForSearch: -1,
+        });
+        $("#exp-year").select2({
+          placeholder: "Ano de validade",
+          minimumResultsForSearch: -1,
+        });
+        $("#exp-month").select2({
+          placeholder: "Mês de validade",
+          minimumResultsForSearch: -1,
+        });
+
+        $('.icheck').iCheck({
+          checkboxClass: 'icheckbox_minimal-blue',
+          radioClass: 'iradio_minimal-blue'
+        });
+      // });
+
+      // Intercept the form submission
+      $('#registration-form').submit(function () {
+          // Show the loading overlay
+          // $('#loading-overlay').show();
+      });
+
+    </script>
+
+    <div class="loader">
+      <center>
+        <img class="loading-image" src="http://127.0.0.1:8000/images/gears.gif" alt="busy...">
+      </center>
+    </div>
+  </body>
+</html>

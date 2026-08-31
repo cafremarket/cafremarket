@@ -1,119 +1,99 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.delivery_boys') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.delivery_boys') }}</h3>
-      <div class="box-tools pull-right">
-        <a href="javascript:void(0)" data-link="{{ route('admin.admin.deliveryboy.create') }}" class="ajax-modal-btn btn btn-new btn-flat">{{ trans('app.add_delivery_boy') }}</a>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-2nd-no-sort">
-        <thead>
-          <tr>
-            @can('massDelete', \App\Models\User::class)
-              <th class="massActionWrapper">
-                <!-- Check all button -->
-                <div class="btn-group ">
-                  <button type="button" class="btn btn-xs btn-default checkbox-toggle">
-                    <i class="fa fa-square-o" data-toggle="tooltip" data-placement="top" title="{{ trans('app.select_all') }}"></i>
-                  </button>
+  @php
+    $deliveryBoyModel = \App\Models\User::class;
+    $massActions = [
+      ['url' => panel_route('admin.admin.deliveryboy.massTrash'), 'label' => trans('app.trash'), 'icon' => 'fa-trash'],
+      ['url' => panel_route('admin.admin.deliveryboy.massDestroy'), 'label' => trans('app.delete_permanently'), 'icon' => 'fa-times'],
+    ];
+  @endphp
 
-                  <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <span class="caret"></span>
-                    <span class="sr-only">{{ trans('app.toggle_dropdown') }}</span>
-                  </button>
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.delivery_boys'),
+    'icon' => 'fa-motorcycle',
+    'actions' => view('admin.deliveryboy._header_actions')->render(),
+  ])
 
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a href="javascript:void(0)" data-link="{{ route('admin.admin.deliveryboy.massTrash') }}" class="massAction" data-doafter="reload"><i class="fa fa-trash"></i> {{ trans('app.trash') }}</a></li>
+  <table class="table table-hover admin-table table-2nd-no-sort">
+    <thead>
+      <tr>
+        @include('admin.partials.ui.mass_checkbox_header', ['model' => $deliveryBoyModel, 'massActions' => $massActions])
+        @cannot('massDelete', $deliveryBoyModel)
+          <th></th>
+        @endcannot
+        <th>{{ trans('app.avatar') }}</th>
+        <th>{{ trans('app.nice_name') }}</th>
+        <th>{{ trans('app.full_name') }}</th>
+        <th>{{ trans('app.phone_number') }}</th>
+        <th>{{ trans('app.email') }}</th>
+        <th>{{ trans('app.status') }}</th>
+        <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
+      </tr>
+    </thead>
+    <tbody id="massSelectArea">
+      @foreach ($deliveryBoys as $deliveryboy)
+        <tr>
+          @can('massDelete', $deliveryBoyModel)
+            <td><input id="{{ $deliveryboy->id }}" type="checkbox" class="massCheck"></td>
+          @else
+            <td></td>
+          @endcan
+          <td>
+            <img src="{{ get_avatar_src($deliveryboy, 'tiny') }}" class="img-circle img-sm admin-table__avatar" alt="">
+          </td>
+          <td>{{ $deliveryboy->nice_name }}</td>
+          <td>{{ $deliveryboy->full_name }}</td>
+          <td>{{ $deliveryboy->phone_number ?? '' }}</td>
+          <td>{{ $deliveryboy->email }}</td>
+          <td>{{ $deliveryboy->status == 1 ? trans('app.active') : trans('app.inactive') }}</td>
+          <td class="row-options admin-row-actions">
+            <a href="javascript:void(0)" data-link="{{ panel_route('admin.admin.deliveryboy.show', $deliveryboy->id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.profile') }}" data-toggle="tooltip"><i class="fa fa-user-circle-o"></i></a>
+            <a href="javascript:void(0)" data-link="{{ panel_route('admin.admin.deliveryboy.edit', $deliveryboy->id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.edit') }}" data-toggle="tooltip"><i class="fa fa-edit"></i></a>
+            {!! Form::open(['route' => ['admin.admin.deliveryboy.trash', $deliveryboy->id], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}
+            <button type="submit" class="admin-action-btn confirm ajax-silent" title="{{ trans('app.trash') }}" data-toggle="tooltip"><i class="fa fa-trash-o"></i></button>
+            {!! Form::close() !!}
+          </td>
+        </tr>
+      @endforeach
+    </tbody>
+  </table>
 
-                    <li><a href="javascript:void(0)" data-link="{{ route('admin.admin.deliveryboy.massDestroy') }}" class="massAction" data-doafter="reload"><i class="fa fa-times"></i> {{ trans('app.delete_permanently') }}</a></li>
-                  </ul>
-                </div>
-              </th>
-            @endcan
-            <th>{{ trans('app.avatar') }}</th>
-            <th>{{ trans('app.nice_name') }}</th>
-            <th>{{ trans('app.full_name') }}</th>
-            <th>{{ trans('app.phone_number') }}</th>
-            <th>{{ trans('app.email') }}</th>
-            <th>{{ trans('app.status') }}</th>
-            <th>&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody id="massSelectArea">
-          @foreach ($deliveryBoys as $deliveryboy)
-            <tr>
-              <td><input id="{{ $deliveryboy->id }}" type="checkbox" class="massCheck"></td>
-              <td>
-                <img src="{{ get_avatar_src($deliveryboy, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-              </td>
-              <td>{{ $deliveryboy->nice_name }}</td>
-              <td>{{ $deliveryboy->full_name }}</td>
-              <td>{{ $deliveryboy->phone_number ?? '' }}</td>
-              <td>{{ $deliveryboy->email }}</td>
-              <td>{{ $deliveryboy->status == 1 ? trans('app.active') : trans('app.inactive') }}</td>
-              <td class="row-options">
-                <a href="javascript:void(0)" data-link="{{ route('admin.admin.deliveryboy.show', $deliveryboy->id) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.profile') }}" class="fa fa-user-circle-o"></i></a>&nbsp;
+  @include('admin.partials.ui.card_end')
 
-                <a href="javascript:void(0)" data-link="{{ route('admin.admin.deliveryboy.edit', $deliveryboy->id) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.edit') }}" class="fa fa-edit"></i></a>&nbsp;
+  @include('admin.partials.ui.trash_start', ['title' => trans('app.trash')])
 
-                {!! Form::open(['route' => ['admin.admin.deliveryboy.trash', $deliveryboy->id], 'method' => 'delete', 'class' => 'data-form']) !!}
-                {!! Form::button('<i class="fa fa-trash-o"></i>', ['type' => 'submit', 'class' => 'confirm ajax-silent', 'title' => trans('app.trash'), 'data-toggle' => 'tooltip', 'data-placement' => 'top']) !!}
-                {!! Form::close() !!}
-              </td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  <table class="table table-hover admin-table table-no-sort">
+    <thead>
+      <tr>
+        <th>{{ trans('app.avatar') }}</th>
+        <th>{{ trans('app.full_name') }}</th>
+        <th>{{ trans('app.email') }}</th>
+        <th>{{ trans('app.deleted_at') }}</th>
+        <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($trashes as $trash)
+        <tr>
+          <td><img src="{{ get_avatar_src($trash, 'tiny') }}" class="img-circle img-sm admin-table__avatar" alt=""></td>
+          <td>{{ $trash->nice_name }}</td>
+          <td>{{ $trash->email }}</td>
+          <td>{{ $trash->deleted_at->diffForHumans() }}</td>
+          <td class="row-options admin-row-actions">
+            @include('admin.partials.ui.action_btn', ['href' => panel_route('admin.admin.deliveryboy.restore', $trash->id), 'icon' => 'fa-database', 'title' => trans('app.restore')])
+            {!! Form::open(['route' => ['admin.admin.deliveryboy.destroy', $trash->id], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}
+            <button type="submit" class="admin-action-btn confirm ajax-silent" title="{{ trans('app.delete_permanently') }}" data-toggle="tooltip"><i class="fa fa-trash-o"></i></button>
+            {!! Form::close() !!}
+          </td>
+        </tr>
+      @endforeach
+    </tbody>
+  </table>
 
-  <div class="box collapsed-box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        {!! Form::open(['route' => ['admin.admin.deliveryboy.emptyTrash'], 'method' => 'delete', 'class' => 'data-form']) !!}
-        {!! Form::button('<i class="fa fa-trash-o"></i>', ['type' => 'submit', 'class' => 'confirm btn btn-default btn-flat ajax-silent', 'title' => trans('help.empty_trash'), 'data-toggle' => 'tooltip', 'data-placement' => 'right']) !!}
-        {!! Form::close() !!}
-        {{ trans('app.trash') }}
-      </h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
-        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-no-sort">
-        <thead>
-          <tr>
-            <th>{{ trans('app.avatar') }}</th>
-            <th>{{ trans('app.full_name') }}</th>
-            <th>{{ trans('app.email') }}</th>
-            <th>{{ trans('app.deleted_at') }}</th>
-            <th>{{ trans('app.option') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach ($trashes as $trash)
-            <tr>
-              <td>
-                <img src="{{ get_avatar_src($trash, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-              </td>
-              <td>{{ $trash->nice_name }}</td>
-              <td>{{ $trash->email }}</td>
-              <td>{{ $trash->deleted_at->diffForHumans() }}</td>
-              <td class="row-options">
-                <a href="{{ route('admin.admin.deliveryboy.restore', $trash->id) }}"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.restore') }}" class="fa fa-database"></i></a>&nbsp;
-
-                {!! Form::open(['route' => ['admin.admin.deliveryboy.destroy', $trash->id], 'method' => 'delete', 'class' => 'data-form']) !!}
-                {!! Form::button('<i class="glyphicon glyphicon-trash"></i>', ['type' => 'submit', 'class' => 'confirm ajax-silent', 'title' => trans('app.delete_permanently'), 'data-toggle' => 'tooltip', 'data-placement' => 'top']) !!}
-                {!! Form::close() !!}
-              </td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 @endsection

@@ -1,15 +1,21 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.ticket') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.ticket') }}</h3>
-      <div class="box-tools pull-right">
-        <a href="javascript:void(0)" data-link="{{ route('admin.account.ticket.reply', $ticket) }}" class="ajax-modal-btn btn btn-new btn-flat">{{ trans('app.reply') }}</a>
-        <a href="{{ route('admin.account.ticket') }}" class="btn btn-default btn-flat">{{ trans('app.back') }}</a>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
+  @php
+    $ticketActions = '<a href="' . route('admin.account.ticket') . '" class="btn btn-default btn-flat btn-sm"><i class="fa fa-arrow-left"></i> ' . e(trans('app.back')) . '</a> '
+      . '<a href="javascript:void(0)" data-link="' . route('admin.account.ticket.reply', $ticket) . '" class="ajax-modal-btn btn btn-new btn-flat btn-sm"><i class="fa fa-reply"></i> ' . e(trans('app.reply')) . '</a>';
+  @endphp
+
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.ticket'),
+    'icon' => 'fa-ticket',
+    'actions' => $ticketActions,
+    'bodyClass' => 'admin-detail-view',
+  ])
       <div class="row">
         <div class="col-md-2 nopadding-right">
           <div class="form-group indent10">
@@ -96,6 +102,5 @@
           </div>
         </div>
       </div>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 @endsection

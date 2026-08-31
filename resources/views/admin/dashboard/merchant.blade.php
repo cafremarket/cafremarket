@@ -4,9 +4,18 @@
   @include('plugins.ionic')
 @endsection
 
+@section('page_title')
+  {{ trans('nav.dashboard') }}
+@endsection
+
 @section('content')
 
   @include('admin.partials._subscription_notice')
+
+  <div class="dashboard-welcome">
+    <h2>{{ trans('app.welcome') }}, {{ Auth::user()->getName() }}!</h2>
+    <p>{{ optional(Auth::user()->shop)->name ?? trans('nav.dashboard') }}</p>
+  </div>
 
   <!-- Info boxes -->
   <div class="row">
@@ -212,29 +221,30 @@
         </div>
       @endif
 
-      <div class="box">
-        <div class="nav-tabs-custom">
-          <ul class="nav nav-tabs nav-justified">
-            <li class="active"><a href="#orders_tab" data-toggle="tab">
-                <i class="fa fa-shopping-cart hidden-sm"></i>
-                {{ trans('app.latest_orders') }}
-              </a></li>
-            <li><a href="#inventory_tab" data-toggle="tab">
-                <i class="fa fa-cubes hidden-sm"></i>
-                {{ trans('app.recently_added_products') }}
-              </a></li>
-            <li><a href="#low_stock_tab" data-toggle="tab">
-                <i class="fa fa-cube hidden-sm"></i>
-                {{ trans('app.low_stock_items') }}
-              </a></li>
-          </ul>
-          <!-- /.nav .nav-tabs -->
+      @include('admin.partials.ui.card_tabbed_start', [
+        'title' => trans('nav.dashboard'),
+        'icon' => 'fa-dashboard',
+        'bodyClass' => '',
+      ])
 
-          <div class="tab-content">
-            <div class="tab-pane active" id="orders_tab">
-              <div class="box-body nopadding">
-                <div class="table-responsive">
-                  <table class="table no-margin table-condensed">
+        <ul class="nav nav-tabs nav-justified admin-tabs">
+          <li class="active"><a href="#orders_tab" data-toggle="tab">
+              <i class="fa fa-shopping-cart hidden-sm"></i>
+              {{ trans('app.latest_orders') }}
+            </a></li>
+          <li><a href="#inventory_tab" data-toggle="tab">
+              <i class="fa fa-cubes hidden-sm"></i>
+              {{ trans('app.recently_added_products') }}
+            </a></li>
+          <li><a href="#low_stock_tab" data-toggle="tab">
+              <i class="fa fa-cube hidden-sm"></i>
+              {{ trans('app.low_stock_items') }}
+            </a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane active responsive-table" id="orders_tab">
+            <table class="table table-hover admin-table table-no-sort">
                     <thead>
                       <tr>
                         <th>{{ trans('app.order_number') }}</th>
@@ -270,33 +280,25 @@
                         <tr>
                           <td colspan="6">{{ trans('app.no_data_found') }}</td>
                         </tr>
-                      @endforelse
-                    </tbody>
-                  </table>
-                </div>
-                <!-- /.table-responsive -->
-              </div>
-              <!-- /.box-body -->
-              <div class="box-footer clearfix">
-                @can('create', \App\Models\Order::class)
-                  <a href="javascript:void(0)" data-link="{{ route('admin.order.order.searchCustomer') }}" class="ajax-modal-btn btn btn-new btn-flat pull-left">
-                    <i class="icon ion-md-cart"></i> {{ trans('app.add_order') }}
-                  </a>
-                @endcan
-                @can('index', \App\Models\Order::class)
-                  <a href="{{ route('admin.order.order.index') }}" class="btn btn-default btn-flat pull-right">
-                    <i class="icon ion-md-gift"></i> {{ trans('app.all_orders') }}
-                  </a>
-                @endcan
-              </div>
-              <!-- /.box-footer -->
+                    @endforelse
+                  </tbody>
+                </table>
+            <div class="admin-card__footer">
+              @can('create', \App\Models\Order::class)
+                <a href="javascript:void(0)" data-link="{{ route('admin.order.order.searchCustomer') }}" class="ajax-modal-btn btn btn-new btn-flat pull-left">
+                  <i class="fa fa-cart-plus"></i> {{ trans('app.add_order') }}
+                </a>
+              @endcan
+              @can('index', \App\Models\Order::class)
+                <a href="{{ route('admin.order.order.index') }}" class="btn btn-default btn-flat pull-right">
+                  <i class="fa fa-list"></i> {{ trans('app.all_orders') }}
+                </a>
+              @endcan
             </div>
-            <!-- /.tab-pane -->
+          </div>
 
-            <div class="tab-pane" id="inventory_tab">
-              <div class="box-body nopadding">
-                <div class="table-responsive">
-                  <table class="table no-margin table-condensed">
+          <div class="tab-pane responsive-table" id="inventory_tab">
+            <table class="table table-hover admin-table table-no-sort">
                     <thead>
                       <tr>
                         <th>{{ trans('app.image') }}</th>
@@ -334,24 +336,20 @@
                         <tr>
                           <td colspan="6">{{ trans('app.no_data_found') }}</td>
                         </tr>
-                      @endforelse
-                    </tbody>
-                  </table>
-                </div><!-- /.table-responsive -->
-              </div><!-- /.box-body -->
-              <div class="box-footer clearfix">
-                @can('index', \App\Models\Inventory::class)
-                  <a href="{{ route('admin.stock.inventory.index') }}" class="btn btn-default btn-flat pull-right">
-                    <i class="icon ion-md-cube"></i> {{ trans('app.inventories') }}
-                  </a>
-                @endcan
-              </div><!-- /.box-footer -->
-            </div><!-- /.tab-pane -->
+                    @endforelse
+                  </tbody>
+                </table>
+            <div class="admin-card__footer">
+              @can('index', \App\Models\Inventory::class)
+                <a href="{{ route('admin.stock.inventory.index') }}" class="btn btn-default btn-flat pull-right">
+                  <i class="fa fa-cubes"></i> {{ trans('app.inventories') }}
+                </a>
+              @endcan
+            </div>
+          </div>
 
-            <div class="tab-pane" id="low_stock_tab">
-              <div class="box-body nopadding">
-                <div class="table-responsive">
-                  <table class="table no-margin table-condensed">
+          <div class="tab-pane responsive-table" id="low_stock_tab">
+            <table class="table table-hover admin-table table-no-sort">
                     <thead>
                       <tr>
                         <th>{{ trans('app.image') }}</th>
@@ -372,9 +370,9 @@
                           <td>{{ optional($inventory->product)->name }}</td>
                           <td class="qtt-{{ $inventory->id }}">{{ $inventory->stock_quantity > 0 ? $inventory->stock_quantity : trans('app.out_of_stock') }}</td>
                           <td>{{ $inventory->active ? trans('app.active') : trans('app.inactive') }}</td>
-                          <td class="row-options">
+                          <td class="row-options admin-row-actions">
                             @can('update', $inventory)
-                              <a href="javascript:void(0)" data-link="{{ route('admin.stock.inventory.editQtt', $inventory->id) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.update') }}" class="icon ion-md-add-circle"></i></a>
+                              <a href="javascript:void(0)" data-link="{{ route('admin.stock.inventory.editQtt', $inventory->id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.update') }}" data-toggle="tooltip"><i class="fa fa-plus-circle"></i></a>
                             @endcan
                           </td>
                         </tr>
@@ -382,22 +380,20 @@
                         <tr>
                           <td colspan="6">{{ trans('app.no_data_found') }}</td>
                         </tr>
-                      @endforelse
-                    </tbody>
-                  </table>
-                </div> <!-- /.table-responsive -->
-              </div> <!-- /.box-body -->
-              <div class="box-footer clearfix">
-                @can('index', \App\Models\Inventory::class)
-                  <a href="{{ route('admin.stock.inventory.index') }}" class="btn btn-default btn-flat pull-right">
-                    <i class="icon ion-md-cube"></i> {{ trans('app.inventories') }}
-                  </a>
-                @endcan
-              </div> <!-- /.box-footer -->
-            </div> <!-- /.tab-pane -->
-          </div> <!-- /.tab-content -->
-        </div> <!-- /.nav-tabs-custom -->
-      </div> <!-- /.box -->
+                    @endforelse
+                  </tbody>
+                </table>
+            <div class="admin-card__footer">
+              @can('index', \App\Models\Inventory::class)
+                <a href="{{ route('admin.stock.inventory.index') }}" class="btn btn-default btn-flat pull-right">
+                  <i class="fa fa-cubes"></i> {{ trans('app.inventories') }}
+                </a>
+              @endcan
+            </div>
+          </div>
+        </div>
+
+      @include('admin.partials.ui.card_tabbed_end')
 
       {{-- Activity Logs --}}
       @include('admin.partials._activity_logs', ['logger' => $shop])
@@ -411,15 +407,13 @@
         @endphp
 
         @if ($staff_count_percentage > 90 || $stock_used_percentage > 75)
-          <div class="box box-solid removable">
-            <div class="box-header">
-              <h3 class="box-title text-warning"><i class="icon ion-md-pulse"></i> {{ trans('app.resource_uses') }}</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>
-
-            <div class="box-body">
+          @include('admin.partials.ui.card_start', [
+            'title' => trans('app.resource_uses'),
+            'icon' => 'fa-briefcase',
+            'class' => 'box-solid removable admin-card--warning',
+            'bodyClass' => '',
+            'actions' => '<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>',
+          ])
               <span class="progress-description">
                 <i class="icon ion-md-contacts"></i> {{ trans('app.staff') }}
               </span>
@@ -477,13 +471,13 @@
               <div class="callout callout-info" style="margin-bottom: 0!important;">
                 <i class="fa fa-support"></i> {{ trans('messages.time_to_upgrade_plan') }}
               </div>
-            </div>
-            <div class="box-footer">
+          @include('admin.partials.ui.card_body_end')
+            <div class="admin-card__footer">
               <a href="{{ route('admin.account.billing') }}" type="button" class="btn btn-flat btn-default">
                 <i class="fa fa-leaf"></i> {{ trans('app.choose_plan') }}
               </a>
 
-              <div class="box-tools pull-right">
+              <div class="box-tools pull-right admin-card__actions">
                 <a href="javascript:void(0)" data-link="{{ route('admin.dashboard.config.toggle', 'upgrade_plan_notice') }}" type="button" class="btn btn-box-tool toggle-widget toggle-confirm">
                   <i class="fa fa-trash" data-toggle="tooltip" data-placement="left" title="{{ trans('app.never_show_this') }}"></i>
                 </a>
@@ -493,22 +487,18 @@
         @endif
       @endif
 
-      <div class="box box-solid">
-        <div class="box-header with-border">
-          <h3 class="box-title text-warning">
-            <i class="icon ion-md-clock"></i> {{ trans('app.latest_days', ['days' => config('charts.latest_sales.days', 15)]) }}
-          </h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-          </div>
-        </div> <!-- /.box-header -->
-
-        <div class="box-body">
-          <p class="text-muted"><span class="lead"> {{ trans('app.total') }}: {{ get_formated_currency($latest_sale_total, 2, config('system_settings.currency.id')) }} </span><span class="pull-right">{{ $latest_order_count . ' ' . trans('app.orders') }}</span></p>
-          <div>{!! $chart->container() !!}</div>
-
-          <table class="table table-default">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.latest_days', ['days' => config('charts.latest_sales.days', 15)]),
+        'icon' => 'fa-clock-o',
+        'bodyClass' => '',
+        'class' => 'admin-card--collapsible',
+      ])
+        <p class="text-muted admin-dashboard-sales-summary">
+          <span class="lead">{{ trans('app.total') }}: {{ get_formated_currency($latest_sale_total, 2, config('system_settings.currency.id')) }}</span>
+          <span class="pull-right">{{ $latest_order_count . ' ' . trans('app.orders') }}</span>
+        </p>
+        <div>{!! $chart->container() !!}</div>
+        <table class="table table-hover admin-table admin-table--compact">
             <thead>
               <tr>
                 <td><span class="info-box-text">{{ trans('app.breakdown') }}:</span></td>
@@ -528,24 +518,16 @@
                 <td>{{ trans('app.total') }}</td>
                 <td class="pull-right">{{ get_formated_currency($latest_sale_total - $latest_refund_total, 2, config('system_settings.currency.id')) }}</td>
               </tr>
-            </tbody>
-          </table>
-        </div>
-        <!-- /.box-body -->
-      </div> <!-- /.box -->
+          </tbody>
+        </table>
+      @include('admin.partials.ui.card_end')
 
-      <!-- PRODUCT LIST -->
-      <div class="box box-primary">
-        <div class="box-header with-border">
-          <h3 class="box-title"><i class="icon ion-md-rocket"></i> {{ trans('app.top_selling_items') }}</h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-          </div>
-        </div><!-- /.box-header -->
-        <div class="box-body">
-          <div class="table-responsive">
-            <table class="table no-margin table-condensed">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.top_selling_items'),
+        'icon' => 'fa-rocket',
+        'bodyClass' => '',
+      ])
+        <table class="table table-hover admin-table admin-table--compact">
               <thead>
                 <tr class="text-muted">
                   <th width="60px">&nbsp;</th>
@@ -581,14 +563,12 @@
                 @endforeach
               </tbody>
             </table>
-          </div>
-        </div><!-- /.box-body -->
-        <div class="box-footer text-center">
+        <div class="admin-card__footer text-center">
           <a href="{{ route('admin.stock.inventory.index') }}" class="btn btn-default btn-flat pull-right">
-            <i class="icon ion-md-cube"></i> {{ trans('app.inventories') }}
+            <i class="fa fa-cubes"></i> {{ trans('app.inventories') }}
           </a>
-        </div><!-- /.box-footer -->
-      </div><!-- /.box -->
+        </div>
+      @include('admin.partials.ui.card_end')
 
     </div><!-- /.col-*-* -->
   </div><!-- /.row -->

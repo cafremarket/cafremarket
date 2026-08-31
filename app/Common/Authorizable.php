@@ -69,6 +69,7 @@ trait Authorizable
         'secretLogin' => 'login',
         'assign' => 'assign',
         'user' => 'view',
+        'dashboard' => 'view',
     ];
 
     /**
@@ -192,6 +193,10 @@ trait Authorizable
         $temp1 = explode('.', Request::route()->getName());
         $module = $module ? $module : array_slice($temp1, -2, 1)[0];
         $action = $action ? $action : array_slice($temp1, -1, 1)[0];
+
+        if ($action === 'dashboard') {
+            return 'dashboard';
+        }
 
         if ($this->isVendor($module)) {
             return $this->abilities[$action].'_vendor';

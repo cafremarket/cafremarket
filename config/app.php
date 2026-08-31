@@ -271,11 +271,11 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\HelperServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
         App\Providers\ValidationServiceProvider::class,
         App\Providers\ViewComposerServiceProvider::class,
-        App\Providers\HelperServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
         App\Providers\GoogleDriveServiceProvider::class,
         App\Providers\MysqlScoutServiceProvider::class,

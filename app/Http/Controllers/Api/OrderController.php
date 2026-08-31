@@ -13,6 +13,7 @@ use App\Exceptions\PaymentFailedException;
 use App\Models\Order;
 use App\Models\Reply;
 use App\Services\Emola\EmolaOrderPaymentService;
+use App\Services\Geo\DistanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -158,11 +159,46 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function track(Request $request, Order $order)
+    public function track(Request $request, Order $order, DistanceService $distanceService)
     {
-        $url = $order->getTrackingUrl();
+        $payload = ['tracking_url' => $order->getTrackingUrl()];
 
-        return response()->json(['tracking_url' => $url], 200);
+        if ($order->canTrack()) {
+            $rider = $order->deliveryBoy;
+            $shopAddress = $order->shop?->storeAddress();
+
+            $payload['rider'] = [
+                'latitude' => (float) $rider->current_latitude,
+                'longitude' => (float) $rider->current_longitude,
+                'last_location_at' => optional($rider->last_location_at)->toIso8601String(),
+                'name' => $rider->getName(),
+            ];
+
+            if ($order->customer_latitude && $order->customer_longitude) {
+                $payload['customer'] = [
+                    'latitude' => (float) $order->customer_latitude,
+                    'longitude' => (float) $order->customer_longitude,
+                ];
+
+                $payload['eta_km'] = round($distanceService->distanceKm(
+                    (float) $rider->current_latitude,
+                    (float) $rider->current_longitude,
+                    (float) $order->customer_latitude,
+                    (float) $order->customer_longitude
+                ), 2);
+            }
+
+            if ($shopAddress?->latitude && $shopAddress?->longitude) {
+                $payload['shop'] = [
+                    'latitude' => (float) $shopAddress->latitude,
+                    'longitude' => (float) $shopAddress->longitude,
+                ];
+            }
+
+            $payload['delivery_mode'] = $order->delivery_mode;
+        }
+
+        return response()->json($payload, 200);
     }
 
     /**

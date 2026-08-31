@@ -1,5 +1,9 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.orders') }}
+@endsection
+
 @section('content')
   @include('admin.partials.reports.sales_nav')
   @include('admin.partials.reports.summary_orders')
@@ -62,20 +66,20 @@
     </div>
   </div>
 
-  <div class="box report-table-box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.orders') }}</h3>
-      <div class="box-tools pull-right">
-        @include('admin.partials.reports.timeframe')
-      </div>
-    </div>
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.orders'),
+    'icon' => 'fa-shopping-cart',
+    'class' => 'report-table-box',
+    'actions' => view('admin.partials.reports.timeframe')->render(),
+    'bodyClass' => '',
+  ])
+
       <div class="report-chart-card">
         <h4>{{ trans('app.orders') }}</h4>
         <canvas id="salesReport" style="height: 300px; min-height: 300px; max-height: 300px"></canvas>
       </div>
 
-      <table class="table table-hover table-no-sort table-responsive orders-report-table">
+      <table class="table table-hover admin-table table-no-sort table-responsive orders-report-table">
         <thead>
           <tr>
             <th>{{ trans('app.order_date') }}</th>
@@ -93,8 +97,8 @@
         </thead>
         <tbody></tbody>
       </table>
-    </div>
-  </div>
+
+  @include('admin.partials.ui.card_end')
 @endsection
 
 @section('page-script')

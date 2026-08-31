@@ -1,13 +1,10 @@
 @extends('admin.layouts.master')
 
 @section('content')
-  <div class="box">
-    <div class="box-header">
-        <div class="box-title">
-          <h3>{{ trans('app.custom_shipping_labels') }}</h3>
-        </div>
-    </div>
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.custom_shipping_labels'),
+    'icon' => 'fa-tag',
+  ])
           {!! Form::open(['route' => '', 'id' => 'form', 'class' => 'inline-form', 'data-toggle' => 'validator', 'files' => true]) !!}
 
           <div class="form-group">
@@ -50,6 +47,5 @@
 
           {!! Form::button(trans('app.save'), ['type' => 'submit', 'class' => 'confirm btn btn-new btn-flat']) !!}
           {!! Form::close() !!}
-    </div>
-  </div>
-@endSection
+  @include('admin.partials.ui.card_end')
+@endsection

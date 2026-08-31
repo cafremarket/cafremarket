@@ -4,8 +4,17 @@
   @include('plugins.ionic')
 @endsection
 
+@section('page_title')
+  {{ trans('nav.dashboard') }}
+@endsection
+
 @section('content')
   @include('admin.partials._check_misconfigured_subscription')
+
+  <div class="dashboard-welcome">
+    <h2>{{ trans('app.welcome') }}, {{ Auth::user()->getName() }}!</h2>
+    <p>{{ trans('nav.dashboard') }} — {{ config('system_settings.name') ?? get_site_title() }}</p>
+  </div>
 
   <div class="row dashboard-total">
     <div class="col-md-3 stretch-card grid-margin">
@@ -169,77 +178,54 @@
 
   <div class="row">
     <div class="col-xs-12">
-      <div class="box">
-        <div class="nav-tabs-custom">
-          <ul class="nav nav-tabs nav-justified">
-            <div class="box-header with-border">
-              <h3 class="box-title"><i class="fa fa-dollar"></i>
-                {{ trans('app.sales_graph') }}</h3>
-            </div>
-          </ul> <!-- /.nav .nav-tabs -->
-
-          <div class="tab-content total-sale-graph">
-            <!-- Tab buttons for user interaction -->
-            <div class="tab-container">
-              <div class="tab-button active" data-timeframe="week">{{ trans('app.this_week') }}</div>
-              <div class="tab-button" data-timeframe="month">{{ trans('app.this_month') }}</div>
-              <div class="tab-button" data-timeframe="year">{{ trans('app.this_year') }}</div>
-            </div>
-
-            <!-- Chart canvas container -->
-            <canvas id="saleChart" height="100vh"></canvas>
-          </div> <!-- /.tab-content -->
-        </div> <!-- /.nav-tabs-custom -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.sales_graph'),
+        'icon' => 'fa-line-chart',
+        'bodyClass' => '',
+      ])
+        <div class="tab-content total-sale-graph">
+          <div class="tab-container">
+            <div class="tab-button active" data-timeframe="week">{{ trans('app.this_week') }}</div>
+            <div class="tab-button" data-timeframe="month">{{ trans('app.this_month') }}</div>
+            <div class="tab-button" data-timeframe="year">{{ trans('app.this_year') }}</div>
+          </div>
+          <canvas id="saleChart" height="100vh"></canvas>
+        </div>
+      @include('admin.partials.ui.card_end')
     </div>
   </div>
 
 
   <div class="row">
     <div class="col-md-8">
-      <div class="box">
-        <div class="nav-tabs-custom">
-          <ul class="nav nav-tabs nav-justified">
-            <div class="box-header with-border">
-              <h3 class="box-title">
-                <i class="icon ion-md-pulse hidden-sm"></i>
-                {{ trans('app.visitors_graph') }}
-            </div>
-          </ul>
-          <!-- /.nav .nav-tabs -->
-
-          <div class="tab-content">
-            <div class="tab-pane active" id="visitors_tab">
-              <div>{!! $chart->container() !!}</div>
-            </div>
-          </div>
-          <!-- /.tab-content -->
-        </div>
-        <!-- /.nav-tabs-custom -->
-      </div><!-- /.box -->
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.visitors_graph'),
+        'icon' => 'fa-area-chart',
+        'bodyClass' => '',
+      ])
+        <div>{!! $chart->container() !!}</div>
+      @include('admin.partials.ui.card_end')
     </div>
     <div class="col-md-4">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            <i class="fa fa-pie-chart"></i>
-            {{ trans('app.catalog_graph') }}
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.catalog_graph'),
+        'icon' => 'fa-pie-chart',
+        'bodyClass' => '',
+      ])
+        <div class="donutChart admin-dashboard-donut">
+          <canvas id="productChart"></canvas>
         </div>
-        <div class="donutChart" style="min-height: 340px; padding: 30px 0;">
-          <canvas id="productChart" class=""></canvas>
-        </div>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
   </div>
 
   <div class="row dashboard-ticket-section">
     <div class="col-md-6">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            {{ trans('app.open_tickets') }}
-        </div>
-        <table class="table table-bordered">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.open_tickets'),
+        'icon' => 'fa-ticket',
+      ])
+        <table class="table table-hover admin-table">
           <thead>
             <tr>
               <th width="65%">{{ trans('app.subject') }}</th>
@@ -248,7 +234,7 @@
               <th>{{ trans('app.updated_at') }}</th>
             </tr>
           </thead>
-          <tbody class="box-body">
+          <tbody>
             @forelse($open_tickets->take(5) as $ticket)
               <tr>
                 <td>
@@ -268,15 +254,14 @@
             @endforelse
           </tbody>
         </table>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
     <div class="col-md-3">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            {{ trans('app.top_customers') }}
-        </div>
-        <table class="table table-bordered">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.top_customers'),
+        'icon' => 'fa-users',
+      ])
+        <table class="table table-hover admin-table">
           <thead>
             <tr>
               <th>{{ trans('app.name') }}</th>
@@ -285,7 +270,7 @@
             </tr>
           </thead>
 
-          <tbody class="box-body">
+          <tbody>
             @forelse($top_customers as $customer)
               <tr>
                 <td>
@@ -322,16 +307,15 @@
             @endforelse
           </tbody>
         </table>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
 
     <div class="col-md-3">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            {{ trans('app.top_vendors') }}
-        </div>
-        <table class="table table-bordered">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.top_vendors'),
+        'icon' => 'fa-store',
+      ])
+        <table class="table table-hover admin-table">
           <thead>
             <tr>
               <th>{{ trans('app.name') }}</th>
@@ -339,7 +323,7 @@
               <th>{{ trans('app.revenue') }}</th>
             </tr>
           </thead>
-          <tbody class="box-body">
+          <tbody>
             @forelse($top_vendors as $vendor)
               <tr>
                 <td>
@@ -366,27 +350,26 @@
             @endforelse
           </tbody>
         </table>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
   </div>
   <div class="row dashboard-product-section">
     <div class="col-md-6">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            {{ trans('app.top_sale_products') }}
-        </div>
-        <table class="table table-bordered">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.top_sale_products'),
+        'icon' => 'fa-star',
+      ])
+        <table class="table table-hover admin-table">
           <thead>
             <tr>
               <th>{{ trans('app.image') }}</th>
               <th>{{ trans('app.name') }}</th>
               <th>{{ trans('app.sold') }}</th>
               <th>{{ trans('app.gtin') }}</th>
-              <th>{{ trans('app.action') }}</th>
+              <th class="admin-table__actions-col">{{ trans('app.action') }}</th>
             </tr>
           </thead>
-          <tbody class="box-body">
+          <tbody>
             @foreach ($top_selling_products as $product)
               <tr>
                 <td><img src="{{ get_storage_file_url(optional($product->featureImage)->path, 'tiny') }}" alt="{{ $product->name }}" class="img-thumbnail"></td>
@@ -395,34 +378,33 @@
                   </a></td>
                 <td><span class="label label-outline">{{ $product->inventories_sum_sold_quantity }}</span></td>
                 <td><span class="label label-outline">{{ $product->gtin_type }}</span> {{ $product->gtin }}</td>
-                <td>
+                <td class="row-options admin-row-actions">
                   @can('update', $product)
-                    <a class="btn btn-primary" href="{{ route('admin.catalog.product.edit', $product->id) }}"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.edit') }}" class="fa fa-edit"></i></a>
+                    <a class="admin-action-btn" href="{{ route('admin.catalog.product.edit', $product->id) }}" title="{{ trans('app.edit') }}" data-toggle="tooltip"><i class="fa fa-edit"></i></a>
                   @endcan
                 </td>
               </tr>
             @endforeach
           </tbody>
         </table>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
     <div class="col-md-6">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            {{ trans('app.recently_added_products') }}
-        </div>
-        <table class="table table-bordered">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.recently_added_products'),
+        'icon' => 'fa-clock-o',
+      ])
+        <table class="table table-hover admin-table">
           <thead>
             <tr>
               <th>{{ trans('app.image') }}</th>
               <th>{{ trans('app.name') }}</th>
               <th>{{ trans('app.sold') }}</th>
               <th>{{ trans('app.gtin') }}</th>
-              <th>{{ trans('app.action') }}</th>
+              <th class="admin-table__actions-col">{{ trans('app.action') }}</th>
             </tr>
           </thead>
-          <tbody class="box-body">
+          <tbody>
             @foreach ($latest_products as $product)
               <tr>
                 <td><img src="{{ get_storage_file_url(optional($product->featureImage)->path, 'tiny') }}" alt="{{ $product->name }}" class="img-thumbnail"></td>
@@ -431,91 +413,85 @@
                   </a></td>
                 <td><span class="label label-outline">{{ $product->inventories_sum_sold_quantity }}</span></td>
                 <td><span class="label label-outline">{{ $product->gtin_type }}</span> {{ $product->gtin }}</td>
-                <td>
+                <td class="row-options admin-row-actions">
                   @can('update', $product)
-                    <a class="btn btn-primary" href="{{ route('admin.catalog.product.edit', $product->id) }}"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.edit') }}" class="fa fa-edit"></i></a>
+                    <a class="admin-action-btn" href="{{ route('admin.catalog.product.edit', $product->id) }}" title="{{ trans('app.edit') }}" data-toggle="tooltip"><i class="fa fa-edit"></i></a>
                   @endcan
                 </td>
               </tr>
             @endforeach
           </tbody>
         </table>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
   </div>
 
   <div class="row dashboard-product-section">
     <div class="col-md-6">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            {{ trans('app.top_sale_brands') }}
-        </div>
-        <table class="table table-bordered">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.top_sale_brands'),
+        'icon' => 'fa-industry',
+      ])
+        <table class="table table-hover admin-table admin-table--compact">
           <thead>
             <tr>
               <th>{{ trans('app.image') }}</th>
               <th>{{ trans('app.name') }}</th>
               <th>{{ trans('app.sold') }}</th>
               <th>{{ trans('app.country') }}</th>
-              <th>{{ trans('app.action') }}</th>
+              <th class="admin-table__actions-col">{{ trans('app.action') }}</th>
             </tr>
           </thead>
-          <tbody class="box-body">
+          <tbody>
             @foreach ($top_selling_brands as $manufacturer)
               <tr>
-                <td><img src="{{ get_logo_url($manufacturer, 'tiny') }}" class="img-sm" alt="{{ trans('app.image') }}"></td>
-                <td><a href="#" class="ajax-modal-btn">
-                    {{ $manufacturer->name }}
-                  </a></td>
+                <td><img src="{{ get_logo_url($manufacturer, 'tiny') }}" class="img-sm admin-table__banner-thumb" alt=""></td>
+                <td>{{ $manufacturer->name }}</td>
                 <td><span class="label label-outline">{{ $manufacturer->inventories_sum_sold_quantity }}</span></td>
                 <td>{{ optional($manufacturer->country)->name }}</td>
-                <td>
+                <td class="row-options admin-row-actions">
                   @can('update', $manufacturer)
-                    <a href="javascript:void(0)" data-link="{{ route('admin.catalog.manufacturer.edit', $manufacturer->id) }}" class="ajax-modal-btn btn btn-primary"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.edit') }}" class="fa fa-edit"></i></a>&nbsp;
+                    <a href="javascript:void(0)" data-link="{{ route('admin.catalog.manufacturer.edit', $manufacturer->id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.edit') }}" data-toggle="tooltip"><i class="fa fa-edit"></i></a>
                   @endcan
                 </td>
               </tr>
             @endforeach
           </tbody>
         </table>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
     <div class="col-md-6">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            {{ trans('app.top_sale_categories') }}
-        </div>
-        <table class="table table-bordered">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.top_sale_categories'),
+        'icon' => 'fa-tags',
+      ])
+        <table class="table table-hover admin-table admin-table--compact">
           <thead>
             <tr>
               <th>{{ trans('app.image') }}</th>
               <th>{{ trans('app.name') }}</th>
               <th>{{ trans('app.sold') }}</th>
               <th>{{ trans('app.parent') }}</th>
-              <th>{{ trans('app.action') }}</th>
+              <th class="admin-table__actions-col">{{ trans('app.action') }}</th>
             </tr>
           </thead>
-          <tbody class="box-body">
+          <tbody>
             @foreach ($top_selling_categories as $category)
               <tr>
-                <td><img src="{{ get_storage_file_url(optional($category->featureImage)->path, 'tiny') }}" alt="{{ $category->name }}" class="img-thumbnail"></td>
-                <td><a href="#" class="ajax-modal-btn">
-                    {{ $category->name }}
-                  </a></td>
+                <td><img src="{{ get_storage_file_url(optional($category->featureImage)->path, 'tiny') }}" class="img-sm admin-table__banner-thumb" alt=""></td>
+                <td>{{ $category->name }}</td>
                 <td><span class="label label-outline">{{ $category->listings_sum_sold_quantity }}</span></td>
-                <td>{{ $category->subGroup->name }} <i class="fa fa-angle-double-right small"></i> {{ $category->subGroup->group->name }}</td>
-                <td>
+                <td class="small">{{ $category->subGroup->name }} <i class="fa fa-angle-right"></i> {{ $category->subGroup->group->name }}</td>
+                <td class="row-options admin-row-actions">
                   @can('update', $category)
-                    <a href="javascript:void(0)" data-link="{{ route('admin.catalog.category.edit', $category->id) }}" class="ajax-modal-btn btn btn-primary"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.edit') }}" class="fa fa-edit"></i></a>&nbsp;
+                    <a href="javascript:void(0)" data-link="{{ route('admin.catalog.category.edit', $category->id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.edit') }}" data-toggle="tooltip"><i class="fa fa-edit"></i></a>
                   @endcan
                 </td>
               </tr>
             @endforeach
           </tbody>
         </table>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
   </div>
 @endsection

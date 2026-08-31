@@ -10,8 +10,9 @@ include 'admin/Installer.php';
 include 'admin/Auth.php';
 
 // Admin Routes
-Route::middleware('auth')->name('admin.')->prefix('admin')->group(function () {
-    include 'admin/Package.php';
+Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('admin')->group(function () {
+    // Addon package manager removed — custom features are built in-house.
+    // include 'admin/Package.php';
     include 'admin/Promos.php';
 
     // flash deals
@@ -55,7 +56,7 @@ Route::middleware('auth')->name('admin.')->prefix('admin')->group(function () {
         'secretLogout',
     ])->name('secretLogout');
 
-    Route::middleware(['subscribed', 'checkBillingInfo'])->group(function () {
+    Route::middleware(['subscribed', 'checkBillingInfo', 'requireMerchantVerification'])->group(function () {
         // Dashboard
         Route::put('dashboard/config/{node}/toggle', [
             Admin\DashboardController::class,
@@ -79,6 +80,7 @@ Route::middleware('auth')->name('admin.')->prefix('admin')->group(function () {
             include 'admin/User.php';
             include 'admin/Customer.php';
             include 'admin/DeliveryBoy.php';
+            include 'admin/Hyperlocal.php';
         });
 
         // Vendors Routes for Admin

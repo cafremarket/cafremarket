@@ -148,7 +148,7 @@ class ConfigController extends Controller
         $config = $shop->config;
 
         return response()->json([
-            'data' => [
+            'data' => array_merge([
                 'verified' => $shop->isVerified(),
                 'verification_status' => $shop->getVerificationStatus(),
                 'verification_request_status' => $config?->verificationRequestStatus(),
@@ -164,7 +164,7 @@ class ConfigController extends Controller
                         'url' => url('api/vendor/attachment/'.$attachment->id.'/download'),
                     ];
                 }) ?? [],
-            ],
+            ], $this->verificationMetaPayload($config)),
         ]);
     }
 
@@ -182,15 +182,38 @@ class ConfigController extends Controller
         }
 
         $request->validate([
-            'documents' => 'required|array|min:1',
+            'national_id' => 'nullable|string|max:64',
+            'verified_phone' => 'nullable|string|max:32',
+            'verified_address' => 'nullable|string|max:500',
+            'nuit' => 'nullable|string|max:64',
+            'business_license' => 'nullable|string|max:128',
+            'business_registration' => 'nullable|string|max:128',
+            'documents' => 'nullable|array|min:1',
             'documents.*' => 'file|max:'.(config('system_settings.max_img_size_limit_kb') * 4),
         ]);
 
-        $config->saveAttachments($request->file('documents'));
+        $meta = array_filter([
+            'national_id' => $request->input('national_id'),
+            'verified_phone' => $request->input('verified_phone'),
+            'verified_address' => $request->input('verified_address'),
+            'nuit' => $request->input('nuit'),
+            'business_license' => $request->input('business_license'),
+            'business_registration' => $request->input('business_registration'),
+        ], fn ($v) => $v !== null && $v !== '');
+
+        if ($request->hasFile('documents')) {
+            $config->saveAttachments($request->file('documents'));
+        } elseif (! $config->attachments()->exists()) {
+            return response()->json([
+                'message' => trans('validation.required', ['attribute' => 'documents']),
+            ], 422);
+        }
+
         $config->update([
             'pending_verification' => 1,
             'verification_rejection_reason' => null,
             'verification_rejected_at' => null,
+            'verification_meta' => array_merge($config->verification_meta ?? [], $meta),
         ]);
 
         clearShopConfigCache($shopId);
@@ -289,6 +312,8 @@ class ConfigController extends Controller
      */
     public function toggleMaintenanceMode(ToggleMaintenanceModeRequest $request, $id)
     {
+        $this->assertOwnsShop((int) $id);
+
         if (config('app.demo') == true && $id <= config('system.demo.shops', 2)) {
             return response('error', 444);
         }
@@ -308,9 +333,68 @@ class ConfigController extends Controller
 
             clearShopConfigCache($config->shop_id); // Clear cached values
 
-            return response('success', 200);
+            return response()->json([
+                'message' => trans('api.config_updated_successfully'),
+                'maintenance_mode' => (bool) $config->maintenance_mode,
+            ], 200);
         }
 
         return response('error', 405);
+    }
+
+    /**
+     * Toggle shop active status (activate / deactivate store).
+     */
+    public function toggleShopActive(Request $request, $shop_id)
+    {
+        $this->assertOwnsShop((int) $shop_id);
+
+        if (config('app.demo') == true && $shop_id <= config('system.demo.shops', 2)) {
+            return response('error', 444);
+        }
+
+        $shop = Shop::findOrFail($shop_id);
+        $shop->active = ! $shop->active;
+        $shop->save();
+
+        event(new ShopUpdated($shop));
+
+        return response()->json([
+            'message' => trans('api.config_updated_successfully'),
+            'active' => (bool) $shop->active,
+        ]);
+    }
+
+    /**
+     * Toggle e-commerce (store live / paused).
+     */
+    public function toggleActiveEcommerce(Request $request, $config_id)
+    {
+        $this->assertOwnsShop((int) $config_id);
+
+        $config = Config::findOrFail($config_id);
+        $config->active_ecommerce = ! $config->active_ecommerce;
+        $config->save();
+
+        clearShopConfigCache($config->shop_id);
+
+        return response()->json([
+            'message' => trans('api.config_updated_successfully'),
+            'active_ecommerce' => (bool) $config->active_ecommerce,
+        ]);
+    }
+
+    protected function verificationMetaPayload(?Config $config): array
+    {
+        $meta = $config?->verification_meta ?? [];
+
+        return [
+            'national_id' => $meta['national_id'] ?? '',
+            'verified_phone' => $meta['verified_phone'] ?? '',
+            'verified_address' => $meta['verified_address'] ?? '',
+            'nuit' => $meta['nuit'] ?? '',
+            'business_license' => $meta['business_license'] ?? '',
+            'business_registration' => $meta['business_registration'] ?? '',
+        ];
     }
 }

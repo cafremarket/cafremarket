@@ -83,6 +83,8 @@
 
   @include('scripts.demo_restrict')
 
+  @include('theme::scripts.password_toggle')
+
   <script type="text/javascript">
 
     $("#plans").select2({

@@ -959,4 +959,7 @@ return [
     'shop_not_found' => 'The shop :shop not found',
 
     'subscription_plan_id_need_to_know' => 'You need to know the subscription plan id.',
+    'drag_pin_to_set_location' => 'Drag the pin or click on the map to set the exact store location.',
+    'service_radius_km' => 'Maximum distance (in km) this shop will deliver to from its store location.',
+    'delivery_capability' => 'Choose whether this shop uses its own riders, platform riders, or both.',
 ];

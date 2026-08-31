@@ -1,15 +1,16 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('packages.wallet.payouts') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.wallet.payouts') }}</h3>
-      <div class="box-tools pull-right">
-        @include('wallet::admin._btn_payout')
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
-      <table class="table table-hover table-no-sort">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('packages.wallet.payouts'),
+    'icon' => 'fa-money',
+    'actions' => view('wallet::admin._btn_payout')->render(),
+  ])
+      <table class="table table-hover admin-table table-no-sort">
         <thead>
           <tr>
             <th>{{ trans('packages.wallet.date') }}</th>
@@ -59,6 +60,5 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 @endsection

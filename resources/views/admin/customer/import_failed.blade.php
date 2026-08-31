@@ -1,17 +1,21 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.import_failed') }}
+@endsection
+
 @section('content')
   <div class="alert alert-danger">
     <strong><i class="icon fa fa-info-circle"></i>{{ trans('app.notice') }}</strong>
     {{ trans('messages.import_ignored') }}
   </div>
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.import_failed') }}</h3>
-    </div> <!-- /.box-header -->
-
-    <div class="box-body responsive-table">
-      <table class="table table-striped">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.import_failed'),
+    'icon' => 'fa-times-circle',
+    'class' => 'admin-card--danger',
+    'bodyClass' => 'responsive-table',
+  ])
+      <table class="table table-striped admin-table">
         <thead>
           <tr>
             <th>{{ trans('app.avatar') }}</th>
@@ -97,17 +101,21 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-    <div class="box-footer">
-      <a href="{{ route('admin.admin.customer.index') }}" class="btn btn-danger btn-flat">{{ trans('app.dismiss') }}</a>
-      <div class="box-tools pull-right">
-        {!! Form::open(['route' => 'admin.admin.customer.downloadFailedRows', 'id' => 'form', 'class' => 'inline-form', 'data-toggle' => 'validator']) !!}
-        @foreach ($failed_rows as $row)
-          <input type="hidden" name="data[]" value="{{ serialize($row['data']) }}">
-        @endforeach
-        {!! Form::button(trans('app.download_failed_rows'), ['type' => 'submit', 'class' => 'btn btn-new btn-flat']) !!}
-        {!! Form::close() !!}
-      </div>
-    </div> <!-- /.box-footer -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
+
+  @php
+    $hiddenFields = '';
+    foreach ($failed_rows as $row) {
+      $hiddenFields .= '<input type="hidden" name="data[]" value="' . e(serialize($row['data'])) . '">';
+    }
+  @endphp
+  @include('admin.partials.ui.import_footer', [
+    'cancelUrl' => route('admin.admin.customer.index'),
+    'cancelClass' => 'btn-danger',
+    'cancelLabel' => trans('app.dismiss'),
+    'formRoute' => 'admin.admin.customer.downloadFailedRows',
+    'hiddenFields' => $hiddenFields,
+    'submitLabel' => trans('app.download_failed_rows'),
+    'submitClass' => 'btn btn-new btn-flat',
+  ])
 @endsection

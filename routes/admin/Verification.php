@@ -8,3 +8,6 @@ Route::get('verify', [ConfigController::class, 'verify'])->name('verify');
 
 Route::post('verify', [ConfigController::class, 'saveVerificationData'])
     ->name('verify.submit');
+
+Route::post('verify/location', [ConfigController::class, 'saveStoreLocation'])
+    ->name('verify.location');

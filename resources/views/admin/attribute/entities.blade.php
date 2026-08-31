@@ -1,17 +1,19 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.attribute') .': ' .$attribute->name .' | ' .trans('app.type') .': ' .$attribute->attributeType->type }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.attribute') .': ' .$attribute->name .' | ' .trans('app.type') .': ' .$attribute->attributeType->type }}</h3>
-      <div class="box-tools pull-right">
-        @can('create', \App\Models\AttributeValue::class)
-          <a href="javascript:void(0)" data-link="{{ route('admin.catalog.attributeValue.create', $attribute) }}" class="ajax-modal-btn btn btn-new btn-flat">{{ trans('app.add_attribute_value') }} </a>
-        @endcan
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-2nd-no-sort" id="sortable" data-action="{{ Route('admin.catalog.attributeValue.reorder') }}">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.attribute') . ': ' . $attribute->name . ' | ' . trans('app.type') . ': ' . $attribute->attributeType->type,
+    'icon' => 'fa-tags',
+    'actions' => Gate::allows('create', \App\Models\AttributeValue::class)
+      ? '<a href="javascript:void(0)" data-link="' . route('admin.catalog.attributeValue.create', $attribute) . '" class="ajax-modal-btn btn btn-new btn-flat btn-sm"><i class="fa fa-plus"></i> ' . e(trans('app.add_attribute_value')) . '</a>'
+      : '',
+    'bodyClass' => 'responsive-table',
+  ])
+      <table class="table table-hover admin-table table-2nd-no-sort" id="sortable" data-action="{{ Route('admin.catalog.attributeValue.reorder') }}">
         <thead>
           <tr>
             @can('massDelete', \App\Models\AttributeValue::class)
@@ -46,7 +48,7 @@
             <th>{{ trans('app.values') }}</th>
             <th>{{ trans('app.color') }}</th>
             <th>{{ trans('app.pattern') }}</th>
-            <th>{{ trans('app.option') }}</th>
+            <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
           </tr>
         </thead>
         <tbody id="massSelectArea">
@@ -71,7 +73,7 @@
                   <img src="{{ get_storage_file_url($attributeValue->image->path, 'tiny') }}" class="img-sm" alt="{{ trans('app.image') }}">
                 @endif
               </td>
-              <td class="row-options">
+              <td class="row-options admin-row-actions">
                 @can('view', $attributeValue)
                   <a href="javascript:void(0)" data-link="{{ route('admin.catalog.attributeValue.show', ['attributeValue' => $attributeValue->id]) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.detail') }}" class="fa fa-expand"></i></a>&nbsp;
                 @endcan
@@ -88,34 +90,17 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 
-  <div class="box collapsed-box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        @can('massDelete', \App\Models\AttributeValue::class)
-          {!! Form::open(['route' => ['admin.catalog.attributeValue.emptyTrash'], 'method' => 'delete', 'class' => 'data-form']) !!}
-          {!! Form::button('<i class="fa fa-trash-o"></i>', ['type' => 'submit', 'class' => 'confirm btn btn-default btn-flat ajax-silent', 'title' => trans('help.empty_trash'), 'data-toggle' => 'tooltip', 'data-placement' => 'right']) !!}
-          {!! Form::close() !!}
-        @else
-          <i class="fa fa-trash-o"></i>
-        @endcan
-        {{ trans('app.trash') }}
-      </h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
-        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-option">
+  @include('admin.partials.ui.trash_start', ['title' => trans('app.trash')])
+
+      <table class="table table-hover admin-table table-option">
         <thead>
           <tr>
             <th>{{ trans('app.values') }}</th>
             <th>{{ trans('app.color') }}</th>
             <th>{{ trans('app.deleted_at') }}</th>
-            <th>{{ trans('app.option') }}</th>
+            <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -129,7 +114,7 @@
                 @endif
               </td>
               <td>{{ $trash->deleted_at->diffForHumans() }}</td>
-              <td class="row-options">
+              <td class="row-options admin-row-actions">
                 @can('delete', $trash)
                   <a href="{{ route('admin.catalog.attributeValue.restore', $trash->id) }}"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.restore') }}" class="fa fa-database"></i></a>&nbsp;
 
@@ -142,8 +127,8 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+    
+  @include('admin.partials.ui.card_end')
 @endsection
 
 @section('page-script')

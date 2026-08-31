@@ -9,8 +9,11 @@ use App\Http\Requests\DeliveryBoy\MyDeliveryRequest;
 use App\Http\Resources\FeedbackResource;
 use App\Http\Resources\OrderLightResource;
 use App\Http\Resources\OrderResource;
+use App\Models\DeliveryBoy;
 use App\Models\Order;
+use App\Services\Delivery\DeliveryDispatchService;
 use App\Services\FCMService;
+use App\Services\Geo\DistanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,7 +28,13 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $orders = Order::where('shop_id', Auth::guard('delivery_boy-api')->user()->shop_id);
+        $rider = Auth::guard('delivery_boy-api')->user();
+
+        if ($rider->isPlatform()) {
+            return $this->platformOrders($request, $rider);
+        }
+
+        $orders = Order::where('shop_id', $rider->shop_id);
 
         switch ($request->get('filter')) {
             case 'all_orders':
@@ -106,17 +115,90 @@ class OrderController extends Controller
      *
      * @param [order_id] [request]
      */
-    public function assignActiveOrder($orderID)
+    public function assignActiveOrder($orderID, DeliveryDispatchService $dispatchService)
     {
         try {
-            $order = Order::find($orderID);
-            $order->delivery_boy_id = Auth::guard('delivery_boy-api')->user()->id;
-            $order->save();
+            $order = Order::findOrFail($orderID);
+            $rider = Auth::guard('delivery_boy-api')->user();
+
+            if ($rider->isPlatform()) {
+                $dispatchService->assignPlatformRider($order, $rider);
+            } else {
+                $dispatchService->assignShopRider($order, $rider);
+            }
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
 
         return response()->json(['message' => trans('responses.order_assigned_successfully')], 200);
+    }
+
+    public function updateOrderStatus(MyDeliveryRequest $request, Order $order)
+    {
+        try {
+            if ($request->filled('order_status_id')) {
+                $order->order_status_id = $request->order_status_id;
+            }
+
+            if ($request->filled('status')) {
+                $order->order_status_id = $request->status;
+            }
+
+            if ((int) $order->order_status_id === Order::STATUS_DELIVERED) {
+                $order->mark_as_goods_received();
+                $order->otp = null;
+            }
+
+            $order->save();
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage());
+        }
+
+        return $this->success(trans('api.order_status_updated'));
+    }
+
+    protected function platformOrders(Request $request, DeliveryBoy $rider)
+    {
+        $orders = Order::query()
+            ->where('fulfilment_type', Order::FULFILMENT_TYPE_DELIVER)
+            ->whereIn('order_status_id', [Order::STATUS_CONFIRMED, Order::STATUS_FULFILLED, Order::STATUS_AWAITING_DELIVERY]);
+
+        switch ($request->get('filter')) {
+            case 'assigned':
+                $orders = $orders->where('delivery_boy_id', $rider->id);
+                break;
+            case 'all_orders':
+                $orders = $orders->withArchived();
+                break;
+            case 'unassign':
+            default:
+                $orders = $orders->whereNull('delivery_boy_id')
+                    ->where('delivery_mode', DeliveryDispatchService::MODE_SYSTEM);
+                break;
+        }
+
+        if ($rider->current_latitude && $rider->current_longitude) {
+            $distance = app(DistanceService::class);
+            $maxRadius = app(DeliveryDispatchService::class)->maxDispatchRadius();
+
+            $orders = $orders->get()->filter(function ($order) use ($distance, $rider, $maxRadius) {
+                $shopAddress = $order->shop?->storeAddress();
+                if (! $shopAddress?->latitude || ! $shopAddress?->longitude) {
+                    return false;
+                }
+
+                return $distance->distanceKm(
+                    (float) $rider->current_latitude,
+                    (float) $rider->current_longitude,
+                    (float) $shopAddress->latitude,
+                    (float) $shopAddress->longitude
+                ) <= $maxRadius;
+            });
+        } else {
+            $orders = $orders->get();
+        }
+
+        return OrderLightResource::collection($orders);
     }
 
     public function todayOrders()

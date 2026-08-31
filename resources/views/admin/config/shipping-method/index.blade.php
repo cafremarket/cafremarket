@@ -1,5 +1,9 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.shipping_methods') }}
+@endsection
+
 @php
   $can_update = Gate::allows('update', $config) ?? null;
   $active_shipping_methods = $config->shippingMethods->pluck('id')->toArray();
@@ -7,13 +11,12 @@
 @endphp
 
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        {{ trans('app.shipping_methods') }}
-      </h3>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.shipping_methods'),
+    'icon' => 'fa-truck',
+    'bodyClass' => 'admin-card__body--settings',
+  ])
+
       <div class="row">
         <div class="col-sm-12">
           @unless (count($active_shipping_methods))
@@ -110,6 +113,6 @@
           @endforeach
         </div> <!-- col-sm-12 -->
       </div> <!-- row -->
-    </div> <!-- box-body -->
-  </div> <!-- box -->
+
+  @include('admin.partials.ui.card_end')
 @endsection

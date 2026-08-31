@@ -1,17 +1,19 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('packages.wallet.wallet_settings') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.wallet.wallet_settings') }}</h3>
-      <div class="box-tools pull-right">
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
-      <div class="spacer20"></div>
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('packages.wallet.wallet_settings'),
+    'icon' => 'fa-cog',
+    'bodyClass' => '',
+  ])
+
+      {!! Form::open(['route' => ['admin.package.config.update', 'wallet'], 'files' => true, 'class' => 'form-horizontal admin-settings-form', 'id' => 'form', 'data-toggle' => 'validator']) !!}
       <div class="row">
-        {!! Form::open(['route' => ['admin.package.config.update', 'wallet'], 'files' => true, 'class' => 'form-horizontal', 'id' => 'form', 'data-toggle' => '	validator']) !!}
-        <div class="col-sm-10">
+        <div class="col-sm-10 col-sm-offset-1">
           <div class="form-group">
             <div class="col-sm-5 text-right">
               {!! Form::label('wallet_min_withdrawal_limit', trans('packages.wallet.minimum_withdrawal_limit') . ': *', ['class' => 'with-help control-label']) !!}
@@ -181,31 +183,8 @@
 
           {!! Form::submit(trans('app.update'), ['class' => 'btn btn-lg btn-flat btn-new pull-right']) !!}
         </div>
-
-        {{-- <div class="col-sm-5 nopadding-left">
-          <div class="row">
-            <div class="col-sm-5 text-right nopadding-left">
-              <div class="form-group">
-                {!! Form::label('wallet_checkout', trans('packages.wallet.wallet_checkout') . ':', ['class' => 'with-help control-label']) !!}
-                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title=""></i> {{ trans('packages.wallet.allow_customer_wallet_checkout') }}
-              </div>
-            </div>
-            <div class="col-sm-7 nopadding-left nopadding-right">
-              @php
-                $wallet_checkout = get_from_option_table('wallet_checkout');
-              @endphp
-              <div class="handle horizontal">
-                <a href="javascript:void(0)" data-link="{{ route('admin.package.config.toggle', ['option' => 'wallet_checkout']) }}" type="button" class="btn btn-md btn-secondary btn-toggle {{ !vendor_get_paid_directly() && $wallet_checkout == 1 ? 'active' : '' }}" data-toggle="button" aria-pressed="{{ $wallet_checkout == 1 ? 'true' : 'false' }}" autocomplete="off" {{ vendor_get_paid_directly() ? 'disabled' : '' }}>
-                  <div class="btn-handle"></div>
-                </a>
-              </div>
-              <div class="help-block with-errors">{!! vendor_get_paid_directly() ? trans('packages.wallet.wallet_checkout_off_when_vendor_paid') : '' !!}</div>
-            </div>
-          </div> <!-- /.row -->
-        </div> --}}
-        {!! Form::close() !!}
       </div>
-      <div class="spacer20"></div>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+      {!! Form::close() !!}
+
+  @include('admin.partials.ui.card_end')
 @endsection

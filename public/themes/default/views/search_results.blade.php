@@ -47,6 +47,16 @@
   <!-- CONTENT SECTION -->
   <section>
     <div class="container category-single-page">
+      @if (! empty($require_location))
+        <div class="hyperlocal-location-gate mb-4">
+          <i class="fal fa-map-marker-alt fa-3x text-primary mb-3"></i>
+          <h3>{{ trans('theme.set_delivery_location') }}</h3>
+          <p class="text-muted">{{ trans('theme.set_location_to_shop') }}</p>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#locationModal">
+            {{ trans('theme.confirm_location') }}
+          </button>
+        </div>
+      @else
       <div class="row mb-3">
         <div class="col-md-12">
           <form action="{{ route('inCategoriesSearch') }}" method="GET" class="form-inline flex-wrap align-items-end">
@@ -109,6 +119,7 @@
       </div>
 
       @include('theme::contents.product_list', ['colum' => 3])
+      @endif
 
     </div> <!-- /.container -->
   </section>

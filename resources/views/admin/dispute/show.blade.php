@@ -1,75 +1,65 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.dispute') }}
+@endsection
+
 @section('content')
-  <div class="row">
-    <div class="col-md-2 nopadding-right">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ trans('app.merchant') }}</h3>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
-          @if (Gate::allows('view', $dispute->shop))
-            <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.show', $dispute->shop_id) }}" class="ajax-modal-btn small"><span class="lead"> {{ $dispute->shop->name }} </span></a>
-          @else
-            <span class="lead">{{ $dispute->shop->name }}</span>
-          @endif
-
-          <img src="{{ get_logo_url($dispute->shop, 'small') }}" class="thumbnail" alt="{{ trans('app.logo') }}">
-
-          <p>
-            {{ trans('app.total_disputes') }}:
-            <span class="label label-outline">{{ \App\Helpers\Statistics::dispute_count($dispute->shop_id) }}</span>
-          </p>
-          <p>
-            {{ trans('app.latest_days', ['days' => 30]) }}:
-            <span class="label label-info"><strong>{{ \App\Helpers\Statistics::dispute_count($dispute->shop_id, 30) }}</strong></span>
-          </p>
-
-          @if ($dispute->shop->owner)
-            <hr />
-            <div class="form-group">
-              <label>{{ trans('app.owner') }}</label>
-              <p>
-                <img src="{{ get_avatar_src($dispute->shop->owner, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-                &nbsp;
-                @if (Gate::allows('view', $dispute->shop->owner))
-                  <a href="javascript:void(0)" data-link="{{ route('admin.admin.user.show', $dispute->shop->owner_id) }}" class="ajax-modal-btn small"><span class="lead">{{ $dispute->shop->owner->getName() }}</span></a>
-                @else
-                  <span class="small">{{ $dispute->shop->owner->getName() }}</span>
-                @endif
-              </p>
-            </div>
-          @endif
-        </div>
-      </div>
+  <div class="row admin-dispute-detail">
+    <div class="col-md-3 admin-dispute-detail__sidebar">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.merchant'),
+        'icon' => 'fa-store',
+        'bodyClass' => 'admin-order-sidebar-panel',
+      ])
+        @if (Gate::allows('view', $dispute->shop))
+          <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.show', $dispute->shop_id) }}" class="ajax-modal-btn admin-order-sidebar-panel__name"><strong>{{ $dispute->shop->name }}</strong></a>
+        @else
+          <strong>{{ $dispute->shop->name }}</strong>
+        @endif
+        <img src="{{ get_logo_url($dispute->shop, 'small') }}" class="admin-detail-panel__thumb" alt="">
+        <dl class="admin-order-sidebar-panel__meta">
+          <dt>{{ trans('app.total_disputes') }}</dt>
+          <dd><span class="label label-outline">{{ \App\Helpers\Statistics::dispute_count($dispute->shop_id) }}</span></dd>
+          <dt>{{ trans('app.latest_days', ['days' => 30]) }}</dt>
+          <dd><span class="label label-info">{{ \App\Helpers\Statistics::dispute_count($dispute->shop_id, 30) }}</span></dd>
+        </dl>
+        @if ($dispute->shop->owner)
+          <label class="admin-detail-panel__label">{{ trans('app.owner') }}</label>
+          <div class="admin-order-sidebar-panel__user">
+            <img src="{{ get_avatar_src($dispute->shop->owner, 'tiny') }}" class="img-circle img-sm" alt="">
+            @if (Gate::allows('view', $dispute->shop->owner))
+              <a href="javascript:void(0)" data-link="{{ route('admin.admin.user.show', $dispute->shop->owner_id) }}" class="ajax-modal-btn">{{ $dispute->shop->owner->getName() }}</a>
+            @else
+              {{ $dispute->shop->owner->getName() }}
+            @endif
+          </div>
+        @endif
+      @include('admin.partials.ui.card_end')
     </div>
 
-    <div class="col-md-7">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">
-            {{ trans('app.dispute') }}
-            <span class="indent10">{!! $dispute->statusName() !!}</span>
-          </h3>
-          <div class="box-tools pull-right">
-            @can('view', $dispute->order)
-              <a href="{{ route('admin.order.order.show', $dispute->order->id) }}" class="btn btn-default btn-flat">
-                <i class="fa fa-shopping-cart"></i> {{ trans('app.order_details') }}
-              </a>
-            @endcan
+    <div class="col-md-6 admin-dispute-detail__main">
+      @php
+        $disputeActions = '';
+        if (Gate::allows('view', $dispute->order)) {
+          $disputeActions .= '<a href="' . route('admin.order.order.show', $dispute->order->id) . '" class="btn btn-default btn-flat btn-sm"><i class="fa fa-shopping-cart"></i> ' . e(trans('app.order_details')) . '</a> ';
+        }
+        if (!$dispute->order->refunds->count() && Gate::allows('initiate', \App\Models\Refund::class)) {
+          $disputeActions .= '<a href="javascript:void(0)" data-link="' . route('admin.support.refund.form', $dispute->order->id) . '" class="ajax-modal-btn btn btn-new btn-flat btn-sm">' . e(trans('app.initiate_refund')) . '</a> ';
+        }
+        if (Gate::allows('response', $dispute)) {
+          $disputeActions .= '<a href="javascript:void(0)" data-link="' . route('admin.support.dispute.response', $dispute) . '" class="ajax-modal-btn btn btn-info btn-flat btn-sm"><i class="fa fa-reply"></i> ' . e(trans('app.response')) . '</a>';
+        }
+      @endphp
 
-            @unless ($dispute->order->refunds->count())
-              @can('initiate', \App\Models\Refund::class)
-                <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.form', $dispute->order->id) }}" class="ajax-modal-btn btn btn-new btn-flat">{{ trans('app.initiate_refund') }}</a>
-              @endcan
-            @endunless
-
-            @can('response', $dispute)
-              <a href="javascript:void(0)" data-link="{{ route('admin.support.dispute.response', $dispute) }}" class="ajax-modal-btn btn btn-info btn-flat"><i class="fa fa-reply"></i> {{ trans('app.response') }}</a>
-            @endcan
-          </div>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.dispute'),
+        'icon' => 'fa-gavel',
+        'headerExtra' => $dispute->statusName(),
+        'actions' => $disputeActions,
+        'bodyClass' => 'admin-detail-view',
+      ])
+        <div class="admin-detail-view__badges">
           <span class="label label-outline">
             @can('view', $dispute->order)
               <a href="{{ route('admin.order.order.show', $dispute->order->id) }}">
@@ -79,149 +69,124 @@
               {{ trans('app.order_number') . ': ' }}{{ $dispute->order->order_number }}
             @endcan
           </span>
-          <p class="lead">{{ $dispute->dispute_type->detail }}</p>
+        </div>
 
-          @if (count($dispute->attachments))
-            {{ trans('app.attachments') . ': ' }}
+        <p class="admin-detail-view__title">{{ $dispute->dispute_type->detail }}</p>
+
+        @if (count($dispute->attachments))
+          <div class="admin-detail-view__attachments">
+            {{ trans('app.attachments') }}:
             @foreach ($dispute->attachments as $attachment)
-              <a href="{{ route('attachment.download', $attachment) }}"><i class="fa fa-file"></i></a>
+              <a href="{{ route('attachment.download', $attachment) }}" class="btn btn-default btn-xs btn-flat"><i class="fa fa-file"></i></a>
             @endforeach
-          @endif
+          </div>
+        @endif
 
-          @if ($dispute->description)
-            <div class="well">
-              {!! $dispute->description !!}
-            </div>
-          @endif
+        @if ($dispute->description)
+          <div class="admin-detail-view__message well">{!! $dispute->description !!}</div>
+        @endif
 
-          @if ($dispute->replies->count() > 0)
-            <fieldset>
-              <legend>{{ strtoupper(trans('app.conversations')) }}</legend>
-            </fieldset>
-
+        @if ($dispute->replies->count() > 0)
+          <div class="admin-detail-view__replies">
+            <strong>{{ trans('app.conversations') }}</strong>
             @foreach ($dispute->replies as $reply)
               @include('admin.partials._reply_conversations')
             @endforeach
-          @endif
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+          </div>
+        @endif
+      @include('admin.partials.ui.card_end')
 
       @if ($dispute->order->refunds->count())
-        <div class="box">
-          <div class="box-header with-border">
-            <h3 class="box-title">{{ trans('app.refunds') }}</h3>
-            <div class="box-tools pull-right"></div>
-          </div>
-          <div class="box-body">
-            <table class="table">
-              <thead>
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.refunds'),
+          'icon' => 'fa-undo',
+        ])
+          <table class="table table-hover admin-table admin-table--compact">
+            <thead>
+              <tr>
+                <th>{{ trans('app.refund_amount') }}</th>
+                <th>{{ trans('app.status') }}</th>
+                <th>{{ trans('app.created_at') }}</th>
+                <th>{{ trans('app.updated_at') }}</th>
+                <th class="admin-table__actions-col">&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach ($dispute->order->refunds as $refund)
                 <tr>
-                  <th>{{ trans('app.refund_amount') }}</th>
-                  <th>{{ trans('app.status') }}</th>
-                  <th>{{ trans('app.created_at') }}</th>
-                  <th>{{ trans('app.updated_at') }}</th>
-                  <th>&nbsp;</th>
+                  <td>{{ get_formated_currency($refund->amount, 2, $dispute->order->currency_id) }}</td>
+                  <td>{!! $refund->statusName() !!}</td>
+                  <td>{{ $refund->created_at->diffForHumans() }}</td>
+                  <td>{{ $refund->updated_at->diffForHumans() }}</td>
+                  <td class="row-options admin-row-actions">
+                    @if ($refund->isOpen())
+                      @can('approve', $refund)
+                        <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.response', $refund) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.response') }}" data-toggle="tooltip"><i class="fa fa-random"></i></a>
+                      @endcan
+                    @endif
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                @foreach ($dispute->order->refunds as $refund)
-                  <tr>
-                    <td>{{ get_formated_currency($refund->amount, 2, $dispute->order->currency_id) }}</td>
-                    <td>{!! $refund->statusName() !!}</td>
-                    <td>{{ $refund->created_at->diffForHumans() }}</td>
-                    <td>{{ $refund->updated_at->diffForHumans() }}</td>
-                    <td>
-                      @if ($refund->isOpen())
-                        @can('approve', $refund)
-                          <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.response', $refund) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.response') }}" class="fa fa-random"></i></a>&nbsp;
-                        @endcan
-                      @endif
-                    </td>
-                  </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
+              @endforeach
+            </tbody>
+          </table>
+        @include('admin.partials.ui.card_end')
       @endif
 
       @include('admin.partials._activity_logs', ['logger' => $dispute])
     </div>
 
-    <div class="col-md-3 nopadding-left">
+    <div class="col-md-3 admin-dispute-detail__aside">
       @if ($dispute->product_id)
-        <div class="box">
-          <div class="box-header with-border">
-            <h3 class="box-title"> {{ trans('app.product') }}</h3>
-            <div class="box-tools pull-right">
-              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            </div>
-          </div> <!-- /.box-header -->
-          <div class="box-body">
-            <div class="form-group">
-              <img src="{{ get_storage_file_url(optional($dispute->product->image)->path, 'medium') }}" class="thumbnail" width="100%" alt="{{ trans('app.image') }}">
-
-              @if (Gate::allows('view', $dispute->product))
-                <a href="javascript:void(0)" data-link="{{ route('admin.catalog.product.show', $dispute->product_id) }}" class="ajax-modal-btn"><span>{{ $dispute->product->name }}</span></a>
-              @else
-                <span>{{ $dispute->product->name }}</span>
-              @endif
-            </div>
-          </div>
-        </div>
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.product'),
+          'icon' => 'fa-cube',
+          'bodyClass' => 'admin-order-sidebar-panel',
+        ])
+          <img src="{{ get_storage_file_url(optional($dispute->product->image)->path, 'medium') }}" class="admin-detail-panel__thumb admin-detail-panel__thumb--full" alt="">
+          @if (Gate::allows('view', $dispute->product))
+            <a href="javascript:void(0)" data-link="{{ route('admin.catalog.product.show', $dispute->product_id) }}" class="ajax-modal-btn">{{ $dispute->product->name }}</a>
+          @else
+            {{ $dispute->product->name }}
+          @endif
+        @include('admin.partials.ui.card_end')
       @endif
 
       @if ($dispute->refund_amount)
-        <div class="box">
-          <div class="box-header with-border">
-            <h3 class="box-title">{{ trans('app.refund_requested') }}</h3>
-          </div>
-          <div class="box-body">
-            <p>
-              <strong>{{ trans('app.amount') }}: </strong> {{ get_formated_currency($dispute->refund_amount, 2, $dispute->order->currency_id) }}
-            </p>
-          </div>
-        </div>
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.refund_requested'),
+          'icon' => 'fa-money',
+          'bodyClass' => 'admin-order-sidebar-panel',
+        ])
+          <strong>{{ get_formated_currency($dispute->refund_amount, 2, $dispute->order->currency_id) }}</strong>
+        @include('admin.partials.ui.card_end')
       @endif
 
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title"> {{ trans('app.customer') }}</h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
-          <img src="{{ get_avatar_src($dispute->customer, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-
-          @if (Gate::allows('view', $dispute->customer))
-            <a href="javascript:void(0)" data-link="{{ route('admin.admin.customer.show', $dispute->customer_id) }}" class="ajax-modal-btn small"><span class="lead indent10">{{ $dispute->customer->getName() }}</span></a>
-          @else
-            <span class="lead indent10">{{ $dispute->customer->getName() }}</span>
-          @endif
-
-          <p>
-            {{ trans('app.total_disputes') }}:
-            <span class="label label-outline">{{ \App\Helpers\Statistics::disputes_by_customer_count($dispute->customer_id) }}</span>
-          </p>
-
-          <p>
-            {{ trans('app.latest_days', ['days' => 30]) }}:
-            <span class="label label-info"><strong>{{ \App\Helpers\Statistics::disputes_by_customer_count($dispute->customer_id, 30) }}</strong></span>
-          </p>
-          <hr />
-          <div class="form-group text-muted">
-            <p>
-              <label>{{ trans('app.created_at') }}</label>
-              {{ $dispute->created_at->diffForHumans() }}
-            </p>
-            <p>
-              <label>{{ trans('app.updated_at') }}</label>
-              {{ $dispute->updated_at->diffForHumans() }}
-            </p>
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.customer'),
+        'icon' => 'fa-user',
+        'bodyClass' => 'admin-order-sidebar-panel',
+      ])
+        <div class="admin-order-sidebar-panel__user">
+          <img src="{{ get_avatar_src($dispute->customer, 'tiny') }}" class="img-circle img-sm" alt="">
+          <div>
+            @if (Gate::allows('view', $dispute->customer))
+              <a href="javascript:void(0)" data-link="{{ route('admin.admin.customer.show', $dispute->customer_id) }}" class="ajax-modal-btn"><strong>{{ $dispute->customer->getName() }}</strong></a>
+            @else
+              <strong>{{ $dispute->customer->getName() }}</strong>
+            @endif
           </div>
         </div>
-      </div>
+        <dl class="admin-order-sidebar-panel__meta">
+          <dt>{{ trans('app.total_disputes') }}</dt>
+          <dd><span class="label label-outline">{{ \App\Helpers\Statistics::disputes_by_customer_count($dispute->customer_id) }}</span></dd>
+          <dt>{{ trans('app.latest_days', ['days' => 30]) }}</dt>
+          <dd><span class="label label-info">{{ \App\Helpers\Statistics::disputes_by_customer_count($dispute->customer_id, 30) }}</span></dd>
+          <dt>{{ trans('app.created_at') }}</dt>
+          <dd>{{ $dispute->created_at->diffForHumans() }}</dd>
+          <dt>{{ trans('app.updated_at') }}</dt>
+          <dd>{{ $dispute->updated_at->diffForHumans() }}</dd>
+        </dl>
+      @include('admin.partials.ui.card_end')
     </div>
   </div>
 @endsection

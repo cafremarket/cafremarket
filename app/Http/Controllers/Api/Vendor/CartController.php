@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CartResource;
+use App\Models\Cart;
 use App\Repositories\Cart\CartRepository;
 use Illuminate\Http\Request;
 
@@ -11,86 +12,34 @@ class CartController extends Controller
 {
     private $cart;
 
-    /**
-     * construct
-     */
     public function __construct(CartRepository $cart)
     {
         parent::__construct();
         $this->cart = $cart;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
-        return CartResource::collection($this->cart->all());
+        $query = Cart::mine()->with('customer', 'inventories');
+
+        if ($request->get('filter') === 'abandoned') {
+            $hours = (int) config('system_settings.abandoned_cart_hours', 24);
+            $query->where('updated_at', '<=', now()->subHours($hours));
+        }
+
+        $carts = $query->whereHas('customer')->latest()->paginate(
+            config('mobile_app.view_listing_per_page', 8)
+        );
+
+        return CartResource::collection($carts);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
-    }
+        $cart = Cart::mine()
+            ->with('customer', 'inventories.image', 'shop')
+            ->findOrFail($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return new CartResource($cart);
     }
 }

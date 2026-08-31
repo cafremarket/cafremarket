@@ -149,6 +149,96 @@ if (! function_exists('get_site_title')) {
     }
 }
 
+if (! function_exists('mp_route')) {
+    /**
+     * Resolve a merchant-panel route from an admin route name when available.
+     */
+    function mp_route(string $name, $parameters = [], $absolute = true)
+    {
+        $merchantName = str_starts_with($name, 'admin.')
+            ? 'merchant.'.substr($name, 6)
+            : $name;
+
+        if (\Illuminate\Support\Facades\Route::has($merchantName)) {
+            return route($merchantName, $parameters, $absolute);
+        }
+
+        return route($name, $parameters, $absolute);
+    }
+}
+
+if (! function_exists('mp_url')) {
+    /**
+     * Build a merchant-panel URL from an admin-style path.
+     */
+    function mp_url(string $path = ''): string
+    {
+        $path = ltrim($path, '/');
+
+        if ($path === 'admin' || $path === '') {
+            return route('merchant.dashboard');
+        }
+
+        if (str_starts_with($path, 'admin/')) {
+            return url('merchant/'.substr($path, 6));
+        }
+
+        return url($path);
+    }
+}
+
+if (! function_exists('mp_is')) {
+    /**
+     * Match the current request against merchant-panel paths.
+     */
+    function mp_is(string $pattern): bool
+    {
+        $pattern = str_replace('admin/', 'merchant/', $pattern);
+
+        return request()->is($pattern);
+    }
+}
+
+if (! function_exists('mp_is_any')) {
+    function mp_is_any(array $patterns): bool
+    {
+        foreach ($patterns as $pattern) {
+            if (mp_is($pattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+if (! function_exists('panel_route_name')) {
+    /**
+     * Resolve the correct route name for admin or merchant panel context.
+     */
+    function panel_route_name(string $name): string
+    {
+        if (request()->is('merchant/*') && \Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->isFromMerchant()) {
+            $merchantName = str_starts_with($name, 'admin.')
+                ? 'merchant.'.substr($name, 6)
+                : $name;
+
+            if (\Illuminate\Support\Facades\Route::has($merchantName)) {
+                return $merchantName;
+            }
+        }
+
+        return $name;
+    }
+}
+
+if (! function_exists('panel_route')) {
+    function panel_route(string $name, $parameters = [], $absolute = true)
+    {
+        return route(panel_route_name($name), $parameters, $absolute);
+    }
+}
+
 if (! function_exists('get_system_currency')) {
     function get_system_currency()
     {
@@ -1064,11 +1154,44 @@ if (! function_exists('get_trust_badge_url')) {
 if (! function_exists('verifyUniqueSlug')) {
     function verifyUniqueSlug($slug, $table, $field = 'slug', $json = true)
     {
-        if (DB::table($table)->select($field)->where($field, $slug)->first()) {
+        $query = DB::table($table)->select($field)->where($field, $slug);
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn($table, 'deleted_at')) {
+            $query->whereNull('deleted_at');
+        }
+
+        if ($query->first()) {
             return $json ? response()->json('false') : false;
         }
 
         return $json ? response()->json('true') : true;
+    }
+}
+
+if (! function_exists('generate_unique_shop_slug')) {
+    /**
+     * Build a unique shop slug for the storefront URL (/shop/{slug}).
+     */
+    function generate_unique_shop_slug(string $name, ?int $exceptShopId = null): string
+    {
+        $base = Str::slug($name) ?: 'shop';
+        $slug = $base;
+        $counter = 1;
+
+        while (true) {
+            $query = DB::table('shops')->where('slug', $slug)->whereNull('deleted_at');
+
+            if ($exceptShopId) {
+                $query->where('id', '!=', $exceptShopId);
+            }
+
+            if (! $query->exists()) {
+                return $slug;
+            }
+
+            $slug = $base.'-'.$counter;
+            $counter++;
+        }
     }
 }
 
@@ -2841,6 +2964,131 @@ if (! function_exists('get_featured_items')) {
 
             return $items;
         });
+    }
+}
+
+if (! function_exists('hyperlocal_enabled')) {
+    function hyperlocal_enabled(): bool
+    {
+        return (bool) config('hyperlocal.enabled', true);
+    }
+}
+
+if (! function_exists('buyer_has_location')) {
+    function buyer_has_location(): bool
+    {
+        return app(\App\Services\Hyperlocal\BuyerLocationService::class)->hasLocation();
+    }
+}
+
+if (! function_exists('get_deliverable_shop_ids')) {
+    function get_deliverable_shop_ids(): array
+    {
+        return app(\App\Services\Hyperlocal\HyperlocalCatalogService::class)->deliverableShopIds();
+    }
+}
+
+if (! function_exists('scope_inventory_for_buyer')) {
+    /**
+     * Restrict inventory queries to approved shops within buyer delivery radius.
+     */
+    function scope_inventory_for_buyer($query, ?int $shop_id = null)
+    {
+        if ($shop_id) {
+            return $query->where('shop_id', $shop_id);
+        }
+
+        $query = $query->whereHas('shop', function ($q) {
+            $q->approved();
+        });
+
+        if (hyperlocal_enabled()) {
+            return app(\App\Services\Hyperlocal\HyperlocalCatalogService::class)->scopeInventoryQuery($query);
+        }
+
+        return $query->zipcode();
+    }
+}
+
+if (! function_exists('hyperlocal_location_cache_suffix')) {
+    function hyperlocal_location_cache_suffix(): string
+    {
+        if (! hyperlocal_enabled()) {
+            return '';
+        }
+
+        $location = app(\App\Services\Hyperlocal\BuyerLocationService::class);
+
+        return '_hl_'.round((float) ($location->latitude() ?? 0), 3).'_'.round((float) ($location->longitude() ?? 0), 3);
+    }
+}
+
+if (! function_exists('hyperlocal_browse_gate_view')) {
+    /**
+     * Return a location gate view when browse requires buyer location.
+     */
+    function hyperlocal_browse_gate_view()
+    {
+        $catalog = app(\App\Services\Hyperlocal\HyperlocalCatalogService::class);
+        $buyerLocation = app(\App\Services\Hyperlocal\BuyerLocationService::class);
+        $buyerLocation->syncFromCustomer();
+
+        if (! $catalog->requiresLocationForBrowse() || $buyerLocation->hasLocation()) {
+            return null;
+        }
+
+        return view('theme::search_results', [
+            'products' => \App\Models\Inventory::whereRaw('1 = 0')->paginate(config('system.view_listing_per_page', 15)),
+            'category' => null,
+            'brands' => collect(),
+            'priceRange' => ['min' => 0, 'max' => 0],
+            'searchCountries' => collect(),
+            'searchStates' => collect(),
+            'require_location' => true,
+        ]);
+    }
+}
+
+if (! function_exists('get_nearby_featured_items')) {
+    /**
+     * Get up to N featured products from nearby shop IDs.
+     */
+    function get_nearby_featured_items(array $shopIds, int $limit = 5)
+    {
+        if (empty($shopIds)) {
+            return collect();
+        }
+
+        $items = collect();
+
+        foreach ($shopIds as $shopId) {
+            $featured = get_featured_items($shopId);
+            if ($featured && count($featured)) {
+                $items = $items->merge($featured);
+            }
+        }
+
+        if ($items->count() < $limit) {
+            $existingIds = $items->pluck('id')->filter()->toArray();
+
+            $fallback = Inventory::query()
+                ->whereIn('shop_id', $shopIds)
+                ->where('active', 1)
+                ->where('available_from', '<=', Carbon::now())
+                ->when(! empty($existingIds), fn ($q) => $q->whereNotIn('id', $existingIds))
+                ->with([
+                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'image:path,imageable_id,imageable_type',
+                    'shop:id,name,slug',
+                ])
+                ->orderByDesc('sold_quantity')
+                ->limit($limit - $items->count())
+                ->get();
+
+            $items = $items->merge($fallback);
+        }
+
+        return $items->unique('id')->take($limit)->values();
     }
 }
 

@@ -4,9 +4,10 @@ use App\Http\Controllers\Api\DeliveryBoy\AccountController;
 use App\Http\Controllers\Api\DeliveryBoy\AuthController;
 use App\Http\Controllers\Api\DeliveryBoy\CustomerController;
 use App\Http\Controllers\Api\DeliveryBoy\DeliveryBoyController;
-use App\Http\Controllers\Api\DeliveryBoy\HomeController;
+use App\Http\Controllers\Api\DeliveryBoy\LocationController;
 use App\Http\Controllers\Api\DeliveryBoy\OrderController;
 use App\Http\Controllers\Api\DeliveryBoy\ShopController;
+use App\Http\Controllers\Api\DeliveryBoy\HomeController;
 use Illuminate\Support\Facades\Route;
 
 // Delivery boy
@@ -35,6 +36,7 @@ Route::prefix('deliveryboy')->namespace('DeliveryBoy')->group(function () {
         Route::post('orders/{order}/markasdelivered', [OrderController::class, 'markAsDelivered']);
         Route::post('orders/{order}/markaspaid', [OrderController::class, 'markAsPaid']);
         Route::post('orders/{order}/sendotp', [OrderController::class, 'sendOtp']);
+        Route::post('location', [LocationController::class, 'update']);
 
         // Delivery boy App Version 2.0
         Route::post('assign/{active_order_id}/order', [OrderController::class, 'assignActiveOrder']);

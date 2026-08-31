@@ -6,7 +6,7 @@
       {!! trans('messages.listings_not_visible', ['reason' => trans('messages.your_shop_in_maintenance_mode')]) !!}
       @if (Auth::user()->isMerchant())
         <span class="pull-right">
-          <a href="{{ route('admin.setting.config.general') }}" class="btn bg-navy"><i class="fa fa-rocket"></i> {{ trans('app.take_action') }}</a>
+          <a href="{{ panel_route('admin.setting.config.general') }}" class="btn bg-navy"><i class="fa fa-rocket"></i> {{ trans('app.take_action') }}</a>
         </span>
       @endif
     </div>
@@ -25,7 +25,7 @@
       {!! trans('messages.listings_not_visible', ['reason' => trans('messages.no_active_payment_method')]) !!}
       @if (Auth::user()->isMerchant())
         <span class="pull-right">
-          <a href="{{ route('admin.setting.config.paymentMethod.index') }}" class="btn bg-navy"><i class="fa fa-rocket"></i> {{ trans('app.take_action') }}</a>
+          <a href="{{ panel_route('admin.setting.config.paymentMethod.index') }}" class="btn bg-navy"><i class="fa fa-rocket"></i> {{ trans('app.take_action') }}</a>
         </span>
       @endif
     </div>
@@ -41,7 +41,7 @@
       </span>
     @endif
   </div>
-@elseif(!Auth::user()->shop->hasShippingZones())
+@elseif(!Auth::user()->shop->hasShippingZones() && ! Auth::user()->isFromMerchant())
   @unless (Request::is('admin/shipping/shippingZone*'))
     <div class="alert alert-warning alert-dismissible no-print">
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

@@ -1120,7 +1120,7 @@ class ViewComposerServiceProvider extends ServiceProvider
     {
         View::composer(
 
-            'admin.dashboard.merchant',
+            ['admin.dashboard.merchant', 'merchant.dashboard.index'],
 
             function ($view) {
                 // Charts

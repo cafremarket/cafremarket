@@ -1,113 +1,106 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.disputes') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.disputes') }}</h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-no-sort">
-        <thead>
-          <tr>
-            <th>{{ trans('app.customer') }}</th>
-            <th>{{ trans('app.type') }}</th>
-            <th>{{ trans('app.refund_requested') }}</th>
-            <th>{{ trans('app.response') }}</th>
-            <th>{{ trans('app.updated_at') }}</th>
-            <th>&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach ($disputes as $dispute)
-            <tr>
-              <td>
-                <img src="{{ get_avatar_src($dispute->customer, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.disputes'),
+    'icon' => 'fa-gavel',
+    'bodyClass' => 'responsive-table',
+  ])
 
-                <p class="indent10">
-                  <strong>{{ $dispute->customer->getName() }}</strong>
-                  @if (Auth::user()->isFromPlatform() && $dispute->shop)
-                    <br /><span>{{ trans('app.vendor') . ': ' . optional($dispute->shop)->name }}</span>
-                  @endif
-                </p>
-              </td>
-              <td>
-                @if (!Auth::user()->isFromPlatform())
-                  {!! $dispute->statusName() !!}
+  <table class="table table-hover admin-table table-no-sort">
+    <thead>
+      <tr>
+        <th>{{ trans('app.customer') }}</th>
+        <th>{{ trans('app.type') }}</th>
+        <th>{{ trans('app.refund_requested') }}</th>
+        <th>{{ trans('app.response') }}</th>
+        <th>{{ trans('app.updated_at') }}</th>
+        <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($disputes as $dispute)
+        <tr>
+          <td>
+            <div class="admin-table__shop-cell">
+              <img src="{{ get_avatar_src($dispute->customer, 'tiny') }}" class="img-circle img-sm admin-table__avatar" alt="">
+              <div>
+                <strong>{{ $dispute->customer->getName() }}</strong>
+                @if (Auth::user()->isFromPlatform() && $dispute->shop)
+                  <br><span class="text-muted">{{ trans('app.vendor') . ': ' . optional($dispute->shop)->name }}</span>
                 @endif
+              </div>
+            </div>
+          </td>
+          <td>
+            @if (!Auth::user()->isFromPlatform())
+              {!! $dispute->statusName() !!}
+            @endif
+            <a href="{{ route('admin.support.dispute.show', $dispute->id) }}">{{ $dispute->dispute_type->detail }}</a>
+          </td>
+          <td>{{ get_formated_currency($dispute->refund_amount, 2, $dispute->order->currency_id) }}</td>
+          <td><span class="label label-default">{{ $dispute->replies_count }}</span></td>
+          <td>{{ $dispute->updated_at->diffForHumans() }}</td>
+          <td class="row-options admin-row-actions">
+            <a href="{{ route('admin.support.dispute.show', $dispute->id) }}" class="admin-action-btn" title="{{ trans('app.detail') }}" data-toggle="tooltip"><i class="fa fa-expand"></i></a>
+            @can('response', $dispute)
+              <a href="javascript:void(0)" data-link="{{ route('admin.support.dispute.response', $dispute) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.response') }}" data-toggle="tooltip"><i class="fa fa-reply"></i></a>
+            @endcan
+          </td>
+        </tr>
+      @endforeach
+    </tbody>
+  </table>
 
-                <a href="{{ route('admin.support.dispute.show', $dispute->id) }}">{{ $dispute->dispute_type->detail }}</a>
-              </td>
-              <td>
-                {{ get_formated_currency($dispute->refund_amount, 2, $dispute->order->currency_id) }}
-              </td>
-              <td><span class="label label-default">{{ $dispute->replies_count }}</span></td>
-              <td>{{ $dispute->updated_at->diffForHumans() }}</td>
-              <td class="row-options">
-                <a href="{{ route('admin.support.dispute.show', $dispute->id) }}"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.detail') }}" class="fa fa-expand"></i></a>&nbsp;
+  @include('admin.partials.ui.card_end')
 
-                @can('response', $dispute)
-                  <a href="javascript:void(0)" data-link="{{ route('admin.support.dispute.response', $dispute) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.response') }}" class="fa fa-reply"></i></a>&nbsp;
-                @endcan
-              </td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.trash_start', ['title' => trans('app.trash')])
 
-  <div class="box collapsed-box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.closed_disputes') }}</h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-no-sort">
-        <thead>
-          <tr>
-            <th>{{ trans('app.customer') }}</th>
-            <th>{{ trans('app.type') }}</th>
-            <th>{{ trans('app.response') }}</th>
-            <th>{{ trans('app.updated_at') }}</th>
-            <th>{{ trans('app.option') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach ($closed as $dispute)
-            <tr>
-              <td>
-                <img src="{{ get_avatar_src($dispute->customer, 'tiny') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-                <p class="indent10">
-                  <strong>{{ $dispute->customer->getName() }}</strong>
-                  @if (Auth::user()->isFromPlatform() && $dispute->shop)
-                    <br /><span>{{ trans('app.vendor') . ': ' . optional($dispute->shop)->name }}</span>
-                  @endif
-                </p>
-              </td>
-              <td>
-                @if (!Auth::user()->isFromPlatform())
-                  {!! $dispute->statusName() !!}
+  <table class="table table-hover admin-table table-no-sort">
+    <thead>
+      <tr>
+        <th>{{ trans('app.customer') }}</th>
+        <th>{{ trans('app.type') }}</th>
+        <th>{{ trans('app.response') }}</th>
+        <th>{{ trans('app.updated_at') }}</th>
+        <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach ($closed as $dispute)
+        <tr>
+          <td>
+            <div class="admin-table__shop-cell">
+              <img src="{{ get_avatar_src($dispute->customer, 'tiny') }}" class="img-circle img-sm admin-table__avatar" alt="">
+              <div>
+                <strong>{{ $dispute->customer->getName() }}</strong>
+                @if (Auth::user()->isFromPlatform() && $dispute->shop)
+                  <br><span class="text-muted">{{ trans('app.vendor') . ': ' . optional($dispute->shop)->name }}</span>
                 @endif
-                <a href="{{ route('admin.support.dispute.show', $dispute->id) }}">{{ $dispute->dispute_type->detail }}</a>
-              </td>
-              <td><span class="label label-default">{{ $dispute->replies_count }}</span></td>
-              <td>{{ $dispute->updated_at->diffForHumans() }}</td>
-              <td class="row-options">
-                @can('response', $dispute)
-                  <a href="javascript:void(0)" data-link="{{ route('admin.support.dispute.response', $dispute) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.response') }}" class="fa fa-reply"></i></a>&nbsp;
-                @endcan
-              </td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+              </div>
+            </div>
+          </td>
+          <td>
+            @if (!Auth::user()->isFromPlatform())
+              {!! $dispute->statusName() !!}
+            @endif
+            <a href="{{ route('admin.support.dispute.show', $dispute->id) }}">{{ $dispute->dispute_type->detail }}</a>
+          </td>
+          <td><span class="label label-default">{{ $dispute->replies_count }}</span></td>
+          <td>{{ $dispute->updated_at->diffForHumans() }}</td>
+          <td class="row-options admin-row-actions">
+            @can('response', $dispute)
+              <a href="javascript:void(0)" data-link="{{ route('admin.support.dispute.response', $dispute) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.response') }}" data-toggle="tooltip"><i class="fa fa-reply"></i></a>
+            @endcan
+          </td>
+        </tr>
+      @endforeach
+    </tbody>
+  </table>
+
+  @include('admin.partials.ui.card_end')
 @endsection

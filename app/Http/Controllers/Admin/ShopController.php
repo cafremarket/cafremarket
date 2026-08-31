@@ -160,7 +160,23 @@ class ShopController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.shop.verifications', compact('merchants', 'unverifiedShops'));
+        $verifiedShops = Shop::with(['owner', 'logo', 'config'])
+            ->where('id_verified', 1)
+            ->where('phone_verified', 1)
+            ->where('address_verified', 1)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        $rejectedMerchants = Config::whereNotNull('verification_rejected_at')
+            ->where(function ($query) {
+                $query->whereNull('pending_verification')
+                    ->orWhere('pending_verification', false);
+            })
+            ->with(['shop.logo', 'shop.owner', 'attachments'])
+            ->orderByDesc('verification_rejected_at')
+            ->get();
+
+        return view('admin.shop.verifications', compact('merchants', 'unverifiedShops', 'verifiedShops', 'rejectedMerchants'));
     }
 
     /**
@@ -171,7 +187,7 @@ class ShopController extends Controller
      */
     public function showVerificationForm(Request $request, Shop $shop)
     {
-        $shop->load(['config.attachments', 'owner']);
+        $shop->load(['config.attachments', 'owner', 'addresses']);
 
         return view('admin.shop._verify', compact('shop'));
     }
@@ -181,6 +197,11 @@ class ShopController extends Controller
         return view('admin.shop._reject_verification', compact('shop'));
     }
 
+    public function showRevertVerificationForm(Request $request, Shop $shop)
+    {
+        return view('admin.shop._revert_verification', compact('shop'));
+    }
+
     public function approveVerification(Request $request, Shop $shop)
     {
         if (config('app.demo') == true && $shop->id <= config('system.demo.shops', 2)) {
@@ -188,10 +209,10 @@ class ShopController extends Controller
         }
 
         $shop->update([
-            'id_verified' => $request->boolean('id_verified', true),
-            'phone_verified' => $request->boolean('phone_verified', true),
-            'address_verified' => $request->boolean('address_verified', true),
-            'active' => $request->has('active') ? $request->boolean('active') : $shop->active,
+            'id_verified' => true,
+            'phone_verified' => true,
+            'address_verified' => true,
+            'active' => true,
         ]);
 
         if ($shop->config) {
@@ -199,6 +220,7 @@ class ShopController extends Controller
                 'pending_verification' => null,
                 'verification_rejection_reason' => null,
                 'verification_rejected_at' => null,
+                'maintenance_mode' => 0,
             ]);
         }
 
@@ -241,6 +263,38 @@ class ShopController extends Controller
         }
 
         return back()->with('success', trans('messages.verification_rejected'));
+    }
+
+    public function revertVerification(Request $request, Shop $shop)
+    {
+        if (config('app.demo') == true && $shop->id <= config('system.demo.shops', 2)) {
+            return back()->with('warning', trans('messages.demo_restriction'));
+        }
+
+        $shop->update([
+            'id_verified' => false,
+            'phone_verified' => false,
+            'address_verified' => false,
+        ]);
+
+        if ($shop->config) {
+            $shop->config->update([
+                'pending_verification' => null,
+                'verification_rejection_reason' => null,
+                'verification_rejected_at' => null,
+            ]);
+        }
+
+        clearShopConfigCache($shop->id);
+        event(new ShopUpdated($shop));
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => trans('messages.verification_reverted'),
+            ]);
+        }
+
+        return back()->with('success', trans('messages.verification_reverted'));
     }
 
     /**

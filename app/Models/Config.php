@@ -39,6 +39,7 @@ class Config extends BaseModel
         'maintenance_mode' => 'boolean',
         'pending_verification' => 'boolean',
         'verification_rejected_at' => 'datetime',
+        'verification_meta' => 'array',
         'auto_archive_order' => 'boolean',
         'digital_goods_only' => 'boolean',
         'notify_new_disput' => 'boolean',
@@ -114,6 +115,7 @@ class Config extends BaseModel
         'pending_verification',
         'verification_rejection_reason',
         'verification_rejected_at',
+        'verification_meta',
         'active_ecommerce',
         'pay_online',
         'pay_in_person',
@@ -153,7 +155,99 @@ class Config extends BaseModel
             return false;
         }
 
-        return ! $this->pending_verification;
+        if ($this->pending_verification) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function wasVerificationRejected(): bool
+    {
+        return (bool) $this->verification_rejected_at;
+    }
+
+    public function verificationMeta(): array
+    {
+        return is_array($this->verification_meta) ? $this->verification_meta : [];
+    }
+
+    public function personVerificationAttachmentIds(): array
+    {
+        $meta = $this->verificationMeta();
+
+        if (! empty($meta['person_attachment_ids'])) {
+            return array_map('intval', $meta['person_attachment_ids']);
+        }
+
+        // Legacy uploads were treated as person/identity documents.
+        if (empty($meta['store_attachment_ids']) && $this->relationLoaded('attachments')) {
+            return $this->attachments->pluck('id')->map(fn ($id) => (int) $id)->all();
+        }
+
+        return [];
+    }
+
+    public function storeVerificationAttachmentIds(): array
+    {
+        $meta = $this->verificationMeta();
+
+        return ! empty($meta['store_attachment_ids'])
+            ? array_map('intval', $meta['store_attachment_ids'])
+            : [];
+    }
+
+    public function personVerificationAttachments()
+    {
+        $ids = $this->personVerificationAttachmentIds();
+
+        return $this->attachments->whereIn('id', $ids)->values();
+    }
+
+    public function storeVerificationAttachments()
+    {
+        $ids = $this->storeVerificationAttachmentIds();
+
+        return $this->attachments->whereIn('id', $ids)->values();
+    }
+
+    public function hasPersonVerificationDocuments(): bool
+    {
+        return count($this->personVerificationAttachmentIds()) > 0;
+    }
+
+    public function hasStoreVerificationDocuments(): bool
+    {
+        return count($this->storeVerificationAttachmentIds()) > 0;
+    }
+
+    public function registerVerificationAttachmentIds(array $attachmentIds, string $type): void
+    {
+        $attachmentIds = array_values(array_unique(array_map('intval', $attachmentIds)));
+
+        if ($attachmentIds === []) {
+            return;
+        }
+
+        $meta = $this->verificationMeta();
+        $key = $type === 'store' ? 'store_attachment_ids' : 'person_attachment_ids';
+        $meta[$key] = array_values(array_unique(array_merge($meta[$key] ?? [], $attachmentIds)));
+
+        $this->forceFill(['verification_meta' => $meta])->save();
+    }
+
+    public function unregisterVerificationAttachmentId(int $attachmentId): void
+    {
+        $meta = $this->verificationMeta();
+
+        foreach (['person_attachment_ids', 'store_attachment_ids'] as $key) {
+            $meta[$key] = array_values(array_filter(
+                $meta[$key] ?? [],
+                fn ($id) => (int) $id !== $attachmentId
+            ));
+        }
+
+        $this->forceFill(['verification_meta' => $meta])->save();
     }
 
     /**

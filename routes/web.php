@@ -12,6 +12,9 @@ include 'Frontend.php';
 // Backoffice routes
 include 'Backoffice.php';
 
+// Merchant panel (separate from admin)
+include 'Merchant.php';
+
 // Webhooks
 // Route::post('webhook/stripe', [WebhookController::class, 'handleStripeCallback']); 		// Stripe
 Route::post('stripe/webhook', [WebhookController::class, 'handleWebhook'])->name('cashier.webhook');

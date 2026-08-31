@@ -16,7 +16,7 @@ class CheckCustomerCanRegister
     public function handle(Request $request, Closure $next)
     {
         if (! customer_can_register()) {
-            return redirect()->to('/login');
+            return redirect()->route('homepage', ['login' => 1]);
         }
 
         return $next($request);

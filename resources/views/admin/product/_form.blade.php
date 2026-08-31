@@ -19,17 +19,13 @@
 @else
   <div class="row">
     <div class="col-md-8">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ isset($product) ? trans('app.update_product') : trans('app.add_product') }}</h3>
-          <div class="box-tools pull-right">
-            @if (!isset($product))
-              <a href="javascript:void(0)" data-link="{{ route('admin.catalog.product.upload') }}" class="ajax-modal-btn btn btn-default btn-flat">{{ trans('app.bulk_import') }}</a>
-            @endif
-          </div>
-        </div> <!-- /.box-header -->
-
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => isset($product) ? trans('app.update_product') : trans('app.add_product'),
+        'icon' => 'fa-cube',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+        'actions' => !isset($product) ? '<a href="javascript:void(0)" data-link="' . route('admin.catalog.product.upload') . '" class="ajax-modal-btn btn btn-default btn-flat btn-sm">' . e(trans('app.bulk_import')) . '</a>' : null,
+      ])
           <div class="row">
             <div class="col-md-9 nopadding-right">
               <div class="form-group">
@@ -100,19 +96,19 @@
 
           <p class="help-block">* {{ trans('app.form.required_fields') }}</p>
 
-          <div class="box-tools pull-right">
+          <div class="box-tools pull-right admin-card__actions">
             {!! Form::submit(isset($product) ? trans('app.form.update') : trans('app.form.save'), ['class' => 'btn btn-flat btn-lg btn-primary']) !!}
           </div>
-        </div>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
 
     <div class="col-md-4 nopadding-left">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ trans('app.organization') }}</h3>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.organization'),
+        'icon' => 'fa-sitemap',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+      ])
           <div class="form-group">
             {!! Form::label('category_list[]', trans('app.form.categories') . '*') !!}
             {!! Form::select('category_list[]', $categories, null, ['class' => 'form-control select2-normal', 'multiple' => 'multiple', 'required']) !!}
@@ -240,8 +236,7 @@
               {!! Form::select('tag_list[]', $tags, null, ['class' => 'form-control select2-tag', 'multiple' => 'multiple']) !!}
             </div>
           </fieldset>
-        </div>
-      </div>
+      @include('admin.partials.ui.card_end')
     </div>
   </div>
 @endif

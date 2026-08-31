@@ -4,17 +4,13 @@
 {{ Form::hidden('lang', $selected_language) }}
 <div class="row">
   <div class="col-md-12">
-    <div class="box">
-      <div class="box-header with-border">
-        <h3 class="box-title">
-          {{ $inventory->hasTranslation($selected_language) ? trans('app.update_model_translation', ['model' => trans('app.model.inventory')]) : trans('app.add_model_translation', ['model' => trans('app.model.inventory')]) }}
-          | {{ trans('app.title') . ':' }} {{ $inventory->title }}
-        </h3>
-        <div class="box-tools pull-right">
-          <a href="javascript:void(0)" data-link="{{ route('admin.stock.inventory.translate.bulk') }}" class="ajax-modal-btn btn btn-default btn-flat"><em class="fa fa-language"></em> {{ trans('app.bulk_translation_import') }}</a>
-        </div>
-      </div> {{-- box header --}}
-      <div class="box-body">
+    @include('admin.partials.ui.card_start', [
+      'title' => ($inventory->hasTranslation($selected_language) ? trans('app.update_model_translation', ['model' => trans('app.model.inventory')]) : trans('app.add_model_translation', ['model' => trans('app.model.inventory')])) . ' | ' . $inventory->title,
+      'icon' => 'fa-language',
+      'class' => 'admin-form-section',
+      'actions' => '<a href="javascript:void(0)" data-link="' . route('admin.stock.inventory.translate.bulk') . '" class="ajax-modal-btn btn btn-default btn-flat btn-sm"><em class="fa fa-language"></em> ' . e(trans('app.bulk_translation_import')) . '</a>',
+    ])
+
         <div class="row">
           <div class="col-md-12">
             <ul class="nav nav-tabs nav-tabs-justified mb-4">
@@ -87,11 +83,10 @@
           </div> 
         </div><!-- /.box for key_features-->
 
-        <div class="box-tools pull-right">
-          <button type="submit" class="btn btn-flat btn-lg btn-primary">{{ $inventory->hasTranslation($selected_language) ? trans('app.form.update') : trans('app.form.save') }}</button>
-        </div>
-      </div>
+        <div class="text-right">
+      <button type="submit" class="btn btn-flat btn-lg btn-new">{{ $inventory->hasTranslation($selected_language) ? trans('app.form.update') : trans('app.form.save') }}</button>
     </div>
+@include('admin.partials.ui.card_end')
   </div>
 </div>
 

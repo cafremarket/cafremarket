@@ -4,6 +4,7 @@ namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
 use App\Models\Role;
+use Illuminate\Validation\Rule;
 
 class CreateMerchantRequest extends Request
 {
@@ -29,9 +30,24 @@ class CreateMerchantRequest extends Request
         $rules = [
             'name' => 'required|max:255',
             'legal_name' => 'required',
-            'slug' => 'required|alpha_dash|max:255|unique:shops',
-            'shop_name' => 'required|string|max:255|unique:shops,name',
-            'email' => 'required|email|max:255|unique:users',
+            'slug' => [
+                'required',
+                'alpha_dash',
+                'max:255',
+                Rule::unique('shops', 'slug')->whereNull('deleted_at'),
+            ],
+            'shop_name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('shops', 'name')->whereNull('deleted_at'),
+            ],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->whereNull('deleted_at'),
+            ],
             'external_url' => 'nullable|url',
             'password' => 'required|min:6',
             'active' => 'required',
@@ -39,7 +55,11 @@ class CreateMerchantRequest extends Request
         ];
 
         if (is_incevio_package_loaded('otp-login')) {
-            $rules['phone'] = 'required|string|unique:users';
+            $rules['phone'] = [
+                'required',
+                'string',
+                Rule::unique('users', 'phone')->whereNull('deleted_at'),
+            ];
         }
 
         return $rules;

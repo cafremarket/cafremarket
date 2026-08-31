@@ -1,208 +1,145 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="{{ app()->getLocale() }}">
+@php
+  $useMerchantPanelLayout = request()->is('merchant/*')
+    && Auth::check()
+    && Auth::user()->isFromMerchant();
+@endphp
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no">
-  <meta name="author" content="Incevio | incevio.com">
-
-  <title>{!! $title ?? get_site_title() !!}</title>
+  <title>
+    @if ($useMerchantPanelLayout ?? false)
+      @hasSection('page_title')
+        @yield('page_title') —
+      @elseif(isset($page_title))
+        {!! strip_tags($page_title) !!} —
+      @endif
+      {{ optional(Auth::user()->shop)->name ?? get_platform_title() }}
+    @else
+      {!! $title ?? get_site_title() !!}
+    @endif
+  </title>
 
   <link rel="manifest" href="{{ asset('site.webmanifest') }}">
   <link rel="icon" href="{{ get_storage_file_url('icon.png', 'full') }}" type="image/x-icon" />
   <link rel="apple-touch-icon" href="{{ get_storage_file_url('icon.png', 'full') }}">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+  <link href="{{ asset('css/admin-modern.css') }}" rel="stylesheet">
+  @if ($useMerchantPanelLayout ?? false)
+    <link href="{{ asset('css/merchant-panel.css') }}" rel="stylesheet">
+  @endif
 
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,300italic,400italic,600italic' rel='stylesheet'>
-
-  <!-- Scripts -->
-  <link rel="preconnect" href="https://maxcdn.bootstrapcdn.com">
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap-transition.js"></script>
-
-
-  <link href="/css/app.css" rel="stylesheet">
-
-  <!-- START Page specific Stylesheets -->
   @yield('page-style')
-  <!-- END Page specific Stylesheets -->
-
-  {{-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries --}}
-  {{-- WARNING: Respond.js doesn't work if you view the page via file:// --}}
-  <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
 
   @if (is_incevio_package_loaded('otp-login'))
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
   @endif
-
-  <style>
-    .iti {
-      display: block;
-    }
-  </style>
+  <style>.iti { display: block; }</style>
 </head>
-{{--
-  BODY TAG OPTIONS:
-  =================
-  Apply one or more of the following classes to get the
-  desired effect
-  |---------------------------------------------------------|
-  | SKINS         | skin-blue                               |
-  |               | skin-blue-light                         |
-  |               | skin-black                              |
-  |               | skin-black-light                        |
-  |               | skin-purple                             |
-  |               | skin-purple-light                       |
-  |               | skin-yellow                             |
-  |               | skin-yellow-light                       |
-  |               | skin-red                                |
-  |               | skin-red-light                          |
-  |               | skin-green                              |
-  |               | skin-green-light                        |
-  |---------------------------------------------------------|
-  |LAYOUT OPTIONS | fixed                                   |
-  |               | layout-boxed                            |
-  |               | layout-top-nav                          |
-  |               | sidebar-collapse                        |
-  |               | sidebar-mini                            |
-  |---------------------------------------------------------|
---}}
 
-<body class="hold-transition skin-black sidebar-mini">
-  <div class="wrapper">
+@if ($useMerchantPanelLayout)
+<body class="mp-body mp-body--panel">
+  <script>window.__merchantPanel = true;</script>
+  <div class="mp-app">
+    @include('merchant.partials.sidebar')
 
-    @include('admin.header')
-
-    @include('admin.sidebar')
-
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      @if (View::hasSection('buttons') || isset($page_title))
-        <section class="content-header">
-          <h1>
-            {!! $page_title ?? '' !!}
-
-            <small>{!! $page_description ?? '' !!}</small>
-          </h1>
-          <span class='opt-button'>
-
-            @yield('buttons')
-
-          </span>
-        </section>
-      @endif
-
-      <!-- Main content -->
-      <section class="content">
-        {{-- If the user is impersonated --}}
-        @if (Request::session()->has('impersonated'))
-          <div class="callout callout-info no-print">
-            <p>
-              <strong><i class="icon ion-md-nuclear"></i> {{ trans('app.alert') }}</strong>
-              {{ trans('messages.you_are_impersonated') }}
-              <a href="{{ route('admin.secretLogout') }}" class="nav-link pull-right"><i class="fa fa-sign-out" data-toggle="tooltip" data-placement="top" title="{{ trans('app.log_out') }}"></i></a>
-            </p>
-          </div>
-        @endif
-
-        <!-- VALIDATION ERRORS -->
-        @if (count($errors) > 0)
-          <div class="alert alert-danger no-print">
-            <strong>{{ trans('app.error') }}!</strong> {{ trans('messages.input_error') }}<br><br>
-            <ul class="list-group">
-              @foreach ($errors->all() as $error)
-                <li class="list-group-item list-group-item-danger">{{ $error }}</li>
-              @endforeach
-            </ul>
-          </div>
-        @endif
-
-        {{-- Global Notice --}}
-        @include('admin.partials._global_notice')
-
-        {{-- Listings Notice --}}
-        @if (Auth::user()->isFromMerchant())
-          @if (Auth::user()->hasBillingInfo() || !requires_stripe_card_for_subscription())
-            @unless (Auth::user()->isVerified())
-              <div class="alert alert-info alert-dismissible no-print">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <strong><i class="icon fa fa-info-circle"></i>{{ trans('app.notice') }}</strong>
-                {{ trans('messages.email_verification_notice') }}
-                <a href="{{ route('verify') }}">{{ trans('app.resend_verification_link') }}</a>
-              </div>
-            @endunless
-
-            @if (optional(Auth::user()->shop)->config && ! Auth::user()->shop->isVerified())
-              <div class="alert alert-warning alert-dismissible no-print">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <strong><i class="icon fa fa-shield"></i>{{ trans('app.verification') }}</strong>
-                @if (Auth::user()->shop->config->pending_verification)
-                  {{ trans('messages.verification_request_pending_notice') }}
-                @elseif (Auth::user()->shop->config->verification_rejected_at)
-                  {{ trans('messages.verification_request_rejected_notice') }}
-                  <a href="{{ route('admin.setting.verify') }}">{{ trans('app.get_verified') }}</a>
-                @else
-                  {{ trans('messages.verification_intro') }}
-                  <a href="{{ route('admin.setting.verify') }}">{{ trans('app.get_verified') }}</a>
-                @endif
-              </div>
-            @endif
-
-            @include('admin.partials._listings_notice')
+    <div class="mp-main">
+      <header class="mp-topbar">
+        <h1 class="mp-topbar__title">
+          @hasSection('page_title')
+            @yield('page_title')
+          @elseif(isset($page_title))
+            {!! strip_tags($page_title) !!}
+          @else
+            {{ trans('nav.dashboard') }}
           @endif
+        </h1>
+        <div class="mp-topbar__actions">
+          @include('merchant.partials.language_switcher')
+          <a href="{{ get_shop_url() }}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i> {{ trans('app.store_front') ?? 'My store' }}</a>
+          <span>{{ Auth::user()->getName() }}</span>
+          <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('mp-logout').submit();">{{ trans('app.log_out') ?? trans('app.logout') }}</a>
+          <form id="mp-logout" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
+        </div>
+      </header>
+
+      <div class="mp-content mp-content--admin">
+        @if (View::hasSection('page_title') || View::hasSection('buttons') || isset($page_title))
+          @include('merchant.partials.page_header')
         @endif
 
-        {{-- Main content --}}
+        @include('admin.partials.ui.alerts')
         @yield('content')
-
-      </section>
-      <!-- /.content -->
+      </div>
     </div>
-    <!-- /.content-wrapper -->
-
-    @include('admin.footer')
-
-    @include('admin.control_sidebar')
-
-    <!-- /.control-sidebar -->
-    <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
-    <div class="control-sidebar-bg"></div>
-
-    <!--Modal-->
-    <div id="myDynamicModal" class="modal fade" aria-hidden="true" data-backdrop="static" data-keyboard="false"></div>
-  </div><!-- ./wrapper -->
-
-  <div class="loader">
-    <center>
-      <img class="loading-image" src="{{ asset('images/gears.gif') }}" alt="busy...">
-    </center>
   </div>
 
-  {{-- Previous scripts --}}
-  <script src='/js/app.js'></script>
+  <div id="myDynamicModal" class="modal fade admin-modal" aria-hidden="true" data-backdrop="static" data-keyboard="false"></div>
 
-  {{-- Improved page script --}}
-  <!-- Notification -->
+  <div class="loader admin-loader">
+    <div class="admin-loader__spinner"></div>
+  </div>
+
+  <script src="{{ asset('js/app.js') }}"></script>
   @include('admin.notification')
-
-  <!-- START Page specific Script -->
   @yield('page-script')
-  <!-- END Page specific Script -->
-
 
   @if (is_incevio_package_loaded('otp-login'))
     @include('otp-login::scripts')
   @endif
 
-  <!-- Scripts -->
   @include('admin.footer_js')
+  <script src="{{ asset('js/admin-modern.js') }}"></script>
+  @include('scripts.password_toggle')
+  @include('scripts.google_place')
+  @stack('script')
+  @yield('scripts')
+</body>
+@else
+<body class="hold-transition skin-black sidebar-mini admin-modern">
+  <div class="wrapper">
+    @include('admin.header')
+    @include('admin.sidebar')
+
+    <div class="content-wrapper admin-content">
+      @if (View::hasSection('page_title') || View::hasSection('buttons') || isset($page_title))
+        @include('admin.partials.page_header')
+      @endif
+
+      <section class="content admin-content__body">
+        @include('admin.partials.ui.alerts')
+        @yield('content')
+      </section>
+    </div>
+
+    @include('admin.footer')
+    <div id="myDynamicModal" class="modal fade admin-modal" aria-hidden="true" data-backdrop="static" data-keyboard="false"></div>
+  </div>
+
+  <div class="loader admin-loader">
+    <div class="admin-loader__spinner"></div>
+  </div>
+
+  <script src="{{ asset('js/app.js') }}"></script>
+  @include('admin.notification')
+  @yield('page-script')
+
+  @if (is_incevio_package_loaded('otp-login'))
+    @include('otp-login::scripts')
+  @endif
+
+  @include('admin.footer_js')
+  <script src="{{ asset('js/admin-modern.js') }}"></script>
+  @include('scripts.password_toggle')
+  @include('scripts.google_place')
   @stack('script')
 </body>
-
+@endif
 </html>

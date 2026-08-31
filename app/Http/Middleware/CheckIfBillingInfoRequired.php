@@ -23,8 +23,12 @@ class CheckIfBillingInfoRequired
             return $next($request);
         }
 
+        $billingRoute = $request->user()->isFromMerchant()
+            ? 'merchant.account.billing'
+            : 'admin.account.billing';
+
         return $request->ajax() || $request->wantsJson() ?
             response(trans('messages.no_card_added'), 402)
-            : redirect()->route('admin.account.billing')->with('error', trans('messages.no_card_added'));
+            : redirect()->route($billingRoute)->with('error', trans('messages.no_card_added'));
     }
 }

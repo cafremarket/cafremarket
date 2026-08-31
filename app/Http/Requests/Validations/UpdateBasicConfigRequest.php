@@ -27,12 +27,14 @@ class UpdateBasicConfigRequest extends Request
 
         return [
             'name' => 'required',
-            'slug' => 'required|alpha_dash|unique:shops,slug,'.$id,
+            'slug' => 'required|alpha_dash|unique:shops,slug,'.$id.',id,deleted_at,NULL',
             'legal_name' => 'required',
             'email' => 'required|email|max:255|unique:shops,email,'.$id,
             'external_url' => 'nullable|url',
             'logo' => 'max:'.config('system_settings.max_img_size_limit_kb').'|mimes:jpg,jpeg,png,gif,svg',
             'cover_image' => 'nullable|mimes:jpg,jpeg,png,gif,svg',
+            'service_radius_km' => 'nullable|numeric|min:1|max:100',
+            'delivery_capability' => 'nullable|in:shop_only,system_only,both',
         ];
     }
 

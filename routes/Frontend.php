@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\Selling\LoginController as SellingLoginController;
+use App\Http\Controllers\Selling\RegisterController as SellingRegisterController;
 use App\Http\Controllers\Selling\SellingController;
 use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\BlogController;
 use App\Http\Controllers\Storefront\ConversationController;
 use App\Http\Controllers\Storefront\HomeController;
+use App\Http\Controllers\Storefront\LocationController;
 use App\Http\Controllers\Storefront\NewsletterController;
 use App\Http\Controllers\Storefront\ShopController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +18,18 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
     Route::post('newsletter', [
         NewsletterController::class, 'subscribe',
     ])->name('newsletter.subscribe')->middleware('xssSanitizer');
+
+    Route::post('customer/location', [
+        LocationController::class, 'store',
+    ])->name('customer.location.save');
+
+    Route::post('customer/location/reverse-geocode', [
+        LocationController::class, 'reverseGeocode',
+    ])->name('customer.location.reverse');
+
+    Route::get('customer/location/search', [
+        LocationController::class, 'searchAddress',
+    ])->name('customer.location.search');
 
     // Chat
     include 'storefront/Chat.php';
@@ -156,6 +171,20 @@ Route::middleware('selling')
         Route::get('selling', [
             SellingController::class, 'index',
         ])->name('selling');
+
+        Route::middleware(['guest', 'xssSanitizer'])->group(function () {
+            Route::get('selling/login', [
+                SellingLoginController::class, 'showLoginForm',
+            ])->name('selling.login');
+
+            Route::get('selling/register/{plan?}', [
+                SellingRegisterController::class, 'showRegistrationForm',
+            ])->name('selling.register');
+
+            Route::post('selling/register', [
+                SellingRegisterController::class, 'register',
+            ])->name('selling.register.submit');
+        });
     });
 
 // Route for customers

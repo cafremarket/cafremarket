@@ -129,4 +129,5 @@ return [
     'packaging_restored_successfully' => 'Packaging restored successfully',
     'packaging_destroyed_successfully' => 'Packaging destroyed successfully',
     'model_translation_saved_successfully' => ':model translation saved successfully',
+    'location_updated' => 'Location updated successfully',
 ];

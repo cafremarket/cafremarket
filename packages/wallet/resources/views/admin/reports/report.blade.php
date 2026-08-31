@@ -1,47 +1,38 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('packages.wallet.payouts') }}
+@endsection
+
 @section('content')
   <div class="row">
     <div class="col-sm-12">
-      <div id="filter-panel">
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <div class="row">
-              <div class="col-md-2 nopadding-right">
-                <div class="form-group">
-                  <label>{{ trans('packages.wallet.type') }}</label>
-                  <select id="payoutType" onchange="fireEventOnFilter(this.value)" class="form-control" name="payout_type">
-                    <option value="" @if (request()->get('payout_type') == '') selected @endif>{{ trans('app.all') }}</option>
-                    <option value="deposit" @if (request()->get('payout_type') == 'deposit') selected @endif>{{ trans('packages.wallet.deposit') }}</option>
-                    <option value="withdraw" @if (request()->get('payout_type') == 'withdraw') selected @endif>{{ trans('packages.wallet.withdraw') }}</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-2 nopadding-right">
-                <div class="form-group">
-                  <label>{{ trans('packages.wallet.status') }}</label>
-                  <select id="status" onchange="fireEventOnFilter(this.value)" class="form-control" name="status">
-                    <option value="" @if (request()->get('status') == '') selected @endif>{{ trans('app.all') }}</option>
-                    <option value="0" @if (request()->get('status') == '0') selected @endif>{{ trans('packages.wallet.pending') }}</option>
-                    <option value="1" @if (request()->get('status') == '1') selected @endif>{{ trans('packages.wallet.approve') }}</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-2 nopadding-right nopadding-left">
-                &nbsp;
-              </div>
-              <div class="col-md-2 nopadding-right nopadding-left">
-                &nbsp;
-              </div>
-              <div class="col-md-2 nopadding-right nopadding-left">
-                &nbsp;
-              </div>
-              <div class="col-md-2 nopadding-left">
-                <div class="form-group">
-                  <label>&nbsp;</label>
-                  <button onclick="clearAllFilter()" type="button" class="btn btn-default pull-right" name="search" value="1"><i class="fa fa-caret-left"></i> {{ trans('app.clear') }}</button>
-                </div>
-              </div>
+      <div class="report-filter-panel">
+        <div class="row">
+          <div class="col-md-2 nopadding-right">
+            <div class="form-group">
+              <label>{{ trans('packages.wallet.type') }}</label>
+              <select id="payoutType" onchange="fireEventOnFilter(this.value)" class="form-control" name="payout_type">
+                <option value="" @if (request()->get('payout_type') == '') selected @endif>{{ trans('app.all') }}</option>
+                <option value="deposit" @if (request()->get('payout_type') == 'deposit') selected @endif>{{ trans('packages.wallet.deposit') }}</option>
+                <option value="withdraw" @if (request()->get('payout_type') == 'withdraw') selected @endif>{{ trans('packages.wallet.withdraw') }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-2 nopadding-right">
+            <div class="form-group">
+              <label>{{ trans('packages.wallet.status') }}</label>
+              <select id="status" onchange="fireEventOnFilter(this.value)" class="form-control" name="status">
+                <option value="" @if (request()->get('status') == '') selected @endif>{{ trans('app.all') }}</option>
+                <option value="0" @if (request()->get('status') == '0') selected @endif>{{ trans('packages.wallet.pending') }}</option>
+                <option value="1" @if (request()->get('status') == '1') selected @endif>{{ trans('packages.wallet.approve') }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button onclick="clearAllFilter()" type="button" class="btn btn-default pull-right" name="search" value="1"><i class="fa fa-caret-left"></i> {{ trans('app.clear') }}</button>
             </div>
           </div>
         </div>
@@ -49,21 +40,20 @@
     </div>
   </div>
 
-  <div class="box margin-top-2">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('packages.wallet.payouts') }}</h3>
-      <div class="box-tools pull-right">
-        @include('admin.partials.reports.timeframe')
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('packages.wallet.payouts'),
+    'icon' => 'fa-money',
+    'class' => 'margin-top-2',
+    'bodyClass' => '',
+    'actions' => view('admin.partials.reports.timeframe')->render(),
+  ])
       <div class="rg-card-simple equal-height">
         <canvas id="payoutReport" style="height: 300px; min-height: 300px; max-height: 300px; width: 100%"></canvas>
       </div>
 
       <span class="spacer30"></span>
 
-      <table class="table table-hover table-no-sort">
+      <table class="table table-hover admin-table table-no-sort">
         <thead>
           <tr>
             <th>{{ trans('packages.wallet.date') }}</th>
@@ -99,8 +89,7 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 @endsection
 
 @section('page-script')

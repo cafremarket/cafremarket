@@ -35,7 +35,7 @@ class Authorize
         }
 
         if (! is_catalog_enabled() && $this->slug == 'edit_product') {
-            return in_array($this->slug, $this->permissionSlugs());
+            return in_array($this->slug, $this->permissionSlugs() ?? [], true);
         }
 
         // Deny the action immediately if the model has shop_id field and user from different shop
@@ -48,7 +48,7 @@ class Authorize
             return false;
         }
 
-        return in_array($this->slug, $this->permissionSlugs());
+        return in_array($this->slug, $this->permissionSlugs() ?? [], true);
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Common\Feedbackable;
 use App\Common\HasHumanAttributes;
 use App\Common\Imageable;
 use App\Common\Loggable;
+use App\Common\ReleasesUniqueIdentifiers;
 use App\Common\Translatable;
 use App\Helpers\Statistics;
 use Carbon\Carbon;
@@ -20,7 +21,7 @@ use Illuminate\Support\Str;
 
 class Shop extends ShopWallet
 {
-    use Addressable, Billable, Feedbackable, HasFactory, HasHumanAttributes, Imageable, Loggable, Notifiable, SoftDeletes, Translatable;
+    use Addressable, Billable, Feedbackable, HasFactory, HasHumanAttributes, Imageable, Loggable, Notifiable, ReleasesUniqueIdentifiers, SoftDeletes, Translatable;
 
     /**
      * The database table used by the model.
@@ -110,6 +111,9 @@ class Shop extends ShopWallet
         'id_verified',
         'phone_verified',
         'address_verified',
+        'service_radius_km',
+        'delivery_capability',
+        'primary_address_id',
         'total_item_sold',
         'total_sold_amount',
         'total_reward_given',
@@ -853,6 +857,44 @@ class Shop extends ShopWallet
         }
 
         return $query;
+    }
+
+    /**
+     * Resolve the shop's operational/store address (with map coordinates when set).
+     * Use primaryAddress relation for eager loading and standard primary address access.
+     */
+    public function storeAddress(): ?Address
+    {
+        if ($this->primary_address_id) {
+            return Address::find($this->primary_address_id);
+        }
+
+        if ($this->relationLoaded('primaryAddress') && $this->primaryAddress) {
+            if ($this->primaryAddress->latitude && $this->primaryAddress->longitude) {
+                return $this->primaryAddress;
+            }
+        }
+
+        return $this->addresses()->whereNotNull('latitude')->whereNotNull('longitude')->first()
+            ?? $this->primaryAddress()->first()
+            ?? $this->addresses()->first();
+    }
+
+    public function supportsShopDelivery(): bool
+    {
+        return in_array($this->delivery_capability, ['shop_only', 'both'], true);
+    }
+
+    public function supportsSystemDelivery(): bool
+    {
+        return in_array($this->delivery_capability, ['system_only', 'both'], true);
+    }
+
+    public function hasStoreLocation(): bool
+    {
+        $address = $this->storeAddress();
+
+        return $address && $address->latitude && $address->longitude;
     }
 
     /**

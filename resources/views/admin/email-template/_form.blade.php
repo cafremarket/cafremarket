@@ -58,17 +58,15 @@
   {!! Form::textarea('body', null, ['class' => 'form-control summernote-long', 'placeholder' => trans('app.placeholder.template_body'), 'required']) !!}
 </div>
 
-<div class="box collapsed-box">
-  <div class="box-header with-border">
-    <h3 class="box-title"><i class="fa fa-code"></i> {{ trans('app.short_codes') }}</h3>
-    <div class="box-tools pull-right">
-      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
-      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-    </div>
-  </div> <!-- /.box-header -->
-  <div class="box-body">
+@include('admin.partials.ui.card_start', [
+  'title' => trans('app.short_codes'),
+  'icon' => 'fa-code',
+  'class' => 'admin-form-section collapsed-box',
+  'bodyClass' => '',
+  'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>'
+    . '<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>',
+])
     @include('admin.email-template._short_codes')
-  </div>
-</div>
+@include('admin.partials.ui.card_end')
 
 <p class="help-block">* {{ trans('app.form.required_fields') }}</p>

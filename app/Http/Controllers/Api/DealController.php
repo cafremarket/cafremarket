@@ -9,6 +9,8 @@ use App\Http\Resources\ImageResource;
 use App\Http\Resources\ItemResource;
 use App\Http\Resources\ListingResource;
 use App\Models\Inventory;
+use App\Services\Hyperlocal\BuyerLocationService;
+use App\Services\Hyperlocal\HyperlocalCatalogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -19,8 +21,9 @@ class DealController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function flashDeals()
+    public function flashDeals(HyperlocalCatalogService $catalog, BuyerLocationService $buyerLocation)
     {
+        $buyerLocation->syncFromCustomer();
         $flashdeals = get_flash_deals();
 
         // Check if the deal is still valid
@@ -33,11 +36,17 @@ class DealController extends Controller
             $featured = null;
 
             if ($flashdeals['listings']) {
-                $listings = ListingResource::collection($flashdeals['listings']);
+                $listings = $catalog->isEnabled()
+                    ? $catalog->filterInventories(collect($flashdeals['listings']))
+                    : collect($flashdeals['listings']);
+                $listings = ListingResource::collection($listings);
             }
 
             if ($flashdeals['featured']) {
-                $featured = ListingResource::collection($flashdeals['featured']);
+                $featured = $catalog->isEnabled()
+                    ? $catalog->filterInventories(collect($flashdeals['featured']))
+                    : collect($flashdeals['featured']);
+                $featured = ListingResource::collection($featured);
             }
 
             // return $flashdeals;
@@ -59,8 +68,9 @@ class DealController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function underPrice(Request $request)
+    public function underPrice(Request $request, HyperlocalCatalogService $catalog, BuyerLocationService $buyerLocation)
     {
+        $buyerLocation->syncFromCustomer();
         $shop_id = null;
 
         if ($request->has('shop_id')) {
@@ -69,9 +79,13 @@ class DealController extends Controller
 
         $price = best_finds_under($shop_id);
 
-        $listings = Cache::remember('deals_under'.$shop_id, config('cache.remember.deals', 0), function () use ($price, $shop_id) {
+        $listings = Cache::remember('deals_under'.$shop_id.hyperlocal_location_cache_suffix(), config('cache.remember.deals', 0), function () use ($price, $shop_id) {
             return ListHelper::best_find_under($price, 20, $shop_id);
         });
+
+        if ($catalog->isEnabled() && ! $shop_id) {
+            $listings = $catalog->filterInventories(collect($listings));
+        }
 
         return ListingResource::collection($listings)->additional([
             'meta' => [
@@ -86,8 +100,9 @@ class DealController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function dealOfTheDay(Request $request)
+    public function dealOfTheDay(Request $request, HyperlocalCatalogService $catalog, BuyerLocationService $buyerLocation)
     {
+        $buyerLocation->syncFromCustomer();
         $shop_id = null;
 
         if ($request->has('shop_id')) {
@@ -95,6 +110,10 @@ class DealController extends Controller
         }
 
         $item = get_deal_of_the_day($shop_id);
+
+        if ($item && $catalog->isEnabled() && ! $shop_id && ! $catalog->isShopDeliverable((int) $item->shop_id)) {
+            $item = null;
+        }
 
         if (! $item) {
             return response()->json(['data' => null]);

@@ -14,8 +14,10 @@ use App\Http\Requests\Validations\UpdateConfigRequest;
 use App\Models\Config;
 use App\Models\PdfTemplate;
 use App\Models\Shop;
+use App\Services\Geo\GeocodeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ConfigController extends Controller
 {
@@ -92,7 +94,13 @@ class ConfigController extends Controller
 
         $this->authorize('update', $config); // Check permission
 
-        $config->shop->update($request->all());
+        $data = $request->all();
+
+        if (! $request->user()->isFromPlatform()) {
+            unset($data['delivery_capability']);
+        }
+
+        $config->shop->update($data);
 
         event(new ShopUpdated($config->shop));
 
@@ -173,9 +181,30 @@ class ConfigController extends Controller
 
         $config = Config::findOrFail($shop_id);
 
+        if (! $config->canSubmitVerificationRequest()) {
+            return back()->with('error', trans('messages.verification_request_not_allowed'));
+        }
+
         if ($request->hasFile('documents')) {
             $config->saveAttachments($request->file('documents'));
         }
+
+        $config->load('attachments');
+
+        if ($config->attachments->isEmpty()) {
+            return back()->with('error', trans('messages.verification_documents_required'));
+        }
+
+        if (config('hyperlocal.require_store_location_for_verification', true)
+            && ! $config->shop->hasStoreLocation()) {
+            return back()->with('error', trans('app.store_location_required'));
+        }
+
+        if (! filled(trim((string) ($config->support_phone ?: Auth::user()->phone)))) {
+            return back()->with('error', trans('messages.verification_phone_required'));
+        }
+
+        $wasRejected = $config->wasVerificationRejected();
 
         $config->update([
             'pending_verification' => 1,
@@ -185,7 +214,79 @@ class ConfigController extends Controller
 
         clearShopConfigCache($shop_id); // Clear cached values
 
-        return back()->with('success', trans('messages.verification_request_submitted'));
+        return back()->with(
+            'success',
+            $wasRejected
+                ? trans('messages.verification_request_resubmitted')
+                : trans('messages.verification_request_submitted')
+        );
+    }
+
+    /**
+     * Save store location during merchant onboarding / verification.
+     */
+    public function saveStoreLocation(Request $request)
+    {
+        $user = Auth::user();
+
+        if (! $user->merchantId() || (int) $user->shop->id !== (int) $user->merchantId()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'address_line_1' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'zip_code' => 'nullable|string|max:32',
+        ]);
+
+        $shop = $user->shop;
+        $address = $shop->storeAddress();
+
+        if (! $address) {
+            $address = $shop->addresses()->create([
+                'address_type' => 'Primary',
+                'address_title' => $shop->name,
+                'address_line_1' => $request->input('address_line_1', $shop->name),
+                'city' => $request->input('city', ''),
+                'zip_code' => $request->input('zip_code', '00000'),
+                'country_id' => config('system_settings.address_default_country'),
+                'state_id' => config('system_settings.address_default_state'),
+                'phone' => optional($shop->config)->support_phone ?? $user->phone,
+            ]);
+        }
+
+        $address->latitude = $request->latitude;
+        $address->longitude = $request->longitude;
+
+        if ($request->filled('address_line_1')) {
+            $address->address_line_1 = $request->address_line_1;
+        }
+
+        if ($request->filled('city')) {
+            $address->city = $request->city;
+        }
+
+        if ($request->filled('zip_code')) {
+            $address->zip_code = $request->zip_code;
+        }
+
+        if (! $request->filled('address_line_1')) {
+            $formatted = app(GeocodeService::class)->reverseGeocode(
+                (float) $request->latitude,
+                (float) $request->longitude
+            );
+
+            if ($formatted) {
+                $address->address_line_1 = Str::limit($formatted, 255, '');
+            }
+        }
+
+        $address->save();
+        $shop->update(['primary_address_id' => $address->id]);
+
+        return back()->with('success', trans('app.store_location_set'));
     }
 
     /**

@@ -19,9 +19,10 @@ class SellingTheme
         $paths = [
             selling_theme_views_path(),
             selling_theme_views_path('default'),
+            resource_path('views'),
         ];
 
-        // Reset views path to load theme views
+        // Reset views path to load theme views (shared partials fall back to resources/views)
         View::setFinder(new FileViewFinder(app('files'), $paths));
         // View::setFinder(new FileViewFinder(app()['files'], $paths));
 

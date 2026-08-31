@@ -1,19 +1,22 @@
 @extends('auth.master')
 
 @section('content')
-  <div class="box">
+  <div class="admin-auth-card">
     <div class="login-section">
-      <div class="form-container">
-        <div class="image-holder"></div>
-        <div class="login-form-section">
-          <div class="login-logo">
+      <div class="form-container admin-auth-card__inner">
+        <div class="image-holder admin-auth-card__visual"></div>
+        <div class="login-form-section admin-auth-card__form">
+          <div class="login-logo admin-auth-card__logo">
             <a href="{{ url('/') }}">
-              <img src="{{ get_logo_url('system', 'full') }}" class="brand-logo" height="47px" alt="{{ trans('theme.logo') }}" title="{{ trans('theme.logo') }}">
+              <img src="{{ get_logo_url('system', 'full') }}" class="brand-logo" height="47" alt="{{ trans('theme.logo') }}">
             </a>
           </div>
+
           <div class="form-section">
-            <h3 class="text-center mt-0">{{ trans('app.form.register') }}</h3>
-            {!! Form::open(['route' => 'register', 'id' => config('system_settings.required_card_upfront') ? 'stripe-form' : 'registration-form', 'data-toggle' => 'validator', 'files' => true]) !!}
+            <h3 class="admin-auth-card__title">{{ trans('app.form.register') }}</h3>
+            <p class="admin-auth-card__subtitle">{{ get_site_title() }}</p>
+
+            {!! Form::open(['route' => 'register', 'id' => config('system_settings.required_card_upfront') ? 'stripe-form' : 'registration-form', 'data-toggle' => 'validator', 'files' => true, 'class' => 'admin-auth-form']) !!}
 
             @if (is_subscription_enabled())
               <div class="form-group has-feedback">
@@ -77,22 +80,22 @@
                 <div class="help-block with-errors"></div>
               </div>
             @endif
+
             @if (config('system_settings.show_vendor_terms_and_conditions'))
               <div class="form-group">
-                <label>
-                  {!! Form::checkbox('agree', null, null, ['class' => 'icheck', 'required']) !!} {!! trans('app.form.i_agree_with_merchant_terms', ['url' => route('page.open', \App\Models\Page::PAGE_TNC_FOR_MERCHANT)]) !!}
+                <label class="admin-auth-form__remember">
+                  {!! Form::checkbox('agree', null, null, ['class' => 'icheck', 'required']) !!}
+                  {!! trans('app.form.i_agree_with_merchant_terms', ['url' => route('page.open', \App\Models\Page::PAGE_TNC_FOR_MERCHANT)]) !!}
                 </label>
                 <div class="help-block with-errors"></div>
               </div>
             @endif
-            {!! Form::submit(trans('app.form.register'), ['id' => 'card-button', 'class' => 'btn btn-block btn-lg btn-flat btn-primary']) !!}
 
+            {!! Form::submit(trans('app.form.register'), ['id' => 'card-button', 'class' => 'btn btn-block btn-lg btn-flat btn-new admin-auth-form__submit']) !!}
             {!! Form::close() !!}
 
-            <div class="spacer10"></div>
-
-            <a href="{{ route('login') }}" class="btn btn-link nopadding-left">
-              <i class="fa fa-user-o" aria-hidden="true"></i> {{ trans('app.form.have_an_account') }} | <i class="fa fa-sign-in" aria-hidden="true"></i> {{ trans('app.login') }}
+            <a class="admin-auth-form__register" href="{{ route('login') }}">
+              <i class="fa fa-sign-in"></i> {{ trans('app.form.have_an_account') }} — {{ trans('app.login') }}
             </a>
           </div>
         </div>
@@ -100,6 +103,5 @@
     </div>
   </div>
 
-  {{--  recaptcha api --}}
-  <script src='https://www.google.com/recaptcha/api.js'></script>
+  <script src="https://www.google.com/recaptcha/api.js"></script>
 @endsection

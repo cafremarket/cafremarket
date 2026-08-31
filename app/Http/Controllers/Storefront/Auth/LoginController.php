@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Storefront\Auth;
 
 use App\Http\Controllers\SocialiteBaseController;
 use App\Models\Customer;
+use App\Services\Hyperlocal\BuyerLocationService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,20 +62,15 @@ class LoginController extends SocialiteBaseController
     }
 
     /**
-     * Show the application's login form.
+     * Show the application's login form — customer login uses the storefront popup only.
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function showLoginForm()
     {
-        // Set intended url so user will redirect to previous page
         Session::put('url.intended', URL::previous());
 
-        if (is_incevio_package_loaded('otp-login')) {
-            return view('otp-login::login');
-        }
-
-        return view('theme::auth.login');
+        return redirect()->route('homepage', ['login' => 1]);
     }
 
     /**
@@ -90,14 +86,14 @@ class LoginController extends SocialiteBaseController
             ]);
 
             if (! Customer::where('phone', $request['phone'])->exists()) {
-                return redirect()->route('customer.login')
+                return redirect()->route('homepage', ['login' => 1])
                     ->withErrors([trans('packages.otp-login.not_registered')]);
             }
 
             try {
                 send_otp_code($request['phone'], 'customer.login');
             } catch (\Exception $e) {
-                return redirect()->route('customer.login')
+                return redirect()->route('homepage', ['login' => 1])
                     ->withErrors([trans('packages.otp-login.phone_session_expired')]);
             }
 
@@ -121,8 +117,7 @@ class LoginController extends SocialiteBaseController
 
         // if successful, then redirect to their intended location
         if ($this->attemptLogin($request)) {
-            return redirect()->intended(url()->previous())
-                ->with('success', trans('theme.notify.logged_in_successfully'));
+            return $this->sendLoginResponse($request);
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -145,6 +140,26 @@ class LoginController extends SocialiteBaseController
                 $request->only($this->username($request), 'password'),
                 $request->filled('remember')
             );
+    }
+
+    /**
+     * After successful login, use saved default address as delivery location when available.
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        app(BuyerLocationService::class)->syncFromSavedAddress($user);
+    }
+
+    /**
+     * Failed login — return to storefront with login popup open.
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        return redirect()->route('homepage', ['login' => 1])
+            ->withInput($request->only($this->username($request)))
+            ->withErrors([
+                $this->username($request) => trans('auth.failed'),
+            ]);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Repositories\Merchant;
 
 use App\Models\Role;
+use App\Models\Shop;
 use App\Models\User;
 use App\Repositories\BaseRepository;
 use App\Repositories\EloquentRepository;
@@ -70,13 +71,30 @@ class EloquentMerchant extends EloquentRepository implements BaseRepository, Mer
         return $merchant;
     }
 
+    public function trash($id)
+    {
+        $merchant = $this->model->findOrFail($id);
+
+        $shop = Shop::where('owner_id', $merchant->id)->first();
+        if ($shop) {
+            $shop->delete();
+        }
+
+        return $merchant->delete();
+    }
+
     public function destroy($id)
     {
         $merchant = parent::findTrash($id);
 
         $merchant->flushAddresses();
-
         $merchant->flushImages();
+
+        $shop = Shop::withTrashed()->where('owner_id', $merchant->id)->first();
+        if ($shop) {
+            $shop->clearData();
+            $shop->forceDelete();
+        }
 
         return $merchant->forceDelete();
     }

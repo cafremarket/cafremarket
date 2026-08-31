@@ -1,13 +1,10 @@
 @extends('admin.layouts.master')
 
 @section('content')
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title"><i class="fa fa-flash"></i> {{ trans('app.flashdeals') }}</h3>
-      <div class="box-tools pull-right"></div>
-    </div> <!-- /.box-header -->
-
-    <div class="box-body">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.flashdeals'),
+    'icon' => 'fa-bolt',
+  ])
       <div class="spacer20"></div>
       {!! Form::open(['route' => ['admin.flashdeal.create', 'flashdeal'], 'files' => false, 'class' => 'form-horizontal', 'id' => 'form', 'data-toggle' => '	validator']) !!}
       <div class="row">
@@ -93,7 +90,5 @@
         </div>
       </div>
       {!! Form::close() !!}
-      <div class="spacer20"></div>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 @endsection

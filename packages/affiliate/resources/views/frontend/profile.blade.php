@@ -5,13 +5,13 @@
 @endsection
 
 @section('content')
-  <div class="box">
-    <div class="box-header with-border text-center">
+  <div class="box admin-card">
+    <div class="box-header with-border admin-card__header text-center">
       <div class="box-title">
             {{ trans('app.profile') }}
       </div>
     </div>
-    <div class="box-body">
+    <div class="box-body admin-card__body">
         {!! Form::model($affiliate, ['route' => ['affiliate.profile.update', $affiliate], 'method' => 'put', 'id' => 'form', 'data-toggle' => 'validator', 'files' => true]) !!}
         <div class="row">
           <div class="col-md-6 col-md-offset-3 pb-4">

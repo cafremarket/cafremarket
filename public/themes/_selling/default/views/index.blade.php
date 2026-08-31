@@ -182,7 +182,7 @@
                         @endif
                       @endif
                     </ul>
-                    <a href="{{ route('vendor.register', $plan) }}" class='pricing-action'>{{ __('theme.button.choose_plan') }}</a>
+                    <a href="{{ route('selling.register', $plan->plan_id) }}" class='pricing-action'>{{ __('theme.button.choose_plan') }}</a>
                   </div>
                 @endforeach
               </div>

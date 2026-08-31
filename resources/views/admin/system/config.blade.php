@@ -4,10 +4,17 @@
   $can_update = Gate::allows('update', $system) ?? null;
 @endphp
 
+@section('page_title')
+  {{ trans('app.system_config') }}
+@endsection
+
 @section('content')
-  <div class="box">
-    <div class="nav-tabs-custom">
-      <ul class="nav nav-tabs nav-justified">
+  @include('admin.partials.ui.card_tabbed_start', [
+    'title' => trans('app.system_config'),
+    'icon' => 'fa-sliders',
+  ])
+
+      <ul class="nav nav-tabs nav-justified admin-tabs">
         <li class="active">
           <a href="#basic_settings_tab" data-toggle="tab">
             <i class="fa fa-cubes hidden-sm"></i>
@@ -1452,6 +1459,6 @@
         </div>
       </div>
       <!-- /.tab-content -->
-    </div>
-  </div> <!-- /.box -->
+
+  @include('admin.partials.ui.card_tabbed_end')
 @endsection

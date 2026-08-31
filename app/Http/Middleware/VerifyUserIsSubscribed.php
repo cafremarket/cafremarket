@@ -23,8 +23,12 @@ class VerifyUserIsSubscribed
             return $next($request);
         }
 
+        $billingRoute = $request->user()->isFromMerchant()
+            ? 'merchant.account.billing'
+            : 'admin.account.billing';
+
         return $request->ajax() || $request->wantsJson() ?
             response('Subscription required to access this page.', 402)
-            : redirect()->route('admin.account.billing');
+            : redirect()->route($billingRoute);
     }
 }

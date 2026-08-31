@@ -13,7 +13,8 @@ use App\Http\Controllers\Api\DealController;
 use App\Http\Controllers\Api\DisputeController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\HomeController;
-use App\Http\Controllers\Api\ListingController;
+use App\Http\Controllers\Api\CustomerLocationController;
+use App\Http\Controllers\Api\NearbyShopController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\PaymentCredentialController;
@@ -51,6 +52,8 @@ Route::middleware('customerApp')->group(function () {
     Route::get('categories/{sub_group?}', [CategoryController::class, 'index']);
 
     // Shops
+    Route::get('shops/nearby', [NearbyShopController::class, 'index']);
+    Route::get('shops/nearby/map', [NearbyShopController::class, 'map']);
     Route::get('shops', [HomeController::class, 'allShops']);
     Route::get('shop/{slug}', [HomeController::class, 'shop']);
     Route::get('shop/{slug}/listings', [ListingController::class, 'shop']);
@@ -108,6 +111,7 @@ Route::middleware('customerApp')->group(function () {
     Route::get('paymentOptions/{shop}', [HomeController::class, 'paymentOptions']);
     Route::get('countries', [HomeController::class, 'countries']);
     Route::get('states/{country}', [HomeController::class, 'states']);
+    Route::post('customer/location', [CustomerLocationController::class, 'store']);
 
     // delivery body
     Route::post('deliveryBoy/{order}/feedback', [FeedbackController::class, 'save_delivery_boy_feedbacks']);

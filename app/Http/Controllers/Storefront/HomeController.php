@@ -17,7 +17,10 @@ use App\Models\Manufacturer;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\Slider;
+use App\Services\Hyperlocal\BuyerLocationService;
+use App\Services\Hyperlocal\HyperlocalCatalogService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -33,8 +36,10 @@ class HomeController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request, BuyerLocationService $buyerLocation, HyperlocalCatalogService $catalog)
     {
+        $buyerLocation->syncFromCustomer();
+
         $sliders = Cache::rememberForever('sliders', function () {
             return Slider::orderBy('order', 'asc')
                 ->with([
@@ -52,57 +57,24 @@ class HomeController extends Controller
                 ->groupBy('group_id')->toArray();
         });
 
-        // Trending Category Load With Images
-        $trending_categories = get_trending_categories_with_items();
+        $latitude = $buyerLocation->latitude();
+        $longitude = $buyerLocation->longitude();
+        $buyerAddress = $buyerLocation->addressText();
 
-        // Featured Category Load With Images
-        $featured_category = get_featured_category();
-
-        // Featured Brands
-        $featured_brands = get_featured_brands();
-
-        // Featured Vendors
-        $featured_vendors = get_featured_vendors();
-
-        // Deal of the day;
-        $deal_of_the_day = get_deal_of_the_day();
-
-        // Get featured items
-        $featured_items = get_featured_items();
-
-        // Recently Added Items
-        $recent = ListHelper::latest_available_items(10);
-
-        // Best deal under the amount:
-        $deals_under = Cache::rememberForever('deals_under', function () {
-            return ListHelper::best_find_under(best_finds_under());
-        });
-
-        // Flash deals
-        $flashdeals = get_flash_deals();
-
-        // For legacy theme support. Will be removed in future
-        if (active_theme() == 'legacy' || active_theme() == 'martfury') {
-            // Trending items
-            $trending = Cache::remember('popular_items', config('auction.cache_auction_items'), function () {
-                return ListHelper::popular_items(config('system.popular.period.daily', 1), config('system.popular.take.trending', 12));
-            });
-
-            View::share('trending', $trending);
-        }
+        $nearbyResults = $catalog->nearbyShopsWithDistance();
+        $nearbyShops = $nearbyResults->pluck('shop');
+        $distances = $nearbyResults->mapWithKeys(fn ($row) => [$row['shop']->id => $row['distance_km']]);
+        $nearbyFeaturedItems = $catalog->nearbyFeaturedItems(5);
 
         return view('theme::index', compact(
             'banners',
             'sliders',
-            'recent',
-            'trending_categories',
-            'featured_items',
-            'deal_of_the_day',
-            'deals_under',
-            'featured_category',
-            'featured_brands',
-            'featured_vendors',
-            'flashdeals',
+            'nearbyShops',
+            'distances',
+            'nearbyFeaturedItems',
+            'latitude',
+            'longitude',
+            'buyerAddress',
         ));
     }
 
@@ -114,6 +86,12 @@ class HomeController extends Controller
      */
     public function browseCategory(BrowseProductRequest $request, $slug, $sortby = null)
     {
+        if ($gate = hyperlocal_browse_gate_view()) {
+            return $gate;
+        }
+
+        $catalog = app(HyperlocalCatalogService::class);
+
         $category = Category::where('slug', $slug)
             ->with([
                 'subGroup' => function ($q) {
@@ -129,7 +107,7 @@ class HomeController extends Controller
             ->active()->firstOrFail();
 
         // Avoid loading every listing into memory just for min/max price.
-        $listingsBase = $category->listings()->available();
+        $listingsBase = $catalog->scopeInventoryQuery($category->listings()->available());
         $minRaw = (clone $listingsBase)->min('inventories.sale_price');
         $maxRaw = (clone $listingsBase)->max('inventories.sale_price');
         $priceRange = [
@@ -158,6 +136,11 @@ class HomeController extends Controller
      */
     public function browseCategorySubGrp(BrowseProductRequest $request, $slug, $sortby = null)
     {
+        if ($gate = hyperlocal_browse_gate_view()) {
+            return $gate;
+        }
+
+        $catalog = app(HyperlocalCatalogService::class);
         $now = Carbon::now();
         $min = null;
         $max = null;
@@ -193,6 +176,10 @@ class HomeController extends Controller
         /** @var \Illuminate\Database\Eloquent\Builder $all_products * */
         $all_products = prepareFilteredListingsNew($request, $categorySubGroup->categories);
 
+        if ($catalog->isEnabled()) {
+            $all_products = $catalog->filterInventories($all_products);
+        }
+
         $priceRange = compact('min', 'max');
 
         // Paginate the results
@@ -210,6 +197,11 @@ class HomeController extends Controller
      */
     public function browseCategoryGroup(BrowseProductRequest $request, $slug, $sortby = null)
     {
+        if ($gate = hyperlocal_browse_gate_view()) {
+            return $gate;
+        }
+
+        $catalog = app(HyperlocalCatalogService::class);
         $now = Carbon::now();
         $min = null;
         $max = null;
@@ -246,6 +238,10 @@ class HomeController extends Controller
 
         /** @var \Illuminate\Database\Eloquent\Builder $all_products */
         $all_products = prepareFilteredListingsNew($request, $categoryGroup->categories);
+
+        if ($catalog->isEnabled()) {
+            $all_products = $catalog->filterInventories($all_products);
+        }
 
         $priceRange = compact('min', 'max');
 
@@ -431,12 +427,16 @@ class HomeController extends Controller
      */
     public function brand(BrowseProductRequest $request, $slug)
     {
+        if ($gate = hyperlocal_browse_gate_view()) {
+            return $gate;
+        }
+
+        $catalog = app(HyperlocalCatalogService::class);
         $now = Carbon::now();
         $brand = Manufacturer::where('slug', $slug)->firstOrFail();
         $ids = Product::where('manufacturer_id', $brand->id)->pluck('id');
 
         $all_products = Inventory::whereIn('product_id', $ids)
-            // ->filter($request->all())
             ->whereHas('shop', function (\Illuminate\Database\Eloquent\Builder $q) {
                 $q->select(['id', 'current_billing_plan', 'active'])->active();
             })
@@ -445,7 +445,9 @@ class HomeController extends Controller
                 'images:path,imageable_id,imageable_type',
             ])
             ->where('parent_id', null)
-            ->active()/* ->inRandomOrder()->get() */;
+            ->active();
+
+        $all_products = $catalog->scopeInventoryQuery($all_products);
 
         $forPriceRange = $all_products->get();
         $min = floor($forPriceRange->min('sale_price'));
@@ -472,6 +474,11 @@ class HomeController extends Controller
      */
     public function brandProducts(BrowseProductRequest $request, string $slug)
     {
+        if ($gate = hyperlocal_browse_gate_view()) {
+            return $gate;
+        }
+
+        $catalog = app(HyperlocalCatalogService::class);
         $now = Carbon::now();
 
         $brand = Manufacturer::where('slug', $slug)->firstOrFail();
@@ -491,7 +498,9 @@ class HomeController extends Controller
                     $q->where('order_items.created_at', '>=', Carbon::now()->subHours(config('system.popular.hot_item.period', 24)));
                 },
             ])
-            ->active()/* ->inRandomOrder()->get() */;
+            ->active();
+
+        $all_products = $catalog->scopeInventoryQuery($all_products);
 
         $forPriceRange = $all_products->get();
         $min = floor($forPriceRange->min('sale_price'));

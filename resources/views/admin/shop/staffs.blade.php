@@ -1,18 +1,17 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.staffs') }}
+@endsection
+
 @section('content')
   @include('admin.partials._shop_widget')
 
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">{{ trans('app.staffs') }}</h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-2nd-no-sort">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.staffs'),
+    'icon' => 'fa-users',
+  ])
+      <table class="table table-hover admin-table table-2nd-no-sort">
         <thead>
           <tr>
             @can('massDelete', \App\Models\User::class)
@@ -39,7 +38,7 @@
             <th>{{ trans('app.email') }}</th>
             <th>{{ trans('app.role') }}</th>
             <th>{{ trans('app.status') }}</th>
-            <th>{{ trans('app.option') }}</th>
+            <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
           </tr>
         </thead>
         <tbody id="massSelectArea">
@@ -63,7 +62,7 @@
                 <span class="label label-outline">{{ optional($user->role)->name }}</span>
               </td>
               <td>{{ $user->active ? trans('app.active') : trans('app.inactive') }}</td>
-              <td class="row-options">
+              <td class="row-options admin-row-actions">
                 @if (Auth::user()->isSuperAdmin() || $user->id != $shop->owner_id)
                   @can('view', $user)
                     <a href="javascript:void(0)" data-link="{{ route('admin.admin.user.show', $user->id) }}" class="ajax-modal-btn"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.detail') }}" class="fa fa-user-circle-o"></i></a>&nbsp;
@@ -94,28 +93,11 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
 
-  <div class="box collapsed-box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        @can('massDelete', \App\Models\User::class)
-          {!! Form::open(['route' => ['admin.admin.user.emptyTrash'], 'method' => 'delete', 'class' => 'data-form']) !!}
-          {!! Form::button('<i class="fa fa-trash-o"></i>', ['type' => 'submit', 'class' => 'confirm btn btn-default btn-flat ajax-silent', 'title' => trans('help.empty_trash'), 'data-toggle' => 'tooltip', 'data-placement' => 'right']) !!}
-          {!! Form::close() !!}
-        @else
-          <i class="fa fa-trash-o"></i>
-        @endcan
-        {{ trans('app.trash') }}
-      </h3>
-      <div class="box-tools pull-right">
-        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
-        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
-      </div>
-    </div> <!-- /.box-header -->
-    <div class="box-body responsive-table">
-      <table class="table table-hover table-no-sort">
+  @include('admin.partials.ui.trash_start', ['title' => trans('app.trash')])
+
+      <table class="table table-hover admin-table table-no-sort">
         <thead>
           <tr>
             <th>{{ trans('app.avatar') }}</th>
@@ -124,7 +106,7 @@
             <th>{{ trans('app.email') }}</th>
             <th>{{ trans('app.role') }}</th>
             <th>{{ trans('app.deleted_at') }}</th>
-            <th>{{ trans('app.option') }}</th>
+            <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -138,7 +120,7 @@
               <td>{{ $trash->email }}</td>
               <td><span class="label label-outline">{{ optional($user->role)->name }}</span></td>
               <td>{{ $trash->deleted_at->diffForHumans() }}</td>
-              <td class="row-options">
+              <td class="row-options admin-row-actions">
                 @can('delete', $trash)
                   <a href="{{ route('admin.admin.user.restore', $trash->id) }}"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.restore') }}" class="fa fa-database"></i></a>&nbsp;
 
@@ -151,6 +133,6 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-  </div> <!-- /.box -->
+    
+  @include('admin.partials.ui.card_end')
 @endsection

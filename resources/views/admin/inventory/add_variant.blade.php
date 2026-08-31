@@ -1,13 +1,18 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.add_variants') }}
+@endsection
+
 @section('content')
   <div class="row">
     <div class="col-md-8 nopadding-right">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ trans('app.add_variants') }}</h3>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.add_variants'),
+        'icon' => 'fa-cubes',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+      ])
           {!! Form::open(['route' => ['admin.stock.inventory.saveVariant', $inventory], 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
 
           <div class="row">
@@ -105,23 +110,21 @@
             <i class="fa fa-angle-double-left"></i> {{ trans('app.back') }}
           </a>
 
-          <div class="box-tools pull-right">
+          <div class="box-tools pull-right admin-card__actions">
             {!! Form::submit(isset($product) ? trans('app.form.update') : trans('app.form.save'), ['class' => 'btn btn-flat btn-lg btn-primary']) !!}
           </div>
 
           {!! Form::close() !!}
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_end')
     </div><!-- /.col-md-8 -->
 
     <div class="col-md-4">
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ trans('app.product') }}</h3>
-          <div class="box-tools pull-right">
-          </div>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.product'),
+        'icon' => 'fa-cube',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+      ])
 
           @include('admin.partials._product_widget', ['product' => $product])
 
@@ -152,8 +155,7 @@
               @endforeach
             </table>
           </fieldset>
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_end')
     </div><!-- /.col-md-4 -->
   </div><!-- /.row -->
 @endsection

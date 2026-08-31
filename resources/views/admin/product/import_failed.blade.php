@@ -5,15 +5,14 @@
     <strong><i class="icon fa fa-info-circle"></i>{{ trans('app.notice') }}</strong>
     {{ trans('messages.import_ignored') }}
   </div>
-  <div class="box">
-    <div class="box-header with-border">
-      <h3 class="box-title">
-        {{ trans('app.import_failed') }} <small>({{ trans('app.total_number_of_rows', ['value' => count($failed_rows)]) }})</small>
-      </h3>
-    </div> <!-- /.box-header -->
-
-    <div class="box-body responsive-table">
-      <table class="table table-striped">
+  @include('admin.partials.ui.card_start', [
+    'title' => trans('app.import_failed'),
+    'icon' => 'fa-times-circle',
+    'class' => 'admin-card--danger',
+    'headerExtra' => '<small class="text-muted">(' . e(trans('app.total_number_of_rows', ['value' => count($failed_rows)])) . ')</small>',
+    'bodyClass' => 'responsive-table',
+  ])
+      <table class="table table-striped admin-table">
         <thead>
           <tr>
             <th>{{ trans('app.image') }}</th>
@@ -73,18 +72,22 @@
           @endforeach
         </tbody>
       </table>
-    </div> <!-- /.box-body -->
-    <div class="box-footer">
-      <a href="{{ route('admin.catalog.product.index') }}" class="btn btn-danger btn-flat">{{ trans('app.dismiss') }}</a>
-      <small class="indent20">{{ trans('app.total_number_of_rows', ['value' => count($failed_rows)]) }}</small>
-      <div class="box-tools pull-right">
-        {!! Form::open(['route' => 'admin.catalog.product.downloadFailedRows', 'id' => 'form', 'class' => 'inline-form', 'data-toggle' => 'validator']) !!}
-        @foreach ($failed_rows as $row)
-          <input type="hidden" name="data[]" value="{{ serialize($row['data']) }}">
-        @endforeach
-        {!! Form::button(trans('app.download_failed_rows'), ['type' => 'submit', 'class' => 'btn btn-new btn-flat']) !!}
-        {!! Form::close() !!}
-      </div>
-    </div> <!-- /.box-footer -->
-  </div> <!-- /.box -->
+  @include('admin.partials.ui.card_end')
+
+  @php
+    $hiddenFields = '';
+    foreach ($failed_rows as $row) {
+      $hiddenFields .= '<input type="hidden" name="data[]" value="' . e(serialize($row['data'])) . '">';
+    }
+  @endphp
+  @include('admin.partials.ui.import_footer', [
+    'cancelUrl' => route('admin.catalog.product.index'),
+    'cancelClass' => 'btn-danger',
+    'cancelLabel' => trans('app.dismiss'),
+    'rowCount' => count($failed_rows),
+    'formRoute' => 'admin.catalog.product.downloadFailedRows',
+    'hiddenFields' => $hiddenFields,
+    'submitLabel' => trans('app.download_failed_rows'),
+    'submitClass' => 'btn btn-new btn-flat',
+  ])
 @endsection

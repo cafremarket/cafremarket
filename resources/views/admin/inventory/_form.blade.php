@@ -1,15 +1,15 @@
 <div class="row">
   <div class="col-md-8">
-    <div class="box">
-      <div class="box-header with-border">
-        <h3 class="box-title">
-          {{ isset($inventory) ? trans('app.update_inventory') : trans('app.add_inventory') }}
-          @if ($product->downloadable)
-            ({{ trans('app.digital_product') }})
-          @endif
-        </h3>
-      </div> <!-- /.box-header -->
-      <div class="box-body">
+    @php
+      $inventoryFormTitle = (isset($inventory) ? trans('app.update_inventory') : trans('app.add_inventory'))
+        . ($product->downloadable ? ' (' . trans('app.digital_product') . ')' : '');
+    @endphp
+    @include('admin.partials.ui.card_start', [
+      'title' => $inventoryFormTitle,
+      'icon' => 'fa-cubes',
+      'class' => 'admin-form-section',
+      'bodyClass' => '',
+    ])
         @include('admin.partials._product_widget')
 
         @php
@@ -94,52 +94,44 @@
 
           {!! Form::textarea('description', null, ['class' => 'form-control summernote', 'placeholder' => trans('app.placeholder.description')]) !!}
         </div>
-      </div> <!-- /.box-body -->
-    </div> <!-- /.box -->
+    @include('admin.partials.ui.card_end')
 
-    <div class="box">
-      <div class="box-header with-border">
-        <h3 class="box-title">{{ trans('app.form.images') }}</h3>
-        <div class="box-tools pull-right">
-          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        </div>
-      </div> <!-- /.box-header -->
-      <div class="box-body">
+    @include('admin.partials.ui.card_start', [
+      'title' => trans('app.form.images'),
+      'icon' => 'fa-image',
+      'class' => 'admin-form-section',
+      'bodyClass' => '',
+      'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+    ])
         <div class="form-group">
           <div class="file-loading">
             <input id="dropzone-input" name="images[]" type="file" accept="image/*" multiple>
           </div>
           <span class="small"><i class="fa fa-info-circle"></i> {{ trans('help.multi_img_upload_instruction', ['size' => getAllowedMaxImgSize(), 'number' => getMaxNumberOfImgsForInventory(), 'dimension' => '800 x 800']) }}</span>
         </div>
-      </div> <!-- /.box-body -->
-    </div> <!-- /.box -->
+    @include('admin.partials.ui.card_end')
 
     @if (isset($inventoryVariant) && $inventoryVariant->count())
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ trans('app.variants') }}</h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-
-            {{-- <a href="javascript:void(0)" data-link="{{ route('admin.catalog.product.addVariant', $product) }}" class="ajax-modal-btn btn btn-xs btn-new" data-toggle="tooltip" data-title="{{ trans('app.add_variants') }}"><i class="fa fa-plus"></i></a> --}}
-          </div>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.variants'),
+        'icon' => 'fa-cubes',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+        'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+      ])
           @include('admin.inventory._variants')
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_end')
     @endif
 
     @include('admin.inventory._key_features')
 
-    <div class="box">
-      <div class="box-header with-border">
-        <h3 class="box-title">{{ trans('app.seo') }}</h3>
-        <div class="box-tools pull-right">
-          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        </div>
-      </div> <!-- /.box-header -->
-      <div class="box-body">
+    @include('admin.partials.ui.card_start', [
+      'title' => trans('app.seo'),
+      'icon' => 'fa-search',
+      'class' => 'admin-form-section',
+      'bodyClass' => '',
+      'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+    ])
         <div class="form-group">
           {!! Form::label('slug', trans('app.form.slug') . '*', ['class' => 'with-help']) !!}
           <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.slug') }}"></i>
@@ -166,8 +158,7 @@
           {!! Form::text('meta_description', null, ['class' => 'form-control', 'maxlength' => config('seo.meta.description_character_limit', '160'), 'placeholder' => trans('app.placeholder.meta_description')]) !!}
           <div class="help-block with-errors"><small><i class="fa fa-info-circle"></i> {{ trans('help.max_chat_allowed', ['size' => config('seo.meta.description_character_limit', '160')]) }}</small></div>
         </div>
-      </div> <!-- /.box-body -->
-    </div> <!-- /.box -->
+    @include('admin.partials.ui.card_end')
 
     {{-- div for buyerGroupDetails --}}
     @if (is_incevio_package_loaded('buyerGroup'))
@@ -176,27 +167,25 @@
 
     <p class="help-block">* {{ trans('app.form.required_fields') }}</p>
 
-    <div class="box">
-      <div class="box-body">
+    <div class="admin-card admin-card--footer-only admin-form-section">
+      <div class="admin-card__body">
         @if (isset($inventory))
           <a href="{{ route('admin.stock.inventory.index') }}" class="btn btn-default btn-flat">{{ trans('app.form.cancel_update') }}</a>
         @endif
 
         {!! Form::submit(trans('app.form.save'), ['class' => 'btn btn-flat btn-lg btn-new pull-right']) !!}
-      </div> <!-- /.box-body -->
-    </div> <!-- /.box -->
+      </div>
+    </div>
   </div><!-- /.col-md-8 -->
 
   <div class="col-md-4 nopadding-left">
-    <div class="box">
-      <div class="box-header with-border">
-        <h3 class="box-title">{{ trans('app.inventory_rules') }}</h3>
-        <div class="box-tools pull-right">
-          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        </div>
-      </div> <!-- /.box-header -->
-
-      <div class="box-body">
+    @include('admin.partials.ui.card_start', [
+      'title' => trans('app.inventory_rules'),
+      'icon' => 'fa-sliders',
+      'class' => 'admin-form-section',
+      'bodyClass' => '',
+      'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+    ])
         @if (is_incevio_package_loaded('auction'))
           @include('auction::admin._listing_type')
         @endif
@@ -306,8 +295,7 @@
         @if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled())
           @include('wallet::admin._inventory_fields')
         @endif
-      </div> <!-- /.box-body -->
-    </div> <!-- /.box -->
+    @include('admin.partials.ui.card_end')
 
     @if (is_incevio_package_loaded('wholesale'))
       @include('wholesale::wholesale_inventory_form')
@@ -318,28 +306,25 @@
     @endif
 
     @if (is_incevio_package_loaded('pharmacy'))
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ trans('packages.pharmacy.pharmacy') }}</h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('packages.pharmacy.pharmacy'),
+        'icon' => 'fa-medkit',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+        'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+      ])
           @include('pharmacy::inventory_form')
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_end')
     @endif
 
     @if ($product->downloadable)
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ trans('app.downloadable') }}</h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.downloadable'),
+        'icon' => 'fa-download',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+        'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+      ])
           {!! Form::hidden('stock_quantity', 1) !!}
 
           @if (isset($inventory))
@@ -370,19 +355,17 @@
             {!! Form::number('download_limit', isset($inventory) ? $inventory->download_limit : null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.download_limit')]) !!}
             <div class="help-block with-errors"></div>
           </div>
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_end')
     @endif
 
     @if ($attributes->count())
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ trans('app.attributes') }}</h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
-        </div> <!-- /.box-header -->
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.attributes'),
+        'icon' => 'fa-tags',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+        'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+      ])
           @foreach ($attributes as $attribute)
             <div class="form-group">
               {!! Form::label($attribute->name, $attribute->name . '*') !!}
@@ -400,20 +383,17 @@
               <div class="help-block with-errors"></div>
             </div> <!-- /.form-group -->
           @endforeach
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_end')
     @endif
 
     @if ($requires_shipping)
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">{{ trans('app.shipping') }}</h3>
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-          </div>
-        </div> <!-- /.box-header -->
-
-        <div class="box-body">
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.shipping'),
+        'icon' => 'fa-truck',
+        'class' => 'admin-form-section',
+        'bodyClass' => '',
+        'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+      ])
           @unless ($product->downloadable)
             <div class="form-group">
               {!! Form::label('warehouse_id[]', trans('app.form.warehouse'), ['class' => 'with-help']) !!}
@@ -450,20 +430,18 @@
               </div>
             </div>
           @endunless
-        </div> <!-- /.box-body -->
-      </div> <!-- /.box -->
+      @include('admin.partials.ui.card_end')
     @endif
 
     @include('admin.inventory._cross_selling_fields')
 
-    <div class="box">
-      <div class="box-header with-border">
-        <h3 class="box-title">{{ trans('app.reporting') }}</h3>
-        <div class="box-tools pull-right">
-          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        </div>
-      </div> <!-- /.box-header -->
-      <div class="box-body">
+    @include('admin.partials.ui.card_start', [
+      'title' => trans('app.reporting'),
+      'icon' => 'fa-bar-chart',
+      'class' => 'admin-form-section',
+      'bodyClass' => '',
+      'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
+    ])
         @isset($suppliers)
           <div class="form-group">
             {!! Form::label('supplier_id', trans('app.form.supplier'), ['class' => 'with-help']) !!}
@@ -491,7 +469,6 @@
             @endif
           </div> <!-- /.input-group -->
         </div> <!-- /.form-group -->
-      </div> <!-- /.box-body -->
-    </div> <!-- /.box -->
+    @include('admin.partials.ui.card_end')
   </div><!-- /.col-md-4 -->
 </div><!-- /.row -->

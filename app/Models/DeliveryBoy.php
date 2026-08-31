@@ -7,6 +7,7 @@ use App\Common\ApiAuthTokens;
 use App\Common\Feedbackable;
 use App\Common\HasHumanAttributes;
 use App\Common\Imageable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,8 +20,13 @@ class DeliveryBoy extends Authenticatable
 {
     use Addressable, ApiAuthTokens, Feedbackable, HasFactory, HasHumanAttributes, Imageable, Notifiable, SoftDeletes;
 
+    const TYPE_SHOP = 'shop';
+
+    const TYPE_PLATFORM = 'platform';
+
     protected $fillable = [
         'shop_id',
+        'type',
         'first_name',
         'last_name',
         'nice_name',
@@ -28,6 +34,10 @@ class DeliveryBoy extends Authenticatable
         'phone_number',
         'password',
         'status',
+        'is_online',
+        'current_latitude',
+        'current_longitude',
+        'last_location_at',
         'dob',
         'sex',
         'remember_token',
@@ -35,66 +45,62 @@ class DeliveryBoy extends Authenticatable
         'fcm_token',
     ];
 
-    /**
-     * The database table used by the model.
-     *
-     * @var string
-     */
+    protected $casts = [
+        'status' => 'boolean',
+        'is_online' => 'boolean',
+        'last_location_at' => 'datetime',
+    ];
+
     protected $table = 'delivery_boys';
 
-    /**
-     * The guard used by the model.
-     *
-     * @var string
-     */
     protected $guard = 'delivery_boy';
 
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password',
         'remember_token',
         'verification_token',
     ];
 
-    /**
-     * This function returns a shop_name which associated with delivery boy
-     *
-     * @return [shop]
-     */
     public function shop(): BelongsTo
     {
         return $this->belongsTo(Shop::class, 'shop_id');
     }
 
-    /**
-     * This method will make hash password.
-     *
-     * @return [hash_password]
-     */
+    public function isPlatform(): bool
+    {
+        return $this->type === self::TYPE_PLATFORM;
+    }
+
+    public function isShopRider(): bool
+    {
+        return $this->type === self::TYPE_SHOP;
+    }
+
     public function setPasswordAttribute($password)
     {
         $this->attributes['password'] = Hash::needsRehash($password) ? Hash::make($password) : $password;
     }
 
-    /**
-     * Scope a query to only include inactive records.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
     public function scopeActive($query)
     {
-        return $query->where('status', '==', BaseModel::ACTIVE);
+        return $query->where('status', BaseModel::ACTIVE);
     }
 
-    /**
-     * Scope a query to only include records from the users shop.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
+    public function scopeOnline($query)
+    {
+        return $query->where('is_online', true);
+    }
+
+    public function scopeShopRiders(Builder $query)
+    {
+        return $query->where('type', self::TYPE_SHOP);
+    }
+
+    public function scopePlatformRiders(Builder $query)
+    {
+        return $query->where('type', self::TYPE_PLATFORM);
+    }
+
     public function scopeMine($query)
     {
         return $query->where('shop_id', Auth::user()->merchantId());

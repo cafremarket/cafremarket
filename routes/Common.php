@@ -31,6 +31,16 @@ Route::get('order/attachment/{attachment}/{order}/{inventory}/download', [
     'download',
 ])->name('order.attachment.download');
 
+Route::get('address/search', [
+    \App\Http\Controllers\Storefront\LocationController::class,
+    'searchAddress',
+])->name('address.search');
+
+Route::post('address/reverse-geocode', [
+    \App\Http\Controllers\Storefront\LocationController::class,
+    'reverseGeocode',
+])->name('address.reverse');
+
 Route::middleware(['ajax', 'xssSanitizer'])->group(function () {
     // Use php helper functions from js
     Route::get('helper/getFromPHPHelper', [
