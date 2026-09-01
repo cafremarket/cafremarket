@@ -354,8 +354,39 @@ class ListHelper
     public static function availableLocales()
     {
         return Cache::rememberForever('active_locales', function () {
-            return Language::orderBy('order', 'asc')->active()->get();
+            $locales = Language::orderBy('order', 'asc')->active()->get();
+            $hasPortuguese = false;
+
+            return $locales->filter(function ($locale) use (&$hasPortuguese) {
+                $isPortuguese = self::isPortugueseLanguageCode($locale->code)
+                    || stripos((string) $locale->language, 'portuguese') !== false;
+
+                if (! $isPortuguese) {
+                    return true;
+                }
+
+                if ($hasPortuguese) {
+                    return false;
+                }
+
+                $hasPortuguese = true;
+                $locale->code = 'pt';
+                $locale->language = 'Portuguese';
+
+                return true;
+            })->values();
         });
+    }
+
+    protected static function isPortugueseLanguageCode(?string $code): bool
+    {
+        if (! $code) {
+            return false;
+        }
+
+        $normalized = strtolower(str_replace('-', '_', $code));
+
+        return $normalized === 'pt' || str_starts_with($normalized, 'pt_');
     }
 
     public static function availableTranslationLocales()
@@ -773,9 +804,34 @@ class ListHelper
 
     public static function languages()
     {
-        return DB::table('languages')->where('deleted_at', null)
+        $rows = DB::table('languages')
+            ->whereNull('deleted_at')
             ->where('active', BaseModel::ACTIVE)
-            ->orderBy('order', 'asc')->pluck('language', 'code');
+            ->orderBy('order', 'asc')
+            ->get(['code', 'language']);
+
+        $languages = collect();
+        $hasPortuguese = false;
+
+        foreach ($rows as $row) {
+            $isPortuguese = self::isPortugueseLanguageCode($row->code)
+                || stripos((string) $row->language, 'portuguese') !== false;
+
+            if ($isPortuguese) {
+                if ($hasPortuguese) {
+                    continue;
+                }
+
+                $hasPortuguese = true;
+                $languages->put('pt', 'Portuguese');
+
+                continue;
+            }
+
+            $languages->put($row->code, $row->language);
+        }
+
+        return $languages;
     }
 
     /**

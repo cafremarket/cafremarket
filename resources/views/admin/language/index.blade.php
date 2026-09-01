@@ -59,7 +59,7 @@
               <a href="javascript:void(0)" data-link="{{ route('admin.setting.language.edit', $language) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.edit') }}" data-toggle="tooltip"><i class="fa fa-edit"></i></a>
             @endcan
             @can('delete', $language)
-              @if (in_array($language->id, config('system.freeze.languages')))
+              @if (in_array($language->code, ['en', 'pt'], true) || in_array($language->id, config('system.freeze.languages')))
                 <i class="fa fa-bell-o text-muted" data-toggle="tooltip" title="{{ trans('messages.freezed_model') }}"></i>
               @else
                 {!! Form::open(['route' => ['admin.setting.language.trash', $language], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}
