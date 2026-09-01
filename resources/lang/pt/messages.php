@@ -1,18 +1,6 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Messages Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to display messages for any action, notices and warnings.
-    | You are free to change them to anything
-    | you want to customize your views to better match your application.
-    |
-    */
-
     'canceled' => 'Cancelado!',
     'confirmed' => 'Confirmado',
     'created' => ':model foi criado com sucesso!',
@@ -57,7 +45,6 @@ return [
     'theme_activated' => 'Tema :theme ativado com sucesso!',
     'the_ip_banned' => 'O endereço IP foi banido do aplicativo.',
     'the_ip_unbanned' => 'O endereço IP foi removido da lista de bloqueio.',
-
     'no_billing_info' => 'Adicione informações de cobrança para continuar.',
     'no_card_added' => 'Adicione informações de cobrança para assinar.',
     'billing_setup_unavailable' => 'O pagamento com cartão ainda não está disponível. Contacte o administrador da plataforma para configurar o Stripe ou desativar "Cartão necessário antecipadamente" nas definições do sistema.',
@@ -91,34 +78,16 @@ return [
     'license_updated' => 'Licença atualizada.',
     'take_a_backup' => 'Você pode fazer um backup do banco de dados. Certifique-se de que as preferências de backup estão configuradas antes de realizar esta ação. O <code>mysqldump</code> deve estar instalado no seu servidor. Consulte a documentação para ajuda.',
     'backup_done' => 'Backup realizado com sucesso!',
-
-    // 'you_have_disputes_solve' => 'There are :disputes active disputes! Please review and solve disputes.',
-    // 'you_have_refund_request' => 'You have :requests refund request. Please review and take action.',
-
-    // 'action_failed'    => [
-    //     'create'   => 'Create :model has been failed!',
-    //     'update'   => 'Update :model has been failed!',
-    //     'trash'   => ':model has been moved to trash!',
-    //     'restore'  => ':model has been restored failed!',
-    //     'delete'   => ':model has been deleted failed!',
-    // ],
-
-    'inventory_exist'   => 'The product is already exist in your inventory. Please update the existing list instead of creating duplicate list.',
-    'inventory_not_found'   => 'The product is not found in your inventory. Please update the inventory and try again.',
-
+    'inventory_exist' => 'The product is already exist in your inventory. Please update the existing list instead of creating duplicate list.',
+    'inventory_not_found' => 'The product is not found in your inventory. Please update the inventory and try again.',
     'notice' => [
         'no_billing_address' => 'This customer has no billing address set up yet. Please add a billing address before create an order.',
-
         'no_active_payment_method' => 'Your store has no active payment method. Please activate at least one payment method to accept order.',
-
         'no_shipping_option_for_the_zone' => 'No shipping zone available for this area. Please create a new shipping zone or add this shipping area to an existing zone.',
-
         'no_rate_for_the_shipping_zone' => 'The <strong> :zone </strong> shipping zone has no shipping rates. Please create shipping rates to accept orders from this zone.',
-
         'cant_cal_weight_shipping_rate' => 'Can\'t calculate weight based shipping rate. Because weight are not set for some items.',
     ],
-
-   'no_changes' => 'Nada para mostrar',
+    'no_changes' => 'Nada para mostrar',
     'no_orders' => 'Nenhum pedido encontrado!',
     'no_history_data' => 'Nenhuma informação para mostrar',
     'this_slug_taken' => 'Este slug já foi utilizado! Tente outro.',
@@ -169,9 +138,7 @@ return [
     'import_demo_contents' => 'Importar conteúdos de demonstração removerá todos os dados do banco de dados e reiniciará todas as configurações, exceto o arquivo <small>(o .env e outros arquivos de configuração no diretório configs/)</small>. O sistema voltará a uma instalação limpa. <br/><b>Alterações aqui são irreversíveis.</b>',
     'env_saved' => 'O arquivo .env foi salvo com sucesso!',
     'modify_environment_file' => 'Tenha cuidado ao trabalhar com o arquivo `.env`, pois ele é a principal configuração do sistema. Qualquer alteração incorreta pode quebrar o sistema. Sempre faça um backup antes de modificar. <br/><b>Alterações aqui são irreversíveis.</b>',
-
     'be_careful_sensitive_area' => 'Tenha cuidado com suas ações! Estas configurações são muito sensíveis e o sistema pode quebrar se algo for feito incorretamente. <br/><b>Alterações aqui são irreversíveis.</b>',
-
     'unfulfilled_percents' => ':percent% do total de pedidos de hoje',
     'last_30_days_percents' => ':percent% :state nos últimos 30 dias',
     'stock_out_percents' => ':percent% do total de :total itens',
@@ -179,33 +146,20 @@ return [
     'todays_order_percents' => ':percent% :state em relação a ontem',
     'no_sale' => 'Nenhuma venda em :date',
     'logged_in_as_admin' => 'Você já está logado como administrador.',
-
-    'permission'        => [
-        'denied'        => 'Permission denied!',
+    'permission' => [
+        'denied' => 'Permission denied!',
     ],
-
-    // Version 1.2.4
     'listings_not_visible' => 'Seus anúncios não estão visíveis na frente da loja. Motivo: :reason',
     'no_active_payment_method' => 'Sua loja não possui nenhum método de pagamento ativo.',
     'no_active_shipping_zone' => 'Sua loja não possui nenhuma zona de entrega ativa. Crie zonas de entrega para aceitar pedidos.',
-
-    // Version 1.2.5
     'our_shop_in_hold' => 'Sua loja está em espera! Revisaremos e aprovaremos sua loja o mais rápido possível!',
     'your_shop_in_maintenance_mode' => 'A loja está em modo de manutenção.',
-
-    // Version 1.3.0
     'how_id_verification_helps' => 'Como a verificação de identidade ajuda',
-
     'how_the_verification_process_works' => 'Como o processo funciona',
-
     'subscription_updated' => 'A assinatura foi atualizada com sucesso!',
-
     'subscription_update_failed' => 'A atualização da assinatura falhou! Por favor, veja o arquivo de log para mais detalhes.',
-
     'pending_approvals' => '[0,1] :count aprovação pendente precisa de ação|[2,*] :count aprovações pendentes precisam de ação',
-
     'pending_verifications' => '[0,1] :count verificação pendente precisa de ação|[2,*] :count verificações pendentes precisam de ação',
-
     'verification_request_submitted' => 'O seu pedido de verificação foi enviado. Um administrador irá rever os seus documentos em breve.',
     'verification_approved' => 'A verificação da loja foi aprovada.',
     'verification_rejected' => 'O pedido de verificação da loja foi rejeitado.',
@@ -216,9 +170,7 @@ return [
     'store_verification_approved_notice' => 'A sua loja está verificada. O selo verificado é exibido no perfil da sua loja.',
     'no_verification_documents_uploaded' => 'Ainda não foram carregados documentos de verificação.',
     'verification_rejection_help' => 'Indique a :shop o motivo da rejeição do pedido de verificação. O vendedor pode carregar novos documentos e enviar novamente.',
-
     'verification_intro' => 'Uma vez verificado, exibiremos o selo <strong>verificado</strong> no seu negócio e na página do perfil da sua loja. Isso ajuda seu negócio a construir confiança no Cafremarket.',
-
     'verification_process' => '<ul>
             <li>Tire uma foto ou escaneie seu documento de identidade (passaporte, carteira de motorista ou documento emitido pelo governo) usando uma câmera HD e faça o upload</li>
             <li>Envie um comprovante de endereço (carteira de motorista, recibo de imposto sobre propriedade, conta de serviços públicos ou contrato de aluguel)</li>
@@ -226,10 +178,8 @@ return [
             <li>Verificaremos se todas as fotos são da mesma pessoa.</li>
             <li>Não é possível usar o mesmo documento (carteira de motorista) para verificação de identidade e endereço.</li>
                     </ul>',
-
-   'what_the_verification_documents_need' => 'Quais documentos de identidade formal eu preciso?',
-
-'verification_documents' => 'Você pode usar: <ul>
+    'what_the_verification_documents_need' => 'Quais documentos de identidade formal eu preciso?',
+    'verification_documents' => 'Você pode usar: <ul>
         <li>seu passaporte</li>
         <li>sua carteira de motorista</li>
         <li>um documento emitido pelo governo</li>
@@ -239,118 +189,123 @@ return [
     </ul>
         </ul>
        As cartas de condução e os documentos de identidade emitidos pelo governo devem ser feitos de plástico. Todos os documentos de identidade devem ser válidos..',
-
     'verified_business_name_like' => 'O nome da sua empresa será apresentado assim:',
-
-    // Version 1.3.3
     'csv_import_process_started' => 'The data has been submitted successfully. The process may take a few minimums. You\'ll get an email when it\'s done.',
-
     'model_has_association' => 'The :model has :associate in it. To delete this :model, please remove all :associate under the :model',
-
-    // Version 1.4.0
     'active_worldwide_business_area' => 'The status will not affect as the Cafremarket business area is set to worldwide! To change the business area settings please check the configuration section.',
-
     'please_select_conversation' => 'Please select a conversation from the left.',
-
     'session_expired' => 'Your session has been expired! Please login.',
-
     'no_address_for_invoice' => 'You have no business address set up yet. Please add address now.',
-
     'package_settings_updated' => 'Plugin settings updated',
-
     'next_billing_date' => 'Your next subscription billing date is <strong>:date</strong> Please keep sufficient balance on your wallet to keep going.',
-
     'package_installed_success' => 'The :package module has been installed successfully!',
-
     'package_upgraded_success' => 'The :package module has been upgraded successfully!',
-
     'package_installed_already' => 'The :package module is already installed!',
-
     'package_uninstalled_success' => 'The :package module has been uninstalled successfully!',
-
     'cancellation_require_admin_approval' => 'Cancellation require admin approval. A cancellation fee may applied.',
-
     'a_cancellation_fee_be_charged' => 'A cancellation fee of <strong>:fee</strong> will be charged',
-
     'order_will_be_cancelled_instantly' => 'The order will be cancelled instantly.',
-
     'not_accessible_on_demo' => 'This content is not accessible on the demo mode!',
-
     'updated_deal_of_the_day' => 'Deal of the day updated successfully.',
-
     'updated_tagline' => 'Tagline updated successfully.',
-
     'featured_brands_updated' => 'Featured brands updated successfully.',
-
     'featured_vendors_updated' => 'Featured vendors updated successfully.',
-
     'featured_items_updated' => 'Featured items updated successfully.',
-
     'best_finds_under_updated' => 'Best finds under updated successfully.',
-
     'trending_now_category_updated' => 'Trending now category updated successfully.',
-
     'trending_categories_update_failed' => 'You can add maximum :limit trending category',
-
     'package_inactive' => ':package is inactive, please activate from admin panel.',
-
     'misconfigured_subscription_stripe' => 'The system found misconfigured Stripe subscriptions. Please check your settings. Read the documentation if need help.',
-
     'misconfigured_subscription_wallet' => 'Wallet based subscription required WALLET and LOCAL SUBSCRIPTION packages to function. Please contact support team for help. System will try to use STRIPE subscription unless these requirements met.',
-
     'some_item_out_of_stock' => 'Few items are not available right now. We\'ve added all available item',
-
     'dependent_package_failed' => 'Plugin dependency failed! need to enable and configure the :dependency module(s).',
-
     'misconfigured_plugin' => 'The :package needs to configure correctly! Please check the documentation and configure it correctly or contact support if need help.',
-
     'misconfigured_payment' => 'The :payment is misconfigured and needs to configure correctly! Please check the documentation and configure it correctly or contact support if need help.',
-
     'manual_payment_configure_help' => 'Set the manual payment instructions on settings. Without this configuration manual payment will not work.',
-
-    'confirm_regenerate_key' => "Regenerating the application keys will enforce you to rebuild your application apps otherwise your apps won'n work",
-
+    'confirm_regenerate_key' => 'Regenerating the application keys will enforce you to rebuild your application apps otherwise your apps won\'n work',
     'custom_css_added' => 'Custom css added successfully',
-
     'custom_css_updated' => 'Custom css updated successfully',
-
     'custom_css_deleted' => 'Custom css deleted successfully',
-
     'vendor_can_use_own_catalog_only_notice' => 'The Cafremarket is configured as vendor manage the products of their own. You can off this settings <code>vendor can use own catalog only</code> from SETTINGS >> CONFIGURATION section.',
-
     'account_delete' => 'Your all data in our system related with your account will be removed permanently. You can\'t revert this action',
-
     'main_nav_category_updated' => 'Main navigation category updated successfully',
-
     'empty_state_message' => 'State can not be empty. Select at least one state.',
-
     'clear_demo_contents' => 'Clearing demo contents will remove all demo data from the database. The system will go back to a fresh installation. <br/><b>Changes made here are irreversible.</b>',
-
     'demo_data_imported' => 'Demo contents are imported successfully!',
-
     'demo_data_cleared' => 'Demo contents are cleared from your system successfully!',
-
     'reached_download_maximum_limit' => 'Your download maximum limit has been reached',
-
     'download_link_guest_customer' => 'As a non registered customer you\'ll not be able to get the link after you leave this page. Please copy the links and save it for future use. We also sent you an email with order details.',
-
     'download_link_loggedin_customer' => 'The download links as below. You can also download from the order detail page on your account dashboard.',
-
     'package_not_found' => 'The :package module not found!',
-
     'account_number_updated' => 'Account Number has been updated successfully',
-
     'updated_top_bar_banner' => 'Banner has been updated successfully',
-
     'switched_to_customer_successfully' => 'Switched to customer successfully',
-
     'customer_acc_not_exist' => 'Customer account not exist',
-
     'update_from_merchant_notice' => 'To update this information, please switch to your merchant account.',
-
     'customer_acc_created_successfully' => 'Customer account created successfully',
-
     'no_translation_available' => 'No translation option available! Multiple active languages are needed.',
-
     'uploaded_file_not_blade_file' => 'The template file must have to be a blade.php file',
+    'how_the_marketplace_works' => 'It\'s Good To Know How The System Works, Before You Register',
+    'your_shop_in_hold' => 'A sua loja está em espera! Analisaremos e aprovaremos a sua loja o mais breve possível!',
+    'verification_request_resubmitted' => 'Your verification request has been resubmitted. An admin will review it again soon.',
+    'seller_registration_complete_verify_store' => 'Welcome! Your seller account is created. Please pin your store location on the map and upload verification documents to complete setup.',
+    'verification_pending_until_approved' => 'Your verification is pending admin approval. You can use the dashboard once your store is approved.',
+    'complete_store_verification' => 'Please complete store verification — set your store location and upload documents before accessing the dashboard.',
+    'seller_onboarding_title' => 'Complete your store setup',
+    'seller_onboarding_subtitle' => 'Register your account, pin your store on the map, upload verification documents, then submit for admin review.',
+    'seller_onboarding_step_register' => 'Register account',
+    'seller_onboarding_step_location' => 'Store location',
+    'seller_onboarding_step_documents' => 'Upload documents',
+    'seller_onboarding_step_submit' => 'Submit for review',
+    'seller_onboarding_location_help' => 'Pin the exact location of your store on the map. Customers nearby will discover your store based on this location.',
+    'seller_onboarding_pending_help' => 'Your person, phone, and address details have been submitted. Please wait while an admin reviews your store.',
+    'seller_onboarding_map_unavailable' => 'Map is unavailable. Use the address form to set your store location.',
+    'seller_register_next_steps' => 'After you register, you will verify your store by pinning its location on the map and uploading business documents.',
+    'seller_login_subtitle' => 'Sign in to manage your store, orders, and verification.',
+    'verification_rejected_reapply_notice' => 'Your verification was rejected. Review the reason on the verification page and resubmit your request.',
+    'verification_reapply_help' => 'Fix the issues mentioned above, upload updated documents if needed, then resubmit for admin review.',
+    'verification_options_intro' => 'Complete all three verification options below, then submit for admin review.',
+    'verification_tabs_intro' => 'Complete all three verification tabs below, then submit for admin review.',
+    'verification_tab_person_help' => 'Upload your government ID and a clear photo of yourself. Admin will verify your identity.',
+    'verification_tab_store_documents_help' => 'Upload business registration, trade license, or other store documents. Admin will verify your business.',
+    'verification_tab_contact_help' => 'Add your business phone number and email. Admin will verify your contact details.',
+    'verification_person_documents' => 'Upload your government ID and a clear photo of yourself (passport, driving license, or national ID).',
+    'verification_store_documents' => 'Upload store/business documents such as trade license, registration certificate, or tax registration.',
+    'verification_person_document_upload_help' => 'Upload identity documents for the store owner.',
+    'verification_store_document_upload_help' => 'Upload business or store registration documents.',
+    'verification_person_documents_required' => 'Please upload person verification documents before submitting.',
+    'verification_store_documents_required' => 'Please upload store verification documents before submitting.',
+    'verification_email_saved' => 'Email address saved successfully.',
+    'verification_email_saved_notice' => 'Business email is saved and will be reviewed by admin.',
+    'verification_email_field_help' => 'Use an email where customers and admin can reach you.',
+    'verification_email_required' => 'Please save your business email before submitting.',
+    'verification_complete_all_tabs' => 'Complete all three verification tabs (person, store, phone & email) before submitting.',
+    'verification_option_person_help' => 'Upload your ID, proof of address, and a clear photo of yourself. Admin will verify your identity.',
+    'verification_option_phone_help' => 'Add your business phone number. Admin will verify you can be reached on this number.',
+    'verification_option_address_help' => 'Pin your store on the map. Admin will verify your business address matches the location.',
+    'verification_option_your_part' => 'Your submission',
+    'verification_option_admin_part' => 'Admin approval',
+    'verification_phone_saved' => 'Phone number saved successfully.',
+    'verification_phone_saved_notice' => 'Business phone number is saved and will be reviewed by admin.',
+    'verification_phone_field_help' => 'Use a number where customers and admin can reach you.',
+    'verification_phone_required' => 'Please save your business phone number before submitting.',
+    'verification_submit_help' => 'Once all three verification tabs are complete, submit your store for admin review.',
+    'verification_complete_all_options' => 'Complete person verification (documents), phone number, and store location before submitting.',
+    'verification_admin_review_status' => 'Admin review status',
+    'verification_admin_review_help' => 'These badges are approved by admin after you submit. You cannot change them yourself.',
+    'verification_reapply_documents_help' => 'You can upload new documents or keep your existing files and resubmit after addressing the rejection reason.',
+    'upload_new_verification_documents_optional' => 'Upload new documents (optional if your existing files are still valid)',
+    'verification_documents_required' => 'Please upload at least one verification document before submitting.',
+    'verification_documents_uploaded' => 'Documents uploaded successfully.',
+    'verification_document_replaced' => 'Document replaced successfully.',
+    'verification_document_upload_help' => 'Drag and drop files here, or click to browse. You can upload multiple documents at once.',
+    'verification_document_types' => 'Accepted: JPG, PNG, PDF · Max 5 MB per file',
+    'confirm_delete_verification_document' => 'Delete this document? You can upload a new one anytime.',
+    'verification_revert_help' => 'This will reset verification for :shop. The seller will lose dashboard access until they resubmit documents and you approve again.',
+    'verification_reverted' => 'Verification has been reverted. The seller can update documents and submit again.',
+    'store_already_verified' => 'This store is already verified.',
+    'verification_approve_checklist_help' => 'Review the documents and details below. Use Approve to verify the person, phone, and address together.',
+    'verification_status_checklist_help' => 'Current verification status for this store.',
+    'verification_approve_sets_all' => 'Approve will mark person verification, store verification, and phone & email as verified and activate the store.',
+    'something_went_wrong' => 'The action has been failed! Something went wrong!!',
 ];

@@ -9,6 +9,7 @@
   <!-- Main custom css -->
   <link href="{{ theme_asset_url('css/vendors.css') }}" media="screen" rel="stylesheet">
   <link href="{{ theme_asset_url('css/style.css') }}" media="screen" rel="stylesheet">
+  <link href="{{ theme_asset_url('css/storefront-modern.css') }}" media="screen" rel="stylesheet">
 
   @if (config('active_locales') && config('active_locales')->firstWhere('code', App::getLocale())->rtl)
     <link href="{{ theme_asset_url('css/rtl.css') }}" media="screen" rel="stylesheet">
@@ -50,7 +51,9 @@
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 </head>
 
-<body class="{{ config('active_locales')->firstWhere('code', App::getLocale())->rtl ? 'rtl' : 'ltr' }}">
+<body class="{{ config('active_locales')->firstWhere('code', App::getLocale())->rtl ? 'rtl' : 'ltr' }}{{ Request::is('/') ? ' sf-homepage' : '' }}">
+
+  @include('theme::partials._skeleton_loader')
 
   <!-- Google Tag Manager (noscript) -->
   @if (config('services.google.gtm_container_id'))
@@ -172,44 +175,16 @@
 
   @include('theme::scripts.password_toggle')
 
-  @include('scripts.google_place')
+  @if (google_maps_api_key())
+    @include('scripts.google_place')
+  @endif
+
+  @include('theme::scripts.storefront_init')
 
   {{-- Purchase button popup --}}
   @if (config('app.demo') == true && \Str::contains(url()->current(), 'zcart'))
     @include('partials.demo_purchase_btn')
   @endif
-  @include('partials._theme_change_btns')
-
-  <script>
-    // Dynamic theme colors
-    const setTheme = theme => document.documentElement.setAttribute('theme', theme);
-    document.getElementById('zcart-js-theme-select').addEventListener('change', function() {
-      setTheme(this.value);
-    });
-
-    document.addEventListener("DOMContentLoaded", function() {
-      var lazyImages = [].slice.call(document.querySelectorAll(".lazy"));
-
-      if ("IntersectionObserver" in window) {
-        let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
-          entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-              let lazyImage = entry.target;
-              lazyImage.src = lazyImage.dataset.src;
-              lazyImage.classList.remove("lazy");
-              lazyImageObserver.unobserve(lazyImage);
-            }
-          });
-        });
-
-        lazyImages.forEach(function(lazyImage) {
-          lazyImageObserver.observe(lazyImage);
-        });
-      } else {
-        // Possibly fall back to a more compatible method here
-      }
-    });
-  </script>
 </body>
 
 </html>

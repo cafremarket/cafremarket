@@ -31,6 +31,7 @@ return [
         'return_and_refund_policy' => 'Return and Refund Policy',
         'refunds_disputes' => 'Disputes',
         'sell_on' => 'Sell On :platform',
+        'seller_login' => 'Seller Login',
         'support' => 'Support',
         'term_and_conditions' => 'Terms and Conditions',
         'wishlist' => 'Wishlist',

@@ -1,211 +1,153 @@
 <div class="dashboard-section">
+  @if (\App\Models\SystemConfig::CustomerNeedsApproval() && !Auth::guard('customer')->user()->isApproved())
+    <div class="alert alert-warning mb-3">
+      <strong>{{ trans('app.account_pending_for_approval') }}</strong> {{ trans('help.account_pending_for_approval') }}
+    </div>
+  @endif
+
+  <div class="sf-dashboard-welcome">
+    <div class="sf-dashboard-welcome__top">
+      <div class="sf-dashboard-welcome__greeting">
+        <h2>{{ trans('theme.hello') }}, {{ $dashboard->getName() }}!</h2>
+        <p>
+          <i class="fas fa-clock"></i>
+          {{ trans('theme.member_since') }} {{ $dashboard->created_at->diffForHumans() }}
+        </p>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2" style="gap: 8px;">
+        @unless ($dashboard->shippingAddress)
+          <a href="{{ route('account', 'account') }}#address-tab" class="btn btn-default btn-sm">
+            <i class="fas fa-truck"></i> @lang('theme.add_shipping_address')
+          </a>
+        @endunless
+        <a href="{{ url('/') }}" class="btn sf-btn-primary btn-sm">
+          <i class="fas fa-shopping-cart"></i> @lang('theme.button.continue_shopping')
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="sf-stat-grid">
+    <a href="{{ route('account', 'orders') }}" class="sf-stat-card">
+      <span class="sf-stat-card__icon"><i class="fas fa-shopping-bag"></i></span>
+      <span class="sf-stat-card__value">{{ $dashboard->orders_count }}</span>
+      <span class="sf-stat-card__label">@lang('theme.orders')</span>
+    </a>
+
+    <a href="{{ route('account', 'wishlist') }}" class="sf-stat-card">
+      <span class="sf-stat-card__icon"><i class="fas fa-heart"></i></span>
+      <span class="sf-stat-card__value">{{ $dashboard->wishlists_count }}</span>
+      <span class="sf-stat-card__label">@lang('theme.wishlist')</span>
+    </a>
+
+    <a href="{{ route('account', 'messages') }}" class="sf-stat-card">
+      <span class="sf-stat-card__icon"><i class="fas fa-envelope"></i></span>
+      <span class="sf-stat-card__value">{{ $dashboard->messages_count }}</span>
+      <span class="sf-stat-card__label">@lang('theme.unread_messages')</span>
+    </a>
+
+    <a href="{{ route('account', 'coupons') }}" class="sf-stat-card">
+      <span class="sf-stat-card__icon"><i class="fas fa-tags"></i></span>
+      <span class="sf-stat-card__value">{{ $dashboard->coupons_count }}</span>
+      <span class="sf-stat-card__label">@lang('theme.coupons')</span>
+    </a>
+  </div>
+
   <div class="row">
-    <div class="col-12 no-gutters">
-      <div class="my-info-container">
-        @if (\App\Models\SystemConfig::CustomerNeedsApproval() && !Auth::guard('customer')->user()->isApproved())
-          <div class="notice notice-info notice-md" id="customer-not-approved-notice">
-            <strong>{{ trans('app.account_pending_for_approval') }}</strong> {{ trans('help.account_pending_for_approval') }}
-          </div>
-        @endif
-
-        <div class="my-info-box radius-top p-3 border">
-          <div class="me-info-block">
-            <div class="my-photo-block">
-              <img src="{{ get_storage_file_url(optional($dashboard->image)->path, 'thumbnail') }}" class="center-block" alt="{{ trans('theme.avatar') }}" />
-            </div>
-
-            <div class="my-info">
-              <div class="name">
-                <span>
-                  {{ $dashboard->getName() }}
-                </span>
-                {{-- For approved customers show customer approved icon --}}
-                @if (\App\Models\SystemConfig::CustomerNeedsApproval() && Auth::guard('customer')->user()->isApproved())
-                  <em class="fas fa-user-check no-fill" style="color:green" data-toggle="tooltip" data-title="{{ trans('app.statuses.approved') }}"></em>
-                @endif
-
-                <a href="{{ route('account', 'account') }}" class="small pl-2">
-                  <i class="fas fa-edit" data-toggle="tooltip" data-title="{{ trans('theme.edit_account') }}"></i>
-                </a>
-              </div>
-
-              <div class="text-muted">
-                <small>
-                  <i class="fas fa-clock-o no-fill"></i>
-                  {{ trans('theme.member_since') }}: <em>{{ $dashboard->created_at->diffForHumans() }}</em>
-                </small>
-
-                @if (is_incevio_package_loaded('buyerGroup'))
-                  <br>
-                  <small>
-                    @if (isset($dashboard->buyerGroup))
-                      <span class="text-info">
-                        <i class="fa fa-users text-info" data-toggle="tooltip" title="{{ trans('packages.buyer_group') }}"></i>
-                        {{ $dashboard->buyerGroup->name }} <a href="{{ url('/my/account#buyer-group-tab') }}"><em class="fas fa-edit" data-toggle="tooltip" data-title="{{ trans('packages.change_buyer_group') }}"> </em></a>
-                      </span>
-                    @endif
-                  </small>
-                @endif
-              </div>
-            </div>
-
-            <div class="pull-right">
-              @unless ($dashboard->shippingAddress)
-                <a href="{{ route('account', 'account') }}#address-tab" class="btn btn-default">
-                  <i class="fas fa-truck"></i> @lang('theme.add_shipping_address')
-                </a>
-              @endunless
-
-              <a href="{{ url('/') }}" class="btn btn-primary">
-                <i class="fas fa-shopping-cart no-fill"></i> @lang('theme.button.continue_shopping')
-              </a>
-            </div>
-          </div>
-        </div><!-- .my-info-box -->
-
-        <div class="my-info-details border radius-bottom">
-          <ul>
-            <li>
-              <a href="{{ route('account', 'orders') }}">
-                <span class="v">{{ $dashboard->orders_count }}</span>
-                <span class="d">
-                  <i class="fas fa-shopping-cart no-fill"></i> @lang('theme.orders')
-                </span>
-              </a>
-            </li>
-            <li class="devider">|</li>
-            <li>
-              <a href="{{ route('account', 'wishlist') }}">
-                <span class="v">{{ $dashboard->wishlists_count }}</span>
-                <span class="d">
-                  <i class="fas fa-heart no-fill"></i> @lang('theme.wishlist')
-                </span>
-              </a>
-            </li>
-            <li class="devider">|</li>
-            <li>
-              <a href="{{ route('account', 'messages') }}">
-                <span class="v">{{ $dashboard->messages_count }}</span>
-                <span class="d">
-                  <i class="fas fa-envelope no-fill"></i> @lang('theme.unread_messages')
-                </span>
-              </a>
-            </li>
-            <li class="devider">|</li>
-            <li>
-              <a href="{{ route('account', 'coupons') }}">
-                <span class="v">{{ $dashboard->coupons_count }}</span>
-                <span class="d">
-                  <i class="fas fa-tags no-fill"></i> @lang('theme.coupons')
-                </span>
-              </a>
-            </li>
-            <li>|</li>
-            <li>
-              <a href="{{ route('account', 'disputes') }}">
-                <span class="v">{{ $dashboard->disputes_count }}</span>
-                <span class="d">
-                  <i class="fas fa-envelope no-fill"></i> @lang('theme.disputes')
-                </span>
-              </a>
-            </li>
-          </ul>
-        </div><!-- .my-info-details -->
-      </div><!-- .my-info-container -->
-    </div><!-- .col-sm-12 -->
-  </div><!-- .row -->
-
-  <div class="row mb-5">
-    <div class="col-md-6 pr-1">
-      <div class="table-responsive">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>{{ trans('theme.date') }}</th>
-              <th>
-                {{ trans('theme.orders') }}
-                <i class="fas fa-question-circle pull-right no-fill" data-toggle="tooltip" data-title="{{ trans('theme.item_count') }}"></i>
-              </th>
-              <th>{{ trans('theme.amount') }}</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            @foreach ($dashboard->orders as $order)
+    <div class="col-lg-6 mb-3">
+      <div class="sf-panel">
+        <div class="sf-panel__head">
+          <span>@lang('theme.orders')</span>
+          <a href="{{ route('account', 'orders') }}" class="small">@lang('theme.nav.my_orders') &rarr;</a>
+        </div>
+        <div class="sf-panel__body table-responsive">
+          <table class="table table-hover">
+            <thead>
               <tr>
-                <td>{!! $order->created_at->format('M j') !!}</td>
-                <td>
-                  <img src="{{ get_storage_file_url(optional($order->shop->logoImage)->path, 'mini') }}" class="mr-2" alt="{{ $order->shop->name }}" data-toggle="tooltip" data-title="{{ $order->shop->name }}">
-
-                  <a href="{{ route('order.detail', $order) }}">
-                    {!! $order->order_number !!}
-                  </a>
-
-                  <small class="pl-2">{!! $order->orderStatus() !!}</small>
-                  <span class="label label-outline pull-right"> {{ $order->item_count }} </span>
-                </td>
-
-                <td>{!! get_formated_currency($order->grand_total, 2, $order->currency_id) !!}</td>
+                <th>{{ trans('theme.date') }}</th>
+                <th>{{ trans('theme.orders') }}</th>
+                <th>{{ trans('theme.amount') }}</th>
               </tr>
-            @endforeach
-          </tbody>
-        </table>
-      </div> <!-- /.table-responsive -->
-    </div> <!-- .col-sm-6 -->
-
-    <div class="col-md-6 pl-1">
-      <div class="table-responsive">
-        <table class="table table-bordered radius">
-          <thead>
-            <tr>
-              <th>{{ trans('theme.wishlist') }}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach ($dashboard->wishlists as $wish)
-              @if ($wish->inventory)
+            </thead>
+            <tbody>
+              @forelse ($dashboard->orders as $order)
                 <tr>
+                  <td>{{ $order->created_at->format('M j') }}</td>
                   <td>
-                    <img src="{{ get_product_img_src($wish->inventory, 'tiny_thumb') }}" alt="{{ $wish->inventory->title }}" title="{{ $wish->inventory->title }}" />
-
-                    <a class="product-link" href="{{ route('show.product', $wish->inventory->slug) }}">{!! \Illuminate\Support\Str::limit($wish->inventory->title, 35) !!}</a>
+                    <a href="{{ route('order.detail', $order) }}">{{ $order->order_number }}</a>
+                    <small class="text-muted d-block">{!! $order->orderStatus() !!}</small>
                   </td>
-                  <td>
-                    <a class="btn btn-primary" href="{{ route('direct.checkout', $wish->inventory->slug) }}">
-                      <i class="fas fa-rocket no-fill"></i> @lang('theme.button.buy_now')
-                    </a>
-                  </td>
+                  <td>{!! get_formated_currency($order->grand_total, 2, $order->currency_id) !!}</td>
                 </tr>
-              @elseif($wish->product)
+              @empty
                 <tr>
-                  <td>
-                    <img src="{{ get_storage_file_url(optional($wish->product->featureImage)->path, 'tiny') }}" alt="{{ $wish->product->name }}" title="{{ $wish->product->name }}" />
-
-                    <a class="product-link" href="{{ route('show.offers', $wish->product->slug) }}" class="btn btn-sm btn-link">{{ \Illuminate\Support\Str::limit($wish->product->name, 35) }}</a>
-                  </td>
-
-                  <td>
-                    <a class="btn btn-primary btn-xs" href="{{ route('show.offers', $wish->product->slug) }}">
-                      @lang('theme.view_more_offers', ['count' => $wish->product->inventories_count])
-                    </a>
-                  </td>
+                  <td colspan="3" class="text-center text-muted py-4">@lang('theme.no_order_history')</td>
                 </tr>
-              @endif
-            @endforeach
-          </tbody>
-        </table>
-      </div> <!-- /.table-responsive -->
-    </div> <!-- .col-sm-6 -->
-  </div><!-- .row -->
+              @endforelse
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-  @if(is_incevio_package_loaded('auction') && $dashboard->bids_count > 0)
+    <div class="col-lg-6 mb-3">
+      <div class="sf-panel">
+        <div class="sf-panel__head">
+          <span>@lang('theme.wishlist')</span>
+          <a href="{{ route('account', 'wishlist') }}" class="small">@lang('theme.nav.my_wishlist') &rarr;</a>
+        </div>
+        <div class="sf-panel__body table-responsive">
+          <table class="table table-hover">
+            <tbody>
+              @forelse ($dashboard->wishlists as $wish)
+                @if ($wish->inventory)
+                  <tr>
+                    <td width="50">
+                      <img src="{{ get_product_img_src($wish->inventory, 'tiny_thumb') }}" alt="" width="40" height="40" style="object-fit:cover;border-radius:6px;">
+                    </td>
+                    <td>
+                      <a href="{{ route('show.product', $wish->inventory->slug) }}">{{ Str::limit($wish->inventory->title, 40) }}</a>
+                    </td>
+                    <td class="text-right">
+                      <a class="btn btn-xs sf-btn-primary" href="{{ route('direct.checkout', $wish->inventory->slug) }}">
+                        @lang('theme.button.buy_now')
+                      </a>
+                    </td>
+                  </tr>
+                @elseif ($wish->product)
+                  <tr>
+                    <td width="50">
+                      <img src="{{ get_storage_file_url(optional($wish->product->featureImage)->path, 'tiny') }}" alt="" width="40" height="40" style="object-fit:cover;border-radius:6px;">
+                    </td>
+                    <td>
+                      <a href="{{ route('show.offers', $wish->product->slug) }}">{{ Str::limit($wish->product->name, 40) }}</a>
+                    </td>
+                    <td class="text-right">
+                      <a class="btn btn-xs btn-default" href="{{ route('show.offers', $wish->product->slug) }}">
+                        @lang('theme.view_more_offers', ['count' => $wish->product->inventories_count ?? 0])
+                      </a>
+                    </td>
+                  </tr>
+                @endif
+              @empty
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-4">@lang('theme.empty_wishlist')</td>
+                </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (is_incevio_package_loaded('auction') && $dashboard->bids_count > 0)
     @include('auction::frontend._dashboard_bid_table')
   @endif
 
   @if (is_incevio_package_loaded('buyerGroup'))
     @include('buyerGroup::charts.customerCharts')
-
     @include('buyerGroup::partials._customer_report_section')
   @endif
 </div>

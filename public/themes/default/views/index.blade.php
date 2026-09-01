@@ -1,7 +1,10 @@
 @extends('theme::layouts.main')
 
 @section('content')
-  {{-- 1. Hero slider --}}
+  {{-- Location picker hero — primary address selector on homepage --}}
+  @include('theme::sections.home_location_hero')
+
+  {{-- Hero slider --}}
   @if (count($sliders) > 0 || config('system_settings.show_empty_homepage_slider'))
     @desktop
       @include('theme::sections.slider')

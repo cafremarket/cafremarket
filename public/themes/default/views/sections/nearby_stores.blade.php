@@ -1,28 +1,20 @@
 @if (isset($nearbyShops) && $nearbyShops->count())
   <section class="nearby-stores-section pb-5">
     <div class="container">
-      <div class="sell-header mb-3">
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
-          <div>
-            <div class="sell-header-title">
-              <h2 class="mb-1">
-                {{ trans('theme.stores_near_you') }}
-                <i class="fal fa-store"></i>
-              </h2>
-              @if (session('buyer_address_text'))
-                <p class="text-muted mb-0">
-                  <i class="fal fa-map-marker-alt"></i>
-                  {{ Str::limit(session('buyer_address_text'), 60) }}
-                  <a href="javascript:void(0)" data-toggle="modal" data-target="#locationModal" class="ml-2">{{ trans('theme.change') }}</a>
-                </p>
-              @endif
-            </div>
-            <div class="header-line"><span></span></div>
-          </div>
-          <a href="{{ route('shops', ['lat' => session('buyer_latitude'), 'lng' => session('buyer_longitude')]) }}" class="btn btn-outline-primary btn-round btn-sm mt-2">
-            {{ trans('theme.view_all_stores') }}
-          </a>
+      <div class="d-flex justify-content-between align-items-start flex-wrap mb-3">
+        <div class="home-section-heading mb-0">
+          <h2>{{ trans('theme.stores_near_you') }} <i class="fal fa-store"></i></h2>
+          @if (session('buyer_address_text'))
+            <p>
+              <i class="fal fa-map-marker-alt"></i>
+              {{ Str::limit(session('buyer_address_text'), 60) }}
+            </p>
+          @endif
+          <div class="accent-line"></div>
         </div>
+        <a href="{{ route('shops', ['lat' => session('buyer_latitude'), 'lng' => session('buyer_longitude')]) }}" class="btn btn-outline-primary btn-round btn-sm mt-2">
+          {{ trans('theme.view_all_stores') }}
+        </a>
       </div>
 
       <div class="row">

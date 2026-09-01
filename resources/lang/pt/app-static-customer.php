@@ -168,8 +168,8 @@ return [
    "second_step" => "Segundo passo",
    "dispute_second_step" => "Você pode escolher entre duas opções:\n\nApenas reembolso – significa que você não recebeu o item e está solicitando um reembolso total, ou que recebeu o item e deseja um reembolso parcial (sem precisar devolver o item), OU\n\nDevolver produtos – significa que você deseja devolver o item e solicitar um reembolso total.",
    "third_step" => "Terceiro passo",
-   "dispute_third_step" => "Se você e o vendedor não chegarem a um acordo, você pode apelar da disputa para revisão. Nesse ponto, nós interveremos para ajudar."
-      "empty_inbox" => "Caixa de entrada vazia!",
+   "dispute_third_step" => "Se você e o vendedor não chegarem a um acordo, você pode apelar da disputa para revisão. Nesse ponto, nós interveremos para ajudar.",
+   "empty_inbox" => "Caixa de entrada vazia!",
    "order_chat" => "Chat do pedido",
    "ordered_at" => "Pedido realizado em",
    "confirm_received" => "Confirmar recebimento",

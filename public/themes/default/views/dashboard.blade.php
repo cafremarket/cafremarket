@@ -1,46 +1,33 @@
 @extends('theme::layouts.main')
 
 @section('content')
-  <!-- HEADER SECTION -->
   <div class="container">
     <header class="page-header">
-      <div class="row">
-        <div class="col-md-12">
-          <ol class="breadcrumb nav-breadcrumb">
-            @include('theme::headers.lists.home')
-            @include('theme::headers.lists.account')
-            <li class="active">@lang('theme.' . $tab)</li>
-          </ol>
-        </div>
-      </div>
+      <ol class="breadcrumb nav-breadcrumb">
+        @include('theme::headers.lists.home')
+        @include('theme::headers.lists.account')
+        <li class="active">@lang('theme.' . $tab)</li>
+      </ol>
     </header>
   </div>
 
-  {{-- Notices --}}
   <div class="container">
     @if (!Auth::guard('customer')->user()->isVerified())
       <div class="alert alert-info alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-
         <strong><i class="icon fas fa-info-circle"></i> {{ trans('theme.notice') }}</strong>
-
         {{ trans('messages.email_verification_notice') }}
         <a href="{{ route('customer.verify') }}"> {{ trans('auth.resend_verification_link') }}</a>
       </div>
     @endif
   </div>
 
-  <!-- CONTENT SECTION -->
-  <section class="account-section">
-    <div class="container mt-3 mb-4 md-100">
-      <div class="row">
-        <div class="col-md-2 pr-0">
+  <section class="account-section pb-5">
+    <div class="container">
+      <div class="sf-account-layout">
+        @include('theme::nav.account_sidebar')
 
-          @include('theme::nav.account_sidebar')
-
-        </div><!-- /.col-md-2 -->
-
-        <div class="col-md-10">
+        <div class="sf-account-content">
           @if (isset($content))
             {!! $content !!}
           @else
@@ -52,12 +39,11 @@
               @include('theme::contents.' . $tab)
             @endif
           @endif
-        </div><!-- /.col-md-10 -->
-      </div><!-- /.row -->
-    </div><!-- /.container -->
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- BROWSING ITEMS -->
   @include('theme::sections.recent_views')
 @endsection
 

@@ -28,10 +28,11 @@ class LoginController extends SocialiteBaseController
 
     /**
      * Where to redirect users after login.
-     *
-     * @var string
      */
-    protected $redirectTo = 'dashboard';
+    protected function redirectTo(): string
+    {
+        return route('account', 'dashboard', false);
+    }
 
     /**
      * Create a new controller instance.

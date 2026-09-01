@@ -4,6 +4,8 @@ use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\WishlistController;
 use Illuminate\Support\Facades\Route;
 
+Route::redirect('dashboard', '/my/dashboard');
+
 Route::middleware('xssSanitizer')->group(function () {
     Route::get('my/{tab?}', [
         AccountController::class, 'index',
