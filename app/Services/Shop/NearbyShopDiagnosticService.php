@@ -112,6 +112,7 @@ class NearbyShopDiagnosticService
             'within_shop_radius' => $withinShopRadius,
             'shows_in_nearby' => $showsInNearby,
             'issues' => $issues,
+            'warnings' => $warnings,
         ];
     }
 
@@ -123,6 +124,7 @@ class NearbyShopDiagnosticService
         float $shopRadius
     ): array {
         $issues = [];
+        $warnings = [];
 
         if (! $shop->active) {
             $issues[] = 'Shop is inactive (active = 0)';
@@ -133,7 +135,11 @@ class NearbyShopDiagnosticService
         }
 
         if ((int) $shop->active_inventories_count === 0) {
-            $issues[] = 'No active products/inventory listed';
+            if (config('hyperlocal.require_inventory_for_nearby', false)) {
+                $issues[] = 'No active products/inventory listed';
+            } else {
+                $warnings[] = 'No active products yet (store can still appear in nearby)';
+            }
         }
 
         if ($shop->config && $shop->config->maintenance_mode) {

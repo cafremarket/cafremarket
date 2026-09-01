@@ -10,4 +10,6 @@ return [
     'rider_accept_timeout_min' => (int) env('HYPERLOCAL_RIDER_ACCEPT_TIMEOUT_MIN', 5),
     'google_maps_api_key' => env('GOOGLE_PLACE_KEY'),
     'require_store_location_for_verification' => env('HYPERLOCAL_REQUIRE_STORE_LOCATION', true),
+    // When false, nearby store lists include shops even if they have no active products yet.
+    'require_inventory_for_nearby' => env('HYPERLOCAL_REQUIRE_INVENTORY_FOR_NEARBY', false),
 ];

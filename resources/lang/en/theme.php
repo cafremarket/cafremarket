@@ -875,6 +875,7 @@ return [
     'stores_near_you' => 'Stores near you',
     'view_all_stores' => 'View all stores',
     'no_stores_nearby' => 'No stores deliver to this location yet. Try a different address.',
+    'no_products_listed_yet' => 'No products listed yet',
     'change_location' => 'Change location',
     'change' => 'Change',
     'address_step_location' => 'Pick location',

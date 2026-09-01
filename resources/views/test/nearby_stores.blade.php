@@ -80,6 +80,8 @@
     .badge-warn { background: var(--warn-bg); color: var(--warn); }
     .issues { margin: 0; padding-left: 18px; color: var(--bad); }
     .issues li { margin-bottom: 4px; }
+    .warnings { margin: 8px 0 0; padding-left: 18px; color: var(--warn); }
+    .warnings li { margin-bottom: 4px; }
     .toolbar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
     .note { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 12px 14px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; }
     @media (max-width: 900px) {
@@ -203,7 +205,14 @@
                   @endforeach
                 </ul>
               @else
-                <span style="color:var(--ok)">No issues</span>
+                <span style="color:var(--ok)">No blocking issues</span>
+              @endif
+              @if (! empty($shop['warnings']))
+                <ul class="warnings">
+                  @foreach ($shop['warnings'] as $warning)
+                    <li>{{ $warning }}</li>
+                  @endforeach
+                </ul>
               @endif
             </td>
           </tr>

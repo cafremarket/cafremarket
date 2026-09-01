@@ -32,9 +32,16 @@ class NearbyShopService
             ->whereNotNull('addresses.longitude')
             ->approved()
             ->active()
-            ->whereHas('inventories', function ($q) {
-                $q->where('active', 1)->where('available_from', '<=', now());
+            ->when(config('hyperlocal.require_inventory_for_nearby', false), function ($query) {
+                $query->whereHas('inventories', function ($q) {
+                    $q->where('active', 1)->where('available_from', '<=', now());
+                });
             })
+            ->withCount([
+                'inventories as active_inventories_count' => function ($q) {
+                    $q->where('active', 1)->where('available_from', '<=', now());
+                },
+            ])
             ->havingRaw('distance_km <= ?', [$radiusKm])
             ->with(['logoImage', 'config', 'owner:id,name', 'avgFeedback:rating,count,feedbackable_id,feedbackable_type'])
             ->orderBy('distance_km')

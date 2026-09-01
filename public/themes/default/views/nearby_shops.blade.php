@@ -45,6 +45,10 @@
                 <p class="text-muted mb-2"><i class="fa fa-map-marker"></i> {{ number_format($distances[$shop->id], 1) }} km</p>
               @endif
 
+              @if (isset($shop->active_inventories_count) && (int) $shop->active_inventories_count === 0)
+                <p class="text-warning small mb-2">{{ trans('theme.no_products_listed_yet') }}</p>
+              @endif
+
               @include('theme::layouts.ratings', ['ratings' => $shop->ratings, 'count' => $shop->ratings_count])
 
               <a href="{{ route('show.store', $shop->slug) }}" class="btn btn-default btn-rounded mt-3 waves-effect w-md waves-light">
