@@ -27,7 +27,12 @@
   <section>
     <div class="container mb-4 sm-100">
       @if ($shops->isEmpty())
-        <div class="alert alert-info">{{ trans('app.no_nearby_shops') }}</div>
+        @include('theme::partials._no_stores_message', [
+          'title' => trans('theme.no_store_found'),
+          'message' => trans('theme.no_stores_nearby'),
+          'showLocationButton' => true,
+          'locationButtonText' => trans('theme.change_location'),
+        ])
       @endif
 
       <div class="row thumb-lists justify-content-center align-self-center">
@@ -42,7 +47,7 @@
               </a>
 
               @if (isset($distances[$shop->id]))
-                <p class="text-muted mb-2"><i class="fa fa-map-marker"></i> {{ number_format($distances[$shop->id], 1) }} km</p>
+                <p class="text-muted mb-2"><i class="fa fa-map-marker"></i> {{ format_distance_km($distances[$shop->id]) }}</p>
               @endif
 
               @if (isset($shop->active_inventories_count) && (int) $shop->active_inventories_count === 0)

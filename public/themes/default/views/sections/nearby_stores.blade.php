@@ -31,7 +31,7 @@
               @if (isset($distances[$shop->id]))
                 <p class="text-muted mb-2">
                   <i class="fal fa-map-marker-alt"></i>
-                  {{ number_format($distances[$shop->id], 1) }} km
+                  {{ format_distance_km($distances[$shop->id]) }}
                 </p>
               @endif
 
@@ -50,16 +50,35 @@
       </div>
     </div>
   </section>
-@elseif (session('buyer_latitude'))
+@else
   <section class="nearby-stores-section pb-5">
     <div class="container">
-      <div class="alert alert-warning text-center py-4">
-        <i class="fal fa-store-slash fa-2x mb-2 d-block"></i>
-        <p class="mb-2">{{ trans('theme.no_stores_nearby') }}</p>
-        <button type="button" class="btn btn-outline-primary btn-round" data-toggle="modal" data-target="#locationModal">
-          {{ trans('theme.change_location') }}
-        </button>
+      <div class="home-section-heading mb-3">
+        <h2>{{ trans('theme.stores_near_you') }} <i class="fal fa-store"></i></h2>
+        @if (session('buyer_address_text'))
+          <p>
+            <i class="fal fa-map-marker-alt"></i>
+            {{ Str::limit(session('buyer_address_text'), 60) }}
+          </p>
+        @endif
+        <div class="accent-line"></div>
       </div>
+
+      @if (session('buyer_latitude') && session('buyer_longitude'))
+        @include('theme::partials._no_stores_message', [
+          'title' => trans('theme.no_store_found'),
+          'message' => trans('theme.no_stores_nearby'),
+          'showLocationButton' => true,
+          'locationButtonText' => trans('theme.change_location'),
+        ])
+      @else
+        @include('theme::partials._no_stores_message', [
+          'title' => trans('theme.no_store_found'),
+          'message' => trans('theme.set_location_to_see_products'),
+          'showLocationButton' => true,
+          'locationButtonText' => trans('theme.set_delivery_location'),
+        ])
+      @endif
     </div>
   </section>
 @endif

@@ -1548,6 +1548,26 @@ if (! function_exists('get_formated_decimal')) {
     }
 }
 
+if (! function_exists('format_distance_km')) {
+    /**
+     * Format a distance in kilometres for display (meters when very close).
+     */
+    function format_distance_km($km): string
+    {
+        $km = (float) $km;
+
+        if ($km < 0.01) {
+            if ($km <= 0) {
+                return trans('theme.distance_at_location');
+            }
+
+            return max(1, (int) round($km * 1000)).' m';
+        }
+
+        return number_format($km, 2).' km';
+    }
+}
+
 if (! function_exists('get_formated_price_value')) {
     function get_formated_price_value($value = 0)
     {

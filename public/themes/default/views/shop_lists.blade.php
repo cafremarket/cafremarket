@@ -29,6 +29,13 @@
   <!-- CONTENT SECTION -->
   <section>
     <div class="container mb-4 sm-100">
+      @if ($shops->isEmpty())
+        @include('theme::partials._no_stores_message', [
+          'title' => trans('theme.no_store_found'),
+          'message' => trans('theme.no_stores_nearby'),
+        ])
+      @endif
+
       <div class="row thumb-lists justify-content-center align-self-center">
         @foreach ($shops as $shop)
           <div class="col-lg-3 col-sm-6 p-1">

@@ -19,17 +19,7 @@ class NearbyShopService
     {
         $radiusKm = $radiusKm ?? $this->defaultSearchRadius();
 
-        $distanceSql = $this->distance->haversineSql('addresses.latitude', 'addresses.longitude', $latitude, $longitude);
-
         $shops = Shop::query()
-            ->select('shops.*')
-            ->selectRaw("{$distanceSql} AS distance_km")
-            ->join('addresses', function ($join) {
-                $join->on('addresses.addressable_id', '=', 'shops.id')
-                    ->where('addresses.addressable_type', '=', Shop::class);
-            })
-            ->whereNotNull('addresses.latitude')
-            ->whereNotNull('addresses.longitude')
             ->approved()
             ->active()
             ->when(config('hyperlocal.require_inventory_for_nearby', false), function ($query) {
@@ -42,27 +32,46 @@ class NearbyShopService
                     $q->where('active', 1)->where('available_from', '<=', now());
                 },
             ])
-            ->havingRaw('distance_km <= ?', [$radiusKm])
-            ->with(['logoImage', 'config', 'owner:id,name', 'avgFeedback:rating,count,feedbackable_id,feedbackable_type'])
-            ->orderBy('distance_km')
-            ->get()
-            ->filter(function ($shop) use ($radiusKm) {
+            ->with([
+                'logoImage',
+                'config',
+                'owner:id,name',
+                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'primaryAddress',
+                'addresses',
+            ])
+            ->get();
+
+        return $shops
+            ->map(function ($shop) use ($latitude, $longitude, $radiusKm) {
+                $address = $shop->storeAddress();
+
+                if (! $address || ! $address->latitude || ! $address->longitude) {
+                    return null;
+                }
+
+                $distanceKm = $this->distance->distanceKm(
+                    $latitude,
+                    $longitude,
+                    (float) $address->latitude,
+                    (float) $address->longitude
+                );
+
                 $shopRadius = (float) ($shop->service_radius_km ?: config('hyperlocal.default_shop_service_radius_km', 5));
-                $distance = (float) ($shop->distance_km ?? 999);
 
-                return $distance <= min($shopRadius, $radiusKm);
+                if ($distanceKm > $radiusKm || $distanceKm > $shopRadius) {
+                    return null;
+                }
+
+                return [
+                    'shop' => $shop,
+                    'distance_km' => $distanceKm,
+                    'deliverable' => true,
+                ];
             })
+            ->filter()
+            ->sortBy('distance_km')
             ->values();
-
-        return $shops->map(function ($shop) use ($latitude, $longitude) {
-            $deliverable = $this->isShopDeliverableTo($shop, $latitude, $longitude);
-
-            return [
-                'shop' => $shop,
-                'distance_km' => round((float) $shop->distance_km, 2),
-                'deliverable' => $deliverable,
-            ];
-        })->filter(fn ($row) => $row['deliverable']);
     }
 
     /**

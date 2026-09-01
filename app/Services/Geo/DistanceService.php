@@ -21,7 +21,7 @@ class DistanceService
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
-        return round(self::EARTH_RADIUS_KM * $c, 2);
+        return round(self::EARTH_RADIUS_KM * $c, 4);
     }
 
     public function withinRadius(float $lat1, float $lng1, float $lat2, float $lng2, float $radiusKm): bool

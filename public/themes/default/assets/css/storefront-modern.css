@@ -906,3 +906,33 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
     text-align: center;
   }
 }
+
+/* ── Empty stores state ─────────────────────────────────────────────── */
+.sf-empty-stores {
+  background: #fff;
+  border: 1px dashed #e0e0e0;
+  border-radius: 14px;
+  padding: 40px 24px;
+  margin: 8px 0 24px;
+}
+
+.sf-empty-stores__icon {
+  font-size: 3rem;
+  color: var(--primary-light, #ff944d);
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.sf-empty-stores__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-text, #333e48);
+  margin: 0 0 8px;
+}
+
+.sf-empty-stores__text {
+  color: var(--secondary-text, #868e8e);
+  font-size: 0.95rem;
+  max-width: 420px;
+  margin: 0 auto 8px;
+}
