@@ -23,6 +23,7 @@
   var wizardId = @json($wizardId ?? 'addr-wizard');
   var reverseGeocodeUrl = @json(route('address.reverse'));
   var searchAddressUrl = @json(route('address.search'));
+  var statesUrl = @json(route('ajax.getCountryStates'));
   var csrfToken = @json(csrf_token());
   var hasGoogleMaps = {{ $googleMapsKey ? 'true' : 'false' }};
   var deferInit = {{ ! empty($deferInit) ? 'true' : 'false' }};
@@ -35,6 +36,7 @@
   var lookupFailedLabel = @json(trans('theme.address_lookup_failed'));
   var geoUnsupportedLabel = @json(trans('theme.geolocation_not_supported'));
   var geoDeniedLabel = @json(trans('theme.geolocation_denied'));
+  var statePlaceholder = @json(trans('theme.placeholder.state'));
   var hiddenClass = @json($hiddenClass ?? 'd-none');
   var previewErrorClass = hiddenClass === 'is-hidden' ? 'is-error' : 'alert-danger';
   var previewOkClass = hiddenClass === 'is-hidden' ? '' : 'alert-light';
@@ -203,11 +205,11 @@
   }
 
   function fillDetailsFromGeocode(data) {
-    if (!data || !data.details) return;
+    if (!data || !data.details) return Promise.resolve();
 
     var d = data.details;
     var form = getRoot().closest('form');
-    if (!form) return;
+    if (!form) return Promise.resolve();
 
     function setField(name, value) {
       var el = form.querySelector('[name="' + name + '"]');
@@ -221,19 +223,13 @@
     setField('zip_code', d.zip_code);
 
     var countrySelect = form.querySelector('.addr-wizard-country');
+    var selectedCountryId = countrySelect ? countrySelect.value : null;
+
     if (countrySelect && d.country) {
       Array.prototype.forEach.call(countrySelect.options, function(opt) {
-        if (opt.text.trim().toLowerCase() === d.country.trim().toLowerCase()) {
+        if (opt.value && opt.text.trim().toLowerCase() === d.country.trim().toLowerCase()) {
           countrySelect.value = opt.value;
-        }
-      });
-    }
-
-    var stateSelect = form.querySelector('.addr-wizard-state');
-    if (stateSelect && d.state) {
-      Array.prototype.forEach.call(stateSelect.options, function(opt) {
-        if (opt.text.trim().toLowerCase() === d.state.trim().toLowerCase()) {
-          stateSelect.value = opt.value;
+          selectedCountryId = opt.value;
         }
       });
     }
@@ -242,6 +238,66 @@
     if (selectedText) {
       selectedText.textContent = resolvedAddress || d.formatted_address || '';
     }
+
+    if (selectedCountryId) {
+      return loadStatesForCountry(selectedCountryId, null, d.state);
+    }
+
+    return Promise.resolve();
+  }
+
+  function populateStateSelect(states, selectedStateId, selectedStateName) {
+    var stateSelect = q('.addr-wizard-state');
+    if (!stateSelect) return;
+
+    var html = '<option value="">' + statePlaceholder + '</option>';
+    var stateIds = states && typeof states === 'object' ? Object.keys(states) : [];
+
+    stateIds.forEach(function(id) {
+      html += '<option value="' + id + '">' + states[id] + '</option>';
+    });
+
+    stateSelect.innerHTML = html;
+
+    if (stateIds.length > 0) {
+      stateSelect.setAttribute('required', 'required');
+    } else {
+      stateSelect.removeAttribute('required');
+    }
+
+    if (selectedStateId) {
+      stateSelect.value = String(selectedStateId);
+    } else if (selectedStateName) {
+      Array.prototype.forEach.call(stateSelect.options, function(opt) {
+        if (opt.value && opt.text.trim().toLowerCase() === String(selectedStateName).trim().toLowerCase()) {
+          stateSelect.value = opt.value;
+        }
+      });
+    }
+  }
+
+  function loadStatesForCountry(countryId, selectedStateId, selectedStateName) {
+    var stateSelect = q('.addr-wizard-state');
+    if (!stateSelect) return Promise.resolve();
+
+    if (!countryId) {
+      populateStateSelect({}, null, null);
+      return Promise.resolve();
+    }
+
+    return fetch(statesUrl + '?id=' + encodeURIComponent(countryId), {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    })
+    .then(function(r) { return r.ok ? r.json() : {}; })
+    .then(function(states) {
+      populateStateSelect(states || {}, selectedStateId, selectedStateName);
+    })
+    .catch(function() {
+      populateStateSelect({}, null, null);
+    });
   }
 
   function searchAddresses(query) {
@@ -403,12 +459,13 @@
       nextBtn.addEventListener('click', function() {
         var coords = getLatLng();
         fetchAddressDetails(coords.lat, coords.lng).then(function(data) {
-          fillDetailsFromGeocode(data);
-          var selectedText = q('.addr-wizard-selected-text');
-          if (selectedText) {
-            selectedText.textContent = resolvedAddress || (data && data.address_text) || '';
-          }
-          setStep(2);
+          return fillDetailsFromGeocode(data).then(function() {
+            var selectedText = q('.addr-wizard-selected-text');
+            if (selectedText) {
+              selectedText.textContent = resolvedAddress || (data && data.address_text) || '';
+            }
+            setStep(2);
+          });
         });
       });
     }
@@ -435,6 +492,13 @@
         el.dataset.userEdited = '1';
       });
     });
+
+    var countrySelect = q('.addr-wizard-country');
+    if (countrySelect) {
+      countrySelect.addEventListener('change', function() {
+        loadStatesForCountry(countrySelect.value, null, null);
+      });
+    }
   }
 
   window.initAddressWizard = function(id) {
