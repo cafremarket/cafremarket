@@ -159,6 +159,10 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
     Route::get('shop/{slug}/reviews', [
         ShopController::class, 'reviews',
     ])->name('shop.reviews');
+
+    Route::get('test/nearby-stores', [
+        \App\Http\Controllers\Storefront\NearbyShopDiagnosticController::class, 'index',
+    ])->name('test.nearby_stores');
 });
 
 Route::get('switchToMerchant', [
