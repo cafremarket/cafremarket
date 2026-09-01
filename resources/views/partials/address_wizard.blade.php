@@ -1,10 +1,12 @@
 @php
   $wizardId = $wizardId ?? 'addr-wizard';
   $address = $address ?? null;
+  $iconPrefix = $iconPrefix ?? 'fal';
   $initialLat = old('latitude', optional($address)->latitude ?: session('buyer_latitude'));
   $initialLng = old('longitude', optional($address)->longitude ?: session('buyer_longitude'));
-  $startAtStep = isset($address) && $address->latitude && $address->longitude ? 2 : 1;
+  $startAtStep = (old('latitude') && old('longitude')) || (isset($address) && $address->latitude && $address->longitude) ? 2 : 1;
   $initialLocationText = optional($address)->toString(true) ?: session('buyer_address_text');
+  $googleMapsKey = google_maps_api_key();
 @endphp
 
 <div class="address-wizard" id="{{ $wizardId }}" data-wizard-id="{{ $wizardId }}">
@@ -31,7 +33,7 @@
     <div class="location-map-wrap">
       <div class="location-map-canvas addr-wizard-map"></div>
       <button type="button" class="location-map-current-btn addr-wizard-map-gps" title="{{ trans('theme.map_current_location') }}" aria-label="{{ trans('theme.map_current_location') }}">
-        <i class="fal fa-crosshairs"></i>
+        <i class="{{ $iconPrefix }} fa-crosshairs"></i>
       </button>
       <p class="text-muted small mt-2 mb-0">{{ trans('theme.drag_map_to_adjust_pin') }}</p>
     </div>
@@ -41,11 +43,11 @@
     </div>
 
     <button type="button" class="btn btn-outline-primary btn-block btn-lg btn-round addr-wizard-use-gps">
-      <i class="fal fa-crosshairs"></i> {{ trans('theme.use_current_location') }}
+      <i class="{{ $iconPrefix }} fa-crosshairs"></i> {{ trans('theme.use_current_location') }}
     </button>
 
     <div class="alert alert-light mt-3 addr-wizard-preview d-none">
-      <i class="fal fa-check-circle text-success"></i>
+      <i class="{{ $iconPrefix }} fa-check-circle text-success"></i>
       <span class="addr-wizard-preview-text"></span>
     </div>
 
@@ -59,7 +61,7 @@
     <p class="text-muted text-center mb-3">{{ trans('theme.address_step_details_help') }}</p>
 
     <div class="alert alert-light addr-wizard-selected-location mb-3">
-      <i class="fal fa-map-marker-alt text-primary"></i>
+      <i class="{{ $iconPrefix }} fa-map-marker text-primary"></i>
       <span class="addr-wizard-selected-text">{{ $initialLocationText }}</span>
       <button type="button" class="btn btn-link btn-sm float-right p-0 addr-wizard-back">{{ trans('theme.change') }}</button>
     </div>
@@ -72,7 +74,7 @@
     @endif
 
     <div class="form-group">
-      {!! Form::text('address_title', optional($address)->address_title, ['class' => 'form-control flat', 'placeholder' => trans('theme.placeholder.full_name') . '*', 'required']) !!}
+      {!! Form::text('address_title', old('address_title', optional($address)->address_title ?: ($defaultAddressTitle ?? '')), ['class' => 'form-control flat', 'placeholder' => trans('theme.placeholder.full_name') . '*', 'required']) !!}
       <div class="help-block with-errors"></div>
     </div>
 
@@ -122,7 +124,7 @@
     </div>
 
     <div class="form-group">
-      {!! Form::text('phone', optional($address)->phone, ['class' => 'form-control flat', 'placeholder' => trans('theme.placeholder.phone_number') . '*', 'required']) !!}
+      {!! Form::text('phone', old('phone', optional($address)->phone ?: ($defaultPhone ?? '')), ['class' => 'form-control flat', 'placeholder' => trans('theme.placeholder.phone_number') . '*', 'required']) !!}
       <div class="help-block with-errors"></div>
     </div>
 
@@ -130,7 +132,7 @@
     <input type="hidden" name="longitude" class="addr-wizard-lng" value="{{ $initialLng }}">
 
     <button type="submit" class="btn btn-primary btn-block btn-lg btn-round mt-3">
-      {{ trans('theme.button.save_address') }}
+      {{ $submitLabel ?? trans('theme.button.save_address') }}
     </button>
   </div>
 </div>
@@ -238,4 +240,6 @@
   'hasExistingCoords' => $initialLat && $initialLng ? 'true' : 'false',
   'startAtStep' => $startAtStep,
   'initialLocationText' => $initialLocationText ?? '',
+  'googleMapsKey' => $googleMapsKey,
+  'deferInit' => ! empty($deferInit),
 ])

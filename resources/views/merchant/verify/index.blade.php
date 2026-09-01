@@ -122,7 +122,7 @@
 
     <div class="mp-verify-tabs__content">
       @include('merchant.verify.partials.tab_person', compact('config', 'shop', 'canSubmit', 'hasPersonDocs', 'personAttachments'))
-      @include('merchant.verify.partials.tab_store', compact('config', 'shop', 'canSubmit', 'hasLocation', 'hasStoreDocs', 'storeAddress', 'storeAttachments'))
+      @include('merchant.verify.partials.tab_store', compact('config', 'shop', 'canSubmit', 'hasLocation', 'hasStoreDocs', 'storeAddress', 'storeAttachments', 'countries', 'states', 'shopPhone'))
       @include('merchant.verify.partials.tab_contact', compact('config', 'shop', 'canSubmit', 'hasPhone', 'hasEmail', 'shopPhone', 'shopEmail'))
     </div>
   </div>
@@ -213,6 +213,17 @@
         panel.hidden = panel.id !== 'mp-tab-' + key;
       });
 
+      if (key === 'store') {
+        setTimeout(function() {
+          if (typeof window.initAddressWizard === 'function') {
+            window.initAddressWizard('merchant-store-wizard');
+          }
+          if (typeof window.refreshAddressWizardMap === 'function') {
+            window.refreshAddressWizardMap('merchant-store-wizard');
+          }
+        }, 120);
+      }
+
       if (window.history && window.history.replaceState) {
         var url = new URL(window.location.href);
         url.searchParams.set('tab', key);
@@ -289,31 +300,6 @@
       }
     });
   });
-
-  var noMapBtn = document.getElementById('verify-use-current-location');
-  if (noMapBtn) {
-    noMapBtn.addEventListener('click', function() {
-      if (typeof window.useAdminMapCurrentLocation === 'function') {
-        window.useAdminMapCurrentLocation();
-        return;
-      }
-
-      if (!navigator.geolocation) {
-        alert(@json(trans('theme.geolocation_not_supported')));
-        return;
-      }
-
-      noMapBtn.disabled = true;
-      navigator.geolocation.getCurrentPosition(function(pos) {
-        document.getElementById('latitude').value = pos.coords.latitude;
-        document.getElementById('longitude').value = pos.coords.longitude;
-        noMapBtn.disabled = false;
-      }, function() {
-        noMapBtn.disabled = false;
-        alert(@json(trans('theme.geolocation_denied')));
-      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-    });
-  }
 })();
 </script>
 @endsection

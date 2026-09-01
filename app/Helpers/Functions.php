@@ -881,6 +881,15 @@ if (! function_exists('default_brand_icon_url')) {
     }
 }
 
+if (! function_exists('google_maps_api_key')) {
+    function google_maps_api_key(): ?string
+    {
+        return config('services.google.place_api_key')
+            ?: config('hyperlocal.google_maps_api_key')
+            ?: null;
+    }
+}
+
 if (! function_exists('get_storage_file_url')) {
     function get_storage_file_url($path = null, $size = '')
     {

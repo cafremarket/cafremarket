@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Merchant;
 
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Controller;
+use App\Helpers\ListHelper;
 use App\Http\Requests\Validations\MerchantVerifyRequest;
 use App\Models\Attachment;
 use App\Models\Config;
@@ -16,8 +17,13 @@ class VerificationController extends Controller
     public function index(MerchantVerifyRequest $request)
     {
         $config = Config::with(['attachments', 'shop'])->findOrFail(Auth::user()->merchantId());
+        $storeAddress = $config->shop->storeAddress();
+        $countries = ListHelper::countries();
+        $states = $storeAddress && $storeAddress->country_id
+            ? ListHelper::states($storeAddress->country_id)
+            : ListHelper::states(config('system_settings.address_default_country'));
 
-        return view('merchant.verify.index', compact('config'));
+        return view('merchant.verify.index', compact('config', 'countries', 'states', 'storeAddress'));
     }
 
     public function submit(MerchantVerifyRequest $request)

@@ -19,6 +19,7 @@
         @if ($hasLocation)
           <div class="mp-alert mp-alert--success"><i class="fa fa-check-circle"></i> {{ trans('app.store_location_set') }}</div>
           <p class="mp-text-muted mp-text-muted--spaced">
+            {{ $storeAddress->address_title ? $storeAddress->address_title.', ' : '' }}
             {{ $storeAddress->address_line_1 }}{{ $storeAddress->city ? ', '.$storeAddress->city : '' }}
           </p>
         @else
@@ -26,40 +27,18 @@
         @endif
 
         @if ($canSubmit)
-          {!! Form::open(['route' => 'merchant.verify.location', 'id' => 'store-location-form']) !!}
-            <div class="mp-form-grid">
-              <div class="mp-form-group">
-                {!! Form::label('address_line_1', trans('app.form.address_line_1')) !!}
-                {!! Form::text('address_line_1', old('address_line_1', optional($storeAddress)->address_line_1), ['class' => 'mp-form-control', 'placeholder' => trans('app.placeholder.address_line_1')]) !!}
-              </div>
-              <div class="mp-form-group">
-                {!! Form::label('city', trans('app.form.city')) !!}
-                {!! Form::text('city', old('city', optional($storeAddress)->city), ['class' => 'mp-form-control', 'placeholder' => trans('app.placeholder.city')]) !!}
-              </div>
-            </div>
-
-            @if (config('services.google.place_api_key'))
-              <div class="mp-map-wrap">
-                @include('partials.map_pin_picker', [
-                  'latitude' => old('latitude', optional($storeAddress)->latitude),
-                  'longitude' => old('longitude', optional($storeAddress)->longitude),
-                  'skipMapsScript' => true,
-                ])
-              </div>
-            @else
-              <div class="mp-alert mp-alert--info">
-                <i class="fa fa-info-circle"></i> {{ trans('messages.seller_onboarding_map_unavailable') }}
-              </div>
-              <button type="button" id="verify-use-current-location" class="map-current-location-btn mp-btn-spaced">
-                <i class="fa fa-crosshairs"></i> {{ trans('theme.use_current_location') }}
-              </button>
-              <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', optional($storeAddress)->latitude) }}">
-              <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', optional($storeAddress)->longitude) }}">
-            @endif
-
-            <button type="submit" class="mp-btn mp-btn--primary">
-              <i class="fa fa-map-pin"></i> {{ trans('app.save_store_location') }}
-            </button>
+          {!! Form::open(['route' => 'merchant.verify.location', 'id' => 'store-location-form', 'class' => 'mp-address-wizard-form']) !!}
+            @include('partials.address_wizard', [
+              'wizardId' => 'merchant-store-wizard',
+              'address' => $storeAddress,
+              'countries' => $countries ?? [],
+              'states' => $states ?? [],
+              'iconPrefix' => 'fa',
+              'submitLabel' => trans('app.save_store_location'),
+              'defaultAddressTitle' => $shop->name,
+              'defaultPhone' => $shopPhone ?? optional($config)->support_phone ?? Auth::user()->phone,
+              'deferInit' => true,
+            ])
           {!! Form::close() !!}
         @endif
       </div>

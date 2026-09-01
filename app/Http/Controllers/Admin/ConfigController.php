@@ -236,9 +236,15 @@ class ConfigController extends Controller
         $request->validate([
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
-            'address_line_1' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
+            'address_title' => 'required|string|max:255',
+            'address_line_1' => 'required|string|max:255',
+            'address_line_2' => 'nullable|string|max:255',
+            'landmark' => 'nullable|string|max:255',
+            'city' => 'required|string|max:255',
             'zip_code' => 'nullable|string|max:32',
+            'country_id' => 'required|integer',
+            'state_id' => 'nullable|integer',
+            'phone' => 'required|string|max:32',
         ]);
 
         $shop = $user->shop;
@@ -247,46 +253,45 @@ class ConfigController extends Controller
         if (! $address) {
             $address = $shop->addresses()->create([
                 'address_type' => 'Primary',
-                'address_title' => $shop->name,
-                'address_line_1' => $request->input('address_line_1', $shop->name),
+                'address_title' => $request->input('address_title', $shop->name),
+                'address_line_1' => $request->input('address_line_1'),
+                'address_line_2' => $request->input('address_line_2'),
+                'landmark' => $request->input('landmark'),
                 'city' => $request->input('city', ''),
                 'zip_code' => $request->input('zip_code', '00000'),
-                'country_id' => config('system_settings.address_default_country'),
-                'state_id' => config('system_settings.address_default_state'),
-                'phone' => optional($shop->config)->support_phone ?? $user->phone,
+                'country_id' => $request->input('country_id', config('system_settings.address_default_country')),
+                'state_id' => $request->input('state_id', config('system_settings.address_default_state')),
+                'phone' => $request->input('phone', optional($shop->config)->support_phone ?? $user->phone),
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
             ]);
+        } else {
+            $address->fill($request->only([
+                'address_title',
+                'address_line_1',
+                'address_line_2',
+                'landmark',
+                'city',
+                'zip_code',
+                'country_id',
+                'state_id',
+                'phone',
+                'latitude',
+                'longitude',
+            ]));
+            $address->latitude = $request->latitude;
+            $address->longitude = $request->longitude;
+            $address->save();
         }
 
-        $address->latitude = $request->latitude;
-        $address->longitude = $request->longitude;
-
-        if ($request->filled('address_line_1')) {
-            $address->address_line_1 = $request->address_line_1;
+        if (! $address->latitude || ! $address->longitude) {
+            app(GeocodeService::class)->applyToAddress($address->fresh());
+            $address->refresh();
         }
 
-        if ($request->filled('city')) {
-            $address->city = $request->city;
-        }
-
-        if ($request->filled('zip_code')) {
-            $address->zip_code = $request->zip_code;
-        }
-
-        if (! $request->filled('address_line_1')) {
-            $formatted = app(GeocodeService::class)->reverseGeocode(
-                (float) $request->latitude,
-                (float) $request->longitude
-            );
-
-            if ($formatted) {
-                $address->address_line_1 = Str::limit($formatted, 255, '');
-            }
-        }
-
-        $address->save();
         $shop->update(['primary_address_id' => $address->id]);
 
-        return back()->with('success', trans('app.store_location_set'));
+        return back()->with('success', trans('app.store_location_set'))->with('verification_tab', 'store');
     }
 
     /**

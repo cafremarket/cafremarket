@@ -1,4 +1,7 @@
-@if (config('services.google.place_api_key'))
+@php
+  $googleMapsKey = $googleMapsKey ?? google_maps_api_key();
+@endphp
+@if ($googleMapsKey)
   <script>
     if (typeof window.initLocationMapServices !== 'function') {
       window.initLocationMapServices = function() {
@@ -8,7 +11,7 @@
     }
   </script>
   @unless (! empty($skipMapsScript))
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.place_api_key') }}&libraries=places&callback=initLocationMapServices"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $googleMapsKey }}&libraries=places&callback=initLocationMapServices"></script>
   @endunless
 @else
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
@@ -21,7 +24,8 @@
   var reverseGeocodeUrl = @json(route('address.reverse'));
   var searchAddressUrl = @json(route('address.search'));
   var csrfToken = @json(csrf_token());
-  var hasGoogleMaps = {{ config('services.google.place_api_key') ? 'true' : 'false' }};
+  var hasGoogleMaps = {{ $googleMapsKey ? 'true' : 'false' }};
+  var deferInit = {{ ! empty($deferInit) ? 'true' : 'false' }};
   var defaultLat = parseFloat(@json($initialLat ?? '-25.9655'));
   var defaultLng = parseFloat(@json($initialLng ?? '32.5832'));
   var hasExistingCoords = @json(! empty($hasExistingCoords) && $hasExistingCoords === 'true');
@@ -311,6 +315,18 @@
     }
   }
 
+  function refreshMapSize() {
+    if (!mapInstance) return;
+
+    if (hasGoogleMaps) {
+      google.maps.event.trigger(mapInstance, 'resize');
+      var coords = getLatLng();
+      mapInstance.setCenter({ lat: coords.lat, lng: coords.lng });
+    } else if (mapInstance.invalidateSize) {
+      mapInstance.invalidateSize();
+    }
+  }
+
   function initMap() {
     if (mapInstance) return;
     if (hasGoogleMaps) {
@@ -318,6 +334,8 @@
     } else {
       initLeafletMap();
     }
+
+    setTimeout(refreshMapSize, 150);
   }
 
   function useCurrentLocation() {
@@ -413,10 +431,21 @@
     }
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() { window.initAddressWizard(wizardId); });
-  } else {
-    window.initAddressWizard(wizardId);
+  window.refreshAddressWizardMap = function(id) {
+    if (id) wizardId = id;
+    if (!mapInstance && startAtStep === 1) {
+      initMap();
+      return;
+    }
+    refreshMapSize();
+  };
+
+  if (!deferInit) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { window.initAddressWizard(wizardId); });
+    } else {
+      window.initAddressWizard(wizardId);
+    }
   }
 })();
 </script>
