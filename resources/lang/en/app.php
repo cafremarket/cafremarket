@@ -1883,6 +1883,8 @@ return [
     'store_location' => 'Store location',
     'store_location_required' => 'Set your store location on the map before submitting verification.',
     'store_location_set' => 'Store location is set.',
+    'map_coordinates' => 'Map coordinates',
+    'view_on_map' => 'View on map',
     'save_store_location' => 'Save store location',
     'show_password' => 'Show password',
     'hide_password' => 'Hide password',

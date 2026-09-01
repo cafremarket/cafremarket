@@ -28,13 +28,11 @@
 
         @if ($canSubmit)
           {!! Form::open(['route' => 'merchant.verify.location', 'id' => 'store-location-form', 'class' => 'mp-address-wizard-form']) !!}
-            @include('partials.address_wizard', [
+            @include('merchant.verify.partials.address_wizard', [
               'wizardId' => 'merchant-store-wizard',
               'address' => $storeAddress,
               'countries' => $countries ?? [],
               'states' => $states ?? [],
-              'iconPrefix' => 'fa',
-              'submitLabel' => trans('app.save_store_location'),
               'defaultAddressTitle' => $shop->name,
               'defaultPhone' => $shopPhone ?? optional($config)->support_phone ?? Auth::user()->phone,
               'deferInit' => true,

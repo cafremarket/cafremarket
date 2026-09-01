@@ -136,12 +136,7 @@
             <h5 class="admin-verify-modal__section-title"><i class="fa fa-map-marker"></i> {{ trans('app.address_verification') }}</h5>
 
             @if ($hasLocation)
-              <p class="admin-verify-modal__location">
-                {{ $storeAddress->address_line_1 }}{{ $storeAddress->city ? ', '.$storeAddress->city : '' }}
-                @if ($storeAddress->latitude && $storeAddress->longitude)
-                  <br><small class="text-muted">{{ number_format($storeAddress->latitude, 6) }}, {{ number_format($storeAddress->longitude, 6) }}</small>
-                @endif
-              </p>
+              @include('admin.partials._address_details', ['address' => $storeAddress])
             @else
               <div class="alert alert-warning admin-verify-modal__alert">
                 <i class="fa fa-exclamation-triangle"></i> {{ trans('app.store_location_required') }}

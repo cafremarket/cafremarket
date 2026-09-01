@@ -35,6 +35,27 @@
   var lookupFailedLabel = @json(trans('theme.address_lookup_failed'));
   var geoUnsupportedLabel = @json(trans('theme.geolocation_not_supported'));
   var geoDeniedLabel = @json(trans('theme.geolocation_denied'));
+  var hiddenClass = @json($hiddenClass ?? 'd-none');
+  var previewErrorClass = hiddenClass === 'is-hidden' ? 'is-error' : 'alert-danger';
+  var previewOkClass = hiddenClass === 'is-hidden' ? '' : 'alert-light';
+
+  function hideElement(el) {
+    if (el) el.classList.add(hiddenClass);
+  }
+
+  function showElement(el) {
+    if (el) el.classList.remove(hiddenClass);
+  }
+
+  function setStep(step) {
+    qa('.address-wizard-step').forEach(function(el) {
+      el.classList.toggle('is-active', el.getAttribute('data-step') === String(step));
+    });
+    qa('.address-wizard-panel').forEach(function(el) {
+      var isActive = el.getAttribute('data-panel') === String(step);
+      el.classList.toggle(hiddenClass, !isActive);
+    });
+  }
 
   function getRoot() {
     return document.getElementById(wizardId);
@@ -55,15 +76,6 @@
   var lookupToken = 0;
   var searchTimer = null;
   var resolvedAddress = initialLocationText || '';
-
-  function setStep(step) {
-    qa('.address-wizard-step').forEach(function(el) {
-      el.classList.toggle('is-active', el.getAttribute('data-step') === String(step));
-    });
-    qa('.address-wizard-panel').forEach(function(el) {
-      el.classList.toggle('d-none', el.getAttribute('data-panel') !== String(step));
-    });
-  }
 
   function setLatLng(lat, lng) {
     var latEl = q('.addr-wizard-lat');
@@ -88,8 +100,18 @@
     var box = q('.addr-wizard-preview');
     var span = q('.addr-wizard-preview-text');
     if (!box || !span) return;
-    box.classList.remove('d-none', 'alert-danger', 'alert-light');
-    box.classList.add(isError ? 'alert-danger' : 'alert-light');
+    box.classList.remove(hiddenClass, 'alert-danger', 'alert-light', 'is-error');
+    if (!text) {
+      hideElement(box);
+      span.textContent = '';
+      return;
+    }
+    showElement(box);
+    if (isError) {
+      box.classList.add(previewErrorClass);
+    } else if (previewOkClass) {
+      box.classList.add(previewOkClass);
+    }
     span.textContent = text;
   }
 
@@ -97,7 +119,7 @@
     var list = q('.addr-wizard-autocomplete');
     if (list) {
       list.innerHTML = '';
-      list.classList.add('d-none');
+      hideElement(list);
     }
   }
 
@@ -237,7 +259,7 @@
 
     list.innerHTML = '';
     if (!results.length) {
-      list.classList.add('d-none');
+      hideElement(list);
       return;
     }
 
@@ -251,7 +273,7 @@
       list.appendChild(li);
     });
 
-    list.classList.remove('d-none');
+    showElement(list);
   }
 
   function initGoogleMap() {

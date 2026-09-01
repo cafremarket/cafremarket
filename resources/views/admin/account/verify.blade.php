@@ -84,7 +84,7 @@
 
           @if ($hasLocation)
             <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ trans('app.store_location_set') }}</div>
-            <p class="small text-muted">{{ $storeAddress->address_line_1 }}{{ $storeAddress->city ? ', '.$storeAddress->city : '' }}</p>
+            @include('admin.partials._address_details', ['address' => $storeAddress])
           @else
             <div class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> {{ trans('app.store_location_required') }}</div>
           @endif

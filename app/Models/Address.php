@@ -233,6 +233,10 @@ class Address extends BaseModel
             $str[] = $this->address_line_2;
         }
 
+        if (strlen($this->landmark ?? '')) {
+            $str[] = $this->landmark;
+        }
+
         if (strlen($this->city)) {
             $str[] = $this->city;
         }

@@ -3160,6 +3160,79 @@ body.login-page .login-box:has(.admin-auth-card) {
   font-size: 14px;
 }
 
+.admin-address-details {
+  background: #f8fafc;
+  border: 1px solid var(--admin-card-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.admin-address-details__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 20px;
+}
+
+.admin-address-details__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-address-details__item--full {
+  grid-column: 1 / -1;
+}
+
+.admin-address-details__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+  color: #94a3b8;
+}
+
+.admin-address-details__value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.admin-address-details__map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--admin-primary);
+  text-decoration: none !important;
+}
+
+.admin-address-details__map-link:hover {
+  text-decoration: underline !important;
+  color: var(--admin-primary-dark, #1d4ed8);
+}
+
+.admin-address-details__empty {
+  margin: 0;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .admin-address-details__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-address-details__map-link {
+    display: flex;
+    margin-left: 0;
+    margin-top: 6px;
+  }
+}
+
 .admin-verify-modal__help {
   font-size: 13px;
   margin: -4px 0 14px;
