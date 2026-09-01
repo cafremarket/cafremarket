@@ -46,7 +46,7 @@ class NearbyShopService
             ->with(['logoImage', 'config', 'owner:id,name', 'avgFeedback:rating,count,feedbackable_id,feedbackable_type'])
             ->orderBy('distance_km')
             ->get()
-            ->filter(function ($shop) use ($latitude, $longitude) {
+            ->filter(function ($shop) use ($radiusKm) {
                 $shopRadius = (float) ($shop->service_radius_km ?: config('hyperlocal.default_shop_service_radius_km', 5));
                 $distance = (float) ($shop->distance_km ?? 999);
 
