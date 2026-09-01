@@ -171,6 +171,11 @@
           if (typeof initAppPlugins == 'function') {
             initAppPlugins();
           }
+
+          var wizard = document.querySelector('.address-wizard');
+          if (wizard && typeof window.initAddressWizard === 'function') {
+            window.initAddressWizard(wizard.getAttribute('data-wizard-id'));
+          }
         });
       });
 

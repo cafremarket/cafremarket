@@ -113,6 +113,87 @@ class GeocodeService
         return $this->reverseGeocodeWithNominatim($latitude, $longitude);
     }
 
+    /**
+     * Reverse geocode coordinates into structured address fields for forms.
+     */
+    public function reverseGeocodeDetails(float $latitude, float $longitude): array
+    {
+        $empty = [
+            'formatted_address' => null,
+            'address_line_1' => '',
+            'city' => '',
+            'state' => '',
+            'country' => '',
+            'zip_code' => '',
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+        ];
+
+        $apiKey = config('hyperlocal.google_maps_api_key') ?: config('services.google.place_api_key');
+
+        if ($apiKey) {
+            try {
+                $response = $this->httpClient()->get('https://maps.googleapis.com/maps/api/geocode/json', [
+                    'latlng' => $latitude.','.$longitude,
+                    'key' => $apiKey,
+                ]);
+
+                $data = $response->json();
+
+                if (($data['status'] ?? '') === 'OK' && ! empty($data['results'][0])) {
+                    return array_merge($empty, $this->parseGoogleGeocodeResult($data['results'][0]));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('GeocodeService reverseGeocodeDetails failed: '.$e->getMessage());
+            }
+        }
+
+        $formatted = $this->reverseGeocodeWithNominatim($latitude, $longitude);
+
+        if ($formatted) {
+            return array_merge($empty, [
+                'formatted_address' => $formatted,
+                'address_line_1' => explode(',', $formatted)[0] ?? $formatted,
+            ]);
+        }
+
+        return $empty;
+    }
+
+    protected function parseGoogleGeocodeResult(array $result): array
+    {
+        $components = collect($result['address_components'] ?? []);
+
+        $get = function (array $types, bool $short = false) use ($components) {
+            $match = $components->first(function ($component) use ($types) {
+                return count(array_intersect($types, $component['types'] ?? [])) > 0;
+            });
+
+            if (! $match) {
+                return '';
+            }
+
+            return $short ? ($match['short_name'] ?? '') : ($match['long_name'] ?? '');
+        };
+
+        $streetNumber = $get(['street_number']);
+        $route = $get(['route']);
+        $addressLine1 = trim($streetNumber.' '.$route);
+
+        if ($addressLine1 === '' && ! empty($result['formatted_address'])) {
+            $addressLine1 = explode(',', $result['formatted_address'])[0] ?? $result['formatted_address'];
+        }
+
+        return [
+            'formatted_address' => $result['formatted_address'] ?? null,
+            'address_line_1' => $addressLine1,
+            'city' => $get(['locality', 'postal_town', 'administrative_area_level_2']),
+            'state' => $get(['administrative_area_level_1']),
+            'country' => $get(['country']),
+            'zip_code' => $get(['postal_code']),
+        ];
+    }
+
     protected function reverseGeocodeWithNominatim(float $latitude, float $longitude): ?string
     {
         try {

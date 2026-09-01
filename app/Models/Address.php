@@ -34,6 +34,7 @@ class Address extends BaseModel
         'address_type',
         'address_line_1',
         'address_line_2',
+        'landmark',
         'city',
         'state_id',
         'country_id',
@@ -184,6 +185,10 @@ class Address extends BaseModel
 
         if (strlen($this->address_line_2)) {
             $html[] = $this->address_line_2;
+        }
+
+        if (strlen($this->landmark ?? '')) {
+            $html[] = e($this->landmark);
         }
 
         if (strlen($this->city)) {

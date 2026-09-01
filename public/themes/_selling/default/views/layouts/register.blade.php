@@ -7,7 +7,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no">
   <title>{{ trans('app.form.register_as_merchant') }} — {{ get_platform_title() }}</title>
-  <link rel="icon" href="{{ Storage::url('icon.png') }}" type="image/x-icon" />
+  <link rel="icon" href="{{ get_icon_url('system', 'thumbnail') }}" type="image/x-icon" />
 
   <link href="{{ selling_theme_asset_url('css/vendor.css') }}" rel="stylesheet">
   <link href="{{ selling_theme_asset_url('css/agency.css') }}" rel="stylesheet">

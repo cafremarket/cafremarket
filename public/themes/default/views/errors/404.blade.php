@@ -60,11 +60,7 @@
 
 <body>
   <a href="{{ url('/') }}">
-    @if (Storage::exists('logo.png'))
-      <img src="{{ get_storage_file_url('logo.png', 'full') }}" alt="{{ trans('app.logo') }}" title="{{ trans('app.logo') }}">
-    @else
-      <img src="https://placehold.it/140x60/eee?text={{ get_platform_title() }}" alt="LOGO" title="LOGO" />
-    @endif
+    <img src="{{ get_logo_url('system', 'full') }}" class="brand-logo" alt="{{ trans('app.logo') }}" title="{{ trans('app.logo') }}">
   </a>
   <h1>Page Not Found</h1>
   <p>Sorry, but the page you were trying to view does not exist.</p>

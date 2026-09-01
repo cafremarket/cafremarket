@@ -2,8 +2,8 @@
 <header class="main-header admin-topbar">
   <!-- Logo -->
   <a href="{{ url('admin/dashboard') }}" class="logo">
-    <span class="logo-mini"><i class="fa fa-shopping-bag"></i></span>
-    <span class="logo-lg">{{ get_site_title() }}</span>
+    <span class="logo-mini"><img src="{{ get_icon_url('system', 'tiny') }}" alt="" style="height:22px;width:22px;border-radius:4px;"></span>
+    <span class="logo-lg"><img src="{{ get_logo_url('system', 'logo') }}" alt="{{ get_site_title() }}" style="height:32px;max-width:160px;vertical-align:middle;margin-right:8px;">{{ get_site_title() }}</span>
   </a>
 
   <!-- Header Navbar -->

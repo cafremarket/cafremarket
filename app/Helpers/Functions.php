@@ -867,10 +867,24 @@ if (! function_exists('image_cache_path')) {
     }
 }
 
+if (! function_exists('default_brand_logo_url')) {
+    function default_brand_logo_url($size = 'logo')
+    {
+        return asset('images/brand/logo.svg');
+    }
+}
+
+if (! function_exists('default_brand_icon_url')) {
+    function default_brand_icon_url($size = 'thumbnail')
+    {
+        return asset('images/brand/icon.svg');
+    }
+}
+
 if (! function_exists('get_storage_file_url')) {
     function get_storage_file_url($path = null, $size = '')
     {
-        if (! $path) {
+        if (! $path || ! \Illuminate\Support\Facades\Storage::exists($path)) {
             return get_placeholder_img($size);
         }
 
@@ -975,8 +989,7 @@ if (! function_exists('pdf_dompdf_storage_image_src')) {
 if (! function_exists('get_placeholder_img')) {
     function get_placeholder_img($size = 'small', $txt = null)
     {
-        // Local PNG — external placehold.co URLs fail in Flutter/Android image decoders.
-        return asset('images/placeholders/no_img.png');
+        return asset('images/brand/placeholder.svg');
     }
 }
 
@@ -992,7 +1005,7 @@ if (! function_exists('get_product_img_src')) {
     function get_product_img_src($item = null, $size = 'medium', $type = 'primary')
     {
         if (! $item) {
-            return asset('images/placeholders/no_img.png');
+            return asset('images/brand/placeholder.svg');
         }
 
         if (is_numeric($item) && ! ($item instanceof Inventory)) {
@@ -1108,10 +1121,17 @@ if (! function_exists('get_logo_url')) {
         if ($model == 'system') {
             return Cache::rememberForever('system_logo_img_'.$size, function () use ($size) {
                 $system = System::orderBy('id', 'asc')->first();
+                $path = optional($system?->logoImage)->path;
 
-                return get_storage_file_url(optional($system->logoImage)->path, $size) ?? null;
+                if ($path && Storage::exists($path)) {
+                    return url("image/{$path}?p={$size}");
+                }
+
+                return default_brand_logo_url($size);
             });
-        } elseif (is_object($model) && $model->logoImage) {
+        }
+
+        if (is_object($model) && $model->logoImage && Storage::exists($model->logoImage->path)) {
             return get_storage_file_url($model->logoImage->path, $size);
         }
 
@@ -1125,14 +1145,21 @@ if (! function_exists('get_icon_url')) {
         if ($model == 'system') {
             return Cache::rememberForever('favicon_img', function () use ($size) {
                 $system = System::orderBy('id', 'asc')->first();
+                $path = optional($system?->iconImage)->path;
 
-                return get_storage_file_url(optional($system->iconImage)->path, $size) ?? null;
+                if ($path && Storage::exists($path)) {
+                    return url("image/{$path}?p={$size}");
+                }
+
+                return default_brand_icon_url($size);
             });
-        } elseif (is_object($model) && $model->iconImage) {
+        }
+
+        if (is_object($model) && $model->iconImage && Storage::exists($model->iconImage->path)) {
             return get_storage_file_url($model->iconImage->path, $size);
         }
 
-        return get_placeholder_img($size);
+        return default_brand_icon_url($size);
     }
 }
 

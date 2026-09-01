@@ -15,6 +15,8 @@ use App\Models\Customer;
 // use App\Events\Profile\PasswordUpdated;
 use App\Models\Merchant;
 use App\Models\Wishlist;
+use App\Services\Geo\GeocodeService;
+use App\Services\Hyperlocal\BuyerLocationService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -322,8 +324,10 @@ class AccountController extends Controller
      */
     public function save_address(CreateAddressRequest $request)
     {
-        $address = Auth::guard('customer')->user()
-            ->addresses()->create($request->all());
+        $customer = Auth::guard('customer')->user();
+        $address = $customer->addresses()->create($request->all());
+
+        $this->finalizeCustomerAddress($address, $customer);
 
         return redirect()->to(url()->previous().'?address='.$address->id.'#address-tab')
             ->with('success', trans('theme.notify.address_created'));
@@ -352,6 +356,8 @@ class AccountController extends Controller
     public function address_update(SelfAddressUpdateRequest $request, Address $address)
     {
         $address->update($request->all());
+
+        $this->finalizeCustomerAddress($address->fresh(), Auth::guard('customer')->user());
 
         return redirect()->route('account', 'account#address-tab')
             ->with('success', trans('theme.notify.info_updated'));
@@ -428,5 +434,22 @@ class AccountController extends Controller
 
         return redirect()->route('merchant.dashboard')
             ->with('success', trans('theme.notify.switched_to_merchant_successfully'));
+    }
+
+    /**
+     * Ensure map coordinates are stored and sync buyer delivery location.
+     */
+    protected function finalizeCustomerAddress(Address $address, Customer $customer): void
+    {
+        if (! $address->latitude || ! $address->longitude) {
+            app(GeocodeService::class)->applyToAddress($address->fresh());
+            $address->refresh();
+        }
+
+        $buyerLocation = app(BuyerLocationService::class);
+
+        if ($address->address_type === 'Primary' || ! $buyerLocation->hasLocation()) {
+            $buyerLocation->applyAddressAsLocation($address, $customer);
+        }
     }
 }

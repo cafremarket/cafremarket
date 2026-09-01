@@ -25,12 +25,17 @@ class CreateAddressRequest extends Request
     {
         return [
             'address_type' => 'bail|sometimes|composite_unique:addresses,addressable_id,addressable_type',
+            'address_title' => 'required|string|max:255',
             'address_line_1' => 'required|string',
             'address_line_2' => 'nullable|string',
+            'landmark' => 'nullable|string|max:255',
             'city' => 'required|string',
+            'state_id' => 'nullable',
             'zip_code' => 'nullable|string',
             'country_id' => 'required',
-            'phone' => 'nullable|string',
+            'phone' => 'required|string',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ];
     }
 

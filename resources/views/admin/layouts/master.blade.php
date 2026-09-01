@@ -24,8 +24,8 @@
   </title>
 
   <link rel="manifest" href="{{ asset('site.webmanifest') }}">
-  <link rel="icon" href="{{ get_storage_file_url('icon.png', 'full') }}" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="{{ get_storage_file_url('icon.png', 'full') }}">
+  <link rel="icon" href="{{ get_icon_url('system', 'thumbnail') }}" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="{{ get_icon_url('system', 'thumbnail') }}">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">

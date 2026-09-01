@@ -1,6 +1,6 @@
 <aside class="mp-sidebar">
   <div class="mp-sidebar__brand">
-    <img src="{{ get_storage_file_url('icon.png', 'tiny') }}" alt="">
+    <img src="{{ get_logo_url('system', 'tiny') }}" alt="{{ get_platform_title() }}">
     <span>{{ optional(Auth::user()->shop)->name ?? trans('app.merchant') }}</span>
   </div>
 

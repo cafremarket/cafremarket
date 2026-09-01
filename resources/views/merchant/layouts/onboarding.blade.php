@@ -6,7 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', trans('messages.seller_onboarding_title')) — {{ get_platform_title() }}</title>
-  <link rel="icon" href="{{ get_storage_file_url('icon.png', 'full') }}" type="image/x-icon" />
+  <link rel="icon" href="{{ get_icon_url('system', 'thumbnail') }}" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -16,7 +16,7 @@
 <body class="mp-body mp-onboarding">
   <header class="mp-onboarding__header">
     <a href="{{ url('/') }}" class="mp-onboarding__brand">
-      <img src="{{ get_storage_file_url('logo.png', 'small') }}" alt="{{ get_platform_title() }}">
+      <img src="{{ get_logo_url('system', 'logo') }}" alt="{{ get_platform_title() }}">
       <span>{{ get_platform_title() }}</span>
     </a>
     <div class="mp-onboarding__user">

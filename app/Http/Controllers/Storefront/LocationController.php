@@ -62,6 +62,10 @@ class LocationController extends Controller
                 (float) $request->latitude,
                 (float) $request->longitude
             ),
+            'details' => $geocoder->reverseGeocodeDetails(
+                (float) $request->latitude,
+                (float) $request->longitude
+            ),
         ]);
     }
 

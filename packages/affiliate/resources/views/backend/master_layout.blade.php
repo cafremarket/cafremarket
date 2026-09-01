@@ -11,8 +11,8 @@
   <title>{!! $title ?? get_site_title() !!}</title>
 
   <link rel="manifest" href="{{ asset('site.webmanifest') }}">
-  <link rel="icon" href="{{ get_storage_file_url('icon.png', 'full') }}" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="{{ get_storage_file_url('icon.png', 'full') }}">
+  <link rel="icon" href="{{ get_icon_url('system', 'thumbnail') }}" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="{{ get_icon_url('system', 'thumbnail') }}">
 
   <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,300italic,400italic,600italic' rel='stylesheet'>
 
