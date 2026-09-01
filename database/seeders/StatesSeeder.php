@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class StatesSeeder extends BaseSeeder
@@ -14,57 +15,66 @@ class StatesSeeder extends BaseSeeder
      */
     public function run()
     {
-        // Get all of the countries
-        $file_path = 'data/states';
+        $filePath = __DIR__.'/data/states';
+        $files = glob($filePath.'/*.json');
 
-        $files = glob(__DIR__.'/'.$file_path.'/'.'*.json');
+        if (empty($files)) {
+            $this->command?->warn('No state JSON files found in database/seeders/data/states.');
 
-        $now = Carbon::Now();
+            return;
+        }
+
+        $now = Carbon::now();
+        $seededCountries = 0;
+        $skippedCountries = 0;
+        $seededStates = 0;
+
         foreach ($files as $file) {
-            $country_code = basename($file, '.json'); // Get the the country iso_code from file name
+            $countryCode = basename($file, '.json');
+            $country = DB::table('countries')->where('iso_code', $countryCode)->first();
 
-            $country = DB::table('countries')->where('iso_code', $country_code)->first();
-
-            // If the $country_id not found in countries table then ignore the file and move next
-            if (! $country->id) {
+            if (! $country) {
+                $skippedCountries++;
                 continue;
             }
 
             $json = json_decode(file_get_contents($file), true);
 
-            // If the json decode returns null, for invalid json
-            if (! $json) {
+            if (! is_array($json)) {
                 continue;
             }
 
-            // Sort data alphabetically
             usort($json, function ($a, $b) {
-                return $a['name'] > $b['name'] ? 1 : -1;
+                return strcmp($a['name'] ?? '', $b['name'] ?? '');
             });
 
-            $data = [];
-            foreach ($json as $key => $state) {
-                if (! isset($state['iso_code'])) {
+            foreach ($json as $state) {
+                if (empty($state['iso_code']) || empty($state['name'])) {
                     continue;
                 }
 
-                $data[] = [
-                    'country_id' => $country->id,
-                    'name' => $state['name'],
-                    'iso_code' => isset($state['iso_code']) ? $state['iso_code'] : null,
-                    'iso_numeric' => isset($state['iso_numeric']) ? $state['iso_numeric'] : null,
-                    // 'region' => isset($state['region']) ? $state['region'] : NULL,
-                    // 'region_code' => isset($state['region_code']) ? $state['region_code'] : NULL,
-                    'calling_code' => isset($state['calling_code']) ? $state['calling_code'] : null,
-                    'active' => isset($state['active']) ? $state['active'] : 1,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
+                DB::table('states')->updateOrInsert(
+                    [
+                        'country_id' => $country->id,
+                        'iso_code' => $state['iso_code'],
+                    ],
+                    [
+                        'name' => $state['name'],
+                        'iso_numeric' => $state['iso_numeric'] ?? null,
+                        'calling_code' => $state['calling_code'] ?? null,
+                        'active' => $state['active'] ?? 1,
+                        'updated_at' => $now,
+                        'created_at' => $now,
+                    ]
+                );
+
+                $seededStates++;
             }
 
-            if (! empty($data)) {
-                DB::table('states')->insert($data);
-            }
+            Cache::forget('states_pluck_'.$country->id);
+            $seededCountries++;
         }
+
+        $this->command?->info("States seeded for {$seededCountries} countries ({$seededStates} state rows). Skipped {$skippedCountries} files with no matching country.");
     }
 }

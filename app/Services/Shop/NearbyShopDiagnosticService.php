@@ -26,7 +26,7 @@ class NearbyShopDiagnosticService
         }
 
         $shops = Shop::query()
-            ->with(['config:id,shop_id,maintenance_mode,active_ecommerce,pending_verification'])
+            ->with(['config:shop_id,maintenance_mode,active_ecommerce,pending_verification'])
             ->withCount([
                 'inventories as active_inventories_count' => function ($q) {
                     $q->where('active', 1)->where('available_from', '<=', now());
