@@ -148,7 +148,17 @@ class LoginController extends SocialiteBaseController
      */
     protected function authenticated(Request $request, $user)
     {
-        app(BuyerLocationService::class)->syncFromSavedAddress($user);
+        $buyerLocation = app(BuyerLocationService::class);
+
+        if ($user->addresses()->count() === 0) {
+            session()->forget([
+                'buyer_latitude',
+                'buyer_longitude',
+                'buyer_address_text',
+            ]);
+        }
+
+        $buyerLocation->ensureDeliveryLocation($user);
     }
 
     /**

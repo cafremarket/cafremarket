@@ -6,6 +6,13 @@ use App\Http\Requests\Request;
 
 class CreateAddressRequest extends Request
 {
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('state_id') && $this->input('state_id') === '') {
+            $this->merge(['state_id' => null]);
+        }
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -30,7 +37,7 @@ class CreateAddressRequest extends Request
             'address_line_2' => 'nullable|string',
             'landmark' => 'nullable|string|max:255',
             'city' => 'required|string',
-            'state_id' => 'nullable',
+            'state_id' => 'nullable|integer|exists:states,id',
             'zip_code' => 'nullable|string',
             'country_id' => 'required',
             'phone' => 'required|string',

@@ -42,11 +42,11 @@
 
           <input type="hidden" name="latitude" id="locationLatitude" value="{{ session('buyer_latitude') }}">
           <input type="hidden" name="longitude" id="locationLongitude" value="{{ session('buyer_longitude') }}">
-          <input type="hidden" name="address_text" id="locationAddressText" value="{{ session('buyer_address_text') }}">
+          <input type="hidden" name="address_text" id="locationAddressText" value="{{ buyer_delivery_address_label() }}">
 
-          <div id="locationPreview" class="alert alert-light mt-3 {{ session('buyer_address_text') ? '' : 'd-none' }}">
+          <div id="locationPreview" class="alert alert-light mt-3 {{ buyer_delivery_address_label() ? '' : 'd-none' }}">
             <i class="fal fa-check-circle text-success"></i>
-            <span id="locationPreviewText">{{ session('buyer_address_text') }}</span>
+            <span id="locationPreviewText">{{ buyer_delivery_address_label() }}</span>
           </div>
         </form>
       </div>

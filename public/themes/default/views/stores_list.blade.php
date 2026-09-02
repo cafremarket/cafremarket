@@ -16,10 +16,10 @@
               <i class="fal fa-store"></i>
             </h2>
             @if ($isNearby ?? false)
-              @if (session('buyer_address_text'))
+              @if (buyer_delivery_address_label())
                 <p>
                   <i class="fal fa-map-marker-alt"></i>
-                  {{ Str::limit(session('buyer_address_text'), 60) }}
+                  {{ Str::limit(buyer_delivery_address_label(), 60) }}
                 </p>
               @endif
             @elseif (method_exists($shops, 'total') && $shops->total() > 0)

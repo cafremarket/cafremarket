@@ -182,5 +182,6 @@ Route::middleware('customerApp')->group(function () {
 
         Route::get('customer/location', [CustomerLocationController::class, 'show']);
         Route::post('customer/location', [CustomerLocationController::class, 'store']);
+        Route::post('customer/location/use-address/{address}', [CustomerLocationController::class, 'useAddress']);
     });
 });

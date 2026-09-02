@@ -226,10 +226,16 @@ class AccountController extends Controller
      */
     private function account()
     {
-        // Supply important data to the views
-        View::share('address_types', ListHelper::address_types());
-        View::share('countries', ListHelper::countries());
+        return Auth::guard('customer')->user();
+    }
 
+    /**
+     * Return delete account page data
+     *
+     * @return collection
+     */
+    private function account_delete()
+    {
         return Auth::guard('customer')->user();
     }
 
@@ -251,7 +257,7 @@ class AccountController extends Controller
     public function update(Request $request)
     {
         if (config('app.demo') == true && Auth::guard('customer')->user()->id <= config('system.demo.customers', 1)) {
-            return redirect()->route('account', 'account#account-info-tab')
+            return redirect()->route('account', 'account')
                 ->with('warning', trans('messages.demo_restriction'));
         }
 
@@ -272,7 +278,7 @@ class AccountController extends Controller
         $user->description = $request->input('description');
         $user->save();
 
-        return redirect()->route('account', 'account#account-info-tab')
+        return redirect()->route('account', 'account')
             ->with('success', trans('theme.notify.info_updated'));
     }
 
@@ -285,7 +291,7 @@ class AccountController extends Controller
     public function password_update(SelfPasswordUpdateRequest $request)
     {
         if (config('app.demo') == true && Auth::guard('customer')->user()->id <= config('system.demo.customers', 1)) {
-            return redirect()->route('account', 'account#password-tab')
+            return redirect()->route('account.password')
                 ->with('warning', trans('messages.demo_restriction'));
         }
 
@@ -293,8 +299,77 @@ class AccountController extends Controller
 
         // event(new PasswordUpdated(Auth::user()));
 
-        return redirect()->route('account', 'account#password-tab')
+        return redirect()->route('account.password')
             ->with('success', trans('theme.notify.info_updated'));
+    }
+
+    /**
+     * Delivery address picker modal (list saved addresses + add new).
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function select_address(Request $request)
+    {
+        $customer = Auth::guard('customer')->user();
+        $addresses = $customer->addresses()->orderBy('id')->get();
+        $buyerLocation = app(BuyerLocationService::class);
+        $buyerLocation->ensureDeliveryLocation($customer);
+
+        $activeAddressId = $customer->preferred_address_id;
+
+        if (! $activeAddressId) {
+            $sessionLat = session('buyer_latitude');
+            $sessionLng = session('buyer_longitude');
+
+            if ($sessionLat !== null && $sessionLng !== null) {
+                foreach ($addresses as $address) {
+                    if ($address->latitude && $address->longitude
+                        && abs((float) $address->latitude - (float) $sessionLat) < 0.0001
+                        && abs((float) $address->longitude - (float) $sessionLng) < 0.0001) {
+                        $activeAddressId = $address->id;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return view(
+            'theme::modals._select_address',
+            compact('addresses', 'activeAddressId')
+        )->render();
+    }
+
+    /**
+     * Apply a saved address as the active delivery location.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function use_address(Request $request, Address $address)
+    {
+        $customer = Auth::guard('customer')->user();
+
+        if ($address->addressable_id != $customer->id
+            || $address->addressable_type != Customer::class) {
+            abort(403);
+        }
+
+        $buyerLocation = app(BuyerLocationService::class);
+
+        if (! $buyerLocation->applyAddressAsLocation($address, $customer)) {
+            return response()->json([
+                'success' => false,
+                'message' => trans('theme.address_geocode_failed'),
+            ], 422);
+        }
+
+        $customer->refresh();
+
+        return response()->json([
+            'success' => true,
+            'message' => trans('theme.location_saved'),
+            'address_text' => $buyerLocation->addressText(),
+            'preferred_address_id' => $customer->preferred_address_id,
+        ]);
     }
 
     /**
@@ -329,7 +404,7 @@ class AccountController extends Controller
 
         $this->finalizeCustomerAddress($address, $customer);
 
-        return redirect()->to(url()->previous().'?address='.$address->id.'#address-tab')
+        return redirect()->route('account.addresses', ['address' => $address->id])
             ->with('success', trans('theme.notify.address_created'));
     }
 
@@ -359,7 +434,7 @@ class AccountController extends Controller
 
         $this->finalizeCustomerAddress($address->fresh(), Auth::guard('customer')->user());
 
-        return redirect()->route('account', 'account#address-tab')
+        return redirect()->route('account.addresses')
             ->with('success', trans('theme.notify.info_updated'));
     }
 
@@ -371,9 +446,23 @@ class AccountController extends Controller
      */
     public function address_delete(SelfAddressDeleteRequest $request, Address $address)
     {
+        $customer = Auth::guard('customer')->user();
+        $buyerLocation = app(BuyerLocationService::class);
+
+        if ((int) $customer->preferred_address_id === (int) $address->id) {
+            $buyerLocation->clearPreferredAddress($customer);
+            session()->forget([
+                'buyer_latitude',
+                'buyer_longitude',
+                'buyer_address_text',
+            ]);
+        }
+
         $address->delete();
 
-        return redirect()->route('account', 'account#address-tab')
+        $buyerLocation->ensureDeliveryLocation($customer->fresh());
+
+        return redirect()->route('account.addresses')
             ->with('success', trans('theme.notify.address_deleted'));
     }
 
@@ -383,7 +472,7 @@ class AccountController extends Controller
 
         Auth::guard('customer')->user()->saveImage($request->file('avatar'));
 
-        return redirect()->route('account', 'account#account-info-tab')
+        return redirect()->route('account', 'account')
             ->with('success', trans('theme.notify.info_updated'));
     }
 
@@ -391,7 +480,7 @@ class AccountController extends Controller
     {
         Auth::guard('customer')->user()->deleteImage();
 
-        return redirect()->route('account', 'account#account-info-tab')
+        return redirect()->route('account', 'account')
             ->with('success', trans('theme.notify.info_deleted'));
     }
 

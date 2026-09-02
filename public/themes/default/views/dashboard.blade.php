@@ -21,9 +21,21 @@
           <div class="sf-account-page-head">
             <div>
               <p class="sf-account-page-head__eyebrow">@lang('theme.nav.my_account')</p>
-              <h1 class="sf-account-page-head__title">@lang('theme.' . $tab)</h1>
+              @php
+                $pageTitles = [
+                  'account' => trans('theme.basic_info'),
+                  'password' => trans('theme.change_password'),
+                  'addresses' => trans('theme.addresses'),
+                  'account_delete' => trans('theme.button.delete'),
+                  'wallet' => trans('packages.wallet.my_wallet'),
+                ];
+                $pageTitle = $pageTitles[$tab] ?? trans('theme.' . $tab);
+              @endphp
+              <h1 class="sf-account-page-head__title">{{ $pageTitle }}</h1>
             </div>
           </div>
+
+          @include('theme::partials._account_subnav')
 
           @if (isset($content))
             {!! $content !!}

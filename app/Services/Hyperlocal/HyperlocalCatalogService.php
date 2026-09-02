@@ -5,6 +5,7 @@ namespace App\Services\Hyperlocal;
 use App\Models\Inventory;
 use App\Models\Shop;
 use App\Services\Shop\NearbyShopService;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class HyperlocalCatalogService
@@ -126,5 +127,27 @@ class HyperlocalCatalogService
         }
 
         return $this->nearbyShops->find($lat, $lng);
+    }
+
+    /**
+     * Paginated nearby shops for homepage / inline store listings.
+     */
+    public function nearbyShopsPaginated(?int $perPage = null): LengthAwarePaginator
+    {
+        $perPage = $perPage ?? (int) config('hyperlocal.home_stores_per_page', 8);
+        $results = $this->nearbyShopsWithDistance();
+        $page = max(1, (int) request()->get('stores_page', 1));
+        $items = $results->forPage($page, $perPage)->values();
+
+        return (new LengthAwarePaginator(
+            $items,
+            $results->count(),
+            $perPage,
+            $page,
+            [
+                'path' => request()->url(),
+                'pageName' => 'stores_page',
+            ]
+        ))->withQueryString()->fragment('nearby-stores');
     }
 }

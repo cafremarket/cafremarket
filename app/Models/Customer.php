@@ -114,6 +114,7 @@ class Customer extends CustomerWallet
         'preferred_latitude',
         'preferred_longitude',
         'preferred_address_text',
+        'preferred_address_id',
 
         // for buyer group
         'buyer_group_id',

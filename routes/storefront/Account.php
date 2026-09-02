@@ -7,6 +7,18 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('dashboard', '/my/dashboard');
 
 Route::middleware('xssSanitizer')->group(function () {
+    Route::get('my/account/password', function () {
+        return app(AccountController::class)->index('password');
+    })->name('account.password');
+
+    Route::get('my/account/addresses', function () {
+        return app(AccountController::class)->index('addresses');
+    })->name('account.addresses');
+
+    Route::get('my/account/delete', function () {
+        return app(AccountController::class)->index('account_delete');
+    })->name('account.delete');
+
     Route::get('my/{tab?}', [
         AccountController::class, 'index',
     ])->name('account');
@@ -41,6 +53,14 @@ Route::middleware('xssSanitizer')->group(function () {
     ])->name('my.avatar.remove');
 
     // Address
+    Route::get('my/address/select', [
+        AccountController::class, 'select_address',
+    ])->name('my.address.select');
+
+    Route::post('my/address/{address}/use', [
+        AccountController::class, 'use_address',
+    ])->name('my.address.use');
+
     Route::get('my/address/create', [
         AccountController::class, 'create_address',
     ])->name('my.address.create');

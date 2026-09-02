@@ -59,7 +59,7 @@ abstract class SocialiteBaseController extends Controller
 
         Auth::guard('customer')->login($customer);
 
-        app(BuyerLocationService::class)->syncFromSavedAddress($customer);
+        app(BuyerLocationService::class)->ensureDeliveryLocation($customer);
 
         return redirect()->intended('/')
             ->with('success', trans('theme.notify.logged_in_successfully'));

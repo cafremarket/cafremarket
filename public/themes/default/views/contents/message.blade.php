@@ -7,7 +7,7 @@
         <div class="message-user-name" title="seller">
           @if ($message->shop)
             <a href="{{ route('show.store', $message->shop->slug) }}">
-              <img src="{{ get_storage_file_url(optional($message->shop->image)->path, 'thumbnail') }}" class="seller-info-logo mx-2" width="35%" alt="{{ trans('theme.logo') }}">
+              <img src="{{ get_logo_url($message->shop, 'thumbnail') }}" class="seller-info-logo sf-shop-logo mx-2" width="35%" alt="{{ trans('theme.logo') }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
               {!! $message->shop->getQualifiedName(10) !!}
             </a>
           @elseif($message->shop_id)
@@ -80,7 +80,7 @@
         <div class="message-user-info">
           <div class="message-user-name" title="seller">
             @if ($msg->repliable->shop)
-              <img src="{{ get_storage_file_url(optional($msg->repliable->shop->image)->path, 'thumbnail') }}" class="seller-info-logo mx-2" width="35%" alt="{{ trans('theme.logo') }}">
+              <img src="{{ get_logo_url($msg->repliable->shop, 'thumbnail') }}" class="seller-info-logo sf-shop-logo mx-2" width="35%" alt="{{ trans('theme.logo') }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
               {!! $msg->repliable->shop->getName() !!}
             @elseif($msg->repliable->shop_id)
               {{ trans('theme.store') }}

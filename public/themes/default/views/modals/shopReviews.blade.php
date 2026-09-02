@@ -15,7 +15,7 @@
           </div> <!-- /.widget-shop-header -->
 
           <div class="widget-shop-image">
-            <img src="{{ get_storage_file_url(optional($shop->logoImage)->path, 'small') }}" alt="{{ trans('theme.logo') }}">
+            <img src="{{ get_logo_url($shop, 'small') }}" class="sf-shop-logo" alt="{{ trans('theme.logo') }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
           </div>
 
           <div class="row">

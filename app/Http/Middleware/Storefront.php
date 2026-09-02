@@ -32,7 +32,7 @@ class Storefront
             return $next($request);
         }
 
-        app(BuyerLocationService::class)->syncFromCustomer();
+        app(BuyerLocationService::class)->ensureDeliveryLocation();
 
         View::share('buyer_has_location', buyer_has_location());
         View::share('hyperlocal_enabled', hyperlocal_enabled());

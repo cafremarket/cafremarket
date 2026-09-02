@@ -56,8 +56,6 @@
         </a>
       </li>
 
-      <li class="sf-account-nav__section">{{ trans('theme.nav.my_account') }}</li>
-
       @if (customer_has_wallet())
         <li class="{{ $tab == 'wallet' || $tab == 'deposit' ? 'active' : '' }}">
           <a href="{{ route('customer.account.wallet') }}">
@@ -83,10 +81,33 @@
         </li>
       @endif
 
-      <li class="{{ $tab == 'account' ? 'active' : '' }}">
+      <li class="sf-account-nav__section">{{ trans('theme.nav.my_account') }}</li>
+
+      <li class="sf-account-nav__sub {{ $tab == 'account' ? 'active' : '' }}">
         <a href="{{ route('account', 'account') }}">
-          <span class="sf-account-nav__icon"><i class="fas fa-user-cog" aria-hidden="true"></i></span>
-          <span>@lang('theme.nav.my_account')</span>
+          <span class="sf-account-nav__icon"><i class="fas fa-user" aria-hidden="true"></i></span>
+          <span>@lang('theme.basic_info')</span>
+        </a>
+      </li>
+
+      <li class="sf-account-nav__sub {{ $tab == 'password' ? 'active' : '' }}">
+        <a href="{{ route('account.password') }}">
+          <span class="sf-account-nav__icon"><i class="fas fa-lock" aria-hidden="true"></i></span>
+          <span>@lang('theme.change_password')</span>
+        </a>
+      </li>
+
+      <li class="sf-account-nav__sub {{ $tab == 'addresses' ? 'active' : '' }}">
+        <a href="{{ route('account.addresses') }}">
+          <span class="sf-account-nav__icon"><i class="fas fa-map-marker-alt" aria-hidden="true"></i></span>
+          <span>@lang('theme.addresses')</span>
+        </a>
+      </li>
+
+      <li class="sf-account-nav__sub {{ $tab == 'account_delete' ? 'active' : '' }}">
+        <a href="{{ route('account.delete') }}">
+          <span class="sf-account-nav__icon"><i class="fas fa-trash-alt" aria-hidden="true"></i></span>
+          <span>@lang('theme.button.delete')</span>
         </a>
       </li>
     </ul>

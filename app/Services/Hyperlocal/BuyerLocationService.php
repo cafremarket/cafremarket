@@ -15,6 +15,13 @@ class BuyerLocationService
         return $this->latitude() !== null && $this->longitude() !== null;
     }
 
+    public function activeAddressId(?Customer $customer = null): ?int
+    {
+        $customer = $customer ?? $this->customer();
+
+        return $customer?->preferred_address_id;
+    }
+
     public function latitude(): ?float
     {
         $fromRequest = $this->coordinatesFromRequest();
@@ -70,22 +77,68 @@ class BuyerLocationService
         return $this->customer()?->preferred_address_text;
     }
 
-    public function save(float $latitude, float $longitude, ?string $addressText = null, ?Request $request = null): void
+    /**
+     * Keep session, customer profile, and saved addresses aligned.
+     */
+    public function ensureDeliveryLocation(?Customer $customer = null): bool
     {
+        $customer = $customer ?? $this->customer();
+
+        if ($customer && $this->restorePreferredAddress($customer)) {
+            return true;
+        }
+
+        if ($this->hasLocation()) {
+            $this->hydrateSessionFromResolvedLocation($customer);
+
+            return true;
+        }
+
+        if (session()->has('buyer_address_text')) {
+            session()->forget([
+                'buyer_latitude',
+                'buyer_longitude',
+                'buyer_address_text',
+            ]);
+        }
+
+        if (! $customer) {
+            return false;
+        }
+
+        return $this->syncFromSavedAddress($customer);
+    }
+
+    public function save(
+        float $latitude,
+        float $longitude,
+        ?string $addressText = null,
+        ?Request $request = null,
+        ?int $addressId = null
+    ): void {
+        $customer = $this->customer($request);
+        $resolvedAddressText = $addressText
+            ?? session('buyer_address_text')
+            ?? $customer?->preferred_address_text;
+
         session([
             'buyer_latitude' => $latitude,
             'buyer_longitude' => $longitude,
-            'buyer_address_text' => $addressText,
+            'buyer_address_text' => $resolvedAddressText,
         ]);
 
-        $customer = $this->customer($request);
-
         if ($customer) {
-            $customer->update([
+            $payload = [
                 'preferred_latitude' => $latitude,
                 'preferred_longitude' => $longitude,
-                'preferred_address_text' => $addressText,
-            ]);
+                'preferred_address_text' => $resolvedAddressText,
+            ];
+
+            if ($addressId !== null) {
+                $payload['preferred_address_id'] = $addressId;
+            }
+
+            $customer->update($payload);
         }
     }
 
@@ -126,6 +179,14 @@ class BuyerLocationService
      */
     public function applyAddressAsLocation(Address $address, ?Customer $customer = null): bool
     {
+        $customer = $customer ?? $this->customer();
+
+        if ($customer
+            && ($address->addressable_id != $customer->id
+                || $address->addressable_type != Customer::class)) {
+            return false;
+        }
+
         $lat = $address->latitude;
         $lng = $address->longitude;
 
@@ -150,7 +211,7 @@ class BuyerLocationService
 
         $addressText = $address->toString(true) ?: $address->toShortString();
 
-        $this->save((float) $lat, (float) $lng, $addressText ?: null);
+        $this->save((float) $lat, (float) $lng, $addressText ?: null, null, (int) $address->id);
 
         return true;
     }
@@ -160,22 +221,22 @@ class BuyerLocationService
      */
     public function syncFromSavedAddress(?Customer $customer = null): bool
     {
-        if ($this->hasLocation()) {
-            return true;
-        }
-
         $customer = $customer ?? $this->customer();
 
         if (! $customer) {
-            return false;
+            return $this->hasLocation();
+        }
+
+        if ($this->restorePreferredAddress($customer)) {
+            return true;
         }
 
         if ($customer->preferred_latitude && $customer->preferred_longitude) {
-            session([
-                'buyer_latitude' => (float) $customer->preferred_latitude,
-                'buyer_longitude' => (float) $customer->preferred_longitude,
-                'buyer_address_text' => $customer->preferred_address_text,
-            ]);
+            $this->save(
+                (float) $customer->preferred_latitude,
+                (float) $customer->preferred_longitude,
+                $customer->preferred_address_text
+            );
 
             return true;
         }
@@ -186,12 +247,26 @@ class BuyerLocationService
             return false;
         }
 
+        if (! $address->latitude || ! $address->longitude) {
+            app(GeocodeService::class)->applyToAddress($address);
+            $address->refresh();
+        }
+
         return $this->applyAddressAsLocation($address, $customer);
     }
 
     public function syncFromCustomer(): void
     {
-        $this->syncFromSavedAddress();
+        $this->ensureDeliveryLocation();
+    }
+
+    public function clearPreferredAddress(?Customer $customer = null): void
+    {
+        $customer = $customer ?? $this->customer();
+
+        if ($customer) {
+            $customer->update(['preferred_address_id' => null]);
+        }
     }
 
     public function toArray(): array
@@ -201,7 +276,57 @@ class BuyerLocationService
             'longitude' => $this->longitude(),
             'address_text' => $this->addressText(),
             'has_location' => $this->hasLocation(),
+            'preferred_address_id' => $this->activeAddressId(),
         ];
+    }
+
+    protected function restorePreferredAddress(Customer $customer): bool
+    {
+        if (! $customer->preferred_address_id) {
+            return false;
+        }
+
+        $address = Address::query()
+            ->where('id', $customer->preferred_address_id)
+            ->where('addressable_id', $customer->id)
+            ->where('addressable_type', Customer::class)
+            ->first();
+
+        if (! $address) {
+            $customer->update(['preferred_address_id' => null]);
+
+            return false;
+        }
+
+        $lat = $address->latitude;
+        $lng = $address->longitude;
+
+        if (! $lat || ! $lng) {
+            return $this->applyAddressAsLocation($address, $customer);
+        }
+
+        $addressText = $address->toString(true) ?: $address->toShortString();
+
+        session([
+            'buyer_latitude' => (float) $lat,
+            'buyer_longitude' => (float) $lng,
+            'buyer_address_text' => $addressText,
+        ]);
+
+        if (
+            (float) $customer->preferred_latitude !== (float) $lat
+            || (float) $customer->preferred_longitude !== (float) $lng
+            || $customer->preferred_address_text !== $addressText
+        ) {
+            $customer->update([
+                'preferred_latitude' => $lat,
+                'preferred_longitude' => $lng,
+                'preferred_address_text' => $addressText,
+                'preferred_address_id' => $address->id,
+            ]);
+        }
+
+        return true;
     }
 
     protected function customer(?Request $request = null): ?Customer
@@ -219,6 +344,19 @@ class BuyerLocationService
         return Auth::guard('customer')->user() ?? Auth::guard('api')->user();
     }
 
+    protected function hydrateSessionFromResolvedLocation(?Customer $customer = null): void
+    {
+        if (! $this->hasLocation()) {
+            return;
+        }
+
+        session([
+            'buyer_latitude' => $this->latitude(),
+            'buyer_longitude' => $this->longitude(),
+            'buyer_address_text' => $this->addressText(),
+        ]);
+    }
+
     /**
      * Mobile/API clients send coordinates via query or headers on each request.
      *
@@ -229,6 +367,13 @@ class BuyerLocationService
         $request = request();
 
         if (! $request) {
+            return ['lat' => null, 'lng' => null];
+        }
+
+        $customer = $this->customer();
+
+        // Logged-in customers with a chosen saved address always use that — not URL params.
+        if ($customer && $customer->preferred_address_id) {
             return ['lat' => null, 'lng' => null];
         }
 

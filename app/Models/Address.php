@@ -105,7 +105,13 @@ class Address extends BaseModel
      */
     public function setStateIdAttribute($value)
     {
-        if (! is_numeric($value) && $value != null) {
+        if ($value === '' || $value === null) {
+            $this->attributes['state_id'] = null;
+
+            return;
+        }
+
+        if (! is_numeric($value)) {
             // Getting the country id
             if (isset($this->attributes['country_id']) && is_numeric($this->attributes['country_id'])) {
                 $country_id = $this->attributes['country_id'];

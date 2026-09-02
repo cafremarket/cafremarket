@@ -56,30 +56,34 @@
       });
     }
 
-    function openAddressSetupModal() {
-      var url = @json(route('my.address.create'));
+    function openAddressSetupModal(options) {
+      options = options || {};
+      var isOnboarding = options.onboarding === true;
+      var url = @json(route('my.address.select'));
       var $modal = $('#myDynamicModal');
 
       if (!$modal.length || !url) {
-        window.location.href = @json(route('account', 'account')) + '#address-tab';
+        window.location.href = @json(route('account.addresses'));
         return;
       }
 
       $.get(url, function(data) {
         cleanupModalOverlay();
-        $modal.attr('data-onboarding', '1');
+        $modal.attr('data-onboarding', isOnboarding ? '1' : '0');
+        $modal.attr('data-modal-type', 'address-select');
         $modal.html(data).modal({
-          backdrop: 'static',
-          keyboard: false,
+          backdrop: isOnboarding ? 'static' : true,
+          keyboard: true,
           show: true
         });
       }).fail(function() {
-        window.location.href = @json(route('account', 'account')) + '#address-tab';
+        window.location.href = @json(route('account.addresses'));
       });
     }
 
     window.openCustomerLoginModal = openLoginModal;
     window.switchAuthModal = switchAuthModal;
+    window.openAddressSetupModal = openAddressSetupModal;
 
     $(function() {
       var isGuest = {{ Auth::guard('customer')->check() ? 'false' : 'true' }};
@@ -99,6 +103,47 @@
         }
       });
 
+      $(document).on('click', '.js-open-address-setup', function(e) {
+        e.preventDefault();
+        openAddressSetupModal({ onboarding: false });
+      });
+
+      $(document).on('click', '.js-close-address-select', function() {
+        $('#myDynamicModal').modal('hide');
+      });
+
+      $(document).on('click', '.js-use-delivery-address', function(e) {
+        e.preventDefault();
+
+        var addressId = $(this).data('address-id');
+        if (!addressId) {
+          return;
+        }
+
+        var $btn = $(this);
+        $btn.prop('disabled', true).addClass('is-loading');
+
+        $.post(@json(url('my/address')) + '/' + addressId + '/use')
+          .done(function(data) {
+            if (data && data.success) {
+              window.location.reload();
+              return;
+            }
+
+            alert((data && data.message) ? data.message : @json(trans('theme.error')));
+          })
+          .fail(function(xhr) {
+            var msg = @json(trans('theme.error'));
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+              msg = xhr.responseJSON.message;
+            }
+            alert(msg);
+          })
+          .always(function() {
+            $btn.prop('disabled', false).removeClass('is-loading');
+          });
+      });
+
       if (isGuest) {
         $('#loginModal, #createAccountModal, #passwordResetModal').on('shown.bs.modal', function() {
           $(this).find('.close').hide();
@@ -109,7 +154,7 @@
       }
 
       if (needsAddress && !hasLocation) {
-        openAddressSetupModal();
+        openAddressSetupModal({ onboarding: true });
       }
     });
   })(window.jQuery);

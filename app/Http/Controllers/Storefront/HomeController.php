@@ -38,7 +38,7 @@ class HomeController extends Controller
      */
     public function index(Request $request, BuyerLocationService $buyerLocation, HyperlocalCatalogService $catalog)
     {
-        $buyerLocation->syncFromCustomer();
+        $buyerLocation->ensureDeliveryLocation();
 
         $sliders = Cache::rememberForever('sliders', function () {
             return Slider::orderBy('order', 'asc')
@@ -61,16 +61,13 @@ class HomeController extends Controller
         $longitude = $buyerLocation->longitude();
         $buyerAddress = $buyerLocation->addressText();
 
-        $nearbyResults = $catalog->nearbyShopsWithDistance();
-        $nearbyShops = $nearbyResults->pluck('shop');
-        $distances = $nearbyResults->mapWithKeys(fn ($row) => [$row['shop']->id => $row['distance_km']]);
+        $nearbyShopsPaginator = $catalog->nearbyShopsPaginated();
         $nearbyFeaturedItems = $catalog->nearbyFeaturedItems(5);
 
         return view('theme::index', compact(
             'banners',
             'sliders',
-            'nearbyShops',
-            'distances',
+            'nearbyShopsPaginator',
             'nearbyFeaturedItems',
             'latitude',
             'longitude',

@@ -12,4 +12,6 @@ return [
     'require_store_location_for_verification' => env('HYPERLOCAL_REQUIRE_STORE_LOCATION', true),
     // When false, nearby store lists include shops even if they have no active products yet.
     'require_inventory_for_nearby' => env('HYPERLOCAL_REQUIRE_INVENTORY_FOR_NEARBY', false),
+
+    'home_stores_per_page' => (int) env('HYPERLOCAL_HOME_STORES_PER_PAGE', 8),
 ];

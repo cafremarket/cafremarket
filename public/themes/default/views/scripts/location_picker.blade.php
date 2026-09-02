@@ -27,6 +27,7 @@
   var LOCATION_STORAGE_KEY = 'cafrepay_buyer_location';
   var LOCATION_SYNC_FLAG = 'cafrepay_location_synced';
   var hasServerLocation = {{ buyer_has_location() ? 'true' : 'false' }};
+  var isLoggedInCustomer = {{ Auth::guard('customer')->check() ? 'true' : 'false' }};
 
   window.CafrepayLocationStorage = window.CafrepayLocationStorage || {
     key: LOCATION_STORAGE_KEY,
@@ -51,7 +52,7 @@
   };
 
   function restoreLocationFromLocalStorage() {
-    if (hasServerLocation) {
+    if (isLoggedInCustomer || hasServerLocation) {
       return Promise.resolve(false);
     }
 

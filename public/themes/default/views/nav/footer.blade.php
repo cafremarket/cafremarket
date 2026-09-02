@@ -61,7 +61,7 @@
         <div class="sf-footer-col">
           <h4>{{ trans('theme.nav.let_us_help') }}</h4>
           <ul>
-            <li><a href="{{ route('account', 'dashboard') }}" rel="nofollow">{{ trans('theme.nav.your_account') }}</a></li>
+            <li><a href="{{ route('account', 'account') }}" rel="nofollow">{{ trans('theme.nav.your_account') }}</a></li>
             <li><a href="{{ route('account', 'orders') }}" rel="nofollow">{{ trans('theme.nav.your_orders') }}</a></li>
             <li><a href="{{ route('blog') }}" target="_blank" rel="noopener">{{ trans('theme.nav.blog') }}</a></li>
             @foreach (($pages ?? collect())->where('position', 'footer_1st_column') as $page)

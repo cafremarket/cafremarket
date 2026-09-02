@@ -99,7 +99,7 @@ class AuthController extends Controller
                 $customer->save();
             }
 
-            app(BuyerLocationService::class)->syncFromSavedAddress($customer);
+            app(BuyerLocationService::class)->ensureDeliveryLocation($customer);
 
             return new CustomerResource($customer);
         }

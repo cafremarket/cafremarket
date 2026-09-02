@@ -326,6 +326,17 @@
   color: #fff;
 }
 
+.sf-account-nav__sub a {
+  padding-left: 28px !important;
+  font-size: 0.86rem !important;
+}
+
+.sf-account-nav__sub .sf-account-nav__icon {
+  width: 28px;
+  height: 28px;
+  font-size: 0.82rem;
+}
+
 .sf-account-sidebar__footer {
   padding: 0 12px 14px;
   border-top: 1px solid #f1f5f9;
@@ -1290,6 +1301,69 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   pointer-events: none;
 }
 
+/* Homepage nearby stores — paginated grid (no "view all" link) */
+.sf-home-stores-section {
+  padding-top: 36px;
+  scroll-margin-top: 110px;
+}
+
+.sf-home-stores-head {
+  margin-bottom: 24px;
+}
+
+.sf-home-stores-head__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.sf-home-stores-head__title {
+  margin: 0 0 10px;
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+  color: var(--primary-text, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sf-home-stores-head__title i {
+  color: var(--primary-color, #ff6600);
+  font-size: 1.1rem;
+}
+
+.sf-home-stores-head__location {
+  margin: 0 0 8px;
+  color: #64748b;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 720px;
+}
+
+.sf-home-stores-head__location i {
+  color: var(--primary-color, #ff6600);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.sf-home-stores-head__meta {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.sf-home-stores-section .sf-stores-grid .nearby-store-card {
+  padding: 24px 20px 20px;
+  background: #fff;
+  height: 100%;
+}
+
 /* Legacy alias — keep until cached CSS clears */
 .sf-vendors-page,
 .sf-vendors-grid,
@@ -1358,6 +1432,58 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   background: #fef2f2;
   border: 1px solid #fecaca;
   color: #991b1b;
+}
+
+.sf-account-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.sf-account-section {
+  scroll-margin-top: 110px;
+}
+
+.sf-account-section__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.sf-account-section__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff7ed;
+  color: var(--primary-color, #ff6600);
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.sf-account-section__icon--danger {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.sf-account-section__title {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sf-account-section__hint {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.sf-account-settings .sf-address-toolbar {
+  margin-bottom: 16px;
 }
 
 .sf-account-tabs {
@@ -1550,8 +1676,130 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   margin-bottom: 12px;
 }
 
-#myDynamicModal[data-onboarding="1"] .modal-header .close {
+#myDynamicModal[data-onboarding="1"] .sf-address-create-modal .modal-header .close {
   display: none;
+}
+
+.sf-address-select-modal__header {
+  position: relative;
+}
+
+.sf-address-select-modal__close {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  opacity: 0.65;
+  font-size: 1.75rem;
+  z-index: 2;
+}
+
+.sf-address-select-modal__close:hover,
+.sf-address-select-modal__close:focus {
+  opacity: 1;
+}
+
+.sf-address-select-modal .modal-footer .btn-default {
+  min-width: 96px;
+}
+
+.sf-shop-logo,
+.nearby-store-card .thumb-lg img,
+.seller-info-logo,
+.vendor-logo {
+  object-fit: contain;
+  background: #fff7ed;
+}
+
+.sf-shop-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff7ed;
+  padding: 8px;
+}
+
+.sf-shop-logo-wrap img.sf-shop-logo {
+  width: 72px;
+  height: 72px;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+.sf-shop-logo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  color: var(--primary-color, #ff6600);
+  font-size: 2rem;
+  background: #fff7ed;
+}
+
+.sf-shop-logo-fallback.d-none {
+  display: none !important;
+}
+
+.sf-shop-logo--default {
+  padding: 10%;
+}
+
+.sf-address-select-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sf-address-grid--select {
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.sf-address-card--selectable {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid #e8edf2;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.sf-address-card--selectable:hover,
+.sf-address-card--selectable:focus {
+  border-color: rgba(255, 102, 0, 0.35);
+  box-shadow: 0 4px 16px rgba(255, 102, 0, 0.08);
+  outline: none;
+}
+
+.sf-address-card--selectable.sf-address-card--active {
+  border-color: var(--primary-color, #ff6600);
+  box-shadow: 0 0 0 1px rgba(255, 102, 0, 0.15);
+}
+
+.sf-address-card--selectable.is-loading {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.sf-address-card__badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary-color, #ff6600);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sf-address-select-modal .modal-title {
+  font-weight: 700;
+  color: #0f172a;
 }
 
 @media (max-width: 767px) {
@@ -1577,4 +1825,75 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
 
 .sf-shop-card__badge {
   font-size: 0.8rem;
+}
+
+/* ── Wallet (Cafre-pay) dashboard ─────────────────────────────────── */
+.sf-wallet-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sf-wallet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sf-wallet-actions .btn {
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.sf-stat-card--action {
+  cursor: default;
+}
+
+.sf-stat-card--action:hover {
+  box-shadow: 0 4px 16px rgba(255, 102, 0, 0.12);
+}
+
+.sf-stat-card--action .sf-stat-card__value {
+  font-size: 1.1rem;
+}
+
+.sf-wallet-deposit {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sf-wallet-deposit__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 20px;
+}
+
+.sf-wallet-deposit__panel {
+  background: #fff;
+  border: 1px solid #e8edf2;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04);
+}
+
+.sf-wallet-deposit__panel-title {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sf-wallet-deposit .payment-option {
+  margin-right: 8px;
+}
+
+.sf-wallet-deposit #submit-btn-block {
+  margin-top: 16px;
+}
+
+@media (max-width: 991px) {
+  .sf-wallet-deposit__grid {
+    grid-template-columns: 1fr;
+  }
 }

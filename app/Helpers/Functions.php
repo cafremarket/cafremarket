@@ -1124,6 +1124,26 @@ if (! function_exists('get_cover_img_src')) {
     }
 }
 
+if (! function_exists('default_shop_logo_url')) {
+    function default_shop_logo_url($size = 'small')
+    {
+        return asset('images/brand/default-store.svg');
+    }
+}
+
+if (! function_exists('shop_has_custom_logo')) {
+    function shop_has_custom_logo($model): bool
+    {
+        if (! is_object($model)) {
+            return false;
+        }
+
+        $path = optional($model->logoImage)->path;
+
+        return filled($path) && \Illuminate\Support\Facades\Storage::exists($path);
+    }
+}
+
 if (! function_exists('get_logo_url')) {
     function get_logo_url($model, $size = 'small')
     {
@@ -1140,11 +1160,13 @@ if (! function_exists('get_logo_url')) {
             });
         }
 
-        if (is_object($model) && $model->logoImage && Storage::exists($model->logoImage->path)) {
-            return get_storage_file_url($model->logoImage->path, $size);
+        $path = is_object($model) ? optional($model->logoImage)->path : null;
+
+        if (shop_has_custom_logo($model)) {
+            return get_storage_file_url($path, $size);
         }
 
-        return get_placeholder_img($size);
+        return default_shop_logo_url($size);
     }
 }
 
@@ -3059,9 +3081,25 @@ if (! function_exists('buyer_has_location')) {
     }
 }
 
+if (! function_exists('buyer_delivery_address_label')) {
+    /**
+     * Unified delivery address label for header, homepage, and store pages.
+     */
+    function buyer_delivery_address_label(): ?string
+    {
+        $service = app(\App\Services\Hyperlocal\BuyerLocationService::class);
+
+        if (! $service->hasLocation()) {
+            return null;
+        }
+
+        return $service->addressText();
+    }
+}
+
 if (! function_exists('customer_needs_delivery_address')) {
     /**
-     * Logged-in customer still has no delivery location after profile/address sync.
+     * Logged-in customer must add or sync a saved delivery address.
      */
     function customer_needs_delivery_address(): bool
     {
@@ -3073,7 +3111,22 @@ if (! function_exists('customer_needs_delivery_address')) {
             return false;
         }
 
-        return ! buyer_has_location();
+        $customer = Auth::guard('customer')->user();
+        $service = app(\App\Services\Hyperlocal\BuyerLocationService::class);
+
+        if ($customer->addresses()->count() === 0) {
+            session()->forget([
+                'buyer_latitude',
+                'buyer_longitude',
+                'buyer_address_text',
+            ]);
+
+            return true;
+        }
+
+        $service->ensureDeliveryLocation($customer);
+
+        return ! $service->hasLocation();
     }
 }
 

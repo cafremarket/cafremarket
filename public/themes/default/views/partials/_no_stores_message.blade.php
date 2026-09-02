@@ -7,7 +7,7 @@
     <p class="sf-empty-stores__text">{{ $message }}</p>
   @endif
   @if (!empty($showLocationButton))
-    <button type="button" class="btn sf-btn-primary btn-round mt-2" data-toggle="modal" data-target="#locationModal">
+    <button type="button" class="btn sf-btn-primary btn-round mt-2 js-open-address-setup">
       {{ $locationButtonText ?? trans('theme.change_location') }}
     </button>
   @endif

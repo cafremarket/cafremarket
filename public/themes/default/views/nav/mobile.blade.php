@@ -19,8 +19,13 @@
 
     @auth('customer')
       <a href="{{ route('account', 'dashboard') }}" class="sf-mobile-drawer__link">
-        <span class="sf-mobile-drawer__icon"><i class="fal fa-user" aria-hidden="true"></i></span>
-        <span>{{ trans('theme.account') }}</span>
+        <span class="sf-mobile-drawer__icon"><i class="fal fa-tachometer-alt" aria-hidden="true"></i></span>
+        <span>{{ trans('theme.nav.dashboard') }}</span>
+      </a>
+
+      <a href="{{ route('account', 'account') }}" class="sf-mobile-drawer__link">
+        <span class="sf-mobile-drawer__icon"><i class="fal fa-user-cog" aria-hidden="true"></i></span>
+        <span>{{ trans('theme.nav.my_account') }}</span>
       </a>
 
       <a href="{{ route('account', 'orders') }}" class="sf-mobile-drawer__link">

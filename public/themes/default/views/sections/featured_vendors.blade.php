@@ -10,7 +10,7 @@
                   <div class="product-list-col-header">
                     <div class="sell-header d-flex flex-column align-items-center justify-content-end">
                       <figure>
-                        <img class="lazy brand-logo" src="{{ get_storage_file_url(optional($featured_vendor->logoImage)->path, 'tyni') }}" data-src="{{ get_storage_file_url(optional($featured_vendor->logoImage)->path, 'full') }}" class="seller-info-logo mb-1" alt="{{ trans('theme.logo') }}">
+                        <img class="lazy brand-logo sf-shop-logo" src="{{ get_logo_url($featured_vendor, 'tyni') }}" data-src="{{ get_logo_url($featured_vendor, 'full') }}" class="seller-info-logo mb-1" alt="{{ trans('theme.logo') }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
                       </figure>
 
                       <div class="sell-header-title">

@@ -18,7 +18,7 @@
 
       <div class="sf-dashboard-welcome__actions">
         @unless ($dashboard->shippingAddress)
-          <a href="{{ route('account', 'account') }}#address-tab" class="btn btn-default btn-sm">
+          <a href="{{ route('account.addresses') }}" class="btn btn-default btn-sm">
             <i class="fas fa-map-marker-alt" aria-hidden="true"></i> @lang('theme.add_shipping_address')
           </a>
         @endunless

@@ -160,7 +160,7 @@
                   </a>
                 </div>
 
-                <img class="lazy seller-info-logo" src="{{ get_storage_file_url(optional($item->shop->logoImage)->path, 'tiny') }}" data-src="{{ get_storage_file_url(optional($item->shop->logoImage)->path, 'medium') }}" alt="{{ trans('theme.logo') }}">
+                <img class="lazy seller-info-logo sf-shop-logo" src="{{ get_logo_url($item->shop, 'tiny') }}" data-src="{{ get_logo_url($item->shop, 'medium') }}" alt="{{ trans('theme.logo') }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
 
                 <a href="{{ route('show.store', $item->shop->slug) }}" class="seller-info-name">
                   {!! $item->shop->getQualifiedName() !!}

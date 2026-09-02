@@ -10,7 +10,7 @@
       <div class="row profile-header border mt-3">
         <div class="col-lg-2 col-md-3 text-center my-3">
           <div class="d-flex thumbnail rounded-circle justify-content-center align-items-center mx-auto p-2">
-            <img class="lazy w-100" src="{{ get_storage_file_url(optional($shop->logoImage)->path, 'tiny') }}" data-src="{{ get_storage_file_url(optional($shop->logoImage)->path, 'full') }}" alt="{{ $shop->name }}">
+            <img class="lazy w-100 sf-shop-logo" src="{{ get_logo_url($shop, 'tiny') }}" data-src="{{ get_logo_url($shop, 'full') }}" alt="{{ $shop->name }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
           </div>
         </div> <!-- /.col -->
 

@@ -20,7 +20,7 @@
               <tr class="order-body">
                 <td>
                   <div class="product-img-wrap">
-                    <img src="{{ get_storage_file_url(optional($order->shop->image)->path, 'small') }}" alt="{{ $order->shop->slug }}" title="{{ $order->shop->slug }}" />
+                    <img src="{{ get_logo_url($order->shop, 'small') }}" class="sf-shop-logo" alt="{{ $order->shop->slug }}" title="{{ $order->shop->slug }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');" />
                   </div>
 
                   <div class="product-info">

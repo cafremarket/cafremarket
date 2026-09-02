@@ -52,7 +52,7 @@
           <i class="fal fa-map-marker-alt fa-3x text-primary mb-3"></i>
           <h3>{{ trans('theme.set_delivery_location') }}</h3>
           <p class="text-muted">{{ trans('theme.set_location_to_shop') }}</p>
-          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#locationModal">
+          <button type="button" class="btn btn-primary js-open-address-setup">
             {{ trans('theme.confirm_location') }}
           </button>
         </div>

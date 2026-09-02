@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+<div class="modal-dialog modal-lg modal-dialog-centered sf-address-create-modal" role="document">
   <div class="modal-content p-2">
     <div class="modal-header p-3 border-0">
       <button type="button" class="close" data-dismiss="modal" aria-label="Close">

@@ -3,13 +3,13 @@
     <div class="container">
       <div class="top-nav-inner">
         <div class="top-nav-left">
-          @if (session('buyer_address_text'))
-            <a href="javascript:void(0);" data-toggle="modal" data-target="#locationModal" class="delivery-location-chip">
+          @if (buyer_delivery_address_label())
+            <a href="javascript:void(0);" class="delivery-location-chip js-open-address-setup">
               <i class="fal fa-map-marker-alt"></i>
-              {{ trans('theme.deliver_to') }} <strong>{{ Str::limit(session('buyer_address_text'), 28) }}</strong>
+              {{ trans('theme.deliver_to') }} <strong>{{ Str::limit(buyer_delivery_address_label(), 28) }}</strong>
             </a>
           @else
-            <a href="javascript:void(0);" data-toggle="modal" data-target="#locationModal" class="delivery-location-chip delivery-location-chip--empty">
+            <a href="javascript:void(0);" class="delivery-location-chip delivery-location-chip--empty js-open-address-setup">
               <i class="fal fa-map-marker-alt"></i> {{ trans('theme.set_delivery_location') }}
             </a>
           @endif
@@ -227,8 +227,8 @@
 
               <li>
                 @auth('customer')
-                  <a href="{{ route('account', 'account') }}" aria-label="{{ trans('theme.your_account') }}">
-                    <i class="fal fa-user" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.your_account') }}"></i>
+                  <a href="{{ route('account', 'dashboard') }}" aria-label="{{ trans('theme.nav.dashboard') }}">
+                    <i class="fal fa-user" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.nav.dashboard') }}"></i>
                   </a>
                 @else
                   <a href="javascript:void(0);" data-toggle="modal" data-target="#loginModal" aria-label="{{ trans('theme.login') }}">

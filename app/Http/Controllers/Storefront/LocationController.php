@@ -38,6 +38,9 @@ class LocationController extends Controller
             $request
         );
 
+        $buyerLocation->clearPreferredAddress();
+        $buyerLocation->ensureDeliveryLocation();
+
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'message' => trans('theme.location_saved'),

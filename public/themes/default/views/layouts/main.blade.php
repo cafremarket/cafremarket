@@ -178,7 +178,7 @@
   @unless (Auth::guard('customer')->check())
     @include('theme::scripts.auth_gate')
   @else
-    @if (customer_needs_delivery_address())
+    @if (function_exists('hyperlocal_enabled') && hyperlocal_enabled())
       @include('theme::scripts.auth_gate')
     @endif
   @endunless

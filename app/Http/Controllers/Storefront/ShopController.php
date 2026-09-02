@@ -25,14 +25,30 @@ class ShopController extends Controller
      */
     public function index(Request $request, BuyerLocationService $buyerLocation, HyperlocalCatalogService $catalog)
     {
-        $buyerLocation->syncFromCustomer();
-        $latitude = $request->get('lat', $buyerLocation->latitude());
-        $longitude = $request->get('lng', $buyerLocation->longitude());
+        $buyerLocation->ensureDeliveryLocation();
+
         $scope = $request->get('scope', 'nearby');
+        $customer = auth('customer')->user();
 
-        if ($latitude && $longitude && $scope !== 'all') {
-            $buyerLocation->save((float) $latitude, (float) $longitude, $request->get('address_text'), $request);
+        if ($customer?->preferred_address_id && $request->hasAny(['lat', 'lng', 'address_text'])) {
+            return redirect()->route('shops', $request->except(['lat', 'lng', 'address_text']));
+        }
 
+        if (
+            ! $customer?->preferred_address_id
+            && $request->filled('lat')
+            && $request->filled('lng')
+            && $scope !== 'all'
+        ) {
+            $buyerLocation->save(
+                (float) $request->get('lat'),
+                (float) $request->get('lng'),
+                $request->get('address_text') ?: $buyerLocation->addressText(),
+                $request
+            );
+        }
+
+        if ($buyerLocation->hasLocation() && $scope !== 'all') {
             $nearby = $catalog->nearbyShopsWithDistance();
             $shops = $nearby->pluck('shop');
             $distances = $nearby->mapWithKeys(fn ($row) => [$row['shop']->id => $row['distance_km']]);

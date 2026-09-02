@@ -1,14 +1,12 @@
 <div class="card-box text-center h-100 nearby-store-card">
   <a href="{{ route('show.store', $shop->slug) }}" class="text-reset">
+    <div class="thumb-lg sf-shop-logo-wrap thumbnail rounded-circle mx-auto">
+      @include('theme::partials._shop_logo', ['shop' => $shop])
+    </div>
+
     @if (config('system_settings.show_merchant_info_as_vendor'))
-      <div class="thumb-lg d-flex thumbnail rounded-circle justify-content-center align-items-center mx-auto p-2">
-        <img class="lazy w-100" src="{{ get_avatar_src($shop->owner, 'tiny_thumb') }}" data-src="{{ get_avatar_src($shop->owner, 'full') }}" alt="{{ $shop->name }}">
-      </div>
       <h4 class="mb-1 mt-2">{!! $shop->owner->getName() !!}</h4>
     @else
-      <div class="thumb-lg d-flex thumbnail rounded-circle justify-content-center align-items-center mx-auto p-2">
-        <img class="lazy w-100" src="{{ get_storage_file_url(optional($shop->logoImage)->path, 'tiny_thumb') }}" data-src="{{ get_storage_file_url(optional($shop->logoImage)->path, 'full') }}" alt="{{ $shop->name }}">
-      </div>
       <h4 class="mb-1 mt-2">{!! $shop->getQualifiedName(10) !!}</h4>
       @if (!empty($shop->reward_badge))
         <div class="sf-shop-card__badge mb-1">{!! $shop->reward_badge !!}</div>
