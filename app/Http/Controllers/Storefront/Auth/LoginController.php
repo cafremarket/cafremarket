@@ -130,17 +130,26 @@ class LoginController extends SocialiteBaseController
     }
 
     /**
+     * Get the guard to be used during authentication.
+     *
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    protected function guard()
+    {
+        return Auth::guard('customer');
+    }
+
+    /**
      * Attempt to log the user into the application.
      *
      * @return bool
      */
     protected function attemptLogin(Request $request)
     {
-        return Auth::guard('customer')
-            ->attempt(
-                $request->only($this->username($request), 'password'),
-                $request->filled('remember')
-            );
+        return $this->guard()->attempt(
+            $request->only($this->username($request), 'password'),
+            $request->filled('remember')
+        );
     }
 
     /**
@@ -148,6 +157,12 @@ class LoginController extends SocialiteBaseController
      */
     protected function authenticated(Request $request, $user)
     {
+        $user ??= $this->guard()->user();
+
+        if (! $user instanceof Customer) {
+            return;
+        }
+
         $buyerLocation = app(BuyerLocationService::class);
 
         if ($user->addresses()->count() === 0) {
