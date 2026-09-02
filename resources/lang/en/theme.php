@@ -825,6 +825,7 @@ return [
     'already_given_feedback' => 'You already gave feedback!',
     'no_comment' => 'No comment',
     'continue_as_guest' => 'Continue as guest',
+    'login_required_to_shop' => 'Sign in to browse stores and place orders.',
     'set_delivery_location' => 'Set delivery location',
     'deliver_to' => 'Deliver to',
     'where_deliver' => 'Where should we deliver?',

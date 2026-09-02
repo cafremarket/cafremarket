@@ -3059,6 +3059,24 @@ if (! function_exists('buyer_has_location')) {
     }
 }
 
+if (! function_exists('customer_needs_delivery_address')) {
+    /**
+     * Logged-in customer still has no delivery location after profile/address sync.
+     */
+    function customer_needs_delivery_address(): bool
+    {
+        if (! Auth::guard('customer')->check()) {
+            return false;
+        }
+
+        if (function_exists('hyperlocal_enabled') && ! hyperlocal_enabled()) {
+            return false;
+        }
+
+        return ! buyer_has_location();
+    }
+}
+
 if (! function_exists('get_deliverable_shop_ids')) {
     function get_deliverable_shop_ids(): array
     {

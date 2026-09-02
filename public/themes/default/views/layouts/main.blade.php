@@ -175,9 +175,13 @@
     @include('theme::scripts.location_picker')
   @endif
 
-  @if (Request::is('/'))
-    @include('theme::scripts.homepage_flow')
-  @endif
+  @unless (Auth::guard('customer')->check())
+    @include('theme::scripts.auth_gate')
+  @else
+    @if (customer_needs_delivery_address())
+      @include('theme::scripts.auth_gate')
+    @endif
+  @endunless
 
   @include('theme::scripts.password_toggle')
 

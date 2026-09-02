@@ -36,6 +36,7 @@ class Storefront
 
         View::share('buyer_has_location', buyer_has_location());
         View::share('hyperlocal_enabled', hyperlocal_enabled());
+        View::share('customer_needs_address', customer_needs_delivery_address());
 
         // Push an empty value of 0 to card session if not exist
         if (Session::missing('session_carts')) {

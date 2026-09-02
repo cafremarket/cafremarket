@@ -3,11 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\Geo\GeocodeService;
 use App\Services\Hyperlocal\BuyerLocationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerLocationController extends Controller
 {
+    public function show(BuyerLocationService $buyerLocation)
+    {
+        $customer = Auth::guard('api')->user();
+        $buyerLocation->syncFromSavedAddress($customer);
+
+        return response()->json($buyerLocation->toArray());
+    }
+
     public function store(Request $request, BuyerLocationService $buyerLocation)
     {
         $request->validate([

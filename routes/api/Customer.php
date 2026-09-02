@@ -111,7 +111,6 @@ Route::middleware('customerApp')->group(function () {
     Route::get('paymentOptions/{shop}', [HomeController::class, 'paymentOptions']);
     Route::get('countries', [HomeController::class, 'countries']);
     Route::get('states/{country}', [HomeController::class, 'states']);
-    Route::post('customer/location', [CustomerLocationController::class, 'store']);
 
     // delivery body
     Route::post('deliveryBoy/{order}/feedback', [FeedbackController::class, 'save_delivery_boy_feedbacks']);
@@ -180,5 +179,8 @@ Route::middleware('customerApp')->group(function () {
         Route::post('dispute/{dispute}/appeal', [DisputeController::class, 'appeal']);
         Route::put('dispute/{dispute}/solved', [DisputeController::class, 'mark_as_solved']);
         Route::get('attachment/{attachment}/download', [AttachmentController::class, 'download']);
+
+        Route::get('customer/location', [CustomerLocationController::class, 'show']);
+        Route::post('customer/location', [CustomerLocationController::class, 'store']);
     });
 });

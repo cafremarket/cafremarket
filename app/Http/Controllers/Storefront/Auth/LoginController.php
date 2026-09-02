@@ -31,7 +31,7 @@ class LoginController extends SocialiteBaseController
      */
     protected function redirectTo(): string
     {
-        return route('account', 'dashboard', false);
+        return route('homepage', absolute: false);
     }
 
     /**

@@ -640,17 +640,6 @@
 
   document.addEventListener('DOMContentLoaded', function() {
     bootLocationPicker();
-
-    restoreLocationFromLocalStorage().then(function(synced) {
-      if (!synced) {
-        return;
-      }
-
-      if (!sessionStorage.getItem(LOCATION_SYNC_FLAG)) {
-        sessionStorage.setItem(LOCATION_SYNC_FLAG, '1');
-        window.location.reload();
-      }
-    });
   });
 })();
 </script>

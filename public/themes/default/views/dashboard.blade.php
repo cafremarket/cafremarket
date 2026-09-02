@@ -1,33 +1,30 @@
 @extends('theme::layouts.main')
 
 @section('content')
-  <div class="container">
-    <header class="page-header">
-      <ol class="breadcrumb nav-breadcrumb">
-        @include('theme::headers.lists.home')
-        @include('theme::headers.lists.account')
-        <li class="active">@lang('theme.' . $tab)</li>
-      </ol>
-    </header>
-  </div>
-
-  <div class="container">
-    @if (!Auth::guard('customer')->user()->isVerified())
-      <div class="alert alert-info alert-dismissible">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        <strong><i class="icon fas fa-info-circle"></i> {{ trans('theme.notice') }}</strong>
-        {{ trans('messages.email_verification_notice') }}
-        <a href="{{ route('customer.verify') }}"> {{ trans('auth.resend_verification_link') }}</a>
-      </div>
-    @endif
-  </div>
-
-  <section class="account-section pb-5">
+  <section class="sf-dashboard-page account-section pb-5">
     <div class="container">
+      @if (!Auth::guard('customer')->user()->isVerified())
+        <div class="sf-alert sf-alert--info">
+          <i class="fas fa-info-circle" aria-hidden="true"></i>
+          <div>
+            <strong>{{ trans('theme.notice') }}</strong>
+            {{ trans('messages.email_verification_notice') }}
+            <a href="{{ route('customer.verify') }}">{{ trans('auth.resend_verification_link') }}</a>
+          </div>
+        </div>
+      @endif
+
       <div class="sf-account-layout">
         @include('theme::nav.account_sidebar')
 
         <div class="sf-account-content">
+          <div class="sf-account-page-head">
+            <div>
+              <p class="sf-account-page-head__eyebrow">@lang('theme.nav.my_account')</p>
+              <h1 class="sf-account-page-head__title">@lang('theme.' . $tab)</h1>
+            </div>
+          </div>
+
           @if (isset($content))
             {!! $content !!}
           @else

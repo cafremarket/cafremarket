@@ -1,4 +1,4 @@
-<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true">
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog auth-modal modal-sm modal-dialog-centered" role="document">
     @if (is_incevio_package_loaded('otp-login'))
       @include('otp-login::modal')
@@ -9,7 +9,7 @@
             <img src="{{ get_icon_url('system', 'full') }}" alt="rocket_contact">
           </div>
 
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close" style="display:none;">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -31,6 +31,12 @@
               <div class="help-block with-errors"></div>
             </div>
 
+            <div class="form-group text-right mb-2">
+              <a href="javascript:void(0);" class="sf-auth-link js-auth-switch" data-target="#passwordResetModal">
+                {{ trans('theme.forgot_password') }}
+              </a>
+            </div>
+
             <div class="form-group text-left">
               <label>
                 <input name="remeber" id="remeber" class="i-check-blue" type="checkbox" /> {{ trans('theme.remember_me') }}
@@ -40,27 +46,27 @@
             <input class="btn btn-primary btn-block btn-lg btn-round mt-3" type="submit" value="{{ trans('theme.button.login') }}">
             {!! Form::close() !!}
 
+            <div class="sf-auth-divider"><span>{{ trans('theme.or') }}</span></div>
+
+            <div class="sf-auth-secondary-actions">
+              @if (is_incevio_package_loaded('buyerGroup') || is_incevio_package_loaded('smartForm'))
+                <a href="{{ route('customer.register') }}" class="btn btn-default btn-block btn-lg btn-round sf-auth-register-btn">
+                  {{ trans('theme.create_account') }}
+                </a>
+              @else
+                <a href="javascript:void(0);" class="btn btn-default btn-block btn-lg btn-round sf-auth-register-btn js-auth-switch" data-target="#createAccountModal">
+                  {{ trans('theme.create_account') }}
+                </a>
+              @endif
+            </div>
+
             @include('theme::auth._social_modal_login')
           </div>
         </div>
 
         <div class="modal-footer">
-          <div class="signup-section d-flex justify-content-center flex-wrap">
-            @if (!is_incevio_package_loaded('otp-login'))
-              <a href="javascript:void(0);" class="mr-4" data-dismiss="modal" data-toggle="modal" data-target="#passwordResetModal">{{ trans('theme.forgot_password') }}</a>
-            @endif
-
-            @if (is_incevio_package_loaded('buyerGroup') || is_incevio_package_loaded('smartForm'))
-              <a href="{{ route('customer.register') }}">{{ trans('theme.register_here') }}</a>
-            @else
-              <a href="javascript:void(0);" data-dismiss="modal" data-toggle="modal" data-target="#createAccountModal">{{ trans('theme.register_here') }}</a>
-            @endif
-          </div>
-
-          <div class="text-center mt-3 w-100">
-            <button type="button" class="btn btn-link btn-sm" id="continueAsGuestBtn">
-              {{ trans('theme.continue_as_guest') }}
-            </button>
+          <div class="text-center w-100 sf-login-required-note">
+            <p class="text-muted small mb-0">{{ trans('theme.login_required_to_shop') }}</p>
           </div>
 
           @include('partials._demo_customer_login')
@@ -72,14 +78,14 @@
 
 <div class="modal fade" id="guestContinueModal" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;"></div>
 
-<div class="modal fade auth-modal" id="createAccountModal" tabindex="-1" role="dialog" aria-labelledby="createAccountModal" aria-hidden="true">
+<div class="modal fade auth-modal" id="createAccountModal" tabindex="-1" role="dialog" aria-labelledby="createAccountModal" aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog auth-modal modal-md modal-dialog-centered" role="document">
     <div class="modal-content px-3">
       <div class="modal-header p-3">
         <div class="modal-icon">
           <img src="{{ get_icon_url('system', 'full') }}" alt="rocket_contact">
         </div>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close" style="display:none;">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -151,7 +157,7 @@
 
       <div class="modal-footer d-flex justify-content-center">
         <div class="signup-section mb-3">
-          <a href="javascript:void(0);" data-dismiss="modal" data-toggle="modal" data-target="#loginModal">
+          <a href="javascript:void(0);" class="sf-auth-link js-auth-switch" data-target="#loginModal">
             {{ trans('theme.have_account') }}
           </a>
         </div>
@@ -160,14 +166,14 @@
   </div>
 </div> <!-- /#createAccountModal -->
 
-<div class="modal fade" id="passwordResetModal" tabindex="-1" role="dialog" aria-labelledby="passwordResetModal" aria-hidden="true">
+<div class="modal fade" id="passwordResetModal" tabindex="-1" role="dialog" aria-labelledby="passwordResetModal" aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog auth-modal modal-sm modal-dialog-centered" role="document">
     <div class="modal-content px-2">
       <div class="modal-header p-3">
         <div class="modal-icon">
           <img src="{{ get_icon_url('system', 'full') }}" alt="rocket_contact">
         </div>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close" style="display:none;">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -191,7 +197,7 @@
 
       <div class="modal-footer">
         <div class="signup-section my-3">
-          <a href="javascript:void(0);" data-dismiss="modal" data-toggle="modal" data-target="#loginModal">{{ trans('theme.login') }}</a>
+          <a href="javascript:void(0);" class="sf-auth-link js-auth-switch" data-target="#loginModal">{{ trans('theme.login') }}</a>
         </div>
       </div>
     </div> <!-- /.modal-content -->

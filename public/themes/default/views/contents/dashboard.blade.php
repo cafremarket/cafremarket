@@ -8,21 +8,22 @@
   <div class="sf-dashboard-welcome">
     <div class="sf-dashboard-welcome__top">
       <div class="sf-dashboard-welcome__greeting">
+        <p class="sf-dashboard-welcome__eyebrow">@lang('theme.nav.dashboard')</p>
         <h2>{{ trans('theme.hello') }}, {{ $dashboard->getName() }}!</h2>
         <p>
-          <i class="fas fa-clock"></i>
+          <i class="fas fa-clock" aria-hidden="true"></i>
           {{ trans('theme.member_since') }} {{ $dashboard->created_at->diffForHumans() }}
         </p>
       </div>
 
-      <div class="d-flex flex-wrap gap-2" style="gap: 8px;">
+      <div class="sf-dashboard-welcome__actions">
         @unless ($dashboard->shippingAddress)
           <a href="{{ route('account', 'account') }}#address-tab" class="btn btn-default btn-sm">
-            <i class="fas fa-truck"></i> @lang('theme.add_shipping_address')
+            <i class="fas fa-map-marker-alt" aria-hidden="true"></i> @lang('theme.add_shipping_address')
           </a>
         @endunless
         <a href="{{ url('/') }}" class="btn sf-btn-primary btn-sm">
-          <i class="fas fa-shopping-cart"></i> @lang('theme.button.continue_shopping')
+          <i class="fas fa-shopping-cart" aria-hidden="true"></i> @lang('theme.button.continue_shopping')
         </a>
       </div>
     </div>
