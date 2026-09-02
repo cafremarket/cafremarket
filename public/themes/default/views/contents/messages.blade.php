@@ -19,7 +19,7 @@
             <td class="mailbox-name" width="15%">
               @if ($message->shop)
                 <a href="{{ route('show.store', $message->shop->slug) }}">
-                  <img src="{{ get_logo_url($message->shop, 'thumbnail') }}" class="seller-info-logo sf-shop-logo" alt="{{ trans('theme.logo') }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
+                  @include('theme::partials._shop_logo_frame', ['shop' => $message->shop, 'frameSize' => 'sm', 'thumbSize' => 'thumbnail', 'fullSize' => 'thumbnail'])
                   {!! $message->shop->getQualifiedName(10) !!}
                 </a>
               @elseif($message->shop_id)

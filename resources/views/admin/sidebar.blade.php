@@ -382,6 +382,15 @@
                     @endif
                   </a>
                 </li>
+                <li class="{{ Request::is('admin/seller/shop/slug-change-requests*') ? 'active' : '' }}">
+                  <a href="{{ route('admin.vendor.shop.slugChangeRequests') }}">
+                    <i class="fa fa-angle-double-right"></i> {{ trans('nav.slug_change_requests') }}
+                    @php($pendingSlugChanges = \App\Helpers\Statistics::pending_slug_change_count())
+                    @if ($pendingSlugChanges > 0)
+                      <span class="label label-warning pull-right">{{ $pendingSlugChanges }}</span>
+                    @endif
+                  </a>
+                </li>
               @endif
             @endcan
           </ul>
@@ -511,6 +520,15 @@
         <li class="nav-section"><span class="nav-section-label">{{ trans('nav.appearance') ?? 'Content' }}</span></li>
       @endif
 
+      @if (Auth::user()->isAdmin() && (new \App\Helpers\Authorize(Auth::user(), 'customize_appearance'))->check())
+        <li class="{{ Request::is('admin/web-banners*') ? 'active' : '' }}">
+          <a href="{{ route('admin.web_banner.index') }}">
+            <i class="fa fa-images"></i>
+            <span>{{ trans('nav.web_banners') }}</span>
+          </a>
+        </li>
+      @endif
+
       @if ((new \App\Helpers\Authorize(Auth::user(), 'customize_appearance'))->check())
         <li class="treeview {{ Request::is('admin/appearance*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
@@ -535,11 +553,13 @@
               @endif
             @endunless
 
+            @if (Auth::user()->isMerchant())
             <li class="{{ Request::is('admin/appearance/banner*') ? 'active' : '' }}">
               <a href="{{ url('admin/appearance/banner') }}">
                 <i class="fa fa-angle-double-right"></i> {{ trans('nav.banners') }}
               </a>
             </li>
+            @endif
 
             <li class="{{ Request::is('admin/appearance/slider*') ? 'active' : '' }}">
               <a href="{{ url('admin/appearance/slider') }}">

@@ -12,6 +12,7 @@
     <div class="col-lg-6 col-lg-offset-3 col-md-8 col-md-offset-2">
       <div class="seller-register-card">
         {!! Form::open(['route' => 'login', 'id' => 'seller-login-form', 'data-toggle' => 'validator']) !!}
+          {!! Form::hidden('_store_login', 1) !!}
           <div class="form-group">
             {!! Form::label('email', trans('app.form.email_address')) !!}
             {!! Form::email('email', old('email'), ['class' => 'form-control', 'placeholder' => trans('app.placeholder.valid_email'), 'required', 'autofocus']) !!}

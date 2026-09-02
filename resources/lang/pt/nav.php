@@ -38,6 +38,7 @@ return [
     'themes' => 'Temas',
     'theme_options' => 'Opções do tema',
     'banners' => 'Banners',
+    'web_banners' => 'Banners do site',
     'sliders' => 'Slides',
     'shipping' => 'Envio',
     'packaging' => 'Embalagem',

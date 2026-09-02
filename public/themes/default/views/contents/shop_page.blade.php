@@ -9,9 +9,7 @@
     <div class="col-12 mb-5 px-md-1 px-0">
       <div class="row profile-header border mt-3">
         <div class="col-lg-2 col-md-3 text-center my-3">
-          <div class="d-flex thumbnail rounded-circle justify-content-center align-items-center mx-auto p-2">
-            <img class="lazy w-100 sf-shop-logo" src="{{ get_logo_url($shop, 'tiny') }}" data-src="{{ get_logo_url($shop, 'full') }}" alt="{{ $shop->name }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
-          </div>
+          @include('theme::partials._shop_logo_frame', ['shop' => $shop, 'frameSize' => 'lg', 'class' => 'mx-auto', 'thumbSize' => 'tiny', 'fullSize' => 'full'])
         </div> <!-- /.col -->
 
         <div class="col-lg-6 col-md-9 profile-info">

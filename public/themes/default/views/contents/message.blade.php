@@ -7,7 +7,7 @@
         <div class="message-user-name" title="seller">
           @if ($message->shop)
             <a href="{{ route('show.store', $message->shop->slug) }}">
-              <img src="{{ get_logo_url($message->shop, 'thumbnail') }}" class="seller-info-logo sf-shop-logo mx-2" width="35%" alt="{{ trans('theme.logo') }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
+              @include('theme::partials._shop_logo_frame', ['shop' => $message->shop, 'frameSize' => 'sm', 'thumbSize' => 'thumbnail', 'fullSize' => 'thumbnail', 'class' => 'mx-2 d-inline-flex'])
               {!! $message->shop->getQualifiedName(10) !!}
             </a>
           @elseif($message->shop_id)
@@ -80,7 +80,7 @@
         <div class="message-user-info">
           <div class="message-user-name" title="seller">
             @if ($msg->repliable->shop)
-              <img src="{{ get_logo_url($msg->repliable->shop, 'thumbnail') }}" class="seller-info-logo sf-shop-logo mx-2" width="35%" alt="{{ trans('theme.logo') }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
+              @include('theme::partials._shop_logo_frame', ['shop' => $msg->repliable->shop, 'frameSize' => 'sm', 'thumbSize' => 'thumbnail', 'fullSize' => 'thumbnail', 'class' => 'mx-2 d-inline-flex'])
               {!! $msg->repliable->shop->getName() !!}
             @elseif($msg->repliable->shop_id)
               {{ trans('theme.store') }}

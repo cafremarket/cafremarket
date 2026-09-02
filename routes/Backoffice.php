@@ -159,6 +159,11 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             // include 'admin/CustomInvoice.php';
         });
 
+        // Web homepage banners (platform admin only)
+        Route::middleware(['userType:admin'])->group(function () {
+            include 'admin/WebBanner.php';
+        });
+
         // Promotions Routes for Admin
         Route::name('promotion.')->prefix('promotion')->group(function () {
             include 'admin/Coupon.php';

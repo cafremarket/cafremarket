@@ -43,7 +43,7 @@
             {{-- <div class="shopping-cart-header"> --}}
             <div class="shopping-cart-header flex-between-center border-b">
               <div class="logo-wrapper">
-                <img class="lazy vendor-logo sf-shop-logo" src="{{ get_logo_url($cart->shop, 'tiny_thumb') }}" data-src="{{ get_logo_url($cart->shop, 'medium') }}" alt="{{ $cart->shop->name }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
+                @include('theme::partials._shop_logo_frame', ['shop' => $cart->shop, 'frameSize' => 'sm', 'thumbSize' => 'tiny_thumb', 'fullSize' => 'medium'])
 
                 <a href="{{ route('show.store', $cart->shop->slug) }}" class="seller-info-name ml-2">
                   {!! $cart->shop->getQualifiedName(10) !!}

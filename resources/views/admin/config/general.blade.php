@@ -48,8 +48,20 @@
               </div>
               <div class="col-sm-8 nopadding-left">
                 @if ($can_update)
-                  {!! Form::text('slug', null, ['class' => 'form-control slug', 'placeholder' => trans('app.placeholder.slug'), 'required']) !!}
-                  <div class="help-block with-errors"></div>
+                  @if ($isMerchant && !empty($pendingSlugChangeRequest))
+                    <div class="alert alert-info">
+                      <i class="fa fa-clock-o"></i> {{ trans('messages.slug_change_request_pending') }}
+                      <br><strong>{{ trans('app.requested_slug') }}:</strong> <code>{{ $pendingSlugChangeRequest->requested_slug }}</code>
+                    </div>
+                    {!! Form::text('slug', $shop->slug, ['class' => 'form-control slug', 'readonly' => true]) !!}
+                  @elseif ($isMerchant && !empty($slugChangeRequiresApproval))
+                    {!! Form::text('slug', null, ['class' => 'form-control slug', 'placeholder' => trans('app.placeholder.slug'), 'required']) !!}
+                    <p class="help-block text-muted">{{ trans('messages.slug_change_requires_approval') }}</p>
+                    <div class="help-block with-errors"></div>
+                  @else
+                    {!! Form::text('slug', null, ['class' => 'form-control slug', 'placeholder' => trans('app.placeholder.slug'), 'required']) !!}
+                    <div class="help-block with-errors"></div>
+                  @endif
                 @else
                   {{ get_shop_url($shop->id) }}
                   <a href="{{ get_shop_url($shop->id) }}" target="_blank">
@@ -60,6 +72,7 @@
             </div> <!-- /.row -->
           </div>
 
+          @if (!$isMerchant)
           <div class="form-group">
             <div class="row">
               <div class="col-sm-4 text-right">
@@ -76,6 +89,9 @@
               </div>
             </div> <!-- /.row -->
           </div>
+          @else
+            {!! Form::hidden('legal_name', $shop->legal_name) !!}
+          @endif
 
           <div class="form-group">
             <div class="row">
@@ -94,10 +110,11 @@
             </div> <!-- /.row -->
           </div>
 
-          @if (is_incevio_package_loaded('livechat'))
+          @if (!$isMerchant && is_incevio_package_loaded('livechat'))
             @include('liveChat::facebook.fb_chat_config_form')
           @endif
 
+          @if (!$isMerchant)
           <div class="form-group">
             <div class="row">
               <div class="col-sm-4 text-right">
@@ -130,6 +147,10 @@
               </div>
             </div> <!-- /.row -->
           </div>
+          @else
+            {!! Form::hidden('timezone_id', $shop->timezone_id) !!}
+            {!! Form::hidden('external_url', $shop->external_url) !!}
+          @endif
 
           <div class="form-group">
             <div class="row">
@@ -184,6 +205,7 @@
               </div> <!-- /.row -->
             </div>
 
+            @if (!$isMerchant)
             <div class="form-group">
               <div class="row">
                 <div class="col-sm-4 text-right">
@@ -202,8 +224,10 @@
                 </div>
               </div> <!-- /.row -->
             </div>
+            @endif
           @endif
 
+          @if (!$isMerchant)
           <div class="form-group">
             <div class="row">
               <div class="col-sm-4 text-right">
@@ -219,6 +243,7 @@
               </div>
             </div>
           </div>
+          @endif
 
           @if (Auth::user()->isFromPlatform())
           <div class="form-group">
@@ -257,7 +282,7 @@
         </div>
 
         <div class="col-sm-4">
-          @if ($can_update)
+          @if ($can_update && !$isMerchant)
             <div class="form-group text-center">
               {!! Form::label('maintenance_mode', trans('app.form.maintenance_mode'), ['class' => 'control-label with-help']) !!}
               <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.shop_maintenance_mode_handle') }}"></i>
@@ -291,7 +316,7 @@
             </div>
           @endif
 
-          @if (is_incevio_package_loaded('wallet'))
+          @if (is_incevio_package_loaded('wallet') && !$isMerchant)
             <div class="form-group text-center mt-4">
               {!! Form::label('bank_info', trans('app.bank_info'), ['class' => 'control-label with-help']) !!}
               <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.payout_bank_info') }}"></i>

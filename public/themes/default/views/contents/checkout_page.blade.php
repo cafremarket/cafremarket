@@ -53,7 +53,7 @@
           </div>
 
           <div class="logo-wrapper flex-between-center">
-            <img class="lazy vendor-logo sf-shop-logo" src="{{ get_logo_url($shop, 'tiny_thumb') }}" data-src="{{ get_logo_url($shop, 'medium') }}" alt="{{ $shop->name }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
+            @include('theme::partials._shop_logo_frame', ['shop' => $shop, 'frameSize' => 'sm', 'thumbSize' => 'tiny_thumb', 'fullSize' => 'medium'])
 
             <a href="{{ route('show.store', $shop->slug) }}" class="seller-info-name ml-2">
               <img>

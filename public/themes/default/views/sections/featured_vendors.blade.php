@@ -9,8 +9,13 @@
                 <div class="product-list-col">
                   <div class="product-list-col-header">
                     <div class="sell-header d-flex flex-column align-items-center justify-content-end">
-                      <figure>
-                        <img class="lazy brand-logo sf-shop-logo" src="{{ get_logo_url($featured_vendor, 'tyni') }}" data-src="{{ get_logo_url($featured_vendor, 'full') }}" class="seller-info-logo mb-1" alt="{{ trans('theme.logo') }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');">
+                      <figure class="mb-0">
+                        @include('theme::partials._shop_logo_frame', [
+                          'shop' => $featured_vendor,
+                          'thumbSize' => 'tyni',
+                          'fullSize' => 'full',
+                          'class' => 'mx-auto mb-1',
+                        ])
                       </figure>
 
                       <div class="sell-header-title">

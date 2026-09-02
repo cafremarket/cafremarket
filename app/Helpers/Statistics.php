@@ -374,4 +374,11 @@ class Statistics
             ->where('status', \App\Models\ShopAddressChangeRequest::STATUS_PENDING)
             ->count();
     }
+
+    public static function pending_slug_change_count()
+    {
+        return \App\Models\ShopSlugChangeRequest::query()
+            ->where('status', \App\Models\ShopSlugChangeRequest::STATUS_PENDING)
+            ->count();
+    }
 }

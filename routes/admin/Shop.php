@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ShopAddressChangeRequestController;
+use App\Http\Controllers\Admin\ShopSlugChangeRequestController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\ShopTranslationController;
 use App\Http\Controllers\Admin\SubscriptionController;
@@ -18,6 +19,11 @@ Route::get('shop/address-change-requests', [ShopAddressChangeRequestController::
 Route::get('shop/address-change-requests/{addressChangeRequest}', [ShopAddressChangeRequestController::class, 'show'])->name('shop.addressChangeRequests.show');
 Route::post('shop/address-change-requests/{addressChangeRequest}/approve', [ShopAddressChangeRequestController::class, 'approve'])->name('shop.addressChangeRequests.approve');
 Route::post('shop/address-change-requests/{addressChangeRequest}/reject', [ShopAddressChangeRequestController::class, 'reject'])->name('shop.addressChangeRequests.reject');
+
+Route::get('shop/slug-change-requests', [ShopSlugChangeRequestController::class, 'index'])->name('shop.slugChangeRequests');
+Route::get('shop/slug-change-requests/{slugChangeRequest}', [ShopSlugChangeRequestController::class, 'show'])->name('shop.slugChangeRequests.show');
+Route::post('shop/slug-change-requests/{slugChangeRequest}/approve', [ShopSlugChangeRequestController::class, 'approve'])->name('shop.slugChangeRequests.approve');
+Route::post('shop/slug-change-requests/{slugChangeRequest}/reject', [ShopSlugChangeRequestController::class, 'reject'])->name('shop.slugChangeRequests.reject');
 
 Route::get('shop/{shop}/verify', [ShopController::class, 'showVerificationForm'])->name('shop.verify');
 

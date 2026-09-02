@@ -38,6 +38,7 @@ return [
     'themes' => 'Themes',
     'theme_options' => 'Theme Options',
     'banners' => 'Banners',
+    'web_banners' => 'Web Banners',
     'sliders' => 'Sliders',
     'shipping' => 'Shipping',
     'packaging' => 'Packaging',
@@ -83,5 +84,8 @@ return [
     'shipping_methods' => 'Shipping Methods',
     'pdf_template' => 'PDF templates',
     'address_change_requests' => 'Address Change Requests',
+    'slug_change_requests' => 'Store URL Change Requests',
+    'store_management' => 'Store Management',
+    'staff' => 'Staff',
     'delivery' => 'Delivery',
 ];

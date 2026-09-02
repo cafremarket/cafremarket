@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -133,6 +134,22 @@ class LoginController extends Controller
         $this->incrementLoginAttempts($request);
 
         return $this->sendFailedLoginResponse($request);
+    }
+
+    /**
+     * Merchants may only sign in through the store login page (/selling/login).
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        if ($user->isFromMerchant() && ! $request->boolean('_store_login')) {
+            $this->guard()->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            throw ValidationException::withMessages([
+                $this->username() => [trans('messages.merchant_use_store_login')],
+            ]);
+        }
     }
 
     /**

@@ -20,7 +20,7 @@
               <tr class="order-body">
                 <td>
                   <div class="product-img-wrap">
-                    <img src="{{ get_logo_url($order->shop, 'small') }}" class="sf-shop-logo" alt="{{ $order->shop->slug }}" title="{{ $order->shop->slug }}" onerror="this.onerror=null;this.src='{{ default_shop_logo_url() }}';this.classList.add('sf-shop-logo--default');" />
+                    @include('theme::partials._shop_logo_frame', ['shop' => $order->shop, 'frameSize' => 'sm', 'thumbSize' => 'small', 'fullSize' => 'small'])
                   </div>
 
                   <div class="product-info">

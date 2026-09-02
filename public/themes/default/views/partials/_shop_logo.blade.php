@@ -6,7 +6,7 @@
 @endphp
 
 <img
-  class="sf-shop-logo w-100 lazy{{ $hasCustomLogo ? '' : ' sf-shop-logo--default' }}"
+  class="sf-shop-logo lazy{{ $hasCustomLogo ? '' : ' sf-shop-logo--default' }}"
   src="{{ $hasCustomLogo ? get_logo_url($shop, $thumbSize) : $defaultLogo }}"
   data-src="{{ $hasCustomLogo ? get_logo_url($shop, $fullSize) : $defaultLogo }}"
   alt="{{ $shop->name }}"

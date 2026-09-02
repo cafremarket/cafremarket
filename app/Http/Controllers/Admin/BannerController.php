@@ -39,6 +39,10 @@ class BannerController extends Controller
      */
     public function index()
     {
+        if (Auth::user()->isAdmin()) {
+            return redirect()->route('admin.web_banner.index');
+        }
+
         $banners = Banner::with('group', 'featureImage', 'images')
             ->where('shop_id', Auth::user()->shop_id)
             ->orderBy('group_id', 'asc')->get();

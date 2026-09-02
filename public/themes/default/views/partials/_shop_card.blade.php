@@ -1,8 +1,6 @@
 <div class="card-box text-center h-100 nearby-store-card">
   <a href="{{ route('show.store', $shop->slug) }}" class="text-reset">
-    <div class="thumb-lg sf-shop-logo-wrap thumbnail rounded-circle mx-auto">
-      @include('theme::partials._shop_logo', ['shop' => $shop])
-    </div>
+    @include('theme::partials._shop_logo_frame', ['shop' => $shop, 'class' => 'mx-auto'])
 
     @if (config('system_settings.show_merchant_info_as_vendor'))
       <h4 class="mb-1 mt-2">{!! $shop->owner->getName() !!}</h4>

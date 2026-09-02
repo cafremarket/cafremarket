@@ -1704,48 +1704,94 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   min-width: 96px;
 }
 
-.sf-shop-logo,
-.nearby-store-card .thumb-lg img,
-.seller-info-logo,
-.vendor-logo {
-  object-fit: contain;
-  background: #fff7ed;
-}
-
-.sf-shop-logo-wrap {
-  display: flex;
+.sf-shop-logo-frame {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   overflow: hidden;
+  border-radius: 50%;
+  border: 2px solid #e2e8f0;
   background: #fff7ed;
-  padding: 8px;
+  box-sizing: border-box;
 }
 
-.sf-shop-logo-wrap img.sf-shop-logo {
-  width: 72px;
-  height: 72px;
+.sf-shop-logo-frame--sm {
+  width: 56px;
+  height: 56px;
+}
+
+.sf-shop-logo-frame--md {
+  width: 88px;
+  height: 88px;
+}
+
+.sf-shop-logo-frame--lg {
+  width: 120px;
+  height: 120px;
+}
+
+.sf-shop-logo-frame img.sf-shop-logo {
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
   display: block;
-}
-
-.sf-shop-logo-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 72px;
-  height: 72px;
-  color: var(--primary-color, #ff6600);
-  font-size: 2rem;
+  object-fit: cover;
+  border-radius: 50%;
   background: #fff7ed;
 }
 
-.sf-shop-logo-fallback.d-none {
-  display: none !important;
+.sf-shop-logo-frame img.sf-shop-logo.sf-shop-logo--default {
+  object-fit: contain;
+  padding: 18%;
 }
 
-.sf-shop-logo--default {
-  padding: 10%;
+/* Legacy standalone store logos without a frame */
+img.sf-shop-logo:not(.sf-shop-logo-frame img) {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #e2e8f0;
+  background: #fff7ed;
+  display: inline-block;
+}
+
+img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
+  object-fit: contain;
+  padding: 18%;
+}
+
+.seller-info .seller-info-logo.sf-shop-logo {
+  width: auto;
+  height: auto;
+  border: none;
+  padding: 0;
+}
+
+.shopping-cart-wrapper .logo-wrapper .sf-shop-logo-frame {
+  vertical-align: middle;
+}
+
+.shopping-cart-wrapper .logo-wrapper img.vendor-logo.sf-shop-logo {
+  width: 56px;
+  height: 56px;
+  max-height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sell-header .sf-shop-logo-frame {
+  margin-bottom: 0.25rem;
+}
+
+#profile-container .profile-header .sf-shop-logo-frame {
+  margin-bottom: 0;
+}
+
+.card-box .sf-shop-logo-frame {
+  margin-bottom: 0.25rem;
 }
 
 .sf-address-select-toolbar {

@@ -17,6 +17,7 @@ use App\Models\PdfTemplate;
 use App\Models\Shop;
 use App\Services\Geo\GeocodeService;
 use App\Services\Shop\ShopAddressChangeService;
+use App\Services\Shop\ShopSlugChangeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -68,6 +69,8 @@ class ConfigController extends Controller
                 ? ListHelper::states($storeAddress->country_id)
                 : ListHelper::states(config('system_settings.address_default_country'));
             $viewData['pendingAddressChangeRequest'] = app(ShopAddressChangeService::class)->pendingForShop($shop->id);
+            $viewData['pendingSlugChangeRequest'] = app(ShopSlugChangeService::class)->pendingForShop($shop->id);
+            $viewData['slugChangeRequiresApproval'] = $shop->isVerified() || $shop->active;
         }
 
         return view('admin.config.general', $viewData);
@@ -118,6 +121,24 @@ class ConfigController extends Controller
             unset($data['delivery_capability']);
         }
 
+        $slugChanges = app(ShopSlugChangeService::class);
+        $newSlug = $request->input('slug');
+        $flashMessage = null;
+
+        if (! $request->user()->isFromPlatform()) {
+            if ($slugChanges->requiresApproval($config->shop, $newSlug)) {
+                try {
+                    $slugChanges->submitRequest($config->shop, $newSlug, $request->user());
+                    $flashMessage = trans('messages.slug_change_request_submitted');
+                } catch (\RuntimeException $e) {
+                    return back()->with('error', $e->getMessage());
+                }
+                unset($data['slug']);
+            } elseif ($slugChanges->hasPendingRequest($config->shop->id)) {
+                unset($data['slug']);
+            }
+        }
+
         $config->shop->update($data);
 
         event(new ShopUpdated($config->shop));
@@ -146,7 +167,13 @@ class ConfigController extends Controller
             $config->shop->saveImage($request->file('stamp_image'), 'stamp');
         }
 
-        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+        $response = back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+
+        if ($flashMessage) {
+            $response = back()->with('success', $flashMessage);
+        }
+
+        return $response;
     }
 
     /**
