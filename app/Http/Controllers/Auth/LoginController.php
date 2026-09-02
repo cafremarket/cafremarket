@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Services\Auth\JwtAuthService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -85,7 +86,7 @@ class LoginController extends Controller
             try {
                 send_otp_code($request['phone'], 'login');
             } catch (\Exception $e) {
-                return redirect()->route('customer.login')
+                return redirect()->route('homepage', ['login' => 1])
                     ->withErrors([trans('packages.otp-login.phone_session_expired')]);
             }
 
@@ -135,6 +136,32 @@ class LoginController extends Controller
     }
 
     /**
+     * Get the guard to be used during authentication.
+     */
+    protected function guard()
+    {
+        return Auth::guard('web');
+    }
+
+    /**
+     * Send the response after the user was authenticated.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+
+        $this->clearLoginAttempts($request);
+
+        $user = $this->guard()->user();
+        $jwt = app(JwtAuthService::class)->issue($user, 'web');
+        $cookie = app(JwtAuthService::class)->makeCookie('web', $jwt, $request->filled('remember'));
+
+        return redirect()->intended($this->redirectPath())->withCookie($cookie);
+    }
+
+    /**
      * Log the user out of the application.
      *
      * @return \Illuminate\Http\Response
@@ -145,12 +172,14 @@ class LoginController extends Controller
         $user = Auth::guard('web')->user();
         if ($user) {
             Cache::forget('permissions_'.$user->id);
+            app(JwtAuthService::class)->invalidate($user, 'web');
         }
 
-        Auth::guard()->logout();
+        Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
-        return $this->loggedOut($request) ?? redirect($this->redirectTo);
+        return ($this->loggedOut($request) ?? redirect($this->redirectPath()))
+            ->withCookie(app(JwtAuthService::class)->forgetCookie('web'));
     }
 }

@@ -6,11 +6,7 @@ use Illuminate\Support\Facades\Route;
 // Auth route for customers
 Route::middleware(['xssSanitizer'])->name('customer.')
     ->prefix('customer')->group(function () {
-        Route::get('/login', [
-            Auth\LoginController::class, 'showLoginForm',
-        ])->name('login');
-
-        Route::post('/login', [
+        Route::post('/auth/login', [
             Auth\LoginController::class, 'login',
         ])->name('login.submit');
 

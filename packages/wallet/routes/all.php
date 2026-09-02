@@ -240,38 +240,6 @@ Route::middleware(['web'])->group(function () {
             DepositController::class, 'paypalPaymentSuccess',
         ])->name('deposit.paypal.success');
 
-        Route::get('wallet/depositSuccessPaystack', [
-            DepositController::class, 'paystackPaymentSuccess',
-        ])->name('deposit.paystack.success');
-
-        Route::post('wallet/sslcommerzdeposit', [
-            DepositController::class, 'sslcommerzPaymentSuccess',
-        ])->name('deposit.sslcommerz.success');
-
-        Route::any('wallet/flutterwavedeposit', [
-            DepositController::class, 'flutterwavePaymentRedirect',
-        ])->name('deposit.flutterwave.redirect');
-
-        Route::any('wallet/molliedeposit', [
-            DepositController::class, 'molliePaymentRedirect',
-        ])->name('deposit.mollie.redirect');
-
-        Route::any('wallet/bkashdeposit', [
-            DepositController::class, 'bkashPaymentRedirect',
-        ])->name('deposit.bkash.redirect');
-
-        Route::any('wallet/paytmdeposit', [
-            DepositController::class, 'paytmPaymentRedirect',
-        ])->name('deposit.paytm.redirect');
-
-        Route::any('payment/callback/payfast/deposit/notify', [
-            DepositController::class, 'payfastPaymentNotify',
-        ])->name('deposit.payfast.notify');
-
-        Route::any('wallet/instamojodeposit', [
-            DepositController::class, 'instamojoPaymentSuccess',
-        ])->name('deposit.instamojo.success');
-
         // M-Pesa wallet deposit: complete page + status polling
         Route::get('wallet/deposit/mpesa/complete', [
             DepositController::class, 'mpesaDepositComplete',

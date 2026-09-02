@@ -50,13 +50,6 @@ return [
         'sandbox' => env('PAYPAL_SANDBOX_MODE'),
     ],
 
-    'cybersource' => [
-        'merchant_id' => env('CYBERSOURCE_MERCHANT_ID'),
-        'api_key_id' => env('CYBERSOURCE_API_KEY_ID'),
-        'secret' => env('CYBERSOURCE_SECRET'),
-        'sandbox' => env('CYBERSOURCE_SANDBOX'),
-    ],
-
     'nexmo' => [
         'key' => env('NEXMO_KEY'),
         'secret' => env('NEXMO_SECRET'),

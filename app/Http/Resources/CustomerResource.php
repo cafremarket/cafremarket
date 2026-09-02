@@ -28,9 +28,8 @@ class CustomerResource extends JsonResource
             'accepts_marketing' => $this->accepts_marketing,
             'member_since' => optional($this->created_at)->diffForHumans(),
             'avatar' => get_storage_file_url(optional($this->avatarImage)->path, 'small'),
-            // 'last_visited_at' => $this->last_visited_at,
-            // 'last_visited_from' => $this->last_visited_from,
-            'api_token' => $this->api_token,
+            'api_token' => $this->jwt_access_token ?? null,
+            'access_token' => $this->jwt_access_token ?? null,
         ];
 
         if (is_incevio_package_loaded('buyerGroup')) {

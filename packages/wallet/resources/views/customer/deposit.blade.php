@@ -87,7 +87,6 @@
       </div>
 
       <div class="sf-wallet-deposit__panel">
-        @include('partials.authorizenet_card_form')
         @include('partials.stripe_card_form')
 
         <p id="payment-instructions" class="text-info small">

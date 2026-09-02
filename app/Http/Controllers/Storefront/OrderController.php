@@ -503,25 +503,6 @@ class OrderController extends Controller
         switch ($gateway) {
             case 'paypal':
                 return $request->has('token') && $request->has('PayerID');
-                // return $request->has('token') && $request->has('paymentId') && $request->has('PayerID');
-
-            case 'mollie':
-                $mollie = new \Incevio\Package\Mollie\Services\MolliePaymentService($request);
-                $mollie->setConfig();
-                $mollie->verifyPaidPayment();
-
-                return $mollie->status == PaymentService::STATUS_PAID;
-
-            case 'bkash':
-                if ($request->status != 'success') {
-                    return false;
-                }
-
-                $bkash = new \Incevio\Package\Bkash\Services\BkashPaymentService($request);
-                $bkash->setConfig();
-                $bkash->verifyPaidPayment();
-
-                return $bkash->status == PaymentService::STATUS_PAID;
 
             case 'stripeWeb':
                 $stripeWeb = new \App\Services\Payments\StripeWebPaymentService($request);
@@ -529,13 +510,6 @@ class OrderController extends Controller
                 $stripeWeb->verifyPaidPayment();
 
                 return $stripeWeb->status == PaymentService::STATUS_PAID;
-
-            case 'paytm':
-                $paytm = new \Incevio\Package\Paytm\Services\PaytmPaymentService($request);
-                $paytm->setConfig();
-                $paytm->verifyPaidPayment();
-
-                return $paytm->status == PaymentService::STATUS_PAID;
         }
 
         return false;

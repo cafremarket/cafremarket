@@ -1,43 +1,25 @@
 <script src="https://js.stripe.com/v2/"></script>
 
-{{-- Razorpay --}}
-@if (is_incevio_package_loaded('razorpay'))
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-@endif
-
-{{-- MercadoPago Payment --}}
-@if (is_incevio_package_loaded('mercado-pago'))
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
-
-  @include('mercadoPago::card_form')
-@endif
-
 <script type="text/javascript">
   "use strict";;
   (function($, window, document) {
     $(document).ready(function() {
-      $('.payment-option').on('click', function(e) {
+      $('.i-check, .i-radio, .i-check-blue, .i-radio-blue').iCheck({
+        checkboxClass: 'icheckbox_minimal-blue',
+        radioClass: 'iradio_minimal-blue',
+      });
 
+      $('.payment-option').on('ifChecked', function(e) {
         var code = $(this).data('code');
-
         $("#payment-instructions.text-danger").removeClass('text-danger').addClass('text-info small');
         $('#payment-instructions').children('span').html($(this).data('info'));
 
-        // Alter checkout button text Stripe
         if ('stripe' == code && $(this).val() != 'saved_card') {
           showStripeCardForm();
         } else {
           hideStripeCardForm();
         }
 
-        // Alter checkout button text Authorize Net or cybersource or iyzico
-        if ('authorizenet' == code || 'cybersource' == code || 'iyzico' == code) {
-          showSimpleCardForm();
-        } else {
-          hideSimpleCardForm();
-        }
-
-        // Alter checkout button
         if ('paypal' == code) {
           $('#paypal-express-btn').removeClass('hide');
           $('#pay-now-btn').addClass('hide');
@@ -50,13 +32,11 @@
         refreshWalletTopupFeePreview();
       });
 
-      // Submit the form
       $("a#paypal-express-btn").on('click', function(e) {
         e.preventDefault();
         $("form#depositForm").submit();
       });
 
-      // Show cart form if the card option is selected
       var paymentOptionSelected = $('input[name="payment_method"]:checked');
 
       if (paymentOptionSelected.length > 0) {
@@ -64,21 +44,13 @@
 
         if (code == 'stripe' && paymentOptionSelected.val() != 'saved_card') {
           showStripeCardForm();
-        } else if (code == 'authorizenet' || code == 'cybersource' || 'iyzico' == code) {
-          showSimpleCardForm();
         } else if ('paypal' == code) {
           $('#pay-now-btn').addClass('hide');
           $('#paypal-express-btn').removeClass('hide');
         }
-
         toggleWalletMobileFields(code);
-        refreshWalletTopupFeePreview();
       }
 
-      $('#amount').on('input change', refreshWalletTopupFeePreview);
-      refreshWalletTopupFeePreview();
-
-      // Stripe code, create a token
       Stripe.setPublishableKey("{{ config('services.stripe.key') }}");
 
       $("form#depositForm").on('submit', function(e) {
@@ -90,19 +62,14 @@
           return;
         }
 
-        // Check if payment method has been selected or not
         if (!$("input:radio[name='payment_method']").is(":checked")) {
           $("#payment-instructions.text-info").removeClass('text-info small').addClass('text-danger');
           return;
         }
 
-        apply_busy_filter('body');
-
         var payment_method = $('input[name=payment_method]:checked').val();
 
-        // Skip the strip payment and submit if the payment method is not stripe
         if (payment_method == 'stripe') {
-          // Stripe API skip the request if the information are not there
           if (!$("input[data-stripe='number']").val() || !$("input[data-stripe='cvc']").val()) {
             return;
           }
@@ -116,67 +83,18 @@
               form.get(0).submit();
             }
           });
-        } else if (payment_method == 'razorpay' && !$('input[name=razorpay_payment_id]').val()) {
-          // console.log(payment_method);
-          @if (is_incevio_package_loaded('razorpay'))
-            @include('razorpay::script');
-          @endif
-        } else if (payment_method == 'mercado-pago' && !$("#cardPaymentBrickModal").hasClass('in')) {
-          @if (is_incevio_package_loaded('mercado-pago'))
-            @include('mercadoPago::script')
-
-            $('#cardPaymentBrickModal').modal('show');
-          @endif
         } else {
           form.get(0).submit();
         }
       });
 
-      // Submit the form
-      $("a#paypal-express-btn").on('click', function(e) {
-        e.preventDefault();
-        $("form#depositForm").submit();
-      });
+      $('#amount').on('input change', refreshWalletTopupFeePreview);
 
-      $("#submit-btn-block").show(); // Show the submit buttons after loading the doms
+      $("#submit-btn-block").show();
+      refreshWalletTopupFeePreview();
     });
 
-    // Stripe
-    function showStripeCardForm() {
-      $('#cc-form').show().find('input:text, select').attr('required', 'required');
-    }
-
-    function hideStripeCardForm() {
-      $('#cc-form').hide().find('input, select').removeAttr('required');
-    }
-
-    // Authorize Net
-    function showSimpleCardForm() {
-      $('#authorize-net-cc-form').show().find('input, select').attr('required', 'required');
-    }
-
-    function hideSimpleCardForm() {
-      $('#authorize-net-cc-form').hide().find('input, select').removeAttr('required');
-    }
-
-    function toggleWalletMobileFields(code) {
-      if ($('#mpesa-form').length) {
-        if ('mpesa' == code) {
-          $('#mpesa-form').show().find('input.mpesa-request-field').attr('required', 'required');
-        } else {
-          $('#mpesa-form').hide().find('input.mpesa-request-field').removeAttr('required');
-        }
-      }
-      if ($('#emola-form').length) {
-        if ('emola' == code) {
-          $('#emola-form').show().find('input.emola-request-field').attr('required', 'required');
-        } else {
-          $('#emola-form').hide().find('input.emola-request-field').removeAttr('required');
-        }
-      }
-    }
-
-    var walletFeePreviewUrl = $('#wallet-topup-fee-box').data('fee-url') || '{{ url('account/wallet/deposit/platform-fee') }}';
+    var walletFeePreviewUrl = $('#wallet-topup-fee-box').data('fee-url') || '{{ url('wallet/deposit/platform-fee') }}';
 
     function refreshWalletTopupFeePreview() {
       var box = $('#wallet-topup-fee-box');
@@ -218,6 +136,31 @@
         $('#pay-now-btn').prop('disabled', false);
         box.hide();
       });
+    }
+
+    function showStripeCardForm() {
+      $('#cc-form').show().find('input:text, select').attr('required', 'required');
+    }
+
+    function hideStripeCardForm() {
+      $('#cc-form').hide().find('input, select').removeAttr('required');
+    }
+
+    function toggleWalletMobileFields(code) {
+      if ($('#mpesa-form').length) {
+        if ('mpesa' == code) {
+          $('#mpesa-form').show().find('input.mpesa-request-field').attr('required', 'required');
+        } else {
+          $('#mpesa-form').hide().find('input.mpesa-request-field').removeAttr('required');
+        }
+      }
+      if ($('#emola-form').length) {
+        if ('emola' == code) {
+          $('#emola-form').show().find('input.emola-request-field').attr('required', 'required');
+        } else {
+          $('#emola-form').hide().find('input.emola-request-field').removeAttr('required');
+        }
+      }
     }
   }(window.jQuery, window, document));
 </script>

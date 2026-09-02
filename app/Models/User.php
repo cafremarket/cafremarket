@@ -39,6 +39,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'verification_token',
+        'api_token',
     ];
 
     /**
@@ -260,7 +261,13 @@ class User extends Authenticatable
      */
     public function setPasswordAttribute($password)
     {
-        $this->attributes['password'] = Hash::needsRehash($password) ? Hash::make($password) : $password;
+        if ($password === null || $password === '') {
+            return;
+        }
+
+        $this->attributes['password'] = Hash::needsRehash($password)
+            ? Hash::make($password)
+            : $password;
     }
 
     public function setActiveAttribute($value)

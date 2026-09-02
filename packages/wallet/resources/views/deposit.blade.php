@@ -91,8 +91,6 @@
         <div class="panel panel-default">
           <div class="panel-body">
             {{-- authorize-net --}}
-            @include('partials.authorizenet_card_form')
-
             {{-- Stripe --}}
             @include('partials.stripe_card_form')
 

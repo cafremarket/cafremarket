@@ -1,17 +1,5 @@
 <script src="https://js.stripe.com/v2/"></script>
 
-{{-- Razorpay --}}
-@if (is_incevio_package_loaded('razorpay'))
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-@endif
-
-{{-- MercadoPago Payment --}}
-@if (is_incevio_package_loaded('mercado-pago'))
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
-
-  @include('mercadoPago::card_form')
-@endif
-
 <script type="text/javascript">
   "use strict";;
   (function($, window, document) {
@@ -32,13 +20,6 @@
           showStripeCardForm();
         } else {
           hideStripeCardForm();
-        }
-
-        // Alter checkout button text Authorize Net or cybersource
-        if ('authorizenet' == code || 'cybersource' == code || 'iyzico' == code) {
-          showSimpleCardForm();
-        } else {
-          hideSimpleCardForm();
         }
 
         // Alter checkout button
@@ -68,8 +49,6 @@
 
         if (code == 'stripe' && paymentOptionSelected.val() != 'saved_card') {
           showStripeCardForm();
-        } else if (code == 'authorizenet' || code == 'cybersource' || 'iyzico' == code) {
-          showSimpleCardForm();
         } else if ('paypal' == code) {
           $('#pay-now-btn').addClass('hide');
           $('#paypal-express-btn').removeClass('hide');
@@ -95,13 +74,9 @@
           return;
         }
 
-        // apply_busy_filter('body');
-
         var payment_method = $('input[name=payment_method]:checked').val();
 
-        // Skip the strip payment and submit if the payment method is not stripe
         if (payment_method == 'stripe') {
-          // Stripe API skip the request if the information are not there
           if (!$("input[data-stripe='number']").val() || !$("input[data-stripe='cvc']").val()) {
             return;
           }
@@ -115,30 +90,14 @@
               form.get(0).submit();
             }
           });
-        } else if (payment_method == 'razorpay' && !$('input[name=razorpay_payment_id]').val()) {
-          @if (is_incevio_package_loaded('razorpay'))
-            @include('razorpay::script');
-          @endif
-        } else if (payment_method == 'mercado-pago' && !$("#cardPaymentBrickModal").hasClass('in')) {
-          @if (is_incevio_package_loaded('mercado-pago'))
-            @include('mercadoPago::script')
-
-            $('#cardPaymentBrickModal').modal('show');
-          @endif
         } else {
           form.get(0).submit();
         }
       });
 
-      // Submit the form
-      $("a#paypal-express-btn").on('click', function(e) {
-        e.preventDefault();
-        $("form#depositForm").submit();
-      });
-
       $('#amount').on('input change', refreshWalletTopupFeePreview);
 
-      $("#submit-btn-block").show(); // Show the submit buttons after loading the doms
+      $("#submit-btn-block").show();
       refreshWalletTopupFeePreview();
     });
 
@@ -186,22 +145,12 @@
       });
     }
 
-    // Stripe
     function showStripeCardForm() {
       $('#cc-form').show().find('input:text, select').attr('required', 'required');
     }
 
     function hideStripeCardForm() {
       $('#cc-form').hide().find('input, select').removeAttr('required');
-    }
-
-    // Authorize Net
-    function showSimpleCardForm() {
-      $('#authorize-net-cc-form').show().find('input, select').attr('required', 'required');
-    }
-
-    function hideSimpleCardForm() {
-      $('#authorize-net-cc-form').hide().find('input, select').removeAttr('required');
     }
 
     function toggleWalletMobileFields(code) {

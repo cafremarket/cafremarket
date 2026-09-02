@@ -16,10 +16,12 @@ use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotificatio
 use App\Notifications\Auth\UserResetPasswordNotification as SendPasswordResetEmail;
 use App\Notifications\SuperAdmin\VendorRegistered as VendorRegisteredNotification;
 use App\Notifications\User\PasswordUpdated as PasswordResetSuccess;
+use App\Services\Auth\JwtAuthService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
@@ -47,7 +49,7 @@ class AuthController extends Controller
         try {
             $merchant = $this->create($data);
 
-            $merchant->generateToken();
+            $merchant->generateToken('vendor_api');
 
             // Dispatching Shop create job
             CreateShopForMerchant::dispatch($merchant, $data);
@@ -126,12 +128,12 @@ class AuthController extends Controller
             'password' => $request->password,
         ];
 
-        if (Auth::guard('vendor')->attempt($credentials)) {
-            $merchant = Auth::guard('vendor')->user();
+        $user = User::where('email', $credentials['email'])->first();
 
-            $merchant->generateToken();
+        if ($user && Hash::check($credentials['password'], $user->password)) {
+            $user->generateToken('vendor_api');
 
-            return new MerchantResource($merchant);
+            return new MerchantResource($user);
         }
 
         return response()->json(['message' => trans('api.auth_failed')], 401);
@@ -148,7 +150,7 @@ class AuthController extends Controller
         $data = [
             'name' => $request_data['name'] ?? $request_data['shop_name'],
             'email' => $request_data['email'],
-            'password' => bcrypt($request_data['password']),
+            'password' => $request_data['password'],
             'verification_token' => Str::random(40),
             'role_id' => Role::MERCHANT,
         ];
@@ -185,8 +187,7 @@ class AuthController extends Controller
         $user = Auth::guard('vendor_api')->user();
 
         if ($user) {
-            $user->api_token = null;
-            $user->save();
+            app(JwtAuthService::class)->invalidate($user, 'vendor_api');
         }
 
         return response()->json(trans('api.auth_out'), 200);
@@ -287,7 +288,7 @@ class AuthController extends Controller
             ], 404);
         }
 
-        $user->password = bcrypt($request->password);
+        $user->password = $request->password;
         $user->save();
 
         DB::table('password_resets')->where('token', $request->token)->delete();

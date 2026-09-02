@@ -192,41 +192,8 @@ class SystemConfig extends BaseModel
             case 'stripe':
                 return (bool) (config('services.stripe.key') && config('services.stripe.client_id') && config('services.stripe.secret'));
 
-            case 'paypal-marketplace':
-                return (bool) (config('paypalMarketplace.api.client_id') && config('paypalMarketplace.api.secret'));
-
-            case 'instamojo':
-                return (bool) (config('instamojo.api_key') && config('instamojo.auth_token'));
-
-            case 'iyzico':
-                return (bool) (config('iyzico.api.api_key') && config('iyzico.api.secret_key'));
-
             case 'paypal':
                 return (bool) (config('paypal_payment.account.client_id') && config('paypal_payment.account.client_secret'));
-
-            case 'payfast':
-                return (bool) (config('payfast.merchant_id') && config('payfast.merchant_key'));
-
-            case 'mercado-pago':
-                return (bool) (config('mercadoPago.api.access_token') && config('mercadoPago.api.public_key'));
-
-            case 'authorizenet':
-                return (bool) (config('authorizenet.api_login_id') && config('authorizenet.transaction_key'));
-
-            case 'cybersource':
-                return (bool) (config('services.cybersource.merchant_id') && config('services.cybersource.api_key_id') && config('services.cybersource.secret'));
-
-            case 'paystack':
-                return (bool) (config('paystack.public_key') && config('paystack.secret'));
-
-            case 'razorpay':
-                return (bool) (config('razorpay.merchant.api_key') && config('razorpay.merchant.secret'));
-
-            case 'sslcommerz':
-                return (bool) (config('sslcommerz.api.store_id') && config('sslcommerz.api.store_password'));
-
-            case 'flutterwave':
-                return (bool) config('flutterwave.api.secret_key');
 
             case 'mpesa':
                 // M-Pesa Mozambique: api_key, public_key, service_provider_code (or legacy consumer_key/consumer_secret)
@@ -244,30 +211,6 @@ class SystemConfig extends BaseModel
                     && config('emola.partner_code')
                     && config('emola.key')
                 );
-
-            case 'orangemoney':
-                return (bool) (config('orangemoney.api') && config('orangemoney.api'));
-
-            case 'mollie':
-                return (bool) (config('mollie.api.merchant_key'));
-
-            case 'bkash':
-                return (bool) (config('bkash.api.app_key') && config('bkash.api.app_secret'));
-
-            case 'upiPayment':
-                return (bool) (config('upiPayment.api.username') && config('upiPayment.api.password') && config('upiPayment.api.vpa'));
-
-            case 'paytm':
-                return (bool) (config('paytm.api.merchant_id') && config('paytm.api.merchant_key'));
-
-            case 'twoCheckout':
-                return (bool) (config('twoCheckout.api.public_key') && config('twoCheckout.api.private_key'));
-
-            case 'mtnMoney':
-                return (bool) (config('mtnMoney.api.api_key') && config('mtnMoney.api.api_secret'));
-
-            case 'upiPayment':
-                return (bool) (config('upiPayment.api.username') && config('upiPayment.api.password') && config('upiPayment.api.vpa'));
 
             case 'zcart-wallet':
                 return customer_has_wallet();

@@ -430,7 +430,7 @@
                 $("#conversationBox").html(""); //Clear the chatbox
                 response = $('<p>').addClass('text-danger').text("{!! trans('messages.session_expired') !!}");
                 $('<br/><br/>').prependTo(response);
-                $('<a>').attr('href', "{{ route('customer.login') }}").addClass('btn btn-primary').text("{{ trans('app.login') }}").appendTo(response);
+                $('<a>').attr('href', "{{ route('homepage', ['login' => 1]) }}").addClass('btn btn-primary').text("{{ trans('app.login') }}").appendTo(response);
                 break;
               default:
                 $('#conversationBox [data-pending="1"]').remove();

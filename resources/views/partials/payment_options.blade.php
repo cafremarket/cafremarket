@@ -57,16 +57,8 @@
   @endforeach
 </div>
 
-{{-- authorize-net --}}
-@include('partials.authorizenet_card_form')
-
 {{-- Stripe --}}
 @include('partials.stripe_card_form')
-
-{{-- Razorpay --}}
-@if (is_incevio_package_loaded('razorpay'))
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-@endif
 
 {{-- M-Pesa Payment --}}
 @if (is_incevio_package_loaded('mpesa'))
@@ -154,10 +146,3 @@
     <img src="{{ asset(sys_image_path('payment-methods') . 'paypal-express.png') }}" width="70%" alt="paypal express checkout" title="paypal-express" />
   </a>
 </div>
-
-{{-- MercadoPago Payment --}}
-@if (is_incevio_package_loaded('mercado-pago'))
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
-
-  @include('mercadoPago::card_form')
-@endif

@@ -52,14 +52,13 @@ return [
         ],
 
         'delivery_boy-api' => [
-            'driver' => 'token',
+            'driver' => 'delivery-boy-jwt',
             'provider' => 'delivery_boys',
         ],
 
         'api' => [
-            'driver' => 'token',
+            'driver' => 'customer-jwt',
             'provider' => 'customers',
-            'hash' => false,
         ],
 
         'vendor' => [
@@ -69,9 +68,8 @@ return [
         ],
 
         'vendor_api' => [
-            'driver' => 'token',
+            'driver' => 'vendor-jwt',
             'provider' => 'vendor_api',
-            'hash' => false,
         ],
 
         'affiliate' => [

@@ -3,7 +3,6 @@
 namespace App\Contracts;
 
 use Illuminate\Http\Request;
-use Incevio\Package\Payfast\Services\PayfastPaymentService;
 
 interface PaymentMethodContract
 {
@@ -14,7 +13,7 @@ interface PaymentMethodContract
      *
      * @return void
      */
-    public function orderReturn(Request $request, PayfastPaymentService $payfast, string $order_ids);
+    public function orderReturn(Request $request, string $order_ids);
 
     public function depositReturn(Request $request);
 }

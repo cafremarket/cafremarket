@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\DealController;
 use App\Http\Controllers\Api\DisputeController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\ListingController;
 use App\Http\Controllers\Api\CustomerLocationController;
 use App\Http\Controllers\Api\NearbyShopController;
 use App\Http\Controllers\Api\OrderController;

@@ -16,15 +16,11 @@ class VerifyCsrfToken extends Middleware
         'api/*',
         'customer/login/apple/callback',
         'ebay/callbacks/*',
-        'flutterwave/*',
         'paymentFailed/*',
         'payment/response/callback',
         'socialite/customer/apple/callback',
         '/build-twiml/*',
-        'sslcommerz/*',
         'stripe/*',
-        'wallet/sslcommerzdeposit',
-        'mercadopago/process_payment',
         'payment/callback/*', // Use this common API for all payment webhook callback
         'payment/callback/*/failed', // Use this common API for all payment failed notification callback
     ];

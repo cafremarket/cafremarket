@@ -10,6 +10,7 @@ use App\Http\Resources\DeliveryBoyResource;
 use App\Models\DeliveryBoy;
 use App\Notifications\DeliveryBoy\PasswordReset;
 use App\Services\FCMService;
+use App\Services\Auth\JwtAuthService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,16 +34,17 @@ class AuthController extends Controller
             'password' => $request->password,
         ];
 
-        if (Auth::guard('delivery_boy')->attempt($credentials)) {
-            $deliveryboys = Auth::guard('delivery_boy')->user();
-            $deliveryboys->generateToken();
+        $deliveryBoy = DeliveryBoy::where('email', $credentials['email'])->first();
+
+        if ($deliveryBoy && Hash::check($credentials['password'], $deliveryBoy->password)) {
+            $deliveryBoy->generateToken('delivery_boy');
 
             if ($request->filled('fcm_token')) {
-                $deliveryboys->fcm_token = FCMService::normalizeToken($request->fcm_token) ?: null;
-                $deliveryboys->save();
+                $deliveryBoy->fcm_token = FCMService::normalizeToken($request->fcm_token) ?: null;
+                $deliveryBoy->save();
             }
 
-            return new DeliveryBoyResource($deliveryboys);
+            return new DeliveryBoyResource($deliveryBoy);
         }
 
         return response()->json(['message' => trans('api.auth_failed')], 401);
@@ -59,9 +61,7 @@ class AuthController extends Controller
         $deliveryBoy = Auth::guard('delivery_boy-api')->user();
 
         if ($deliveryBoy) {
-            $deliveryBoy->api_token = null;
-            $deliveryBoy->fcm_token = null;
-            $deliveryBoy->save();
+            app(JwtAuthService::class)->invalidate($deliveryBoy, 'delivery_boy');
         }
 
         return response()->json(trans('api.auth_out'), 200);

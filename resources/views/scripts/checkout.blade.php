@@ -27,38 +27,13 @@
         $("#payment-instructions.text-danger").removeClass('text-danger').addClass('text-info small');
         $('#payment-instructions').children('span').html($(this).data('info'));
 
-
-        // Alter checkout button text Authorize Net or cybersource or iyzico
-        if ('authorizenet' == code || 'cybersource' == code || 'iyzico' == code) {
-          showSimpleCardForm();
-        } else {
-          hideSimpleCardForm();
-        }
-
         // Alter checkout button
-        if ('paypal' == code || 'paypal-marketplace' == code) {
+        if ('paypal' == code) {
           $('#paypal-express-btn').removeClass('hide');
           $('#pay-now-btn').addClass('hide');
         } else {
           $('#paypal-express-btn').addClass('hide');
           $('#pay-now-btn').removeClass('hide');
-        }
-
-        if ('pip' == code) {
-          $('#payment-instructions').addClass('hide');
-          $('#payInPerson').removeClass('hide');
-          $('#pay-now-btn-txt').addClass('hide');
-          $('#place-order-text').removeClass('hide');
-        } else {
-          $('#payment-instructions').removeClass('hide');
-          $('#payInPerson').addClass('hide');
-          $('#place-order-text').addClass('hide');
-          $('#pay-now-btn-txt').removeClass('hide');
-        }
-
-        // Razorpay form
-        if ('razorpay' == code) {
-          $('#pay-now-btn-txt').html('{!! trans('theme.button.pay_now') !!}');
         }
 
         // mpesa form
@@ -97,13 +72,11 @@
       if (paymentOptionSelected.length > 0) {
         var code = paymentOptionSelected.data('code');
 
-        if (code == 'authorizenet' || code == 'cybersource' || 'iyzico' == code) {
-          showSimpleCardForm();
-        } else if ('paypal' == code || 'paypal-marketplace' == code) {
+        if ('paypal' == code) {
           $('#pay-now-btn').addClass('hide');
           $('#paypal-express-btn').removeClass('hide');
         } else if ('mpesa' == code) {
-          showMPesaForm(); // mpesa package
+          showMPesaForm();
         } else if ('emola' == code) {
           showEmolaForm();
         } else if ('wire' == code) {
@@ -155,43 +128,8 @@
 
         var payment_method = $('input[name=payment_method]:checked').data('code');
 
-        // Skip the strip payment and submit if the payment method is not stripe
         if (payment_method == 'stripe') {
           form.get(0).submit();
-        } else if (payment_method == 'razorpay' && !$('input[name=razorpay_payment_id]').val()) {
-          @if (is_incevio_package_loaded('razorpay'))
-            @include('razorpay::script')
-          @endif
-
-          @if (is_incevio_package_loaded('mpesa'))
-            // // Create and get access token
-            // var request = $.ajax({
-            // url: "{!-- isset($cart) ? route(config('mpesa.routes.get_token'), $cart) : (isset($one_checkout_form) ? route(config('mpesa.routes.get_token'), 'all_checkout') : route(config('mpesa.routes.get_token'))) --}",
-            // type: 'POST',
-            // data: {
-            // mpesa_account: $("#mpesa-account").val(),
-            // }
-            // });
-
-            // request.done(function(response) {
-            // remove_busy_filter('body');
-
-            // // When server response with message
-            // if (response.message) {
-            // $('#checkout-notice-msg').html(response.message);
-            // $('#checkout-notice').show();
-            // }
-
-            // console.log(response);
-            // });
-            //
-          @endif
-        } else if (payment_method == 'mercado-pago' && !$("#cardPaymentBrickModal").hasClass('in')) {
-          @if (is_incevio_package_loaded('mercado-pago'))
-            @include('mercadoPago::script')
-
-            $('#cardPaymentBrickModal').modal('show');
-          @endif
         } else {
           form.get(0).submit();
         }
@@ -202,18 +140,6 @@
 
     function showAccountForm() {
       $('#create-account').show().find('input[type=email],input[type=password]').attr('required', 'required');
-    }
-
-
-    // Authorize Net and some other payment method
-    function showSimpleCardForm() {
-      $('#authorize-net-cc-form').show().find('input, select').attr('required', 'required');
-      $('#pay-now-btn-txt').html('{!! trans('theme.button.pay_now') !!}');
-    }
-
-    function hideSimpleCardForm() {
-      $('#authorize-net-cc-form').hide().find('input, select').removeAttr('required');
-      $('#pay-now-btn-txt').text('{{ trans('theme.button.checkout') }}');
     }
 
     // M-Pesa Payment

@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Storefront\Auth;
 
 use App\Http\Controllers\SocialiteBaseController;
 use App\Models\Customer;
+use App\Services\Auth\CustomerJwtService;
 use App\Services\Hyperlocal\BuyerLocationService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\URL;
 
 class LoginController extends SocialiteBaseController
 {
@@ -60,18 +60,6 @@ class LoginController extends SocialiteBaseController
         }
 
         return 'email';
-    }
-
-    /**
-     * Show the application's login form — customer login uses the storefront popup only.
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function showLoginForm()
-    {
-        Session::put('url.intended', URL::previous());
-
-        return redirect()->route('homepage', ['login' => 1]);
     }
 
     /**
@@ -153,6 +141,31 @@ class LoginController extends SocialiteBaseController
     }
 
     /**
+     * Send the response after the user was authenticated.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+
+        $this->clearLoginAttempts($request);
+
+        $user = $this->guard()->user();
+        $jwt = app(CustomerJwtService::class)->issue($user);
+        $cookie = app(CustomerJwtService::class)->makeCookie(
+            $jwt,
+            $request->filled('remember')
+        );
+
+        if ($response = $this->authenticated($request, $user)) {
+            return $response->withCookie($cookie);
+        }
+
+        return redirect()->intended($this->redirectPath())->withCookie($cookie);
+    }
+
+    /**
      * After successful login, use saved default address as delivery location when available.
      */
     protected function authenticated(Request $request, $user)
@@ -199,6 +212,12 @@ class LoginController extends SocialiteBaseController
 
         $currency = Session::get('currency');
 
+        $customer = Auth::guard('customer')->user();
+
+        if ($customer instanceof Customer) {
+            app(CustomerJwtService::class)->invalidate($customer);
+        }
+
         Auth::guard('customer')->logout();
 
         $request->session()->invalidate();
@@ -208,6 +227,7 @@ class LoginController extends SocialiteBaseController
         $request->session()->put('currency', $currency);
 
         return redirect()->to('/')
+            ->withCookie(app(CustomerJwtService::class)->forgetCookie())
             ->with('success', trans('theme.notify.logged_out_successfully'));
     }
 }

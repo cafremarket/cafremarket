@@ -9,7 +9,7 @@ class CustomerDashboardTest extends TestCase
     public function test_customer_dashboard_can_be_viewed()
     {
         $customer = \App\Models\Customer::where('email', 'customer@demo.com')->first();
-        $this->post('customer/login', [
+        $this->post('customer/auth/login', [
             'email' => $customer->email,
             'password' => '123456',
         ]);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Services\Auth\CustomerJwtService;
 use App\Services\Hyperlocal\BuyerLocationService;
 // use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,7 +62,10 @@ abstract class SocialiteBaseController extends Controller
 
         app(BuyerLocationService::class)->ensureDeliveryLocation($customer);
 
+        $jwt = app(CustomerJwtService::class)->issue($customer);
+
         return redirect()->intended('/')
+            ->withCookie(app(CustomerJwtService::class)->makeCookie($jwt))
             ->with('success', trans('theme.notify.logged_in_successfully'));
     }
 

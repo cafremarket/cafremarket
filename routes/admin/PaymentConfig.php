@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\ConfigCyberSourceController;
 use App\Http\Controllers\Admin\ConfigPaypalController;
 use App\Http\Controllers\Admin\ConfigStripeController;
 use App\Http\Controllers\Admin\PaymentMethodController;
@@ -26,15 +25,6 @@ Route::get('stripe/connect', [ConfigStripeController::class, 'connect'])->name('
 Route::get('stripe/redirect', [ConfigStripeController::class, 'redirect'])->name('stripe.redirect');
 
 Route::get('stripe/disconnect', [ConfigStripeController::class, 'disconnect'])->name('stripe.disconnect');
-
-// Instamojo
-
-// CyberSource
-Route::get('cybersource/activate', [ConfigCyberSourceController::class, 'activate'])->name('cybersource.activate');
-
-Route::put('cybersource/{cybersource}/update', [ConfigCyberSourceController::class, 'update'])->name('cybersource.update');
-
-Route::get('cybersource/deactivate', [ConfigCyberSourceController::class, 'deactivate'])->name('cybersource.deactivate');
 
 // PayPal
 Route::get('paypal/activate', [ConfigPaypalController::class, 'activate'])->name('paypal.activate');

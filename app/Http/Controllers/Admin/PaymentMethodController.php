@@ -75,32 +75,9 @@ class PaymentMethodController extends Controller
     {
         $routes = [
             'stripe' => 'admin.setting.stripe.connect',
-            'authorizenet' => 'admin.setting.authorizenet.activate',
-            'instamojo' => 'admin.setting.instamojo.activate',
-            'iyzico' => 'admin.setting.iyzico.activate',
             'paypal' => 'admin.setting.paypal.activate',
-            'payfast' => 'admin.setting.payfast.activate',
-            'mercado-pago' => 'admin.setting.mercagoPago.activate',
-            'paypal-express' => 'admin.setting.paypalExpress.activate',
-            'paypal-marketplace' => 'admin.setting.paypalMarketplace.initiate',
-            'paystack' => 'admin.setting.paystack.activate',
-            'cybersource' => 'admin.setting.cybersource.activate',
-            'razorpay' => 'admin.setting.razorpay.activate',
-            'sslcommerz' => 'admin.setting.sslcommerz.activate',
-            'flutterwave' => 'admin.setting.flutterwave.activate',
-            'orangemoney' => 'admin.setting.orangemoney.activate',
-            'mollie' => 'admin.setting.mollie.activate',
             'mpesa' => 'admin.setting.mpesa.activate',
-            'bkash' => 'admin.setting.bkash.activate',
-            'paytm' => 'admin.setting.paytm.activate',
-            'twoCheckout' => 'admin.setting.twoCheckout.activate',
-            'mtnMoney' => 'admin.setting.mtnMoney.activate',
-            'upiPayment' => 'admin.setting.upiPayment.activate',
-
-            // Manual Payment methods
             'wire' => 'admin.setting.manualPaymentMethod.activate',
-            'pip' => 'admin.setting.manualPaymentMethod.activate',
-            'wallet' => 'admin.setting.manualPaymentMethod.activate',
             'cod' => 'admin.setting.manualPaymentMethod.activate',
         ];
 

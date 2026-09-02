@@ -193,7 +193,7 @@ class RegisterController extends Controller
         $data = [
             'name' => $request_data['name'] ?? $request_data['shop_name'],
             'email' => $request_data['email'],
-            'password' => bcrypt($request_data['password']),
+            'password' => $request_data['password'],
             'verification_token' => Str::random(40),
             'role_id' => Role::MERCHANT,
         ];

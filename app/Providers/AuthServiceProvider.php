@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Services\Auth\JwtAuthService;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Passport\Passport;
 
@@ -68,6 +71,18 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Auth::viaRequest('customer-jwt', function (Request $request) {
+            return app(JwtAuthService::class)->resolveFromRequest($request, 'customer');
+        });
+
+        Auth::viaRequest('vendor-jwt', function (Request $request) {
+            return app(JwtAuthService::class)->resolveFromRequest($request, 'vendor_api');
+        });
+
+        Auth::viaRequest('delivery-boy-jwt', function (Request $request) {
+            return app(JwtAuthService::class)->resolveFromRequest($request, 'delivery_boy');
+        });
 
         // Passport::tokensCan([
         //     'user' => 'User Type',

@@ -37,11 +37,11 @@ class RouteServiceProvider extends ServiceProvider
     public const ADMIN_LOGIN = '/login';
 
     /**
-     * The path to the "customer login" route for your application.
+     * Storefront home with login modal (no dedicated customer login page).
      *
      * @var string
      */
-    public const CUSTOMER_LOGIN = '/customer/login';
+    public const CUSTOMER_LOGIN = '/?login=1';
 
     /**
      * Define your route model bindings, pattern filters, etc.

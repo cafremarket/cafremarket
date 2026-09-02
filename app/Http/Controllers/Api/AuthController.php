@@ -10,12 +10,14 @@ use App\Models\Customer;
 use App\Notifications\Auth\CustomerResetPasswordNotification as SendPasswordResetEmail;
 use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
 use App\Notifications\Customer\PasswordUpdated as PasswordResetSuccess;
+use App\Services\Auth\JwtAuthService;
 use App\Services\FCMService;
 use App\Services\Hyperlocal\BuyerLocationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 // use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Support\Str;
 
@@ -78,7 +80,7 @@ class AuthController extends Controller
             try {
                 send_otp_code($request->phone, null);
             } catch (\Exception $e) {
-                return redirect()->route('customer.login')
+                return redirect()->route('homepage', ['login' => 1])
                     ->withErrors([trans('packages.otp-login.phone_session_expired')]);
             }
 
@@ -90,8 +92,9 @@ class AuthController extends Controller
             'password' => $request->password,
         ];
 
-        if (Auth::guard('customer')->attempt($credentials)) {
-            $customer = Auth::guard('customer')->user();
+        $customer = Customer::where('email', $credentials['email'])->first();
+
+        if ($customer && Hash::check($credentials['password'], $customer->password)) {
             $customer->generateToken();
 
             if ($request->filled('fcm_token')) {
@@ -112,9 +115,7 @@ class AuthController extends Controller
         $customer = Auth::guard('api')->user();
 
         if ($customer) {
-            $customer->api_token = null;
-            $customer->fcm_token = null;
-            $customer->save();
+            app(JwtAuthService::class)->invalidate($customer, 'customer');
         }
 
         return response()->json(trans('api.auth_out'), 200);
@@ -212,7 +213,7 @@ class AuthController extends Controller
             ], 404);
         }
 
-        $customer->password = bcrypt($request->password);
+        $customer->password = $request->password;
         $customer->save();
 
         DB::table('password_resets')->where('token', $request->token)->delete();

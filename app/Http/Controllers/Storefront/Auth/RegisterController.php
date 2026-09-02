@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
 use App\Providers\RouteServiceProvider;
+use App\Services\Auth\CustomerJwtService;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,7 +126,7 @@ class RegisterController extends Controller
         $data = [
             'name' => $request->input('name'),
             'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password')),
+            'password' => $request->input('password'),
             'verification_token' => Str::random(40),
         ];
 
@@ -189,7 +190,10 @@ class RegisterController extends Controller
 
         $this->guard('customer')->login($customer);
 
-        return redirect($this->redirectPath());
+        $jwt = app(CustomerJwtService::class)->issue($customer);
+
+        return redirect($this->redirectPath())
+            ->withCookie(app(CustomerJwtService::class)->makeCookie($jwt));
     }
 
     /**

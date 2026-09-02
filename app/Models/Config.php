@@ -312,38 +312,6 @@ class Config extends BaseModel
     }
 
     /**
-     * Get the authorizeNet for the shop.
-     */
-    public function authorizeNet()
-    {
-        return $this->hasOne(\Incevio\Package\AuthorizeNet\Models\ConfigAuthorizeNet::class, 'shop_id');
-    }
-
-    /**
-     * Get the paypalExpress for the shop.
-     */
-    public function paypalExpress()
-    {
-        return $this->hasOne(ConfigPaypalExpress::class, 'shop_id');
-    }
-
-    /**
-     * Get the instamojo for the shop.
-     */
-    public function instamojo()
-    {
-        return $this->hasOne(\Incevio\Package\Instamojo\Models\ConfigInstamojo::class, 'shop_id');
-    }
-
-    /**
-     * Get the paystack for the shop.
-     */
-    public function paystack()
-    {
-        return $this->hasOne(\Incevio\Package\Paystack\Models\ConfigPaystack::class, 'shop_id');
-    }
-
-    /**
      * Get the paypal for the shop.
      */
     public function paypal()
@@ -352,128 +320,11 @@ class Config extends BaseModel
     }
 
     /**
-     * Get the iyzico for the shop.
-     */
-    public function iyzico()
-    {
-        return $this->hasOne(\Incevio\Package\Iyzico\Models\ConfigIyzico::class, 'shop_id');
-    }
-
-    /**
-     * Get the Payfast for the shop.
-     */
-    public function payfast()
-    {
-        return $this->hasOne(\Incevio\Package\Payfast\Models\ConfigPayfast::class, 'shop_id');
-    }
-
-    /**
-     * Get the Mercago Pado for the shop.
-     */
-    public function mercadoPago()
-    {
-        return $this->hasOne(\Incevio\Package\MercadoPago\Models\ConfigMercadoPago::class, 'shop_id');
-    }
-
-    /**
-     * Get the cybersource for the shop.
-     */
-    public function cybersource()
-    {
-        return $this->hasOne(ConfigCyberSource::class, 'shop_id');
-    }
-
-    /**
-     * Get the Razorpay for the shop.
-     */
-    public function razorpay()
-    {
-        return $this->hasOne(\Incevio\Package\Razorpay\Models\ConfigRazorpay::class, 'shop_id');
-    }
-
-    /**
-     * Get the sslcommerz for the shop.
-     */
-    public function sslcommerz()
-    {
-        return $this->hasOne(\Incevio\Package\SslCommerz\Models\ConfigSslCommerz::class, 'shop_id');
-    }
-
-    /**
-     * Get the bkash for the shop
-     */
-    public function bkash()
-    {
-        return $this->hasOne(\Incevio\Package\Bkash\Models\ConfigBkash::class, 'shop_id');
-    }
-
-    /**
-     * Get the upiPayment for shop
-     */
-    public function upiPayment()
-    {
-        return $this->hasOne(\Incevio\Package\UpiPayment\Models\ConfigUpiPayment::class, 'shop_id');
-    }
-
-    /**
-     * Get the flutterwave for the shop.
-     */
-    public function flutterwave()
-    {
-        return $this->hasOne(\Incevio\Package\FlutterWave\Models\ConfigFlutterWave::class, 'shop_id');
-    }
-
-    /**
-     * Get the paypal Marketplace for the shop.
-     */
-    public function paypalMarketplace()
-    {
-        return $this->hasOne(\Incevio\Package\PaypalMarketplace\Models\ConfigPaypalMarketplace::class, 'shop_id');
-    }
-
-    /**
      * Get the mpesa for the shop.
      */
     public function mpesa()
     {
         return $this->hasOne(\Incevio\Package\MPesa\Models\ConfigMPesa::class, 'shop_id');
-    }
-
-    /**
-     * Get the orangemoney for the shop.
-     */
-    public function orangeMoney()
-    {
-        return $this->hasOne(\Incevio\Package\OrangeMoney\Models\ConfigOrangeMoney::class, 'shop_id');
-    }
-
-    /**
-     * Get the mollie for the shop
-     */
-    public function mollie()
-    {
-        return $this->hasOne(\Incevio\Package\Mollie\Models\ConfigMollie::class, 'shop_id');
-    }
-
-    /**
-     * Get the mtnMoney for the shop
-     */
-    public function mtnMoney()
-    {
-        return $this->hasOne(\Incevio\Package\MtnMoney\Models\MtnMoneyConfig::class, 'shop_id');
-    }
-
-    public function twoCheckout()
-    {
-        return $this->hasOne(\Incevio\Package\twoCheckout\Models\ConfigtwoCheckout::class, 'shop_id');
-    }
-
-    /**
-     * Get the paytm for the shop
-     */
-    public function paytm()
-    {
-        return $this->hasOne(\Incevio\Package\Paytm\Models\ConfigPaytm::class, 'shop_id');
     }
 
     /**

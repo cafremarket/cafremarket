@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Storefront\Auth;
 
 use App\Events\Customer\PasswordUpdated;
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Providers\RouteServiceProvider;
+use App\Services\Auth\CustomerJwtService;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -79,7 +81,7 @@ class ResetPasswordController extends Controller
      */
     protected function resetPassword($customer, $password)
     {
-        $customer->password = Hash::make($password);
+        $customer->password = $password;
 
         $customer->setRememberToken(Str::random(60));
 
@@ -88,5 +90,25 @@ class ResetPasswordController extends Controller
         event(new PasswordUpdated($customer));
 
         $this->guard('customer')->login($customer);
+    }
+
+    /**
+     * Get the response for a successful password reset.
+     *
+     * @param  string  $response
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendResetResponse(Request $request, $response)
+    {
+        $customer = $this->guard()->user();
+        $redirect = redirect($this->redirectPath())->with('status', trans($response));
+
+        if ($customer instanceof Customer) {
+            $jwt = app(CustomerJwtService::class)->issue($customer);
+
+            return $redirect->withCookie(app(CustomerJwtService::class)->makeCookie($jwt));
+        }
+
+        return $redirect;
     }
 }

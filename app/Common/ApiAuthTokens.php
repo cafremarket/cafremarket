@@ -2,7 +2,7 @@
 
 namespace App\Common;
 
-use Illuminate\Support\Str;
+use App\Services\Auth\JwtAuthService;
 
 /**
  * Attach this Trait to a User has ApiAuthTokens
@@ -11,20 +11,10 @@ use Illuminate\Support\Str;
  */
 trait ApiAuthTokens
 {
-    public function generateToken()
+    public function generateToken(?string $guard = null)
     {
-        // Reuse the existing token so logging in on web/another device
-        // does not kick the mobile app out of its session.
-        if (! empty($this->api_token)) {
-            return $this->api_token;
-        }
+        $guard ??= app(JwtAuthService::class)->inferGuardFromUser($this);
 
-        $token = Str::random(60);
-
-        $this->api_token = $token;
-
-        $this->save();
-
-        return $token;
+        return app(JwtAuthService::class)->issue($this, $guard);
     }
 }
