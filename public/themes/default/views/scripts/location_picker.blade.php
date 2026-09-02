@@ -24,6 +24,61 @@
   var fetchingAddressLabel = @json(trans('theme.fetching_address'));
   var addressLookupFailedLabel = @json(trans('theme.address_lookup_failed'));
   var confirmLocationLabel = @json(trans('theme.confirm_location'));
+  var LOCATION_STORAGE_KEY = 'cafrepay_buyer_location';
+  var LOCATION_SYNC_FLAG = 'cafrepay_location_synced';
+  var hasServerLocation = {{ buyer_has_location() ? 'true' : 'false' }};
+
+  window.CafrepayLocationStorage = window.CafrepayLocationStorage || {
+    key: LOCATION_STORAGE_KEY,
+    read: function() {
+      try {
+        var raw = localStorage.getItem(LOCATION_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    },
+    write: function(data) {
+      if (!data || !data.latitude || !data.longitude) {
+        return;
+      }
+      localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify({
+        latitude: parseFloat(data.latitude),
+        longitude: parseFloat(data.longitude),
+        address_text: data.address_text || ''
+      }));
+    }
+  };
+
+  function restoreLocationFromLocalStorage() {
+    if (hasServerLocation) {
+      return Promise.resolve(false);
+    }
+
+    var stored = window.CafrepayLocationStorage.read();
+    if (!stored || !stored.latitude || !stored.longitude) {
+      return Promise.resolve(false);
+    }
+
+    return fetch(saveUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken,
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify(stored)
+    })
+    .then(function(response) {
+      return response.ok;
+    })
+    .catch(function() {
+      return false;
+    });
+  }
+
+  window.CafrepayRestoreLocation = restoreLocationFromLocalStorage;
 
   var mapInstance = null;
   var mapMarker = null;
@@ -482,6 +537,13 @@
         return r.json();
       })
       .then(function() {
+        if (window.CafrepayLocationStorage) {
+          window.CafrepayLocationStorage.write({
+            latitude: lat,
+            longitude: lng,
+            address_text: resolvedAddress
+          });
+        }
         sessionStorage.setItem('location_just_saved', '1');
         if (typeof toastr !== 'undefined') {
           toastr.success('{{ trans('theme.location_saved') }}');
@@ -576,6 +638,19 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', bootLocationPicker);
+  document.addEventListener('DOMContentLoaded', function() {
+    bootLocationPicker();
+
+    restoreLocationFromLocalStorage().then(function(synced) {
+      if (!synced) {
+        return;
+      }
+
+      if (!sessionStorage.getItem(LOCATION_SYNC_FLAG)) {
+        sessionStorage.setItem(LOCATION_SYNC_FLAG, '1');
+        window.location.reload();
+      }
+    });
+  });
 })();
 </script>

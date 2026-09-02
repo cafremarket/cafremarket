@@ -171,7 +171,11 @@
   <!-- Page Scripts -->
   @yield('scripts')
 
-  @if (Request::is('/') || (function_exists('hyperlocal_enabled') && hyperlocal_enabled()))
+  @if (function_exists('hyperlocal_enabled') && hyperlocal_enabled())
+    @include('theme::scripts.location_picker')
+  @endif
+
+  @if (Request::is('/'))
     @include('theme::scripts.homepage_flow')
   @endif
 
