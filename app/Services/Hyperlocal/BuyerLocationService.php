@@ -17,6 +17,12 @@ class BuyerLocationService
 
     public function latitude(): ?float
     {
+        $fromRequest = $this->coordinatesFromRequest();
+
+        if ($fromRequest['lat'] !== null) {
+            return $fromRequest['lat'];
+        }
+
         $lat = session('buyer_latitude');
 
         if ($lat !== null && $lat !== '') {
@@ -34,6 +40,12 @@ class BuyerLocationService
 
     public function longitude(): ?float
     {
+        $fromRequest = $this->coordinatesFromRequest();
+
+        if ($fromRequest['lng'] !== null) {
+            return $fromRequest['lng'];
+        }
+
         $lng = session('buyer_longitude');
 
         if ($lng !== null && $lng !== '') {
@@ -205,5 +217,28 @@ class BuyerLocationService
         }
 
         return Auth::guard('customer')->user() ?? Auth::guard('api')->user();
+    }
+
+    /**
+     * Mobile/API clients send coordinates via query or headers on each request.
+     *
+     * @return array{lat: ?float, lng: ?float}
+     */
+    protected function coordinatesFromRequest(): array
+    {
+        $request = request();
+
+        if (! $request) {
+            return ['lat' => null, 'lng' => null];
+        }
+
+        $lat = $request->get('lat', $request->header('X-Buyer-Latitude'));
+        $lng = $request->get('lng', $request->header('X-Buyer-Longitude'));
+
+        if ($lat === null || $lng === null || $lat === '' || $lng === '') {
+            return ['lat' => null, 'lng' => null];
+        }
+
+        return ['lat' => (float) $lat, 'lng' => (float) $lng];
     }
 }
