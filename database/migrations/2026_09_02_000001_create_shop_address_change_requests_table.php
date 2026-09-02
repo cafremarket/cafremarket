@@ -8,9 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::dropIfExists('shop_address_change_requests');
+
         Schema::create('shop_address_change_requests', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('shop_id');
+            $table->unsignedInteger('shop_id');
             $table->unsignedBigInteger('address_id')->nullable();
             $table->unsignedBigInteger('requested_by')->nullable();
             $table->json('previous_address');
