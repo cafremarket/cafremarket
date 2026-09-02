@@ -35,11 +35,12 @@
       }
 
       var navToggle = document.getElementById('sf-account-nav-toggle');
-      var nav = document.getElementById('sf-account-nav');
+      var navSidebar = document.querySelector('.sf-account-sidebar');
 
-      if (navToggle && nav) {
+      if (navToggle && navSidebar) {
         navToggle.addEventListener('click', function () {
-          nav.classList.toggle('is-open');
+          var open = navSidebar.classList.toggle('is-open');
+          navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
       }
     });

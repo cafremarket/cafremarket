@@ -220,18 +220,56 @@
         }
       });
 
-      // Mobile mega menu
-      $('.main-menu').mobileMegaMenu({
-        changeToggleText: false,
-        enableWidgetRegion: true,
-        prependCloseButton: true,
-        stayOnActive: true,
-        // toogleTextOnClose: 'Close Menu',
-        menuToggle: 'main-menu-toggle'
+      // Mobile drawer (replaces legacy mega menu plugin)
+      var mobileDrawer = document.getElementById('sf-mobile-drawer');
+      var mobileOverlay = document.querySelector('.close-sidebar');
+
+      function openMobileDrawer() {
+        if (!mobileDrawer) return;
+        mobileDrawer.classList.add('open');
+        mobileDrawer.setAttribute('aria-hidden', 'false');
+        if (mobileOverlay) mobileOverlay.classList.add('active');
+        document.body.classList.add('overflow');
+      }
+
+      function closeMobileDrawer() {
+        if (!mobileDrawer) return;
+        mobileDrawer.classList.remove('open');
+        mobileDrawer.setAttribute('aria-hidden', 'true');
+        if (mobileOverlay) mobileOverlay.classList.remove('active');
+        document.body.classList.remove('overflow');
+      }
+
+      document.querySelectorAll('.main-menu-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          if (!mobileDrawer) return;
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          if (mobileDrawer.classList.contains('open')) {
+            closeMobileDrawer();
+          } else {
+            openMobileDrawer();
+          }
+        }, true);
       });
 
-      // Remmove the unwanted li that pushed via mobileMegaMenu plugin
-      $("#mobile-lang ul li a.close-button").closest('li').remove();
+      if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', function () {
+          closeMobileDrawer();
+        });
+      }
+
+      document.addEventListener('keyup', function (e) {
+        if (e.key === 'Escape') closeMobileDrawer();
+      });
+
+      if (mobileDrawer) {
+        mobileDrawer.querySelectorAll('a:not([data-toggle])').forEach(function (link) {
+          link.addEventListener('click', function () {
+            closeMobileDrawer();
+          });
+        });
+      }
     });
 
     // Search only on explicit submit (search button). Allow keyword and/or zone and/or category.

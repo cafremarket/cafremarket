@@ -28,15 +28,20 @@ class ShopController extends Controller
         $buyerLocation->syncFromCustomer();
         $latitude = $request->get('lat', $buyerLocation->latitude());
         $longitude = $request->get('lng', $buyerLocation->longitude());
+        $scope = $request->get('scope', 'nearby');
 
-        if ($latitude && $longitude) {
+        if ($latitude && $longitude && $scope !== 'all') {
             $buyerLocation->save((float) $latitude, (float) $longitude, $request->get('address_text'), $request);
 
             $nearby = $catalog->nearbyShopsWithDistance();
             $shops = $nearby->pluck('shop');
             $distances = $nearby->mapWithKeys(fn ($row) => [$row['shop']->id => $row['distance_km']]);
 
-            return view('theme::nearby_shops', compact('shops', 'distances', 'latitude', 'longitude'));
+            return view('theme::stores_list', [
+                'shops' => $shops,
+                'distances' => $distances,
+                'isNearby' => true,
+            ]);
         }
 
         $shops = Shop::select('id', 'owner_id', 'slug', 'name', 'id_verified', 'phone_verified', 'address_verified', 'total_item_sold', 'total_sold_amount', 'created_at')
@@ -62,7 +67,11 @@ class ShopController extends Controller
             ->paginate(16)
             ->appends(request()->query());
 
-        return view('theme::shop_lists', compact('shops'));
+        return view('theme::stores_list', [
+            'shops' => $shops,
+            'distances' => [],
+            'isNearby' => false,
+        ]);
     }
 
     /**

@@ -1548,6 +1548,28 @@ if (! function_exists('get_formated_decimal')) {
     }
 }
 
+if (! function_exists('remaining_days_until')) {
+    /**
+     * Whole days remaining until a date (rounds up partial days).
+     */
+    function remaining_days_until($date): int
+    {
+        if (! $date) {
+            return 0;
+        }
+
+        $target = $date instanceof \Carbon\CarbonInterface
+            ? $date
+            : \Carbon\Carbon::parse($date);
+
+        if ($target->isPast()) {
+            return 0;
+        }
+
+        return (int) max(0, ceil(now()->diffInHours($target, false) / 24));
+    }
+}
+
 if (! function_exists('format_distance_km')) {
     /**
      * Format a distance in kilometres for display (meters when very close).

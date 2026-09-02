@@ -367,4 +367,11 @@ class Statistics
             ->join('configs', 'configs.shop_id', '=', 'shops.id')
             ->where('configs.pending_verification', 1)->count();
     }
+
+    public static function pending_address_change_count()
+    {
+        return \App\Models\ShopAddressChangeRequest::query()
+            ->where('status', \App\Models\ShopAddressChangeRequest::STATUS_PENDING)
+            ->count();
+    }
 }

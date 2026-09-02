@@ -1,18 +1,6 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Messages Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to display messages for any action, notices and warnings.
-    | You are free to change them to anything
-    | you want to customize your views to better match your application.
-    |
-    */
-
     'canceled' => 'Canceled!',
     'confirmed' => 'Confirmed',
     'created' => ':model has been created successfully!',
@@ -57,7 +45,6 @@ return [
     'theme_activated' => 'Theme :theme has been activated successfully!',
     'the_ip_banned' => 'The IP address has been banned from the application.',
     'the_ip_unbanned' => 'The IP address has been removed from block-list.',
-
     'no_billing_info' => 'Please add billing information to continue.',
     'no_card_added' => 'Please add billing information to subscribe.',
     'billing_setup_unavailable' => 'Card billing is not available yet. Please contact the platform administrator to configure Stripe, or ask them to disable "Required card upfront" in system settings.',
@@ -91,33 +78,15 @@ return [
     'license_updated' => 'License updated.',
     'take_a_backup' => 'You can take a database backup snapshot. Make sure you have configured the backup preferences before take this action. Make sure the <code>mysqldump</code> is installed on your server. Check the documentation for help.',
     'backup_done' => 'Backup done successfully!',
-
-    // 'you_have_disputes_solve' => 'There are :disputes active disputes! Please review and solve disputes.',
-    // 'you_have_refund_request' => 'You have :requests refund request. Please review and take action.',
-
-    // 'action_failed'    => [
-    //     'create'   => 'Create :model has been failed!',
-    //     'update'   => 'Update :model has been failed!',
-    //     'trash'   => ':model has been moved to trash!',
-    //     'restore'  => ':model has been restored failed!',
-    //     'delete'   => ':model has been deleted failed!',
-    // ],
-
     'inventory_exist' => 'The product is already exist in your inventory. Please update the existing list instead of creating duplicate list.',
     'inventory_not_found' => 'The product is not found in your inventory. Please update the inventory and try again.',
-
     'notice' => [
         'no_billing_address' => 'This customer has no billing address set up yet. Please add a billing address before create an order.',
-
         'no_active_payment_method' => 'Your store has no active payment method. Please activate at least one payment method to accept order.',
-
         'no_shipping_option_for_the_zone' => 'No shipping zone available for this area. Please create a new shipping zone or add this shipping area to an existing zone.',
-
         'no_rate_for_the_shipping_zone' => 'The <strong> :zone </strong> shipping zone has no shipping rates. Please create shipping rates to accept orders from this zone.',
-
         'cant_cal_weight_shipping_rate' => 'Can\'t calculate weight based shipping rate. Because weight are not set for some items.',
     ],
-
     'no_changes' => 'Nothing to show',
     'no_orders' => 'No order found!',
     'no_history_data' => 'No information to show',
@@ -169,9 +138,7 @@ return [
     'import_demo_contents' => 'Importing demo contents will remove all data from the database and reset all configurations except the file <small>(the .env and other config files in configs/ directory)</small> configurations . The system will go back to a fresh installation. <br/><b>Changes made here are irreversible.</b>',
     'env_saved' => 'The .env file saved successfully!',
     'modify_environment_file' => 'Be cautious when working with the `.env` file, as it serves as the main configuration for the system. Any incorrect changes can cause the system to break down. Always take a backup before making any modifications. <br/><b>Changes made here are irreversible.</b>',
-
     'be_careful_sensitive_area' => 'Be careful about your actions! This configurations are very sensitive and the system may breaks if you do anything wrong here. <br/><b>Changes made here are irreversible.</b>',
-
     'unfulfilled_percents' => ':percent% of today\'s total orders',
     'last_30_days_percents' => ':percent% :state in 30 days',
     'stock_out_percents' => ':percent% of total :total items',
@@ -179,33 +146,20 @@ return [
     'todays_order_percents' => ':percent% :state from yesterday',
     'no_sale' => 'No sale :date',
     'logged_in_as_admin' => 'You\'re already logged in as an admin user.',
-
     'permission' => [
         'denied' => 'Permission denied!',
     ],
-
-    // Version 1.2.4
     'listings_not_visible' => 'Your listings are not visible on the front end. Because: :reason',
     'no_active_payment_method' => 'Your store has no active payment method.',
     'no_active_shipping_zone' => 'Your store has no active shipping zone. Please create shipping zones to accept order.',
-
-    // Version 1.2.5
     'your_shop_in_hold' => 'A sua loja está em espera! Analisaremos e aprovaremos a sua loja o mais breve possível!',
     'your_shop_in_maintenance_mode' => 'The shop is in maintenance mode.',
-
-    // Version 1.3.0
     'how_id_verification_helps' => 'How Identity Verification Helps',
-
     'how_the_verification_process_works' => 'How the process works',
-
     'subscription_updated' => 'Subscription has been updated successfully!',
-
     'subscription_update_failed' => 'Subscription update has been failed! Please see the log file for details.',
-
     'pending_approvals' => '[0,1] :count Pending approval need action|[2,*] :count Pending approvals need action',
-
     'pending_verifications' => '[0,1] :count Pending verification need action|[2,*] :count Pending verifications need action',
-
     'verification_request_submitted' => 'Your verification request has been submitted. An admin will review your documents soon.',
     'verification_request_resubmitted' => 'Your verification request has been resubmitted. An admin will review it again soon.',
     'seller_registration_complete_verify_store' => 'Welcome! Your seller account is created. Please pin your store location on the map and upload verification documents to complete setup.',
@@ -248,6 +202,11 @@ return [
     'verification_option_person_help' => 'Upload your ID, proof of address, and a clear photo of yourself. Admin will verify your identity.',
     'verification_option_phone_help' => 'Add your business phone number. Admin will verify you can be reached on this number.',
     'verification_option_address_help' => 'Pin your store on the map. Admin will verify your business address matches the location.',
+    'address_change_request_pending' => 'Your address change request is pending admin approval. You will be notified once it is reviewed.',
+    'address_change_request_submitted' => 'Your address change request has been submitted. An admin will review it before the new location goes live.',
+    'address_change_request_not_pending' => 'This address change request is no longer pending review.',
+    'address_change_request_approved' => 'The store address change has been approved.',
+    'address_change_request_rejected' => 'The store address change has been rejected.',
     'verification_option_your_part' => 'Your submission',
     'verification_option_admin_part' => 'Admin approval',
     'verification_phone_saved' => 'Phone number saved successfully.',
@@ -276,9 +235,7 @@ return [
     'verification_approve_checklist_help' => 'Review the documents and details below. Use Approve to verify the person, phone, and address together.',
     'verification_status_checklist_help' => 'Current verification status for this store.',
     'verification_approve_sets_all' => 'Approve will mark person verification, store verification, and phone & email as verified and activate the store.',
-
     'verification_intro' => 'Once you are verified, we will show the <strong>verified</strong> badge on your business and on your store profile page. This lets your business build trust on the marketplace.',
-
     'verification_process' => '<ul>
             <li>You take a picture or scan your ID (passport, driving license or government issued ID) using a HD camera and upload</li>
             <li>Upload proof of your address (driving license, property tax receipt, utility bill or lease agreement)</li>
@@ -286,9 +243,7 @@ return [
             <li>We will check that they are pictures of the same person.</li>
             <li>You can not use same documentation(driving license) for ID and Address verification.</li>
         </ul>',
-
     'what_the_verification_documents_need' => 'What formal identity documents do I need?',
-
     'verification_documents' => 'You can use: <ul>
             <li>your passport</li>
             <li>your driving license</li>
@@ -298,121 +253,63 @@ return [
             <li>lease agreement</li>
         </ul>
         Driving licenses and government issued IDs must be made out of plastic. All IDs must be valid.',
-
     'verified_business_name_like' => 'Your business name will be shown like this',
-
-    // Version 1.3.3
     'csv_import_process_started' => 'The data has been submitted successfully. The process may take a few minimums. You\'ll get an email when it\'s done.',
-
     'model_has_association' => 'The :model has :associate in it. To delete this :model, please remove all :associate under the :model',
-
-    // Version 1.4.0
     'active_worldwide_business_area' => 'The status will not affect as the marketplace business area is set to worldwide! To change the business area settings please check the configuration section.',
-
     'please_select_conversation' => 'Please select a conversation from the left.',
-
     'session_expired' => 'Your session has been expired! Please login.',
-
     'no_address_for_invoice' => 'You have no business address set up yet. Please add address now.',
-
     'package_settings_updated' => 'Plugin settings updated',
-
     'next_billing_date' => 'Your next subscription billing date is <strong>:date</strong> Please keep sufficient balance on your wallet to keep going.',
-
     'package_installed_success' => 'The :package module has been installed successfully!',
-
     'package_upgraded_success' => 'The :package module has been upgraded successfully!',
-
     'package_installed_already' => 'The :package module is already installed!',
-
     'package_uninstalled_success' => 'The :package module has been uninstalled successfully!',
-
     'cancellation_require_admin_approval' => 'Cancellation require admin approval. A cancellation fee may applied.',
-
     'a_cancellation_fee_be_charged' => 'A cancellation fee of <strong>:fee</strong> will be charged',
-
     'order_will_be_cancelled_instantly' => 'The order will be cancelled instantly.',
-
     'not_accessible_on_demo' => 'This content is not accessible on the demo mode!',
-
     'updated_deal_of_the_day' => 'Deal of the day updated successfully.',
-
     'updated_tagline' => 'Tagline updated successfully.',
-
     'featured_brands_updated' => 'Featured brands updated successfully.',
-
     'featured_vendors_updated' => 'Featured vendors updated successfully.',
-
     'featured_items_updated' => 'Featured items updated successfully.',
-
     'best_finds_under_updated' => 'Best finds under updated successfully.',
-
     'trending_now_category_updated' => 'Trending now category updated successfully.',
-
     'trending_categories_update_failed' => 'You can add maximum :limit trending category',
-
     'package_inactive' => ':package is inactive, please activate from admin panel.',
-
     'misconfigured_subscription_stripe' => 'The system found misconfigured Stripe subscriptions. Please check your settings. Read the documentation if need help.',
-
     'misconfigured_subscription_wallet' => 'Wallet based subscription required WALLET and LOCAL SUBSCRIPTION packages to function. Please contact support team for help. System will try to use STRIPE subscription unless these requirements met.',
-
     'some_item_out_of_stock' => 'Few items are not available right now. We\'ve added all available item',
-
     'dependent_package_failed' => 'Plugin dependency failed! need to enable and configure the :dependency module(s).',
-
     'misconfigured_plugin' => 'The :package needs to configure correctly! Please check the documentation and configure it correctly or contact support if need help.',
-
     'misconfigured_payment' => 'The :payment is misconfigured and needs to configure correctly! Please check the documentation and configure it correctly or contact support if need help.',
-
     'manual_payment_configure_help' => 'Set the manual payment instructions on settings. Without this configuration manual payment will not work.',
-
-    'confirm_regenerate_key' => "Regenerating the application keys will enforce you to rebuild your application apps otherwise your apps won'n work",
-
+    'confirm_regenerate_key' => 'Regenerating the application keys will enforce you to rebuild your application apps otherwise your apps won\'n work',
     'custom_css_added' => 'Custom css added successfully',
-
     'custom_css_updated' => 'Custom css updated successfully',
-
     'custom_css_deleted' => 'Custom css deleted successfully',
-
     'vendor_can_use_own_catalog_only_notice' => 'The marketplace is configured as vendor manage the products of their own. You can off this settings <code>vendor can use own catalog only</code> from SETTINGS >> CONFIGURATION section.',
-
     'account_delete' => 'Your all data in our system related with your account will be removed permanently. You can\'t revert this action',
-
     'main_nav_category_updated' => 'Main navigation category updated successfully',
-
     'empty_state_message' => 'State can not be empty. Select at least one state.',
-
     'clear_demo_contents' => 'Clearing demo contents will remove all demo data from the database. The system will go back to a fresh installation. <br/><b>Changes made here are irreversible.</b>',
-
     'demo_data_imported' => 'Demo contents are imported successfully!',
-
     'demo_data_cleared' => 'Demo contents are cleared from your system successfully!',
-
     'reached_download_maximum_limit' => 'Your download maximum limit has been reached',
-
     'download_link_guest_customer' => 'As a non registered customer you\'ll not be able to get the link after you leave this page. Please copy the links and save it for future use. We also sent you an email with order details.',
-
     'download_link_loggedin_customer' => 'The download links as below. You can also download from the order detail page on your account dashboard.',
-
     'package_not_found' => 'The :package module not found!',
-
     'account_number_updated' => 'Account Number has been updated successfully',
-
     'updated_top_bar_banner' => 'Banner has been updated successfully',
-
     'switched_to_customer_successfully' => 'Switched to customer successfully',
-
     'customer_acc_not_exist' => 'Customer account not exist',
-
     'update_from_merchant_notice' => 'To update this information, please switch to your merchant account.',
-
     'customer_acc_created_successfully' => 'Customer account created successfully',
-
     'no_translation_available' => 'No translation option available! Multiple active languages are needed.',
-
     'uploaded_file_not_blade_file' => 'The template file must have to be a blade.php file',
-
     'something_went_wrong' => 'The action has been failed! Something went wrong!!',
-
+    'download_link_of_digital_product' => 'Click here to download the digital product.',
+    'updated_promotional_tagline' => 'Updated Promotional Tagline',
 ];

@@ -49,9 +49,13 @@
   <script>window.__merchantPanel = true;</script>
   <div class="mp-app">
     @include('merchant.partials.sidebar')
+    <div class="mp-sidebar-overlay" id="mp-sidebar-overlay" hidden aria-hidden="true"></div>
 
     <div class="mp-main">
       <header class="mp-topbar">
+        <button type="button" class="mp-sidebar-toggle" id="mp-sidebar-toggle" aria-label="{{ trans('app.toggle_navigation') }}" aria-expanded="false" aria-controls="mp-sidebar">
+          <i class="fa fa-bars"></i>
+        </button>
         <h1 class="mp-topbar__title">
           @hasSection('page_title')
             @yield('page_title')
@@ -104,6 +108,7 @@
 </body>
 @else
 <body class="hold-transition skin-black sidebar-mini admin-modern">
+  <div class="admin-sidebar-overlay" id="admin-sidebar-overlay" hidden aria-hidden="true"></div>
   <div class="wrapper">
     @include('admin.header')
     @include('admin.sidebar')

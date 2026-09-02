@@ -303,6 +303,25 @@ class TranslationAuditService
         return $undefined;
     }
 
+    public function findUndefinedKeysInLocale(string $locale, array $usedKeys): array
+    {
+        $undefined = [];
+
+        foreach ($usedKeys as $key => $files) {
+            if ($this->shouldSkipTranslationKey($key)) {
+                continue;
+            }
+
+            if ($this->translationKeyExistsInLocale($key, $locale)) {
+                continue;
+            }
+
+            $undefined[$key] = array_values(array_unique($files));
+        }
+
+        return $undefined;
+    }
+
     public function translationKeyExists(string $key, string $locale, string $baseLocale = 'en'): bool
     {
         foreach ($this->resolveTranslationKey($key) as $candidate) {
@@ -318,6 +337,23 @@ class TranslationAuditService
                 $baseFlat = $this->flatten($this->safeLoadFile($root, $baseLocale, $candidate['file']));
 
                 if (array_key_exists($candidate['item'], $baseFlat)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function translationKeyExistsInLocale(string $key, string $locale): bool
+    {
+        foreach ($this->resolveTranslationKey($key) as $candidate) {
+            $roots = $candidate['roots'] ?? $this->langRoots;
+
+            foreach ($roots as $root) {
+                $flat = $this->flatten($this->safeLoadFile($root, $locale, $candidate['file']));
+
+                if (array_key_exists($candidate['item'], $flat)) {
                     return true;
                 }
             }
@@ -437,6 +473,149 @@ class TranslationAuditService
         }
 
         return Str::contains($key, '.');
+    }
+
+    public function shouldSkipTranslationKey(string $key): bool
+    {
+        if ($key === '' || Str::endsWith($key, ['.', '_'])) {
+            return true;
+        }
+
+        if (Str::contains($key, '::')) {
+            [$namespace] = explode('::', $key, 2);
+
+            return $this->packageLangRootForNamespace($namespace) === null;
+        }
+
+        return false;
+    }
+
+    /**
+     * Find the best existing translation for a dotted key by searching nested lang files.
+     */
+    public function findBestTranslationValue(string $key, string $locale = 'en'): ?string
+    {
+        foreach ($this->resolveTranslationKey($key) as $candidate) {
+            $roots = $candidate['roots'] ?? $this->langRoots;
+
+            foreach ($roots as $root) {
+                $flat = $this->flatten($this->safeLoadFile($root, $locale, $candidate['file']));
+
+                if (array_key_exists($candidate['item'], $flat) && $flat[$candidate['item']] !== '') {
+                    return (string) $flat[$candidate['item']];
+                }
+            }
+        }
+
+        [$file, $item] = array_pad(explode('.', $key, 2), 2, null);
+
+        if (! $file || ! $item) {
+            return null;
+        }
+
+        $lastSegment = Str::afterLast($item, '.');
+        $bestMatch = null;
+        $bestScore = -1;
+
+        foreach ($this->langRoots as $root) {
+            foreach ($this->filesFor($root, $locale) as $langFile) {
+                $flat = $this->flatten($this->safeLoadFile($root, $locale, $langFile));
+
+                foreach ($flat as $flatKey => $value) {
+                    if ($value === null || $value === '') {
+                        continue;
+                    }
+
+                    $score = 0;
+
+                    if ($flatKey === $item) {
+                        $score = 100;
+                    } elseif (Str::endsWith($flatKey, '.'.$item)) {
+                        $score = 90;
+                    } elseif (Str::afterLast($flatKey, '.') === $lastSegment) {
+                        $score = 50;
+                    } else {
+                        continue;
+                    }
+
+                    if ($langFile === $file) {
+                        $score += 10;
+                    }
+
+                    if ($score > $bestScore) {
+                        $bestScore = $score;
+                        $bestMatch = (string) $value;
+                    }
+                }
+            }
+        }
+
+        return $bestMatch;
+    }
+
+    protected function humanizeTranslationKey(string $key): string
+    {
+        $segment = Str::afterLast($key, '.');
+
+        return Str::title(str_replace('_', ' ', $segment));
+    }
+
+    /**
+     * Add translation keys used in code but missing from lang files.
+     *
+     * @return array{added: array<string, array<string, string>>, skipped: array<int, string>}
+     */
+    public function syncUndefinedKeys(string $baseLocale = 'en', array $targetLocales = ['pt'], bool $dryRun = true): array
+    {
+        $usedKeys = $this->scanCodebaseForTranslationKeys();
+        $locales = array_values(array_unique(array_merge([$baseLocale], $targetLocales)));
+
+        $result = [
+            'added' => [],
+            'skipped' => array_keys(array_filter(
+                $usedKeys,
+                fn ($files, $key) => $this->shouldSkipTranslationKey($key),
+                ARRAY_FILTER_USE_BOTH
+            )),
+        ];
+
+        foreach ($locales as $locale) {
+            $undefined = $this->findUndefinedKeysInLocale($locale, $usedKeys);
+
+            foreach ($undefined as $key => $files) {
+                $value = $this->findBestTranslationValue($key, $locale)
+                    ?? $this->findBestTranslationValue($key, $baseLocale)
+                    ?? $this->humanizeTranslationKey($key);
+
+                if ($dryRun) {
+                    $result['added'][$locale][$key] = $value;
+
+                    continue;
+                }
+
+                $this->writeTranslationKey($key, $value, $locale);
+                $result['added'][$locale][$key] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    protected function writeTranslationKey(string $key, string $value, string $locale): void
+    {
+        foreach ($this->resolveTranslationKey($key) as $candidate) {
+            $roots = $candidate['roots'] ?? $this->langRoots;
+
+            foreach ($roots as $root) {
+                $path = $root.DIRECTORY_SEPARATOR.$locale.DIRECTORY_SEPARATOR.$candidate['file'].'.php';
+                $current = is_file($path) ? $this->loadFile($root, $locale, $candidate['file']) : [];
+                $flat = $this->flatten($current);
+                $flat[$candidate['item']] = $value;
+                $content = $this->exportPhpArray($this->unflatten($flat));
+                File::ensureDirectoryExists(dirname($path));
+                File::put($path, $content);
+            }
+        }
     }
 
     protected function exportPhpArray(array $array, int $depth = 1): string

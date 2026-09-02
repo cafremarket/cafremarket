@@ -104,12 +104,9 @@ return [
         'visit_store' => 'Visit Shop',
         'place_order' => 'Place Order',
     ],
-
-    // Store Front
     'account' => 'Account',
     'account_login' => 'Account Login',
     'active_listings' => 'Active listings',
-    // 'actions' => 'Actions',
     'address' => 'Address',
     'addresses' => 'Addresses',
     'alert' => 'Alert',
@@ -130,11 +127,9 @@ return [
     'billing_detail' => 'Billing Detail',
     'billing_address' => 'Billing Address',
     'bio' => 'Detail',
-    // 'bought_together' => 'Frequently bought together',
     'brand' => 'Brand',
     'by' => 'By',
     'category' => 'Category',
-    // 'cart_item_count' => ':count Items',
     'cart_summary' => 'Cart Summary',
     'card' => 'Card',
     'change_password' => 'Change Password',
@@ -245,9 +240,6 @@ return [
     'message_history' => 'Message History',
     'message_from_seller' => 'Message From the Seller',
     'most_popular' => 'Most popular',
-    // 'my_account' => 'My account',
-    // 'my_orders' => 'My orders',
-    // 'my_inbox' => 'Inbox',
     'name' => 'Name',
     'new_arrivals' => 'New Arrivals',
     'new_password' => 'New Password',
@@ -342,7 +334,6 @@ return [
     'store' => 'Shop',
     'shop_down' => 'This shop is unavailable right now',
     'store_not_available' => 'Shop not available',
-    // 'store_profile' => 'Shop Profile',
     'stuff_pick' => 'Staff Pick',
     'status' => 'Status',
     'stay_connected' => 'Stay Connected',
@@ -402,11 +393,9 @@ return [
         'upload_photo' => 'You can upload only 1 file not more than 2MB in size and supports JPG, JPEG or PNG',
         'when_marketplace_steps_in' => 'If you and the seller can\'t come to an agreement, we will step in and help.',
     ],
-
     'defaults' => [
         'new_message_from' => 'New message from :sender',
     ],
-
     'notify' => [
         'address_created' => 'Address saved successfully!',
         'address_deleted' => 'Address deleted successfully!',
@@ -479,13 +468,11 @@ return [
         'business_days_not_given' => 'Shops business days not given',
         'select_pickup_address' => 'You must select a pickup address to place your order',
     ],
-
     'input_label' => [
         'agree' => 'I agree',
         'i_agree_with_terms' => 'I agree with the <u><a href=":url" target="_blank"> terms</a></u>',
         'subscribe_to_the_newsletter' => 'Subscribe to the Newsletter',
     ],
-
     'placeholder' => [
         'address_line_1' => 'Address',
         'address_line_2' => 'Apartment, unit, suite, or floor',
@@ -524,7 +511,6 @@ return [
         'write_your_feedback' => 'Write your feedback within 250 characters',
         'zip_code' => 'Zip code',
     ],
-
     'validation' => [
         'dispute_type_id_required' => 'Select dispute type',
         'dispute_product_id_required_with' => 'Select the products that have an issue.',
@@ -533,14 +519,12 @@ return [
         'incorrect_current_password' => 'Your current password is not correct!',
         'address_title' => 'Please include first name and last name in the \'Contact Person\' input field.',
     ],
-
     'confirm_action' => [
         'cant_undo' => 'Are you sure? <br/>You can\'t undo this action',
         'delete' => 'Are you sure want to delete this resource? <br/>You can\'t undo this action!',
         'goods_received' => 'Are you sure? <br/>You can\'t undo this action',
         'open_a_dispute' => 'Before opening a dispute, please try to solve the issue with the seller.',
     ],
-
     'section_headings' => [
         'additional_items' => 'Additional items <span class="text-primary">to explore</span>',
         'contact_seller' => 'Leave a message for the seller',
@@ -561,7 +545,6 @@ return [
         'you_may_also_like' => 'You may also like',
         'trending_now' => 'Trending <span class="text-primary">Now</span>',
     ],
-
     'bundle_offer' => 'Bundle Offers',
     'you_may_also_like' => 'You may also like',
     'featured' => 'Featured',
@@ -588,25 +571,23 @@ return [
     'featured_brand' => 'Featured Brands',
     'featured_vendor' => 'Featured Vendors',
     'featured_categories' => 'Featured Categories',
-
     'benefit' => [
         'one' => [
             'title' => 'Start Selling in Minutes',
-            'icon' => 'rocket', // Don't translate this line
+            'icon' => 'rocket',
             'detail' => 'Get straight to growing your business. We handle everything to sell online. So you can focus on your business rather managing the infrastructure.',
         ],
         'two' => [
             'title' => 'Comprehensive Dashboard',
-            'icon' => 'tablet', // Don't translate this line
+            'icon' => 'tablet',
             'detail' => 'Get a holistic and detailed view of your business to better understand sales, orders, and customers to better tailor your products.',
         ],
         'three' => [
             'title' => 'Get Paid Directly and Securely',
-            'icon' => 'credit-card', // Don't translate this line
+            'icon' => 'credit-card',
             'detail' => 'We don\'t keep your money! The payment goes to you directly as soon as a buyer pays.',
         ],
     ],
-
     'plan' => [
         'inventory_limit' => ':limit Products',
         'marketplace_commission' => ':commission marketplace commission',
@@ -616,7 +597,6 @@ return [
         'transaction_and_commission' => ':commission + :fee per transaction',
         'transaction_fee' => ':fee per transaction',
     ],
-
     'how_it_work_steps' => [
         'step_1' => [
             'title' => 'Register as Merchant',
@@ -636,17 +616,13 @@ return [
         ],
         'ending' => 'Be Part <br/>of Our <br/>Story!',
     ],
-
     'intro_lead' => 'Everything you need to start selling online!',
     'intro_heading' => 'It\'s made for you',
     'selling_price_tagline' => 'Starting :price a month + additional fees',
-
     'benefits' => 'Benefits',
     'faq' => 'FAQ',
     'how_it_works' => 'How It Works',
     'pricing' => 'Pricing',
-
-    // Version 1.2.4
     'first_listed_on' => 'Date first listed on :platform',
     'created_at' => 'Created at',
     'dispute_details' => 'Dispute Details',
@@ -665,12 +641,9 @@ return [
     'success' => 'Success',
     'info' => 'Info',
     'danger' => 'Error',
-    // Version 1.3.0
     'enter_tracking_number' => 'Enter your order tracking number.',
     'from_verified_seller' => 'Verified seller',
     'mark_as_solved' => 'Mark as solved',
-
-    // Version 2.0.0
     'add_shipping_address' => 'Add a shipping address',
     'archive' => 'Archive',
     'country' => 'Country',
@@ -689,7 +662,7 @@ return [
     'message_archived' => 'Message has been archived successfully!',
     'my_messages' => 'Messages',
     'of_total' => ':first - :last of :total',
-    'or' => 'OR',
+    'or' => 'or',
     'subject' => 'Subject',
     'unread_messages' => 'Unread messages',
     'std_delivery_time' => 'Standard delivery time',
@@ -703,15 +676,13 @@ return [
     'order_cancellation_requested' => 'Cancellation request has been saved.',
     'order_return_requested' => 'Return request has been saved.',
     'return' => 'Return',
-
-    // Version 2.1.0
     'chat_welcome' => 'Hey! Have a question?',
     'connecting' => 'Connecting...',
     'login_to_chat' => 'We\'re just one step away! Please login to start the conversation.',
     'now' => 'Now',
     'offline' => 'Offline',
     'online' => 'Online',
-    'shop_not_found' => 'Shop not found. Check other vendors.',
+    'shop_not_found' => 'Store not found. Check other stores.',
     'session_expired' => 'The session has been expired! Please refresh the page.',
     'item_not_available' => 'This item is no more available!',
     'cancel_items' => 'Cancel Items',
@@ -751,9 +722,11 @@ return [
     'additional_item' => 'Additional items to explore',
     'track_your_order' => 'Track Your Order',
     'brands' => 'Brands',
-    'vendors' => 'Vendors',
+    'vendors' => 'Stores',
+    'stores' => 'Stores',
     'all_brands' => 'All Brands',
-    'all_shops' => 'All Vendors',
+    'all_stores' => 'All Stores',
+    'all_shops' => 'All Stores',
     'profile' => 'Profile',
     'product_videos' => 'Product videos',
     'events' => 'Events',
@@ -775,7 +748,6 @@ return [
     'cart_update_failed' => 'Cart update failed!',
     'cart_count' => 'Cart count',
     'listings_count' => ':count items',
-    // 'follow_us' => 'Follow Us',
     'for_customers' => 'For Customers',
     'search_product_and_supplier' => 'Search Products & Suppliers',
     'quick_links' => 'Quick Links',
@@ -795,7 +767,6 @@ return [
     'login_with_social' => 'or use your social media account',
     'invalid_address' => 'The address is not valid. Please enter a valid address.',
     'change_shipping_location' => 'Change the shipping location, It may change the available shipping options and cost of shipping.',
-    // mobile-menu
     'settings' => 'Settings',
     'menu_options' => 'Menu Options',
     'languages' => 'Languages',
@@ -875,6 +846,11 @@ return [
     'featured_nearby_subtitle' => 'Top picks from stores that deliver to your area',
     'stores_near_you' => 'Stores near you',
     'view_all_stores' => 'View all stores',
+    'browse_all_stores' => 'Browse all stores and discover local shops on the marketplace.',
+    'showing_stores_near_you' => 'Showing stores that can deliver to your location.',
+    'showing_stores_count' => ':count stores available',
+    'browse_all_vendors' => 'Browse all stores and discover local shops on the marketplace.',
+    'showing_vendors_count' => ':count stores available',
     'no_stores_nearby' => 'No stores deliver to this location yet. Try a different address.',
     'no_store_found' => 'No store found',
     'distance_at_location' => 'At your location',
@@ -888,8 +864,19 @@ return [
     'continue_to_address_details' => 'Continue to address details',
     'set_location_to_see_products' => 'Set your delivery location to see featured products from nearby stores.',
     'saving' => 'Saving',
-    'or' => 'or',
     'set_location_to_shop' => 'Please set your delivery location to browse and shop.',
     'show_password' => 'Show password',
     'hide_password' => 'Hide password',
+    'ask' => 'Ask',
+    'coupon_applied' => 'Coupon \\":coupon\\" applied',
+    'coupon_limit_expired' => 'This coupon has been used!',
+    'coupon_min_order_value' => 'Invalid coupon! The coupon is not valid for this amount of order. Shop more to get discounts!',
+    'coupon_not_exist' => 'Coupon does not exist!',
+    'coupon_not_valid' => 'Invalid coupon!',
+    'coupon_not_valid_for_zone' => 'This coupon is not valid for your area!',
+    'coupon_value' => 'Coupon value',
+    'donwloadable' => 'Donwloadable',
+    'hot_item' => 'Hot Item',
+    'not_available' => 'Not available',
+    'remove' => 'Remove',
 ];

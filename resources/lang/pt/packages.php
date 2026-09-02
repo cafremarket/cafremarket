@@ -246,6 +246,11 @@ return [
         'check_payment_status' => 'I\'ve paid – check status',
         'checking_status' => 'Checking payment status…',
         'poll_timeout' => 'Still waiting for payment. You can go back to your wallet; if you have already paid, the balance will update when we receive the confirmation.',
+        'composite_unique' => 'The :attribute :value already exists.',
+        'desputed_amount' => 'Desputed Amount',
+        'detail' => 'Detalhe',
+        'today' => 'Hoje',
+        'wallet_module_not_active' => 'Wallet Module Not Active',
     ],
     'inspector' => [
         'filter' => 'Filter',

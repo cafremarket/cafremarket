@@ -1,18 +1,6 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Navigation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used by the paginator library to build
-    | the simple pagination links. You are free to change them to anything
-    | you want to customize your views to better match your application.
-    |
-    */
-
     'dashboard' => 'Dashboard',
     'admin' => 'Admin',
     'announcements' => 'announcements',
@@ -39,7 +27,6 @@ return [
     'digital_products' => 'Digital Items',
     'physical_products' => 'Physical Items',
     'warehouses' => 'Warehouses',
-
     'utilities' => 'Utilities',
     'support' => 'Support desk',
     'support_messages' => 'Messages',
@@ -73,19 +60,14 @@ return [
     'pages' => 'Pages',
     'appearance' => 'Appearance',
     'performance' => 'Performance',
-
     'reports' => 'Reports',
     'visitors' => 'Visitors',
     'sales_report' => 'Sales',
     'system_settings' => 'System settings',
     'shop_settings' => 'Shop settings',
     'subscription_plans' => 'Plans',
-
-    // Version 1.4.0
     'chats' => 'chats',
     'countries' => 'Business Area',
-
-    // Version 2.1.0
     'cancellations' => 'Cancellations',
     'sales' => 'Sales',
     'packages' => 'Plugins',
@@ -98,10 +80,8 @@ return [
     'delivery_boys' => 'Delivery Boys',
     'custom_css' => 'Custom CSS',
     'logout' => 'Logout',
-
-    // Version 2.13.0
     'shipping_methods' => 'Shipping Methods',
-
-    // Version 2.17.0
     'pdf_template' => 'PDF templates',
+    'address_change_requests' => 'Address Change Requests',
+    'delivery' => 'Delivery',
 ];

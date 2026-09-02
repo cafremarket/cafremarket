@@ -1,18 +1,6 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines contain the default error messages used by
-    | the validator class. Some of these rules have multiple versions such
-    | as the size rules. Feel free to tweak each of these messages here.
-    |
-    */
-
     'accepted' => 'The :attribute must be accepted.',
     'active_url' => 'The :attribute is not a valid URL.',
     'after' => 'The :attribute must be a date after :date.',
@@ -119,40 +107,35 @@ return [
     'string' => 'The :attribute must be a string.',
     'timezone' => 'The :attribute must be a valid zone.',
     'unique' => 'The :attribute has already been taken.',
-    'uploaded' => 'The :attribute failed to upload.',
+    'uploaded' => 'The file size exceeded the maximum upload limit on your server. Please check the php.ini file.',
     'url' => 'The :attribute format is invalid.',
     'uuid' => 'The :attribute must be a valid UUID.',
-
-    // Custom app validations
-    // 'full_name_required'            => 'Your name is required',
-    'composite_unique'              => 'The :attribute :value already exists.',
-    'register_email_unique'         => 'This email address already has an account. Please try something else.',
-    'role_type_required'            => 'Select role type.',
-    'attribute_id_required'         => 'Select attribute.',
-    'attribute_type_id_required'    => 'Select attribute type.',
-    'attribute_code_required'       => 'The attribute code field is required.',
-    'attribute_value_required'      => 'The attribute value field is required.',
-    'category_list_required'        => 'Select at least one category.',
-    'manufacturer_required'         => 'The manufacturer field is required.',
-    'origin_required'               => 'The origin field is required.',
-    'offer_start_required'          => 'When you have an offer price, the offer start date is required.',
-    'offer_start_after'             => ' The promotion start time can\'t be a past time.',
-    'offer_end_required'            => 'When you have an offer price, the offer end date is required.',
-    'offer_end_after'               => ' The offer end time must be a time after the offer start time.',
-    'variants_required'             => 'Variants required',
-    'sku-unique'                    => 'The sku :value has already been taken. Try new one.',
-    'sku-distinct'                  => 'Variant :attribute has a duplicate sku value.',
-    'offer_price-numeric'           => ' is not a valid price value. The offer price must be a number.',
-    'email_template_id_required'    => 'Email template is required.',
-    // 'merchant_have_shop'            => 'This merchant have a shop.',
-    'brand_logo_max'                => 'The brand logo may not be greater than :max kilobytes.',
-    'brand_logo_mimes'              => 'The brand logo must be a file of type: :values.',
-    'uploaded'                      => 'The file size exceeded the maximum upload limit on your server. Please check the php.ini file.',
-    'avatar_required'               => 'Choose an avatar.',
-    'subject_required_without'      => 'The subject is required if you don\'t use a template.',
-    'message_required_without'      => 'The message is required if you don\'t use a template.',
+    'composite_unique' => 'The :attribute :value already exists.',
+    'register_email_unique' => 'This email address already has an account. Please try something else.',
+    'role_type_required' => 'Select role type.',
+    'attribute_id_required' => 'Select attribute.',
+    'attribute_type_id_required' => 'Select attribute type.',
+    'attribute_code_required' => 'The attribute code field is required.',
+    'attribute_value_required' => 'The attribute value field is required.',
+    'category_list_required' => 'Select at least one category.',
+    'manufacturer_required' => 'The manufacturer field is required.',
+    'origin_required' => 'The origin field is required.',
+    'offer_start_required' => 'When you have an offer price, the offer start date is required.',
+    'offer_start_after' => ' The promotion start time can\'t be a past time.',
+    'offer_end_required' => 'When you have an offer price, the offer end date is required.',
+    'offer_end_after' => ' The offer end time must be a time after the offer start time.',
+    'variants_required' => 'Variants required',
+    'sku-unique' => 'The sku :value has already been taken. Try new one.',
+    'sku-distinct' => 'Variant :attribute has a duplicate sku value.',
+    'offer_price-numeric' => ' is not a valid price value. The offer price must be a number.',
+    'email_template_id_required' => 'Email template is required.',
+    'brand_logo_max' => 'The brand logo may not be greater than :max kilobytes.',
+    'brand_logo_mimes' => 'The brand logo must be a file of type: :values.',
+    'avatar_required' => 'Choose an avatar.',
+    'subject_required_without' => 'The subject is required if you don\'t use a template.',
+    'message_required_without' => 'The message is required if you don\'t use a template.',
     'template_id_required_without_all' => 'Select a template or composer a new message.',
-    'customer_required'             => 'Select a customer.',
+    'customer_required' => 'Select a customer.',
     'reply_required_without' => 'The reply field is required.',
     'template_id_required_without' => 'Select a template is required when replying with template.',
     'shipping_zone_tax_id_required' => 'Select the tax profile for the zone',
@@ -162,47 +145,24 @@ return [
     'shipping_rate_required_unless' => 'Give a shipping rate or select \'Free shipping\' option',
     'shipping_range_minimum_min' => 'Minimum range can\'t be negative value',
     'shipping_range_maximum_min' => 'Maximum range can\'t be less than minimum value',
-    'csv_mimes'                => 'The :attribute must be a file of type csv.',
+    'csv_mimes' => 'The :attribute must be a file of type csv.',
     'import_data_required' => 'The dataset is not valid to import. Please check your data and try again.',
-    'do_action_required'    => 'You didn\'t provide the input.',
-    'do_action_invalid'    => 'The given keyword/input is not valid.',
+    'do_action_required' => 'You didn\'t provide the input.',
+    'do_action_invalid' => 'The given keyword/input is not valid.',
     'recaptcha' => 'Please ensure that you are a human!',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify custom validation messages for attributes using the
-    | convention "attribute.rule" to name the lines. This makes it quick to
-    | specify a specific custom language line for a given attribute rule.
-    |
-    */
-
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Attributes
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to swap attribute place-holders
-    | with something more reader friendly such as E-Mail Address instead
-    | of "email". This simply helps us make messages a little cleaner.
-    |
-    */
-
-    'attributes' => [],
-
     'upload_rows' => 'You can upload a maximum of :rows records per batch.',
     'csv_upload_invalid_data' => 'Some rows contain invalid data that cannot be processed. Please check your data and try again.',
     'slider_image_required' => 'The slider image is required',
     'banner_image_required' => 'The banner image is required',
     'select_the_item' => 'Select the item',
     'banner_group_id_required' => 'Please select banner group',
-    "valid_css" => "The :attribute may contain valid CSS only."
+    'valid_css' => 'The :attribute may contain valid CSS only.',
+    'csv_update_invalid_data' => 'Csv Update Invalid Data',
+    'refund_order_id_required' => 'Refund Order Id Required',
+    'update_rows' => 'Update Rows',
 ];

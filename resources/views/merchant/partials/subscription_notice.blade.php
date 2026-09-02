@@ -7,14 +7,14 @@
     <div class="mp-notice mp-notice--warning">
       <div class="mp-notice__body">
         <strong><i class="fa fa-info-circle"></i> {{ trans('app.notice') }}</strong>
-        {{ trans('messages.trial_ends_at', ['ends' => number_format(\Carbon\Carbon::now()->diffInDays($subscription->trial_ends_at), 2)]) }}
+        {{ trans('messages.trial_ends_at', ['ends' => remaining_days_until($subscription->trial_ends_at)]) }}
       </div>
     </div>
   @elseif($subscription && Auth::user()->isOnGracePeriod())
     <div class="mp-notice mp-notice--danger">
       <div class="mp-notice__body">
         <strong><i class="fa fa-info-circle"></i> {{ trans('app.notice') }}</strong>
-        {{ trans('messages.resume_subscription', ['ends' => \Carbon\Carbon::now()->diffInDays($subscription->ends_at)]) }}
+        {{ trans('messages.resume_subscription', ['ends' => remaining_days_until($subscription->ends_at)]) }}
       </div>
       <a href="{{ route('merchant.account.subscription.resume') }}" class="mp-btn mp-btn--primary mp-btn--sm confirm">
         <i class="fa fa-rocket"></i> {{ trans('app.resume_subscription') }}
@@ -36,7 +36,7 @@
     <div class="mp-notice mp-notice--warning">
       <div class="mp-notice__body">
         <strong><i class="fa fa-info-circle"></i> {{ trans('app.notice') }}</strong>
-        {{ trans('messages.generic_trial_ends_at', ['ends' => \Carbon\Carbon::now()->diffInDays(Auth::user()->shop->trial_ends_at)]) }}
+        {{ trans('messages.generic_trial_ends_at', ['ends' => remaining_days_until(Auth::user()->shop->trial_ends_at)]) }}
       </div>
       @unless (Request::is('merchant/account/billing'))
         <a href="{{ route('merchant.account.billing') }}" class="mp-btn mp-btn--primary mp-btn--sm">

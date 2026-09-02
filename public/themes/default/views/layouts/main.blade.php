@@ -171,7 +171,9 @@
   <!-- Page Scripts -->
   @yield('scripts')
 
-  @include('theme::scripts.homepage_flow')
+  @if (Request::is('/') || (function_exists('hyperlocal_enabled') && hyperlocal_enabled()))
+    @include('theme::scripts.homepage_flow')
+  @endif
 
   @include('theme::scripts.password_toggle')
 

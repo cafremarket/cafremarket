@@ -3,7 +3,7 @@
 @endphp
 {{ Form::hidden('lang', $selected_language) }}
 @include('admin.partials.ui.card_start', [
-  'title' => ($manufacturer->hasTranslation($selected_language) ? trans('app.update_model_translation', ['model' => trans('app.model.menufacturer')]) : trans('app.add_model_translation', ['model' => trans('app.model.menufacturer')])) . ' | ' . $manufacturer->name,
+  'title' => ($manufacturer->hasTranslation($selected_language) ? trans('app.update_model_translation', ['model' => trans('app.model.manufacturer')]) : trans('app.add_model_translation', ['model' => trans('app.model.manufacturer')])) . ' | ' . $manufacturer->name,
   'icon' => 'fa-language',
   'class' => 'admin-form-section',
 ])

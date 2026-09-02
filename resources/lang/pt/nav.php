@@ -1,18 +1,6 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Navigation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used by the paginator library to build
-    | the simple pagination links. You are free to change them to anything
-    | you want to customize your views to better match your application.
-    |
-    */
-
     'dashboard' => 'Painel de controlo',
     'admin' => 'Administrador',
     'announcements' => 'Anúncios',
@@ -39,8 +27,7 @@ return [
     'digital_products' => 'Itens digitais',
     'physical_products' => 'Itens físicos',
     'warehouses' => 'Armazéns',
-
-   'utilities' => 'Utilitários',
+    'utilities' => 'Utilitários',
     'support' => 'Suporte técnico',
     'support_messages' => 'Mensagens',
     'disputes' => 'Disputas',
@@ -73,19 +60,14 @@ return [
     'pages' => 'Páginas',
     'appearance' => 'Aparência',
     'performance' => 'Desempenho',
-
     'reports' => 'Relatórios',
     'visitors' => 'Visitantes',
     'sales_report' => 'Vendas',
     'system_settings' => 'Configurações do sistema',
     'shop_settings' => 'Configurações da loja',
     'subscription_plans' => 'Planos',
-
-    // Version 1.4.0
     'chats' => 'Chats',
     'countries' => 'Área de Negócio',
-
-    // Version 2.1.0
     'cancellations' => 'Cancelamentos',
     'sales' => 'Vendas',
     'packages' => 'Plugins',
@@ -98,11 +80,8 @@ return [
     'delivery_boys' => 'Entregadores',
     'custom_css' => 'CSS Personalizado',
     'logout' => 'Sair',
-
-    // Version 2.13.0
     'shipping_methods' => 'Métodos de Envio',
-
-    // Version 2.17.0
     'pdf_template' => 'Modelos de PDF',
-
+    'address_change_requests' => 'Pedidos de alteração de endereço',
+    'delivery' => 'Entrega',
 ];

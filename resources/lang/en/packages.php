@@ -1,7 +1,6 @@
 <?php
 
 return [
-    // 4. Wallet
     'wallet' => [
         'alert' => 'Alert',
         'allow_customer_wallet_checkout' => 'Allow customers to checkout using wallet balance',
@@ -184,7 +183,6 @@ return [
         'last_debited' => 'Last debited',
         'transfer_balance' => 'Balance Transfer',
         'transfer_to_wallet' => 'The receiver\'s email address',
-        // 'transferred_balance' => 'Transferred Balance',
         'last_deposit' => 'Last deposit',
         'last_payout' => 'Last payout',
         'transfer_to' => 'Transfer To',
@@ -231,16 +229,11 @@ return [
         'release' => 'Release',
         'released' => 'Released',
         'delete' => 'Delete',
-
-        // Mails
         'greeting' => 'Hello :receiver',
         'update' => 'Update Now',
         'see_now' => 'See Now',
-        'status' => 'Status',
         'thanks' => 'Thank you',
-        'approved' => 'Approved',
         'approved_amount' => 'Payout request of :amount has been approved.',
-        'pending' => 'Pending',
         'pending_subject' => 'Your payout request has been created. we are reviewing your request',
         'approve_subject' => 'Your payout request has been approved.',
         'declined_subject' => 'Your payout request has been declined.',
@@ -253,10 +246,12 @@ return [
         'created_subject' => 'Your payout has been Created by Admin Panel.',
         'periodic_payout_subject' => 'Your :period payout request has been created.',
         'periodic_payout_amount' => 'We are currently reviewing your :period payout request :amount created by system.',
+        'composite_unique' => 'The :attribute :value already exists.',
+        'desputed_amount' => 'Desputed Amount',
+        'detail' => 'Detail',
+        'today' => 'Today',
+        'wallet_module_not_active' => 'Wallet Module Not Active',
     ],
-    // End Wallet
-
-    // 5. Inspector
     'inspector' => [
         'filter' => 'Filter',
         'enter_your_keywords' => 'Enter all the restricted keywords that will be used by the plugin to filter contents. Separated by comma(,)',
@@ -293,8 +288,6 @@ return [
         'deny_success' => 'The item denied successfully.',
         'inspectable_updated' => 'The inspectable data has been updated successfully',
     ],
-
-    // 6. Local Subscription
     'subscription' => [
         'bill_amount' => 'Bill amount',
         'custom_subscription_fee' => 'Custom subscription fee',
@@ -305,27 +298,22 @@ return [
         'thanks' => 'Thanks',
         'button_text' => 'Visit Your Profile',
         'greeting' => 'Hello :shop',
-
         'expire' => [
             'subject' => 'Shop subscription expiring in :day days',
             'message' => 'Please keep sufficient amount on you store wallet balance to get uninterrupted service.',
             'expire_date' => 'Expire Date  :date',
         ],
-
         'billing_failed' => [
             'subject' => 'Subscription billing failed',
             'message' => 'Subscription billing failed due to insufficient balance. Please deposit balance into your wallet to renew your subscription',
             'expire_date' => 'Expire Date  :date',
         ],
-
         'insufficient_balance' => [
             'subject' => 'Insufficient Balance',
             'message' => 'Your current wallet balance is running low. Please deposit balance into your wallet to continue your subscription, your current balance is :amount',
             'expire_date' => 'Expire Date  :date',
         ],
     ],
-
-    // 7. Checkout All
     'checkout' => [
         'checkout_all' => 'Checkout All',
         'onecheckout_not_available' => 'All checkout option is not available right now!',
@@ -334,8 +322,6 @@ return [
         'checkout_all_not_possible' => 'One or many orders can not be processed together! Please check delivery to locations and other information.',
         'make_changes_on_cart_page' => 'Make changes on the cart page.',
     ],
-
-    // 11. Eventy
     'eventy' => [
         'active' => 'Active',
         'create_event' => 'Create event',
@@ -371,8 +357,6 @@ return [
         'event_booked' => 'Event is booked successfully',
         'event_canceled' => 'Event is canceled successfully',
     ],
-
-    // 12. dynamic Commission
     'dynamicCommission' => [
         'add_more_milestone' => 'Add more milestone',
         'and_up' => 'and up',
@@ -391,8 +375,6 @@ return [
         'update_success' => 'Dynamic commissions updated successfully. ',
         'when_sold' => 'When sold',
     ],
-
-    // 15. Pharmacy
     'pharmacy' => [
         'pharmacy' => 'Pharmacy',
         'expiry_date' => 'Expiry date',
@@ -400,22 +382,16 @@ return [
         'prescription' => 'Prescription',
         'upload_prescription' => 'Upload prescription',
     ],
-
-    // 18. Sign in with Apple
     'apple-login' => [
         'login_with_apple' => 'Sign in with Apple',
         'apple' => 'Apple',
     ],
-
-    // 17. PayPal Marketplace
     'paypal-marketplace' => [
         'redirect_text' => 'Return to the partner site now.',
         'will_redirect_to_paypal_connect' => 'You need to connect a PayPal account to start accepting payments. Complete the onboarding process on PayPal\'s website. It’s free to connect, whether you have an existing PayPal account, or want to create a new account.',
         'connect_paypal_account' => 'Connect PayPal',
         'paypal_business_email' => 'PayPal business email',
     ],
-
-    // 19. M-Pesa Payment (Mpesa)
     'mpesa' => [
         'confirm_order' => 'Confirm order',
         'bad_request' => 'Bad request',
@@ -429,16 +405,12 @@ return [
         'consumer_secret' => 'Consumer Secret',
         'consumer_key' => 'Consumer Key',
     ],
-
-    // 21. FlutterWave Payment
     'flutterwave' => [
         'pay_with_flutterwave' => 'Securely pay with FlutterWave.',
         'flutterwave_pub_key' => 'FLUTTERWAVE Public Key',
         'flutterwave_sec_key' => 'flutterwave Secret Key',
         'config_error' => 'FAILED TO CONNECT WITH FLUTTERWAVE API',
     ],
-
-    // 22. Ajax Search Autocomplete
     'searchAutocomplete' => [
         'search_settings' => 'Search settings',
         'min_char' => 'Minimum characters',
@@ -450,38 +422,27 @@ return [
         'styling_css' => 'Styling CSS',
         'styling_css_help' => 'Custom CSS to change the look and feel of the autocomplete dropdown. No need to change if the current design is good for you.',
     ],
-
-    // 23. Trending Search Keywords
     'trendingKeywords' => [
         'trending_keywords' => 'Trending keywords',
         'description' => 'Trending keywords will be shown under the main searchbox, this feature will help customers to faster search.',
     ],
-
-    // 26.Google Analytics
     'analytics' => [
         'analytics' => 'Analytics',
         'visitors' => 'Visitors',
         'behavior' => 'Behavior',
         'most_visited_pages' => 'Most visited pages',
         'top_referrals' => 'Top referrals',
-        // 'misconfigured_google_analytics' => 'The Google Analytics report is enabled but not configured or misconfigured! Please check the documentation for help.',
     ],
-
-    // 28. Authorizenet
     'authorizenet' => [
         'config_authorize_net_transaction_key' => 'The transaction key from Authorize.net. If you\'re not sure, contact Authorize.net to get help.',
         'config_authorize_net_api_login_id' => 'The API login ID from Authorize.net. If you\'re not sure, contact Authorize.net to get help.',
         'authorize_net_api_login_id' => 'AuthorizeNet API login ID',
         'authorize_net_transaction_key' => 'AuthorizeNet transaction key',
     ],
-
-    // 29. Live Chat
     'liveChat' => [
         'fb_page_id' => 'Facebook Page ID',
         'shop_fb_page_id' => 'Facebook page id from messenger chat plugin script of page. Keep this field blank for use system live chat',
     ],
-
-    // 30. Announcement
     'announcement' => [
         'announcements' => 'Announcements',
         'add_announcement' => 'New announcement',
@@ -494,8 +455,6 @@ return [
         'announcement_public' => 'The public announcements will be visible to the storefront and customers will see it.',
         'announcement_body' => 'This is an **example** announcement!',
     ],
-
-    // 32. Packaging and Gift Wrap
     'packaging' => 'Packaging',
     'packagings' => 'Packagings',
     'add_packaging' => 'Add Packaging',
@@ -507,10 +466,6 @@ return [
     'depth' => 'Packaging depth',
     'packaging_not_available' => 'Packaging not available for this item',
     'default_packagings' => 'Default packagings',
-
-    // 36. Sign in with Google
-
-    // 42. eBay Sync
     'welcome' => 'Welcome to the eBay sync plugin. Your marketplace is ready to connect with eBay store. After you authorize, the marketplace will be able to update your eBay store\'s data.',
     'ebay_connected' => 'Your marketplace is authorized and connected with eBay store! No need to do anything, you can refresh the authorization token if you want.',
     'token_valid_untill' => 'Your authorization token will expire at :time',
@@ -538,8 +493,6 @@ return [
     'take_back_policy' => 'Take back policy',
     'locations' => 'Locations',
     'default_category_tree' => 'Default category tree',
-
-    // 43. Product Comparison
     'product_comparison' => [
         'add_to_compare' => 'Add to compare',
         'add_more_items' => 'Add more items',
@@ -562,8 +515,6 @@ return [
         'shipping_details' => 'Shipping &amp; Delivery Details',
         'need_two_items_min' => 'At least two items are required to compare features. Please add more items.',
     ],
-
-    // 45. Login With OTP
     'otp-login' => [
         'phone' => 'Phone',
         'valid_phone' => 'Enter a valid phone number',
@@ -583,7 +534,6 @@ return [
         'login_with_email' => 'Login With Email',
         'verification_code_sent' => 'Verification code has been sent successfully',
     ],
-    // 52. bKash Payment
     'bkash' => [
         'pay_with_bkash' => 'Use bKash to pay your bills',
         'bkash' => 'bKash payment',
@@ -594,8 +544,6 @@ return [
         'enter_bkash_number' => 'Enter your bKash number',
         'bkash_locality' => 'Bkash only works when system currency is in with Bangladeshi taka(BDT).',
     ],
-
-    // 54. Affiliate
     'affiliate' => [
         'affiliate' => 'Affiliate',
         'affiliates' => 'Affiliates',
@@ -632,7 +580,7 @@ return [
         'affiliate_links' => 'Affiliate Links',
         'top_links_by_visitors' => 'Top Links by Visitors',
         'top_links_by_commission' => 'Top Links by Commission',
-        'toggle_navigation' => 'Toggle Navigation',
+        'toggle_navigation' => 'Toggle navigation',
         'invalid_links' => 'Invalid links',
         'create_affiliate_link' => 'Create Affiliate Link',
         'create_your_link' => 'Create Your Link',
@@ -676,10 +624,7 @@ return [
         'slug' => 'Slug',
         'visitors' => 'Visitors',
         'commission_rate' => 'Commission rate',
-        'toggle_navigation' => 'Toggle navigation',
     ],
-
-    // 55. Dynamic Currency
     'dynamic-currency' => [
         'currency_api' => 'Currency API',
         'currency_live_mode' => 'Currency live mode',
@@ -691,8 +636,6 @@ return [
         'currency_api_key_help' => 'Currency API Key from website',
         'currency_changed_successfully' => 'Currency has been changed successfully',
     ],
-
-    // 56. POS
     'pos' => [
         'pos' => 'POS',
         'cart' => 'Cart',
@@ -725,7 +668,6 @@ return [
         'money_returned' => 'Money Returned',
         'money_due' => 'Due',
         'money_return' => 'Return',
-        'change' => 'Change',
         'refund' => 'Refund',
         'payment_method' => 'Payment Method',
         'placeholder_search_products' => 'Search Products',
@@ -761,10 +703,7 @@ return [
         'print_bill' => 'Print bill',
         'back_to_pos' => 'Back to POS',
         'sales_person' => 'Sales Person',
-        // 'walk_in_customer ' => 'Walk-in Customer',
     ],
-
-    // 57. Dynamic Popup
     'dynamic_popups' => 'Dynamic Popups',
     'popup_type' => 'Popup Type',
     'popup_delay_time' => 'Popup Delay Time',
@@ -779,11 +718,8 @@ return [
     'subscribe_newsletter' => 'Subscribe to our newsletter',
     'newsletter_description' => 'Signup for our weekly newsletter to get the latest news, updates and amazing offers delivered directly in your inbox.',
     'subscribe' => 'Subscribe',
-
-    // 62. shopify
     'shopify' => [
         'shopify' => 'Shopify',
-        // 'welcome_message' => 'Welcome to Shopify Import',
         'configure_api' => 'Configure API',
         'update_api' => 'Update API',
         'import_inventory' => 'Import inventory from Shopify',
@@ -800,10 +736,8 @@ return [
         'import_history_deleted' => 'Import history has been deleted',
         'download_csv' => 'Download CSV',
         'no_imports_made_yet' => 'No imports made yet',
-        // 'import_status' => 'Shopify import :status.',
         'import_started' => 'Shopify import has been started, will be process as background task.',
         'import_completed_email_subject' => 'Your Shopify import has been completed',
-        // 'shopify_import_completed_email_subject'
         'completed' => 'Completed',
         'failed' => 'Failed',
         'imported' => 'Imported',
@@ -816,14 +750,12 @@ return [
         'warning_currency_requirements' => 'We don\'t convert currency. Make sure your Shopify currency setting is the same as ours.',
         'warning_list_requirements' => 'For your shopify products to be imported, your shopify products will require <b>:required_fields</b>. Products missing these fields will be skipped.',
         'warning_list_only_images_will_be_imported' => 'Only images will be imported from shopify products media.',
-        'warning_list_notifications_for_import' => "Imports run in the background. You'll receive email and in-app notifications upon completion, including a CSV of any failed/skipped imports.",
+        'warning_list_notifications_for_import' => 'Imports run in the background. You\'ll receive email and in-app notifications upon completion, including a CSV of any failed/skipped imports.',
         'import_completed_greeting' => 'Hello,',
         'import_completed_content' => 'The import of your Shopify products to our platform has been completed. Please click the button below to review the import details',
         'thank_you' => 'Thank you for using our platform',
         'view_details' => 'View details',
     ],
-
-    // 76. Shippo
     'shippo' => [
         'shippo' => 'Shippo',
         'fetch_carriers_btn_label' => 'Fetch Shippo Carriers',
@@ -832,8 +764,6 @@ return [
         'configurations' => 'Configurations',
         'not_configured' => 'Shippo not configured',
     ],
-
-    // 77. Auction
     'auction' => [
         'auction' => 'Auction',
         'auctions' => 'Auctions',
@@ -884,8 +814,6 @@ return [
         'auction_end_validation' => 'The auction end must be a date after available from.',
         'help_bid_accept_action' => 'Will the auction go live again or end the auction when you accept a bid? When you choose to continue, the system will set an ending date based on your previous setting.',
     ],
-
-    // 80. SmartForm
     'smartForm' => [
         'smart_form' => 'Smart Form',
         'create_form' => 'Create Form',
@@ -912,16 +840,13 @@ return [
         'form_enable_html' => 'Enable HTML',
         'additional_message_fields' => 'Additional Message Fields',
         'smart_form_for_contact_us_page' => 'Smart Form for Contact Us Page',
-
         'notify_smart_form_updated_successfully' => 'Smart Form updated successfully',
         'notify_smart_form_created_successfully' => 'Smart Form created successfully',
         'notify_failed_to_update_smart_form' => 'Failed to update Smart Form',
-
         'placeholder_smart_form_name' => 'Enter Smart Form Name',
         'placeholder_smart_form_description' => 'Enter Smart Form Description',
         'placeholder_file_types' => 'Example : jpg, jpeg, png, pdf',
         'placeholder_enter_label' => 'Enter the input field label',
-
         'help_smart_form_name' => 'Name of the smart form',
         'help_smart_form_description' => 'Give a short description for better understanding about the form.',
         'help_add_fields' => 'Add input fields to the form',
@@ -933,7 +858,6 @@ return [
         'help_select_buyer_grp_form' => 'This form will be added to the customer registration form to get additional data your business may needed.',
         'help_smart_form_for_contact_us_page' => 'Add the additional input fields in the form to the contact us page',
         'help_enable_html' => 'Enable HTML tags in the input field label and options (for radio, checkbox, dropdown)',
-
         'messages_input_field_required' => 'You can not create smart form without any input field, At least one input field is required.',
         'messages_input_field_label_required' => 'Missing label for input field.',
         'messages_input_field_label_each_required' => 'Every input field must have a label. Label can\'t be empty',
@@ -949,18 +873,13 @@ return [
         'messages_description_required' => 'The description field cant be empty, please add a description.',
         'form_data_requied_validation_msg' => 'Please submit all required data.',
     ],
-
-    // 82. Wholesale
     'wholesale' => [
         'wholesale_prices' => 'Wholesale Prices',
         'min_quantity' => 'Min Quantity',
         'wholesale' => 'Wholesale',
         'add_another_pricing' => 'Add another pricing',
         'minimum_wholesale_quantity' => 'Minimum quantity to buy for specific wholesale price to be applicable',
-        // 'wholesale_price_for_quantity' => 'Wholesale price for the given quantity',
     ],
-
-    // upiPayment
     'upiPayment' => [
         'api_key' => 'API Key',
         'payment_address' => 'Payment Address',
@@ -971,8 +890,6 @@ return [
         'pay_with_upiPayment' => 'Pay with UPI',
         'enter_upiPayment_number' => 'Enter UPI Payment Number',
     ],
-
-    // 85. buyerGroup
     'buyer_group' => 'Buyer Group',
     'buyer_groups' => 'Buyer Groups',
     'buyer_group_name' => 'Buyer Group Name',
@@ -1002,7 +919,6 @@ return [
     'report_type' => 'Report Type',
     'order_report' => 'Order Report',
     'discount_report' => 'Discount Report',
-
     'buyer_group_application_changed_successfully' => 'Buyer Group application status changed successfully',
     'buyer_group_updated_successfully' => 'Buyer Group updated successfully',
     'buyer_group_deleted_successfully' => 'Buyer Group deleted successfully',
@@ -1014,13 +930,11 @@ return [
     'buyer_group_application_status_updated' => 'Buyer Group application status updated',
     'buyer_group_application_status_not_updated' => 'Buyer Group application status not updated',
     'must_select_buyer_group_to_apply' => 'You must select a buyer group to apply',
-
     'placeholder_buyer_group_name' => 'Enter Buyer Group Name',
     'placeholder_buyer_group_description' => 'Enter Buyer Group Description',
     'placeholder_application_details' => 'Enter Application Details',
     'placeholder_min_order_quantity' => 'Enter Minimum Order Quantity',
     'placeholder_buyer_group_price' => 'Enter Buyer Group Specific Price',
-
     'help_buyer_group_name' => 'Name of the buyer group',
     'help_buyer_group_description' => 'Description of the buyer group',
     'help_see_application_details' => 'See submitted application details of customer',
@@ -1028,8 +942,6 @@ return [
     'help_min_order_quantity' => 'Minimum order quantity for the buyer group. Default minimum order quantity will be used for the buyer group when left empty',
     'help_buyer_group_status' => 'Choose the status of the group.',
     'help_control_on_buyer_grp' => 'Control on Buyer Group settings',
-
-    // 87. Ai Assistant
     'aiAssistant' => [
         'ai_assistant' => 'AI Assistant',
         'calling_assistant' => 'Calling AI Assistant, please wait ...',
@@ -1056,8 +968,6 @@ return [
         'error' => 'Error',
         'enter_the_prompt_node' => 'Please enter the information to use AI Assistant',
     ],
-
-    // 88. smsGateways
     'smsGateways' => [
         'smsGateways' => 'SMS Gateways',
         'welcome' => 'Welcome to the SMS Gateways plugin. Build something beautiful using this!',
@@ -1084,8 +994,6 @@ return [
         'api_key' => 'API Key',
         'api_secret' => 'API Secret',
     ],
-
-    // 50. twoCheckout (2Checkout)
     'twoCheckout' => [
         'twoCheckout' => 'TwoCheckout',
         'merchant_code' => 'Merchant Code',
@@ -1094,8 +1002,6 @@ return [
         'sandbox' => 'Sandbox',
         'pay_with_twoCheckout' => 'Pay with 2Checkout',
     ],
-
-    // 70. mtnMoney
     'mtnMoney' => [
         'mtnMoney' => 'MTN Money',
         'api_key' => 'API Key',

@@ -27,6 +27,9 @@ document.addEventListener('pointerdown', e => {
 */
 function setTargetWidth() {
     var widthOrigin = document.getElementById('primary-nav-container');
+    if (!widthOrigin) {
+        return;
+    }
     var megaMenu = document.querySelectorAll('.mega-dropdown');
     megaMenu.forEach(e => {
         e.style.width = (widthOrigin.offsetWidth - 270) + 'px';

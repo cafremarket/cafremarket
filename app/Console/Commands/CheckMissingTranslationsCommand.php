@@ -110,6 +110,7 @@ class CheckMissingTranslationsCommand extends Command
         if ($hasMissing) {
             $this->newLine();
             $this->comment('Run php artisan translations:fill-missing --locale=pt to copy missing English strings into Portuguese files.');
+        $this->comment('Run php artisan translations:sync-undefined --locale=pt to add keys used in code but missing from lang files.');
 
             return self::FAILURE;
         }

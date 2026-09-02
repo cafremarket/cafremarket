@@ -10,6 +10,8 @@
     initTopbarDropdowns();
     initTopbarPageSearch();
     initCollapsedSidebar();
+    initMobileSidebars();
+    initMerchantNavGroups();
     markActiveSidebarItems();
     initAdminCards();
   });
@@ -116,6 +118,85 @@
           $('.main-sidebar, .sidebar').css('overflow', 'visible');
         }
       }, 350);
+    });
+  }
+
+  function initMobileSidebars() {
+    var $adminOverlay = $('#admin-sidebar-overlay');
+    var $body = $('body');
+
+    function setAdminSidebarOpen(open) {
+      $body.toggleClass('sidebar-open', open);
+      if ($adminOverlay.length) {
+        $adminOverlay.prop('hidden', !open).attr('aria-hidden', open ? 'false' : 'true');
+      }
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
+    if ($adminOverlay.length) {
+      $('.sidebar-toggle').on('click', function () {
+        setTimeout(function () {
+          setAdminSidebarOpen($body.hasClass('sidebar-open'));
+        }, 0);
+      });
+
+      $adminOverlay.on('click', function () {
+        setAdminSidebarOpen(false);
+      });
+
+      $(document).on('keyup', function (e) {
+        if (e.key === 'Escape' && $body.hasClass('sidebar-open')) {
+          setAdminSidebarOpen(false);
+        }
+      });
+    }
+
+    var $mpToggle = $('#mp-sidebar-toggle');
+    var $mpOverlay = $('#mp-sidebar-overlay');
+    var $mpSidebar = $('#mp-sidebar');
+
+    if (!$mpToggle.length || !$mpSidebar.length) return;
+
+    function setMerchantSidebarOpen(open) {
+      document.body.classList.toggle('mp-sidebar-open', open);
+      $mpToggle.attr('aria-expanded', open ? 'true' : 'false');
+      if ($mpOverlay.length) {
+        $mpOverlay.prop('hidden', !open).attr('aria-hidden', open ? 'false' : 'true');
+      }
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
+    $mpToggle.on('click', function () {
+      setMerchantSidebarOpen(!document.body.classList.contains('mp-sidebar-open'));
+    });
+
+    if ($mpOverlay.length) {
+      $mpOverlay.on('click', function () {
+        setMerchantSidebarOpen(false);
+      });
+    }
+
+    $mpSidebar.on('click', 'a.mp-sidebar__link', function () {
+      if (window.matchMedia('(max-width: 991px)').matches) {
+        setMerchantSidebarOpen(false);
+      }
+    });
+
+    $(document).on('keyup', function (e) {
+      if (e.key === 'Escape' && document.body.classList.contains('mp-sidebar-open')) {
+        setMerchantSidebarOpen(false);
+      }
+    });
+  }
+
+  function initMerchantNavGroups() {
+    document.querySelectorAll('.mp-nav-group__toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var group = btn.closest('.mp-nav-group');
+        if (group) {
+          group.classList.toggle('is-open');
+        }
+      });
     });
   }
 

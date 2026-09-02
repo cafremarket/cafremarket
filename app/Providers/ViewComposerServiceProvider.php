@@ -816,8 +816,10 @@ class ViewComposerServiceProvider extends ServiceProvider
     private function composeConfigPage()
     {
         View::composer(
-
-            'admin.config.index',
+            [
+                'admin.config.index',
+                'merchant.config.index',
+            ],
 
             function ($view) {
                 $config = Config::findOrFail(auth()->user()->merchantId());

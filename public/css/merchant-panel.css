@@ -1518,6 +1518,44 @@ body.mp-body {
   min-width: 0;
 }
 
+.mp-sidebar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--mp-border);
+  border-radius: 10px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.mp-sidebar-toggle:hover {
+  background: #f8fafc;
+  color: var(--mp-primary);
+}
+
+.mp-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 1040;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+body.mp-sidebar-open .mp-sidebar-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.mp-sidebar-open {
+  overflow: hidden;
+}
+
 .mp-topbar {
   background: #fff;
   border-bottom: 1px solid var(--mp-border);
@@ -1525,6 +1563,10 @@ body.mp-body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .mp-topbar__title {
@@ -1896,13 +1938,56 @@ body.mp-body {
   }
 }
 
+@media (max-width: 991px) {
+  .mp-sidebar-toggle {
+    display: inline-flex;
+  }
+
+  .mp-topbar {
+    flex-wrap: wrap;
+  }
+
+  .mp-topbar__title {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mp-topbar__actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .mp-app {
+    position: relative;
+  }
+
+  .mp-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(86vw, 300px) !important;
+    max-width: 300px;
+    transform: translateX(-100%);
+    transition: transform 0.28s ease;
+    z-index: 1050;
+    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.18);
+  }
+
+  body.mp-sidebar-open .mp-sidebar {
+    transform: translateX(0);
+  }
+
+  .mp-main {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .mp-stepper { flex-direction: column; gap: 16px; }
   .mp-stepper::before { display: none; }
-  .mp-app { flex-direction: column; }
-  .mp-sidebar { width: 100%; }
   .mp-stat-grid { grid-template-columns: 1fr; }
   .mp-notice { flex-direction: column; align-items: flex-start; }
-  .mp-topbar { flex-wrap: wrap; gap: 12px; }
-  .mp-topbar__actions { flex-wrap: wrap; }
 }

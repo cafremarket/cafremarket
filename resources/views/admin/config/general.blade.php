@@ -7,13 +7,16 @@
 @php
   $can_update = Gate::allows('update', $shop->config) ?? null;
   $translation_language = app()->getLocale();
+  $isMerchant = Auth::user()->isFromMerchant();
+  $storeAddress = $storeAddress ?? $shop->storeAddress();
+  $hasStoreLocation = $shop->hasStoreLocation();
 @endphp
 
 @section('content')
   @include('admin.partials.ui.card_start', [
     'title' => trans('app.general_settings'),
     'icon' => 'fa-cog',
-    'actions' => view('admin.config._general_header_actions', compact('can_update', 'shop', 'translation_language'))->render(),
+    'actions' => $isMerchant ? '' : view('admin.config._general_header_actions', compact('can_update', 'shop', 'translation_language'))->render(),
     'bodyClass' => '',
   ])
 
@@ -266,20 +269,27 @@
             </div>
           @endif
 
-          <div class="text-center mb-4">
-            <div class="form-group">
-              {!! Form::label('shop_address', trans('app.shop_address'), ['class' => 'control-label with-help']) !!}
-              <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.shop_address') }}"></i>
+          @if (!$isMerchant)
+            <div class="text-center mb-4">
+              <div class="form-group">
+                {!! Form::label('shop_address', trans('app.shop_address'), ['class' => 'control-label with-help']) !!}
+                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.shop_address') }}"></i>
+              </div>
+
+              @if ($shop->primaryAddress)
+                {!! $shop->primaryAddress->toHtml() !!}
+              @else
+                <p class="text-muted">{{ trans('app.store_location_required') }}</p>
+              @endif
             </div>
-
-            @if ($shop->primaryAddress)
-              {!! $shop->primaryAddress->toHtml() !!}
-
-              <a href="javascript:void(0)" data-link="{{ route('address.edit', $shop->primaryAddress->id) }}" class="btn btn-default ajax-modal-btn"><i class="fa fa-map-marker"></i> {{ trans('app.update_address') }}</a>
-            @else
-              <a href="javascript:void(0)" data-link="{{ route('address.create', ['shop', $shop->id]) }}" class="btn btn-default ajax-modal-btn"><i class="fa fa-plus-square-o"></i> {{ trans('app.add_address') }}</a>
-            @endif
-          </div>
+          @elseif ($hasStoreLocation && $storeAddress)
+            <div class="text-center mb-4">
+              <div class="form-group">
+                {!! Form::label('shop_address', trans('app.shop_address'), ['class' => 'control-label with-help']) !!}
+              </div>
+              <div class="text-left">{!! $storeAddress->toHtml() !!}</div>
+            </div>
+          @endif
 
           @if (is_incevio_package_loaded('wallet'))
             <div class="form-group text-center mt-4">
@@ -334,7 +344,7 @@
             </div>
 
             <div class="my-5 text-center">
-              <a href="javascript:void(0)" data-link="{{ route('admin.setting.bankInfo.edit', [$shop->id]) }}" class="btn btn-default ajax-modal-btn">
+              <a href="javascript:void(0)" data-link="{{ panel_route('admin.setting.bankInfo.edit', [$shop->id]) }}" class="btn btn-default ajax-modal-btn">
                 <i class="fa fa-money"></i>
                 @lang('app.update_bank_detail')
               </a>
@@ -380,6 +390,44 @@
         </div>
         {!! Form::close() !!}
       </div>
+
+      @if ($isMerchant && $can_update)
+        <div class="row mt-4">
+          <div class="col-sm-8 col-sm-offset-2">
+            <div class="box box-solid">
+              <div class="box-header with-border">
+                <h3 class="box-title"><i class="fa fa-map-marker"></i> {{ trans('app.shop_address') }}</h3>
+              </div>
+              <div class="box-body">
+                @if (!empty($pendingAddressChangeRequest))
+                  <div class="alert alert-info">
+                    <i class="fa fa-clock-o"></i> {{ trans('messages.address_change_request_pending') }}
+                  </div>
+                @elseif (!$hasStoreLocation)
+                  <div class="alert alert-warning">
+                    <i class="fa fa-exclamation-triangle"></i> {{ trans('app.store_location_required') }}
+                  </div>
+                @endif
+
+                @if (empty($pendingAddressChangeRequest))
+                  {!! Form::open(['route' => 'merchant.verify.location', 'id' => 'store-location-form', 'class' => 'mp-address-wizard-form']) !!}
+                    {!! Form::hidden('_from', 'general') !!}
+                    @include('merchant.verify.partials.address_wizard', [
+                      'wizardId' => 'shop-settings-address-wizard',
+                      'address' => $storeAddress,
+                      'countries' => $countries ?? [],
+                      'states' => $states ?? [],
+                      'defaultAddressTitle' => $shop->name,
+                      'defaultPhone' => optional($shop->config)->support_phone ?? Auth::user()->phone,
+                      'submitLabel' => trans('app.update_address'),
+                    ])
+                  {!! Form::close() !!}
+                @endif
+              </div>
+            </div>
+          </div>
+        </div>
+      @endif
 
   @include('admin.partials.ui.card_end')
 @endsection

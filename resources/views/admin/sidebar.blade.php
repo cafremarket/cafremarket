@@ -373,6 +373,15 @@
                     @endif
                   </a>
                 </li>
+                <li class="{{ Request::is('admin/seller/shop/address-change-requests*') ? 'active' : '' }}">
+                  <a href="{{ route('admin.vendor.shop.addressChangeRequests') }}">
+                    <i class="fa fa-angle-double-right"></i> {{ trans('nav.address_change_requests') }}
+                    @php($pendingAddressChanges = \App\Helpers\Statistics::pending_address_change_count())
+                    @if ($pendingAddressChanges > 0)
+                      <span class="label label-warning pull-right">{{ $pendingAddressChanges }}</span>
+                    @endif
+                  </a>
+                </li>
               @endif
             @endcan
           </ul>

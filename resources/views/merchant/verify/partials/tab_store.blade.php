@@ -16,6 +16,12 @@
         @endif
       </div>
       <div class="mp-panel__body">
+        @if (!empty($pendingAddressChangeRequest))
+          <div class="mp-alert mp-alert--info">
+            <i class="fa fa-clock-o"></i> {{ trans('messages.address_change_request_pending') }}
+          </div>
+        @endif
+
         @if ($hasLocation)
           <div class="mp-alert mp-alert--success"><i class="fa fa-check-circle"></i> {{ trans('app.store_location_set') }}</div>
           <p class="mp-text-muted mp-text-muted--spaced">

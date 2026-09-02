@@ -1,4 +1,4 @@
-<aside class="mp-sidebar">
+<aside class="mp-sidebar" id="mp-sidebar">
   <div class="mp-sidebar__brand">
     <img src="{{ get_logo_url('system', 'tiny') }}" alt="{{ get_platform_title() }}">
     <span>{{ optional(Auth::user()->shop)->name ?? trans('app.merchant') }}</span>
@@ -30,16 +30,3 @@
     @include('merchant.partials.sidebar_menu')
   </nav>
 </aside>
-
-<script>
-(function() {
-  document.querySelectorAll('.mp-nav-group__toggle').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var group = btn.closest('.mp-nav-group');
-      if (group) {
-        group.classList.toggle('is-open');
-      }
-    });
-  });
-})();
-</script>

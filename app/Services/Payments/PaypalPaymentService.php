@@ -210,7 +210,7 @@ class PaypalPaymentService extends PaymentService
                 }
             }
 
-            return redirect()->route('wallet.deposit.failed')->with('error', trans('message.something_went_wrong'));
+            return redirect()->route('wallet.deposit.failed')->with('error', trans('messages.something_went_wrong'));
         }
 
         if (isset($payPalOrder['error']['message'])) {

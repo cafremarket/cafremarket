@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ShopAddressChangeRequestController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\ShopTranslationController;
 use App\Http\Controllers\Admin\SubscriptionController;
@@ -12,6 +13,11 @@ Route::post('shop/massDestroy', [ShopController::class, 'massDestroy'])->name('s
 Route::delete('shop/emptyTrash', [ShopController::class, 'emptyTrash'])->name('shop.emptyTrash');
 
 Route::get('shop/verifications', [ShopController::class, 'verifications'])->name('shop.verifications');
+
+Route::get('shop/address-change-requests', [ShopAddressChangeRequestController::class, 'index'])->name('shop.addressChangeRequests');
+Route::get('shop/address-change-requests/{addressChangeRequest}', [ShopAddressChangeRequestController::class, 'show'])->name('shop.addressChangeRequests.show');
+Route::post('shop/address-change-requests/{addressChangeRequest}/approve', [ShopAddressChangeRequestController::class, 'approve'])->name('shop.addressChangeRequests.approve');
+Route::post('shop/address-change-requests/{addressChangeRequest}/reject', [ShopAddressChangeRequestController::class, 'reject'])->name('shop.addressChangeRequests.reject');
 
 Route::get('shop/{shop}/verify', [ShopController::class, 'showVerificationForm'])->name('shop.verify');
 

@@ -44,18 +44,20 @@
       });
     @endif
 
-    $('.nearby-featured-slider').owlCarousel({
-      loop: true,
-      lazyLoad: true,
-      dots: true,
-      margin: 16,
-      nav: true,
-      responsive: {
-        0: { items: 1 },
-        576: { items: 2 },
-        992: { items: 3 },
-        1200: { items: 5 }
-      }
-    });
+    if ($('.nearby-featured-slider').length) {
+      $('.nearby-featured-slider').owlCarousel({
+        loop: true,
+        lazyLoad: true,
+        dots: true,
+        margin: 16,
+        nav: true,
+        responsive: {
+          0: { items: 1 },
+          576: { items: 2 },
+          992: { items: 3 },
+          1200: { items: 5 }
+        }
+      });
+    }
   </script>
 @endsection

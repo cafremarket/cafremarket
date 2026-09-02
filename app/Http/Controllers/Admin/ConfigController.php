@@ -11,10 +11,12 @@ use App\Http\Requests\Validations\MerchantVerifyRequest;
 use App\Http\Requests\Validations\ToggleMaintenanceModeRequest;
 use App\Http\Requests\Validations\UpdateBasicConfigRequest;
 use App\Http\Requests\Validations\UpdateConfigRequest;
+use App\Helpers\ListHelper;
 use App\Models\Config;
 use App\Models\PdfTemplate;
 use App\Models\Shop;
 use App\Services\Geo\GeocodeService;
+use App\Services\Shop\ShopAddressChangeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -56,7 +58,19 @@ class ConfigController extends Controller
             'ac_bank_address',
         ]);
 
-        return view('admin.config.general', compact('shop', 'shop_config'));
+        $viewData = compact('shop', 'shop_config');
+
+        if (Auth::user()->isFromMerchant()) {
+            $storeAddress = $shop->storeAddress();
+            $viewData['storeAddress'] = $storeAddress;
+            $viewData['countries'] = ListHelper::countries();
+            $viewData['states'] = $storeAddress && $storeAddress->country_id
+                ? ListHelper::states($storeAddress->country_id)
+                : ListHelper::states(config('system_settings.address_default_country'));
+            $viewData['pendingAddressChangeRequest'] = app(ShopAddressChangeService::class)->pendingForShop($shop->id);
+        }
+
+        return view('admin.config.general', $viewData);
     }
 
     /**
@@ -74,7 +88,11 @@ class ConfigController extends Controller
 
         $shipping_label_pdf_templates = PdfTemplate::active()->where('type', PdfTemplate::TYPE_SHIPPING_LABEL)->get()->pluck('name', 'id');
 
-        return view('admin.config.index', compact('config', 'order_invoice_pdf_templates', 'shipping_label_pdf_templates'));
+        $view = Auth::user()->isFromMerchant()
+            ? 'merchant.config.index'
+            : 'admin.config.index';
+
+        return view($view, compact('config', 'order_invoice_pdf_templates', 'shipping_label_pdf_templates'));
     }
 
     /**
@@ -225,7 +243,7 @@ class ConfigController extends Controller
     /**
      * Save store location during merchant onboarding / verification.
      */
-    public function saveStoreLocation(Request $request)
+    public function saveStoreLocation(Request $request, ShopAddressChangeService $addressChanges)
     {
         $user = Auth::user();
 
@@ -249,6 +267,20 @@ class ConfigController extends Controller
 
         $shop = $user->shop;
         $address = $shop->storeAddress();
+
+        if ($address && $addressChanges->requiresApproval($shop, $address)) {
+            try {
+                $addressChanges->submitRequest($shop, $address, $request, $user);
+            } catch (\RuntimeException $e) {
+                return $this->redirectAfterStoreLocation($request, 'error', $e->getMessage());
+            }
+
+            return $this->redirectAfterStoreLocation(
+                $request,
+                'success',
+                trans('messages.address_change_request_submitted')
+            );
+        }
 
         if (! $address) {
             $address = $shop->addresses()->create([
@@ -291,7 +323,25 @@ class ConfigController extends Controller
 
         $shop->update(['primary_address_id' => $address->id]);
 
-        return back()->with('success', trans('app.store_location_set'))->with('verification_tab', 'store');
+        return $this->redirectAfterStoreLocation(
+            $request,
+            'success',
+            trans('app.store_location_set')
+        );
+    }
+
+    /**
+     * Redirect after saving store location from verification or shop settings.
+     */
+    protected function redirectAfterStoreLocation(Request $request, string $flashType, string $message)
+    {
+        $redirect = back()->with($flashType, $message);
+
+        if ($request->input('_from') !== 'general') {
+            $redirect->with('verification_tab', 'store');
+        }
+
+        return $redirect;
     }
 
     /**

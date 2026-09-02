@@ -1,18 +1,6 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Application Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to display application language.
-    | You are free to change them to anything
-    | you want to customize your views to better match your application.
-    |
-    */
-
     'model' => [
         'address' => 'Address',
         'announcement' => 'Announcement',
@@ -61,9 +49,8 @@ return [
         'user' => 'User',
         'warehouse' => 'Warehouse',
         'delivery_boy' => 'Delivery Boy',
+        'menufacturer' => 'Menufacturer',
     ],
-
-    // Application Levels
     'and_takes' => 'And takes :time',
     'welcome' => 'Welcome',
     'body' => 'Body',
@@ -461,7 +448,6 @@ return [
     'order' => 'Order',
     'orders' => 'Orders',
     'all_orders' => 'All orders',
-
     'merchant' => 'Merchant',
     'merchants' => 'Merchants',
     'order_details' => 'Order details',
@@ -803,7 +789,6 @@ return [
     'uninstall_app_license' => 'Uninstall license',
     'take_a_backup' => 'Take a backup',
     'private' => 'Private',
-
     'payment_method_type' => [
         'paypal' => [
             'name' => 'PayPal',
@@ -830,8 +815,10 @@ return [
             'description' => 'Offer customers more payment options.',
             'admin_description' => 'Enable mobile payment options to allow vendors to charge their customers in a more mobile friendly ways.',
         ],
+        'digital_wallet' => [
+            'name' => 'Name',
+        ],
     ],
-
     'message_labels' => [
         'inbox' => 'Inbox',
         'sent' => 'Sent',
@@ -839,7 +826,6 @@ return [
         'spam' => 'Spam',
         'trash' => 'Trash',
     ],
-
     'statuses' => [
         'appealed' => 'Appealed',
         'approved' => 'Approved',
@@ -868,14 +854,12 @@ return [
         'waiting' => 'Waiting',
         'waiting_for_payment' => 'Waiting for payment',
     ],
-
     'priorities' => [
         'low' => 'Low',
         'normal' => 'Normal',
         'high' => 'High',
         'critical' => 'Critical',
     ],
-
     'activities' => [
         'created' => 'The :model was created.',
         'added' => 'Updated <strong>:key</strong>: <strong>:value</strong>',
@@ -886,7 +870,6 @@ return [
         'billing_info_changed' => 'Billing information has been updated.',
         'trial_started' => 'The trial period just started.',
     ],
-
     'form' => [
         'account_holder_name' => 'Account holder name',
         'ac_bank_address' => 'Bank Address',
@@ -1055,7 +1038,6 @@ return [
         'cost' => 'Cost',
         'taxrate' => 'Tax rate',
         'variants' => 'Variants',
-
         'packaging' => 'Packaging',
         'packaging_name' => 'Packaging name',
         'shipping_carrier_name' => 'Carrier name',
@@ -1149,7 +1131,6 @@ return [
         'paypal_account' => 'Account',
         'paypal_client_id' => 'Client ID',
         'paypal_secret' => 'Secret Key',
-
         'cost_per_month' => 'Cost/month',
         'featured' => 'Featured',
         'team_size' => 'Team size',
@@ -1166,8 +1147,6 @@ return [
         'uninstall' => 'Uninstall',
         'enable' => 'Enable',
         'disable' => 'Disable',
-
-        // Filter
         'by_customer' => 'By customer',
         'by_status' => 'By status',
         'by_payments' => 'By payments',
@@ -1198,7 +1177,6 @@ return [
         'stamp_image' => 'Stamp image',
         'cover_image' => 'Cover image',
     ],
-
     'placeholder' => [
         'bank_name' => 'Enter The Bank name',
         'ac_holder_name' => 'Account holder name',
@@ -1208,7 +1186,6 @@ return [
         'ac_swift_bic_code' => 'SWIFT/BIC code',
         'account_type' => 'Account type',
         'account_number' => 'Account number',
-        // 'payout_instruction'    => 'Payout instruction for this shop',
         'trust_badge' => 'Upload your trust badge image',
         'body' => 'Body',
         'action_text' => 'Action text',
@@ -1290,7 +1267,6 @@ return [
         'twitter_link' => 'Twitter Link',
         'pinterest_link' => 'Pinterest Link',
         'youtube_link' => 'YouTube Link',
-
         'image' => 'Image',
         'images' => 'Images',
         'avatar' => 'Choose avatar',
@@ -1438,9 +1414,16 @@ return [
         'download_limit' => 'Download Limit',
         'fulfilment_type' => 'Fulfillment type',
         'fulfilment_types' => 'Fulfillment types',
+        'columns' => 'Columns',
+        'coupon_code_size' => 'Coupon code size',
+        'featured_image' => 'Featured image',
+        'is_default' => 'Is default',
+        'payment' => 'Payment',
+        'pickup_instruction' => 'Pickup instruction',
+        'priority' => 'Priority',
+        'tax' => 'Tax',
+        'type' => 'Type',
     ],
-
-    // Version 1.3.0
     'added_by' => 'Added by',
     'add_language' => 'Add language',
     'address_verified' => 'Address verified',
@@ -1511,8 +1494,6 @@ return [
     'vendor_needs_approval' => 'Vendor needs approval',
     'view_conversations' => 'View Conversations',
     'view_dispute' => 'View Dispute',
-
-    // Version 1.3.3
     'in_trash' => 'In trash',
     'key_features' => 'Key features',
     'offer_starts' => 'Offer starts',
@@ -1523,8 +1504,6 @@ return [
     'cookie_consent_agree' => 'Allow cookies',
     'cookies_terms' => 'Here is the the cookie policy',
     'search_result_found' => ':count result found',
-
-    // Version 2.0.0
     'active_business_area' => 'Active business area only',
     'add_country' => 'Add country',
     'add_admin_note' => 'Add admin note',
@@ -1537,7 +1516,7 @@ return [
     'capital' => 'Capital',
     'calling_code' => 'Calling code',
     'citizenship' => 'Citizenship',
-    'coupon_applied' => 'Coupon \":coupon\" applied',
+    'coupon_applied' => 'Coupon \\":coupon\\" applied',
     'cybersource_api_key_id' => 'API key ID',
     'cybersource_merchant_id' => 'Merchant ID',
     'cybersource_secret' => 'Secret Key',
@@ -1565,8 +1544,6 @@ return [
     'mobile_slider' => 'Mobile',
     'today_is' => 'Today is',
     'which_model_you_want_to_reindex' => 'Which model you want to re-index?',
-
-    // Version 2.1.0
     'all_items' => 'All items',
     'archived' => 'Archived',
     'chats' => 'Chats',
@@ -1688,7 +1665,6 @@ return [
     'search_inventory' => 'Search item',
     'show_merchant_info_as_vendor' => 'Show merchant info as vendor',
     'zoom_effect' => 'Zoom effect',
-    // 'checkout_button_configure' => 'Checkout Button Configure',
     'pay_in_person' => 'Pay in Person',
     'pay_online' => 'Pay Online',
     'active_ecommerce' => 'Ecommerce',
@@ -1811,7 +1787,6 @@ return [
     'scheduled' => 'Scheduled',
     'ended' => 'Ended',
     'unknown' => 'Unknown',
-
     'fulfilment_type' => [
         'deliver' => 'Deliver',
         'pickup' => 'Pickup',
@@ -1901,9 +1876,9 @@ return [
     'delivery_capability_shop_only_label' => 'Shop riders only',
     'delivery_capability_system_only_label' => 'Platform delivery only',
     'delivery_capability_both_label' => 'Shop and platform delivery',
-    'nearby_shops' => 'Nearby shops',
-    'showing_shops_near_you' => 'Showing shops that can deliver to your location.',
-    'no_nearby_shops' => 'No shops found within your delivery radius.',
+    'nearby_shops' => 'Nearby stores',
+    'showing_shops_near_you' => 'Showing stores that can deliver to your location.',
+    'no_nearby_shops' => 'No stores found within your delivery radius.',
     'shop_outside_delivery_radius' => 'This shop cannot deliver to your location.',
     'platform_rider' => 'Platform rider',
     'platform_riders' => 'Platform riders',
@@ -1929,5 +1904,41 @@ return [
     'invalid_platform_rider' => 'Invalid platform rider.',
     'shop_does_not_support_platform_delivery' => 'This shop does not support platform delivery.',
     'no_platform_riders_available' => 'No platform riders are available nearby.',
-    'assign' => 'Assign',
+    'add_another_attribute' => 'Add Another Attribute',
+    'address_change_request' => 'Address Change Request',
+    'address_change_requests' => 'Address Change Requests',
+    'browse' => 'Browse',
+    'change_language' => 'Change Language',
+    'commission_rate' => 'Commission rate',
+    'config' => 'Settings',
+    'confirm' => 'Confirm',
+    'created_by' => 'Created by',
+    'custom_shipping_labels' => 'Custom Shipping Labels',
+    'damaged_quantity' => 'Damaged Quantity',
+    'digital_products' => 'Digital Items',
+    'expand' => 'Expand',
+    'filter' => 'Filter',
+    'go_to_page' => 'Go To Page',
+    'image_config' => 'Image Config',
+    'invalid' => 'Invalid',
+    'item_already_in_wishlist' => 'Item already in your wishlist',
+    'logout' => 'Logout',
+    'meta_keywords' => 'Meta Keywords',
+    'new_address' => 'New address',
+    'no_address_change_requests' => 'No Address Change Requests',
+    'no_records_found' => 'No Records Found',
+    'no_shipping_methods_are_configured' => 'No Shipping Methods Are Configured',
+    'none' => 'None',
+    'not_available' => 'Not available',
+    'please_select' => 'Please Select',
+    'previous_address' => 'Previous Address',
+    'puchase_price' => 'Puchase Price',
+    'requested_by' => 'Requested By',
+    'save' => 'Save',
+    'scale' => 'Scale',
+    'select_template' => 'Select Template',
+    'system_config' => 'System Config',
+    'themes' => 'Themes',
+    'tips' => 'TIPS',
+    'verified_stores' => 'Verified Stores',
 ];

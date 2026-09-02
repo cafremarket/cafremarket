@@ -8,13 +8,14 @@ use App\Helpers\ListHelper;
 use App\Http\Requests\Validations\MerchantVerifyRequest;
 use App\Models\Attachment;
 use App\Models\Config;
+use App\Services\Shop\ShopAddressChangeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class VerificationController extends Controller
 {
-    public function index(MerchantVerifyRequest $request)
+    public function index(MerchantVerifyRequest $request, ShopAddressChangeService $addressChanges)
     {
         $config = Config::with(['attachments', 'shop'])->findOrFail(Auth::user()->merchantId());
         $storeAddress = $config->shop->storeAddress();
@@ -22,8 +23,9 @@ class VerificationController extends Controller
         $states = $storeAddress && $storeAddress->country_id
             ? ListHelper::states($storeAddress->country_id)
             : ListHelper::states(config('system_settings.address_default_country'));
+        $pendingAddressChangeRequest = $addressChanges->pendingForShop($config->shop->id);
 
-        return view('merchant.verify.index', compact('config', 'countries', 'states', 'storeAddress'));
+        return view('merchant.verify.index', compact('config', 'countries', 'states', 'storeAddress', 'pendingAddressChangeRequest'));
     }
 
     public function submit(MerchantVerifyRequest $request)
