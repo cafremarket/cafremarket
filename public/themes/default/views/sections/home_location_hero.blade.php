@@ -3,7 +3,11 @@
     <div class="home-location-hero__inner">
       <div class="home-location-hero__text">
         <h1>{{ trans('theme.stores_near_you') }}</h1>
-        <p>{{ trans('theme.set_location_to_see_products') }}</p>
+        @if (buyer_delivery_address_label())
+          <p>{{ trans('theme.showing_stores_near_you') }}</p>
+        @else
+          <p>{{ trans('theme.set_location_to_see_products') }}</p>
+        @endif
       </div>
 
       <button type="button" class="home-location-picker js-open-address-setup" aria-label="{{ trans('theme.set_delivery_location') }}">

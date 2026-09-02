@@ -3,17 +3,10 @@
     <div class="container">
       <div class="sf-home-stores-head">
         <div class="sf-home-stores-head__main">
-          <p class="sf-home-stores-head__eyebrow">{{ trans('theme.stores_near_you') }}</p>
           <h2 class="sf-home-stores-head__title">
             {{ trans('theme.stores') }}
             <i class="fal fa-store" aria-hidden="true"></i>
           </h2>
-          @if (buyer_delivery_address_label())
-            <p class="sf-home-stores-head__location">
-              <i class="fal fa-map-marker-alt" aria-hidden="true"></i>
-              {{ Str::limit(buyer_delivery_address_label(), 72) }}
-            </p>
-          @endif
           <p class="sf-home-stores-head__meta">
             {{ trans('theme.showing_stores_count', ['count' => $nearbyShopsPaginator->total()]) }}
           </p>
@@ -43,17 +36,10 @@
     <div class="container">
       <div class="sf-home-stores-head">
         <div class="sf-home-stores-head__main">
-          <p class="sf-home-stores-head__eyebrow">{{ trans('theme.stores_near_you') }}</p>
           <h2 class="sf-home-stores-head__title">
             {{ trans('theme.stores') }}
             <i class="fal fa-store" aria-hidden="true"></i>
           </h2>
-          @if (buyer_delivery_address_label())
-            <p class="sf-home-stores-head__location">
-              <i class="fal fa-map-marker-alt" aria-hidden="true"></i>
-              {{ Str::limit(buyer_delivery_address_label(), 72) }}
-            </p>
-          @endif
         </div>
       </div>
 
