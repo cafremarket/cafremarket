@@ -24,7 +24,7 @@ class PackageSeeder extends Seeder
         $found = DB::table('modules')->where('name', $module)->first();
 
         if ($found) {
-            $found->update([
+            DB::table('modules')->where('id', $found->id)->update([
                 'access' => $access,
                 'actions' => $actions,
                 'updated_at' => $now,

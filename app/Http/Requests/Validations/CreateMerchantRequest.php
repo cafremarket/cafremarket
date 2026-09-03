@@ -27,9 +27,15 @@ class CreateMerchantRequest extends Request
     {
         Request::merge(['role_id' => Role::MERCHANT]); // Set role_id
 
+        if ($this->filled('nuit')) {
+            $this->merge(['nuit' => preg_replace('/\s+/', '', strtoupper((string) $this->input('nuit')))]);
+        }
+
         $rules = [
             'name' => 'required|max:255',
             'legal_name' => 'required',
+            'seller_type' => 'required|in:individual,company',
+            'nuit' => 'required|string|min:9|max:20',
             'slug' => [
                 'required',
                 'alpha_dash',

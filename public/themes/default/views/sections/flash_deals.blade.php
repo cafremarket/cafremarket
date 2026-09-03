@@ -60,7 +60,7 @@
                   <div class="col-12 col-md-6 col-sm-9 my-3">
                     <div class="flash-deal-product" style="{{ empty($flashdeals['products']) ? 'margin-top: 0' : '' }}">
                       <div class="flash-deal-product-inner">
-                        <a class="flash-deal-product-name" href="{{ route('show.product', $item->slug) }}">
+                        <a class="flash-deal-product-name" href="{{ storefront_product_url($item) }}">
                           {{ $item->title }}
                         </a>
 
@@ -69,7 +69,7 @@
                             <span>{{ $item->condition }}</span>
                           </div>
 
-                          <a href="{{ route('show.product', $item->slug) }}">
+                          <a href="{{ storefront_product_url($item) }}">
                             <img class="lazy" src="/images/square.webp" data-src="{{ get_inventory_img_src($item, 'full') }}" data-name="product_image" alt="{{ $item->title }}" title="{{ $item->title }}">
                           </a>
 
@@ -79,7 +79,7 @@
                         </div>
 
                         <div class="flash-deal-product-details">
-                          {{-- <a class="flash-deal-product-name" href="{{ route('show.product', $item->slug) }}">
+                          {{-- <a class="flash-deal-product-name" href="{{ storefront_product_url($item) }}">
                             <h3>{{ $item->title }}</h3>
                           </a> --}}
 

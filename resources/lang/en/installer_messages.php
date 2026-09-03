@@ -7,7 +7,7 @@ return [
     /**
      * Shared translations.
      */
-    'title' => config('app.name', 'zCart').' Installer',
+    'title' => config('app.name', 'cafremarket').' Installer',
     'next' => 'Next Step',
     'back' => 'Previous',
     'finish' => 'Install',
@@ -21,7 +21,7 @@ return [
      */
     'welcome' => [
         'templateTitle' => 'Welcome',
-        'title' => config('app.name', 'zCart').' Installer',
+        'title' => config('app.name', 'cafremarket').' Installer',
         'message' => 'Easy Installation and Setup Wizard.',
         'next' => 'Check Requirements',
     ],
@@ -186,7 +186,7 @@ return [
      * Installed Log translations.
      */
     'installed' => [
-        'success_log_message' => config('app.name', 'zCart').' Installer successfully INSTALLED on ',
+        'success_log_message' => config('app.name', 'cafremarket').' Installer successfully INSTALLED on ',
     ],
 
     /**
@@ -211,7 +211,7 @@ return [
         /**
          * Shared translations.
          */
-        'title' => config('app.name', 'zCart').' Updater',
+        'title' => config('app.name', 'cafremarket').' Updater',
 
         /**
          * Welcome page translations for update feature.
@@ -240,7 +240,7 @@ return [
         ],
 
         'log' => [
-            'success_message' => config('app.name', 'zCart').' Installer successfully UPDATED on ',
+            'success_message' => config('app.name', 'cafremarket').' Installer successfully UPDATED on ',
         ],
     ],
 ];

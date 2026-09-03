@@ -31,8 +31,14 @@ class RegisterMerchantRequest extends Request
 
         $this->merge(['role_id' => Role::MERCHANT]);
 
+        if ($this->filled('nuit')) {
+            $this->merge(['nuit' => preg_replace('/\s+/', '', strtoupper((string) $this->input('nuit')))]);
+        }
+
         $rules = [
             'name' => 'required|max:255',
+            'seller_type' => 'required|in:individual,company',
+            'nuit' => 'required|string|min:9|max:20',
             'shop_name' => [
                 'required',
                 'string',

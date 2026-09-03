@@ -34,7 +34,7 @@
 
                     <div class="deal-of-day-details">
                       <div class="deal-of-day-details-name">
-                        <a href="{{ route('show.product', $deal_of_the_day->slug) }}">{!! strip_tags($deal_of_the_day->title) !!}</a>
+                        <a href="{{ storefront_product_url($deal_of_the_day) }}">{!! strip_tags($deal_of_the_day->title) !!}</a>
                       </div>
 
                       <div class="deal-of-day-details-price">
@@ -135,7 +135,7 @@
                           <div class="best-seller-item border-animate" data-mycount="{{ $loop->iteration }}">
                             <div class="box-inner">
                               <div class="best-seller-item-image">
-                                <a href="{{ route('show.product', $item->slug) }}">
+                                <a href="{{ storefront_product_url($item) }}">
                                   <img class="lazy" src="/images/square.webp" data-src="{{ get_inventory_img_src($item, 'medium') }}" data-name="product_image" alt="{{ $item->title }}" title="{{ $item->title }}">
                                 </a>
                               </div>
@@ -143,7 +143,7 @@
                               <div class="best-seller-item-details">
                                 <div class="best-seller-item-details-inner">
                                   <div class="best-seller-item-name">
-                                    <a href="{{ route('show.product', $item->slug) }}">
+                                    <a href="{{ storefront_product_url($item) }}">
                                       {{ $item->title }}
                                     </a>
                                   </div>

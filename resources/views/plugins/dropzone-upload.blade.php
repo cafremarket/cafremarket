@@ -137,15 +137,24 @@
         console.log('File Upload Error', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
       }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
         console.log('File Batch Uploaded', preview, config, tags, extraData);
-        window.location.href = extraData.redirect_url;
+        var redirectUrl = extraData.redirect_url;
+        if (typeof toPanelUrl === 'function') {
+          redirectUrl = toPanelUrl(redirectUrl);
+        }
+        window.location.href = redirectUrl;
       });
 
       $('div.btn.btn-primary.btn-file').hide();
 
       $('#form-ajax-upload').on('submit', function(event) {
+        event.preventDefault();
         $(this).find(":submit").prop("disabled", true);
 
         var action = $(this).attr('action');
+        if (typeof toPanelUrl === 'function') {
+          action = toPanelUrl(action);
+        }
+
         var data = $("#form-ajax-upload").serializeArray();
 
         // if has download limit field then append file field to the form
@@ -169,10 +178,22 @@
           formData.append(file.name, $(".variant-img")[i].files[0]);
         });
 
-        if ($("#uploadBtn").val()) {
-          var file = $("#uploadBtn")[0].files[0];
-          formData.append("images[feature]", file);
+        // Featured image upload inside the unified product editor.
+        // Scope to the current product form to avoid grabbing another #uploadBtn
+        // from other components/modals.
+        var $featuredUpload = $("#form-ajax-upload").find("#uploadBtn");
+        if ($featuredUpload.length && $featuredUpload.val()) {
+          var file = $featuredUpload[0].files[0];
+          if (file) {
+            formData.append("images[feature]", file);
+          }
         }
+
+        if (typeof apply_busy_filter === 'function') {
+          apply_busy_filter();
+        }
+
+        window.__keepCatalogBusy = false;
 
         $.ajax({
             url: action,
@@ -183,18 +204,28 @@
             contentType: false, // tell jQuery not to set contentType
           })
           .done(function(result) {
+            // Keep loading overlay until redirect / image batch upload finishes.
+            window.__keepCatalogBusy = true;
+            if (typeof apply_busy_filter === 'function') {
+              apply_busy_filter();
+            }
+
             formData.append('model_id', result.id);
             formData.append('model_name', result.model);
-            formData.append('redirect_url', result.redirect);
+            formData.append('redirect_url', (typeof toPanelUrl === 'function') ? toPanelUrl(result.redirect) : result.redirect);
 
             var node = $('#dropzone-input');
-            if (node.fileinput("getFilesCount") > 0) { // Upload only if there is files
+            if (node.length && node.fileinput("getFilesCount") > 0) { // Upload only if there is files
               node.fileinput('upload').fileinput('disable');
             } else {
-              window.location.href = result.redirect;
+              window.location.href = (typeof toPanelUrl === 'function') ? toPanelUrl(result.redirect) : result.redirect;
             }
           })
           .fail(function(xhr) {
+            window.__keepCatalogBusy = false;
+            if (typeof remove_busy_filter === 'function') {
+              remove_busy_filter();
+            }
             $("#form-ajax-upload").find(":submit").removeAttr("disabled");
             var err = '';
             if (401 === xhr.status) {
@@ -203,19 +234,132 @@
               notie.alert(3, "{{ trans('responses.form_validation_failed') }}", 3);
               var response = xhr.responseJSON;
 
-              $.each(response.errors, function(key, input) {
-                err += input + '<br/>';
+              var $form = $("#form-ajax-upload");
+              $form.find(".has-error").removeClass("has-error");
+              $form.find(".is-invalid").removeClass("is-invalid");
+
+              var firstInvalidEl = null;
+              // DEBUG (temporary): log validation payload + matching.
+              console.group('[Debug][Admin product editor] Validation 422 payload');
+              console.log('responseJSON:', response);
+              console.log('response.errors:', response && response.errors);
+              console.groupEnd();
+
+              function pickFieldElement(fieldKey) {
+                // 1) Exact match for the error key (rare)
+                var $el = $form.find('[name="' + fieldKey + '"]');
+                if ($el.length) return $el.first();
+
+                // 2) dot notation -> bracket notation: images.feature => images[feature]
+                var bracketName = fieldKey.replace(/\.(\w+)/g, '[$1]');
+                $el = $form.find('[name="' + bracketName + '"]');
+                if ($el.length) return $el.first();
+
+                // 3) fallback: match by first segment (category_list.0 => category_list[])
+                var firstSegment = fieldKey.split('.')[0];
+                $el = $form.find('[name^="' + firstSegment + '"]');
+                if ($el.length) return $el.first();
+
+                return $();
+              }
+
+              $.each(response.errors, function(fieldKey, messages) {
+                var msgArr = Array.isArray(messages) ? messages : [messages];
+                if (msgArr.length === 0) return;
+
+                var $el = pickFieldElement(fieldKey);
+                if ($el && $el.length) {
+                  var $group = $el.closest(".form-group");
+                  var labelText = $group.find("label").first().text().trim();
+                  if (!labelText) {
+                    // Some editor fields (like categories / featured image) don’t have a <label>.
+                    // Their caption is in the panel title.
+                    var panelTitle = $el.closest(".wc-panel").find(".wc-panel__title").first().text().trim();
+                    labelText = panelTitle;
+                  }
+
+                  if (!labelText) {
+                    // Slug caption in the unified editor is not a <label> tag.
+                    var permalinkText = $el.closest(".wc-permalink").find(".text-muted").first().text().trim();
+                    labelText = permalinkText;
+                  }
+
+                  // Remove trailing * (required marker) if present.
+                  labelText = labelText ? labelText.replace(/\*\s*$/, '').trim() : '';
+                  labelText = labelText ? labelText.replace(/:\s*$/, '').trim() : '';
+                  var displayName = labelText || fieldKey;
+
+                  console.log('[Debug][Admin product editor] fieldKey=', fieldKey, 'displayName=', displayName, 'pickedElName=', $el.attr('name'));
+
+                  err += '<strong>' + displayName + ':</strong> ' + msgArr[0] + '<br/>';
+                } else {
+                  err += '<strong>' + fieldKey + ':</strong> ' + msgArr[0] + '<br/>';
+                  return;
+                }
+
+                $el.addClass("is-invalid");
+
+                var $group = $el.closest(".form-group");
+                if ($group.length) {
+                  $group.addClass("has-error");
+                  // Put the first error message under the field (best-effort).
+                  var $help = $group.find(".help-block.with-errors, .help-block, .help-inline").first();
+                  if ($help.length) {
+                    $help.html(msgArr[0]);
+                  }
+                }
+
+                if (!firstInvalidEl) {
+                  firstInvalidEl = $el;
+                }
               });
+
+              // If for some reason Laravel didn't return field errors in the expected shape,
+              // show something useful so we can debug quickly.
+              if (!err) {
+                if (response && response.message) {
+                  err = response.message;
+                } else {
+                  err = $('<div>').text(JSON.stringify(response || {})).html();
+                }
+              }
+
+              if (firstInvalidEl && firstInvalidEl.length) {
+                try {
+                  firstInvalidEl[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } catch (e) {
+                  // ignore
+                }
+              }
+            } else if (500 === xhr.status) {
+              // Server-side exception — show the message returned from our try/catch handler.
+              var resp500 = xhr.responseJSON;
+              if (resp500 && resp500.message) {
+                err = resp500.message;
+                if (resp500.error) {
+                  err += '<br><small class="text-muted">' + $('<div>').text(resp500.error).html() + '</small>';
+                }
+              } else {
+                err = "{{ trans('messages.product_create_failed') }}";
+              }
+              notie.alert(3, err, 5);
             } else {
               err += "{{ trans('responses.error') }}";
             }
+
+            if (!err) { return; }
 
             var msg = '<div class="alert alert-danger alert-dismissible">' +
               '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
               '<h4><i class="icon fa fa-warning"></i>{{ trans('app.error') }}</h4>' +
               '<p id="global-alert-msg">' + err + '</p>' +
               '</div>';
-            $("section.content").prepend(msg);
+            // On merchant panel layout there is no `section.content`.
+            var $container = $("section.content");
+            if (!($container && $container.length)) {
+              $container = $(".mp-content--admin, .mp-content").first();
+            }
+            $container.prepend(msg);
           });
 
         return false;

@@ -68,6 +68,25 @@
   <div class="row">
     <div class="col-md-6 nopadding-right">
       <div class="form-group">
+        {!! Form::label('seller_type', trans('app.form.seller_type') . '*', ['class' => 'with-help']) !!}
+        <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.seller_type') }}"></i>
+        {!! Form::select('seller_type', \App\Models\Shop::sellerTypeOptions(), old('seller_type', \App\Models\Shop::SELLER_TYPE_INDIVIDUAL), ['class' => 'form-control select2-normal', 'required']) !!}
+        <div class="help-block with-errors"></div>
+      </div>
+    </div>
+    <div class="col-md-6 nopadding-left">
+      <div class="form-group">
+        {!! Form::label('nuit', trans('app.form.nuit') . '*', ['class' => 'with-help']) !!}
+        <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.nuit') }}"></i>
+        {!! Form::text('nuit', old('nuit'), ['class' => 'form-control', 'placeholder' => trans('app.placeholder.nuit'), 'required', 'maxlength' => 20]) !!}
+        <div class="help-block with-errors"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 nopadding-right">
+      <div class="form-group">
         {!! Form::label('slug', trans('app.form.slug') . '*', ['class' => 'with-help']) !!}
         <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.shop_slug') }}"></i>
         {!! Form::text('slug', null, ['class' => 'form-control slug', 'placeholder' => trans('app.slug'), 'required']) !!}

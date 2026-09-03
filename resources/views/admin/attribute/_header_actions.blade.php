@@ -8,3 +8,6 @@
     <i class="fa fa-plus"></i> {{ trans('app.add_attribute') }}
   </a>
 @endcan
+<span class="text-muted" style="margin-left:8px;">
+  {{ trans('help.attribute_presets_available') }}
+</span>

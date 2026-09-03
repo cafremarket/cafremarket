@@ -39,7 +39,7 @@
               </div>
 
               <div class="product-info">
-                <a href="{{ route('show.product', $item->slug) }}" class="product-info-title">{{ $item->pivot->item_description }}</a>
+                <a href="{{ storefront_product_url($item) }}" class="product-info-title">{{ $item->pivot->item_description }}</a>
 
                 <div class="order-info-amount">
                   <span>{{ get_formated_currency($item->pivot->unit_price, 2, $dispute->order->currency_id) }} x {{ $item->pivot->quantity }}</span>

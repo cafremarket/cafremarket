@@ -39,9 +39,9 @@
       </div>
     @endif
 
-    <div class="notice notice-warning notice-sm mb-3" id="checkout-notice" style="display: {{ $cart->is_digital || $cart->shipping_rate_id || $cart->is_free_shipping() ? 'none' : 'block' }};">
+    <div class="notice notice-warning notice-sm mb-3" id="checkout-notice" style="display: none;">
       <strong>{{ trans('theme.warning') }}</strong>
-      <span id="checkout-notice-msg">@lang('theme.notify.seller_doesnt_ship')</span>
+      <span id="checkout-notice-msg"></span>
     </div>
 
     {!! Form::open(['route' => ['order.create', $cart], 'id' => 'formId' . $cart->id, 'name' => 'checkoutForm', 'files' => true, 'data-toggle' => 'validator', 'autocomplete' => 'off', 'novalidate']) !!}

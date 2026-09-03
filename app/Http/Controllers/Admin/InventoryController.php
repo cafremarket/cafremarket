@@ -91,10 +91,18 @@ class InventoryController extends Controller
             $inventory = $inventory->withCount('bids')->auction();
         }
 
+        // Merchant/admin tabs follow the Status field on the product form.
+        // Do not use storefront scopes (available_from / expiry) here — those
+        // hide listings from customers, but they must not move an Active
+        // product into the Inactive tab.
         if ($status == 'active') {
-            $inventory = $inventory->active();
+            $inventory = $inventory->where('active', Inventory::ACTIVE)
+                ->where('stock_quantity', '>', 0);
         } elseif ($status == 'inactive') {
-            $inventory = $inventory->inActive();
+            $inventory = $inventory->where(function ($query) {
+                $query->where('active', '!=', Inventory::ACTIVE)
+                    ->orWhereNull('active');
+            });
         } elseif ($status == 'outOfStock') {
             $inventory = $inventory->stockOut();
         }
@@ -331,25 +339,11 @@ class InventoryController extends Controller
     {
         $inventory = $this->inventory->find($id);
 
-        $inventoryVariant = Inventory::where('parent_id', $inventory->id)->get();
-
-        $preview = $inventory->previewImages();
-
-        $product = Product::with('categories.attrsList.attributeValues')->findOrFail($inventory->product_id);
-
-        $attributes = ListHelper::getAttributesBy($product);
-
-        $linkable_items = ListHelper::inventories();
-
-        $suppliers = ListHelper::suppliers();
-
-        if (is_incevio_package_loaded('wholesale')) {
-            $inventory->wholesale = get_wholesale_item_prices($inventory->id);
+        if (! $inventory || ! $inventory->product_id) {
+            abort(404);
         }
 
-        $packagings = is_incevio_package_loaded('packaging') ? ListHelper::packagings() : null;
-
-        return view('admin.inventory.edit', compact('inventory', 'inventoryVariant', 'product', 'preview', 'attributes', 'linkable_items', 'suppliers', 'packagings'));
+        return redirect()->to(mp_route('admin.stock.product.edit', $inventory->product_id));
     }
 
     /**

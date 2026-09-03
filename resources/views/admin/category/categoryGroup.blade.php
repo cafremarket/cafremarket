@@ -29,7 +29,6 @@
         <th>{{ trans('app.background_image') }}</th>
         <th>{{ trans('app.cover_image') }}</th>
         <th>{{ trans('app.category_group') }}</th>
-        <th>{{ trans('app.sub_groups') }}</th>
         <th>{{ trans('app.order') }}</th>
         <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
       </tr>
@@ -58,11 +57,6 @@
             @if ($categoryGrp->description)
               <br><span class="text-muted small">{!! Str::limit($categoryGrp->description, 220) !!}</span>
             @endif
-          </td>
-          <td>
-            <a href="{{ route('admin.catalog.categoryGroup.subGroups', ['categoryGrp' => $categoryGrp->id]) }}">
-              <span class="label label-default">{{ $categoryGrp->sub_groups_count }}</span>
-            </a>
           </td>
           <td>{{ $categoryGrp->order }}</td>
           <td class="row-options admin-row-actions">

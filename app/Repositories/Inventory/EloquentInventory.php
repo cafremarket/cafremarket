@@ -31,11 +31,15 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
 
         switch ($status) {
             case 'active':
-                $inventory = $inventory->active();
+                $inventory = $inventory->where('active', Inventory::ACTIVE)
+                    ->where('stock_quantity', '>', 0);
                 break;
 
             case 'inactive':
-                $inventory = $inventory->inActive();
+                $inventory = $inventory->where(function ($query) {
+                    $query->where('active', '!=', Inventory::ACTIVE)
+                        ->orWhereNull('active');
+                });
                 break;
 
             case 'outOfStock':

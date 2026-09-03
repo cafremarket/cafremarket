@@ -422,11 +422,46 @@
       return;
     }
 
+    setGpsLoading(true);
+
     navigator.geolocation.getCurrentPosition(function(pos) {
-      applyLocation(pos.coords.latitude, pos.coords.longitude, null, true);
+      applyLocation(pos.coords.latitude, pos.coords.longitude, null, true)
+        .finally(function() {
+          setGpsLoading(false);
+        });
     }, function() {
+      setGpsLoading(false);
       alert(geoDeniedLabel);
     }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+  }
+
+  function setGpsLoading(loading) {
+    qa('.addr-wizard-use-gps, .addr-wizard-map-gps').forEach(function(btn) {
+      if (!btn) return;
+
+      if (loading) {
+        if (!btn.dataset.defaultHtml) {
+          btn.dataset.defaultHtml = btn.innerHTML;
+        }
+        btn.disabled = true;
+        btn.classList.add('is-loading');
+        btn.setAttribute('aria-busy', 'true');
+
+        if (btn.classList.contains('addr-wizard-use-gps')) {
+          btn.innerHTML = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i> <span class="addr-wizard-gps-loading-text">' + fetchingLabel + '</span>';
+        } else {
+          btn.innerHTML = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';
+        }
+        return;
+      }
+
+      btn.disabled = false;
+      btn.classList.remove('is-loading');
+      btn.removeAttribute('aria-busy');
+      if (btn.dataset.defaultHtml) {
+        btn.innerHTML = btn.dataset.defaultHtml;
+      }
+    });
   }
 
   function bindEvents() {

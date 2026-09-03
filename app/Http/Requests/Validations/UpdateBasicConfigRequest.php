@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
+use App\Models\Shop;
 
 class UpdateBasicConfigRequest extends Request
 {
@@ -14,6 +15,26 @@ class UpdateBasicConfigRequest extends Request
     public function authorize()
     {
         return Request::user()->merchantId() == Request::route('shop');
+    }
+
+    /**
+     * Merchants may not see/edit legal_name; keep existing or fall back to shop name.
+     */
+    protected function prepareForValidation(): void
+    {
+        $legalName = trim((string) $this->input('legal_name', ''));
+
+        if ($legalName !== '') {
+            return;
+        }
+
+        $shop = Shop::find(Request::route('shop'));
+        $fallback = $shop?->legal_name
+            ?: $this->input('name')
+            ?: $shop?->name
+            ?: 'Store';
+
+        $this->merge(['legal_name' => $fallback]);
     }
 
     /**

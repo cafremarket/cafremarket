@@ -27,7 +27,7 @@
           <div class="location-map-wrap">
             <div id="locationMapCanvas" class="location-map-canvas"></div>
             <button type="button" id="mapCurrentLocationBtn" class="location-map-current-btn" title="{{ trans('theme.map_current_location') }}" aria-label="{{ trans('theme.map_current_location') }}">
-              <i class="fal fa-crosshairs"></i>
+              <i class="fa fa-crosshairs"></i>
             </button>
             <p class="text-muted small mt-2 mb-0">{{ trans('theme.drag_map_to_adjust_pin') }}</p>
           </div>
@@ -37,7 +37,7 @@
           </div>
 
           <button type="button" id="useCurrentLocationBtn" class="btn btn-outline-primary btn-block btn-lg btn-round">
-            <i class="fal fa-crosshairs"></i> {{ trans('theme.use_current_location') }}
+            <i class="fa fa-crosshairs"></i> {{ trans('theme.use_current_location') }}
           </button>
 
           <input type="hidden" name="latitude" id="locationLatitude" value="{{ session('buyer_latitude') }}">

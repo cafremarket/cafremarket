@@ -16,7 +16,7 @@
       </span>
     </a>
   @elseif(isset($item) && isset($count))
-    <a href="{{ route('show.product', $item->slug) . '#reviews_tab' }}" class="rating-count product-rating-count ml-1" aria-controls="reviews_tab" role="tab" data-toggle="tab" id="js-open-product-reviews-tab" aria-label="@lang('theme.reviews')">
+    <a href="{{ storefront_product_url($item).'#reviews_tab' }}" class="rating-count product-rating-count ml-1" aria-controls="reviews_tab" role="tab" data-toggle="tab" id="js-open-product-reviews-tab" aria-label="@lang('theme.reviews')">
       ({{ get_formated_decimal($ratings, true, 1) }}) {{ trans_choice('theme.reviews', $count, ['count' => $count]) }}
     </a>
   @endif

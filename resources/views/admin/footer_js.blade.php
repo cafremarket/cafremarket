@@ -23,6 +23,50 @@
       return url;
     };
 
+    window.isCatalogApiUrl = function(url) {
+      if (!url || typeof url !== 'string') {
+        return false;
+      }
+
+      return url.indexOf('/catalog/') !== -1 || url.indexOf('catalog/') !== -1;
+    };
+
+    window.__catalogAjaxBusy = 0;
+
+    // Catalog AJAX loading overlay (store + admin catalog calls).
+    $(document).ajaxSend(function(event, jqxhr, settings) {
+      if (!window.isCatalogApiUrl(settings.url || '')) {
+        return;
+      }
+
+      window.__catalogAjaxBusy++;
+      if (window.__catalogAjaxBusy === 1 && typeof apply_busy_filter === 'function') {
+        apply_busy_filter();
+      }
+    });
+
+    $(document).ajaxComplete(function(event, jqxhr, settings) {
+      if (!window.isCatalogApiUrl(settings.url || '')) {
+        return;
+      }
+
+      window.__catalogAjaxBusy = Math.max(0, window.__catalogAjaxBusy - 1);
+      if (window.__catalogAjaxBusy === 0 && !window.__keepCatalogBusy && typeof remove_busy_filter === 'function') {
+        remove_busy_filter();
+      }
+    });
+
+    $(document).ajaxError(function(event, jqxhr, settings) {
+      if (!window.isCatalogApiUrl(settings.url || '')) {
+        return;
+      }
+
+      window.__catalogAjaxBusy = Math.max(0, window.__catalogAjaxBusy - 1);
+      if (window.__catalogAjaxBusy === 0 && !window.__keepCatalogBusy && typeof remove_busy_filter === 'function') {
+        remove_busy_filter();
+      }
+    });
+
     // console.log($().jquery);
     $(".ajax-modal-btn").hide(); // hide the ajax functional button untill the page load completely
 
@@ -50,6 +94,13 @@
       // Remove the href from the modal buttons
       $('.ajax-modal-btn').removeAttr('href').css('cursor', 'pointer').show();
 
+      // Merchant panel: rewrite admin form actions on full pages (product create/edit, etc).
+      if (window.__merchantPanel) {
+        $('form[action]').each(function() {
+          $(this).attr('action', toPanelUrl($(this).attr('action')));
+        });
+      }
+
       // Initialize all plugins
       initAppPlugins();
       initDatatables();
@@ -71,6 +122,13 @@
 
               //Load modal data
               $('#myDynamicModal').modal().html(data);
+
+              // Merchant panel: rewrite admin form actions so POSTs are not redirected away.
+              if (window.__merchantPanel) {
+                $('#myDynamicModal form[action]').each(function() {
+                  $(this).attr('action', toPanelUrl($(this).attr('action')));
+                });
+              }
 
               //Initialize application plugins after ajax load the content
               if (typeof initAppPlugins == 'function') {
@@ -247,7 +305,12 @@
   function initDatatables() {
     // Load products
     $('#all-product-table').DataTable($.extend({}, dataTableOptions, {
-      "ajax": "{{ route('admin.catalog.product.getMore') }}",
+      "ajax": {
+        "url": "{{ panel_route('admin.catalog.product.getMore') }}",
+      },
+      "language": {
+        "processing": '<i class="fa fa-spinner fa-spin fa-fw"></i> {{ trans('app.loading') ?? 'Loading...' }}'
+      },
       "columns": [{
           'data': 'checkbox',
           'name': 'checkbox',
@@ -560,7 +623,12 @@
 
     // Load category list by Ajax
     $('#all-categories-table').DataTable($.extend({}, dataTableOptions, {
-      "ajax": "{{ route('admin.catalog.category.getMore') }}",
+      "ajax": {
+        "url": "{{ panel_route('admin.catalog.category.getMore') }}",
+      },
+      "language": {
+        "processing": '<i class="fa fa-spinner fa-spin fa-fw"></i> {{ trans('app.loading') ?? 'Loading...' }}'
+      },
       "columns": [{
           'data': 'checkbox',
           'name': 'checkbox',
@@ -584,12 +652,6 @@
         {
           'data': 'name',
           'name': 'name'
-        },
-        {
-          'data': 'parent',
-          'name': 'parent',
-          'orderable': false,
-          'searchable': false
         },
         {
           'data': 'attrs_list_count',
@@ -821,7 +883,7 @@
         var dataString = 'id=' + $(this).val();
         $.ajax({
           type: "get",
-          url: "{{ route('admin.ajax.getParentAttributeType') }}",
+          url: toPanelUrl("{{ route('admin.ajax.getParentAttributeType') }}"),
           data: dataString,
           datatype: 'JSON',
           success: function(attribute_type) {
@@ -1241,11 +1303,22 @@
 
       // Get the slug from field when not provided
       if (slug == '') {
-        slug = node.val();
+        slug = node.val() || '';
       }
 
       // Minimum 3 charecters required
-      if (slug.length >= 3) {
+      var $errorTarget = node.closest(".wc-permalink");
+      if (!($errorTarget && $errorTarget.length)) {
+        $errorTarget = node.closest(".form-group");
+      }
+
+      var $help = node.closest(".wc-permalink").find(".help-block").first();
+      if (!($help && $help.length)) {
+        // Best-effort: add a help block if the page doesn’t include one next to #slug.
+        $help = $('<div class="help-block with-errors"></div>').insertAfter(node);
+      }
+
+      if (slug && slug.length >= 3) {
         var route = "{{ Route::current()->getName() }}";
 
         if (route.match(/categorySubGroup/i)) {
@@ -1257,16 +1330,12 @@
         } else if (route.match(/category/i)) {
           var tbl = 'categories';
           var url = 'category/';
-        } else if (route.match(/product/i)) {
+        } else if (route.match(/product/i) || route.match(/inventory/i)) {
           var tbl = 'products';
-          var url = 'product/';
+          var url = 'shop/{{ optional(optional(Auth::user())->shop)->slug ?? "shop" }}/';
         } else if (route.match(/manufacturer/i)) {
           var tbl = 'manufacturers';
           var url = 'brand/';
-        } else if (route.match(/inventory/i)) {
-          var tbl = 'inventories';
-          var url = 'product/';
-          slug += '-' + '{{ Auth::user()->shop->slug }}';
         } else if (route.match(/page/i)) {
           var tbl = 'pages';
           var url = 'page/';
@@ -1284,25 +1353,35 @@
           var url = 'shop/';
         }
 
-        // Update the slug field if changed
+        var check = getFromPHPHelper('verifyUniqueSlug', [slug, tbl]);
+        result = JSON.parse(check);
+
+        if (result.original == 'false' && (tbl === 'products' || tbl === 'inventories') && !route.match(/edit/i) && !route.match(/update/i)) {
+          var baseSlug = slug.replace(/-\d+$/, '');
+          var n = 2;
+          while (result.original == 'false' && n < 200) {
+            slug = baseSlug + '-' + n;
+            check = getFromPHPHelper('verifyUniqueSlug', [slug, tbl]);
+            result = JSON.parse(check);
+            n++;
+          }
+          node.val(slug);
+        }
+
         if (slug != node.val()) {
           $('.slug').val(slug);
         }
 
-        var check = getFromPHPHelper('verifyUniqueSlug', [slug, tbl]);
-
-        result = JSON.parse(check);
-
         if (result.original == 'false') {
-          node.closest(".form-group").addClass('has-error');
+          $errorTarget.addClass('has-error');
           msg = "{{ trans('messages.this_slug_taken') }}";
         } else if (result.original == 'true') {
-          node.closest(".form-group").removeClass('has-error');
+          $errorTarget.removeClass('has-error');
           msg = "{{ Str::finish(config('app.url'), '/') }}" + url + slug;
         }
       }
 
-      node.next(".help-block").html(msg);
+      $help.html(msg);
       return;
     }
 
@@ -1819,29 +1898,7 @@
   }
 
   // Shipping and digital item show hide on form of product with inventory
-  if ($('input.requires_shipping').is(':checked') && $('input.downloadable').is(':not(:checked)')) {
-    $('#form_shipping_section').show()
-  } else {
-    $('#form_shipping_section').hide()
-  }
-
-  if ($('input.downloadable').is(':checked')) {
-    $('#downloadable_section').show();
-  } else {
-    $('#downloadable_section').hide();
-  }
-
-  $('input.downloadable').on('ifChanged', function() {
-    var downloadableChecked = $('input.downloadable').is(':checked');
-
-    if (downloadableChecked) {
-      $('#downloadable_section').show();
-    } else {
-      $('#downloadable_section').hide();
-    }
-  });
-
-  $('input.requires_shipping, input.downloadable').on('ifChanged', function() {
+  function syncCatalogRuleSections() {
     var requiresShippingChecked = $('input.requires_shipping').is(':checked');
     var downloadableChecked = $('input.downloadable').is(':checked');
 
@@ -1850,5 +1907,27 @@
     } else {
       $('#form_shipping_section').hide();
     }
+
+    if (downloadableChecked) {
+      $('#downloadable_section').show();
+    } else {
+      $('#downloadable_section').hide();
+    }
+  }
+
+  function syncCatalogRuleCards() {
+    $('.admin-catalog-rule').each(function () {
+      var $card = $(this);
+      var checked = $card.find('.admin-catalog-rule__input').is(':checked');
+      $card.toggleClass('is-active', checked);
+    });
+  }
+
+  syncCatalogRuleSections();
+  syncCatalogRuleCards();
+
+  $('input.requires_shipping, input.downloadable').on('ifChanged change', function () {
+    syncCatalogRuleSections();
+    syncCatalogRuleCards();
   });
 </script>

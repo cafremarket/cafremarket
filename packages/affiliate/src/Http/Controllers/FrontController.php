@@ -28,6 +28,6 @@ class FrontController extends Controller
 
     Session::put('affiliate_marketer_id', $affiliateLink->affiliate_id);
 
-    return redirect()->route('show.product', ['slug' => $affiliateLink->inventory->slug]);
+    return redirect()->to(storefront_product_url($affiliateLink->inventory));
   }
 }

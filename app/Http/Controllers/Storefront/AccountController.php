@@ -379,6 +379,10 @@ class AccountController extends Controller
      */
     public function create_address(Request $request)
     {
+        if (! $request->ajax() && ! $request->expectsJson()) {
+            return redirect()->route('account.addresses', ['create_address' => 1]);
+        }
+
         $countries = ListHelper::countries(); // Country list for ship_to dropdown
 
         $address_types = ListHelper::address_types();
@@ -415,6 +419,10 @@ class AccountController extends Controller
      */
     public function address_edit(Request $request, Address $address)
     {
+        if (! $request->ajax() && ! $request->expectsJson()) {
+            return redirect()->route('account.addresses', ['edit_address' => $address->id]);
+        }
+
         $countries = ListHelper::countries(); // Country list for ship_to dropdown
         $states = $address->state_id ? ListHelper::states($address->country_id) : [];
         $address_types = ListHelper::address_types();

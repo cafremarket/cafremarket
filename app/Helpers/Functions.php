@@ -4,6 +4,8 @@ use App\Helpers\ListHelper;
 use App\Models\Cancellation;
 use App\Models\Cart;
 use App\Models\Category;
+use App\Models\CategoryGroup;
+use App\Models\CategorySubGroup;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\DeliveryBoy;
@@ -426,6 +428,10 @@ if (! function_exists('get_shop_url')) {
     {
         if ($shop instanceof Shop) {
             return url('/shop/'.$shop->slug);
+        } elseif ($shop != '' && is_numeric($shop)) {
+            $model = Shop::select('id', 'slug')->find($shop);
+
+            return $model ? url('/shop/'.$model->slug) : url('/');
         } elseif ($shop != '' && is_string($shop)) {
             return url('/shop/'.$shop);
         }
@@ -436,6 +442,44 @@ if (! function_exists('get_shop_url')) {
         }
 
         return url('/');
+    }
+}
+
+if (! function_exists('get_category_url')) {
+    /**
+     * Public category URL — store-scoped when the category belongs to a shop.
+     */
+    function get_category_url($category, $shop = null): string
+    {
+        if (is_string($category)) {
+            return route('category.browse', $category);
+        }
+
+        $slug = $category->slug ?? null;
+        if (! $slug) {
+            return url('/');
+        }
+
+        $shopSlug = null;
+
+        if ($shop instanceof Shop) {
+            $shopSlug = $shop->slug;
+        } elseif (is_string($shop) && $shop !== '') {
+            $shopSlug = $shop;
+        } elseif (! empty($category->shop_id)) {
+            $shopSlug = optional(Shop::select('id', 'slug')->find($category->shop_id))->slug
+                ?? (Auth::guard('web')->check()
+                    && Auth::user()->isFromMerchant()
+                    && Auth::user()->shop
+                    ? Auth::user()->shop->slug
+                    : null);
+        }
+
+        if ($shopSlug && (! empty($category->shop_id) || $shop)) {
+            return route('shop.category.browse', ['slug' => $shopSlug, 'category' => $slug]);
+        }
+
+        return route('category.browse', $slug);
     }
 }
 
@@ -745,9 +789,255 @@ if (! function_exists('getAllowedMaxImgSize')) {
     }
 }
 
+if (! function_exists('storefront_panel_user')) {
+    /**
+     * Admin / merchant (web guard) session active while browsing the customer storefront.
+     */
+    function storefront_panel_user(): ?\App\Models\User
+    {
+        if (! Auth::guard('web')->check()) {
+            return null;
+        }
+
+        $user = Auth::guard('web')->user();
+
+        return $user instanceof \App\Models\User ? $user : null;
+    }
+}
+
+if (! function_exists('is_panel_user_on_storefront')) {
+    function is_panel_user_on_storefront(): bool
+    {
+        return storefront_panel_user() !== null;
+    }
+}
+
+if (! function_exists('panel_user_storefront_role_label')) {
+    function panel_user_storefront_role_label(): string
+    {
+        $user = storefront_panel_user();
+
+        if (! $user) {
+            return '';
+        }
+
+        if ($user->isFromMerchant()) {
+            return 'Store';
+        }
+
+        if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
+            return 'Admin';
+        }
+
+        if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
+            return 'Admin';
+        }
+
+        if ($user->isFromPlatform()) {
+            return 'Admin';
+        }
+
+        return 'Staff';
+    }
+}
+
+if (! function_exists('panel_user_storefront_message')) {
+    function panel_user_storefront_message(): string
+    {
+        $user = storefront_panel_user();
+
+        if (! $user) {
+            return '';
+        }
+
+        $role = panel_user_storefront_role_label();
+
+        // Prefer shop name for store sessions — never expose numeric IDs.
+        if ($user->isFromMerchant() && $user->shop) {
+            $name = $user->shop->name ?: (method_exists($user, 'getName') ? $user->getName() : null);
+        } else {
+            $name = method_exists($user, 'getName') ? $user->getName() : null;
+        }
+
+        $name = $name ?: ($user->nice_name ?? $user->name ?? $user->email ?? $role);
+
+        return trans('theme.notify.panel_user_logged_in', [
+            'role' => $role,
+            'name' => $name,
+        ]);
+    }
+}
+
+if (! function_exists('storefront_merchant_shop_url')) {
+    /**
+     * Storefront URL for the currently logged-in merchant's shop.
+     */
+    function storefront_merchant_shop_url(): ?string
+    {
+        $user = storefront_panel_user();
+
+        if (! $user || ! $user->isFromMerchant() || ! $user->shop || blank($user->shop->slug)) {
+            return null;
+        }
+
+        return get_shop_url($user->shop);
+    }
+}
+
+if (! function_exists('resolve_attribute_type_id')) {
+    /**
+     * Map attribute name to an internal attribute_type_id (UI no longer asks for type).
+     */
+    function resolve_attribute_type_id(?string $name, ?int $fallback = null): int
+    {
+        $name = strtolower(trim((string) $name));
+
+        if (str_contains($name, 'color') || str_contains($name, 'colour') || str_contains($name, 'pattern')) {
+            return \App\Models\Attribute::TYPE_COLOR;
+        }
+
+        if (in_array($name, ['gender', 'condition', 'format'], true)) {
+            return \App\Models\Attribute::TYPE_RADIO;
+        }
+
+        return $fallback ?: \App\Models\Attribute::TYPE_SELECT;
+    }
+}
+
+if (! function_exists('ensure_shop_attribute_presets')) {
+    /**
+     * Ensure useful preset attributes exist for a shop (Colour, Size, Material, ...).
+     */
+    function ensure_shop_attribute_presets(?int $shopId = null): void
+    {
+        $shopId = $shopId ?: (Auth::check() ? Auth::user()->merchantId() : null);
+        if (! $shopId) {
+            return;
+        }
+
+        // Types must exist (internal FK).
+        $types = [
+            1 => 'Color/Pattern',
+            2 => 'Radio',
+            3 => 'Select',
+        ];
+        foreach ($types as $id => $type) {
+            if (! \Illuminate\Support\Facades\DB::table('attribute_types')->where('id', $id)->exists()) {
+                \Illuminate\Support\Facades\DB::table('attribute_types')->insert([
+                    'id' => $id,
+                    'type' => $type,
+                ]);
+            }
+        }
+
+        $presets = [
+            'Colour' => [
+                'type' => \App\Models\Attribute::TYPE_COLOR,
+                'order' => 1,
+                'values' => [
+                    ['Black', '#000000'], ['White', '#ffffff'], ['Red', '#e53935'],
+                    ['Blue', '#1e88e5'], ['Green', '#43a047'], ['Yellow', '#fdd835'],
+                    ['Pink', '#ec407a'], ['Grey', '#9e9e9e'], ['Brown', '#6d4c41'], ['Orange', '#fb8c00'],
+                ],
+            ],
+            'Size' => [
+                'type' => \App\Models\Attribute::TYPE_SELECT,
+                'order' => 2,
+                'values' => [['XS'], ['S'], ['M'], ['L'], ['XL'], ['XXL'], ['3XL']],
+            ],
+            'Material' => [
+                'type' => \App\Models\Attribute::TYPE_SELECT,
+                'order' => 3,
+                'values' => [['Cotton'], ['Polyester'], ['Leather'], ['Wool'], ['Silk'], ['Denim'], ['Metal'], ['Plastic']],
+            ],
+            'Style' => [
+                'type' => \App\Models\Attribute::TYPE_SELECT,
+                'order' => 4,
+                'values' => [['Casual'], ['Formal'], ['Sport'], ['Classic'], ['Modern']],
+            ],
+            'Gender' => [
+                'type' => \App\Models\Attribute::TYPE_RADIO,
+                'order' => 5,
+                'values' => [['Men'], ['Women'], ['Unisex'], ['Kids']],
+            ],
+            'Storage' => [
+                'type' => \App\Models\Attribute::TYPE_SELECT,
+                'order' => 6,
+                'values' => [['32GB'], ['64GB'], ['128GB'], ['256GB'], ['512GB'], ['1TB']],
+            ],
+        ];
+
+        foreach ($presets as $name => $meta) {
+            $attribute = \App\Models\Attribute::withTrashed()
+                ->where('shop_id', $shopId)
+                ->where('name', $name)
+                ->first();
+
+            if (! $attribute) {
+                $attribute = \App\Models\Attribute::create([
+                    'shop_id' => $shopId,
+                    'name' => $name,
+                    'attribute_type_id' => $meta['type'],
+                    'order' => $meta['order'],
+                ]);
+            } elseif (method_exists($attribute, 'trashed') && $attribute->trashed()) {
+                $attribute->restore();
+            }
+
+            foreach ($meta['values'] as $i => $row) {
+                $value = $row[0];
+                $color = $row[1] ?? null;
+                $exists = \App\Models\AttributeValue::withTrashed()
+                    ->where('attribute_id', $attribute->id)
+                    ->where('value', $value)
+                    ->exists();
+                if ($exists) {
+                    continue;
+                }
+                \App\Models\AttributeValue::create([
+                    'shop_id' => $shopId,
+                    'attribute_id' => $attribute->id,
+                    'value' => $value,
+                    'color' => $color,
+                    'order' => $i + 1,
+                ]);
+            }
+        }
+    }
+}
+
+if (! function_exists('sync_product_category_attributes')) {
+    /**
+     * Attach selected attributes to the product's categories so variants can use them.
+     *
+     * @param  array<int>|null  $categoryIds
+     * @param  array<int>|null  $attributeIds
+     */
+    function sync_product_category_attributes(?array $categoryIds, ?array $attributeIds): void
+    {
+        if (empty($categoryIds) || empty($attributeIds)) {
+            return;
+        }
+
+        $attributeIds = array_values(array_unique(array_map('intval', $attributeIds)));
+
+        foreach ($categoryIds as $categoryId) {
+            $category = \App\Models\Category::find($categoryId);
+            if ($category) {
+                $category->attrsList()->syncWithoutDetaching($attributeIds);
+            }
+        }
+    }
+}
+
 if (! function_exists('allow_checkout')) {
     function allow_checkout()
     {
+        // Admin / Store panel sessions cannot place customer orders on the storefront.
+        if (is_panel_user_on_storefront()) {
+            return false;
+        }
+
         if (\App\Models\SystemConfig::CustomerNeedsApproval() && Auth::guard('customer')->user() instanceof Customer) {
             return Auth::guard('customer')->user()->isApproved();
         }
@@ -966,7 +1256,7 @@ if (! function_exists('pdf_compatible_local_image_path')) {
             try {
                 $imagick = new \Imagick($absolute);
                 $imagick->setImageFormat('png');
-                $pngPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'zcart_pdf_img_'.uniqid('', true).'.png';
+                $pngPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'cafremarket_pdf_img_'.uniqid('', true).'.png';
                 $imagick->writeImage($pngPath);
                 $imagick->clear();
                 $imagick->destroy();
@@ -1144,6 +1434,25 @@ if (! function_exists('shop_has_custom_logo')) {
     }
 }
 
+if (! function_exists('system_has_custom_logo')) {
+    function system_has_custom_logo(): bool
+    {
+        $system = System::orderBy('id', 'asc')->first();
+        $path = optional($system?->logoImage)->path;
+
+        return filled($path) && \Illuminate\Support\Facades\Storage::exists($path);
+    }
+}
+
+if (! function_exists('get_platform_brand_label')) {
+    function get_platform_brand_label(): string
+    {
+        $name = trim((string) (config('system_settings.name') ?? config('app.name') ?? ''));
+
+        return $name !== '' ? $name : 'cafremarket';
+    }
+}
+
 if (! function_exists('get_logo_url')) {
     function get_logo_url($model, $size = 'small')
     {
@@ -1218,7 +1527,13 @@ if (! function_exists('verifyUniqueSlug')) {
             $query->whereNull('deleted_at');
         }
 
-        if ($query->first()) {
+        $taken = (bool) $query->first();
+
+        if (! $taken && in_array($table, ['products', 'inventories'], true)) {
+            $taken = listing_slug_is_taken($slug);
+        }
+
+        if ($taken) {
             return $json ? response()->json('false') : false;
         }
 
@@ -1250,6 +1565,134 @@ if (! function_exists('generate_unique_shop_slug')) {
             $slug = $base.'-'.$counter;
             $counter++;
         }
+    }
+}
+
+if (! function_exists('listing_slug_is_taken')) {
+    /**
+     * Product and inventory slugs share the same public URL namespace.
+     */
+    function listing_slug_is_taken(string $slug, ?int $exceptProductId = null, ?int $exceptInventoryId = null): bool
+    {
+        $products = DB::table('products')->where('slug', $slug);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('products', 'deleted_at')) {
+            $products->whereNull('deleted_at');
+        }
+        if ($exceptProductId) {
+            $products->where('id', '!=', $exceptProductId);
+        }
+        if ($products->exists()) {
+            return true;
+        }
+
+        $inventories = DB::table('inventories')->where('slug', $slug);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('inventories', 'deleted_at')) {
+            $inventories->whereNull('deleted_at');
+        }
+        if ($exceptInventoryId) {
+            $inventories->where('id', '!=', $exceptInventoryId);
+        }
+
+        return $inventories->exists();
+    }
+}
+
+if (! function_exists('generate_unique_listing_slug')) {
+    /**
+     * Unique catalog slug. On collision append -2, -3, … so the product can still be saved.
+     */
+    function generate_unique_listing_slug(string $desired, ?int $exceptProductId = null, ?int $exceptInventoryId = null): string
+    {
+        $base = Str::slug($desired) ?: 'product';
+        $reserved = ['products', 'reviews', 'category', 'product', 'offers', 'quickView'];
+        if (in_array($base, $reserved, true)) {
+            $base .= '-item';
+        }
+
+        $slug = $base;
+        $counter = 2;
+
+        while (listing_slug_is_taken($slug, $exceptProductId, $exceptInventoryId)) {
+            $slug = $base.'-'.$counter;
+            $counter++;
+
+            if ($counter > 500) {
+                $slug = $base.'-'.Str::lower(Str::random(5));
+                break;
+            }
+        }
+
+        return $slug;
+    }
+}
+
+if (! function_exists('storefront_shop_slug')) {
+    function storefront_shop_slug($item): ?string
+    {
+        if (is_object($item) && isset($item->shop) && $item->shop) {
+            return $item->shop->slug;
+        }
+
+        $shopId = is_object($item) ? ($item->shop_id ?? optional($item->product)->shop_id) : null;
+        if (! $shopId) {
+            return null;
+        }
+
+        static $slugs = [];
+        if (! array_key_exists($shopId, $slugs)) {
+            $slugs[$shopId] = DB::table('shops')->where('id', $shopId)->value('slug');
+        }
+
+        return $slugs[$shopId];
+    }
+}
+
+if (! function_exists('storefront_product_url')) {
+    /**
+     * Public product URL: /shop/{store-slug}/{product-slug}
+     */
+    function storefront_product_url($item, string $suffix = ''): string
+    {
+        if (is_string($item)) {
+            $found = \App\Models\Inventory::query()->where('slug', $item)->first(['id', 'slug', 'shop_id']);
+            if ($found) {
+                return storefront_product_url($found, $suffix);
+            }
+
+            return url('product/'.$item.$suffix);
+        }
+
+        $shopSlug = storefront_shop_slug($item);
+        $productSlug = $item->slug ?? '';
+
+        if (! $shopSlug || $productSlug === '') {
+            return url('product/'.$productSlug.$suffix);
+        }
+
+        return url('shop/'.$shopSlug.'/'.$productSlug.$suffix);
+    }
+}
+
+if (! function_exists('storefront_product_quickview_url')) {
+    function storefront_product_quickview_url($item): string
+    {
+        return storefront_product_url($item, '/quickView');
+    }
+}
+
+if (! function_exists('storefront_product_offers_url')) {
+    function storefront_product_offers_url($item): string
+    {
+        $shopSlug = storefront_shop_slug($item);
+        $productSlug = is_object($item)
+            ? (optional($item->product)->slug ?? $item->slug)
+            : $item;
+
+        if (! $shopSlug || ! $productSlug) {
+            return url('product/'.$productSlug.'/offers');
+        }
+
+        return url('shop/'.$shopSlug.'/'.$productSlug.'/offers');
     }
 }
 
@@ -2995,11 +3438,11 @@ if (! function_exists('is_stripe_configured')) {
 
 if (! function_exists('get_chat_room_name')) {
     /**
-     * Return zcart chat_room_name
+     * Return marketplace chat room name
      */
     function get_chat_room_name($room = '')
     {
-        return "zcart-chat{$room}";
+        return "cafremarket-chat{$room}";
     }
 }
 
@@ -3873,5 +4316,50 @@ if (! function_exists('shop_ships_to_country')) {
         }
 
         return false;
+    }
+}
+
+if (! function_exists('ensure_default_category_sub_group_id')) {
+    /**
+     * Categories still require a category_sub_group_id FK.
+     * Sub-group UI was removed, so ensure a shared default exists and return its id.
+     */
+    function ensure_default_category_sub_group_id(): int
+    {
+        $group = CategoryGroup::withTrashed()->firstOrCreate(
+            ['slug' => 'general'],
+            [
+                'name' => 'General',
+                'description' => 'Default category group',
+                'active' => 1,
+                'order' => 100,
+            ]
+        );
+
+        if (method_exists($group, 'trashed') && $group->trashed()) {
+            $group->restore();
+        }
+
+        $subGroup = CategorySubGroup::withTrashed()->firstOrCreate(
+            ['slug' => 'general'],
+            [
+                'name' => 'General',
+                'category_group_id' => $group->id,
+                'description' => 'Default category sub group',
+                'active' => 1,
+                'order' => 100,
+            ]
+        );
+
+        if (method_exists($subGroup, 'trashed') && $subGroup->trashed()) {
+            $subGroup->restore();
+        }
+
+        if ((int) $subGroup->category_group_id !== (int) $group->id) {
+            $subGroup->category_group_id = $group->id;
+            $subGroup->save();
+        }
+
+        return (int) $subGroup->id;
     }
 }

@@ -54,7 +54,7 @@ class MerchantVerifyRequest extends Request
                 $validator->errors()->add('person_documents', trans('messages.verification_person_documents_required'));
             }
 
-            if ($config && ! $config->hasStoreVerificationDocuments()) {
+            if ($config && $config->requiresStoreVerificationDocuments() && ! $config->hasStoreVerificationDocuments()) {
                 $validator->errors()->add('store_documents', trans('messages.verification_store_documents_required'));
             }
 

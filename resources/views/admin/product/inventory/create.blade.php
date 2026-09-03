@@ -1,7 +1,11 @@
 @extends('admin.layouts.master')
 
+@section('page_title')
+  {{ trans('app.add_product') }}
+@endsection
+
 @section('content')
-  {!! Form::open(['route' => 'admin.stock.product.store', 'files' => true, 'id' => 'form-ajax-upload', 'data-toggle' => 'validator']) !!}
+  {!! Form::open(['url' => mp_route('admin.stock.product.store'), 'files' => true, 'id' => 'form-ajax-upload', 'data-toggle' => 'validator']) !!}
 
   @include('admin.product.inventory._form')
 

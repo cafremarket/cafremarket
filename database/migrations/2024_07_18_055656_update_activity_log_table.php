@@ -18,11 +18,13 @@ class UpdateActivityLogTable extends Migration
 
     public function up()
     {
-        Schema::connection($this->connection)->table($this->table, function (Blueprint $table) {
-            if (! Schema::hasColumn($this->table, 'event')) {
+        $schema = Schema::connection($this->connection);
+
+        $schema->table($this->table, function (Blueprint $table) use ($schema) {
+            if (! $schema->hasColumn($this->table, 'event')) {
                 $table->string('event')->nullable()->after('subject_type');
             }
-            if (! Schema::hasColumn($this->table, 'batch_uuid')) {
+            if (! $schema->hasColumn($this->table, 'batch_uuid')) {
                 $table->uuid('batch_uuid')->nullable()->after('properties');
             }
         });
@@ -30,12 +32,14 @@ class UpdateActivityLogTable extends Migration
 
     public function down()
     {
-        Schema::connection($this->connection)->table($this->table, function (Blueprint $table) {
-            if (Schema::hasColumn($this->table, 'batch_uuid')) {
+        $schema = Schema::connection($this->connection);
+
+        $schema->table($this->table, function (Blueprint $table) use ($schema) {
+            if ($schema->hasColumn($this->table, 'batch_uuid')) {
                 $table->dropColumn('batch_uuid');
             }
 
-            if (Schema::hasColumn($this->table, 'event')) {
+            if ($schema->hasColumn($this->table, 'event')) {
                 $table->dropColumn('event');
             }
         });

@@ -22,6 +22,12 @@
         <div class="box-body">
           <h3 class="admin-verify__onboarding-title">{{ trans('messages.seller_onboarding_title') }}</h3>
           <p class="text-muted">{{ trans('messages.seller_onboarding_subtitle') }}</p>
+          <p>
+            <span class="label label-default">{{ $config->shop->sellerTypeLabel() }}</span>
+            @if ($config->shop->nuit)
+              <span class="label label-info">{{ trans('app.nuit') }}: {{ $config->shop->nuit }}</span>
+            @endif
+          </p>
 
           <ol class="admin-verify__steps list-unstyled">
             <li class="admin-verify__step {{ $stepRegister ? 'is-done' : '' }}">
@@ -129,8 +135,13 @@
           'title' => trans('app.upload_documents'),
           'icon' => 'fa-upload',
         ])
-          <p>{!! trans('messages.what_the_verification_documents_need') !!}</p>
-          <p class="text-muted small">{!! trans('messages.verification_documents') !!}</p>
+          @if ($config->shop->requiresBusinessDocuments())
+            <p>{!! trans('messages.what_the_verification_documents_need') !!}</p>
+            <p class="text-muted small">{!! trans('messages.verification_documents') !!}</p>
+          @else
+            <p>{!! trans('messages.verification_person_documents') !!}</p>
+            <p class="text-muted small">{{ trans('messages.verification_individual_no_business_docs') }}</p>
+          @endif
 
           @if (count($config->attachments))
             <ul class="list-group admin-verify__files mb-3">
@@ -182,6 +193,12 @@
         'bodyClass' => 'admin-order-sidebar-panel',
       ])
         <ul class="list-unstyled admin-verify__checklist">
+          <li>
+            <i class="fa fa-id-card-o"></i> {{ $config->shop->sellerTypeLabel() }}
+            @if ($config->shop->nuit)
+              <small class="text-muted">({{ trans('app.nuit') }}: {{ $config->shop->nuit }})</small>
+            @endif
+          </li>
           <li class="{{ $config->shop->id_verified ? 'text-success' : 'text-muted' }}">
             <i class="fa fa-{{ $config->shop->id_verified ? 'check' : 'times' }}-circle-o"></i> {{ trans('app.id_verified') }}
           </li>

@@ -37,6 +37,7 @@ class Category extends BaseModel
      * @var array
      */
     protected $fillable = [
+        'shop_id',
         'name',
         'category_sub_group_id',
         'slug',
@@ -154,6 +155,22 @@ class Category extends BaseModel
     public function scopeFeatured($query)
     {
         return $query->where('featured', 1);
+    }
+
+    /**
+     * Categories available to the current merchant (own + platform).
+     */
+    public function scopeForMerchantCatalog($query, ?int $shopId = null)
+    {
+        $shopId = $shopId ?: optional(auth()->user())->merchantId();
+
+        return $query->where(function ($q) use ($shopId) {
+            $q->whereNull('shop_id');
+
+            if ($shopId) {
+                $q->orWhere('shop_id', $shopId);
+            }
+        });
     }
 
     /**

@@ -72,8 +72,7 @@ class ShopController extends Controller
             ])
             ->withCount([
                 'inventories' => function ($q) {
-                    $q->where('active', 1)
-                        ->where('available_from', '<=', now());
+                    $q->where('active', 1);
                 },
             ])
             // Keep shops page inclusive: show approved sellers even if they
@@ -105,8 +104,7 @@ class ShopController extends Controller
         $shop = Shop::where('slug', $slug)->approved()
             ->withCount([
                 'inventories' => function ($q) {
-                    $q->where('active', 1)
-                        ->where('available_from', '<=', now());
+                    $q->where('active', 1);
                 },
             ])
             ->firstOrFail();
@@ -126,8 +124,7 @@ class ShopController extends Controller
         // Deal of the day;
         $deal_of_the_day = get_deal_of_the_day($shop->id);
 
-        // Get featured items
-        $featured_items = get_featured_items($shop->id);
+        $featured_items = null;
 
         // Top Selling Items
         $top_items = ListHelper::top_selling_shop_items($shop, 10);
@@ -164,8 +161,7 @@ class ShopController extends Controller
         $now = Carbon::now();
         $shop = Shop::where('slug', $slug)->approved()->withCount([
             'inventories' => function ($q) {
-                $q->where('active', 1)
-                    ->where('available_from', '<=', now());
+                $q->where('active', 1);
             },
         ])->firstOrFail();
 
@@ -175,7 +171,6 @@ class ShopController extends Controller
         }
 
         $all_products = Inventory::where('shop_id', $shop->id)
-            ->groupBy('product_id')
             ->with([
                 'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                 'image:path,imageable_id,imageable_type',
@@ -183,8 +178,7 @@ class ShopController extends Controller
             ->withCount(['orders' => function (\Illuminate\Database\Eloquent\Builder $q) use ($now) {
                 $q->where('order_items.created_at', '>=', $now->subHours(config('system.popular.hot_item.period', 24)));
             }])
-            ->where('active', 1)
-            ->where('available_from', '<=', now());
+            ->where('active', 1);
 
         $forPriceRange = $all_products->get();
         $min = floor($forPriceRange->min('sale_price'));
@@ -211,32 +205,63 @@ class ShopController extends Controller
         $products = $all_products->paginate(16); // PLS 15 -> 16 products per page (4 rows by 4 products)
 
         return view('theme::shop', compact('shop', 'products', 'priceRange'));
-        // return view('theme::shop', compact('shop', 'products', 'priceRange', 'hasOffers', 'hasFreeShipping', 'newArrivals', 'productConditions'));
+    }
 
-        // $shop = Shop::where('slug', $slug)->active()->withCount([
-        //   'inventories' => function ($q) {
-        //     $q->available();
-        //   },
-        // ])->firstOrFail();
+    /**
+     * Browse a store-scoped category within a shop.
+     *
+     * @param  string  $slug  shop slug
+     * @param  string  $category  category slug
+     * @return \Illuminate\Http\Response|\Illuminate\Contracts\View\View
+     */
+    public function category(BrowseProductRequest $request, $slug, $category)
+    {
+        $shop = Shop::where('slug', $slug)->approved()->withCount([
+            'inventories' => function ($q) {
+                $q->where('active', 1);
+            },
+        ])->firstOrFail();
 
-        // // Check shop maintenance_mode
-        // if ($shop->isDown()) {
-        //   return response()->view('theme::errors.503', [], 503);
-        // }
+        if ($shop->isDown()) {
+            return response()->view('theme::errors.503', [], 503);
+        }
 
-        // $products = Inventory::where('shop_id', $shop->id)
-        //   ->groupBy('product_id')
-        //   ->filter($request->all())
-        //   ->with([
-        //     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-        //     'images:path,imageable_id,imageable_type',
-        //   ])
-        //   ->withCount(['orders' => function ($q) {
-        //     $q->where('order_items.created_at', '>=', Carbon::now()->subHours(config('system.popular.hot_item.period', 24)));
-        //   }])
-        //   ->available()->inRandomOrder()->paginate(15);
+        $categoryModel = \App\Models\Category::where('slug', $category)
+            ->where(function ($q) use ($shop) {
+                $q->where('shop_id', $shop->id)->orWhereNull('shop_id');
+            })
+            ->with([
+                'attrsList' => function ($q) {
+                    $q->with('attributeValues');
+                },
+            ])
+            ->active()
+            ->firstOrFail();
 
-        // return view('theme::shop', compact('shop', 'products'));
+        $listingsBase = $categoryModel->listings()
+            ->where('inventories.active', 1)
+            ->where('inventories.shop_id', $shop->id);
+
+        $minRaw = (clone $listingsBase)->min('inventories.sale_price');
+        $maxRaw = (clone $listingsBase)->max('inventories.sale_price');
+        $priceRange = [
+            'min' => floor((float) ($minRaw ?? 0)),
+            'max' => ceil((float) ($maxRaw ?? 0)),
+        ];
+
+        $products = $listingsBase
+            ->with([
+                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'shop:id,slug,name,id_verified,phone_verified,address_verified',
+                'image:path,imageable_id,imageable_type',
+            ])
+            ->filter($request->all())
+            ->paginate(config('system.view_listing_per_page', 16))
+            ->appends($request->except('page'));
+
+        $category = $categoryModel;
+
+        return view('theme::category', compact('shop', 'category', 'products', 'priceRange'));
     }
 
     /**
@@ -249,8 +274,7 @@ class ShopController extends Controller
     {
         $shop = Shop::where('slug', $slug)->approved()->withCount([
             'inventories' => function ($q) {
-                $q->where('active', 1)
-                    ->where('available_from', '<=', now());
+                $q->where('active', 1);
             },
         ])->firstOrFail();
 

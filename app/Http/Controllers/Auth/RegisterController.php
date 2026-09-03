@@ -14,8 +14,10 @@ use App\Models\User;
 use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
 use App\Notifications\SuperAdmin\VendorRegistered as VendorRegisteredNotification;
 use App\Providers\RouteServiceProvider;
+use App\Services\Auth\JwtAuthService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -130,8 +132,6 @@ class RegisterController extends Controller
 
             CreateShopForMerchant::dispatch($merchant, $request->all());
 
-            Auth::guard()->login($merchant);
-
             // Create subscription when enabled
             if (is_subscription_enabled()) {
                 SubscribeShopToNewPlan::dispatch($merchant, $request->input('plan'));
@@ -151,6 +151,8 @@ class RegisterController extends Controller
         // Everything is fine. Now commit the transaction
         DB::commit();
 
+        $this->loginMerchant($request, $merchant);
+
         // Trigger after registration events
         $this->triggerAfterEvents($merchant);
 
@@ -160,7 +162,32 @@ class RegisterController extends Controller
             safe_notify($system->superAdmin(), new VendorRegisteredNotification($merchant), 'vendor registered');
         }
 
-        return $this->registered($request, $merchant) ?? redirect($this->redirectPath());
+        return $this->registered($request, $merchant) ?? $this->withAuthCookie(redirect($this->redirectPath()), $merchant);
+    }
+
+    /**
+     * Log the new merchant in and align session + JWT cookies (prevents CSRF / Page Expired
+     * on the next store-panel requests after registration).
+     */
+    protected function loginMerchant(Request $request, User $merchant): void
+    {
+        Auth::guard('web')->login($merchant);
+
+        // SessionGuard::login already migrates the session; only mark confirmation time.
+        if ($request->hasSession()) {
+            $request->session()->put('auth.password_confirmed_at', time());
+        }
+    }
+
+    /**
+     * Attach JWT auth cookie after a successful registration redirect.
+     */
+    protected function withAuthCookie($response, User $merchant)
+    {
+        $jwt = app(JwtAuthService::class)->issue($merchant, 'web');
+        $cookie = app(JwtAuthService::class)->makeCookie('web', $jwt, false);
+
+        return $response->withCookie($cookie);
     }
 
     /**
@@ -271,9 +298,13 @@ class RegisterController extends Controller
     protected function registered($request, $user)
     {
         if ($user->isFromMerchant() && $user->shop) {
-            return redirect()
+            $response = redirect()
                 ->route('merchant.verify')
                 ->with('success', trans('messages.seller_registration_complete_verify_store'));
+
+            return $this->withAuthCookie($response, $user);
         }
+
+        return $this->withAuthCookie(redirect($this->redirectPath()), $user);
     }
 }

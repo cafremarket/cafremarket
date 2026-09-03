@@ -1,7 +1,7 @@
 @foreach ($products as $item)
   <div class="items-slider box border-animate">
     <div class="box-inner">
-      <a href="{{ route('show.product', $item->slug) }}">
+      <a href="{{ storefront_product_url($item) }}">
         <div class="recent-items-img box-img">
           <img class="lazy" src="/images/square.webp" data-src="{{ get_inventory_img_src($item, 'medium') }}" data-name="product_image" alt="{{ $item->title }}" title="{{ $item->title }}">
         </div>
@@ -9,7 +9,7 @@
 
       @if (empty($title))
         <div class="box-title">
-          <a href="{{ route('show.product', $item->slug) }}">
+          <a href="{{ storefront_product_url($item) }}">
             {{ $item->title }}
           </a>
         </div>

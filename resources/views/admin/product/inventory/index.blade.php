@@ -6,29 +6,37 @@
 
 @section('content')
   @can('create', \App\Models\Product::class)
-    @include('admin.partials.ui.card_start', [
-      'title' => trans('app.add_inventory'),
-      'icon' => 'fa-plus',
-      'bodyClass' => '',
-      'class' => 'admin-card--collapsible collapsed-box',
-    ])
-      @if (Auth::user()->shop->canAddMoreInventory())
-        <div class="form-group">
-          <div class="input-group input-group-lg">
-            <span class="input-group-addon"><i class="fa fa-search text-muted"></i></span>
-            {!! Form::text('searchProduct', null, ['id' => 'searchProduct', 'class' => 'form-control', 'placeholder' => trans('app.placeholder.search_product')]) !!}
-          </div>
-        </div>
-        <div id="productFounds"></div>
-      @else
+    @if (Auth::user()->isFromMerchant())
+      {{-- Combined Product + Inventory: direct Add Product button --}}
+      @unless (Auth::user()->shop && Auth::user()->shop->canAddMoreInventory())
         @include('admin.partials._max_inventory_limit_notice')
-      @endif
-    @include('admin.partials.ui.card_end')
+      @endunless
+    @else
+      @include('admin.partials.ui.card_start', [
+        'title' => trans('app.add_inventory'),
+        'icon' => 'fa-plus',
+        'bodyClass' => '',
+        'class' => 'admin-card--collapsible collapsed-box',
+      ])
+        @if (Auth::user()->shop->canAddMoreInventory())
+          <div class="form-group">
+            <div class="input-group input-group-lg">
+              <span class="input-group-addon"><i class="fa fa-search text-muted"></i></span>
+              {!! Form::text('searchProduct', null, ['id' => 'searchProduct', 'class' => 'form-control', 'placeholder' => trans('app.placeholder.search_product')]) !!}
+            </div>
+          </div>
+          <div id="productFounds"></div>
+        @else
+          @include('admin.partials._max_inventory_limit_notice')
+        @endif
+      @include('admin.partials.ui.card_end')
+    @endif
   @endcan
 
   @include('admin.partials.ui.card_tabbed_start', [
     'title' => trans('app.products'),
     'icon' => 'fa-cube',
+    'actions' => view('admin.product.inventory._header_actions')->render(),
   ])
 
     <ul class="nav nav-tabs nav-justified admin-tabs">

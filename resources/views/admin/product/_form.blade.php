@@ -18,13 +18,32 @@
   </div>
 @else
   <div class="row">
+    <div class="col-md-12">
+      <ul class="nav nav-tabs nav-justified admin-tabs product-form-tabs" style="margin-bottom: 15px;">
+        <li class="active">
+          <a href="#catalog_basic_tab" data-toggle="tab">
+            <i class="fa fa-cube"></i> {{ trans('app.tab_basic_info') }}
+          </a>
+        </li>
+        <li>
+          <a href="#catalog_attributes_tab" data-toggle="tab">
+            <i class="fa fa-tags"></i> {{ trans('app.tab_attributes_variants') }}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="catalog_basic_tab">
+  <div class="row">
     <div class="col-md-8">
       @include('admin.partials.ui.card_start', [
         'title' => isset($product) ? trans('app.update_product') : trans('app.add_product'),
         'icon' => 'fa-cube',
         'class' => 'admin-form-section',
         'bodyClass' => '',
-        'actions' => !isset($product) ? '<a href="javascript:void(0)" data-link="' . route('admin.catalog.product.upload') . '" class="ajax-modal-btn btn btn-default btn-flat btn-sm">' . e(trans('app.bulk_import')) . '</a>' : null,
+        'actions' => !isset($product) ? '<a href="javascript:void(0)" data-link="' . mp_route('admin.catalog.product.upload') . '" class="ajax-modal-btn btn btn-default btn-flat btn-sm">' . e(trans('app.bulk_import')) . '</a>' : null,
       ])
           <div class="row">
             <div class="col-md-9 nopadding-right">
@@ -113,56 +132,67 @@
             {!! Form::label('category_list[]', trans('app.form.categories') . '*') !!}
             {!! Form::select('category_list[]', $categories, null, ['class' => 'form-control select2-normal', 'multiple' => 'multiple', 'required']) !!}
             <div class="help-block with-errors"></div>
+            <div class="help-block text-muted">
+              <i class="fa fa-tags"></i> {{ trans('help.attributes_on_next_tab') }}
+            </div>
           </div>
 
-          <fieldset>
+          <fieldset class="admin-catalog-rules">
             <legend>{{ trans('app.catalog_rules') }}</legend>
 
-            <div class="form-group">
-              <div class="input-group">
+            <div class="admin-catalog-rules__list">
+              <label class="admin-catalog-rule">
                 {{ Form::hidden('requires_shipping', 0) }}
-                {!! Form::checkbox('requires_shipping', null, !isset($product) ? 1 : null, ['id' => 'requires_shipping', 'class' => 'icheckbox_line']) !!}
-                {!! Form::label('requires_shipping', trans('app.form.requires_shipping')) !!}
-                <span class="input-group-addon" id="basic-addon1">
-                  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.requires_shipping') }}"></i>
+                {!! Form::checkbox('requires_shipping', 1, !isset($product) ? 1 : null, [
+                  'id' => 'requires_shipping',
+                  'class' => 'admin-catalog-rule__input requires_shipping',
+                ]) !!}
+                <span class="admin-catalog-rule__icon admin-catalog-rule__icon--shipping" aria-hidden="true">
+                  <i class="fa fa-truck"></i>
                 </span>
-              </div>
-            </div>
+                <span class="admin-catalog-rule__meta">
+                  <span class="admin-catalog-rule__title">{{ trans('app.form.requires_shipping') }}</span>
+                  <span class="admin-catalog-rule__desc">{{ trans('help.requires_shipping') }}</span>
+                </span>
+                <span class="admin-catalog-rule__switch" aria-hidden="true"></span>
+              </label>
 
-            <div class="form-group">
-              <div class="input-group">
+              <label class="admin-catalog-rule">
                 {{ Form::hidden('downloadable', 0) }}
-                {!! Form::checkbox('downloadable', null, null, ['class' => 'icheckbox_line']) !!}
-                {!! Form::label('downloadable', trans('app.form.downloadable')) !!}
-                <span class="input-group-addon" id="basic-addon1">
-                  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.downloadable') }}"></i>
+                {!! Form::checkbox('downloadable', 1, null, [
+                  'id' => 'downloadable',
+                  'class' => 'admin-catalog-rule__input downloadable',
+                ]) !!}
+                <span class="admin-catalog-rule__icon admin-catalog-rule__icon--digital" aria-hidden="true">
+                  <i class="fa fa-cloud-download"></i>
                 </span>
-              </div>
+                <span class="admin-catalog-rule__meta">
+                  <span class="admin-catalog-rule__title">{{ trans('app.form.downloadable') }}</span>
+                  <span class="admin-catalog-rule__desc">{{ trans('help.downloadable') }}</span>
+                </span>
+                <span class="admin-catalog-rule__switch" aria-hidden="true"></span>
+              </label>
             </div>
 
             @if (auth()->user()->isFromplatform())
-              <div class="row">
-                <div class="col-md-6 nopadding-right">
-                  <div class="form-group">
-                    {!! Form::label('min_price', trans('app.form.catalog_min_price'), ['class' => 'with-help']) !!}
-                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.catalog_min_price') }}"></i>
-                    <div class="input-group">
-                      <span class="input-group-addon">{{ get_currency_symbol() }}</span>
-                      {!! Form::number('min_price', null, ['class' => 'form-control', 'step' => 'any', 'min' => '0', 'placeholder' => trans('app.placeholder.catalog_min_price')]) !!}
-                    </div>
-                    <div class="help-block with-errors"></div>
+              <div class="admin-catalog-rules__prices">
+                <div class="form-group">
+                  {!! Form::label('min_price', trans('app.form.catalog_min_price'), ['class' => 'with-help']) !!}
+                  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.catalog_min_price') }}"></i>
+                  <div class="input-group">
+                    <span class="input-group-addon">{{ get_currency_symbol() }}</span>
+                    {!! Form::number('min_price', null, ['class' => 'form-control', 'step' => 'any', 'min' => '0', 'placeholder' => trans('app.placeholder.catalog_min_price')]) !!}
                   </div>
+                  <div class="help-block with-errors"></div>
                 </div>
-                <div class="col-md-6 nopadding-left">
-                  <div class="form-group">
-                    {!! Form::label('max_price', trans('app.form.catalog_max_price'), ['class' => 'with-help']) !!}
-                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.catalog_max_price') }}"></i>
-                    <div class="input-group">
-                      <span class="input-group-addon">{{ get_currency_symbol() }}</span>
-                      {!! Form::number('max_price', null, ['class' => 'form-control', 'step' => 'any', 'min' => '0', 'placeholder' => trans('app.placeholder.catalog_max_price')]) !!}
-                    </div>
-                    <div class="help-block with-errors"></div>
+                <div class="form-group">
+                  {!! Form::label('max_price', trans('app.form.catalog_max_price'), ['class' => 'with-help']) !!}
+                  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.catalog_max_price') }}"></i>
+                  <div class="input-group">
+                    <span class="input-group-addon">{{ get_currency_symbol() }}</span>
+                    {!! Form::number('max_price', null, ['class' => 'form-control', 'step' => 'any', 'min' => '0', 'placeholder' => trans('app.placeholder.catalog_max_price')]) !!}
                   </div>
+                  <div class="help-block with-errors"></div>
                 </div>
               </div>
             @endif
@@ -239,4 +269,25 @@
       @include('admin.partials.ui.card_end')
     </div>
   </div>
+    </div>{{-- /#catalog_basic_tab --}}
+
+    <div class="tab-pane" id="catalog_attributes_tab">
+      <div class="row">
+        <div class="col-md-12">
+          @include('admin.partials.ui.card_start', [
+            'title' => trans('app.tab_attributes_variants'),
+            'icon' => 'fa-tags',
+            'class' => 'admin-form-section',
+            'bodyClass' => '',
+          ])
+            @include('admin.product._attributes_tab')
+
+            <div class="box-tools pull-right admin-card__actions">
+              {!! Form::submit(isset($product) ? trans('app.form.update') : trans('app.form.save'), ['class' => 'btn btn-flat btn-lg btn-primary']) !!}
+            </div>
+          @include('admin.partials.ui.card_end')
+        </div>
+      </div>
+    </div>{{-- /#catalog_attributes_tab --}}
+  </div>{{-- /.tab-content --}}
 @endif

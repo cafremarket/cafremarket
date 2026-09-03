@@ -85,11 +85,84 @@
     window.switchAuthModal = switchAuthModal;
     window.openAddressSetupModal = openAddressSetupModal;
 
+    var loginDefaultError = @json(trans('auth.failed'));
+    var loginSubmitLabel = @json(trans('theme.button.login'));
+
+    function hideLoginModalError() {
+      var $alert = $('#loginModalError');
+      $alert.addClass('d-none').find('.sf-login-modal-alert__text').text('');
+      $('#loginForm-1 .is-invalid').removeClass('is-invalid');
+    }
+
+    function showLoginModalError(message) {
+      var $alert = $('#loginModalError');
+      $alert.find('.sf-login-modal-alert__text').text(message || loginDefaultError);
+      $alert.removeClass('d-none');
+      $('#loginForm-1 .form-control').addClass('is-invalid');
+    }
+
+    function extractLoginErrorMessage(xhr) {
+      var payload = xhr.responseJSON;
+
+      if (!payload) {
+        return loginDefaultError;
+      }
+
+      if (payload.message) {
+        return payload.message;
+      }
+
+      if (payload.errors) {
+        var firstKey = Object.keys(payload.errors)[0];
+        if (firstKey && payload.errors[firstKey] && payload.errors[firstKey][0]) {
+          return payload.errors[firstKey][0];
+        }
+      }
+
+      return loginDefaultError;
+    }
+
+    $(document).on('submit', '#loginForm-1', function(e) {
+      e.preventDefault();
+
+      var $form = $(this);
+      var $btn = $form.find('.js-login-submit');
+      var csrf = $('meta[name="csrf-token"]').attr('content');
+
+      hideLoginModalError();
+
+      if (!$form[0].checkValidity()) {
+        $form[0].reportValidity();
+        return;
+      }
+
+      $btn.prop('disabled', true).addClass('is-loading');
+
+      $.ajax({
+        url: $form.attr('action'),
+        method: 'POST',
+        data: $form.serialize(),
+        headers: {
+          'X-CSRF-TOKEN': csrf,
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      }).done(function(res) {
+        window.location.href = (res && res.redirect) ? res.redirect : window.location.href;
+      }).fail(function(xhr) {
+        showLoginModalError(extractLoginErrorMessage(xhr));
+        $form.find('#password').val('').trigger('focus');
+      }).always(function() {
+        $btn.prop('disabled', false).removeClass('is-loading');
+      });
+    });
+
     $(function() {
+      var isPanelUser = {{ is_panel_user_on_storefront() ? 'true' : 'false' }};
       var isGuest = {{ Auth::guard('customer')->check() ? 'false' : 'true' }};
       var hasLocation = {{ buyer_has_location() ? 'true' : 'false' }};
       var needsAddress = {{ customer_needs_delivery_address() ? 'true' : 'false' }};
-      var forceLogin = {{ (request()->boolean('login') || ($errors->any() && ! Auth::guard('customer')->check())) ? 'true' : 'false' }};
+      var forceLogin = {{ (request()->boolean('login') || ($errors->any() && ! Auth::guard('customer')->check() && ! is_panel_user_on_storefront())) ? 'true' : 'false' }};
 
       if (!$('.modal.in').length) {
         cleanupModalOverlay();
@@ -144,9 +217,18 @@
           });
       });
 
+      // Admin / Store panel session: never force customer login modal.
+      if (isPanelUser) {
+        return;
+      }
+
       if (isGuest) {
         $('#loginModal, #createAccountModal, #passwordResetModal').on('shown.bs.modal', function() {
           $(this).find('.close').hide();
+          if ($(this).is('#loginModal')) {
+            hideLoginModalError();
+            $(this).find('#email').trigger('focus');
+          }
         });
 
         openLoginModal();
@@ -217,6 +299,44 @@
     border-color: rgba(255, 102, 0, 0.35) !important;
     color: var(--primary-color, #ff6600) !important;
     background: #fff7ed !important;
+  }
+  .sf-auth-seller-login {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+  }
+  .sf-auth-seller-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--primary-color, #ff6600);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+  .sf-auth-seller-link:hover,
+  .sf-auth-seller-link:focus {
+    color: var(--primary-dark, #cc5200);
+    text-decoration: underline;
+  }
+  .sf-login-modal-alert {
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+  .sf-login-modal-alert .fa {
+    margin-right: 6px;
+  }
+  #loginModal .form-control.is-invalid {
+    border-color: #dc3545;
+  }
+  .js-login-submit.is-loading {
+    opacity: 0.75;
+    pointer-events: none;
   }
   @media (max-width: 575px) {
     #loginModal .modal-dialog,

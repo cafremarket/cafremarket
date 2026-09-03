@@ -5,7 +5,7 @@
 <div class="row justify-content-center">
   @foreach ($products as $item)
     <div class="col mt-3">
-      <a href="{{ route('show.product', $item->slug) }}">
+      <a href="{{ storefront_product_url($item) }}">
         <div class="recent-items-img">
           <img class="lazy" src="/images/square.webp" width="100px" data-src="{{ get_inventory_img_src($item, 'small') }}" data-name="product_image" alt="{{ $item->title }}" title="{{ $item->title }}">
         </div>
@@ -13,7 +13,7 @@
 
       @if (empty($title))
         <div class="box-title">
-          <a href="{{ route('show.product', $item->slug) }}">
+          <a href="{{ storefront_product_url($item) }}">
             {{ $item->title }}
           </a>
         </div>

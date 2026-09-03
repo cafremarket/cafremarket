@@ -17,6 +17,7 @@
       <thead>
         <tr>
           <th>{{ trans('app.shop_name') }}</th>
+          <th>{{ trans('app.seller_type') }}</th>
           <th>{{ trans('app.owner') }}</th>
           <th>{{ trans('app.uploaded_documents') }}</th>
           <th>{{ trans('app.requested_at') }}</th>
@@ -37,6 +38,7 @@
                 @endcan
               </div>
             </td>
+            <td>{{ $merchant->shop->sellerTypeLabel() }}</td>
             <td>{{ optional($merchant->shop->owner)->getName() }}</td>
             <td>
               @forelse ($merchant->attachments as $attachment)

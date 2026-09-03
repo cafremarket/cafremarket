@@ -5,6 +5,60 @@
     $("[data-link]").hide();
     $(".modalAction").hide();
 
+    function syncCsrfToken(token) {
+      if (!token) {
+        return;
+      }
+
+      var meta = document.querySelector('meta[name="csrf-token"]');
+      if (meta) {
+        meta.setAttribute('content', token);
+      }
+
+      document.querySelectorAll('input[name="_token"]').forEach(function(el) {
+        el.value = token;
+      });
+
+      if (typeof $ !== 'undefined' && $.ajaxSetup) {
+        $.ajaxSetup({
+          cache: false,
+          headers: {
+            'X-CSRF-TOKEN': token
+          }
+        });
+      }
+    }
+
+    function refreshCsrfFromServer() {
+      return fetch(window.location.href, {
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'text/html',
+          'Cache-Control': 'no-cache'
+        }
+      }).then(function(res) {
+        return res.text();
+      }).then(function(html) {
+        var match = html.match(/meta name="csrf-token" content="([^"]+)"/);
+        if (match && match[1]) {
+          syncCsrfToken(match[1]);
+        }
+      }).catch(function() {});
+    }
+
+    // Mobile browsers restore cached pages with an old CSRF token (419 on login).
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) {
+        refreshCsrfFromServer();
+      }
+    });
+
+    $(document).on('visibilitychange', function() {
+      if (document.visibilityState === 'visible') {
+        refreshCsrfFromServer();
+      }
+    });
+
     $(document).ready(function() {
 
       // Show featured-categories when page loaded
@@ -157,8 +211,8 @@
         });
       });
 
-      // Dynamic MODAL
-      $(".modalAction").on("click", function(e) {
+      // Dynamic MODAL (delegated — works for AJAX-loaded buttons e.g. address select modal)
+      $(document).on('click', '.modalAction', function(e) {
         e.preventDefault();
         apply_busy_filter('body');
 
@@ -172,7 +226,7 @@
             initAppPlugins();
           }
 
-          var wizard = document.querySelector('.address-wizard');
+          var wizard = document.querySelector('#myDynamicModal .address-wizard');
           if (wizard && typeof window.initAddressWizard === 'function') {
             window.initAddressWizard(wizard.getAttribute('data-wizard-id'));
           }

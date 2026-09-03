@@ -143,7 +143,7 @@ class LoginController extends SocialiteBaseController
     /**
      * Send the response after the user was authenticated.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     protected function sendLoginResponse(Request $request)
     {
@@ -158,8 +158,14 @@ class LoginController extends SocialiteBaseController
             $request->filled('remember')
         );
 
-        if ($response = $this->authenticated($request, $user)) {
-            return $response->withCookie($cookie);
+        $this->authenticated($request, $user);
+
+        if ($this->wantsAjaxLogin($request)) {
+            return response()->json([
+                'success' => true,
+                'message' => trans('theme.notify.logged_in_successfully'),
+                'redirect' => redirect()->intended($this->redirectPath())->getTargetUrl(),
+            ])->withCookie($cookie);
         }
 
         return redirect()->intended($this->redirectPath())->withCookie($cookie);
@@ -190,15 +196,53 @@ class LoginController extends SocialiteBaseController
     }
 
     /**
-     * Failed login — return to storefront with login popup open.
+     * Failed login — JSON for modal AJAX, redirect for legacy form posts.
      */
     protected function sendFailedLoginResponse(Request $request)
     {
+        if ($this->wantsAjaxLogin($request)) {
+            return response()->json([
+                'success' => false,
+                'message' => trans('auth.failed'),
+            ], 422);
+        }
+
         return redirect()->route('homepage', ['login' => 1])
             ->withInput($request->only($this->username($request)))
             ->withErrors([
                 $this->username($request) => trans('auth.failed'),
             ]);
+    }
+
+    /**
+     * Too many attempts — JSON for modal AJAX.
+     */
+    protected function sendLockoutResponse(Request $request)
+    {
+        $seconds = $this->limiter()->availableIn(
+            $this->throttleKey($request)
+        );
+
+        $message = trans('auth.throttle', [
+            'seconds' => $seconds,
+            'minutes' => ceil($seconds / 60),
+        ]);
+
+        if ($this->wantsAjaxLogin($request)) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], 429);
+        }
+
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            $this->username() => [$message],
+        ])->status(429);
+    }
+
+    protected function wantsAjaxLogin(Request $request): bool
+    {
+        return $request->expectsJson() || $request->ajax();
     }
 
     /**

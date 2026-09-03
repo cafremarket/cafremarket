@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="{{ asset('css/merchant-panel.css') }}" rel="stylesheet">
+  <link href="{{ asset('css/merchant-panel.css') }}?v={{ @filemtime(public_path('css/merchant-panel.css')) ?: time() }}" rel="stylesheet">
   @yield('head')
 </head>
 <body class="mp-body">
@@ -47,6 +47,36 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="{{ asset('js/app.js') }}"></script>
+  <script>
+    (function () {
+      var nav = document.getElementById('mp-sidebar-nav');
+      if (!nav) return;
+
+      function setOpen(group, open) {
+        group.classList.toggle('is-open', open);
+        var btn = group.querySelector('.mp-nav-group__toggle');
+        if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+
+      nav.querySelectorAll('.mp-nav-group__toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var group = btn.closest('.mp-nav-group');
+          if (!group) return;
+
+          var willOpen = !group.classList.contains('is-open');
+
+          // Accordion: close other groups when opening one
+          if (willOpen) {
+            nav.querySelectorAll('.mp-nav-group.is-open').forEach(function (other) {
+              if (other !== group) setOpen(other, false);
+            });
+          }
+
+          setOpen(group, willOpen);
+        });
+      });
+    })();
+  </script>
   @include('scripts.password_toggle')
   @include('scripts.google_place')
   @yield('scripts')

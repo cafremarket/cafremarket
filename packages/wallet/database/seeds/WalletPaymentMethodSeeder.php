@@ -16,19 +16,29 @@ class WalletPaymentMethodSeeder extends PackageSeeder
      */
     public function run()
     {
-        DB::table('payment_methods')->insert([
-            'name' => 'Wallet',
-            'code' => 'zcart-wallet',
-            'type' => PaymentMethod::DIGITAL_WALLET,
-            'split_money' => true,
-            'company_name' => 'Incevio',
-            'description' => 'zCart wallet module is the payment method where customer could buy products via customer zCart digital wallet balance.',
-            'admin_description' => 'zCart Wallet module is the payment method where customer could buy products via customer zCart digital wallet balance.',
-            'admin_help_doc_link' => 'https://incevio.com/plugin/wallet',
-            'order' => 8,
-            'created_at' => Carbon::Now(),
-            'updated_at' => Carbon::Now(),
-        ]);
+        if (! DB::table('payment_methods')->where('code', 'zcart-wallet')->exists()) {
+            DB::table('payment_methods')->insert([
+                'name' => 'Cafrepay',
+                'code' => 'zcart-wallet',
+                'type' => PaymentMethod::DIGITAL_WALLET,
+                'split_money' => true,
+                'enabled' => true,
+                'company_name' => 'Cafrepay',
+                'description' => 'Pay with your Cafrepay wallet balance.',
+                'admin_description' => 'Cafrepay is the marketplace wallet. Customers pay from wallet balance; merchants receive sales after subscription commission.',
+                'admin_help_doc_link' => 'https://incevio.com/plugin/wallet',
+                'order' => 1,
+                'created_at' => Carbon::Now(),
+                'updated_at' => Carbon::Now(),
+            ]);
+        } else {
+            DB::table('payment_methods')->where('code', 'zcart-wallet')->update([
+                'name' => 'Cafrepay',
+                'enabled' => true,
+                'company_name' => 'Cafrepay',
+                'updated_at' => Carbon::Now(),
+            ]);
+        }
 
         // Seed Permissions
         $actions = 'setting,payout,report';

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
+use Illuminate\Validation\Rule;
 
 class CreateAttributeRequest extends Request
 {
@@ -13,7 +14,18 @@ class CreateAttributeRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return $this->user() && $this->user()->isFromMerchant() && $this->user()->merchantId();
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'shop_id' => $this->user()->merchantId(),
+            'attribute_type_id' => resolve_attribute_type_id($this->input('name'), (int) $this->input('attribute_type_id') ?: null),
+        ]);
     }
 
     /**
@@ -23,15 +35,18 @@ class CreateAttributeRequest extends Request
      */
     public function rules()
     {
-        // Get current user's shop_id
-        $shop_id = $this->user()->merchantId();
-
-        $this->merge(['shop_id' => $shop_id]); // Set shop_id
+        $shopId = $this->user()->merchantId();
 
         return [
-            'attribute_type_id' => 'required',
-            // 'name' => 'bail|required|composite_unique:attributes,shop_id:' . $shop_id,
-            'name' => 'bail|required|unique:attributes',
+            'shop_id' => 'required|integer',
+            'attribute_type_id' => 'required|integer',
+            'name' => [
+                'bail',
+                'required',
+                Rule::unique('attributes', 'name')->where(function ($query) use ($shopId) {
+                    return $query->where('shop_id', $shopId)->whereNull('deleted_at');
+                }),
+            ],
             'order' => 'integer|nullable',
         ];
     }
@@ -43,8 +58,6 @@ class CreateAttributeRequest extends Request
      */
     public function messages()
     {
-        return [
-            'attribute_type_id.required' => trans('validation.attribute_type_id_required'),
-        ];
+        return [];
     }
 }

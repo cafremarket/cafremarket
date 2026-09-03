@@ -175,6 +175,13 @@ class LoginController extends Controller
         $jwt = app(JwtAuthService::class)->issue($user, 'web');
         $cookie = app(JwtAuthService::class)->makeCookie('web', $jwt, $request->filled('remember'));
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'redirect' => redirect()->intended($this->redirectPath())->getTargetUrl(),
+                'message' => trans('theme.success'),
+            ])->withCookie($cookie);
+        }
+
         return redirect()->intended($this->redirectPath())->withCookie($cookie);
     }
 

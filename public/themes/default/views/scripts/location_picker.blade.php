@@ -20,7 +20,7 @@
   var hasGoogleMaps = {{ config('services.google.place_api_key') ? 'true' : 'false' }};
   var defaultLat = {{ session('buyer_latitude') ?: '-25.9655' }};
   var defaultLng = {{ session('buyer_longitude') ?: '32.5832' }};
-  var useCurrentLocationLabel = @json('<i class="fal fa-crosshairs"></i> ' . trans('theme.use_current_location'));
+  var useCurrentLocationLabel = @json('<i class="fa fa-crosshairs"></i> ' . trans('theme.use_current_location'));
   var fetchingAddressLabel = @json(trans('theme.fetching_address'));
   var addressLookupFailedLabel = @json(trans('theme.address_lookup_failed'));
   var confirmLocationLabel = @json(trans('theme.confirm_location'));
@@ -467,18 +467,30 @@
       }
 
       btn.disabled = !!loading;
+      btn.classList.toggle('is-loading', !!loading);
+      if (loading) {
+        btn.setAttribute('aria-busy', 'true');
+      } else {
+        btn.removeAttribute('aria-busy');
+      }
     });
 
     if (mapBtn) {
+      if (!mapBtn.dataset.defaultHtml) {
+        mapBtn.dataset.defaultHtml = mapBtn.innerHTML;
+      }
       mapBtn.innerHTML = loading
-        ? '<i class="fal fa-spinner fa-spin"></i>'
-        : '<i class="fal fa-crosshairs"></i>';
+        ? '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>'
+        : mapBtn.dataset.defaultHtml;
     }
 
     if (useBtn) {
+      if (!useBtn.dataset.defaultHtml) {
+        useBtn.dataset.defaultHtml = useBtn.innerHTML;
+      }
       useBtn.innerHTML = loading
-        ? '<i class="fal fa-spinner fa-spin"></i> ' + fetchingAddressLabel
-        : useCurrentLocationLabel;
+        ? '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i> ' + fetchingAddressLabel
+        : useBtn.dataset.defaultHtml;
     }
   }
 

@@ -347,7 +347,7 @@
                     <div class="product-info">
                       {{ $item->pivot->item_description }}
 
-                      <a href="{{ route('show.product', $item->slug) }}" class="ml-2" target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.show_product_page') }}">
+                      <a href="{{ storefront_product_url($item) }}" class="ml-2" target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.show_product_page') }}">
                         <i class="fa fa-external-link" aria-hidden="true"></i>
                       </a>
 

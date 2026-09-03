@@ -103,7 +103,7 @@ class PaymentMethod extends BaseModel
     public function getNameAttribute($value)
     {
         if ($this->code == 'zcart-wallet') {
-            return get_platform_title().' '.$value;
+            return $value ?: 'Cafrepay';
         }
 
         return $value;

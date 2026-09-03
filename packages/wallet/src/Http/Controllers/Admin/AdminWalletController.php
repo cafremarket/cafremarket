@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Incevio\Package\Wallet\Exceptions\WalletOwnerInvalid;
+use Incevio\Package\Wallet\Http\Requests\AdminCreateWalletRequest;
 use Incevio\Package\Wallet\Http\Requests\AdminWalletTopupRequest;
 use Incevio\Package\Wallet\Models\Transaction;
 use Incevio\Package\Wallet\Models\Wallet;
@@ -32,8 +33,8 @@ class AdminWalletController extends Controller
                 $q->where('blocked', false)->orWhereNull('blocked');
             });
 
-        // Default: wallets with balance. Pass has_balance=0 to include empty wallets.
-        if ($request->get('has_balance', '1') !== '0') {
+        // Default: show all wallets. Pass has_balance=1 to filter positive balances only.
+        if ($request->get('has_balance', '0') === '1') {
             $query->where('balance', '>', 0);
         }
 
@@ -117,6 +118,49 @@ class AdminWalletController extends Controller
             return redirect()
                 ->route('admin.wallet.list')
                 ->with('success', trans('packages.wallet.admin_topup_success'));
+        } catch (\Exception $exception) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('warning', $exception->getMessage());
+        }
+    }
+
+    /**
+     * Show create-wallet form (customer or store).
+     */
+    public function showCreateForm()
+    {
+        Gate::authorize('payout', Wallet::class);
+
+        return view('wallet::admin._create_wallet');
+    }
+
+    /**
+     * Create an empty wallet for a customer or store if missing.
+     */
+    public function create(AdminCreateWalletRequest $request)
+    {
+        Gate::authorize('payout', Wallet::class);
+
+        try {
+            $holder = $this->getWallet($request->user_type, $request->email);
+
+            if (! $holder) {
+                throw new WalletOwnerInvalid(
+                    trans('packages.wallet.wallet_email_not_found', ['email' => $request->email])
+                );
+            }
+
+            $wallet = app(\Incevio\Package\Wallet\Services\WalletService::class)
+                ->getWallet($holder, true);
+
+            return redirect()
+                ->route('admin.wallet.list')
+                ->with('success', trans('packages.wallet.create_wallet_success', [
+                    'owner' => method_exists($holder, 'getName') ? $holder->getName() : ($holder->name ?? $request->email),
+                    'balance' => get_formated_currency($wallet->balance, 2),
+                ]));
         } catch (\Exception $exception) {
             return redirect()
                 ->back()

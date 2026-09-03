@@ -45,6 +45,10 @@ class CategoryController extends Controller
         } else {
             $categories = Category::with(['coverImage', 'featureImage'])
                 ->orderBy('id', 'asc');
+
+            if (! auth()->user()->isFromPlatform()) {
+                $categories->mine();
+            }
         }
 
         if ($request->has('sub_group_id')) {

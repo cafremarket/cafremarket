@@ -30,7 +30,7 @@
             <td>{!! $link->inventory->shop->name !!}</td>
             <td>
               <span class="js-affiliate-link-url">{{ $link->full_url }}</span>
-              <a href="{{ route('show.product', $link->inventory->slug) }}" target="_blank" class="admin-action-btn" title="{{ trans('packages.affiliate.go_to_product_page') }}" data-toggle="tooltip"><i class="fa fa-external-link"></i></a>
+              <a href="{{ storefront_product_url($link->inventory) }}" target="_blank" class="admin-action-btn" title="{{ trans('packages.affiliate.go_to_product_page') }}" data-toggle="tooltip"><i class="fa fa-external-link"></i></a>
               <a href="javascript:void(0)" class="admin-action-btn" onclick="copyAffiliateLink(this)" data-key="copy-affiliate-link" title="{{ trans('app.copy') }}" data-toggle="tooltip"><i class="fa fa-clipboard"></i></a>
             </td>
             <td>{{ get_formated_currency($link->inventory->sale_price, 2) }}</td>

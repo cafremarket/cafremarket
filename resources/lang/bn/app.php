@@ -1613,7 +1613,7 @@ return [
   'how_it_works' => 'কিভাবে এটা কাজ করে',
   'approve_refund' => 'ফেরত অনুমোদন করুন',
   'expiry_date' => 'মেয়াদ শেষ হওয়ার তারিখ',
-  'zcart_compatibility' => 'সামঞ্জস্যপূর্ণ জেডকার্ট সংস্করণ',
+  'zcart_compatibility' => 'Compatible cafremarket version',
   'assign_deliveryboy' => 'ডেলিভারি বয় নিয়োগ করুন',
   'change_deliveryboy' => 'ডেলিভারি বয় পরিবর্তন করুন',
   'show' => 'দেখান',

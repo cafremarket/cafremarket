@@ -32,13 +32,13 @@
         @foreach ($brands as $brand)
           <div class="col-xl-3 col-md-4 col-sm-6 p-1">
             <div class="card-box text-center">
-              <a href="{{ route('show.brand', $brand->slug) }}">
+              <div>
                 <div class="thumb-lg d-flex thumbnail rounded-circle justify-content-center align-items-center mx-auto p-2">
                   <img class="lazy w-100" src="{{ get_storage_file_url(optional($brand->logoImage)->path, 'tiny_thumb') }}" data-src="{{ get_storage_file_url(optional($brand->logoImage)->path, 'full') }}" alt="{{ $brand->name }}">
                 </div>
 
                 <h4 class="mb-2">{{ $brand->name }}</h4>
-              </a>
+              </div>
             </div> <!-- /.card-box -->
           </div> <!-- /.end col -->
         @endforeach

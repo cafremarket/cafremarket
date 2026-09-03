@@ -16,7 +16,7 @@
     <div class="featured-categories owl-carousel">
       @foreach ($featured_category as $item)
         <div class="featured-category">
-          <a href="{{ route('category.browse', $item->slug) }}">
+          <a href="{{ get_category_url($item) }}">
             <figure>
               <img class="lazy" src="{{ get_storage_file_url(optional($item->featureImage)->path, 'tiny') }}" data-src="{{ get_storage_file_url(optional($item->featureImage)->path, 'full') }}" alt="{{ $item->name }}">
             </figure>

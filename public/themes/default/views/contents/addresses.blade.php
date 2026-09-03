@@ -12,7 +12,7 @@
       <div class="sf-address-toolbar">
         <div></div>
         <a href="{{ route('my.address.create') }}" class="modalAction btn sf-btn-primary">
-          <i class="fas fa-plus" aria-hidden="true"></i> @lang('theme.button.add_new_address')
+          <i class="fa fa-plus" aria-hidden="true"></i> @lang('theme.button.add_new_address')
         </a>
       </div>
 
@@ -55,6 +55,29 @@
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
+    });
+  </script>
+@endif
+
+@if (request()->boolean('create_address') || request()->has('edit_address'))
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var url = @json(
+        request()->boolean('create_address')
+          ? route('my.address.create')
+          : route('my.address.edit', request('edit_address'))
+      );
+
+      $.get(url, function(data) {
+        $('#myDynamicModal').html(data).modal();
+        if (typeof initAppPlugins === 'function') {
+          initAppPlugins();
+        }
+        var wizard = document.querySelector('#myDynamicModal .address-wizard');
+        if (wizard && typeof window.initAddressWizard === 'function') {
+          window.initAddressWizard(wizard.getAttribute('data-wizard-id'));
+        }
+      });
     });
   </script>
 @endif

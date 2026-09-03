@@ -11,7 +11,7 @@
 
           <img class="product-img-alt lazy" src="{{ get_product_img_src($item, 'tiny', 'alt') }}" data-src="{{ get_product_img_src($item, 'full', 'alt') }}" alt="{{ $item->title }}" title="{{ $item->title }}" />
 
-          <a class="product-link" href="{{ route('show.product', $item->slug) }}" data-name="product_link"></a>
+          <a class="product-link" href="{{ storefront_product_url($item) }}" data-name="product_link"></a>
         </div>
 
         <div class="product-actions btn-group">
@@ -19,7 +19,7 @@
             <i class="far fa-heart" data-toggle="tooltip" title="@lang('theme.button.add_to_wishlist')"></i> <span>@lang('theme.button.add_to_wishlist')</span>
           </a>
 
-          <a class="btn btn-default rounded-0 itemQuickView" href="javascript:void(0);" data-link="{{ route('quickView.product', $item->slug) }}" rel="nofollow noindex" aria-label="@lang('theme.button.quick_view')">
+          <a class="btn btn-default rounded-0 itemQuickView" href="javascript:void(0);" data-link="{{ storefront_product_quickview_url($item) }}" rel="nofollow noindex" aria-label="@lang('theme.button.quick_view')">
             <i class="far fa-eye" data-toggle="tooltip" title="@lang('theme.button.quick_view')"></i> <span>@lang('theme.button.quick_view')</span>
           </a>
 
@@ -31,7 +31,7 @@
         <div class="product-info">
           @include('theme::layouts.ratings', ['ratings' => $item->ratings, 'count' => $item->ratings_count])
 
-          <a href="{{ route('show.product', $item->slug) }}" class="product-info-title" data-name="product_name">{{ $item->title }}</a>
+          <a href="{{ storefront_product_url($item) }}" class="product-info-title" data-name="product_name">{{ $item->title }}</a>
 
           <div class="product-info-availability">
             @lang('theme.availability'): <span>{{ $item->stock_quantity > 0 ? trans('theme.in_stock') : trans('theme.out_of_stock') }}</span>

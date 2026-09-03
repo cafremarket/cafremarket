@@ -1,121 +1,194 @@
-//Theme JavaScript
-; (function ($, window, document) {
+// cafremarket Selling page JavaScript
+;(function ($, window, document) {
     "use strict";
+
+    var headerOffset = 120;
+
     $(document).ready(function () {
-        $.ajaxSetup({
-            cache: false,
-            headers: {
-                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+        var csrf = $('meta[name="csrf-token"]').attr('content');
+        if (csrf) {
+            $.ajaxSetup({
+                cache: false,
+                headers: {
+                    'X-CSRF-TOKEN': csrf
+                }
+            });
+        }
+
+        var $recaptcha = document.querySelector('#g-recaptcha-response');
+        if ($recaptcha) {
+            $recaptcha.setAttribute('required', 'required');
+        }
+
+        initSmoothScroll();
+        initSectionNav();
+        initFaqAccordion();
+        initMobileNav();
+        initHeaderScroll();
+        openHashSection();
+    });
+
+    function initSmoothScroll() {
+        $(document).on('click', '.sf-sell-scroll-link', function (event) {
+            var target = $(this).attr('href');
+
+            if (!target || target.charAt(0) !== '#') {
+                return;
+            }
+
+            var $target = $(target);
+            if (!$target.length) {
+                return;
+            }
+
+            event.preventDefault();
+
+            $('html, body').animate({
+                scrollTop: $target.offset().top - headerOffset + 1
+            }, 500);
+
+            if (history.replaceState) {
+                history.replaceState(null, null, target);
+            } else {
+                window.location.hash = target;
+            }
+
+            setActiveSectionLink(target);
+            closeMobileNav();
+        });
+    }
+
+    function initSectionNav() {
+        var $links = $('.sf-sell-section-nav__link, .sf-sell-header__nav .sf-sell-scroll-link');
+        var sections = [];
+
+        $links.each(function () {
+            var href = $(this).attr('href');
+            if (href && href.charAt(0) === '#') {
+                var $section = $(href);
+                if ($section.length) {
+                    sections.push({ id: href, $el: $section });
+                }
             }
         });
 
-        // Make recaptcha field required if exist
-        var $recaptcha = document.querySelector('#g-recaptcha-response');
-        if ($recaptcha) {
-            $recaptcha.setAttribute("required", "required");
+        if (!sections.length) {
+            return;
         }
-    });
 
-    // Update the hash into the url when click a tab
-    $('.nav a').on('show.bs.tab', function (e) {
-        let offset = $(this).offset().top; // Get the offset of the element from the top
+        $(window).on('scroll', function () {
+            var scrollPos = $(window).scrollTop() + headerOffset + 20;
+            var current = sections[0].id;
 
-        window.location = $(this).attr('href'); // Update the hash into the url
+            sections.forEach(function (section) {
+                if (section.$el.offset().top <= scrollPos) {
+                    current = section.id;
+                }
+            });
 
-        $(this).offset().top = offset; // Set the offset of the element from the top
-    });
+            setActiveSectionLink(current);
+        });
+    }
 
-    $(function () {
+    function setActiveSectionLink(hash) {
+        $('.sf-sell-section-nav__link, .sf-sell-header__nav .sf-sell-scroll-link').removeClass('is-active');
+        $('.sf-sell-section-nav__link[href="' + hash + '"], .sf-sell-header__nav .sf-sell-scroll-link[href="' + hash + '"]').addClass('is-active');
+    }
+
+    function openHashSection() {
         var hash = window.location.hash;
-        hash && $('ul.nav a[href="' + hash + '"]').tab('show');
-    });
+        if (hash && $(hash).length) {
+            setTimeout(function () {
+                $('html, body').scrollTop($(hash).offset().top - headerOffset + 1);
+                setActiveSectionLink(hash);
+            }, 100);
+        }
+    }
 
-    $("#contactForm input, #contactForm textarea").jqBootstrapValidation({
-        preventSubmit: true,
-        submitError: function ($form, event, errors) {
-            // additional error messages or events
-        },
-        submitSuccess: function ($form, event) {
-            event.preventDefault(); // prevent default submit behaviour
+    function initFaqAccordion() {
+        $(document).on('click', '.sf-sell-faq-item__question', function () {
+            var $item = $(this).closest('.sf-sell-faq-item');
+            var isOpen = $item.hasClass('is-open');
 
-            var form = $("form#contactForm");
-            var formData = new FormData(form[0]);
+            $item.siblings('.sf-sell-faq-item').removeClass('is-open');
+            $item.toggleClass('is-open', !isOpen);
+            $(this).attr('aria-expanded', !isOpen);
+        });
+    }
 
-            var submmitBtn = $("button[type=submit]");
-            submmitBtn.prop("disabled", true); // Disable submit button until AJAX call is complete to prevent duplicate messages
-            $.ajax({
-                url: form.attr("action"),
-                type: "POST",
-                data: formData,
-                cache: false,
-                processData: false,
-                contentType: false,
-                success: function (response, textStatus, xhr) {
-                    $('#success').html("<div class='alert alert-success'><strong>" + response + "</strong></div>");
-                },
-                error: function (response, textStatus, xhr) {
-                    if (xhr.status === 422) {
-                        var errors = response.responseJSON.errors;
-                        if (errors) {
+    function initMobileNav() {
+        $('#sfSellNavToggle').on('click', function () {
+            $('#sfSellMobileNav').toggleClass('is-open');
+        });
+
+        $('#sfSellMobileNav').on('click', function (event) {
+            if (event.target === this) {
+                closeMobileNav();
+            }
+        });
+    }
+
+    function closeMobileNav() {
+        $('#sfSellMobileNav').removeClass('is-open');
+    }
+
+    function initHeaderScroll() {
+        var $header = $('#sfSellHeader');
+
+        $(window).on('scroll', function () {
+            $header.toggleClass('is-scrolled', $(window).scrollTop() > 12);
+        });
+    }
+
+    if ($.fn.jqBootstrapValidation) {
+        $("#contactForm input, #contactForm textarea").jqBootstrapValidation({
+            preventSubmit: true,
+            submitSuccess: function ($form, event) {
+                event.preventDefault();
+
+                var form = $("form#contactForm");
+                var formData = new FormData(form[0]);
+                var submitBtn = form.find("button[type=submit]");
+                submitBtn.prop("disabled", true);
+
+                $.ajax({
+                    url: form.attr("action"),
+                    type: "POST",
+                    data: formData,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        $('#success').html("<div class='alert alert-success'><strong>" + response + "</strong></div>");
+                    },
+                    error: function (response, textStatus, xhr) {
+                        if (xhr.status === 422 && response.responseJSON && response.responseJSON.errors) {
+                            var errors = response.responseJSON.errors;
                             var errorsHtml = '<ul>';
                             $.each(errors, function (key, value) {
                                 errorsHtml += '<li>' + value[0] + '</li>';
                             });
                             errorsHtml += '</ul>';
                             $('#success').html("<div class='alert alert-danger'>" + errorsHtml + "</div>");
+                        } else {
+                            $('#success').html("<div class='alert alert-danger'><strong>" + (response.responseText || 'Something went wrong.') + "</strong></div>");
                         }
+                    },
+                    complete: function () {
+                        form.trigger("reset");
+                        setTimeout(function () {
+                            submitBtn.prop("disabled", false);
+                        }, 1000);
                     }
-                    else {
-                        $('#success').html("<div class='alert alert-danger'><strong>" + response.responseText + "</strong></div>");
-                    }
-                },
-                complete: function (xhr, textStatus) {
-                    $('#contactForm').trigger("reset"); //clear all fields
-                    setTimeout(function () {
-                        submmitBtn.prop("disabled", false); // Re-enable submit button when AJAX call is complete
-                    }, 1000);
-                }
-            });
-        },
-        filter: function () {
-            return $(this).is(":visible");
-        },
-    });
+                });
+            },
+            filter: function () {
+                return $(this).is(":visible");
+            }
+        });
+    }
 
-    $("a[data-toggle=\"tab\"]").click(function (e) {
-        e.preventDefault();
-        $(this).tab("show");
-    });
-
-    // jQuery for page scrolling feature - requires jQuery Easing plugin
-    $('a.page-scroll').bind('click', function (event) {
-        var $anchor = $(this);
-        $('html, body').stop().animate({
-            scrollTop: ($($anchor.attr('href')).offset().top - 50)
-        }, 1250, 'easeInOutExpo');
-        event.preventDefault();
-    });
-
-    // Highlight the top nav as scrolling occurs
-    $('body').scrollspy({
-        target: '.navbar-fixed-top',
-        offset: 51
-    });
-
-    // Closes the Responsive Menu on Menu Item Click
-    $('.navbar-collapse ul li a').click(function () {
-        $('.navbar-toggle:visible').click();
-    });
-
-    // Offset for Main Navigation
-    $('#mainNav').affix({
-        offset: {
-            top: 100
-        }
-    })
-
-    /*When clicking on Full hide fail/success boxes */
-    $('#name').focus(function () {
+    $('#name').on('focus', function () {
         $('#success').html('');
     });
 

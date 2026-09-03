@@ -19,7 +19,7 @@ class ShowVersion extends Command
      *
      * @var string
      */
-    protected $description = 'Display the current zCart application version.';
+    protected $description = 'Display the current cafremarket application version.';
 
     /**
      * Create a new command instance.
@@ -38,6 +38,6 @@ class ShowVersion extends Command
      */
     public function handle()
     {
-        $this->info('zCart Version '.System::VERSION);
+        $this->info('cafremarket Version '.System::VERSION);
     }
 }

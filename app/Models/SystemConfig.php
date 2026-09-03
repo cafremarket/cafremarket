@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Common\SystemUsers;
-use App\Exceptions\PluginFailed;
 
 class SystemConfig extends BaseModel
 {
@@ -174,7 +173,12 @@ class SystemConfig extends BaseModel
                 return true;
             }
 
-            throw new PluginFailed(trans('messages.dependent_package_failed', ['dependency' => implode(',', $dependencies)]));
+            \Illuminate\Support\Facades\Log::warning(
+                'Wallet subscription billing is configured but required packages are not active.',
+                ['dependencies' => $dependencies]
+            );
+
+            return false;
         }
 
         return false;

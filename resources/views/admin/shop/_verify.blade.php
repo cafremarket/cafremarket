@@ -23,6 +23,12 @@
         {{ trans('app.review_verification_request') }}
       </h4>
       <p class="admin-verify-modal__subtitle">{{ $shop->name }}</p>
+      <p class="admin-verify-modal__meta-line">
+        {{ $shop->sellerTypeLabel() }}
+        @if ($shop->nuit)
+          &middot; {{ trans('app.nuit') }}: {{ $shop->nuit }}
+        @endif
+      </p>
     </div>
 
     <div class="modal-body">
@@ -44,6 +50,18 @@
       @endif
 
       <div class="row">
+        <div class="col-sm-4">
+          <div class="admin-verify-modal__meta">
+            <span class="admin-verify-modal__meta-label">{{ trans('app.seller_type') }}</span>
+            <span class="admin-verify-modal__meta-value">{{ $shop->sellerTypeLabel() }}</span>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="admin-verify-modal__meta">
+            <span class="admin-verify-modal__meta-label">{{ trans('app.nuit') }}</span>
+            <span class="admin-verify-modal__meta-value">{{ $shop->nuit ?: trans('app.not_available') }}</span>
+          </div>
+        </div>
         <div class="col-sm-4">
           <div class="admin-verify-modal__meta">
             <span class="admin-verify-modal__meta-label">{{ trans('app.owner') }}</span>
@@ -160,21 +178,25 @@
 
           <div class="admin-verify-modal__section">
             <h5 class="admin-verify-modal__section-title"><i class="fa fa-file-text-o"></i> {{ trans('app.store_document_verification') }}</h5>
-            @if ($storeAttachments->count())
-              <ul class="admin-verify-modal__files">
-                @foreach ($storeAttachments as $attachment)
-                  <li>
-                    <a href="{{ route('attachment.download', $attachment) }}" class="admin-verify-modal__file">
-                      <span class="admin-verify-modal__file-icon"><i class="fa fa-file-o"></i></span>
-                      <span class="admin-verify-modal__file-name">{{ $attachment->name }}</span>
-                      <span class="admin-verify-modal__file-size">{{ get_formated_file_size($attachment->size) }}</span>
-                      <span class="admin-verify-modal__file-action"><i class="fa fa-download"></i></span>
-                    </a>
-                  </li>
-                @endforeach
-              </ul>
+            @if ($shop->requiresBusinessDocuments())
+              @if ($storeAttachments->count())
+                <ul class="admin-verify-modal__files">
+                  @foreach ($storeAttachments as $attachment)
+                    <li>
+                      <a href="{{ route('attachment.download', $attachment) }}" class="admin-verify-modal__file">
+                        <span class="admin-verify-modal__file-icon"><i class="fa fa-file-o"></i></span>
+                        <span class="admin-verify-modal__file-name">{{ $attachment->name }}</span>
+                        <span class="admin-verify-modal__file-size">{{ get_formated_file_size($attachment->size) }}</span>
+                        <span class="admin-verify-modal__file-action"><i class="fa fa-download"></i></span>
+                      </a>
+                    </li>
+                  @endforeach
+                </ul>
+              @else
+                <p class="text-muted admin-verify-modal__empty">{{ trans('messages.no_verification_documents_uploaded') }}</p>
+              @endif
             @else
-              <p class="text-muted admin-verify-modal__empty">{{ trans('messages.no_verification_documents_uploaded') }}</p>
+              <p class="text-muted admin-verify-modal__empty">{{ trans('messages.verification_individual_no_business_docs') }}</p>
             @endif
           </div>
         </div>

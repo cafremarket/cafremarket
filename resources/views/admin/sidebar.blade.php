@@ -43,65 +43,38 @@
         </a>
       </li>
 
-      {{-- ===== COMMERCE ===== --}}
-      @if (Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\Attribute::class) || Gate::allows('index', \App\Models\Product::class) || Gate::allows('index', \App\Models\Manufacturer::class) || Gate::allows('index', \App\Models\CategoryGroup::class) || Gate::allows('index', \App\Models\CategorySubGroup::class) || Gate::allows('index', \App\Models\Inventory::class) || Gate::allows('index', \App\Models\Warehouse::class) || Gate::allows('index', \App\Models\Supplier::class) || Gate::allows('index', \App\Models\Order::class) || Gate::allows('index', \App\Models\Cart::class) || is_incevio_package_loaded('pos'))
+      {{-- ===== CATALOG (Store / Merchant only) ===== --}}
+      @if (Auth::user()->isFromMerchant() && (Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\Attribute::class) || Gate::allows('index', \App\Models\Product::class) || Gate::allows('index', \App\Models\Manufacturer::class)))
         <li class="nav-section"><span class="nav-section-label">{{ trans('nav.catalog') ?? 'Commerce' }}</span></li>
       @endif
 
-      @if (Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\Attribute::class) || Gate::allows('index', \App\Models\Product::class) || Gate::allows('index', \App\Models\Manufacturer::class) || Gate::allows('index', \App\Models\CategoryGroup::class) || Gate::allows('index', \App\Models\CategorySubGroup::class))
-        <li class="treeview {{ Request::is('admin/catalog*') ? 'active' : '' }}">
+      @if (Auth::user()->isFromMerchant() && (Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\Attribute::class) || Gate::allows('index', \App\Models\Product::class) || Gate::allows('index', \App\Models\Manufacturer::class)))
+        <li class="treeview {{ Request::is('admin/catalog*') || Request::is('merchant/catalog*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
             <i class="fa fa-tags"></i>
             <span>{{ trans('nav.catalog') }}</span>
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            @if (Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\CategoryGroup::class) || Gate::allows('index', \App\Models\CategorySubGroup::class))
-              <li class="{{ Request::is('admin/catalog/category*') ? 'active' : '' }}">
-                <a href="javascript:void(0)">
-                  <i class="fa fa-angle-double-right"></i>
-                  {{ trans('nav.categories') }}
-                  <i class="fa fa-angle-left pull-right"></i>
+            @can('index', \App\Models\Category::class)
+              <li class="{{ Request::is('admin/catalog/category*') || Request::is('merchant/catalog/category*') ? 'active' : '' }}">
+                <a href="{{ url('admin/catalog/category') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.categories') }}
                 </a>
-                <ul class="treeview-menu">
-                  @can('index', \App\Models\CategoryGroup::class)
-                    <li class="{{ Request::is('admin/catalog/categoryGroup*') ? 'active' : '' }}">
-                      <a href="{{ route('admin.catalog.categoryGroup.index') }}">
-                        <i class="fa fa-angle-right"></i>{{ trans('nav.groups') }}
-                      </a>
-                    </li>
-                  @endcan
-
-                  @can('index', \App\Models\CategorySubGroup::class)
-                    <li class="{{ Request::is('admin/catalog/categorySubGroup*') ? 'active' : '' }}">
-                      <a href="{{ route('admin.catalog.categorySubGroup.index') }}">
-                        <i class="fa fa-angle-right"></i>{{ trans('nav.sub-groups') }}
-                      </a>
-                    </li>
-                  @endcan
-
-                  @can('index', \App\Models\Category::class)
-                    <li class="{{ Request::is('admin/catalog/category') ? 'active' : '' }}">
-                      <a href="{{ url('admin/catalog/category') }}">
-                        <i class="fa fa-angle-right"></i>{{ trans('nav.categories') }}
-                      </a>
-                    </li>
-                  @endcan
-                </ul>
               </li>
-            @endif
+            @endcan
 
             @can('index', \App\Models\Attribute::class)
-              <li class="{{ Request::is('admin/catalog/attribute*') ? 'active' : '' }}">
+              <li class="{{ Request::is('admin/catalog/attribute*') || Request::is('merchant/catalog/attribute*') ? 'active' : '' }}">
                 <a href="{{ url('admin/catalog/attribute') }}">
                   <i class="fa fa-angle-double-right"></i> {{ trans('nav.attributes') }}
                 </a>
               </li>
             @endcan
 
-            @if (is_catalog_enabled() || Auth::user()->isFromPlatform())
+            @if (is_catalog_enabled())
               @can('index', \App\Models\Product::class)
-                <li class="{{ Request::is('admin/catalog/product*') ? 'active' : '' }}">
+                <li class="{{ Request::is('admin/catalog/product*') || Request::is('merchant/catalog/product*') ? 'active' : '' }}">
                   <a href="{{ url('admin/catalog/product') }}">
                     <i class="fa fa-angle-double-right"></i> {{ trans('nav.products') }}
                   </a>
@@ -110,7 +83,7 @@
             @endif
 
             @can('index', \App\Models\Manufacturer::class)
-              <li class="{{ Request::is('admin/catalog/manufacturer*') ? 'active' : '' }}">
+              <li class="{{ Request::is('admin/catalog/manufacturer*') || Request::is('merchant/catalog/manufacturer*') ? 'active' : '' }}">
                 <a href="{{ url('admin/catalog/manufacturer') }}">
                   <i class="fa fa-angle-double-right"></i> {{ trans('nav.manufacturers') }}
                 </a>

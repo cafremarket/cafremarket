@@ -1,87 +1,70 @@
 <div class="mp-verify-tab-panel" id="mp-tab-store" role="tabpanel" hidden>
-  <div class="mp-verify-subtabs">
-    <div class="mp-panel mp-panel--flat">
-      <div class="mp-panel__head">
-        <div class="mp-panel__head-icon"><i class="fa fa-map-marker"></i></div>
-        <div class="mp-panel__head-text">
+  <div class="mp-verify-stack">
+    <section class="mp-verify-card">
+      <header class="mp-verify-card__head">
+        <div>
           <h2>{{ trans('app.address_verification') }}</h2>
           <p>{{ trans('messages.verification_option_address_help') }}</p>
         </div>
         @if ($shop->address_verified)
-          <span class="mp-verify-tab-badge mp-verify-tab-badge--success">{{ trans('app.verified') }}</span>
+          <span class="mp-chip mp-chip--success">{{ trans('app.verified') }}</span>
         @elseif ($hasLocation)
-          <span class="mp-verify-tab-badge mp-verify-tab-badge--info">{{ trans('app.submitted') }}</span>
-        @else
-          <span class="mp-verify-tab-badge mp-verify-tab-badge--warning">{{ trans('app.action_required') }}</span>
+          <span class="mp-chip mp-chip--info">{{ trans('app.submitted') }}</span>
         @endif
-      </div>
-      <div class="mp-panel__body">
-        @if (!empty($pendingAddressChangeRequest))
-          <div class="mp-alert mp-alert--info">
-            <i class="fa fa-clock-o"></i> {{ trans('messages.address_change_request_pending') }}
-          </div>
-        @endif
+      </header>
 
-        @if ($hasLocation)
-          <div class="mp-alert mp-alert--success"><i class="fa fa-check-circle"></i> {{ trans('app.store_location_set') }}</div>
-          <p class="mp-text-muted mp-text-muted--spaced">
+      @if (!empty($pendingAddressChangeRequest))
+        <p class="mp-verify-card__note mp-verify-card__note--info">{{ trans('messages.address_change_request_pending') }}</p>
+      @endif
+
+      @if ($hasLocation && $storeAddress)
+        <div class="mp-verify-address">
+          <strong>{{ trans('app.store_location_set') }}</strong>
+          <p>
             {{ $storeAddress->address_title ? $storeAddress->address_title.', ' : '' }}
             {{ $storeAddress->address_line_1 }}{{ $storeAddress->city ? ', '.$storeAddress->city : '' }}
           </p>
-        @else
-          <div class="mp-alert mp-alert--warning"><i class="fa fa-exclamation-triangle"></i> {{ trans('app.store_location_required') }}</div>
-        @endif
+        </div>
+      @else
+        <p class="mp-verify-card__note mp-verify-card__note--warn">{{ trans('app.store_location_required') }}</p>
+      @endif
 
-        @if ($canSubmit)
-          {!! Form::open(['route' => 'merchant.verify.location', 'id' => 'store-location-form', 'class' => 'mp-address-wizard-form']) !!}
-            @include('merchant.verify.partials.address_wizard', [
-              'wizardId' => 'merchant-store-wizard',
-              'address' => $storeAddress,
-              'countries' => $countries ?? [],
-              'states' => $states ?? [],
-              'defaultAddressTitle' => $shop->name,
-              'defaultPhone' => $shopPhone ?? optional($config)->support_phone ?? Auth::user()->phone,
-              'deferInit' => true,
-            ])
-          {!! Form::close() !!}
-        @endif
-      </div>
-    </div>
+      @if ($canSubmit)
+        {!! Form::open(['route' => 'merchant.verify.location', 'id' => 'store-location-form', 'class' => 'mp-address-wizard-form']) !!}
+          @include('merchant.verify.partials.address_wizard', [
+            'wizardId' => 'merchant-store-wizard',
+            'address' => $storeAddress,
+            'countries' => $countries ?? [],
+            'states' => $states ?? [],
+            'defaultAddressTitle' => $shop->name,
+            'defaultPhone' => $shopPhone ?? optional($config)->support_phone ?? Auth::user()->phone,
+            'deferInit' => true,
+          ])
+        {!! Form::close() !!}
+      @endif
+    </section>
 
-    <div class="mp-panel mp-panel--flat">
-      <div class="mp-panel__head">
-        <div class="mp-panel__head-icon"><i class="fa fa-file-text-o"></i></div>
-        <div class="mp-panel__head-text">
+    @if ($shop->requiresBusinessDocuments())
+    <section class="mp-verify-card">
+      <header class="mp-verify-card__head">
+        <div>
           <h2>{{ trans('app.store_document_verification') }}</h2>
           <p>{{ trans('messages.verification_tab_store_documents_help') }}</p>
         </div>
         @if ($hasStoreDocs)
-          <span class="mp-verify-tab-badge mp-verify-tab-badge--info">{{ trans('app.submitted') }}</span>
-        @else
-          <span class="mp-verify-tab-badge mp-verify-tab-badge--warning">{{ trans('app.action_required') }}</span>
+          <span class="mp-chip mp-chip--info">{{ trans('app.submitted') }}</span>
         @endif
-      </div>
-      <div class="mp-panel__body">
-        <div class="mp-alert mp-alert--info">
-          <i class="fa fa-info-circle"></i> {!! trans('messages.verification_store_documents') !!}
-        </div>
+      </header>
 
-        @if ($canSubmit)
-          @include('merchant.verify.partials.documents', [
-            'config' => $config,
-            'editable' => true,
-            'attachments' => $storeAttachments,
-            'documentType' => 'store',
-          ])
-        @else
-          @include('merchant.verify.partials.documents', [
-            'config' => $config,
-            'editable' => false,
-            'attachments' => $storeAttachments,
-            'documentType' => 'store',
-          ])
-        @endif
-      </div>
-    </div>
+      <p class="mp-verify-card__note">{!! trans('messages.verification_store_documents') !!}</p>
+
+      @include('merchant.verify.partials.documents', [
+        'config' => $config,
+        'editable' => $canSubmit,
+        'attachments' => $storeAttachments,
+        'documentType' => 'store',
+      ])
+    </section>
+    @endif
   </div>
 </div>

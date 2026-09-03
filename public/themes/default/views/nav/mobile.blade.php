@@ -1,6 +1,8 @@
 <div class="main-menu mobile-mega-menu sf-mobile-drawer" id="sf-mobile-drawer" aria-hidden="true">
   <div class="sf-mobile-drawer__header">
-    <span class="sf-mobile-drawer__title">{{ trans('theme.menu') ?? 'Menu' }}</span>
+    <a href="{{ url('/') }}" class="sf-mobile-drawer__brand" aria-label="{{ get_platform_title() }}">
+      @include('theme::partials._site_logo', ['wrapLink' => false, 'class' => 'sf-mobile-drawer__logo', 'height' => 36])
+    </a>
     <button type="button" class="sf-mobile-drawer__close main-menu-toggle" aria-label="{{ trans('theme.close') ?? 'Close menu' }}">
       <i class="fal fa-times" aria-hidden="true"></i>
     </button>
@@ -44,8 +46,8 @@
       </a>
     @endauth
 
-    @if (is_null($hidden_menu_items ?? null) || ! in_array('Brands', $hidden_menu_items ?? []))
-      <a href="{{ route('brands') }}" class="sf-mobile-drawer__link">
+    @if (false)
+      <a href="#" class="sf-mobile-drawer__link">
         <span class="sf-mobile-drawer__icon"><i class="fal fa-crown" aria-hidden="true"></i></span>
         <span>{{ trans('theme.brands') }}</span>
       </a>

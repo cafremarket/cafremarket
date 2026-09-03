@@ -178,7 +178,7 @@
                       {{ get_formated_currency($listing->current_sale_price(), 2, config('system_settings.currency.id')) }}
                     </td>
                     <td>
-                      <a href="{{ route('show.product', $listing->slug) }}" target="_blank">
+                      <a href="{{ storefront_product_url($listing) }}" target="_blank">
                         {{ trans('app.view_detail') }}
                       </a>
                     </td>

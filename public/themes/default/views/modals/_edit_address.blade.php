@@ -1,16 +1,24 @@
-<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-  <div class="modal-content p-2">
-    <div class="modal-header p-3 border-0">
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+@include('theme::partials._address_modal_assets')
+
+<div class="modal-dialog modal-lg modal-dialog-centered sf-address-create-modal" role="document">
+  <div class="modal-content sf-address-modal">
+    <div class="modal-header sf-address-modal__header border-0">
+      <div class="sf-address-modal__head">
+        <span class="sf-address-modal__icon" aria-hidden="true">
+          <i class="fa fa-pencil"></i>
+        </span>
+        <div>
+          <h4 class="sf-address-modal__title">{{ ($address->address_type ?? trans('theme.address')) . ' ' . trans('theme.address') }}</h4>
+          <p class="sf-address-modal__subtitle">{{ trans('theme.address_step_details_help') }}</p>
+        </div>
+      </div>
+      <button type="button" class="close sf-address-modal__close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="modal-body pt-0">
-      <div class="form-title text-center mb-2">
-        <h4>{{ ($address->address_type ?? trans('theme.address')) . ' ' . trans('theme.address') }}</h4>
-      </div>
 
-      {!! Form::model($address, ['route' => ['my.address.update', $address], 'method' => 'PUT', 'data-toggle' => 'validator']) !!}
+    <div class="modal-body sf-address-modal__body">
+      {!! Form::model($address, ['route' => ['my.address.update', $address], 'method' => 'PUT', 'class' => 'sf-form', 'data-toggle' => 'validator']) !!}
         @include('partials.address_wizard', [
           'wizardId' => 'edit-address-wizard-' . $address->id,
           'address' => $address,
@@ -20,7 +28,7 @@
         ])
       {!! Form::close() !!}
 
-      <small class="help-block text-muted text-left mt-3">* {{ trans('theme.help.required_fields') }}</small>
+      <p class="sf-address-modal__required">* {{ trans('theme.help.required_fields') }}</p>
     </div>
   </div>
 </div>

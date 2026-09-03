@@ -1674,7 +1674,7 @@ return [
     'how_it_works' => 'Como funciona',
     'approve_refund' => 'Aprovar reembolso',
     'expiry_date' => 'Data de validade',
-    'zcart_compatibility' => 'Versão compatível do zCart',
+    'zcart_compatibility' => 'Versão compatível do cafremarket',
     'assign_deliveryboy' => 'Atribuir entregador',
     'change_deliveryboy' => 'Alterar entregador',
     'show' => 'Mostrar',

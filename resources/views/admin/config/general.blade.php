@@ -90,7 +90,7 @@
             </div> <!-- /.row -->
           </div>
           @else
-            {!! Form::hidden('legal_name', $shop->legal_name) !!}
+            {!! Form::hidden('legal_name', $shop->legal_name ?: $shop->name) !!}
           @endif
 
           <div class="form-group">

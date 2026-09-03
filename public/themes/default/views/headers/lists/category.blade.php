@@ -1,1 +1,1 @@
-<li><a href="{{ route('category.browse', $category->slug) }}">{{ $category->name }}</a></li>
+<li><a href="{{ get_category_url($category) }}">{{ $category->name }}</a></li>

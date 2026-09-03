@@ -34,7 +34,37 @@ class WalletOptionsSeeder extends Seeder
                 'overwrite' => false,
             ], [
                 'option_name' => $prefix.'checkout',
-                'option_value' => false,
+                'option_value' => true,
+                'autoload' => true,
+                'overwrite' => true,
+            ], [
+                'option_name' => 'platform_fee_mpesa_enabled',
+                'option_value' => 0,
+                'autoload' => true,
+                'overwrite' => false,
+            ], [
+                'option_name' => 'platform_fee_mpesa_type',
+                'option_value' => 'percent',
+                'autoload' => true,
+                'overwrite' => false,
+            ], [
+                'option_name' => 'platform_fee_mpesa_value',
+                'option_value' => 0,
+                'autoload' => true,
+                'overwrite' => false,
+            ], [
+                'option_name' => 'platform_fee_emola_enabled',
+                'option_value' => 0,
+                'autoload' => true,
+                'overwrite' => false,
+            ], [
+                'option_name' => 'platform_fee_emola_type',
+                'option_value' => 'percent',
+                'autoload' => true,
+                'overwrite' => false,
+            ], [
+                'option_name' => 'platform_fee_emola_value',
+                'option_value' => 0,
                 'autoload' => true,
                 'overwrite' => false,
             ], [

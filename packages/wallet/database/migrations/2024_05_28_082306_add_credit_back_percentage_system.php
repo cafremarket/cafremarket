@@ -57,19 +57,31 @@ class AddCreditBackPercentageSystem extends Migration
             }
         });
 
-        DB::table(get_option_table_name())->insert([
-            'option_name' => 'wallet_credit_reward_system',
-            'option_value' => true,
-            'autoload' => true,
-            'created_at' => Carbon::Now(),
-            'updated_at' => Carbon::Now(),
-        ], [
-            'option_name' => 'wallet_release_credit_rewards_in_days',
-            'option_value' => config('wallet.default.credit_back_reward_release_in', 3),
-            'autoload' => true,
-            'created_at' => Carbon::Now(),
-            'updated_at' => Carbon::Now(),
-        ]);
+        $optionsTable = get_option_table_name();
+        $now = Carbon::Now();
+
+        foreach ([
+            [
+                'option_name' => 'wallet_credit_reward_system',
+                'option_value' => true,
+            ],
+            [
+                'option_name' => 'wallet_release_credit_rewards_in_days',
+                'option_value' => config('wallet.default.credit_back_reward_release_in', 3),
+            ],
+        ] as $option) {
+            if (DB::table($optionsTable)->where('option_name', $option['option_name'])->exists()) {
+                continue;
+            }
+
+            DB::table($optionsTable)->insert([
+                'option_name' => $option['option_name'],
+                'option_value' => $option['option_value'],
+                'autoload' => true,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
     }
 
     /**

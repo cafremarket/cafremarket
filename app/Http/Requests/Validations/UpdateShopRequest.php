@@ -29,9 +29,15 @@ class UpdateShopRequest extends Request
 
         $id = Request::segment(count(Request::segments())); // Current model ID
 
+        if ($this->filled('nuit')) {
+            $this->merge(['nuit' => preg_replace('/\s+/', '', strtoupper((string) $this->input('nuit')))]);
+        }
+
         return [
             'name' => 'required',
             'legal_name' => 'required',
+            'seller_type' => 'required|in:individual,company',
+            'nuit' => 'nullable|string|min:9|max:20',
             'email' => 'required|email|max:255|unique:shops,email,'.$id,
             'external_url' => 'nullable|url',
             'image' => 'max:'.config('system_settings.max_img_size_limit_kb').'|mimes:jpg,jpeg,png,gif,svg',

@@ -17,8 +17,8 @@ class SystemsSeeder extends BaseSeeder
         DB::table('systems')->insert([
             // 'maintenance_mode' => 1,
             'install_verion' => \App\Models\System::VERSION,
-            'name' => 'zCart',
-            'legal_name' => 'Zcart Inc.',
+            'name' => 'cafremarket',
+            'legal_name' => 'Cafremarket',
             'email' => 'notify@demo.com',
             // 'description' => 'Etc marketplace.',
             'support_phone' => '(+1) 84382648364',

@@ -16,7 +16,7 @@ class LanguagesSeeder extends BaseSeeder
     {
         $now = Carbon::Now();
 
-        DB::table('languages')->insert([
+        foreach ([
             [
                 'code' => 'en',
                 'php_locale_code' => 'en_US',
@@ -24,8 +24,6 @@ class LanguagesSeeder extends BaseSeeder
                 'order' => 1,
                 'rtl' => false,
                 'active' => 1,
-                'created_at' => $now,
-                'updated_at' => $now,
             ],
             [
                 'code' => 'pt',
@@ -34,9 +32,15 @@ class LanguagesSeeder extends BaseSeeder
                 'order' => 2,
                 'rtl' => false,
                 'active' => 1,
-                'created_at' => $now,
-                'updated_at' => $now,
             ],
-        ]);
+        ] as $language) {
+            DB::table('languages')->updateOrInsert(
+                ['code' => $language['code']],
+                array_merge($language, [
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])
+            );
+        }
     }
 }

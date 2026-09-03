@@ -15,7 +15,7 @@ class System extends BaseModel
     use Addressable, Imageable, LogsActivity, Notifiable, SystemUsers;
 
     /**
-     * The zCart version.
+     * The cafremarket version.
      *
      * @var string
      */

@@ -8,16 +8,19 @@
   <title>@yield('title', trans('messages.seller_onboarding_title')) — {{ get_platform_title() }}</title>
   <link rel="icon" href="{{ get_icon_url('system', 'thumbnail') }}" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="{{ asset('css/merchant-panel.css') }}" rel="stylesheet">
+  <link href="{{ asset('css/merchant-panel.css') }}?v={{ filemtime(public_path('css/merchant-panel.css')) }}" rel="stylesheet">
   @yield('head')
 </head>
 <body class="mp-body mp-onboarding">
   <header class="mp-onboarding__header">
     <a href="{{ url('/') }}" class="mp-onboarding__brand">
-      <img src="{{ get_logo_url('system', 'logo') }}" alt="{{ get_platform_title() }}">
-      <span>{{ get_platform_title() }}</span>
+      @if (system_has_custom_logo())
+        <img src="{{ get_logo_url('system', 'logo') }}" alt="{{ get_platform_title() }}">
+      @else
+        <span>{{ get_platform_title() }}</span>
+      @endif
     </a>
     <div class="mp-onboarding__user">
       @include('merchant.partials.language_switcher')

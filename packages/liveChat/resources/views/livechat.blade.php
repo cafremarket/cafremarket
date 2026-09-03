@@ -143,7 +143,7 @@
             $chatSharePayload = [
                 'title' => $product->title,
                 'price' => get_formated_currency($product->current_sale_price(), 2),
-                'url' => route('show.product', $product->slug),
+                'url' => storefront_product_url($product),
                 'image' => get_storage_file_url(optional($product->image)->path, 'tiny_thumb'),
             ];
             $chatShareStorageKey = 'chat_shared_product_'.$product->id;

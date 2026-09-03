@@ -41,7 +41,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'zCart'),
+    'name' => env('APP_NAME', 'cafremarket'),
 
     /*
     |--------------------------------------------------------------------------
@@ -84,7 +84,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | zCart API key.
+    | Marketplace API key.
     |--------------------------------------------------------------------------
     |
     | This key will be used to authorize API calls.
@@ -95,7 +95,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | zCart API secret.
+    | Marketplace API secret.
     |--------------------------------------------------------------------------
     |
     | This string will be used to encrypt sensitive values deliver to APIs
@@ -108,7 +108,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | zCart IV key.
+    | Marketplace encryption IV key.
     |--------------------------------------------------------------------------
     |
     | This key will be used to authorize API calls.

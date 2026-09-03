@@ -9,24 +9,37 @@
 
   <div class="col-md-6 nopadding-left">
     <div class="form-group">
-      {!! Form::label('category_sub_group_id', trans('app.form.category_sub_group') . '*') !!}
-      {!! Form::select('category_sub_group_id', $catList, session('convenient_sub_group_id') ?? null, ['class' => 'form-control select2-categories', 'placeholder' => trans('app.placeholder.category_sub_group'), 'required']) !!}
+      {!! Form::label('slug', trans('app.form.slug') . '*', ['class' => 'with-help']) !!}
+      <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.slug') }}"></i>
+      {!! Form::text('slug', null, ['class' => 'form-control slug', 'placeholder' => trans('app.placeholder.slug'), 'required']) !!}
       <div class="help-block with-errors"></div>
+      @php
+        $shopUrlBase = Auth::check() && Auth::user()->isFromMerchant() && Auth::user()->shop
+          ? rtrim(get_shop_url(Auth::user()->shop), '/')
+          : null;
+      @endphp
+      @if ($shopUrlBase)
+        <p class="help-block text-muted" style="margin-top:6px;">
+          {{ trans('app.form.url') ?? 'URL' }}:
+          <code id="mp-category-url-preview">{{ $shopUrlBase }}/category/<span class="mp-category-slug-preview">{{ old('slug', optional($category ?? null)->slug) }}</span></code>
+        </p>
+        <script>
+          (function () {
+            var input = document.querySelector('input.slug, input[name="slug"]');
+            var preview = document.querySelector('.mp-category-slug-preview');
+            if (!input || !preview) return;
+            var sync = function () { preview.textContent = input.value || ''; };
+            input.addEventListener('input', sync);
+            input.addEventListener('change', sync);
+          })();
+        </script>
+      @endif
     </div>
   </div>
 </div>
 
 <div class="row">
-  <div class="col-md-6 nopadding-right">
-    <div class="form-group">
-      {!! Form::label('slug', trans('app.form.slug') . '*', ['class' => 'with-help']) !!}
-      <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.slug') }}"></i>
-      {!! Form::text('slug', null, ['class' => 'form-control slug', 'placeholder' => trans('app.placeholder.slug'), 'required']) !!}
-      <div class="help-block with-errors"></div>
-    </div>
-  </div>
-
-  <div class="col-md-3 nopadding-right nopadding-left">
+  <div class="col-md-3 nopadding-right">
     <div class="form-group">
       {!! Form::label('active', trans('app.form.status') . '*', ['class' => 'with-help']) !!}
       {!! Form::select('active', ['1' => 'Active', '0' => 'Inactive'], null, ['class' => 'form-control select2-normal', 'placeholder' => trans('app.placeholder.status'), 'required']) !!}
@@ -34,7 +47,7 @@
     </div>
   </div>
 
-  <div class="col-md-3 nopadding-left">
+  <div class="col-md-3 nopadding-left nopadding-right">
     <div class="form-group">
       {!! Form::label('order', trans('app.form.position'), ['class' => 'with-help']) !!}
       <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.display_order') }}"></i>
@@ -107,18 +120,6 @@
       </div>
     </div>
   </div>
-</div>
-
-<div class="form-group">
-  {!! Form::label('meta_title', trans('app.form.meta_title'), ['class' => 'with-help']) !!}
-  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.meta_title') }}"></i>
-  {!! Form::text('meta_title', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.meta_title')]) !!}
-</div>
-
-<div class="form-group">
-  {!! Form::label('meta_description', trans('app.form.meta_description'), ['class' => 'with-help']) !!}
-  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.meta_description') }}"></i>
-  {!! Form::textarea('meta_description', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.meta_description'), 'rows' => '1']) !!}
 </div>
 
 <p class="help-block">* {{ trans('app.form.required_fields') }}</p>

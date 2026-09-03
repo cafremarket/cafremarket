@@ -42,7 +42,7 @@ class Package extends BaseModel
     ];
 
     /**
-     * Check it the package is compatible with the current zCart version.
+     * Check it the package is compatible with the current cafremarket version.
      *
      * @var bool
      */

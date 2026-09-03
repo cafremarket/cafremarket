@@ -118,7 +118,7 @@
                     </div>
 
                     <div class="product-info">
-                      <a href="{{ route('show.product', $item->slug) }}" class="product-info-title">{{ $item->pivot->item_description }}</a>
+                      <a href="{{ storefront_product_url($item) }}" class="product-info-title">{{ $item->pivot->item_description }}</a>
 
                       <div class="mt-2">
                         @if (optional($item->avgFeedback)->rating)

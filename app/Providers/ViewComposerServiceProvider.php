@@ -211,8 +211,10 @@ class ViewComposerServiceProvider extends ServiceProvider
             'admin.attribute._form',
 
             function ($view) {
+                // Attribute type is assigned automatically; keep list for backward compatibility only.
                 $view->with('typeList', ListHelper::attribute_types());
-                $view->with('categories', ListHelper::catWithSubGrpListArray());
+                // Store-oriented flat category list (no groups / sub-groups).
+                $view->with('categories', ListHelper::categories());
             }
         );
     }
@@ -227,7 +229,7 @@ class ViewComposerServiceProvider extends ServiceProvider
             'admin.attribute-value._form',
 
             function ($view) {
-                $view->with('attributeList', ListHelper::attributes(true));
+                $view->with('attributeList', ListHelper::attributes());
             }
         );
     }
@@ -242,8 +244,7 @@ class ViewComposerServiceProvider extends ServiceProvider
             'admin.category._form',
 
             function ($view) {
-                $view->with('catList', ListHelper::catGrpSubGrpListArray());
-                $view->with('attrsList', ListHelper::attributes(true));
+                $view->with('attrsList', ListHelper::attributes());
             }
         );
     }
@@ -335,9 +336,16 @@ class ViewComposerServiceProvider extends ServiceProvider
             ['admin.product._form', 'admin.product.inventory._form'],
 
             function ($view) {
-                $view->with('categories', ListHelper::catWithSubGrpListArray());
+                // Ensure Colour / Size / Material presets exist for this store.
+                if (Auth::check() && Auth::user()->isFromMerchant()) {
+                    ensure_shop_attribute_presets(Auth::user()->merchantId());
+                }
+
+                $view->with('categories', ListHelper::categories());
 
                 $view->with('manufacturers', ListHelper::manufacturers());
+
+                $view->with('attrsList', ListHelper::attributes());
 
                 $view->with('gtin_types', ListHelper::gtin_types());
 

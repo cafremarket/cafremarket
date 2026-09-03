@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class UpdateCategoryRequest extends Request
 {
@@ -13,7 +15,34 @@ class UpdateCategoryRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return $this->user() && $this->user()->isFromMerchant() && $this->user()->merchantId();
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $shopId = Auth::user()->merchantId();
+
+        $slug = $this->input('slug');
+        if ($shopId && filled($slug)) {
+            if (! str_ends_with($slug, '-s'.$shopId) && ! str_contains($slug, '-s'.$shopId.'-')) {
+                $slug .= '-s'.$shopId;
+            }
+        } elseif ($shopId && blank($slug) && $this->filled('name')) {
+            $slug = Str::slug($this->input('name')).'-s'.$shopId;
+        }
+
+        // Sub-group / meta UI removed — drop accidental client values so update keeps existing FK.
+        $data = collect($this->except(['category_sub_group_id', 'meta_title', 'meta_description']))
+            ->all();
+
+        if ($slug !== null) {
+            $data['slug'] = $slug;
+        }
+
+        $this->replace($data);
     }
 
     /**
@@ -26,7 +55,6 @@ class UpdateCategoryRequest extends Request
         $id = $this->route('category');
 
         return [
-            'category_sub_group_id' => 'required',
             'name' => 'required',
             'slug' => 'required|alpha_dash|composite_unique:categories, '.$id,
             'image' => 'mimes:jpg,jpeg,png,svg',
@@ -42,7 +70,7 @@ class UpdateCategoryRequest extends Request
     public function messages()
     {
         return [
-            // 'attribute_type_id.required' => trans('validation.attribute_type_id_required'),
+            //
         ];
     }
 }

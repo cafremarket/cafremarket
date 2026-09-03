@@ -35,8 +35,6 @@
             </div>
           </div>
 
-          @include('theme::partials._account_subnav')
-
           @if (isset($content))
             {!! $content !!}
           @else

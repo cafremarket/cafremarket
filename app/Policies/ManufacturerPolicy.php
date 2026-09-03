@@ -18,7 +18,8 @@ class ManufacturerPolicy
      */
     public function index(User $user)
     {
-        return (new Authorize($user, 'view_manufacturer'))->check();
+        return $user->isFromMerchant()
+            && (new Authorize($user, 'view_manufacturer'))->check();
     }
 
     /**
@@ -28,6 +29,10 @@ class ManufacturerPolicy
      */
     public function view(User $user, Manufacturer $manufacturer)
     {
+        if ($user->isFromMerchant() && ! $this->ownsManufacturer($user, $manufacturer)) {
+            return false;
+        }
+
         return (new Authorize($user, 'view_manufacturer', $manufacturer))->check();
     }
 
@@ -48,6 +53,10 @@ class ManufacturerPolicy
      */
     public function update(User $user, Manufacturer $manufacturer)
     {
+        if ($user->isFromMerchant() && ! $this->ownsManufacturer($user, $manufacturer)) {
+            return false;
+        }
+
         return (new Authorize($user, 'edit_manufacturer', $manufacturer))->check();
     }
 
@@ -58,6 +67,10 @@ class ManufacturerPolicy
      */
     public function delete(User $user, Manufacturer $manufacturer)
     {
+        if ($user->isFromMerchant() && ! $this->ownsManufacturer($user, $manufacturer)) {
+            return false;
+        }
+
         return (new Authorize($user, 'delete_manufacturer', $manufacturer))->check();
     }
 
@@ -69,5 +82,10 @@ class ManufacturerPolicy
     public function massDelete(User $user)
     {
         return (new Authorize($user, 'delete_manufacturer'))->check();
+    }
+
+    private function ownsManufacturer(User $user, Manufacturer $manufacturer): bool
+    {
+        return (int) $manufacturer->shop_id === (int) $user->merchantId();
     }
 }

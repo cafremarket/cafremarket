@@ -108,7 +108,7 @@
                       <img src="{{ get_product_img_src($wish->inventory, 'tiny_thumb') }}" alt="" width="40" height="40" style="object-fit:cover;border-radius:6px;">
                     </td>
                     <td>
-                      <a href="{{ route('show.product', $wish->inventory->slug) }}">{{ Str::limit($wish->inventory->title, 40) }}</a>
+                      <a href="{{ storefront_product_url($wish->inventory) }}">{{ Str::limit($wish->inventory->title, 40) }}</a>
                     </td>
                     <td class="text-right">
                       <a class="btn btn-xs sf-btn-primary" href="{{ route('direct.checkout', $wish->inventory->slug) }}">
@@ -122,10 +122,10 @@
                       <img src="{{ get_storage_file_url(optional($wish->product->featureImage)->path, 'tiny') }}" alt="" width="40" height="40" style="object-fit:cover;border-radius:6px;">
                     </td>
                     <td>
-                      <a href="{{ route('show.offers', $wish->product->slug) }}">{{ Str::limit($wish->product->name, 40) }}</a>
+                      <a href="{{ storefront_product_offers_url($wish->inventory) }}">{{ Str::limit($wish->product->name, 40) }}</a>
                     </td>
                     <td class="text-right">
-                      <a class="btn btn-xs btn-default" href="{{ route('show.offers', $wish->product->slug) }}">
+                      <a class="btn btn-xs btn-default" href="{{ storefront_product_offers_url($wish->inventory) }}">
                         @lang('theme.view_more_offers', ['count' => $wish->product->inventories_count ?? 0])
                       </a>
                     </td>

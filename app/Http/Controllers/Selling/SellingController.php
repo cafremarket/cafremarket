@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Selling;
 
 use App\Http\Controllers\Controller;
-use App\Models\FaqTopic;
-use App\Models\SubscriptionPlan;
 
 class SellingController extends Controller
 {
@@ -15,9 +13,6 @@ class SellingController extends Controller
      */
     public function index()
     {
-        $faqTopics = FaqTopic::merchant()->with('faqs')->get();
-        $subscription_plans = SubscriptionPlan::orderBy('order', 'asc')->get();
-
-        return view('index', compact('subscription_plans', 'faqTopics'));
+        return view('index');
     }
 }

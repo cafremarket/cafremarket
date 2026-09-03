@@ -17,7 +17,7 @@ class BlogSeeder extends BaseSeeder
     public function run()
     {
         \App\Models\Blog::factory()->create([
-            'slug' => 'abc-zcart-blog-post',
+            'slug' => 'abc-cafremarket-blog-post',
         ]);
         \App\Models\Blog::factory()->count($this->count)->create();
 

@@ -25,7 +25,7 @@
                     <ul class="nav-category-inner-list show-hide-content less">
                       @foreach ($subGroup->categories as $cat)
                         <li>
-                          <a href="{{ route('category.browse', $cat->slug) }}">{{ $cat->name }}</a>
+                          <a href="{{ get_category_url($cat) }}">{{ $cat->name }}</a>
                         </li>
                       @endforeach
                     </ul>

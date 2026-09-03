@@ -25,9 +25,9 @@
       </div>
       <div class="form-group">
         {!! Form::select('has_balance', [
-          '1' => trans('packages.wallet.with_balance'),
           '0' => trans('packages.wallet.all_active_wallets'),
-        ], request('has_balance', '1'), ['class' => 'form-control input-sm']) !!}
+          '1' => trans('packages.wallet.with_balance'),
+        ], request('has_balance', '0'), ['class' => 'form-control input-sm']) !!}
       </div>
       <button type="submit" class="btn btn-default btn-sm btn-flat">
         <i class="fa fa-search"></i> {{ trans('app.search') }}

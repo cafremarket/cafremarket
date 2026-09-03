@@ -5,8 +5,8 @@
     @else
       <div class="modal-content p-2">
         <div class="modal-header p-3">
-          <div class="modal-icon">
-            <img src="{{ get_icon_url('system', 'full') }}" alt="rocket_contact">
+          <div class="modal-icon sf-auth-modal-logo">
+            @include('theme::partials._site_logo', ['wrapLink' => false, 'class' => 'sf-auth-modal-logo__img', 'height' => 56])
           </div>
 
           <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close" style="display:none;">
@@ -19,10 +19,15 @@
             <h4>{{ trans('theme.account_login') }}</h4>
           </div>
 
+          <div id="loginModalError" class="alert alert-danger sf-login-modal-alert text-left d-none" role="alert" aria-live="polite">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+            <span class="sf-login-modal-alert__text"></span>
+          </div>
+
           <div class="d-flex flex-column text-center">
-            {!! Form::open(['route' => 'customer.login.submit', 'id' => 'loginForm-1', 'data-toggle' => 'validator', 'novalidate']) !!}
+            {!! Form::open(['route' => 'customer.login.submit', 'id' => 'loginForm-1', 'class' => 'js-ajax-login-form', 'data-toggle' => 'validator', 'novalidate']) !!}
             <div class="form-group">
-              <input name="email" id="email" class="form-control input-lg" type="email" placeholder="{{ trans('theme.placeholder.your_email') }}" required />
+              <input name="email" id="email" class="form-control input-lg" type="email" placeholder="{{ trans('theme.placeholder.your_email') }}" required autofocus />
               <div class="help-block with-errors"></div>
             </div>
 
@@ -43,7 +48,9 @@
               </label>
             </div>
 
-            <input class="btn btn-primary btn-block btn-lg btn-round mt-3" type="submit" value="{{ trans('theme.button.login') }}">
+            <button class="btn btn-primary btn-block btn-lg btn-round mt-3 js-login-submit" type="submit">
+              {{ trans('theme.button.login') }}
+            </button>
             {!! Form::close() !!}
 
             <div class="sf-auth-divider"><span>{{ trans('theme.or') }}</span></div>
@@ -60,7 +67,14 @@
               @endif
             </div>
 
-            @include('theme::auth._social_modal_login')
+            <div class="sf-auth-seller-login">
+              <a href="{{ route('selling.login') }}" class="sf-auth-seller-link">
+                <i class="fal fa-store" aria-hidden="true"></i>
+                {{ trans('theme.nav.seller_login') }}
+              </a>
+            </div>
+
+            {{-- Social login hidden for now --}}
           </div>
         </div>
 
@@ -82,8 +96,8 @@
   <div class="modal-dialog auth-modal modal-md modal-dialog-centered" role="document">
     <div class="modal-content px-3">
       <div class="modal-header p-3">
-        <div class="modal-icon">
-          <img src="{{ get_icon_url('system', 'full') }}" alt="rocket_contact">
+        <div class="modal-icon sf-auth-modal-logo">
+          @include('theme::partials._site_logo', ['wrapLink' => false, 'class' => 'sf-auth-modal-logo__img', 'height' => 56])
         </div>
         <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close" style="display:none;">
           <span aria-hidden="true">&times;</span>
@@ -170,8 +184,8 @@
   <div class="modal-dialog auth-modal modal-sm modal-dialog-centered" role="document">
     <div class="modal-content px-2">
       <div class="modal-header p-3">
-        <div class="modal-icon">
-          <img src="{{ get_icon_url('system', 'full') }}" alt="rocket_contact">
+        <div class="modal-icon sf-auth-modal-logo">
+          @include('theme::partials._site_logo', ['wrapLink' => false, 'class' => 'sf-auth-modal-logo__img', 'height' => 56])
         </div>
         <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close" style="display:none;">
           <span aria-hidden="true">&times;</span>

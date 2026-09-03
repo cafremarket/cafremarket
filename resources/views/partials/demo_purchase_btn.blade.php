@@ -1,5 +1,5 @@
 <style>
-  .zcart-purchase-btn {
+  .cafremarket-purchase-btn {
     position: fixed;
     left: 20px;
     bottom: 20px;
@@ -13,24 +13,24 @@
     color: #fff;
   }
 
-  .zcart-purchase-btn del {
+  .cafremarket-purchase-btn del {
     font-size: 16px;
     display: block;
   }
 
-  .zcart-purchase-price {
+  .cafremarket-purchase-price {
     font-size: 31px;
     margin-top: -8px;
   }
 
-  .zcart-purchase-price>sup {
+  .cafremarket-purchase-price>sup {
     font-size: 16px;
   }
 </style>
 
-<a href="https://zcart.net" target="_blank">
-  <div class="zcart-purchase-btn">
+<a href="https://www.cafremarket.co.mz" target="_blank">
+  <div class="cafremarket-purchase-btn">
     <del class="small">$299</del>
-    <div class="zcart-purchase-price"><sup>$</sup>149</div>
+    <div class="cafremarket-purchase-price"><sup>$</sup>149</div>
   </div>
 </a>

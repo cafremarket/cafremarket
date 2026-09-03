@@ -14,7 +14,7 @@
         var shop = $('#shop-id' + cart).val();
         var shippingOptions = getShippingOptions(cart);
 
-        if (!shop || !shippingOptions) {
+        if (!shop) {
           disableCartCheckout(cart);
         } else {
           var shippingRateId = Number($('#shipping-rate-id' + cart).val());
@@ -258,7 +258,7 @@
         zone = JSON.parse(zone);
 
         if ($.isEmptyObject(zone) && !cart_digital) {
-          @include('theme::layouts.notification', ['message' => trans('theme.notify.seller_doesnt_ship'), 'type' => 'warning', 'icon' => 'times-circle'])
+          return;
         }
 
         // Skip and return if the zone is still the same
@@ -479,7 +479,7 @@
           var handlingCost = $('#handling-cost' + cart).val();
 
           if ($.isEmptyObject(filtered)) {
-            var options = '<p class="mb-1">{{ trans('theme.seller_doesnt_ship') }}</p>';
+            var options = '<p class="mb-1">{{ trans('theme.notify.will_calculated_on_select') }}</p>';
           } else {
             var options = '<table class="table table-striped" id="checkout-options-table">';
 
@@ -739,7 +739,7 @@
             enableCartCheckout(cart);
           } else {
             setShippingCostThenSave(cart);
-            disableCartCheckout(cart);
+            enableCartCheckout(cart);
           }
         }
 
@@ -828,21 +828,13 @@
       }
 
       function disableCartCheckout(cart) {
-        disableCartPayment("{{ trans('theme.notify.seller_doesnt_ship') }}"); // For checkout page only
-
         $('#checkout-btn' + cart).attr("disabled", "disabled");
         $('#table' + cart + ' > tfoot').addClass('hidden');
-
-        // Disanle all checkout option
-        $('#allCheckoutBtn').attr("disabled", "disabled");
-        $('#allCheckoutDisable').removeClass('hidden');
 
         var shop = $('#shop-id' + cart).val();
         if (!shop) {
           $('#store-unavailable-notice' + cart).removeClass('hidden');
           $('#table' + cart + ' td, #cart-summary' + cart).addClass('text-disable');
-        } else {
-          $('#shipping-notice' + cart).removeClass('hidden');
         }
       }
 

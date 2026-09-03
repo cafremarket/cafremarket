@@ -26,9 +26,6 @@
     @include('theme::sections.banners', ['banners' => $banners['group_3']])
   @endif
 
-  {{-- 3. Featured products from nearby stores (5 items) --}}
-  @include('theme::sections.nearby_featured')
-
   {{-- 4. Nearby stores based on delivery address --}}
   @include('theme::sections.nearby_stores')
 @endsection
@@ -43,21 +40,5 @@
         slideshow_interval: 4000,
       });
     @endif
-
-    if ($('.nearby-featured-slider').length) {
-      $('.nearby-featured-slider').owlCarousel({
-        loop: true,
-        lazyLoad: true,
-        dots: true,
-        margin: 16,
-        nav: true,
-        responsive: {
-          0: { items: 1 },
-          576: { items: 2 },
-          992: { items: 3 },
-          1200: { items: 5 }
-        }
-      });
-    }
   </script>
 @endsection

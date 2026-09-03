@@ -93,6 +93,14 @@ Route::middleware(['web'])->group(function () {
                 AdminWalletController::class, 'topup',
             ])->name('wallet.topup.submit');
 
+            Route::get('wallet/create', [
+                AdminWalletController::class, 'showCreateForm',
+            ])->name('wallet.create');
+
+            Route::post('wallet/create', [
+                AdminWalletController::class, 'create',
+            ])->name('wallet.create.submit');
+
             Route::get('wallet/transactions', [
                 AdminWalletController::class, 'transactions',
             ])->name('wallet.transactions');

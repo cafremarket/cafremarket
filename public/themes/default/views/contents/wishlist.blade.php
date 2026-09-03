@@ -24,11 +24,11 @@
 
             <img class="lazy product-img-alt" src="{{ get_product_img_src($wish->inventory, 'tiny_thumb', 'alt') }}" data-src="{{ get_product_img_src($wish->inventory, 'full', 'alt') }}" alt="{{ $wish->inventory->title }}" title="{{ $wish->inventory->title }}" />
 
-            <a class="product-link" href="{{ route('show.product', $wish->inventory->slug) }}"></a>
+            <a class="product-link" href="{{ storefront_product_url($wish->inventory) }}"></a>
           </div>
 
           <div class="product-actions">
-            <a class="btn btn-default itemQuickView" href="javascript:void(0);" data-link="{{ route('quickView.product', $wish->inventory->slug) }}" rel="nofollow noindex">
+            <a class="btn btn-default itemQuickView" href="javascript:void(0);" data-link="{{ storefront_product_quickview_url($wish->inventory) }}" rel="nofollow noindex">
               <i class="far fa-eye" data-toggle="tooltip" title="@lang('theme.button.quick_view')"></i>
               <span class="ml-1">@lang('theme.button.quick_view')</span>
             </a>
@@ -52,7 +52,7 @@
           <div class="product-info">
             @include('theme::layouts.ratings', ['ratings' => $wish->inventory->ratings])
 
-            <a href="{{ route('show.product', $wish->inventory->slug) }}" class="product-info-title">
+            <a href="{{ storefront_product_url($wish->inventory) }}" class="product-info-title">
               {{ $wish->inventory->title }}
             </a>
 

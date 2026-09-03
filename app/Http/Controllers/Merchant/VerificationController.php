@@ -33,9 +33,9 @@ class VerificationController extends Controller
         return app(ConfigController::class)->saveVerificationData($request);
     }
 
-    public function saveLocation(Request $request)
+    public function saveLocation(Request $request, ShopAddressChangeService $addressChanges)
     {
-        return app(ConfigController::class)->saveStoreLocation($request);
+        return app(ConfigController::class)->saveStoreLocation($request, $addressChanges);
     }
 
     public function savePhone(Request $request)

@@ -29,6 +29,28 @@ class EloquentManufacturer extends EloquentRepository implements BaseRepository,
         return $query->mine()->get();
     }
 
+    public function find($id)
+    {
+        $query = $this->model->newQuery();
+
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
+        }
+
+        return $query->findOrFail($id);
+    }
+
+    public function findTrash($id)
+    {
+        $query = $this->model->onlyTrashed();
+
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
+        }
+
+        return $query->findOrFail($id);
+    }
+
     public function trashOnly()
     {
         $query = $this->model->onlyTrashed();

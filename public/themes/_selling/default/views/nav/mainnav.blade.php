@@ -1,41 +1,43 @@
-<nav id="mainNav" class="navbar navbar-default navbar-custom navbar-fixed-top">
-  <div class="container">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header page-scroll">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-        <span class="sr-only">{{ trans('theme.nav.toggle_navigation') }}</span> {{ trans('theme.nav.menu') }} <i class="fa fa-bars"></i>
-      </button>
-      <a class="navbar-brand page-scroll" href="{{ url('/') }}">
-        {{-- @if (Storage::exists('logo.png')) --}}
-        <img src="{{ get_logo_url('system', 'logo') }}" class="brand-logo" alt="{{ trans('theme.logo') }}" title="{{ trans('theme.logo') }}" />
-        {{-- <img src="{{ url('image/logo.png') }}" class="brand-logo" alt="{{ trans('app.logo') }}" title="{{ trans('app.logo') }}" /> --}}
-        {{-- @else
-          <img src="https://placehold.it/140x60/eee?text={{ get_platform_title() }}" class="brand-logo" alt="LOGO" title="LOGO" />
-        @endif --}}
-      </a>
-    </div>
+<header class="sf-sell-header" id="sfSellHeader">
+  <div class="container sf-sell-header__inner">
+    <a href="{{ url('/') }}" class="sf-sell-header__brand">
+      @if (system_has_custom_logo())
+        <img src="{{ get_logo_url('system', 'logo') }}" class="sf-sell-header__logo" alt="{{ get_platform_brand_label() }}">
+      @else
+        <span class="sf-sell-header__brand-text">{{ get_platform_brand_label() }}</span>
+      @endif
+    </a>
 
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav navbar-right">
-        <li class="hidden">
-          <a href="#page-top"></a>
-        </li>
-        <li>
-          {{-- <a class="page-scroll" href="#services">{{ trans('theme.nav.benefits') }}</a> --}}
-        </li>
-        <li>
-          <a href="{{ route('selling.login') }}">{{ trans('app.form.login') }}</a>
-        </li>
-        <li>
-          <a href="{{ route('selling.register') }}">{{ trans('app.form.register_as_merchant') }}</a>
-        </li>
-        <li>
-          <a class="page-scroll" href="#contact">{{ trans('theme.nav.contact_us') }}</a>
-        </li>
-      </ul>
+    <ul class="sf-sell-header__nav">
+      <li><a href="#benefits" class="sf-sell-scroll-link">{{ trans('theme.benefits') }}</a></li>
+      <li><a href="#howItWorks" class="sf-sell-scroll-link">{{ trans('theme.how_it_works') }}</a></li>
+      @if (is_subscription_enabled())
+        <li><a href="#pricing" class="sf-sell-scroll-link">{{ trans('theme.pricing') }}</a></li>
+      @endif
+      <li><a href="#faqs" class="sf-sell-scroll-link">{{ trans('theme.faq') }}</a></li>
+      <li><a href="#contact" class="sf-sell-scroll-link">{{ trans('theme.nav.contact_us') }}</a></li>
+    </ul>
+
+    <div class="sf-sell-header__actions">
+      <a href="{{ route('selling.login') }}" class="sf-sell-btn sf-sell-btn--ghost">{{ trans('app.form.login') }}</a>
+      <a href="{{ route('selling.register') }}" class="sf-sell-btn sf-sell-btn--primary">{{ trans('theme.button.selling') }}</a>
+      <button type="button" class="sf-sell-header__toggle" id="sfSellNavToggle" aria-label="{{ trans('theme.nav.toggle_navigation') }}">
+        <i class="fa fa-bars"></i>
+      </button>
     </div>
-    <!-- /.navbar-collapse -->
   </div>
-  <!-- /.container-fluid -->
-</nav>
+</header>
+
+<div class="sf-sell-mobile-nav" id="sfSellMobileNav">
+  <div class="sf-sell-mobile-nav__panel">
+    <a href="#benefits" class="sf-sell-scroll-link">{{ trans('theme.benefits') }}</a>
+    <a href="#howItWorks" class="sf-sell-scroll-link">{{ trans('theme.how_it_works') }}</a>
+    @if (is_subscription_enabled())
+      <a href="#pricing" class="sf-sell-scroll-link">{{ trans('theme.pricing') }}</a>
+    @endif
+    <a href="#faqs" class="sf-sell-scroll-link">{{ trans('theme.faq') }}</a>
+    <a href="#contact" class="sf-sell-scroll-link">{{ trans('theme.nav.contact_us') }}</a>
+    <a href="{{ route('selling.login') }}">{{ trans('app.form.login') }}</a>
+    <a href="{{ route('selling.register') }}">{{ trans('theme.button.selling') }}</a>
+  </div>
+</div>

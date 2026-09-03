@@ -1,3 +1,5 @@
+@include('theme::partials._address_modal_assets')
+
 <div class="modal-dialog modal-lg modal-dialog-centered sf-address-select-modal" role="document">
   <div class="modal-content p-2">
     <div class="modal-header p-3 border-0 sf-address-select-modal__header">
@@ -23,7 +25,7 @@
               <span class="sf-address-card__type">{{ $address->address_type }}</span>
               @if ($activeAddressId === $address->id)
                 <span class="sf-address-card__badge">
-                  <i class="fas fa-check-circle" aria-hidden="true"></i> {{ trans('theme.current') }}
+                  <i class="fa fa-check-circle" aria-hidden="true"></i> {{ trans('theme.current') }}
                 </span>
               @endif
             </div>
@@ -33,7 +35,7 @@
           </button>
         @empty
           <div class="sf-empty-state">
-            <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+            <i class="fa fa-map" aria-hidden="true"></i>
             <p>{{ trans('theme.nothing_found') }}</p>
             <p class="text-muted">{{ trans('theme.add_delivery_address_help') }}</p>
           </div>
@@ -45,8 +47,9 @@
       <button type="button" class="btn btn-default flat js-close-address-select" data-dismiss="modal">
         {{ trans('theme.button.cancel') }}
       </button>
-      <a href="{{ route('my.address.create') }}" class="modalAction btn sf-btn-primary">
-        <i class="fas fa-plus" aria-hidden="true"></i> {{ trans('theme.button.add_new_address') }}
+      <a href="{{ route('my.address.create') }}" class="modalAction btn sf-btn-primary sf-address-select-modal__add-btn">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+        <span>{{ trans('theme.button.add_new_address') }}</span>
       </a>
     </div>
   </div>

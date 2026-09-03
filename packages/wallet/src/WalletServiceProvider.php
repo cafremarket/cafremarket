@@ -106,6 +106,7 @@ class WalletServiceProvider extends ServiceProvider
         $classes = [
             \Incevio\Package\Wallet\Http\Controllers\Admin\AdminWalletController::class => __DIR__.'/Http/Controllers/Admin/AdminWalletController.php',
             \Incevio\Package\Wallet\Http\Requests\AdminWalletTopupRequest::class => __DIR__.'/Http/Requests/AdminWalletTopupRequest.php',
+            \Incevio\Package\Wallet\Http\Requests\AdminCreateWalletRequest::class => __DIR__.'/Http/Requests/AdminCreateWalletRequest.php',
         ];
 
         foreach ($classes as $class => $path) {

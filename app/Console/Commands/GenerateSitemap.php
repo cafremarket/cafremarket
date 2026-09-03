@@ -32,18 +32,18 @@ class GenerateSitemap extends Command
         $sitemap = SitemapGenerator::create(url('/'))->getSitemap();
 
         // products
-        DB::table('products')->select('slug')
+        DB::table('products')->select('slug', 'shop_id')
             ->orderBy('id')->chunk(100, function ($items) use ($sitemap) {
                 foreach ($items as $item) {
-                    $sitemap->add(route('show.offers', $item->slug));
+                    $sitemap->add(storefront_product_offers_url($item));
                 }
             });
 
         // inventories
-        DB::table('inventories')->select('slug')
+        DB::table('inventories')->select('slug', 'shop_id')
             ->orderBy('id')->chunk(100, function ($items) use ($sitemap) {
                 foreach ($items as $item) {
-                    $sitemap->add(route('show.product', $item->slug));
+                    $sitemap->add(storefront_product_url($item));
                 }
             });
 
@@ -55,19 +55,22 @@ class GenerateSitemap extends Command
                 }
             });
 
-        // brands
-        DB::table('manufacturers')->select('slug')
-            ->orderBy('id')->chunk(100, function ($items) use ($sitemap) {
-                foreach ($items as $item) {
-                    $sitemap->add(route('show.brand', $item->slug));
-                }
-            });
-
-        // categories
-        DB::table('categories')->select('slug')
+        // categories (store-scoped when shop_id is set)
+        DB::table('categories')->select('slug', 'shop_id')
             ->orderBy('id')->chunk(100, function ($cats) use ($sitemap) {
+                $shopSlugs = DB::table('shops')
+                    ->whereIn('id', collect($cats)->pluck('shop_id')->filter()->unique())
+                    ->pluck('slug', 'id');
+
                 foreach ($cats as $cat) {
-                    $sitemap->add(route('category.browse', $cat->slug));
+                    if ($cat->shop_id && isset($shopSlugs[$cat->shop_id])) {
+                        $sitemap->add(route('shop.category.browse', [
+                            'slug' => $shopSlugs[$cat->shop_id],
+                            'category' => $cat->slug,
+                        ]));
+                    } else {
+                        $sitemap->add(route('category.browse', $cat->slug));
+                    }
                 }
             });
 

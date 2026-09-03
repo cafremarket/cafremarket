@@ -1,26 +1,28 @@
-<section style="margin-bottom: 0px;" class="d-none d-sm-block">
+@php
+  $shop = $item->shop;
+  $productCategories = optional($item->product)->categories ?? collect();
+  $t_category = $productCategories->first(function ($category) use ($shop) {
+      return $shop && (int) $category->shop_id === (int) $shop->id;
+  }) ?: $productCategories->first();
+@endphp
+<nav class="sf-pdp-crumb" aria-label="breadcrumb">
   <div class="container">
-    <header class="page-header">
-      <div class="row">
-        {{-- <div class="col-md-12">
-          @php
-            $t_category = $item->product->categories->first();
-          @endphp
-          <ol class="breadcrumb nav-breadcrumb">
-            @if ($t_category && $t_category->subGroup)
-              @if ($t_category->subGroup->group)
-                @include('theme::headers.lists.category_grp', ['category' => $t_category->subGroup->group])
-              @endif
+    <ol class="sf-pdp-crumb__list">
+      @include('theme::headers.lists.home')
 
-              @include('theme::headers.lists.category_subgrp', ['category' => $t_category->subGroup])
+      @if ($shop)
+        <li>
+          <a href="{{ route('show.store', $shop->slug) }}">{{ $shop->name }}</a>
+        </li>
+      @endif
 
-              @include('theme::headers.lists.category', ['category' => $t_category])
+      @if ($t_category)
+        <li>
+          <a href="{{ get_category_url($t_category, $shop) }}">{{ $t_category->name }}</a>
+        </li>
+      @endif
 
-            @endif
-            <li class="active">{!! \Str::limit($item->title, 50) !!}</li>
-          </ol>
-        </div> --}}
-      </div>
-    </header>
+      <li class="active">{{ \Illuminate\Support\Str::limit($item->title, 48) }}</li>
+    </ol>
   </div>
-</section>
+</nav>

@@ -221,6 +221,24 @@ class Config extends BaseModel
         return count($this->storeVerificationAttachmentIds()) > 0;
     }
 
+    public function requiresStoreVerificationDocuments(): bool
+    {
+        return $this->shop && $this->shop->requiresBusinessDocuments();
+    }
+
+    public function hasRequiredVerificationDocuments(): bool
+    {
+        if (! $this->hasPersonVerificationDocuments()) {
+            return false;
+        }
+
+        if ($this->requiresStoreVerificationDocuments() && ! $this->hasStoreVerificationDocuments()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function registerVerificationAttachmentIds(array $attachmentIds, string $type): void
     {
         $attachmentIds = array_values(array_unique(array_map('intval', $attachmentIds)));

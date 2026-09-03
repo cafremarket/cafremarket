@@ -18,7 +18,8 @@ class AttributePolicy
      */
     public function index(User $user)
     {
-        return (new Authorize($user, 'view_attribute'))->check();
+        return $user->isFromMerchant()
+            && (new Authorize($user, 'view_attribute'))->check();
     }
 
     /**

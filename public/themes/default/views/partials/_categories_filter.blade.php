@@ -140,7 +140,7 @@
 
         <ul>
           @foreach ($categorySubGroup->categories as $slug => $t_category)
-            <li><a href="{{ route('category.browse', $t_category->slug) }}">{{ $t_category->name }}</a></li>
+            <li><a href="{{ get_category_url($t_category) }}">{{ $t_category->name }}</a></li>
           @endforeach
         </ul>
       </li>
@@ -166,7 +166,7 @@
               @if ($t_category->slug == $category->slug)
                 <strong>{{ $t_category->name }}</strong>
               @else
-                <a href="{{ route('category.browse', $t_category->slug) }}">{{ $t_category->name }}</a>
+                <a href="{{ get_category_url($t_category) }}">{{ $t_category->name }}</a>
               @endif
             </li>
           @endforeach
@@ -175,7 +175,7 @@
     @else
       @foreach ($categories as $slug => $t_category)
         <li>
-          <a href="{{ route('category.browse', $t_category->slug) }}">{{ $t_category->name }}
+          <a href="{{ get_category_url($t_category) }}">{{ $t_category->name }}
             {{-- <span class="small">({{ $t_category->listings_count }})</span> --}}
           </a>
         </li>

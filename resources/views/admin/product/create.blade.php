@@ -1,7 +1,7 @@
 @extends('admin.layouts.master')
 
 @section('content')
-  {!! Form::open(['route' => 'admin.catalog.product.store', 'files' => true, 'id' => 'form-ajax-upload', 'data-toggle' => 'validator']) !!}
+  {!! Form::open(['url' => mp_route('admin.catalog.product.store'), 'files' => true, 'id' => 'form-ajax-upload', 'data-toggle' => 'validator']) !!}
 
   @include('admin.product._form')
 

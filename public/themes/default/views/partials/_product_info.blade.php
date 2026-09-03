@@ -15,10 +15,10 @@
     @include('auction::frontend.timer')
   @endif
 
-  @if ($item->product->manufacturer->slug)
-    <a href="{{ route('show.brand', $item->product->manufacturer->slug) }}" class="product-info-seller-name">
+  @if ($item->product->manufacturer)
+    <span class="product-info-seller-name">
       <i class="fal fa-crown small"></i> {{ $item->product->manufacturer->name }}
-    </a>
+    </span>
   @else
     <a href="{{ route('show.store', $item->shop->slug) }}" class="product-info-seller-name">
       <i class="far fa-store"></i> {!! $item->shop->getQualifiedName() !!}
@@ -27,7 +27,7 @@
 
   @if ('quickView.product' == Route::currentRouteName())
     <h5 class="product-info-title mt-0" data-name="product_name">
-      <a href="{{ route('show.product', $item->slug) }}" class="">
+      <a href="{{ storefront_product_url($item) }}" class="">
         {{ $item->title }}
       </a>
     </h5>

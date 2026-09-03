@@ -70,6 +70,28 @@
               <div class="help-block with-errors"></div>
             </div>
 
+            @php $selectedSellerType = old('seller_type', \App\Models\Shop::SELLER_TYPE_INDIVIDUAL); @endphp
+            <div class="form-group">
+              <label>{{ trans('app.form.seller_type') }} *</label>
+              <div class="row">
+                @foreach (\App\Models\Shop::sellerTypeOptions() as $value => $label)
+                  <div class="col-sm-6">
+                    <label class="radio-inline" style="display:block; margin-bottom:8px;">
+                      <input type="radio" name="seller_type" value="{{ $value }}" {{ $selectedSellerType === $value ? 'checked' : '' }} required>
+                      {{ $label }}
+                    </label>
+                  </div>
+                @endforeach
+              </div>
+              <div class="help-block with-errors"></div>
+            </div>
+
+            <div class="form-group has-feedback">
+              {!! Form::text('nuit', old('nuit'), ['class' => 'form-control input-lg', 'placeholder' => trans('app.placeholder.nuit'), 'required', 'maxlength' => 20]) !!}
+              <i class="glyphicon glyphicon-barcode form-control-feedback"></i>
+              <div class="help-block with-errors">{{ trans('help.nuit') }}</div>
+            </div>
+
             @if (\App\Models\SystemConfig::vendorRegistrationHasAdditionalFields())
               @include('smartForm::partials._parsed_input_fields', ['row' => smart_form_fields(config('system_settings.smart_form_id_for_vendor_additional_info'))])
             @endif

@@ -21,11 +21,14 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
 
     Route::name('account.')->prefix('account')->group(function () {
         Route::get('profile', [AccountController::class, 'profile'])->name('profile');
+        Route::get('billing', [AccountController::class, 'profile'])->name('billing');
         Route::put('update', [AccountController::class, 'update'])->name('update');
         Route::get('changePasswordForm', [AccountController::class, 'ShowChangePasswordForm'])->name('showChangePasswordForm');
         Route::post('updatePassword', [AccountController::class, 'updatePassword'])->name('updatePassword');
         Route::post('updatePhoto', [AccountController::class, 'updatePhoto'])->name('updatePhoto');
         Route::get('deletePhoto', [AccountController::class, 'deletePhoto'])->name('deletePhoto');
+
+        include 'admin/Billing.php';
     });
 
     Route::middleware(['subscribed', 'checkBillingInfo', 'requireMerchantVerification'])->group(function () {
@@ -43,7 +46,18 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
         });
 
         Route::name('catalog.')->prefix('catalog')->group(function () {
+            include 'admin/Category.php';
+            include 'admin/Attribute.php';
+            include 'admin/AttributeValues.php';
             include 'admin/Product.php';
+            include 'admin/Manufacturer.php';
+        });
+
+        Route::middleware('ajax')->group(function () {
+            Route::get('catalog/ajax/getParentAttributeType', [
+                \App\Http\Controllers\Admin\AttributeController::class,
+                'ajaxGetParentAttributeType',
+            ])->name('ajax.getParentAttributeType');
         });
 
         Route::name('stock.')->prefix('stock')->group(function () {

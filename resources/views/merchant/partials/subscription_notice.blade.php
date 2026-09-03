@@ -16,9 +16,11 @@
         <strong><i class="fa fa-info-circle"></i> {{ trans('app.notice') }}</strong>
         {{ trans('messages.resume_subscription', ['ends' => remaining_days_until($subscription->ends_at)]) }}
       </div>
-      <a href="{{ route('merchant.account.subscription.resume') }}" class="mp-btn mp-btn--primary mp-btn--sm confirm">
-        <i class="fa fa-rocket"></i> {{ trans('app.resume_subscription') }}
-      </a>
+      @if (Route::has('merchant.account.subscription.resume'))
+        <a href="{{ route('merchant.account.subscription.resume') }}" class="mp-btn mp-btn--primary mp-btn--sm confirm">
+          <i class="fa fa-rocket"></i> {{ trans('app.resume_subscription') }}
+        </a>
+      @endif
     </div>
   @elseif($subscription && $subscription->provider == 'wallet' && $subscription->active() && optional($subscription->ends_at))
     <div class="mp-notice mp-notice--success">
@@ -38,11 +40,11 @@
         <strong><i class="fa fa-info-circle"></i> {{ trans('app.notice') }}</strong>
         {{ trans('messages.generic_trial_ends_at', ['ends' => remaining_days_until(Auth::user()->shop->trial_ends_at)]) }}
       </div>
-      @unless (Request::is('merchant/account/billing'))
+      @if (Route::has('merchant.account.billing') && ! Request::is('merchant/account/billing'))
         <a href="{{ route('merchant.account.billing') }}" class="mp-btn mp-btn--primary mp-btn--sm">
           <i class="fa fa-rocket"></i> {{ trans('app.choose_plan') }}
         </a>
-      @endunless
+      @endif
     </div>
   @endif
 @elseif(Auth::user()->hasExpiredPlan())
@@ -51,10 +53,10 @@
       <strong><i class="fa fa-info-circle"></i> {{ trans('app.notice') }}</strong>
       {{ trans('messages.trial_expired') }}
     </div>
-    @unless (Request::is('merchant/account/billing'))
+    @if (Route::has('merchant.account.billing') && ! Request::is('merchant/account/billing'))
       <a href="{{ route('merchant.account.billing') }}" class="mp-btn mp-btn--primary mp-btn--sm">
         <i class="fa fa-rocket"></i> {{ trans('app.choose_plan') }}
       </a>
-    @endunless
+    @endif
   </div>
 @endif

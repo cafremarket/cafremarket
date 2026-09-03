@@ -14,6 +14,8 @@ use App\Models\Product;
 use App\Repositories\Inventory\InventoryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Yajra\Datatables\Datatables;
 
@@ -119,6 +121,9 @@ class ProductController extends Controller
     {
         $this->authorize('create', Product::class); // Check permission
 
+        try {
+            $product = DB::transaction(function () use ($request) {
+
         $storedProduct = Product::create($request->all());
 
         // Can have multiple images
@@ -135,6 +140,13 @@ class ProductController extends Controller
 
         if ($request->has('category_list')) {
             $storedProduct->categories()->sync($request->input('category_list'));
+        }
+
+        if ($request->has('attrsList')) {
+            sync_product_category_attributes(
+                $request->input('category_list', []),
+                $request->input('attrsList', [])
+            );
         }
 
         if ($request->has('tag_list')) {
@@ -233,7 +245,7 @@ class ProductController extends Controller
                     'sku' => $skus[$key],
                     'stock_quantity' => $stock_quantities[$key],
                     'sale_price' => $sale_prices[$key],
-                    'slug' => Str::slug($request->input('slug').' '.$sku, '-'),
+                    'slug' => generate_unique_listing_slug($request->input('slug').' '.$sku),
                 ];
 
                 // Merge the common info and dynamic info to data array
@@ -264,6 +276,23 @@ class ProductController extends Controller
             }
         }
 
+        return $product;
+
+            }); // end DB::transaction
+        } catch (\Throwable $e) {
+            Log::error('Product store failed: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'request' => $request->except(['image', 'images', 'digital_file']),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => trans('messages.product_create_failed'),
+                'error'   => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
+
         $request->session()->flash('success', trans('messages.created', ['model' => $this->model]));
 
         return response()->json($this->getJsonParams($product));
@@ -292,21 +321,24 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        $product = Product::find($id);
+        $product = Product::with([
+            'categories.attrsList',
+            'inventories.attributeValues',
+            'inventories.attributes',
+            'inventories.image',
+        ])->find($id);
 
         $this->authorize('update', $product); // Check permission
 
         $attributes = collect([]);
 
-        $product->load('inventories');
-
         $inventory = $product->inventories->whereNull('parent_id')->first();
 
-        if (is_incevio_package_loaded('wholesale')) {
+        if (is_incevio_package_loaded('wholesale') && $inventory) {
             $inventory->wholesale = get_wholesale_item_prices($inventory->id);
         }
 
-        $preview = $inventory->previewImages();
+        $preview = $inventory ? $inventory->previewImages() : [];
 
         return view('admin.product.inventory.edit', compact('inventory', 'product', 'preview'));
     }
@@ -322,12 +354,15 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
+        $this->authorize('update', $product); // Check permission
+
+        try {
+            $product = DB::transaction(function () use ($request, $id, $product) {
+
         if ($request->hasFile('digital_file')) {
             $product->flushAttachments();
             $product->saveAttachments($request->file('digital_file'));
         }
-
-        $this->authorize('update', $product); // Check permission
 
         $product->update($request->all());
 
@@ -352,8 +387,6 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $product->updateImage($request->image);
         }
-
-        $this->authorize('update', $product); // Check permission
 
         $inventoryId = Inventory::where('product_id', $id)->whereNull('parent_id')->pluck('id')->first();
 
@@ -418,6 +451,23 @@ class ProductController extends Controller
                     $inventory->saveImage($variant_images[$key]);
                 }
             }
+        }
+
+        return $product;
+
+            }); // end DB::transaction
+        } catch (\Throwable $e) {
+            Log::error('Product update failed: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'product_id' => $id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => trans('messages.product_update_failed'),
+                'error'   => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
         }
 
         $request->session()->flash('success', trans('messages.updated', ['model' => $this->model]));
@@ -494,11 +544,20 @@ class ProductController extends Controller
     public function getAttributesByCategories(Request $request)
     {
         $categoryIds = $request->input('category_ids');
+        $attributeIds = $request->input('attribute_ids');
 
-        if (isset($categoryIds)) {
-            $attributes = Attribute::whereHas('categories', function ($query) use ($categoryIds) {
-                $query->whereIn('categories.id', $categoryIds);
-            })->get();
+        if (! empty($attributeIds)) {
+            $attributes = Attribute::with('attributeValues')
+                ->whereIn('id', (array) $attributeIds)
+                ->orderBy('order')
+                ->get();
+        } elseif (! empty($categoryIds)) {
+            $attributes = Attribute::with('attributeValues')
+                ->whereHas('categories', function ($query) use ($categoryIds) {
+                    $query->whereIn('categories.id', (array) $categoryIds);
+                })
+                ->orderBy('order')
+                ->get();
         } else {
             $attributes = collect();
         }
@@ -585,7 +644,7 @@ class ProductController extends Controller
         return [
             'id' => $product->id,
             'model' => 'inventory',
-            'redirect' => route('admin.stock.product.index'),
+            'redirect' => mp_route('admin.stock.product.index'),
         ];
     }
 

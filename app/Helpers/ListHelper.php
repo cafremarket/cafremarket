@@ -472,8 +472,22 @@ class ListHelper
      */
     public static function categories()
     {
+        $user = Auth::user();
+
+        if ($user && $user->isFromMerchant() && $user->merchantId()) {
+            $shopId = $user->merchantId();
+
+            return Cache::rememberForever('category_list_for_form_shop_'.$shopId, function () use ($shopId) {
+                return DB::table('categories')
+                    ->whereNull('deleted_at')
+                    ->where('shop_id', $shopId)
+                    ->orderBy('name', 'asc')
+                    ->pluck('name', 'id');
+            });
+        }
+
         return Cache::rememberForever('category_list_for_form', function () {
-            return DB::table('categories')->whereNull('deleted_at')->pluck('name', 'id');
+            return DB::table('categories')->whereNull('deleted_at')->orderBy('name', 'asc')->pluck('name', 'id');
         });
     }
 
@@ -1209,7 +1223,10 @@ class ListHelper
             $items = Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('active', 1)
-                ->where('available_from', '<=', Carbon::now())
+                ->where(function ($q) {
+                    $q->whereNull('available_from')
+                        ->orWhere('available_from', '<=', Carbon::now());
+                })
                 ->whereNull('parent_id')
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
@@ -1242,7 +1259,10 @@ class ListHelper
             $items = Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('active', 1)
-                ->where('available_from', '<=', Carbon::now())
+                ->where(function ($q) {
+                    $q->whereNull('available_from')
+                        ->orWhere('available_from', '<=', Carbon::now());
+                })
                 ->whereNull('parent_id')
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
@@ -1268,13 +1288,11 @@ class ListHelper
      */
     public static function latest_shop_items(Shop $shop, $limit = 10)
     {
-        return Cache::remember('latest_items_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
+        return Cache::remember('latest_items_v2_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
             return Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('shop_id', $shop->id)
                 ->where('active', 1)
-                ->where('available_from', '<=', Carbon::now())
-                ->whereNull('parent_id')
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                     'image:path,imageable_id,imageable_type',
@@ -1282,7 +1300,6 @@ class ListHelper
                     'product.image:path,imageable_id,imageable_type',
                     'product.images:path,imageable_id,imageable_type,order',
                 ])
-                ->groupBy('product_id')
                 ->latest()->limit($limit)->get();
         });
     }
@@ -1294,18 +1311,15 @@ class ListHelper
      */
     public static function top_selling_shop_items(Shop $shop, $limit = 10)
     {
-        return Cache::remember('top_selling_items_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
+        return Cache::remember('top_selling_items_v2_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
             return Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('shop_id', $shop->id)
                 ->where('active', 1)
-                ->where('available_from', '<=', Carbon::now())
-                ->whereNull('parent_id')
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                     'image:path,imageable_id,imageable_type',
                 ])
-                ->groupBy('product_id')
                 ->orderBy('sold_quantity', 'desc')->limit($limit)->get();
         });
     }
@@ -1685,8 +1699,17 @@ class ListHelper
      */
     public static function manufacturers()
     {
-        return DB::table('manufacturers')->where('deleted_at', null)
-            ->orderBy('name', 'asc')->pluck('name', 'id');
+        $query = DB::table('manufacturers')->whereNull('deleted_at');
+
+        $user = Auth::user();
+
+        if ($user && $user->isFromMerchant() && $user->merchantId()) {
+            $query->where('shop_id', $user->merchantId());
+        } elseif ($user && $user->isFromPlatform()) {
+            // Platform admins see all manufacturers
+        }
+
+        return $query->orderBy('name', 'asc')->pluck('name', 'id');
     }
 
     /**

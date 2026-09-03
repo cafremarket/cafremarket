@@ -28,6 +28,7 @@ class FreshAdminOnlySeeder extends BaseSeeder
         PermissionSeeder::class,
         PaymentMethodsSeeder::class,
         AddressTypesSeeder::class,
+        BannerGroupsSeeder::class,
         LanguagesSeeder::class,
         TicketCategoriesSeeder::class,
         DisputeTypesSeeder::class,
@@ -45,7 +46,9 @@ class FreshAdminOnlySeeder extends BaseSeeder
             $this->call($seederClass);
         }
 
-        $email = config('fresh_admin.email', env('FRESH_ADMIN_EMAIL', 'admin@cafrepay.com'));
+        $email = config('fresh_admin.email')
+            ?: ($_ENV['FRESH_ADMIN_EMAIL'] ?? $_SERVER['FRESH_ADMIN_EMAIL'] ?? getenv('FRESH_ADMIN_EMAIL') ?: null)
+            ?: 'admin@cafrepay.com';
 
         $this->command?->newLine();
         $this->command?->info('Fresh admin-only database seeded successfully.');

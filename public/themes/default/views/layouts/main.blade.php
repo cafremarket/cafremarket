@@ -9,7 +9,7 @@
   <!-- Main custom css -->
   <link href="{{ theme_asset_url('css/vendors.css') }}" media="screen" rel="stylesheet">
   <link href="{{ theme_asset_url('css/style.css') }}" media="screen" rel="stylesheet">
-  <link href="{{ theme_asset_url('css/storefront-modern.css') }}" media="screen" rel="stylesheet">
+  <link href="{{ theme_asset_url('css/storefront-modern.css') }}?v={{ is_file(theme_assets_path('css/storefront-modern.css')) ? filemtime(theme_assets_path('css/storefront-modern.css')) : time() }}" media="screen" rel="stylesheet">
 
   @if (config('active_locales') && config('active_locales')->firstWhere('code', App::getLocale())->rtl)
     <link href="{{ theme_asset_url('css/rtl.css') }}" media="screen" rel="stylesheet">
@@ -51,7 +51,7 @@
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 </head>
 
-<body class="{{ config('active_locales')->firstWhere('code', App::getLocale())->rtl ? 'rtl' : 'ltr' }}{{ Request::is('/') ? ' sf-homepage' : '' }}">
+<body class="{{ config('active_locales')->firstWhere('code', App::getLocale())->rtl ? 'rtl' : 'ltr' }}{{ Request::is('/') ? ' sf-homepage' : '' }}{{ Request::is('my*') ? ' sf-account-page' : '' }}">
 
   @include('theme::partials._skeleton_loader')
 
@@ -72,8 +72,26 @@
     {{-- <div class="overlay"></div>  --}}
     <!-- Overlay to maintain focus on nagitation -->
 
-    <!-- VALIDATION ERRORS -->
-    @if (count($errors) > 0)
+    <!-- VALIDATION ERRORS (skip when login modal shows the same errors) -->
+    @php
+      $panelUserOnStorefront = is_panel_user_on_storefront();
+      $loginModalHasErrors = count($errors) > 0 && ! Auth::guard('customer')->check() && ! $panelUserOnStorefront && (
+        request()->boolean('login')
+        || $errors->has('email')
+        || $errors->has('password')
+        || $errors->has('phone')
+      );
+    @endphp
+    @if ($panelUserOnStorefront)
+      <div class="alert alert-warning alert-dismissible mb-0 rounded-0 text-center" role="alert" style="margin:0;border-radius:0;">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <strong><i class="fal fa-user-shield"></i></strong>
+        {{ panel_user_storefront_message() }}
+      </div>
+    @endif
+    @if (count($errors) > 0 && ! $loginModalHasErrors)
       <div class="alert alert-danger alert-dismissible mb-0" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -98,7 +116,7 @@
     @endif
 
     <!-- Header start -->
-    <header class="header">
+    <header class="header sf-site-header">
       <!-- Primary Menu -->
       @include('theme::nav.main')
 
@@ -131,7 +149,7 @@
   <!-- MODALS -->
   @include('theme::modals.location_picker')
 
-  @unless (Auth::guard('customer')->check())
+  @unless (Auth::guard('customer')->check() || is_panel_user_on_storefront())
     @include('theme::auth.modals')
   @endunless
 
@@ -175,10 +193,10 @@
     @include('theme::scripts.location_picker')
   @endif
 
-  @unless (Auth::guard('customer')->check())
+  @unless (Auth::guard('customer')->check() || is_panel_user_on_storefront())
     @include('theme::scripts.auth_gate')
   @else
-    @if (function_exists('hyperlocal_enabled') && hyperlocal_enabled())
+    @if (! is_panel_user_on_storefront() && function_exists('hyperlocal_enabled') && hyperlocal_enabled())
       @include('theme::scripts.auth_gate')
     @endif
   @endunless
@@ -192,9 +210,7 @@
   @include('theme::scripts.storefront_init')
 
   {{-- Purchase button popup --}}
-  @if (config('app.demo') == true && \Str::contains(url()->current(), 'zcart'))
-    @include('partials.demo_purchase_btn')
-  @endif
+  {{-- Demo purchase promo removed for cafremarket branding --}}
 </body>
 
 </html>

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Repositories\BaseRepository;
 use App\Repositories\EloquentRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class EloquentCategory extends EloquentRepository implements BaseRepository, CategoryRepository
@@ -19,23 +20,56 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
 
     public function all()
     {
-        return $this->model->with(
+        $query = $this->model->with(
             'subGroup:id,name,category_group_id,deleted_at',
             'subGroup.group:id,name,deleted_at',
             'featureImage',
             'coverImage'
-        )->withCount('products', 'listings')->get();
+        )->withCount('products', 'listings');
+
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
+        }
+
+        return $query->get();
     }
 
     public function trashOnly()
     {
-        return $this->model->with(
+        $query = $this->model->with(
             'subGroup:id,name,category_group_id,deleted_at',
             'subGroup.group:id,name,deleted_at'
-        )->onlyTrashed()->get();
+        )->onlyTrashed();
+
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
+        }
+
+        return $query->get();
     }
 
-    // Create Category
+    public function find($id)
+    {
+        $query = $this->model->newQuery();
+
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
+        }
+
+        return $query->findOrFail($id);
+    }
+
+    public function findTrash($id)
+    {
+        $query = $this->model->onlyTrashed();
+
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
+        }
+
+        return $query->findOrFail($id);
+    }
+
     public function store(Request $request)
     {
         $result = parent::store($request);
@@ -56,7 +90,7 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
 
     public function destroy($id)
     {
-        $category = parent::findTrash($id);
+        $category = $this->findTrash($id);
 
         $category->flushImages();
 
@@ -69,13 +103,19 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
 
     public function massDestroy($ids)
     {
-        $catSubGrps = $this->model->withTrashed()->whereIn('id', $ids)->get();
+        $query = $this->model->withTrashed()->whereIn('id', $ids);
 
-        foreach ($catSubGrps as $catSubGrp) {
-            $catSubGrp->flushImages();
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
         }
 
-        $result = parent::massDestroy($ids);
+        $categories = $query->get();
+
+        foreach ($categories as $category) {
+            $category->flushImages();
+        }
+
+        $result = $query->forceDelete();
 
         $this->clear_cache($result);
 
@@ -84,13 +124,19 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
 
     public function emptyTrash()
     {
-        $catSubGrps = $this->model->onlyTrashed()->get();
+        $query = $this->model->onlyTrashed();
 
-        foreach ($catSubGrps as $catSubGrp) {
-            $catSubGrp->flushImages();
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
         }
 
-        $result = parent::emptyTrash();
+        $categories = $query->get();
+
+        foreach ($categories as $category) {
+            $category->flushImages();
+        }
+
+        $result = $query->forceDelete();
 
         $this->clear_cache($result);
 
@@ -100,11 +146,11 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
     private function clear_cache($result = false)
     {
         if ($result) {
+            Cache::forget('all_categories');
             Cache::forget('category_list_for_form');
-
-            return true;
+            Cache::forget('category_list_for_form_shop_'.(Auth::user()?->merchantId() ?? 'platform'));
         }
 
-        return false;
+        return $result;
     }
 }

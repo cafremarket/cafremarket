@@ -30,7 +30,7 @@
                 <td>
                   <span class="js-affiliate-link-url">{{ $link->full_url }}</span>
 
-                  <a href="{{ route('show.product', $link->inventory->slug) }}" class="ml-2" target="_blank">
+                  <a href="{{ storefront_product_url($link->inventory) }}" class="ml-2" target="_blank">
                     <i class="fa fa-external-link text-info" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.go_to_product_page') }}"></i>
                   </a>
 

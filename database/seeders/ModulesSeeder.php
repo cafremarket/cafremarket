@@ -23,7 +23,7 @@ class ModulesSeeder extends BaseSeeder
         ],
 
         'Attribute' => [
-            'access' => 'Common',
+            'access' => 'Merchant',
             'actions' => 'view,add,edit,delete',
         ],
 
@@ -33,7 +33,7 @@ class ModulesSeeder extends BaseSeeder
         ],
 
         'Category' => [
-            'access' => 'Platform',
+            'access' => 'Merchant',
             'actions' => 'view,add,edit,delete',
         ],
 
@@ -93,7 +93,7 @@ class ModulesSeeder extends BaseSeeder
         ],
 
         'Manufacturer' => [
-            'access' => 'Common',
+            'access' => 'Merchant',
             'actions' => 'view,add,edit,delete',
         ],
 

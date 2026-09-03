@@ -27,6 +27,7 @@ class CreateCatalogProductRequest extends Request
 
         $this->merge([
             'shop_id' => $shop?->id,
+            'slug' => generate_unique_listing_slug((string) ($this->input('slug') ?: $this->input('name') ?: 'product')),
         ]);
     }
 
@@ -36,7 +37,7 @@ class CreateCatalogProductRequest extends Request
             'shop_id' => 'required|exists:shops,id',
             'category_list' => 'required',
             'name' => 'required|unique:products',
-            'slug' => 'required|unique:products',
+            'slug' => 'required|alpha_dash',
             'description' => 'required',
             'active' => 'required',
             'min_price' => 'nullable|numeric|min:0',

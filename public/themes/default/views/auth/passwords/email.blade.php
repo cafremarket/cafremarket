@@ -13,9 +13,7 @@
         <div class="image-holder-customer"></div>
         <div class="login-form-section">
           <div class="login-logo">
-            <a href="{{ url('/') }}">
-              <img src="{{ get_logo_url('system', 'logo') }}" class="brand-logo" height="47px" alt="{{ trans('theme.logo') }}" title="{{ trans('theme.logo') }}">
-            </a>
+            @include('theme::partials._site_logo', ['height' => 47])
           </div>
           <div class="form-section">
             <h2 class="text-center mt-0">{{trans('theme.password_reset')}}</h2>

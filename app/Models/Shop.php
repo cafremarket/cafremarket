@@ -23,6 +23,10 @@ class Shop extends ShopWallet
 {
     use Addressable, Billable, Feedbackable, HasFactory, HasHumanAttributes, Imageable, Loggable, Notifiable, ReleasesUniqueIdentifiers, SoftDeletes, Translatable;
 
+    public const SELLER_TYPE_INDIVIDUAL = 'individual';
+
+    public const SELLER_TYPE_COMPANY = 'company';
+
     /**
      * The database table used by the model.
      *
@@ -92,6 +96,8 @@ class Shop extends ShopWallet
         'owner_id',
         'name',
         'legal_name',
+        'seller_type',
+        'nuit',
         'email',
         'slug',
         'description',
@@ -640,6 +646,36 @@ class Shop extends ShopWallet
         $sub = $this->subscription($this->current_billing_plan)->asStripeSubscription();
 
         return Carbon::createFromTimeStamp($sub->current_period_end)->toFormattedDateString();
+    }
+
+    public static function sellerTypeOptions(): array
+    {
+        return [
+            self::SELLER_TYPE_INDIVIDUAL => trans('app.seller_type_individual'),
+            self::SELLER_TYPE_COMPANY => trans('app.seller_type_company'),
+        ];
+    }
+
+    public function isCompanySeller(): bool
+    {
+        return ($this->seller_type ?: self::SELLER_TYPE_COMPANY) === self::SELLER_TYPE_COMPANY;
+    }
+
+    public function isIndividualSeller(): bool
+    {
+        return ! $this->isCompanySeller();
+    }
+
+    public function requiresBusinessDocuments(): bool
+    {
+        return $this->isCompanySeller();
+    }
+
+    public function sellerTypeLabel(): string
+    {
+        return $this->isCompanySeller()
+            ? trans('app.seller_type_company')
+            : trans('app.seller_type_individual');
     }
 
     public function getVerificationStatus()

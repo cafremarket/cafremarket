@@ -7,4 +7,7 @@ Route::post('web-banners/massDestroy', [WebBannerController::class, 'massDestroy
     ->name('web_banner.massDestroy')
     ->middleware('demoCheck');
 
-Route::resource('web-banners', WebBannerController::class)->except('show');
+Route::resource('web-banners', WebBannerController::class)
+    ->except('show')
+    ->names('web_banner')
+    ->parameters(['web-banners' => 'banner']);

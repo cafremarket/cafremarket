@@ -46,7 +46,7 @@ foreach ($variants as &$value) {
             var preChecked = (current == 'Null' && free_shipping) ? 'checked' : '';
 
             if ($.isEmptyObject(filtered)) {
-              var options = '<p class="mb-1">{{ trans('theme.seller_doesnt_ship') }}</p>';
+              var options = '<p class="mb-1">{{ trans('theme.notify.will_calculated_on_select') }}</p>';
             } else {
               var options = '<table class="table table-striped" id="item-shipping-options-table">';
 
@@ -317,7 +317,7 @@ foreach ($variants as &$value) {
 
         if ($.isEmptyObject(zone)) {
           canNotDeliver();
-          @include('theme::layouts.notification', ['message' => trans('theme.notify.seller_doesnt_ship'), 'type' => 'warning', 'icon' => 'times-circle'])
+          return;
         }
 
         // Return if the item is OUT OF STOCK
@@ -358,20 +358,43 @@ foreach ($variants as &$value) {
     $("#buy-now-btn").on("click", function(e) {
       e.preventDefault();
 
+      if ($(this).attr('disabled') || $(this).hasClass('disabled')) {
+        return;
+      }
+
       let item = $(this).closest('.sc-product-item');
       let qtt = item.find('input.product-info-qty-input').val();
-      let shippingZoneId = item.find('input#shipping-zone-id').val();
-      let shippingRateId = item.find('input#shipping-rate-id').val();
-      let shipToCountryId = item.find('input#shipto-country-id').val();
-      let shipToStateId = item.find('input#shipto-state-id').val();
+      let shippingZoneId = item.find('input#shipping-zone-id').val() || '';
+      let shippingRateId = item.find('input#shipping-rate-id').val() || '';
+      let shipToCountryId = item.find('input#shipto-country-id').val() || '';
+      let shipToStateId = item.find('input#shipto-state-id').val() || '';
+      let href = $(this).attr('href');
+
+      if (!href) {
+        return;
+      }
 
       if (qtt == undefined) {
         qtt = 1;
       }
 
-      if (!$(this).attr('disabled')) {
-        window.location.href = $(this).attr('href') + '?&quantity=' + qtt + '&shippingRateId=' + shippingRateId + '&shippingZoneId=' + shippingZoneId + '&shipToCountryId=' + shipToCountryId + '&shipToStateId=' + shipToStateId;
+      let params = new URLSearchParams();
+      params.set('quantity', qtt);
+      if (shippingRateId && shippingRateId !== 'Null') {
+        params.set('shippingRateId', shippingRateId);
       }
+      if (shippingZoneId) {
+        params.set('shippingZoneId', shippingZoneId);
+      }
+      if (shipToCountryId) {
+        params.set('shipToCountryId', shipToCountryId);
+      }
+      if (shipToStateId) {
+        params.set('shipToStateId', shipToStateId);
+      }
+
+      apply_busy_filter('body');
+      window.location.href = href.split('?')[0] + '?' + params.toString();
     });
 
     function populateStateSelect(country, state = null) {
@@ -509,7 +532,7 @@ foreach ($variants as &$value) {
 
     // In stock
     function setStockQuantity(item) {
-      itemWrapper.find('.sc-add-to-cart').removeAttr("disabled");
+      itemWrapper.find('.sc-add-to-cart, #buy-now-btn').removeAttr("disabled").removeClass('disabled');
       itemWrapper.find('.product-info-availability span').text('{{ trans('theme.in_stock') }}');
       itemWrapper.find('.product-info-title').html(item.title);
       itemWrapper.find('.available-qty-count').text(item.stock_quantity + ' {{ strtolower(trans('theme.in_stock')) }}');
@@ -520,7 +543,7 @@ foreach ($variants as &$value) {
       itemWrapper.find('.product-info-availability span').html('<b class="text-danger">{{ trans('theme.out_of_stock') }}</b>');
       itemWrapper.find('.product-info-price-new').text('{{ trans('theme.out_of_stock') }}');
       itemWrapper.find('.old-price, .available-qty-count').text('');
-      canNotDeliver();
+      itemWrapper.find('.sc-add-to-cart, #buy-now-btn').attr('disabled', 'disabled').addClass('disabled');
     }
     //////////////////////////
     /// END Attribute Changes
@@ -559,14 +582,18 @@ foreach ($variants as &$value) {
 
     function getShippingOptions() {
       let shippingOptions = $("#shipping-options").data('options');
-      if (!shippingOptions || $.isEmptyObject(shippingOptions)) {
-        return NaN;
+      if (!shippingOptions || shippingOptions === 'NaN' || !$.isArray(shippingOptions)) {
+        return [];
       }
 
       let totalPrice = getItemTotal();
       let cartWeight = getShippingWeight();
 
-      let filtered = shippingOptions.filter(function(el) {
+      return shippingOptions.filter(function(el) {
+        if (!el) {
+          return false;
+        }
+
         let result = el.based_on == 'price' && el.minimum <= totalPrice && (el.maximum >= totalPrice || !el.maximum);
 
         if (cartWeight) {
@@ -575,8 +602,6 @@ foreach ($variants as &$value) {
 
         return result;
       });
-
-      return filtered;
     }
 
     function setShippingCost(shipping) {
@@ -630,6 +655,10 @@ foreach ($variants as &$value) {
             });
             setShippingCost(filtered[0]);
           }
+        } else if (stock_quantity > 0) {
+          $('#summary-shipping-cost, #summary-total').removeClass('text-danger text-uppercase').addClass('text-muted').html('{{ trans('theme.notify.will_calculated_on_select') }}');
+          $('#summary-shipping-carrier').text(' ');
+          $('#buy-now-btn').removeAttr('disabled').removeClass('disabled');
         } else {
           canNotDeliver();
         }
@@ -673,9 +702,9 @@ foreach ($variants as &$value) {
     }
 
     function canNotDeliver() {
-      $('#summary-shipping-cost, #summary-total').removeClass('lead').addClass('text-danger text-uppercase').html('{{ trans('theme.notify.cant_deliver') }}');
+      $('#summary-shipping-cost').removeClass('lead').addClass('text-muted').html('{{ trans('theme.notify.will_calculated_on_select') }}');
       $('#summary-shipping-carrier').text(' ');
-      $('#buy-now-btn').attr("disabled", "disabled");
+      $('#buy-now-btn').removeAttr('disabled').removeClass('disabled');
     }
 
   }(window.jQuery, window, document));

@@ -4,7 +4,8 @@
       <div class="col-md-12">
         <ol class="breadcrumb nav-breadcrumb">
           @include('theme::headers.lists.home')
-          <li class="active">{{ trans('theme.shopping_cart') }}</li>
+          <li>{{ trans('theme.shopping_cart') }}</li>
+          <li class="active">{{ trans('theme.checkout') }}</li>
         </ol>
       </div>
     </div>

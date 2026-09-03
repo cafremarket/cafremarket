@@ -18,7 +18,8 @@ class CategoryPolicy
      */
     public function index(User $user)
     {
-        return (new Authorize($user, 'view_category'))->check();
+        return $user->isFromMerchant()
+            && (new Authorize($user, 'view_category'))->check();
     }
 
     /**
@@ -28,6 +29,10 @@ class CategoryPolicy
      */
     public function view(User $user, Category $category)
     {
+        if ($user->isFromMerchant() && ! $this->ownsCategory($user, $category)) {
+            return false;
+        }
+
         return (new Authorize($user, 'view_category', $category))->check();
     }
 
@@ -48,6 +53,10 @@ class CategoryPolicy
      */
     public function update(User $user, Category $category)
     {
+        if ($user->isFromMerchant() && ! $this->ownsCategory($user, $category)) {
+            return false;
+        }
+
         return (new Authorize($user, 'edit_category', $category))->check();
     }
 
@@ -58,6 +67,10 @@ class CategoryPolicy
      */
     public function delete(User $user, Category $category)
     {
+        if ($user->isFromMerchant() && ! $this->ownsCategory($user, $category)) {
+            return false;
+        }
+
         return (new Authorize($user, 'delete_category', $category))->check();
     }
 
@@ -69,5 +82,10 @@ class CategoryPolicy
     public function massDelete(User $user)
     {
         return (new Authorize($user, 'delete_category'))->check();
+    }
+
+    private function ownsCategory(User $user, Category $category): bool
+    {
+        return (int) $category->shop_id === (int) $user->merchantId();
     }
 }

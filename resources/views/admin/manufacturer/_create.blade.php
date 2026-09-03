@@ -1,6 +1,6 @@
 <div class="modal-dialog modal-lg">
   <div class="modal-content">
-    {!! Form::open(['route' => 'admin.catalog.manufacturer.store', 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
+    {!! Form::open(['url' => mp_route('admin.catalog.manufacturer.store'), 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       {{ trans('app.form.form') }}

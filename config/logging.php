@@ -43,13 +43,13 @@ return [
 
         'single' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/zCart.log'),
+            'path' => storage_path('logs/cafremarket.log'),
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/zCart.log'),
+            'path' => storage_path('logs/cafremarket.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
         ],
@@ -57,7 +57,7 @@ return [
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
-            'username' => 'zCart Log',
+            'username' => 'cafremarket Log',
             'emoji' => ':boom:',
             'level' => env('LOG_LEVEL', 'critical'),
         ],

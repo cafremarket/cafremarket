@@ -91,6 +91,11 @@ class OrderController extends Controller
      */
     public function create(CheckoutCartRequest $request, Cart $cart, PaymentGateway $payment)
     {
+        if (is_panel_user_on_storefront()) {
+            return redirect()->route('cart.index')
+                ->with('warning', panel_user_storefront_message());
+        }
+
         $cart = crosscheckAndUpdateOldCartInfo($request, $cart);
 
         $cart->loadMissing('shop');

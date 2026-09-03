@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Role;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AdminOnlyUserSeeder extends BaseSeeder
 {
@@ -13,9 +14,9 @@ class AdminOnlyUserSeeder extends BaseSeeder
      */
     public function run(): void
     {
-        $email = config('fresh_admin.email', env('FRESH_ADMIN_EMAIL', 'admin@cafrepay.com'));
-        $password = config('fresh_admin.password', env('FRESH_ADMIN_PASSWORD', 'password'));
-        $name = config('fresh_admin.name', env('FRESH_ADMIN_NAME', 'Admin'));
+        $email = $this->resolveCredential('email', 'FRESH_ADMIN_EMAIL', 'admin@cafrepay.com');
+        $password = $this->resolveCredential('password', 'FRESH_ADMIN_PASSWORD', 'password');
+        $name = $this->resolveCredential('name', 'FRESH_ADMIN_NAME', 'Admin');
 
         DB::table('users')->insert([
             'id' => 1,
@@ -24,7 +25,7 @@ class AdminOnlyUserSeeder extends BaseSeeder
             'nice_name' => 'Admin',
             'name' => $name,
             'email' => $email,
-            'password' => bcrypt($password),
+            'password' => Hash::make($password),
             'active' => 1,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
@@ -53,5 +54,24 @@ class AdminOnlyUserSeeder extends BaseSeeder
                 'updated_at' => Carbon::now(),
             ]);
         }
+
+        $this->command?->info("Admin user created: {$email}");
+    }
+
+    protected function resolveCredential(string $configKey, string $envKey, string $default): string
+    {
+        $value = config('fresh_admin.'.$configKey);
+
+        if (is_string($value) && $value !== '') {
+            return $value;
+        }
+
+        $env = $_ENV[$envKey] ?? $_SERVER[$envKey] ?? getenv($envKey);
+
+        if (is_string($env) && $env !== '') {
+            return $env;
+        }
+
+        return $default;
     }
 }

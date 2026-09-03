@@ -22,7 +22,7 @@
               </h5>
               <ul class="nav-category-inner-list">
                 @foreach ($subGroup->categories as $cat)
-                  <li><a href="{{ route('category.browse', $cat->slug) }}">{{ $cat->name }}</a>
+                  <li>          <a href="{{ get_category_url($cat) }}">{{ $cat->name }}</a>
                     @if ($cat->description)
                       <p>{!! $cat->description !!}</p>
                     @endif

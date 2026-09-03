@@ -30,7 +30,6 @@
         <th width="7px">{{ trans('app.#') }}</th>
         <th>{{ trans('app.position') }}</th>
         <th>{{ trans('app.name') }}</th>
-        <th>{{ trans('app.type') }}</th>
         <th>{{ trans('app.categories') }}</th>
         <th>{{ trans('app.entities') }}</th>
         <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
@@ -53,7 +52,6 @@
               {{ $attribute->name }}
             @endcan
           </td>
-          <td>{{ $attribute->attributeType->type }}</td>
           <td><span class="label label-info">{{ $attribute->categories_count }}</span></td>
           <td><span class="label label-default">{{ $attribute->attribute_values_count }}</span></td>
           <td class="row-options admin-row-actions">
@@ -83,7 +81,6 @@
     <thead>
       <tr>
         <th>{{ trans('app.name') }}</th>
-        <th>{{ trans('app.type') }}</th>
         <th>{{ trans('app.deleted_at') }}</th>
         <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
       </tr>
@@ -92,7 +89,6 @@
       @foreach ($trashes as $trash)
         <tr>
           <td>{{ $trash->name }}</td>
-          <td>{{ $trash->attributeType->type }}</td>
           <td>{{ $trash->deleted_at->diffForHumans() }}</td>
           <td class="row-options admin-row-actions">
             @can('delete', $trash)

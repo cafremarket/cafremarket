@@ -9,6 +9,7 @@ use App\Http\Requests\Validations\UpdateAttributeRequest;
 use App\Models\Attribute;
 use App\Repositories\Attribute\AttributeRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AttributeController extends Controller
@@ -38,10 +39,17 @@ class AttributeController extends Controller
      */
     public function index()
     {
-        $query = Attribute::with('attributeType')
-            ->withCount(['attributeValues', 'categories']);
+        // Attributes are store-scoped; platform admin catalog management is disabled.
+        abort_unless(Auth::user()->isFromMerchant(), 403);
 
-        $attributes = $query->get();
+        // Ensure Colour/Size/Material presets exist for this store.
+        ensure_shop_attribute_presets(Auth::user()->merchantId());
+
+        $attributes = Attribute::mine()
+            ->with('attributeType')
+            ->withCount(['attributeValues', 'categories'])
+            ->orderBy('order')
+            ->get();
 
         $trashes = $this->attribute->trashOnly();
 

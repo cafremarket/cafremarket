@@ -6,7 +6,9 @@ use App\Models\SubscriptionPlan;
 use App\Models\SystemConfig;
 use App\Models\User;
 use App\Services\Subscription\WalletSubscriptionService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Exceptions\IncompletePayment;
 
 class SubscribeShopToNewPlan
@@ -28,31 +30,66 @@ class SubscribeShopToNewPlan
 
     public function handle()
     {
-        if (SystemConfig::isBillingThroughWallet()) {
-            app(WalletSubscriptionService::class)->activate($this->merchant, $this->plan);
+        if (! $this->plan) {
+            return;
+        }
+
+        if (config('system.subscription.billing') === 'wallet') {
+            if (SystemConfig::isBillingThroughWallet()) {
+                try {
+                    app(WalletSubscriptionService::class)->activate($this->merchant, $this->plan);
+
+                    return;
+                } catch (\Throwable $e) {
+                    Log::warning('Wallet subscription activation failed during registration; assigning plan on shop only.', [
+                        'merchant_id' => $this->merchant->id,
+                        'plan' => $this->plan,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            } else {
+                Log::info('Wallet billing configured but packages inactive; assigning plan on shop only.', [
+                    'merchant_id' => $this->merchant->id,
+                    'plan' => $this->plan,
+                ]);
+            }
+
+            $this->assignPlanOnShopOnly($this->merchant, $this->plan);
 
             return;
         }
 
         $shop = $this->merchant->shop;
-        $subscriptionPlan = SubscriptionPlan::findOrFail($this->plan);
-        $subscription = $shop->newSubscription($subscriptionPlan);
+
+        if (! $shop) {
+            return;
+        }
+
+        $subscriptionPlan = SubscriptionPlan::find($this->plan);
+
+        if (! $subscriptionPlan) {
+            Log::warning('Subscription plan not found during registration.', ['plan' => $this->plan]);
+
+            return;
+        }
 
         if ($shop->onGenericTrial()) {
-            $trialDays = \Carbon\Carbon::now()->lt($shop->trial_ends_at)
-                ? \Carbon\Carbon::now()->diffInDays($shop->trial_ends_at)
+            $trialDays = Carbon::now()->lt($shop->trial_ends_at)
+                ? Carbon::now()->diffInDays($shop->trial_ends_at)
                 : null;
         } else {
             $trialDays = (bool) config('system_settings.trial_days') ? config('system_settings.trial_days') : null;
         }
 
-        if ($trialDays) {
-            $subscription->trialDays($trialDays);
-        } else {
-            $subscription->skipTrial();
-        }
-
         try {
+            $subscription = $shop->newSubscription($subscriptionPlan);
+
+            if ($trialDays) {
+                $subscription->trialDays($trialDays);
+            } else {
+                $subscription->skipTrial();
+            }
+
             $subscription = $subscription->create($this->payment_method, [
                 'email' => $this->merchant->email,
             ]);
@@ -71,7 +108,35 @@ class SubscribeShopToNewPlan
         } catch (IncompletePayment $e) {
             return redirect()->route('cashier.payment', [$e->payment->id, 'redirect' => route('home')]);
         } catch (\Throwable $e) {
-            throw new \Exception($e->getMessage() ?: trans('messages.subscription_error'));
+            Log::warning('Stripe subscription setup failed during registration; assigning plan on shop only.', [
+                'merchant_id' => $this->merchant->id,
+                'plan' => $this->plan,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->assignPlanOnShopOnly($this->merchant, $this->plan);
         }
+    }
+
+    /**
+     * Persist the selected plan on the shop when full billing integration is unavailable.
+     */
+    protected function assignPlanOnShopOnly(User $merchant, string $planId): void
+    {
+        $shop = $merchant->shop;
+
+        if (! $shop) {
+            return;
+        }
+
+        $updates = [
+            'current_billing_plan' => $planId,
+        ];
+
+        if ((bool) config('system_settings.trial_days')) {
+            $updates['trial_ends_at'] = now()->addDays((int) config('system_settings.trial_days'));
+        }
+
+        $shop->forceFill($updates)->save();
     }
 }

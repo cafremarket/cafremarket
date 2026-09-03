@@ -9,6 +9,7 @@ use App\Http\Requests\Validations\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Repositories\Category\CategoryRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
@@ -38,7 +39,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        // $categories = $this->category->all();
+        abort_unless(Auth::user()->isFromMerchant(), 403);
 
         $trashes = $this->category->trashOnly();
 
@@ -56,6 +57,10 @@ class CategoryController extends Controller
             'translations',
         )->withCount(['products', 'listings']);
 
+        if (! auth()->user()->isFromPlatform()) {
+            $category->mine();
+        }
+
         $data = Datatables::of($category)
             ->editColumn('checkbox', function ($category) {
                 return view('admin.category.partials.checkbox', compact('category'));
@@ -71,9 +76,6 @@ class CategoryController extends Controller
             })
             ->editColumn('name', function ($category) {
                 return view('admin.category.partials.name', compact('category'));
-            })
-            ->editColumn('parent', function ($category) {
-                return view('admin.category.partials.parent', compact('category'));
             })
             ->editColumn('attrs_list_count', function ($category) {
                 return view('admin.category.partials.attributes', compact('category'));
@@ -109,9 +111,6 @@ class CategoryController extends Controller
     public function store(CreateCategoryRequest $request)
     {
         $category = $this->category->store($request);
-
-        // Put the grp id for convenience
-        $request->session()->put('convenient_sub_group_id', $category->category_sub_group_id);
 
         Cache::forget('all_categories');
 

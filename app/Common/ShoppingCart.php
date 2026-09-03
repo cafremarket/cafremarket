@@ -57,6 +57,12 @@ trait ShoppingCart
      */
     public function addToCart(Request $request, $slug)
     {
+        if (is_panel_user_on_storefront()) {
+            return response()->json([
+                'message' => panel_user_storefront_message(),
+            ], 403);
+        }
+
         $slugsArray = json_decode($slug, true);
 
         // Check if the slugs parameter is a JSON string, if not, convert it to an array
@@ -74,8 +80,9 @@ trait ShoppingCart
 
         $catalog = app(HyperlocalCatalogService::class);
         $buyerLocation = app(BuyerLocationService::class);
+        $isDirectCheckout = $request->routeIs('direct.checkout');
 
-        if ($catalog->requiresLocationForBrowse() && ! $buyerLocation->hasLocation()) {
+        if (! $isDirectCheckout && $catalog->requiresLocationForBrowse() && ! $buyerLocation->hasLocation()) {
             return response()->json([
                 'message' => trans('theme.set_location_to_shop'),
                 'require_location' => true,
@@ -83,7 +90,7 @@ trait ShoppingCart
         }
 
         foreach ($items as $item) {
-            if ($catalog->isEnabled() && ! $catalog->isShopDeliverable($item->shop_id)) {
+            if (! $isDirectCheckout && $catalog->isEnabled() && ! $catalog->isShopDeliverable($item->shop_id)) {
                 return response()->json([
                     'message' => trans('app.shop_outside_delivery_radius'),
                 ], 422);
@@ -167,7 +174,7 @@ trait ShoppingCart
             // Shipping rate
             $cart->shipping_rate_id = null;
 
-            if (! $cart->is_digital && ! is_null($request->shippingRateId)) {
+            if (! $cart->is_digital && $request->filled('shippingRateId') && is_numeric($request->shippingRateId)) {
                 $cart->shipping_rate_id = $request->shippingRateId;
             }
 

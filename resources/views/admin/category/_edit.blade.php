@@ -1,6 +1,6 @@
 <div class="modal-dialog modal-lg">
   <div class="modal-content">
-    {!! Form::model($category, ['method' => 'PUT', 'route' => ['admin.catalog.category.update', $category->id], 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
+    {!! Form::model($category, ['method' => 'PUT', 'url' => mp_route('admin.catalog.category.update', $category->id), 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       {{ trans('app.form.form') }}

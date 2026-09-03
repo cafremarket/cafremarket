@@ -2,7 +2,7 @@
   "id": 6,
   "slug": "subscription",
   "name": "Local Subscription",
-  "description": "A zCart package for local wallet based subscription",
+  "description": "A cafremarket package for local wallet based subscription",
   "icon": "map-pin",
   "dir": "subscription",
   "author": "Incevio Team",

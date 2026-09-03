@@ -1,10 +1,3 @@
-<div class="form-group">
-  {!! Form::label('attribute_type_id', trans('app.form.attribute_type') . '*', ['class' => 'with-help']) !!}
-  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.attribute_type') }}"></i>
-  {!! Form::select('attribute_type_id', $typeList, null, ['class' => 'form-control select2-normal', 'placeholder' => trans('app.placeholder.attribute_type'), 'required']) !!}
-  <div class="help-block with-errors"></div>
-</div>
-
 <div class="row">
   <div class="col-md-8 nopadding-right">
     <div class="form-group">
@@ -35,7 +28,11 @@
 <div class="form-group">
   {!! Form::label('categories[]', trans('app.form.categories')) !!}
   {!! Form::select('categories[]', $categories, $selectedCategories ?? null, ['class' => 'form-control select2-normal', 'multiple' => 'multiple']) !!}
-  <div class="help-block with-errors"></div>
+  <div class="help-block with-errors">{{ trans('help.category_attributes') }}</div>
 </div>
+
+<p class="help-block text-muted">
+  {{ trans('help.attribute_presets_hint') ?? 'Tip: use presets like Colour, Size, Material. After saving, add option values (e.g. Red, M, Cotton) from the Entities screen.' }}
+</p>
 
 <p class="help-block">* {{ trans('app.form.required_fields') }}</p>

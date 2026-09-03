@@ -38,7 +38,13 @@ class JwtAuthService
         $jwt = JWT::encode($payload, $this->secret(), config('jwt.algo', 'HS256'));
 
         if ($user instanceof Model) {
-            $user->jwt_access_token = $jwt;
+            if (in_array(\App\Common\ApiAuthTokens::class, class_uses_recursive($user), true)) {
+                /** @var \App\Common\ApiAuthTokens&Model $user */
+                $user->setTransientJwtAccessToken($jwt);
+            } else {
+                $user->jwt_access_token = $jwt;
+                $user->syncChanges();
+            }
         }
 
         return $jwt;

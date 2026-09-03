@@ -1115,7 +1115,7 @@
                     <div class="pull-right">
                       <p><i class="fa fa-info-circle"></i> Enhance your customer experience by offering live shipping cost calculations. Keep your customers informed and satisfied with accurate shipping information.</p>
 
-                      <a href="https://zcart.net/plugins" class="btn btn-new mx-2 mt-3" target="_blank"><i class="fa fa-truck"></i> Get Live Shipping Now</a>
+                      {{-- External marketplace plugin link removed --}}
                     </div>
                   @endif
                 @endforelse

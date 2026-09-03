@@ -6,9 +6,11 @@ use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -86,10 +88,38 @@ class Handler extends ExceptionHandler
                 ->with('warning', trans('messages.mail_send_failed_soft'));
         }
 
+        if ($exception instanceof TokenMismatchException && ! $request->expectsJson()) {
+            if ($request->hasSession()) {
+                $request->session()->regenerateToken();
+            }
+
+            $fallback = url('/');
+            if ($request->is('selling/*')) {
+                $fallback = route('selling.register');
+            } elseif ($request->is('merchant/*')) {
+                $fallback = route('selling.login');
+            } elseif ($request->is('admin/*')) {
+                $fallback = route('admin.login');
+            }
+
+            return redirect()
+                ->to($request->headers->get('referer') ?: $fallback)
+                ->withInput($request->except(['password', 'password_confirmation', '_token']))
+                ->with('error', trans('messages.session_expired_retry'));
+        }
+
         if ($request->expectsJson()) {
-            if ($exception instanceof ModelNotFoundException) {
+            if ($exception instanceof ModelNotFoundException || $exception instanceof NotFoundHttpException) {
                 return response()->json(['error' => trans('responses.resource_not_found')], 404);
             }
+        }
+
+        if ($exception instanceof ModelNotFoundException && ! $request->expectsJson()) {
+            return response()->view('errors.404', [], 404);
+        }
+
+        if ($exception instanceof NotFoundHttpException && ! $request->expectsJson()) {
+            return response()->view('errors.404', [], 404);
         }
 
         return parent::render($request, $exception);

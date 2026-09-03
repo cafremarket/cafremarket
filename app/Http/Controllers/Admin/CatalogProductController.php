@@ -34,6 +34,11 @@ class CatalogProductController extends Controller
      */
     public function index()
     {
+        // Store merchants use the combined Product + Inventory module.
+        if (Auth::user()->isFromMerchant()) {
+            return redirect()->to(mp_url('merchant/stock/product/physical'));
+        }
+
         if (Auth::user()->isFromPlatform()) {
             $trashes = Product::onlyTrashed()->with('categories', 'featureImage')->get();
         } else {
@@ -93,6 +98,11 @@ class CatalogProductController extends Controller
      */
     public function create()
     {
+        // Merchants add product + pricing + stock in one screen.
+        if (Auth::user()->isFromMerchant()) {
+            return redirect()->to(mp_url('merchant/stock/product/create'));
+        }
+
         return view('admin.product.create');
     }
 
@@ -122,6 +132,13 @@ class CatalogProductController extends Controller
 
         if ($request->has('category_list')) {
             $product->categories()->sync($request->input('category_list'));
+        }
+
+        if ($request->has('attrsList')) {
+            sync_product_category_attributes(
+                $request->input('category_list', []),
+                $request->input('attrsList', [])
+            );
         }
 
         if ($request->has('tag_list')) {
@@ -156,9 +173,18 @@ class CatalogProductController extends Controller
      */
     public function edit($id)
     {
-        $product = Product::find($id);
+        $product = Product::with([
+            'categories.attrsList',
+            'inventories.attributeValues',
+            'inventories.image',
+        ])->find($id);
 
         $this->authorize('update', $product); // Check permission
+
+        // Merchants edit product + inventory + variants together.
+        if (Auth::user()->isFromMerchant()) {
+            return redirect()->to(mp_url('merchant/stock/product/'.$product->id.'/edit'));
+        }
 
         $preview = $product->previewImages();
 
@@ -187,6 +213,13 @@ class CatalogProductController extends Controller
 
         if ($request->has('category_list')) {
             $product->categories()->sync($request->input('category_list'));
+        }
+
+        if ($request->has('attrsList')) {
+            sync_product_category_attributes(
+                $request->input('category_list', $product->categories()->pluck('categories.id')->all()),
+                $request->input('attrsList', [])
+            );
         }
 
         if ($request->has('tag_list')) {
@@ -368,7 +401,7 @@ class CatalogProductController extends Controller
         return [
             'id' => $product->id,
             'model' => 'product',
-            'redirect' => route('admin.catalog.product.index'),
+            'redirect' => mp_route('admin.catalog.product.index'),
         ];
     }
 }

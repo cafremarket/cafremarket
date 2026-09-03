@@ -97,6 +97,25 @@
       <div class="row">
         <div class="col-md-6 nopadding-right">
           <div class="form-group">
+            {!! Form::label('seller_type', trans('app.form.seller_type') . '*', ['class' => 'with-help']) !!}
+            <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.seller_type') }}"></i>
+            {!! Form::select('seller_type', \App\Models\Shop::sellerTypeOptions(), null, ['class' => 'form-control select2-normal', 'required']) !!}
+            <div class="help-block with-errors"></div>
+          </div>
+        </div>
+        <div class="col-md-6 nopadding-left">
+          <div class="form-group">
+            {!! Form::label('nuit', trans('app.form.nuit') . '*', ['class' => 'with-help']) !!}
+            <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.nuit') }}"></i>
+            {!! Form::text('nuit', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.nuit'), 'maxlength' => 20]) !!}
+            <div class="help-block with-errors"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 nopadding-right">
+          <div class="form-group">
             {!! Form::label('email', trans('app.form.email_address') . '*', ['class' => 'with-help']) !!}
             <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.shop_email') }}"></i>
             {!! Form::email('email', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.valid_email'), 'required']) !!}

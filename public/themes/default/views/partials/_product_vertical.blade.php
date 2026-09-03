@@ -2,7 +2,7 @@
   <div class="best-seller-item border-animate">
     <div class="box-inner">
       <div class="best-seller-item-image">
-        <a href="{{ route('show.product', $item->slug) }}">
+        <a href="{{ storefront_product_url($item) }}">
           <img class="lazy" src="/images/square.webp" data-src="{{ get_inventory_img_src($item, 'medium') }}" data-name="product_image" alt="{{ $item->title }}" title="{{ $item->title }}">
         </a>
       </div> <!-- /.best-seller-item-image -->
@@ -10,7 +10,7 @@
       <div class="best-seller-item-details">
         <div class="best-seller-item-details-inner">
           <div class="best-seller-item-name">
-            <a href="{{ route('show.product', $item->slug) }}">
+            <a href="{{ storefront_product_url($item) }}">
               {{ $item->title }}
             </a>
           </div>

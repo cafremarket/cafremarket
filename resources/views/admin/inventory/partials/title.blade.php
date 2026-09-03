@@ -1,6 +1,6 @@
 {{ $inventory->title }}
 
-<a href="{{ route('show.product', $inventory->slug) }}" class="ml-3" target="_blank"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.view_as_customer') }}" class="fa fa-external-link"></i></a>
+<a href="{{ storefront_product_url($inventory) }}" class="ml-3" target="_blank"><i data-toggle="tooltip" data-placement="top" title="{{ trans('app.view_as_customer') }}" class="fa fa-external-link"></i></a>
 
 @if ($inventory->auctionable && $type != 'auction')
   <span class="label label-default pull-right">{{ trans('packages.auction.auction') }}</span>

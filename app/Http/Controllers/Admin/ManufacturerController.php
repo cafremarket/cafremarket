@@ -8,6 +8,7 @@ use App\Http\Requests\Validations\CreateManufacturerRequest;
 use App\Http\Requests\Validations\UpdateManufacturerRequest;
 use App\Repositories\Manufacturer\ManufacturerRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class ManufacturerController extends Controller
@@ -37,6 +38,8 @@ class ManufacturerController extends Controller
      */
     public function index()
     {
+        abort_unless(Auth::user()->isFromMerchant(), 403);
+
         $manufacturers = $this->manufacturer->all();
 
         $trashes = $this->manufacturer->trashOnly();

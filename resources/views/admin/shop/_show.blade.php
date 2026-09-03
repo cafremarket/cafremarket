@@ -116,6 +116,14 @@
                   <td style="width: 75%;">{{ $shop->legal_name }}</td>
                 </tr>
                 <tr>
+                  <th class="text-right">{{ trans('app.seller_type') }}:</th>
+                  <td style="width: 75%;">{{ $shop->sellerTypeLabel() }}</td>
+                </tr>
+                <tr>
+                  <th class="text-right">{{ trans('app.nuit') }}:</th>
+                  <td style="width: 75%;">{{ $shop->nuit ?: trans('app.not_available') }}</td>
+                </tr>
+                <tr>
                   <th class="text-right">{{ trans('app.slug') }}:</th>
                   <td style="width: 75%;">{{ $shop->slug }}</td>
                 </tr>

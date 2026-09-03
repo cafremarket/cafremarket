@@ -38,6 +38,16 @@ class HomeController extends Controller
      */
     public function index(Request $request, BuyerLocationService $buyerLocation, HyperlocalCatalogService $catalog)
     {
+        // Store panel users should land on their own storefront, not the marketplace homepage.
+        // Skip if the request is already for that shop path (prevents redirect loops).
+        if ($shopUrl = storefront_merchant_shop_url()) {
+            $shopPath = trim(parse_url($shopUrl, PHP_URL_PATH) ?: '', '/');
+            $current = trim($request->path(), '/');
+            if ($shopPath !== '' && $current !== $shopPath && ! str_starts_with($current, $shopPath.'/')) {
+                return redirect()->to($shopUrl);
+            }
+        }
+
         $buyerLocation->ensureDeliveryLocation();
 
         $sliders = Cache::rememberForever('sliders', function () {
@@ -62,13 +72,11 @@ class HomeController extends Controller
         $buyerAddress = $buyerLocation->addressText();
 
         $nearbyShopsPaginator = $catalog->nearbyShopsPaginated();
-        $nearbyFeaturedItems = $catalog->nearbyFeaturedItems(5);
 
         return view('theme::index', compact(
             'banners',
             'sliders',
             'nearbyShopsPaginator',
-            'nearbyFeaturedItems',
             'latitude',
             'longitude',
             'buyerAddress',
@@ -102,6 +110,17 @@ class HomeController extends Controller
                 },
             ])
             ->active()->firstOrFail();
+
+        // Store categories use shop-scoped URLs, not the system /category/{slug} path.
+        if (! empty($category->shop_id)) {
+            $shopSlug = optional(\App\Models\Shop::select('id', 'slug')->find($category->shop_id))->slug;
+            if ($shopSlug) {
+                return redirect()->route('shop.category.browse', [
+                    'slug' => $shopSlug,
+                    'category' => $category->slug,
+                ], 301);
+            }
+        }
 
         // Avoid loading every listing into memory just for min/max price.
         $listingsBase = $catalog->scopeInventoryQuery($category->listings()->available());
@@ -255,23 +274,37 @@ class HomeController extends Controller
      * @param  string  $slug  The slug of the product.
      * @return \Illuminate\View\View The view displaying the product details.
      */
-    public function product($slug)
+    public function product($shop, $slug)
     {
-        $item = Inventory::where('slug', $slug)->withCount('feedbacks')->available()->withTrashed()->first();
+        $item = Inventory::where('slug', $slug)
+            ->whereHas('shop', function ($q) use ($shop) {
+                $q->where('slug', $shop);
+            })
+            ->withCount('feedbacks')->available()->withTrashed()->first();
 
         if (! $item) {
-            // Fallback: allow opening the product page when listing exists
-            // but is currently unavailable (out of stock/inactive shop/etc.).
-            $item = Inventory::where('slug', $slug)->withCount('feedbacks')->withTrashed()->first();
+            $item = Inventory::where('slug', $slug)
+                ->whereHas('shop', function ($q) use ($shop) {
+                    $q->where('slug', $shop);
+                })
+                ->withCount('feedbacks')->withTrashed()->first();
         }
 
         if (! $item) {
+            $fallback = Inventory::where('slug', $slug)->with('shop:id,slug')->first();
+            if ($fallback) {
+                return redirect()->to(storefront_product_url($fallback), 301);
+            }
+
             return view('theme::exceptions.item_not_available');
         }
 
         $item->load([
             'product' => function ($q) use ($item) {
                 $q->select('id', 'brand', 'model_number', 'mpn', 'gtin', 'gtin_type', 'origin_country', 'slug', 'description', 'downloadable', 'manufacturer_id', 'sale_count', 'created_at')
+                    ->with([
+                        'categories:id,slug,name,shop_id,category_sub_group_id',
+                    ])
                     ->withCount(['inventories' => function ($query) use ($item) {
                         $query->where('shop_id', '!=', $item->shop_id)->available();
                     }]);
@@ -342,9 +375,12 @@ class HomeController extends Controller
      * @param  string  $slug
      * @return \Illuminate\View\View| string HTML of rendered view
      */
-    public function quickViewItem($slug)
+    public function quickViewItem($shop, $slug)
     {
         $item = Inventory::where('slug', $slug)
+            ->whereHas('shop', function ($q) use ($shop) {
+                $q->where('slug', $shop);
+            })
             ->available()
             ->with([
                 'images:path,imageable_id,imageable_type',
@@ -387,9 +423,12 @@ class HomeController extends Controller
      * @param  string  $slug
      * @return \Illuminate\View\View
      */
-    public function offers($slug)
+    public function offers($shop, $slug)
     {
         $product = Product::where('slug', $slug)
+            ->whereHas('shop', function ($q) use ($shop) {
+                $q->where('slug', $shop);
+            })
             ->with([
                 'inventories' => function ($q) {
                     $q->available();
@@ -405,116 +444,34 @@ class HomeController extends Controller
     }
 
     /**
-     * Open brand list page
+     * Brand listing page removed from the marketplace.
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function all_brands()
     {
-        $brands = Manufacturer::select('id', 'slug', 'name')->active()->with('logoImage')->paginate(24);
-
-        return view('theme::brand_lists', compact('brands'));
+        return redirect()->route('homepage');
     }
 
     /**
-     * Open brand page
+     * Brand page removed from the marketplace.
      *
      * @param  string  $slug
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function brand(BrowseProductRequest $request, $slug)
     {
-        if ($gate = hyperlocal_browse_gate_view()) {
-            return $gate;
-        }
-
-        $catalog = app(HyperlocalCatalogService::class);
-        $now = Carbon::now();
-        $brand = Manufacturer::where('slug', $slug)->firstOrFail();
-        $ids = Product::where('manufacturer_id', $brand->id)->pluck('id');
-
-        $all_products = Inventory::whereIn('product_id', $ids)
-            ->whereHas('shop', function (\Illuminate\Database\Eloquent\Builder $q) {
-                $q->select(['id', 'current_billing_plan', 'active'])->active();
-            })
-            ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                'images:path,imageable_id,imageable_type',
-            ])
-            ->where('parent_id', null)
-            ->active();
-
-        $all_products = $catalog->scopeInventoryQuery($all_products);
-
-        $forPriceRange = $all_products->get();
-        $min = floor($forPriceRange->min('sale_price'));
-        $max = ceil($forPriceRange->max('sale_price'));
-        $priceRange = compact('min', 'max');
-
-        // Filtering occurs after priceRange has been extracted.
-        if ($request->sort_by) {
-            $all_products = $all_products->filter($request->all())->get();
-        } else {
-            $all_products = $all_products->filter($request->all())->inRandomOrder()->get();
-        }
-
-        // Paginate the results
-        $products = $all_products->paginate(16);  // PLS 15 -> 16 products per page (4 rows by 4 products)
-
-        return view('theme::brand', compact('brand', 'products', 'priceRange'));
+        return redirect()->route('homepage');
     }
 
     /**
-     * Open brand page (theme 2.8.2)
+     * Brand products page removed from the marketplace.
      *
-     * @return \Illuminate\Http\Response|\Illuminate\Contracts\View\View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function brandProducts(BrowseProductRequest $request, string $slug)
     {
-        if ($gate = hyperlocal_browse_gate_view()) {
-            return $gate;
-        }
-
-        $catalog = app(HyperlocalCatalogService::class);
-        $now = Carbon::now();
-
-        $brand = Manufacturer::where('slug', $slug)->firstOrFail();
-        $ids = Product::where('manufacturer_id', $brand->id)->pluck('id');
-
-        $all_products = Inventory::whereIn('product_id', $ids)
-            ->groupBy('product_id', 'shop_id')
-            ->whereHas('shop', function (\Illuminate\Database\Eloquent\Builder $q) {
-                $q->select(['id', 'current_billing_plan', 'active'])->active();
-            })
-            ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                'images:path,imageable_id,imageable_type',
-            ])
-            ->withCount([
-                'orders' => function ($q) {
-                    $q->where('order_items.created_at', '>=', Carbon::now()->subHours(config('system.popular.hot_item.period', 24)));
-                },
-            ])
-            ->active();
-
-        $all_products = $catalog->scopeInventoryQuery($all_products);
-
-        $forPriceRange = $all_products->get();
-        $min = floor($forPriceRange->min('sale_price'));
-        $max = ceil($forPriceRange->max('sale_price'));
-        $priceRange = compact('min', 'max');
-
-        // Filtering occurs after priceRange has been extracted.
-        if ($request->sort_by) {
-            $all_products = $all_products->filter($request->all())->get();
-        } else {
-            $all_products = $all_products->filter($request->all())->inRandomOrder()->get();
-        }
-
-        // Paginate the results
-        $products = $all_products->paginate(16);  // PLS 15 -> 16 products per page (4 rows by 4 products)
-
-        return view('theme::brand', compact('brand', 'products', 'priceRange'));
+        return redirect()->route('homepage');
     }
 
     /**

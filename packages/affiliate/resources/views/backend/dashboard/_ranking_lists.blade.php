@@ -30,7 +30,7 @@
                   <td>{{ $link->slug }}</td>
                   <td>{{ $link->inventory->shop->name }}</td>
                   <td>{{ $link->visitor_count }}</td>
-                  <td><a href="{{ route('show.product',['slug' => $link->inventory->slug]) }}"><i class="fa fa-external-link"></i></a></td>
+                  <td><a href="{{ storefront_product_url($link->inventory) }}"><i class="fa fa-external-link"></i></a></td>
                 </tr>
               @endforeach
             @endif
@@ -71,7 +71,7 @@
                   <td>{{ $commission->affiliateLink->slug }}</td>
                   <td>{{ $commission->order->shop->name }}</td>
                   <td>{{ get_formated_currency($commission->total_commission, 2) }}</td>
-                  <td><a href="{{ route('show.product',['slug' => $commission->affiliateLink->inventory->slug]) }}"><i class="fa fa-external-link"></i></a></td>    
+                  <td><a href="{{ storefront_product_url($commission->affiliateLink->inventory) }}"><i class="fa fa-external-link"></i></a></td>    
                 </tr>
               @endforeach
             @endif

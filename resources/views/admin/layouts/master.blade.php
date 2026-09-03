@@ -30,9 +30,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-  <link href="{{ asset('css/admin-modern.css') }}" rel="stylesheet">
+  <link href="{{ asset('css/admin-modern.css') }}?v={{ @filemtime(public_path('css/admin-modern.css')) ?: time() }}" rel="stylesheet">
   @if ($useMerchantPanelLayout ?? false)
-    <link href="{{ asset('css/merchant-panel.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/merchant-panel.css') }}?v={{ @filemtime(public_path('css/merchant-panel.css')) ?: time() }}" rel="stylesheet">
   @endif
 
   @yield('page-style')

@@ -101,7 +101,7 @@
 
                 <img class="product-img-alt lazy" src="{{ get_product_img_src($item, 'tiny_thumb', 'alt') }}" data-src="{{ get_product_img_src($item, 'full', 'alt') }}" alt="{{ $item->title }}" title="{{ $item->title }}" />
 
-                <a class="product-link" href="{{ route('show.product', $item->slug) }}"></a>
+                <a class="product-link" href="{{ storefront_product_url($item) }}"></a>
               </div> <!-- /.product-img-wrap -->
 
               <div class="product-actions btn-group radius">
@@ -113,12 +113,12 @@
                   @include('comparison::_product_list_compare_btn')
                 @endif
 
-                <a class="btn btn-default itemQuickView" href="javascript:void(0);" data-link="{{ route('quickView.product', $item->slug) }}" rel="nofollow noindex" data-toggle="tooltip" title="@lang('theme.button.quick_view')" aria-label="@lang('theme.button.quick_view')">
+                <a class="btn btn-default itemQuickView" href="javascript:void(0);" data-link="{{ storefront_product_quickview_url($item) }}" rel="nofollow noindex" data-toggle="tooltip" title="@lang('theme.button.quick_view')" aria-label="@lang('theme.button.quick_view')">
                   <i class="far fa-eye"></i> <span>@lang('theme.button.quick_view')</span>
                 </a>
 
                 @if (is_incevio_package_loaded('auction') && $item->auctionable)
-                  <a class="btn btn-primary" href="{{ route('show.product', $item->slug) }}" data-toggle="tooltip" title="{{ trans('packages.auction.place_bid') }}" aria-label="{{ trans('packages.auction.place_bid') }}">
+                  <a class="btn btn-primary" href="{{ storefront_product_url($item) }}" data-toggle="tooltip" title="{{ trans('packages.auction.place_bid') }}" aria-label="{{ trans('packages.auction.place_bid') }}">
                     <i class="fal fa-gavel"></i>
                   </a>
                 @else
@@ -135,7 +135,7 @@
                   @include('theme::layouts.ratings', ['ratings' => $item->ratings, 'count' => $item->ratings_count])
                 @endif
 
-                <a href="{{ route('show.product', $item->slug) }}" class="product-info-title" data-name="product_name" aria-label="{{ $item->title }}">{{ $item->title }}</a>
+                <a href="{{ storefront_product_url($item) }}" class="product-info-title" data-name="product_name" aria-label="{{ $item->title }}">{{ $item->title }}</a>
 
                 <div class="product-info-availability">
                   @lang('theme.availability'): <span>{{ $item->stock_quantity > 0 ? trans('theme.in_stock') : trans('theme.out_of_stock') }}</span>

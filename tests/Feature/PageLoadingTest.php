@@ -17,7 +17,7 @@ class PageLoadingTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee([
-            'Welcome To zCart Marketplace',
+            'Welcome To cafremarket Marketplace',
             'Featured Categories',
         ]);
     }
@@ -50,11 +50,11 @@ class PageLoadingTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_brands_page_is_being_loaded()
+    public function test_brands_page_is_removed()
     {
         $response = $this->get('/brands');
 
-        $response->assertStatus(200);
+        $response->assertStatus(404);
     }
 
     public function test_customer_login_page_is_being_loaded()

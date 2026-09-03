@@ -34,7 +34,7 @@ class Incevio extends Controller
             return geoip(get_visitor_IP())->toArray();
         }
 
-        return '<h1 style="margin-top:100px; text-align: center;">Your marketplace running on zCart version: '.System::VERSION.'</h1>';
+        return '<h1 style="margin-top:100px; text-align: center;">Your marketplace running on cafremarket version: '.System::VERSION.'</h1>';
     }
 
     /**
@@ -141,7 +141,7 @@ class Incevio extends Controller
     }
 
     /**
-     * Upgrade to zCart 2.4.0 from older version.
+     * Upgrade to cafremarket 2.4.0 from older version.
      * Updating all morphic relations of the system.
      *
      * @return void

@@ -5,18 +5,11 @@
       // Check if specific cart is given
       var expressId = '{{ $expressId }}';
 
-      if ('' != expressId) {
-        apply_busy_filter('body');
-
-        // Scroll screen to target element
+      if ('' != expressId && $('#cartId' + expressId).length) {
         $('#cartId' + expressId)[0].scrollIntoView({
           behavior: 'smooth',
-          block: 'start',
-          offsetTop: 50
+          block: 'start'
         });
-
-        // Auto Submit the cart If its express checkout
-        $("form#formId" + expressId).submit();
       }
     });
   }(window.jQuery, window, document));

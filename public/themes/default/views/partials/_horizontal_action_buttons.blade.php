@@ -1,4 +1,4 @@
-<a class="button product-link itemQuickView" href="javascript:void(0);" data-link="{{ route('quickView.product', $item->slug) }}" rel="nofollow noindex" data-toggle="tooltip" data-placement="top" title="{{ trans('app.quick_view') }}">
+<a class="button product-link itemQuickView" href="javascript:void(0);" data-link="{{ storefront_product_quickview_url($item) }}" rel="nofollow noindex" data-toggle="tooltip" data-placement="top" title="{{ trans('app.quick_view') }}">
   <i class="fal fa-eye"></i>
 </a>
 

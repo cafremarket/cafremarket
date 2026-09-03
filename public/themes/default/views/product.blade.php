@@ -19,34 +19,13 @@
   @endif
 
   <!-- RELATED ITEMS -->
-  <section>
-    <div class="feature">
-      <div class="container">
-        <div class="feature-inner">
-          <div class="feature-header">
-            <div class="sell-header">
-              <div class="sell-header-title">
-                <h2>{!! trans('theme.related_items') !!}</h2>
-              </div>
-              <div class="header-line">
-                <span></span>
-              </div>
-              <div class="header-line">
-                <span></span>
-              </div>
-              <div class="best-deal-arrow">
-              </div>
-            </div>
-          </div>
-
-          <div class="feature-items">
-            <div class="feature-items-inner">
-
-              @include('theme::partials._product_horizontal', ['products' => $related])
-
-            </div>
-          </div>
-        </div>
+  <section class="sf-pdp__band">
+    <div class="container">
+      <header class="sf-pdp__band-head">
+        <h2>{!! trans('theme.related_items') !!}</h2>
+      </header>
+      <div class="feature-items-inner">
+        @include('theme::partials._product_horizontal', ['products' => $related])
       </div>
     </div>
   </section>

@@ -56,13 +56,10 @@
             @foreach ($combination as $attrId => $attrValue)
               {{ Form::hidden('variants[' . $loop->parent->index . '][' . $attrId . ']', key($attrValue)) }}
 
-              {{ current($attrValue) }}
-
-              @if ($attrValue !== end($combination))
-                <span class="text-primary"> &#8226; </span>
-              @endif
+              <span class="label label-primary">{{ current($attrValue) }}</span>
             @endforeach
           </div>
+          <small class="text-muted">{{ trans('help.each_variant_own_inventory') }}</small>
         </td>
 
         <td>

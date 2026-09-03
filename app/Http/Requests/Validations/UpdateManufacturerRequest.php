@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class UpdateManufacturerRequest extends Request
 {
@@ -13,7 +16,32 @@ class UpdateManufacturerRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return $this->user() && $this->user()->isFromMerchant() && $this->user()->merchantId();
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $shopId = Auth::user()->merchantId();
+
+        $slug = $this->input('slug');
+        if (blank($slug) && $this->filled('name')) {
+            $slug = Str::slug($this->input('name'));
+        }
+
+        if ($shopId && filled($slug)) {
+            $suffix = '-s'.$shopId;
+            if (! str_ends_with($slug, $suffix) && ! str_contains($slug, $suffix.'-')) {
+                $slug .= $suffix;
+            }
+        }
+
+        $this->merge([
+            'active' => $this->input('active', 1),
+            'slug' => $slug,
+        ]);
     }
 
     /**
@@ -24,13 +52,29 @@ class UpdateManufacturerRequest extends Request
     public function rules()
     {
         $id = $this->route('manufacturer');
+        $shopId = Auth::user()->merchantId();
 
         return [
-            'name' => 'bail|required|unique:manufacturers,name,'.$id,
-            'slug' => 'bail|unique:manufacturers,slug,'.$id,
-            'email' => 'email|max:255|nullable',
-            'active' => 'required',
-            'image' => 'mimes:jpg,jpeg,png,gif,svg|max:'.config('system_settings.max_img_size_limit_kb'),
+            'name' => [
+                'bail',
+                'required',
+                Rule::unique('manufacturers', 'name')
+                    ->ignore($id)
+                    ->where(function ($query) use ($shopId) {
+                        return $query->where('shop_id', $shopId);
+                    }),
+            ],
+            'slug' => [
+                'bail',
+                'required',
+                Rule::unique('manufacturers', 'slug')->ignore($id),
+            ],
+            'email' => 'nullable|email|max:255',
+            'url' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:50',
+            'country_id' => 'nullable|integer',
+            'active' => 'nullable',
+            'images.logo' => 'nullable|mimes:jpg,jpeg,png,gif,svg|max:'.config('system_settings.max_img_size_limit_kb'),
         ];
     }
 
@@ -42,8 +86,8 @@ class UpdateManufacturerRequest extends Request
     public function messages()
     {
         return [
-            'image.max' => trans('validation.brand_logo_max'),
-            'image.mimes' => trans('validation.brand_logo_mimes'),
+            'images.logo.max' => trans('validation.brand_logo_max'),
+            'images.logo.mimes' => trans('validation.brand_logo_mimes'),
         ];
     }
 }

@@ -27,7 +27,7 @@
       <div class="sf-footer-grid">
         <div class="sf-footer-brand">
           <a href="{{ url('/') }}" class="sf-footer-brand__logo">
-            <img src="{{ get_logo_url('system', 'logo') }}" alt="{{ trans('app.logo') }}">
+            @include('theme::partials._site_logo', ['wrapLink' => false, 'class' => 'sf-footer-brand__logo-img'])
           </a>
 
           @if (config('system_settings.slogan'))

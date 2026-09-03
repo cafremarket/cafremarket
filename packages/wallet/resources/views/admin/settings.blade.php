@@ -87,6 +87,22 @@
             </div>
           </div>
 
+          <hr>
+          <h4 class="text-center" style="margin: 24px 0 16px;">{{ trans('packages.wallet.wallet_topup_fees_section') }}</h4>
+          <p class="text-muted text-center small" style="margin-bottom: 20px;">{{ trans('packages.wallet.wallet_topup_fees_help') }}</p>
+
+          @include('wallet::admin.partials.platform_fee_fields', [
+            'prefix' => 'platform_fee_mpesa',
+            'title' => trans('packages.wallet.platform_fee_mpesa_topup'),
+          ])
+
+          @include('wallet::admin.partials.platform_fee_fields', [
+            'prefix' => 'platform_fee_emola',
+            'title' => trans('packages.wallet.platform_fee_emola_topup'),
+          ])
+
+          <hr>
+
           <div class="form-group">
             <div class="col-sm-5 text-right">
               {!! Form::label('wallet_credit_reward_system', trans('packages.wallet.wallet_credit_reward_system') . ':', ['class' => 'with-help control-label']) !!}

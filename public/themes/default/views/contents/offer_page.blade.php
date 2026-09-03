@@ -9,7 +9,9 @@
       <span class="offered-product-widget-text text-muted mb-3">
         @if ($product->manufacturer->slug)
           {{ trans('theme.by') . ' ' }}
-          <a href="{{ route('show.brand', $product->manufacturer->slug) }}" class="product-info-seller-name">{{ $product->manufacturer->name }}</a>
+          @if ($product->manufacturer)
+            <span class="product-info-seller-name">{{ $product->manufacturer->name }}</span>
+          @endif
         @endif
       </span>
 
@@ -50,7 +52,7 @@
             </td>
 
             <td>
-              <a href="{{ route('show.product', $offer->slug) }}" class="product-info-title">
+              <a href="{{ storefront_product_url($offer) }}" class="product-info-title">
                 {{ $offer->title }}
               </a>
 
@@ -82,7 +84,7 @@
             </td> <!-- /.seller-info -->
 
             <td>
-              <a class="btn btn-default rounded-0 btn-block btn-sm itemQuickView" href="javascript:void(0);" data-link="{{ route('quickView.product', $offer->slug) }}" rel="nofollow noindex">
+              <a class="btn btn-default rounded-0 btn-block btn-sm itemQuickView" href="javascript:void(0);" data-link="{{ storefront_product_quickview_url($offer) }}" rel="nofollow noindex">
                 <i class="far fa-eye" data-toggle="tooltip" title="@lang('theme.button.quick_view')"></i>
                 <span>@lang('theme.button.quick_view')</span>
               </a>

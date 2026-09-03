@@ -1,6 +1,6 @@
 {
-  "name": "zCart Multi-Vendor Marketplace by Incevio",
-  "short_name": "zCart",
+  "name": "cafremarket Multi-Vendor Marketplace",
+  "short_name": "cafremarket",
   "start_url": "index.html",
   "scope": "./",
   "icons": [
@@ -15,7 +15,7 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#ffd31d",
+  "theme_color": "#ff6600",
   "background_color": "#333",
   "display": "standalone"
 }

@@ -32,6 +32,17 @@ class Storefront
             return $next($request);
         }
 
+        // Store merchants browsing the marketplace homepage get their own storefront.
+        // Never redirect if already on that shop URL (avoids redirect loops).
+        $path = trim($request->path(), '/');
+        $shopUrl = storefront_merchant_shop_url();
+        if ($shopUrl && ($path === '' || $request->routeIs('homepage'))) {
+            $shopPath = trim(parse_url($shopUrl, PHP_URL_PATH) ?: '', '/');
+            if ($shopPath === '' || $path !== $shopPath) {
+                return redirect()->to($shopUrl);
+            }
+        }
+
         app(BuyerLocationService::class)->ensureDeliveryLocation();
 
         View::share('buyer_has_location', buyer_has_location());

@@ -26,6 +26,7 @@ return [
     'inventories' => 'Inventories',
     'digital_products' => 'Digital Items',
     'physical_products' => 'Physical Items',
+    'stock_overview' => 'Stock overview',
     'warehouses' => 'Warehouses',
     'utilities' => 'Utilities',
     'support' => 'Support desk',

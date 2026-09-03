@@ -1,243 +1,168 @@
-<div class="row">
-  <div class="cover-img-wrapper">
-    <img class="lazy w-100" src="{{ get_cover_img_src($shop, 'shop', 'cover_thumb') }}" data-src="{{ get_cover_img_src($shop, 'shop') }}">
+@php
+  $storeRoute = \Request::route()->getName();
+  $isStoreHome = $storeRoute === 'show.store';
+  $isStoreProducts = $storeRoute === 'shop.products';
+  $isStoreReviews = $storeRoute === 'shop.reviews';
+  $storeRating = $shop->feedbacks->count() ? $shop->feedbacks->avg('rating') : 0;
+@endphp
+
+<div class="sf-store">
+  <div class="sf-store__hero">
+    <img class="sf-store__cover lazy" src="{{ get_cover_img_src($shop, 'shop', 'cover_thumb') }}" data-src="{{ get_cover_img_src($shop, 'shop') }}" alt="{{ $shop->name }}">
+    <div class="sf-store__hero-shade"></div>
   </div>
-</div> <!-- /.row -->
 
-<div class="container lg-100">
-  <div id="profile-container" class="row">
-    <div class="col-12 mb-5 px-md-1 px-0">
-      <div class="row profile-header border mt-3">
-        <div class="col-lg-2 col-md-3 text-center my-3">
-          @include('theme::partials._shop_logo_frame', ['shop' => $shop, 'frameSize' => 'lg', 'class' => 'mx-auto', 'thumbSize' => 'tiny', 'fullSize' => 'full'])
-        </div> <!-- /.col -->
+  <div class="container sf-store__shell">
+    <section class="sf-store__identity">
+      <div class="sf-store__logo-wrap">
+        @include('theme::partials._shop_logo_frame', ['shop' => $shop, 'frameSize' => 'lg', 'class' => 'sf-store__logo', 'thumbSize' => 'tiny', 'fullSize' => 'full'])
+      </div>
 
-        <div class="col-lg-6 col-md-9 profile-info">
-          <div class="header-fullname">
-            {!! $shop->getQualifiedName() !!}
-            {!! $shop->reward_badge !!}
+      <div class="sf-store__identity-main">
+        <div class="sf-store__title-row">
+          <h1 class="sf-store__name">{!! $shop->getQualifiedName() !!}</h1>
+          {!! $shop->reward_badge !!}
+        </div>
 
-            <a href="javascript:void(0);" class="btn btn-primary btn-sm contact-seller-btn" data-toggle="modal" data-target="{{ Auth::guard('customer')->check() ? '#contactSellerModal' : '#loginModal' }}">
-              <i class="far fa-envelope"></i> @lang('theme.button.contact_seller')
-            </a>
+        @if ($shop->feedbacks->count())
+          <div class="sf-store__rating">
+            @include('theme::layouts.ratings', ['ratings' => $storeRating, 'count' => $shop->feedbacks->count(), 'shop' => true])
           </div>
+        @endif
 
-          @if ($shop->feedbacks->count())
-            <span class="small">
-              @include('theme::layouts.ratings', ['ratings' => $shop->feedbacks->avg('rating'), 'count' => $shop->feedbacks->count(), 'shop' => true])
-            </span>
-          @endif
-
-            <div class="header-information show-hide-content mb-0 less">
+        @if ($shop->description)
+          <div class="sf-store__about show-hide-content less">
             {!! clean_rich_html($shop->description) !!}
           </div>
-
-          <a href="javascript::void(0)" class="small show-hide-content-btn">
+          <a href="javascript:void(0)" class="sf-store__more show-hide-content-btn">
             {{ trans('theme.show_more') }} <i class="fa fa-angle-down"></i>
           </a>
-        </div> <!-- /.col -->
+        @endif
 
-        <div class="col-lg-4 profile-stats">
-          <div class="row">
-            <div class="col-6 col-xs-12 stats-col">
-              <div class="stats-value">{{ $shop->inventories_count }}</div>
-              <div class="stats-title">{{ trans('theme.active_listings') }}</div>
+        <div class="sf-store__actions">
+          <a href="javascript:void(0);" class="sf-store__btn sf-store__btn--primary contact-seller-btn" data-toggle="modal" data-target="{{ Auth::guard('customer')->check() ? '#contactSellerModal' : '#loginModal' }}">
+            <i class="far fa-envelope"></i> @lang('theme.button.contact_seller')
+          </a>
+          <a href="{{ route('shop.products', $shop->slug) }}" class="sf-store__btn sf-store__btn--ghost">
+            <i class="far fa-cubes"></i> {{ trans('theme.products') }}
+          </a>
+        </div>
+      </div>
+
+      <aside class="sf-store__stats">
+        <div class="sf-store__stat">
+          <strong>{{ $shop->inventories_count }}</strong>
+          <span>{{ trans('theme.active_listings') }}</span>
+        </div>
+        <div class="sf-store__stat">
+          <strong>{{ $shop->total_item_sold }}</strong>
+          <span>{{ trans('theme.items_sold') }}</span>
+        </div>
+        <div class="sf-store__meta">
+          @if ($shop->address)
+            <div><i class="fa fa-map-marker"></i> {!! $shop->address->toShortString() !!}</div>
+          @endif
+          <div><i class="fa fa-calendar"></i> {{ trans('theme.member_since') . ' ' . $shop->created_at->toFormattedDateString() }}</div>
+        </div>
+      </aside>
+    </section>
+
+    <nav class="sf-store__tabs" aria-label="{{ $shop->name }}">
+      <a class="{{ $isStoreHome ? 'is-active' : '' }}" href="{{ route('show.store', $shop->slug) }}">{{ trans('theme.shop_home') }}</a>
+      <a class="{{ $isStoreProducts ? 'is-active' : '' }}" href="{{ route('shop.products', $shop->slug) }}">{{ trans('theme.products') }}</a>
+      @if ($shop->config->return_refund)
+        <a data-toggle="tab" href="#return-policy-tab">{{ trans('theme.return_and_refund_policy') }}</a>
+      @endif
+      <a class="{{ $isStoreReviews ? 'is-active' : '' }}" href="{{ route('shop.reviews', $shop->slug) }}">{{ trans('theme.latest_reviews') }}</a>
+    </nav>
+
+    <div class="tab-content sf-store__body">
+      <div id="overview-tab" class="tab-pane {{ $isStoreHome ? 'active' : '' }}">
+        @include('theme::sections.slider_shop_page')
+
+        @if (!empty($banners['group_1']))
+          @include('theme::sections.banners', ['banners' => $banners['group_1']])
+        @endif
+
+        @if (isset($top_items) && count($top_items))
+          <section class="sf-store__shelf">
+            <header class="sf-store__shelf-head">
+              <h2>{{ trans('theme.top_selling') }}</h2>
+              <div class="sf-store__shelf-nav">
+                <button type="button" class="left-arrow slider-arrow slick-arrow neckbands-left"><i class="fal fa-chevron-left"></i></button>
+                <button type="button" class="right-arrow slider-arrow slick-arrow neckbands-right"><i class="fal fa-chevron-right"></i></button>
+              </div>
+            </header>
+            <div class="neckbands-items">
+              <div class="neckbands-items-inner">
+                @include('theme::partials._product_horizontal', ['products' => $top_items, 'ratings' => 1])
+              </div>
             </div>
+          </section>
+        @endif
 
-            <div class="col-6 col-xs-12 stats-col">
-              <div class="stats-value">{{ $shop->total_item_sold }}</div>
-              <div class="stats-title">{{ trans('theme.items_sold') }}</div>
+        @include('theme::sections.deal_of_the_day')
+        @include('theme::sections.recently_added')
+
+        @if (!empty($banners['group_2']))
+          <div class="sf-store__banners">
+            @include('theme::sections.banners', ['banners' => $banners['group_2']])
+          </div>
+        @endif
+
+        @if (isset($deals_under) && count($deals_under))
+          <section class="sf-store__shelf">
+            <header class="sf-store__shelf-head">
+              <h2>{{ trans('theme.best_find_under', ['amount' => get_formated_currency(get_from_option_table('best_finds_under' . $shop->id))]) }}</h2>
+              <div class="sf-store__shelf-nav">
+                <button type="button" class="left-arrow slider-arrow slick-arrow best-deal-left"><i class="fal fa-chevron-left"></i></button>
+                <button type="button" class="right-arrow slider-arrow slick-arrow best-deal-right"><i class="fal fa-chevron-right"></i></button>
+              </div>
+            </header>
+            <div class="best-deals-items">
+              <div class="best-deals-items-inner">
+                @include('theme::partials._product_horizontal', ['products' => $deals_under, 'title' => 1, 'ratings' => 1, 'hover' => 1])
+              </div>
             </div>
-          </div> <!-- /.row -->
+          </section>
+        @endif
+      </div>
 
-          <div class="row">
-            <div class="col-6 col-xs-12 inlinestats-col">
-              <i class="fa fa-map-marker mr-2"></i> {!! $shop->address->toShortString() !!}
+      <div id="products-tab" class="tab-pane {{ $isStoreProducts ? 'active' : '' }}">
+        @include('theme::contents.product_list', ['colum' => 3])
+      </div>
+
+      <div id="return-policy-tab" class="tab-pane">
+        <article class="sf-store__policy html-content">
+          {!! $shop->config->return_refund !!}
+        </article>
+      </div>
+
+      <div id="reviews-tab" class="tab-pane {{ $isStoreReviews ? 'active' : '' }}">
+        <div class="sf-store__reviews">
+          @isset($reviews)
+            @forelse($reviews as $review)
+              <article class="sf-store__review">
+                <header>
+                  <strong>{{ $review->customer->nice_name ?? $review->customer->name }}</strong>
+                  <span>
+                    <b class="text-success">@lang('theme.verified_purchase')</b>
+                    <span class="text-muted">{{ $review->created_at->diffForHumans() }}</span>
+                  </span>
+                </header>
+                <p>{{ $review->comment }}</p>
+                @include('theme::layouts.ratings', ['ratings' => $review->rating])
+              </article>
+            @empty
+              <p class="sf-store__empty">@lang('theme.no_reviews')</p>
+            @endforelse
+
+            <div class="row d-flex justify-content-center pagenav-wrapper mt-4 mb-2">
+              {{ $reviews->links('theme::layouts.pagination') }}
             </div>
-
-            <div class="col-6 col-xs-12 inlinestats-col">
-              <strong>{{ trans('theme.member_since') . ' ' . $shop->created_at->toFormattedDateString() }}</strong>
-            </div>
-          </div> <!-- /.row -->
-        </div> <!-- /.col -->
-      </div> <!-- /.row .profile-header -->
-
-      <div class="row profile-body mt-0">
-        <div class="col-12 tabbable p-0">
-          <ul class="nav nav-tabs m-0 nav-justified border" id="myTab11">
-            <li class="border-r {{ \Request::route()->getName() == 'show.store' ? 'active' : '' }}">
-              <a href="{{ route('show.store', $shop->slug) }}" aria-expanded="true">
-                {{ trans('theme.shop_home') }}
-              </a>
-            </li>
-
-            <li class="border-r {{ isset($products) ? 'active' : '' }}">
-              <a href="{{ route('shop.products', $shop->slug) }}" aria-expanded="false">
-                {{ trans('theme.products') }}
-              </a>
-            </li>
-
-            @if ($shop->config->return_refund)
-              <li class="border-r">
-                <a data-toggle="tab" href="#return-policy-tab" aria-expanded="false">
-                  {{ trans('theme.return_and_refund_policy') }}
-                </a>
-              </li>
-            @endif
-
-            <li class="{{ isset($reviews) ? 'active' : '' }}">
-              <a href="{{ route('shop.reviews', $shop->slug) }}" aria-expanded="false">
-                {{ trans('theme.latest_reviews') }}
-              </a>
-            </li>
-          </ul> <!-- /.profile-header -->
-
-          <div class="tab-content mt-3">
-            <div id="overview-tab" class="tab-pane {{ \Request::route()->getName() == 'show.store' ? 'active' : '' }}">
-              <!-- SLIDER -->
-              @include('theme::sections.slider_shop_page')
-
-              <!-- banner grp one -->
-              @if (!empty($banners['group_1']))
-                @include('theme::sections.banners', ['banners' => $banners['group_1']])
-              @endif
-
-              <!-- Top selling -->
-              @isset($top_items)
-                <section>
-                  <div class="neckbands">
-                    <div class="container">
-                      <div class="neckbands-inner">
-                        <div class="neckbands-header">
-                          <div class="sell-header">
-                            <div class="sell-header-title">
-                              <h2>{{ trans('theme.top_selling') }}</h2>
-                            </div>
-
-                            <div class="header-line">
-                              <span></span>
-                            </div>
-
-                            <div class="best-deal-arrow">
-                              <ul>
-                                <li><button class="left-arrow slider-arrow slick-arrow neckbands-left"><i class="fal fa-chevron-left"></i></button></li>
-                                <li><button class="right-arrow slider-arrow slick-arrow neckbands-right"><i class="fal fa-chevron-right"></i></button></li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="neckbands-items">
-                          <div class="neckbands-items-inner">
-                            @include('theme::partials._product_horizontal', ['products' => $top_items, 'ratings' => 1])
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              @endisset
-
-              <!-- Deal of Day start -->
-              @include('theme::sections.deal_of_the_day')
-
-              <!-- Recently Added -->
-              @include('theme::sections.recently_added')
-
-              <!-- banner grp three -->
-              @if (!empty($banners['group_2']))
-                <div class="mt-3">
-                  @include('theme::sections.banners', ['banners' => $banners['group_2']])
-                </div>
-              @endif
-
-              <!-- Best finds under $99 deals start -->
-              @if (isset($deals_under) && count($deals_under))
-                <section>
-                  <div class="best-deals">
-                    <div class="container">
-                      <div class="best-deals-inner">
-                        <div class="best-deals-header">
-                          <div class="sell-header">
-                            <div class="sell-header-title">
-                              <h2>
-                                {{ trans('theme.best_find_under', ['amount' => get_formated_currency(get_from_option_table('best_finds_under' . $shop->id))]) }}
-                              </h2>
-                            </div>
-                            <div class="header-line">
-                              <span></span>
-                            </div>
-                            <div class="best-deal-arrow">
-                              <ul>
-                                <li><button class="left-arrow slider-arrow slick-arrow best-deal-left"><i class="fal fa-chevron-left"></i></button></li>
-                                <li><button class="right-arrow slider-arrow slick-arrow best-deal-right"><i class="fal fa-chevron-right"></i></button></li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="best-deals-items">
-                          <div class="best-deals-items-inner">
-
-                            @include('theme::partials._product_horizontal', ['products' => $deals_under, 'title' => 1, 'ratings' => 1, 'hover' => 1])
-
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              @endif
-            </div> <!-- /#overview-tab -->
-
-            <div id="products-tab" class="tab-pane {{ isset($products) ? 'active' : '' }}">
-
-              @include('theme::contents.product_list', ['colum' => 3])
-
-            </div> <!-- /#products-tab -->
-
-            <div id="return-policy-tab" class="tab-pane">
-              <div class="row html-content pt-5">
-                <div class="col-md-8 col-md-offset-2">
-                  {!! $shop->config->return_refund !!}
-                </div>
-              </div> <!-- /.row -->
-            </div> <!-- /#return-policy-tab -->
-
-            <div id="reviews-tab" class="tab-pane {{ isset($reviews) ? 'active' : '' }}">
-              <div class="row">
-                <div class="col-md-6 offset-md-3">
-                  @isset($reviews)
-                    @forelse($reviews as $review)
-                      <p>
-                        <b>{{ $review->customer->nice_name ?? $review->customer->name }}</b>
-
-                        <span class="pull-right small">
-                          <b class="text-success">@lang('theme.verified_purchase')</b>
-                          <span class="text-muted"> | {{ $review->created_at->diffForHumans() }}</span>
-                        </span>
-                      </p>
-
-                      <p>{{ $review->comment }}</p>
-
-                      @include('theme::layouts.ratings', ['ratings' => $review->rating])
-
-                      @unless ($loop->last)
-                        <hr class="dotted" />
-                      @endunless
-                    @empty
-                      <p class="lead text-center text-muted">@lang('theme.no_reviews')</p>
-                    @endforelse
-
-                    <div class="row d-flex justify-content-center pagenav-wrapper mt-5 mb-3">
-                      {{ $reviews->links('theme::layouts.pagination') }}
-                    </div><!-- /.row .pagenav-wrapper -->
-                  @endisset
-                </div>
-              </div> <!-- /.row -->
-            </div> <!-- /#reviews-tab -->
-          </div> <!-- /.tab-content -->
-        </div> <!-- /.col-lg-12 -->
-      </div> <!-- /.row .profile-body -->
+          @endisset
+        </div>
+      </div>
     </div>
   </div>
 </div>

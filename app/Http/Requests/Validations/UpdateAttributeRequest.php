@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
+use Illuminate\Validation\Rule;
 
 class UpdateAttributeRequest extends Request
 {
@@ -13,7 +14,20 @@ class UpdateAttributeRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return $this->user() && $this->user()->isFromMerchant() && $this->user()->merchantId();
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'attribute_type_id' => resolve_attribute_type_id(
+                $this->input('name'),
+                (int) $this->input('attribute_type_id') ?: null
+            ),
+        ]);
     }
 
     /**
@@ -23,13 +37,20 @@ class UpdateAttributeRequest extends Request
      */
     public function rules()
     {
-        // $shop_id = Request::user()->merchantId(); // Get current user's shop_id
-        $ignore = $this->route('attribute'); // Current model ID
+        $shopId = $this->user()->merchantId();
+        $ignore = $this->route('attribute');
 
         return [
-            'attribute_type_id' => 'required',
-            // 'name' => 'bail|required|composite_unique:attributes,shop_id:' . $shop_id . ', ' . $ignore,
-            'name' => 'bail|required|unique:attributes,name,'.$ignore,
+            'attribute_type_id' => 'required|integer',
+            'name' => [
+                'bail',
+                'required',
+                Rule::unique('attributes', 'name')
+                    ->ignore($ignore)
+                    ->where(function ($query) use ($shopId) {
+                        return $query->where('shop_id', $shopId)->whereNull('deleted_at');
+                    }),
+            ],
             'order' => 'integer|nullable',
         ];
     }
@@ -41,8 +62,6 @@ class UpdateAttributeRequest extends Request
      */
     public function messages()
     {
-        return [
-            'attribute_type_id.required' => trans('validation.attribute_type_id_required'),
-        ];
+        return [];
     }
 }

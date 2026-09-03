@@ -29,7 +29,6 @@
         <th>{{ trans('app.cover_image') }}</th>
         <th>{{ trans('app.feature_image') }}</th>
         <th>{{ trans('app.category_name') }}</th>
-        <th>{{ trans('app.parent') }}</th>
         <th>{{ trans('app.attributes') }}</th>
         <th>{{ trans('app.products') }}</th>
         <th>{{ trans('app.listings') }}</th>
@@ -48,7 +47,6 @@
     <thead>
       <tr>
         <th>{{ trans('app.category_name') }}</th>
-        <th>{{ trans('app.parent') }}</th>
         <th>{{ trans('app.deleted_at') }}</th>
         <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
       </tr>
@@ -61,17 +59,6 @@
             @if ($trash->description)
               <span class="excerpt-td small">{!! Str::limit($trash->description, 150) !!}</span>
             @endif
-          </td>
-          <td>
-            @if ($trash->subGroup->group->deleted_at)
-              <i class="fa fa-trash-o small"></i>
-            @endif
-            {!! $trash->subGroup->group->name !!}
-            &nbsp;<i class="fa fa-angle-double-right small"></i>&nbsp;
-            @if ($trash->subGroup->deleted_at)
-              <i class="fa fa-trash-o small"></i>
-            @endif
-            {!! $trash->subGroup->name !!}
           </td>
           <td>{{ $trash->deleted_at->diffForHumans() }}</td>
           <td class="row-options admin-row-actions">

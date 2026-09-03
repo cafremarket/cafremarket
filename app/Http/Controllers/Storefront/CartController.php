@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Common\ShoppingCart;
 use App\Http\Controllers\Controller;
+use App\Helpers\ListHelper;
 use App\Models\Cart;
 use App\Models\Country;
 use App\Models\Coupon;
+use App\Models\PaymentMethod;
 use App\Models\ShippingRate;
 use App\Models\State;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
@@ -117,6 +120,31 @@ class CartController extends Controller
             $cart->save();
         }
 
+        $customer = Auth::guard('customer')->check() ? Auth::guard('customer')->user() : null;
+        if ($customer) {
+            $customer->load(['addresses.country', 'addresses.state']);
+        }
+
+        $paymentMethods = PaymentMethod::active()->get();
+
+        foreach ($carts as $cart) {
+            if ($cart->shop) {
+                $cart->shop->load(['paymentMethods' => function ($q) {
+                    $q->active();
+                }]);
+
+                if (optional($cart->shop->config)->isPickupEnabled()) {
+                    $cart->shop->load('warehouses.address');
+                }
+            }
+        }
+
+        $states = [];
+        $firstCart = $carts->first();
+        if ($firstCart && $firstCart->ship_to_country_id) {
+            $states = ListHelper::states($firstCart->ship_to_country_id);
+        }
+
         if (is_incevio_package_loaded('packaging')) {
             $carts->load('shippingPackage');
 
@@ -136,10 +164,10 @@ class CartController extends Controller
 
             // dd($shippingRate);
 
-            return view('theme::cart', compact('carts', 'business_areas', 'shipping_zones', 'shipping_options', 'platformDefaultPackaging', 'expressId'));
+            return view('theme::cart', compact('carts', 'business_areas', 'shipping_zones', 'shipping_options', 'platformDefaultPackaging', 'expressId', 'customer', 'paymentMethods', 'states'));
         }
 
-        return view('theme::cart', compact('carts', 'business_areas', 'shipping_zones', 'shipping_options', 'expressId'));
+        return view('theme::cart', compact('carts', 'business_areas', 'shipping_zones', 'shipping_options', 'expressId', 'customer', 'paymentMethods', 'states'));
     }
 
     /**

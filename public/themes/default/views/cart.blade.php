@@ -1,13 +1,8 @@
 @extends('theme::layouts.main')
 
 @section('content')
-  <!-- breadcrumb -->
   @include('theme::headers.cart_page')
-
-  <!-- CONTENT SECTION -->
   @include('theme::contents.cart_page')
-
-  <!-- BROWSING ITEMS -->
   @include('theme::sections.recent_views')
 @endsection
 
@@ -20,4 +15,18 @@
   @endif
 
   @include('theme::scripts.dynamic_checkout')
+
+  @if ($carts->count() > 0)
+    @include('scripts.checkout')
+  @endif
+
+  <script type="text/javascript">
+    "use strict";
+    (function($) {
+      $(document).on('click', '.sf-checkout__change-addr', function() {
+        var target = $(this).data('target');
+        $(target).slideToggle(180);
+      });
+    }(window.jQuery));
+  </script>
 @endsection

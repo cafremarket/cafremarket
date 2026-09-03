@@ -35,7 +35,7 @@
                 </ul>
               @endif
 
-              <a href="{{ route('show.product', $item->slug) }}" class="btn btn-default rounded mt-3 ml-3">
+              <a href="{{ storefront_product_url($item) }}" class="btn btn-default rounded mt-3 ml-3">
                 @lang('theme.button.view_product_details')
               </a>
             </div><!-- /.col-sm-9 .col-6 -->
@@ -54,7 +54,7 @@
           </a>
 
           @if ($item->product->inventories_count > 1)
-            <a href="{{ route('show.offers', $item->product->slug) }}" class="btn btn-sm btn-link">
+            <a href="{{ storefront_product_offers_url($item) }}" class="btn btn-sm btn-link">
               @lang('theme.view_more_offers', ['count' => $item->product->inventories_count])
             </a>
           @endif

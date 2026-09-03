@@ -59,10 +59,21 @@ class CreateShopForMerchant
             }
         }
 
+        $sellerType = in_array($this->request['seller_type'] ?? '', [Shop::SELLER_TYPE_INDIVIDUAL, Shop::SELLER_TYPE_COMPANY], true)
+            ? $this->request['seller_type']
+            : Shop::SELLER_TYPE_INDIVIDUAL;
+
+        $legalName = $this->request['legal_name']
+            ?? ($sellerType === Shop::SELLER_TYPE_COMPANY
+                ? ($this->request['shop_name'] ?? null)
+                : ($this->request['name'] ?? $this->request['shop_name'] ?? null));
+
         $shopData = array_merge($this->request, [
             'name' => $this->request['shop_name'],
             'description' => $this->request['description'] ?? trans('app.welcome'),
-            'legal_name' => $this->request['legal_name'] ?? null,
+            'legal_name' => $legalName,
+            'seller_type' => $sellerType,
+            'nuit' => $this->request['nuit'] ?? null,
             'owner_id' => $this->merchant->id,
             'email' => $this->merchant->email,
             'slug' => generate_unique_shop_slug($this->request['slug'] ?? $this->request['shop_name']),

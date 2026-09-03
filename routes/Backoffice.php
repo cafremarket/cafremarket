@@ -89,10 +89,9 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/Shop.php';
         });
 
-        // Catalog Routes for Admin
+        // Catalog taxonomy is store-managed. Groups/Sub Groups removed.
+        // Routes stay registered under admin.* names so shared views + toPanelUrl keep working.
         Route::name('catalog.')->prefix('catalog')->group(function () {
-            include 'admin/CategoryGroup.php';
-            include 'admin/CategorySubGroup.php';
             include 'admin/Category.php';
             include 'admin/Product.php';
             include 'admin/Attribute.php';
