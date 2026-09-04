@@ -21,6 +21,16 @@ class Banner extends BaseModel
      *
      * @var array
      */
+    public const TYPE_SINGLE = 'single';
+
+    public const TYPE_SLIDER = 'slider';
+
+    public const TYPE_COLOUR = 'colour';
+
+    public const LAYOUT_FULL = 12;
+
+    public const LAYOUT_THIRD = 4;
+
     protected $casts = [
         'effect' => 'boolean',
         'hide_text' => 'boolean',
@@ -43,6 +53,7 @@ class Banner extends BaseModel
         'order',
         'effect',
         'hide_text',
+        'display_type',
     ];
 
     /**

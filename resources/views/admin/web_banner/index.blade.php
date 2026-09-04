@@ -9,9 +9,7 @@
     $bannerModel = \App\Models\Banner::class;
     $bannersByGroup = $banners->groupBy('group_id');
     $homepageGroups = $groups->whereIn('id', $homepageGroupIds)->values();
-    $extraGroups = $groups->whereNotIn('id', $homepageGroupIds)->values();
-    $totalBanners = $banners->count();
-    $homepageBannerCount = $banners->whereIn('group_id', $homepageGroupIds)->count();
+    $totalBanners = $banners->whereIn('group_id', $homepageGroupIds)->count();
   @endphp
 
   <div class="wb-manager">
@@ -26,10 +24,6 @@
         <div class="wb-manager__stat">
           <span class="wb-manager__stat-value">{{ $totalBanners }}</span>
           <span class="wb-manager__stat-label">{{ trans('app.banners') }}</span>
-        </div>
-        <div class="wb-manager__stat">
-          <span class="wb-manager__stat-value">{{ $homepageBannerCount }}</span>
-          <span class="wb-manager__stat-label">{{ trans('app.homepage') }}</span>
         </div>
         <div class="wb-manager__stat">
           <span class="wb-manager__stat-value">{{ $homepageGroups->count() }}</span>
@@ -50,16 +44,24 @@
 
     <div class="wb-manager__layout-guide">
       <div class="wb-manager__layout-guide-item">
-        <strong>12</strong> <span>{{ trans('help.web_banner_width_full') }}</span>
+        <strong>{{ trans('app.banner_type_slider') }}</strong>
+        <span>{{ trans('help.web_banner_guide_slider') }}</span>
       </div>
       <div class="wb-manager__layout-guide-item">
-        <strong>6</strong> <span>{{ trans('help.web_banner_width_half') }}</span>
+        <strong>{{ trans('app.banner_type_single') }}</strong>
+        <span>{{ trans('help.web_banner_guide_single') }}</span>
       </div>
       <div class="wb-manager__layout-guide-item">
-        <strong>4</strong> <span>{{ trans('help.web_banner_width_third') }}</span>
+        <strong>{{ trans('app.banner_type_colour') }}</strong>
+        <span>{{ trans('help.web_banner_guide_colour') }}</span>
       </div>
       <div class="wb-manager__layout-guide-item">
-        <strong>3</strong> <span>{{ trans('help.web_banner_width_quarter') }}</span>
+        <strong>{{ trans('help.web_banner_layout_full') }}</strong>
+        <span>{{ trans('help.web_banner_guide_full') }}</span>
+      </div>
+      <div class="wb-manager__layout-guide-item">
+        <strong>{{ trans('help.web_banner_layout_third') }}</strong>
+        <span>{{ trans('help.web_banner_guide_third') }}</span>
       </div>
     </div>
 
@@ -78,23 +80,5 @@
         ])
       @endforeach
     </div>
-
-    @if ($extraGroups->isNotEmpty())
-      <div class="wb-manager__section">
-        <div class="wb-manager__section-head">
-          <h3>{{ trans('app.extra_banner_rows') }}</h3>
-          <p>{{ trans('help.web_banners_extra_section') }}</p>
-        </div>
-
-        @foreach ($extraGroups as $group)
-          @include('admin.web_banner._group_panel', [
-            'group' => $group,
-            'groupBanners' => $bannersByGroup->get($group->id, collect())->sortBy('order'),
-            'isHomepage' => false,
-            'bannerModel' => $bannerModel,
-          ])
-        @endforeach
-      </div>
-    @endif
   </div>
 @endsection

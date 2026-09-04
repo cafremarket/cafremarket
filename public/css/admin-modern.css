@@ -4508,6 +4508,27 @@ body.login-page .login-box:has(.admin-auth-card) {
   opacity: 1;
 }
 
+.wb-form__color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wb-form__color-row input[type="color"] {
+  width: 42px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid #d0d7de;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.wb-row__badge--type {
+  background: #e8f1ff;
+  color: #1d4ed8;
+}
+
 .wb-form__aside-card {
   padding: 14px 16px;
   background: #f8fafc;

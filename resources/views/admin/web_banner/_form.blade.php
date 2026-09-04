@@ -1,20 +1,33 @@
 @php
+  use App\Models\Banner;
+
   $groupOptions = [
     'group_1' => trans('help.web_banner_group_group_1'),
     'group_2' => trans('help.web_banner_group_group_2'),
     'group_3' => trans('help.web_banner_group_group_3'),
-    'group_4' => trans('help.web_banner_group_group_4'),
-    'group_5' => trans('help.web_banner_group_group_5'),
-    'group_6' => trans('help.web_banner_group_group_6'),
   ];
   $selectedGroup = old('group_id', isset($banner) ? $banner->group_id : ($defaultGroup ?? 'group_1'));
-  $columnOptions = [
-    '12' => trans('help.web_banner_width_full').' (12)',
-    '8' => '8/12',
-    '6' => trans('help.web_banner_width_half').' (6)',
-    '4' => trans('help.web_banner_width_third').' (4)',
-    '3' => trans('help.web_banner_width_quarter').' (3)',
+  if (! array_key_exists($selectedGroup, $groupOptions)) {
+    $selectedGroup = 'group_1';
+  }
+
+  $layoutOptions = [
+    (string) Banner::LAYOUT_FULL => trans('help.web_banner_layout_full'),
+    (string) Banner::LAYOUT_THIRD => trans('help.web_banner_layout_third'),
   ];
+
+  $typeOptions = [
+    Banner::TYPE_SINGLE => trans('app.banner_type_single'),
+    Banner::TYPE_SLIDER => trans('app.banner_type_slider'),
+    Banner::TYPE_COLOUR => trans('app.banner_type_colour'),
+  ];
+
+  $selectedType = old('display_type', isset($banner) ? ($banner->display_type ?: Banner::TYPE_SINGLE) : Banner::TYPE_SINGLE);
+  $selectedLayout = old('columns', isset($banner) ? (string) ($banner->columns ?: Banner::LAYOUT_FULL) : (string) Banner::LAYOUT_FULL);
+  if (! array_key_exists($selectedLayout, $layoutOptions)) {
+    $selectedLayout = (string) Banner::LAYOUT_FULL;
+  }
+  $selectedColor = old('bg_color', isset($banner) ? ($banner->bg_color ?: '#f97316') : '#f97316');
 @endphp
 
 <div class="wb-form">
@@ -56,27 +69,50 @@
           {!! Form::label('group_id', trans('app.form.homepage_row').' *') !!}
           {!! Form::select('group_id', $groupOptions, $selectedGroup, ['class' => 'form-control', 'required']) !!}
         </div>
+
         <div class="form-group">
-          {!! Form::label('columns', trans('app.form.columns')) !!}
-          {!! Form::select('columns', $columnOptions, isset($banner) ? null : '12', ['class' => 'form-control']) !!}
+          {!! Form::label('display_type', trans('app.banner_display_type').' *') !!}
+          {!! Form::select('display_type', $typeOptions, $selectedType, ['class' => 'form-control', 'id' => 'wb_display_type', 'required']) !!}
+          <p class="help-block small">{{ trans('help.web_banner_display_type') }}</p>
         </div>
+
+        <div class="form-group" id="wb_layout_field">
+          {!! Form::label('columns', trans('app.banner_layout').' *') !!}
+          {!! Form::select('columns', $layoutOptions, $selectedLayout, ['class' => 'form-control', 'id' => 'wb_columns', 'required']) !!}
+          <p class="help-block small">{{ trans('help.web_banner_layout') }}</p>
+        </div>
+
         <div class="form-group">
           {!! Form::label('order', trans('app.form.position')) !!}
           {!! Form::number('order', null, ['class' => 'form-control', 'min' => 0, 'placeholder' => '1']) !!}
         </div>
+
         <div class="form-group">
           {!! Form::label('effect', trans('app.zoom_effect')) !!}
           {!! Form::select('effect', [0 => trans('app.no'), 1 => trans('app.yes')], isset($banner) ? null : 0, ['class' => 'form-control']) !!}
         </div>
+
         <div class="form-group">
-          {!! Form::label('hide_text', trans('app.hide_banner_text') ?? 'Hide text (image only)') !!}
+          {!! Form::label('hide_text', trans('app.hide_banner_text')) !!}
           {!! Form::select('hide_text', [0 => trans('app.no'), 1 => trans('app.yes')], isset($banner) ? null : 0, ['class' => 'form-control']) !!}
-          <p class="help-block small">{{ trans('help.web_banner_hide_text') ?? 'When Yes, only the banner image is shown — title and description stay hidden on the storefront.' }}</p>
+          <p class="help-block small">{{ trans('help.web_banner_hide_text') }}</p>
         </div>
       </div>
 
-      <div class="form-group wb-form__upload">
-        <label for="uploadBtn">{{ trans('app.banner_image') }} *</label>
+      <div class="form-group wb-form__colour-field" id="wb_colour_field" style="{{ $selectedType === Banner::TYPE_COLOUR ? '' : 'display:none;' }}">
+        {!! Form::label('bg_color', trans('app.background').' *') !!}
+        <div class="wb-form__color-row">
+          <input type="color" id="wb_bg_color_picker" value="{{ preg_match('/^#[0-9A-Fa-f]{6}$/', $selectedColor) ? $selectedColor : '#f97316' }}" title="{{ trans('app.background') }}">
+          {!! Form::text('bg_color', $selectedColor, ['class' => 'form-control', 'id' => 'wb_bg_color', 'placeholder' => '#f97316']) !!}
+        </div>
+        <p class="help-block small">{{ trans('help.web_banner_colour') }}</p>
+      </div>
+
+      <div class="form-group wb-form__upload" id="wb_image_field">
+        <label for="uploadBtn">
+          {{ trans('app.banner_image') }}
+          <span id="wb_image_required_mark">*</span>
+        </label>
         @if (isset($banner) && $banner->featureImage)
           <div class="wb-form__preview">
             <img src="{{ get_storage_file_url(optional($banner->featureImage)->path, 'medium') }}" alt="">
@@ -95,9 +131,9 @@
           </label>
           <input type="file" name="images[feature]" id="uploadBtn" class="wb-form__file-input"
                  accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml,.jpg,.jpeg,.png,.gif,.webp,.svg"
-                 {{ isset($banner) ? '' : 'required' }} />
+                 {{ isset($banner) || $selectedType === Banner::TYPE_COLOUR ? '' : 'required' }} />
         </div>
-        <p class="help-block small mb-0">{{ trans('help.web_banner_tip_image') }}</p>
+        <p class="help-block small mb-0" id="wb_image_help">{{ trans('help.web_banner_tip_image') }}</p>
       </div>
 
       <p class="help-block mb-0">* {{ trans('app.form.required_fields') }}</p>
@@ -108,6 +144,7 @@
         <h5>{{ trans('help.web_banner_tips_title') }}</h5>
         <ul>
           <li>{{ trans('help.web_banner_tip_row') }}</li>
+          <li>{{ trans('help.web_banner_tip_type') }}</li>
           <li>{{ trans('help.web_banner_tip_width') }}</li>
           <li>{{ trans('help.web_banner_tip_order') }}</li>
           <li>{{ trans('help.web_banner_tip_image') }}</li>
@@ -121,10 +158,65 @@
 (function () {
   var input = document.getElementById('uploadBtn');
   var nameField = document.getElementById('uploadFile');
-  if (!input || !nameField) return;
-  input.addEventListener('change', function () {
-    var file = input.files && input.files[0];
-    nameField.value = file ? file.name : '';
-  });
+  var typeSelect = document.getElementById('wb_display_type');
+  var layoutField = document.getElementById('wb_layout_field');
+  var colourField = document.getElementById('wb_colour_field');
+  var imageRequiredMark = document.getElementById('wb_image_required_mark');
+  var imageHelp = document.getElementById('wb_image_help');
+  var colorPicker = document.getElementById('wb_bg_color_picker');
+  var colorText = document.getElementById('wb_bg_color');
+  var isEdit = {{ isset($banner) ? 'true' : 'false' }};
+
+  if (input && nameField) {
+    input.addEventListener('change', function () {
+      var file = input.files && input.files[0];
+      nameField.value = file ? file.name : '';
+    });
+  }
+
+  function syncTypeUi() {
+    if (!typeSelect) return;
+    var type = typeSelect.value;
+    var isColour = type === 'colour';
+    var isSlider = type === 'slider';
+
+    if (colourField) {
+      colourField.style.display = isColour ? '' : 'none';
+    }
+    if (layoutField) {
+      layoutField.style.display = isSlider ? 'none' : '';
+    }
+    if (imageRequiredMark) {
+      imageRequiredMark.style.display = isColour ? 'none' : '';
+    }
+    if (imageHelp) {
+      imageHelp.textContent = isColour
+        ? @json(trans('help.web_banner_tip_image_optional'))
+        : @json(trans('help.web_banner_tip_image'));
+    }
+    if (input && !isEdit) {
+      if (isColour) {
+        input.removeAttribute('required');
+      } else {
+        input.setAttribute('required', 'required');
+      }
+    }
+  }
+
+  if (typeSelect) {
+    typeSelect.addEventListener('change', syncTypeUi);
+    syncTypeUi();
+  }
+
+  if (colorPicker && colorText) {
+    colorPicker.addEventListener('input', function () {
+      colorText.value = colorPicker.value;
+    });
+    colorText.addEventListener('input', function () {
+      if (/^#[0-9A-Fa-f]{6}$/.test(colorText.value)) {
+        colorPicker.value = colorText.value;
+      }
+    });
+  }
 })();
 </script>
