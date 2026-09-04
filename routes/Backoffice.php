@@ -4,9 +4,6 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\MerchantSwitchToCustomer;
 use Illuminate\Support\Facades\Route;
 
-// Installer routes
-include 'admin/Installer.php';
-
 include 'admin/Auth.php';
 
 // Admin Routes

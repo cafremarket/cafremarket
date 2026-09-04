@@ -104,12 +104,16 @@ class ChatController extends Controller
         $conversation->refresh();
 
         $room = get_chat_room_name($shop->id.$request->customer_id);
+        $clock = livechat_format_message_time($msg_object->created_at);
+
         ChatSocketPublisher::publish($room, 'chat.message', [
             'text' => $replyText,
             'sender_type' => 'customer',
             'conversation_id' => $conversation->id,
             'reply_id' => $msg_object->id,
             'customer_id' => $request->customer_id,
+            'time' => $clock,
+            'created_at' => optional($msg_object->created_at)->toIso8601String(),
             'attachments' => $attachmentsPayload,
         ]);
 
@@ -119,7 +123,8 @@ class ChatController extends Controller
             'conversation_id' => $conversation->id,
             'reply_id' => $msg_object->id,
             'customer_id' => $request->customer_id,
-            'time' => $conversation->updated_at->diffForHumans(),
+            'time' => $clock,
+            'created_at' => optional($msg_object->created_at)->toIso8601String(),
             'attachments' => $attachmentsPayload,
         ]);
 
@@ -132,6 +137,10 @@ class ChatController extends Controller
         return response()->json([
             'status' => 'ok',
             'conversation_id' => $conversation->id,
+            'reply_id' => $msg_object->id,
+            'time' => $clock,
+            'created_at' => optional($msg_object->created_at)->toIso8601String(),
+            'attachments' => $attachmentsPayload,
         ], 200);
     }
 }

@@ -9,7 +9,7 @@ use Incevio\Package\Wallet\Models\Transaction;
 class OrderWalletService
 {
     /**
-     * Credit vendor wallet for a paid order (net of marketplace commission).
+     * Credit vendor wallet for a delivered prepaid order (net of marketplace commission).
      *
      * @param  array|null  $meta
      * @return \Incevio\Package\Wallet\Models\Transaction
@@ -19,8 +19,6 @@ class OrderWalletService
         if ($existing = $this->findVendorSaleCredit($order)) {
             return $existing;
         }
-
-        $confirmed = get_order_escrow_holding_duration() == 0 ? true : false;
 
         $settlement = get_vendor_settlement_for_order($order);
 

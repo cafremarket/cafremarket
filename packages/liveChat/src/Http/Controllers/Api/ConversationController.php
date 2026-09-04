@@ -176,6 +176,8 @@ class ConversationController extends Controller
             if ($msg_object) {
                 $attachmentsPayload = livechat_socket_attachments_payload($msg_object);
                 $conversation->refresh();
+                $clock = livechat_format_message_time($msg_object->created_at);
+                $createdAt = optional($msg_object->created_at)->toIso8601String();
 
                 ChatSocketPublisher::publish(
                     get_chat_room_name($shop->id.$request->customer_id),
@@ -186,6 +188,8 @@ class ConversationController extends Controller
                         'conversation_id' => $conversation->id,
                         'reply_id' => $msg_object->id,
                         'customer_id' => $request->customer_id,
+                        'time' => $clock,
+                        'created_at' => $createdAt,
                         'attachments' => $attachmentsPayload,
                     ]
                 );
@@ -200,7 +204,8 @@ class ConversationController extends Controller
                         'conversation_id' => $conversation->id,
                         'reply_id' => $msg_object->id,
                         'customer_id' => $request->customer_id,
-                        'time' => $conversation->updated_at->diffForHumans(),
+                        'time' => $clock,
+                        'created_at' => $createdAt,
                         'attachments' => $attachmentsPayload,
                     ]
                 );
@@ -338,6 +343,7 @@ class ConversationController extends Controller
         }
 
         $attachmentsPayload = livechat_socket_attachments_payload($reply);
+        $clock = livechat_format_message_time($reply->created_at);
 
         $payload = [
             'text' => $replyText,
@@ -345,6 +351,8 @@ class ConversationController extends Controller
             'conversation_id' => $chat->id,
             'reply_id' => $reply->id,
             'customer_id' => $chat->customer_id,
+            'time' => $clock,
+            'created_at' => optional($reply->created_at)->toIso8601String(),
             'attachments' => $attachmentsPayload,
         ];
 

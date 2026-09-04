@@ -220,6 +220,8 @@
                 </div>
               </div> <!-- /.form-group -->
 
+              @include('merchant.config.partials._shipping_settings')
+
               @if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled())
                 @include('wallet::admin._shop_config_credit_field')
               @endif
@@ -266,24 +268,7 @@
                 </div>
               </div> <!-- /.row -->
 
-              {{-- Pickup enable/disable config --}}
-              <div class="row">
-                <div class="col-sm-4 text-right">
-                  <div class="form-group">
-                    {!! Form::label('pickup_enable', trans('theme.pickup') . ':', ['class' => 'with-help control-label']) !!}
-                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.config_enable_pickup_order') }}"></i>
-                  </div>
-                </div>
-                <div class="col-sm-7">
-                  @if ($can_update)
-                    <div class="handle horizontal">
-                      <a href="javascript:void(0)" data-link="{{ route('admin.setting.config.notification.toggle', 'pickup_enabled') }}" type="button" class="btn btn-md btn-secondary btn-toggle {{ $config->isPickupEnabled() ? 'active' : '' }}" data-toggle="button" aria-pressed="{{ $config->isPickupEnabled() ? 'true' : 'false' }}" autocomplete="off">
-                        <div class="btn-handle"></div>
-                      </a>
-                    </div>
-                  @endif
-                </div>
-              </div> <!-- /.row -->
+              {{-- Pickup enable/disable config removed (pickup disabled system-wide) --}}
             </div> <!-- /.col-sm-* -->
 
             @if ($can_update)
@@ -406,28 +391,7 @@
         </div> <!-- /.tab-pane -->
 
         <div class="tab-pane" id="support-tab">
-          @if (config('system_settings.enable_chat') && is_incevio_package_loaded('livechat'))
-            <div class="row">
-              <div class="col-sm-3 text-right">
-                <div class="form-group">
-                  {!! Form::label('enable_live_chat', trans('app.enable_live_chat') . ':', ['class' => 'with-help control-label']) !!}
-                  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.enable_live_chat_on_shop') }}"></i>
-                </div>
-              </div>
-
-              <div class="col-sm-6">
-                @if ($can_update)
-                  <div class="handle horizontal">
-                    <a href="javascript:void(0)" data-link="{{ route('admin.setting.config.notification.toggle', 'enable_live_chat') }}" type="button" class="btn btn-md btn-secondary btn-toggle {{ $config->enable_live_chat == 1 ? 'active' : '' }}" data-toggle="button" aria-pressed="{{ $config->enable_live_chat == 1 ? 'true' : 'false' }}" autocomplete="off">
-                      <div class="btn-handle"></div>
-                    </a>
-                  </div>
-                @else
-                  <span>{{ $config->enable_live_chat == 1 ? trans('app.on') : trans('app.off') }}</span>
-                @endif
-              </div>
-            </div> <!-- /.row -->
-          @endif
+          {{-- Live chat is always enabled; shop on/off toggle removed. --}}
 
           <div class="row">
             {!! Form::model($config, ['method' => 'PUT', 'route' => ['admin.setting.config.update', $config], 'files' => true, 'id' => 'form2', 'class' => 'form-horizontal ajax-form', 'data-toggle' => 'validator']) !!}

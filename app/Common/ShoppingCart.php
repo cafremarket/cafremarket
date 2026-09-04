@@ -170,15 +170,9 @@ trait ShoppingCart
             $cart->ship_to = $request->shipTo ?? $cart->ship_to;
             $cart->ship_to_country_id = $request->shipToCountryId ?? $cart->ship_to_country_id;
             $cart->ship_to_state_id = $request->shipToStateId ?? $cart->ship_to_state_id;
-
-            // Shipping rate
             $cart->shipping_rate_id = null;
 
-            if (! $cart->is_digital && $request->filled('shippingRateId') && is_numeric($request->shippingRateId)) {
-                $cart->shipping_rate_id = $request->shippingRateId;
-            }
-
-            $cart->handling = $cart->get_handling_cost();
+            $cart->handling = 0;
             $cart->total = $old_cart ? ($old_cart->total + ($qtt * $unit_price)) : ($qtt * $unit_price);
 
             // Set shipping weight
@@ -220,6 +214,21 @@ trait ShoppingCart
             // Save cart items into pivot
             if (! empty($cart_item_pivot_data)) {
                 $cart->inventories()->syncWithoutDetaching($cart_item_pivot_data);
+            }
+
+            // Recalculate location shipping after items are attached
+            $cart->load('inventories');
+            if (! $cart->is_digital) {
+                $destLat = $request->input('latitude') ?? $request->input('lat');
+                $destLng = $request->input('longitude') ?? $request->input('lng');
+                app(\App\Services\Shipping\ShippingCalculator::class)->applyToCart(
+                    $cart,
+                    is_numeric($destLat) ? (float) $destLat : null,
+                    is_numeric($destLng) ? (float) $destLng : null
+                );
+                $cart->handling = $cart->get_handling_cost();
+                $cart->grand_total = $cart->calculate_grand_total();
+                $cart->save();
             }
         }
 
@@ -334,15 +343,15 @@ trait ShoppingCart
                 'customer_phone_number' => $request->phone,
                 'buyer_note' => $request->buyer_note,
                 'device_id' => $request->device_id ?? $cart->device_id,
-                'fulfilment_type' => $request->fulfilment_type ?? Order::FULFILMENT_TYPE_DELIVER,
-                'warehouse_id' => ($request->fulfilment_type == Order::FULFILMENT_TYPE_PICKUP) ? $request->warehouse_id : null,
+                'fulfilment_type' => Order::FULFILMENT_TYPE_DELIVER,
+                'warehouse_id' => null,
                 'customer_latitude' => $customerLat,
                 'customer_longitude' => $customerLng,
             ])
         )->save();
 
-        // If the order is a pickup order enable free shipping for the cart
-        $cart->setFulfilmentType($order->pickup() ? Order::FULFILMENT_TYPE_PICKUP : Order::FULFILMENT_TYPE_DELIVER);
+        // Delivery only — pickup fulfilment is disabled system-wide.
+        $cart->setFulfilmentType(Order::FULFILMENT_TYPE_DELIVER);
 
         if ($request->has('prescription')) {
             $file = $request->file('prescription');

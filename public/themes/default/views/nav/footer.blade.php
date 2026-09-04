@@ -118,11 +118,6 @@
             </ul>
           @endif
 
-          @if ($trust_badge = get_trust_badge_url())
-            <div class="sf-footer-trust">
-              <img src="{{ $trust_badge }}" alt="{{ trans('theme.trust_badge') }}">
-            </div>
-          @endif
         </div>
       </div>
     </div>

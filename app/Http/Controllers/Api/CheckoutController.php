@@ -186,6 +186,10 @@ class CheckoutController extends Controller
         }
 
         $results = $activePaymentMethods->filter(function ($payment) use ($activePaymentCodes, $shop_config) {
+            // Prepaid only — hide Cash on Delivery
+            if ($payment->code === 'cod') {
+                return false;
+            }
 
             $config = get_payment_config_info($payment->code, $shop_config);
             $isActiveAndHasValidConfig = in_array($payment->code, $activePaymentCodes) && $config;

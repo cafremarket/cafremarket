@@ -251,20 +251,11 @@ class Cart extends BaseModel
      */
     public function get_shipping_cost()
     {
-        if ($this->shipping_rate_id && ! $this->isPickup()) {
-            if (
-                is_incevio_package_loaded('shippo') &&
-                \DB::table('config_shippo')->where('shop_id', $this->shop_id)->exists()
-            ) {
-                $shipping_rates = getShippingRates($this->shipping_zone_id, $this);
-                $shipping_rate = $shipping_rates->firstWhere('id', $this->shipping_rate_id);
-                $this->shipping = $shipping_rate->rate;
-            }
-
-            return $this->shipping + $this->handling;
+        if ($this->is_digital || $this->isPickup()) {
+            return 0;
         }
 
-        return $this->is_free_shipping() ? 0 : $this->shipping + $this->handling;
+        return (float) $this->shipping + (float) $this->get_handling_cost();
     }
 
     /**
@@ -274,8 +265,10 @@ class Cart extends BaseModel
      */
     public function get_handling_cost()
     {
-        if ($this->shipping_rate_id) {
-            $this->handling = getShopConfig($this->shop_id, 'order_handling_cost');
+        if ($this->isPickup() || $this->is_digital || (float) $this->shipping <= 0) {
+            $this->handling = 0;
+        } else {
+            $this->handling = getShopConfig($this->shop_id, 'order_handling_cost') ?: 0;
         }
 
         return $this->handling ?? 0;
@@ -294,21 +287,10 @@ class Cart extends BaseModel
             return $grand_total;
         }
 
-        if ($this->shipping_rate_id && ! $this->isPickup()) {
-            if (
-                is_incevio_package_loaded('shippo') &&
-                \DB::table('config_shippo')->where('shop_id', $this->shop_id)->exists()
-            ) {
-                $shipping_rates = getShippingRates($this->shipping_zone_id, $this);
-                $shipping_rate = $shipping_rates->firstWhere('id', $this->shipping_rate_id);
-                $this->shipping = $shipping_rate->rate ?? 0;
-            }
-
-            $grand_total = $grand_total + $this->shipping + $this->handling;
-        }
-
         if ($this->isPickup()) {
-            $this->shipping = 0; // Pickup order has no shipping cost
+            $this->shipping = 0;
+        } else {
+            $grand_total = $grand_total + (float) $this->shipping + (float) $this->handling;
         }
 
         return $grand_total + $this->packaging;
@@ -321,17 +303,11 @@ class Cart extends BaseModel
      */
     public function is_free_shipping()
     {
-        if ($this->isPickup()) { // Pickup order has no shipping cost
+        if ($this->isPickup()) {
             return true;
         }
 
-        foreach ($this->inventories as $item) {
-            if (! $item->free_shipping) {
-                return false;
-            }
-        }
-
-        return true;
+        return (float) $this->shipping <= 0;
     }
 
     /**

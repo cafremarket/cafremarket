@@ -126,28 +126,24 @@
     }
 
     function prepareNewConversation(msgObj) {
-      var link = '{{ route('admin.support.chat_conversation.show', ':slug') }}';
-      link = link.replace(':slug', msgObj.conversation_id);
+      var link = '{{ livechat_support_route('chat_conversation.show', ['chat' => '__CID__']) }}';
+      link = link.replace('__CID__', msgObj.conversation_id);
 
-      return $('<div>').attr('id', 'chat-' + msgObj.customer_id).addClass('row sidebarBody').append(
-        $('<a>').attr('href', 'javascript:void(0)').attr('data-link', link).addClass('get-content').append(
-          $('<div>').addClass('col-sm-3 col-xs-3').append(
-            $('<img/>').attr('src', msgObj.avatar).attr('alt', '{{ trans('app.avatar') }}').addClass('img-circle')
-          )
+      return $('<div>').attr('id', 'chat-' + msgObj.customer_id).addClass('mp-chat-list__item sidebarBody is-unread').append(
+        $('<a>').attr('href', 'javascript:void(0)').attr('data-link', link).addClass('get-content mp-chat-list__link').append(
+          $('<img/>').attr('src', msgObj.avatar).attr('alt', '{{ trans('app.avatar') }}').addClass('mp-chat-list__avatar img-circle')
         ).append(
-          $('<div>').addClass('col-sm-9 col-xs-9 sideBar-main nopadding').append(
-            $('<div>').addClass('row').append(
-              $('<div>').addClass('col-sm-8 col-xs-8 sideBar-name').append(
-                $('<span>').addClass('name-meta strong').text(msgObj.sender).append(
-                  $('<span>').addClass('label label-primary flat indent10').text(msgObj.status)
-                )
-              ).append(
-                $('<p>').addClass('excerpt strong').text(getExcerptMsg(msgObj.text, msgObj.attachments))
-              )
+          $('<div>').addClass('mp-chat-list__meta sideBar-main').append(
+            $('<div>').addClass('mp-chat-list__row').append(
+              $('<span>').addClass('name-meta strong').text(msgObj.sender)
             ).append(
-              $('<div>').addClass('col-sm-4 col-xs-4 pull-right time').append(
-                $('<span>').addClass('time-meta pull-right').text(msgObj.time)
-              )
+              $('<span>').addClass('time-meta').text(msgObj.time)
+            )
+          ).append(
+            $('<div>').addClass('mp-chat-list__row mp-chat-list__row--sub').append(
+              $('<p>').addClass('excerpt strong').text(getExcerptMsg(msgObj.text, msgObj.attachments))
+            ).append(
+              $('<span>').addClass('mp-chat-list__badge label label-primary flat').text(msgObj.status)
             )
           )
         )
@@ -221,7 +217,61 @@
       });
     }
 
-    function prepareNewChatMsg(txt, who, attachments) {
+    function formatChatClock(isoOrDate) {
+      try {
+        var d = isoOrDate ? new Date(isoOrDate) : new Date();
+        if (isNaN(d.getTime())) d = new Date();
+        return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function formatChatDayLabel(isoOrDate) {
+      try {
+        var d = isoOrDate ? new Date(isoOrDate) : new Date();
+        if (isNaN(d.getTime())) return '';
+        var today = new Date();
+        var yday = new Date();
+        yday.setDate(today.getDate() - 1);
+        var sameDay = function(a, b) {
+          return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+        };
+        if (sameDay(d, today)) return '{{ trans('theme.today') !== 'theme.today' ? trans('theme.today') : 'Today' }}';
+        if (sameDay(d, yday)) return '{{ trans('theme.yesterday') !== 'theme.yesterday' ? trans('theme.yesterday') : 'Yesterday' }}';
+        return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function chatDayKey(isoOrDate) {
+      try {
+        var d = isoOrDate ? new Date(isoOrDate) : new Date();
+        if (isNaN(d.getTime())) return '';
+        var m = d.getMonth() + 1;
+        var day = d.getDate();
+        return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function ensureConversationDaySep(boxSelector, isoOrDate) {
+      var $box = $(boxSelector);
+      if (!$box.length) return;
+      var key = chatDayKey(isoOrDate);
+      if (!key) return;
+      var last = $box.children('.mp-chat-day-sep').last();
+      if (last.length && String(last.attr('data-day')) === key) return;
+      $box.append(
+        $('<div>').addClass('mp-chat-day-sep').attr('data-day', key).append(
+          $('<span>').text(formatChatDayLabel(isoOrDate))
+        )
+      );
+    }
+
+    function prepareNewChatMsg(txt, who, attachments, timeLabel, createdAt) {
       who = who || 'sender';
       attachments = attachments || [];
       var shared = parseSharedProduct(txt);
@@ -238,13 +288,13 @@
         contentNode.text(txt);
       }
 
-      return $('<div>').addClass('row message-body').append(
-        $('<div>').addClass('col-sm-12 message-main-' + who).append(
-          $('<div>').addClass(who).append(
-            contentNode
-          )
-        ).append(
-          $('<span>').addClass('message-time').text('{{ trans('theme.now') }}')
+      var clock = timeLabel || formatChatClock(createdAt || new Date().toISOString());
+      var isOut = who === 'sender';
+      var bubbleClass = isOut ? 'mp-chat-bubble mp-chat-bubble--out' : 'mp-chat-bubble mp-chat-bubble--in';
+
+      return $('<div>').addClass(bubbleClass).attr('data-created-at', createdAt || new Date().toISOString()).append(
+        $('<div>').addClass(who).append(contentNode).append(
+          $('<time>').addClass('message-time').attr('datetime', createdAt || '').text(clock)
         )
       );
     }
@@ -301,27 +351,68 @@
         });
       });
 
-      $('body').on('click', 'i#send-btn', function(e) {
-        e.preventDefault();
+      function merchantChatCsrf() {
+        var meta = $('meta[name="csrf-token"]').attr('content');
+        if (meta) return meta;
+        var formToken = $('#chat-form input[name="_token"]').val();
+        return formToken || '';
+      }
 
-        var msg = $.trim($("textarea#message").val());
-        var form = $(this).parents("form#chat-form");
+      function setMerchantChatAjaxHeaders(xhr) {
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.setRequestHeader('Accept', 'application/json');
+        var csrf = merchantChatCsrf();
+        if (csrf) {
+          xhr.setRequestHeader('X-CSRF-TOKEN', csrf);
+        }
+      }
+
+      function sendMerchantChatReply() {
+        var $btn = $('#send-btn');
+        var form = $('#chat-form');
+        if (!form.length || !$btn.length) {
+          return;
+        }
+        if ($btn.data('sending')) {
+          return;
+        }
+
+        var $textarea = form.find('textarea[name="message"]');
+        var msg = $.trim($textarea.val() || '');
         var fileInput = form.find('input[name="photo"]')[0];
-        var hasFile = fileInput && fileInput.files && fileInput.files.length;
+        var hasFile = !!(fileInput && fileInput.files && fileInput.files.length);
         if (msg === '' && !hasFile) {
           return;
         }
 
-        var fdFile = hasFile && fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
-        var ajaxData = hasFile ? new FormData(form[0]) : form.serialize();
+        var postUrl = form.attr('action');
+        if (!postUrl) {
+          if (window.console && console.error) {
+            console.error('[merchant-chat] missing form action');
+          }
+          return;
+        }
 
-        if (hasFile && fdFile) {
+        $btn.data('sending', true);
+
+        var fdFile = hasFile ? fileInput.files[0] : null;
+        var fd = new FormData();
+        fd.append('message', msg);
+        var csrf = merchantChatCsrf();
+        if (csrf) {
+          fd.append('_token', csrf);
+        }
+        if (fdFile) {
+          fd.append('photo', fdFile);
+        }
+
+        if (fdFile) {
           MerchantChatAttachmentPreview.clear();
         }
 
-        // Optimistic UI: show text/attachment immediately (don't wait 5–10s for AJAX).
+        // Optimistic UI
         var pendingAtt = [];
-        if (hasFile && fdFile) {
+        if (fdFile) {
           var ext = (fdFile.name.split('.').pop() || '').toLowerCase();
           pendingAtt = [{
             url: URL.createObjectURL(fdFile),
@@ -331,12 +422,13 @@
         }
         var pendingNode = prepareNewChatMsg(msg || (hasFile ? '[attachment]' : ''), 'sender', pendingAtt)
           .attr('data-pending', '1');
+        ensureConversationDaySep('#conversationBox', new Date().toISOString());
         $("#conversationBox").append(pendingNode);
         updateScroll('conversationBox');
-        $("textarea#message").val('');
+        $textarea.val(''); // clear typed text after send starts
         var ajaxStartedAt = Date.now();
         if (window.console && console.log) {
-          console.log('[chat-ws-web ' + new Date().toISOString() + '] AJAX reply start (optimistic shown)');
+          console.log('[chat-ws-web ' + new Date().toISOString() + '] AJAX reply start url=' + postUrl);
         }
 
         var openChatboxEarly = document.querySelector('[id^="openChatbox-"]');
@@ -345,17 +437,21 @@
           var earlyChatNode = $('#chat-' + earlyCustomerId);
           if (earlyChatNode.length) {
             earlyChatNode.find("p.excerpt").text(getExcerptMsg(msg || (hasFile ? '[attachment]' : ''), pendingAtt));
-            earlyChatNode.find(".time span").text('{{ trans('theme.now') }}');
+            earlyChatNode.find(".time span").text(formatChatClock(new Date().toISOString()));
           }
         }
 
         var response = '';
 
-        var ajaxOpts = {
-          url: form.attr('action'),
+        $.ajax({
+          url: postUrl,
           type: 'POST',
-          data: ajaxData,
-          complete: function(xhr, textStatus) {
+          data: fd,
+          processData: false,
+          contentType: false,
+          beforeSend: setMerchantChatAjaxHeaders,
+          complete: function(xhr) {
+            $btn.data('sending', false);
             var ajaxMs = Date.now() - ajaxStartedAt;
             if (window.console && console.log) {
               console.log('[chat-ws-web ' + new Date().toISOString() + '] AJAX reply done status=' + xhr.status + ' ms=' + ajaxMs);
@@ -368,6 +464,8 @@
                 var replyMsg = msg;
                 var attachments = [];
                 var replyId = null;
+                var replyTime = null;
+                var replyCreatedAt = null;
                 try {
                   var parsed = JSON.parse(xhr.responseText);
                   if (parsed && typeof parsed === 'object') {
@@ -378,27 +476,35 @@
                     if (parsed.reply_id) {
                       replyId = parsed.reply_id;
                     }
+                    replyTime = parsed.time || null;
+                    replyCreatedAt = parsed.created_at || null;
                   }
                 } catch (err) {
                   // Legacy non-JSON success body
                 }
-                // Upgrade pending bubble → final (keeps message instant).
                 if (pendingNode && pendingNode.length) {
                   if (replyId) {
                     pendingNode.attr('data-reply-id', replyId).removeAttr('data-pending');
                   } else {
                     pendingNode.removeAttr('data-pending');
                   }
+                  if (replyCreatedAt) {
+                    pendingNode.attr('data-created-at', replyCreatedAt);
+                  }
+                  if (replyTime || replyCreatedAt) {
+                    pendingNode.find('.message-time').text(replyTime || formatChatClock(replyCreatedAt));
+                  }
                   if (attachments && attachments.length) {
-                    var upgraded = prepareNewChatMsg(replyMsg || (hasFile ? '[attachment]' : ''), 'sender', attachments);
+                    var upgraded = prepareNewChatMsg(replyMsg || (hasFile ? '[attachment]' : ''), 'sender', attachments, replyTime, replyCreatedAt);
                     if (replyId) {
                       upgraded.attr('data-reply-id', replyId);
                     }
                     pendingNode.replaceWith(upgraded);
                     pendingNode = upgraded;
                   }
-                } else {
-                  response = prepareNewChatMsg(replyMsg || (hasFile ? '[attachment]' : ''), 'sender', attachments);
+                } else if (!(replyId && $('#conversationBox [data-reply-id="' + replyId + '"]').length)) {
+                  ensureConversationDaySep('#conversationBox', replyCreatedAt || new Date().toISOString());
+                  response = prepareNewChatMsg(replyMsg || (hasFile ? '[attachment]' : ''), 'sender', attachments, replyTime, replyCreatedAt);
                   if (replyId) {
                     response.attr('data-reply-id', replyId);
                   }
@@ -410,86 +516,82 @@
                   var chatNode = $('#chat-' + customerId);
                   if (chatNode.length) {
                     chatNode.find("p.excerpt").text(getExcerptMsg(replyMsg, attachments));
-                    chatNode.find(".time span").text('{{ trans('theme.now') }}');
+                    chatNode.find(".time span").text(replyTime || formatChatClock(replyCreatedAt || new Date().toISOString()));
                   }
                 }
                 break;
               }
               case 401:
-                MerchantChatAttachmentPreview.clear();
-                $('#conversationBox [data-pending="1"]').remove();
-                $("#conversationBox").html(""); //Clear the chatbox
-                response = $('<p>').addClass('text-danger').text("{!! trans('messages.session_expired') !!}");
-                $('<br/><br/>').prependTo(response);
-                $('<a>').attr('href', "javascript:void(0)").attr('data-toggle', "modal").attr('data-target', "#loginModal").addClass('btn btn-primary').text("{{ trans('app.login') }}").appendTo(response);
-                break;
               case 403:
               case 419:
-                MerchantChatAttachmentPreview.clear();
                 $('#conversationBox [data-pending="1"]').remove();
-                $("#conversationBox").html(""); //Clear the chatbox
-                response = $('<p>').addClass('text-danger').text("{!! trans('messages.session_expired') !!}");
-                $('<br/><br/>').prependTo(response);
-                $('<a>').attr('href', "{{ route('homepage', ['login' => 1]) }}").addClass('btn btn-primary').text("{{ trans('app.login') }}").appendTo(response);
+                $textarea.val(msg); // restore typed text
+                response = $('<p>').addClass('text-danger').css({margin: '8px 12px'}).text("{!! trans('messages.session_expired') !!}");
                 break;
               default:
                 $('#conversationBox [data-pending="1"]').remove();
-                response = $('<div>').addClass('row message-body').append(
-                  $('<div>').addClass('col-sm-12').append(
-                    $('<p class="lead">').addClass('text-danger').text("{!! trans('messages.failed') !!}")
-                  )
-                );
-                $('<br/><br/>').prependTo(response);
+                $textarea.val(msg); // restore typed text
+                response = $('<p>').addClass('text-danger').css({margin: '8px 12px'}).text("{!! trans('messages.failed') !!}");
             }
 
             if (response) {
               $("#conversationBox").append(response);
             }
 
-            updateScroll('conversationBox'); //Scroll to bottom
+            updateScroll('conversationBox');
           },
-        };
-        if (hasFile) {
-          ajaxOpts.processData = false;
-          ajaxOpts.contentType = false;
+        });
+      }
+
+      $('body').on('click', '#send-btn', function(e) {
+        e.preventDefault();
+        sendMerchantChatReply();
+      });
+
+      $('body').on('keydown', '#chat-form textarea[name="message"]', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMerchantChatReply();
         }
-        $.ajax(ajaxOpts);
       });
 
       var wsScheme = '{{ config('chat_socket.scheme') }}';
       var wsHost = '{{ config('chat_socket.client_host') }}';
       var wsPort = '{{ (int) config('chat_socket.port') }}';
       var wsPath = '{{ trim((string) config('chat_socket.client_path', '')) }}';
-      if (wsPath && wsPath.charAt(0) !== '/') {
-        wsPath = '/' + wsPath;
-      }
-      var wsUrl = wsScheme + '://' + wsHost + (wsPath ? wsPath : (':' + wsPort));
-      // wss on subdomain (empty path) must use 443 — do not append :6002
-      if (!wsPath && (wsScheme === 'wss' || wsScheme === 'https')) {
-        wsUrl = wsScheme + '://' + wsHost;
-      } else if (!wsPath && (wsScheme === 'ws' || wsScheme === 'http') && (String(wsPort) === '80' || !wsPort)) {
-        wsUrl = wsScheme + '://' + wsHost;
-      }
+      // Build a browser-safe WS URL (never use 0.0.0.0; don't double-append port).
+      (function() {
+        wsScheme = String(wsScheme || 'ws').replace(/:$/, '');
+        wsHost = String(wsHost || '127.0.0.1').trim();
+        wsPath = String(wsPath || '').trim();
+        if (wsHost === '0.0.0.0' || wsHost.indexOf('0.0.0.0:') === 0) {
+          wsHost = '127.0.0.1' + (wsHost.indexOf(':') > -1 ? wsHost.substring(wsHost.indexOf(':')) : '');
+        }
+        if (wsPath && wsPath.charAt(0) !== '/') {
+          wsPath = '/' + wsPath;
+        }
+        var hostHasPort = /:\d+$/.test(wsHost);
+        window.__chatWsUrl = wsScheme + '://' + wsHost;
+        if (wsPath) {
+          window.__chatWsUrl += wsPath;
+        } else if (!hostHasPort && wsPort && !(wsScheme === 'ws' && String(wsPort) === '80') && !(wsScheme === 'wss' && String(wsPort) === '443')) {
+          window.__chatWsUrl += ':' + wsPort;
+        }
+      })();
+      var wsUrl = window.__chatWsUrl;
       var room = '{{ get_vendor_chat_room_id() }}';
       var socket = null;
-      var CHAT_WS_DEBUG = true;
+      var CHAT_WS_DEBUG = {{ config('chat_socket.debug') ? 'true' : 'false' }};
 
       function chatWsLog() {
         if (!CHAT_WS_DEBUG || !window.console || !console.log) return;
         var args = Array.prototype.slice.call(arguments);
-        args.unshift('[chat-ws-web ' + new Date().toISOString() + ']');
+        args.unshift('[chat-ws]');
         console.log.apply(console, args);
       }
 
       function connectSocket() {
         chatWsLog('connecting', wsUrl, 'room=', room);
-        if (wsHost === '127.0.0.1' || wsHost === 'localhost') {
-          console.error(
-            '[chat-ws-web] BAD CONFIG: CHAT_SOCKET_CLIENT_HOST is ' + wsHost +
-            '. Browsers connect to the visitor PC, not your server. Set CHAT_SOCKET_CLIENT_HOST=www.cafremarket.co.mz and CHAT_SOCKET_SCHEME=wss'
-          );
-        }
-        var tConnect = Date.now();
         try {
           socket = new WebSocket(wsUrl);
         } catch (e) {
@@ -498,7 +600,7 @@
         }
 
         socket.onopen = function() {
-          chatWsLog('OPEN in', (Date.now() - tConnect) + 'ms → subscribe', room);
+          chatWsLog('OPEN → subscribe', room);
           socket.send(JSON.stringify({
             action: 'subscribe',
             room: room
@@ -558,6 +660,12 @@
                 pendingMine.attr('data-reply-id', result.reply_id);
               }
               pendingMine.removeAttr('data-pending');
+              if (result.created_at) {
+                pendingMine.attr('data-created-at', result.created_at);
+              }
+              if (result.time || result.created_at) {
+                pendingMine.find('.message-time').text(result.time || formatChatClock(result.created_at));
+              }
               chatWsLog('upgraded pending bubble reply_id=', result.reply_id);
               return;
             }
@@ -578,7 +686,8 @@
               }
               var mOpenChatbox = mOpenCustomerId ? document.getElementById("openChatbox-" + mOpenCustomerId) : null;
               if (mOpenChatbox) {
-                var mResponse = prepareNewChatMsg(result.text, 'sender', result.attachments || []);
+                ensureConversationDaySep('#conversationBox', result.created_at || new Date().toISOString());
+                var mResponse = prepareNewChatMsg(result.text, 'sender', result.attachments || [], result.time, result.created_at);
                 if (result.reply_id) {
                   mResponse.attr('data-reply-id', result.reply_id);
                 }
@@ -589,7 +698,7 @@
                 chatWsLog('merchant msg but chatbox not open for customer', mOpenCustomerId);
               }
               mChatNode.find("p.excerpt").text(getExcerptMsg(result.text, result.attachments));
-              mChatNode.find(".time span").text(result.time || '{{ trans('theme.now') }}');
+              mChatNode.find(".time span").text(result.time || formatChatClock(result.created_at || new Date().toISOString()));
             } else {
               chatWsLog('merchant msg: no sidebar node for customer_id=', mCustomerId, 'conv=', result.conversation_id);
             }
@@ -626,7 +735,8 @@
               chatWsLog('dedupe customer reply_id', result.reply_id);
               return;
             }
-            response = prepareNewChatMsg(result.text, 'receiver', result.attachments || []);
+            ensureConversationDaySep('#conversationBox', result.created_at || new Date().toISOString());
+            response = prepareNewChatMsg(result.text, 'receiver', result.attachments || [], result.time, result.created_at);
             if (result.reply_id) {
               response.attr('data-reply-id', result.reply_id);
             }
@@ -639,7 +749,7 @@
           }
 
           chatNode.find("p.excerpt").text(getExcerptMsg(result.text, result.attachments)); // Update the excerpt on left menu
-          chatNode.find(".time span").text(result.time || '{{ trans('theme.now') }}'); // Update the time on left menu
+          chatNode.find(".time span").text(result.time || formatChatClock(result.created_at || new Date().toISOString())); // Update the time on left menu
         }
 
         };
@@ -928,15 +1038,58 @@
     height: auto;
   }
 
-  .message-main-receiver {
-    /*padding: 10px 20px;*/
-    max-width: 60%;
+  .mp-chat-day-sep {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 14px 0 10px;
+    clear: both;
   }
 
-  .message-main-sender {
-    padding: 3px 20px !important;
-    margin-left: 40% !important;
-    max-width: 60%;
+  .mp-chat-day-sep span {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+
+  #chatbox.mp-chat .mp-chat-bubble > .receiver,
+  #chatbox.mp-chat .mp-chat-bubble > .sender {
+    position: relative !important;
+    display: inline-block !important;
+    float: none !important;
+    width: max-content !important;
+    max-width: min(70%, 280px) !important;
+    min-width: 0 !important;
+    padding: 8px 12px 18px !important;
+  }
+
+  #chatbox.mp-chat .mp-chat-bubble .message-text {
+    display: block !important;
+    width: max-content !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: pre-wrap !important;
+  }
+
+  #chatbox.mp-chat .mp-chat-bubble .message-time {
+    position: absolute !important;
+    right: 10px !important;
+    bottom: 5px !important;
+    margin: 0 !important;
+    float: none !important;
+    display: block !important;
+    white-space: nowrap !important;
+  }
+
+  #chatbox.mp-chat .receiver,
+  #chatbox.mp-chat .sender {
+    float: none !important;
   }
 
   .message-text {
@@ -1263,5 +1416,93 @@
       padding: 5px 2px 5px 0 !important;
       font-size: 1.8em !important;
     }
+  }
+
+  /* Shared conversation list (admin + merchant markup) */
+  #chatbox:not(.mp-chat) .mp-chat-list {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-list__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #eee;
+    height: 60px;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-list__body {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-list__link {
+    display: flex;
+    gap: 12px;
+    padding: 10px 12px;
+    color: #666;
+    text-decoration: none;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-list__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-list__meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-list__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-list__item.active,
+  #chatbox:not(.mp-chat) .mp-chat-list__item:hover {
+    background: #f5f5f5;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-thread__head {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    height: 60px;
+    background: #eee;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-thread__peer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-thread__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-composer__form {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-composer__attach input {
+    display: none;
+  }
+
+  #chatbox:not(.mp-chat) .mp-chat-composer__send {
+    border: 0;
+    background: transparent;
+    color: #42a5f5;
+    cursor: pointer;
   }
 </style>

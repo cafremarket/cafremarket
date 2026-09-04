@@ -248,9 +248,47 @@ class HomeController extends Controller
      */
     public function shipping(ShippingOptionRequest $request, Shop $shop)
     {
-        $shippingOptions = $request->cart ? getShippingRates($request->zone, $request->cart) : getShippingRates($request->zone);
+        $calculator = app(\App\Services\Shipping\ShippingCalculator::class);
+        $destLat = $request->input('latitude') ?? $request->input('lat');
+        $destLng = $request->input('longitude') ?? $request->input('lng');
+        $lat = is_numeric($destLat) ? (float) $destLat : null;
+        $lng = is_numeric($destLng) ? (float) $destLng : null;
 
-        return ShippingOptionResource::collection($shippingOptions);
+        if ($request->cart) {
+            $cart = \App\Models\Cart::find($request->cart);
+            if ($cart && (int) $cart->shop_id === (int) $shop->id) {
+                return ShippingOptionResource::collection(
+                    $calculator->shippingOptionsPayload($cart, $lat, $lng)
+                );
+            }
+        }
+
+        $shop->loadMissing('config');
+        $distanceKm = $calculator->distanceFromShop($shop, $lat, $lng);
+        $config = $shop->config;
+        $type = strtolower((string) ($config->shipping_type ?? 'fixed'));
+        $amount = match ($type) {
+            'free' => 0.0,
+            'km' => $calculator->kmCharge(
+                $distanceKm,
+                (float) ($config->shipping_per_km_rate ?? 0),
+                (float) ($config->shipping_base_fee ?? 0)
+            ),
+            default => max(0.0, (float) ($config->shipping_fixed_rate ?? 0)),
+        };
+
+        return ShippingOptionResource::collection(collect([(object) [
+            'id' => 'location',
+            'name' => $amount <= 0
+                ? (trans('theme.free_shipping') ?: 'Free shipping')
+                : ((trans('app.shipping') ?: 'Shipping').($distanceKm !== null ? ' ('.round($distanceKm, 1).' km)' : '')),
+            'shipping_zone_id' => null,
+            'carrier_id' => null,
+            'carrier_name' => trans('app.shipping') ?? 'Shipping',
+            'rate' => $amount,
+            'delivery_takes' => $distanceKm !== null ? round($distanceKm, 1).' km' : null,
+            'distance_km' => $distanceKm,
+        ]]));
     }
 
     /**
@@ -278,6 +316,11 @@ class HomeController extends Controller
 
         $results = collect([]);
         foreach ($activePaymentMethods as $payment) {
+            // Prepaid only — hide Cash on Delivery
+            if ($payment->code === 'cod') {
+                continue;
+            }
+
             if (
                 ! in_array($payment->code, $activePaymentCodes) ||
                 ! get_payment_config_info($payment->code, $shop)

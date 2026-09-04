@@ -25,6 +25,10 @@ Route::middleware(['auth', 'xssSanitizer'])->group(function () {
 });
 
 Route::middleware(['auth:customer', 'xssSanitizer'])->group(function () {
+    Route::get('order/confirmation/{order_number}', [
+        OrderController::class, 'confirmation',
+    ])->name('order.confirmation');
+
     Route::get('order/details/{order_number}', [
         OrderController::class, 'detailByOrderNumber',
     ])->name('order.detail.number');

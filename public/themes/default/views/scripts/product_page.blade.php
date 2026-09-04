@@ -34,62 +34,6 @@ foreach ($variants as &$value) {
       // Set the shipping options for physical item
       if (!downloadable) {
         setShippingOptions(); // Set shipping options
-
-        var apply_btn = '<div class="space5"></div><button class="popover-submit-btn btn btn-black btn-block rounded-0" type="button">{{ trans('theme.button.ok') }}</button>';
-
-        $('.dynamic-shipping-rates').popover({
-          html: true,
-          placement: 'bottom',
-          content: function() {
-            var current = $('#shipping-rate-id').val();
-            var filtered = getShippingOptions();
-            var preChecked = (current == 'Null' && free_shipping) ? 'checked' : '';
-
-            if ($.isEmptyObject(filtered)) {
-              var options = '<p class="mb-1">{{ trans('theme.notify.will_calculated_on_select') }}</p>';
-            } else {
-              var options = '<table class="table table-striped" id="item-shipping-options-table">';
-
-              if (free_shipping) {
-                options += "<tr><td><div class='radio'><label id='0' data-option='" + JSON.stringify({
-                    name: '{{ trans('theme.free_shipping') }}',
-                    rate: 0
-                  }) + "'><input type='radio' name='shipping_option' id='{{ trans('theme.free_shipping') }}' value='" + getFormatedValue(0) + "' " + preChecked + "/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ trans('theme.free_shipping') }}</label></div></td>" +
-                  '<td>&nbsp;</td>' +
-                  '<td><small class"text-muted">{{ trans('theme.std_delivery_time') }}</small></td>' +
-                  '<td><span>{{ trans('app.free') }}</span></td></tr>';
-              }
-
-              filtered.forEach(function(item) {
-                preChecked = String(current) == String(item.id) ? 'checked' : '';
-                let shippingRate = Number(item.rate) + Number(handlingCost);
-
-                options += "<tr><td><div class='radio'><label id='" + item.id + "' data-option='" + JSON.stringify(item) + "'><input type='radio' name='shipping_option' id='" + item.name + "' value='" + (item.rate) + "' " + preChecked + '/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + item.name + '</label></div></td>' +
-                  '<td>' + item.carrier.name + '</td>' +
-                  '<td><small class"text-muted">' + item.delivery_takes + '</small></td>' +
-                  '<td><span>' + getFormatedPrice(shippingRate) + '</span></td></tr>';
-              });
-
-              options += '</table>';
-            }
-
-            return '<div class="popover-form" id="shipping-options-popover">' +
-              options + apply_btn + '</div>';
-          }
-        }).on('mouseenter', function() {
-          let _this = this;
-          $(this).popover('show');
-          $('.popover').on('mouseleave', function() {
-            $(_this).popover('hide');
-          });
-        }).on('mouseleave', function() {
-          let _this = this;
-          setTimeout(function() {
-            if (!$('.popover:hover').length) {
-              $(_this).popover('hide');
-            }
-          }, 100);
-        });
       }
 
       // Do appropriate actions and Update order detail
@@ -103,9 +47,6 @@ foreach ($variants as &$value) {
 
         switch (nodeId) {
           case 'shipping-options-popover':
-            let shipping = node.find('input[name=shipping_option]:checked');
-            let option = shipping.parent('label').data('option');
-            setShippingCost(option);
             break;
         }
 
@@ -275,85 +216,8 @@ foreach ($variants as &$value) {
       $('#item_shipping_weight').html(details.shipping_weight + ' ' + "{{ config('system_settings.weight_unit') }}");
     }
 
-    // Open the form
-    $("#shipTo").on("click", function(e) {
-      e.preventDefault();
-
-      $('#shipToModal').modal(); // Open the modal
-
-      // Select the current id
-      let country = $(this).attr('data-country');
-      let state = $(this).attr('data-state');
-
-      $('#shipTo_country option[value="' + country + '"]').attr("selected", "selected");
-      $('#shipTo_country').selectBoxIt();
-
-      // Populate states field if required
-      if (state && $("#state_id_select_wrapper").hasClass('hidden')) {
-        populateStateSelect(country, state);
-      }
-    });
-
-    // Submit
-    $("#shipToForm").on("submit", function(e) {
-      e.preventDefault();
-      let data = $('form#shipToForm').serialize();
-
-      let country_id = $("#shipTo_country").val();
-      let state_id = $("#shipTo_state").val();
-
-      // Check if the state is selected if exist
-      if (state_id || $("#state_id_select_wrapper").hasClass('hidden')) {
-        // Set the ship to text
-        let text = state_id ? "#shipTo_state" : "#shipTo_country";
-        $("#shipTo").text($(text + " option:selected").html());
-
-        // Set ship to country and state
-        $('#shipto-country-id').val(country_id);
-        $('#shipto-state-id').val(state_id);
-
-        let zone = getFromPHPHelper('get_shipping_zone_of', [shop_id, country_id, state_id]);
-        zone = JSON.parse(zone);
-
-        if ($.isEmptyObject(zone)) {
-          canNotDeliver();
-          return;
-        }
-
-        // Return if the item is OUT OF STOCK
-        if (itemWrapper.find('.sc-add-to-cart').is('[disabled]')) return;
-
-        let options = getFromPHPHelper('getShippingRates', [zone.id]);
-        //console.log(options);
-        $("#shipping-options").data('options', JSON.parse(options))
-
-        // Reset shipping option if the zone are not same the same
-        if (zone.id != $('#shipping-zone-id').val()) {
-          setShippingOptions();
-        }
-
-        $('#shipToModal').modal('hide'); //Hide the modal
-      }
-    });
-
-    //When change ship to Country
-    $("#shipTo_country").change(function() {
-      let id = $(this).val();
-      $("#shipTo").attr('data-country', id).attr('data-state', null);
-      populateStateSelect(id);
-    });
-
-    //When change ship to state
-    $("#shipTo_state").change(function() {
-      $("#shipTo").attr('data-state', $(this).val());
-    });
-
-    $("#login_to_shipp_btn").on('click', function(e) {
-      e.preventDefault();
-
-      $('#shipToModal').modal('hide');
-      $('#loginModal').modal();
-    });
+    // Delivery location is managed from the header picker only (no change option on PDP).
+    $("#shipTo").off('click');
 
     $("#buy-now-btn").on("click", function(e) {
       e.preventDefault();
@@ -582,58 +446,50 @@ foreach ($variants as &$value) {
 
     function getShippingOptions() {
       let shippingOptions = $("#shipping-options").data('options');
-      if (!shippingOptions || shippingOptions === 'NaN' || !$.isArray(shippingOptions)) {
+      if (!shippingOptions || shippingOptions === 'NaN') {
         return [];
       }
-
-      let totalPrice = getItemTotal();
-      let cartWeight = getShippingWeight();
-
-      return shippingOptions.filter(function(el) {
-        if (!el) {
-          return false;
-        }
-
-        let result = el.based_on == 'price' && el.minimum <= totalPrice && (el.maximum >= totalPrice || !el.maximum);
-
-        if (cartWeight) {
-          result = result || (el.based_on == 'weight' && el.minimum <= cartWeight && el.maximum >= cartWeight);
-        }
-
-        return result;
-      });
+      if (!$.isArray(shippingOptions)) {
+        // Eloquent collection / object map → array
+        shippingOptions = Object.keys(shippingOptions).map(function(k) {
+          return shippingOptions[k];
+        });
+      }
+      return shippingOptions.filter(Boolean);
     }
 
     function setShippingCost(shipping) {
-      $('#summary-shipping-cost, #summary-total').removeClass('text-danger text-uppercase');
+      $('#summary-shipping-cost, #summary-total').removeClass('text-danger text-uppercase text-muted');
       $('#buy-now-btn').removeAttr("disabled");
 
-      if (free_shipping == 1 && shipping.rate == 0) {
-        $('#summary-shipping-cost').attr('data-value', 0).html(shipping.name);
-        $('#summary-shipping-carrier').text(' ');
-
-        $('#delivery-time').text('{{ trans('theme.std_delivery_time') }}');
-        $('#shipping-rate-id').val('Null');
-      } else {
-        let value = Number(shipping.rate) + Number(handlingCost);
-
-        $('#summary-shipping-cost').attr('data-value', value).html(getFormatedPrice(value));
-
-        if (shipping.carrier.name != ' ') {
-          $('#summary-shipping-carrier').text(' {{ strtolower(trans('theme.by')) }} ' + shipping.carrier.name);
-        } else {
-          $('#summary-shipping-carrier').text(' ');
-        }
-
-        let delivery_takes = shipping.delivery_takes ? '{{ trans('theme.estimated_delivery_time') }}: ' + shipping.delivery_takes : '';
-
-        $('#delivery-time').text(delivery_takes);
-        $('#shipping-zone-id').val(shipping.shipping_zone_id);
-        $('#shipping-rate-id').val(shipping.id);
+      if (!shipping) {
+        $('#summary-shipping-cost').attr('data-value', 0).html('{{ trans('theme.free_shipping') }}');
+        $('#delivery-time').text('');
+        $('#shipping-rate-id').val('location');
+        calculateOrderTotal();
+        return;
       }
 
-      calculateOrderTotal(); // Calculate Order Total
+      let rate = Number(shipping.rate || 0);
+      if (free_shipping == 1 || rate <= 0) {
+        $('#summary-shipping-cost').attr('data-value', 0).html(shipping.name || '{{ trans('theme.free_shipping') }}');
+        $('#delivery-time').text(shipping.delivery_takes || '{{ trans('theme.std_delivery_time') }}');
+        $('#shipping-rate-id').val('location');
+      } else {
+        let value = rate + Number(handlingCost || 0);
+        $('#summary-shipping-cost').attr('data-value', value).html(getFormatedPrice(value));
+        let delivery_takes = shipping.delivery_takes
+          ? shipping.delivery_takes
+          : '{{ trans('theme.notify.shipping_based_on_location') }}';
+        $('#delivery-time').text(delivery_takes);
+        $('#shipping-rate-id').val(shipping.id || 'location');
+      }
 
+      if (shipping.shipping_zone_id) {
+        $('#shipping-zone-id').val(shipping.shipping_zone_id);
+      }
+
+      calculateOrderTotal();
       return;
     }
 
@@ -643,22 +499,16 @@ foreach ($variants as &$value) {
       ).then(function() {
         let filtered = getShippingOptions();
 
-        if (filtered.length && stock_quantity > 0) {
-          if (free_shipping == 1) {
-            setShippingCost({
-              name: '{{ trans('theme.free_shipping') }}',
-              rate: 0
-            }); // Set free shipping
-          } else {
-            filtered.sort(function(a, b) {
-              return a.rate - b.rate
-            });
-            setShippingCost(filtered[0]);
-          }
+        if (stock_quantity > 0 && filtered.length) {
+          setShippingCost(filtered[0]);
         } else if (stock_quantity > 0) {
-          $('#summary-shipping-cost, #summary-total').removeClass('text-danger text-uppercase').addClass('text-muted').html('{{ trans('theme.notify.will_calculated_on_select') }}');
-          $('#summary-shipping-carrier').text(' ');
-          $('#buy-now-btn').removeAttr('disabled').removeClass('disabled');
+          // Still show a clear free/default estimate rather than the old zone message
+          setShippingCost({
+            id: 'location',
+            name: '{{ trans('theme.free_shipping') }}',
+            rate: 0,
+            delivery_takes: '{{ trans('theme.notify.shipping_based_on_location') }}'
+          });
         } else {
           canNotDeliver();
         }
@@ -702,9 +552,10 @@ foreach ($variants as &$value) {
     }
 
     function canNotDeliver() {
-      $('#summary-shipping-cost').removeClass('lead').addClass('text-muted').html('{{ trans('theme.notify.will_calculated_on_select') }}');
-      $('#summary-shipping-carrier').text(' ');
-      $('#buy-now-btn').removeAttr('disabled').removeClass('disabled');
+      $('#summary-shipping-cost').attr('data-value', 0).removeClass('lead').addClass('text-muted').html('{{ trans('theme.out_of_stock') }}');
+      $('#delivery-time').text('');
+      $('#summary-total').removeClass('lead').addClass('text-muted').html('—');
+      $('#buy-now-btn').attr('disabled', true).addClass('disabled');
     }
 
   }(window.jQuery, window, document));

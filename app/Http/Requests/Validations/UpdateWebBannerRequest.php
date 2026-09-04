@@ -13,14 +13,21 @@ class UpdateWebBannerRequest extends Request
 
     public function rules(): array
     {
-        $this->merge(['shop_id' => null]);
-
         return [
             'group_id' => 'required|in:group_1,group_2,group_3,group_4,group_5,group_6',
             'title' => 'max:255',
             'description' => 'max:255',
+            'hide_text' => 'nullable|boolean',
             'images.feature' => 'nullable|mimes:jpg,jpeg,png,gif,svg,webp',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'shop_id' => null,
+            'hide_text' => $this->boolean('hide_text'),
+        ]);
     }
 
     public function messages(): array

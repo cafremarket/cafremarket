@@ -9,7 +9,6 @@ use App\Models\Cart;
 use App\Models\Country;
 use App\Models\Coupon;
 use App\Models\PaymentMethod;
-use App\Models\ShippingRate;
 use App\Models\State;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +29,7 @@ class CartController extends Controller
 
         $carts->load([
             'shop' => function ($q) {
-                $q->with('config', 'logoImage:path,imageable_id,imageable_type')->active();
+                $q->with('config', 'logoImage:path,imageable_id,imageable_type', 'primaryAddress', 'addresses')->active();
 
                 if (is_incevio_package_loaded('packaging')) {
                     $q->with(['packagings' => function ($query) {
@@ -40,6 +39,7 @@ class CartController extends Controller
             },
             'inventories.images:path,imageable_id,imageable_type',
             'shippingZone',
+            'shippingAddress',
             'state:id,name',
             'country:id,name',
             'inventories.image',
@@ -65,52 +65,34 @@ class CartController extends Controller
         $shipping_zones = [];
         $shipping_options = [];
 
-        // Prepare shipping info
+        // Prepare shipping info (location-based: free / fixed / km)
+        $calculator = app(\App\Services\Shipping\ShippingCalculator::class);
+
         foreach ($carts as $cart) {
             $country_id = $cart->ship_to_country_id ?? optional($geoip_country)->id;
             $state_id = $cart->ship_to_state_id ?? optional($geoip_state)->id;
 
+            // Keep zone only for tax resolution when available
             $shipping_zones[$cart->id] = get_shipping_zone_of($cart->shop_id, $country_id, $state_id);
 
-            if (! $cart->is_digital) {
-                $shipping_options[$cart->id] = isset($shipping_zones[$cart->id]->id) ? getShippingRates($shipping_zones[$cart->id]->id, $cart) : 'NaN';
-            }
-
-            // Update cart if needed
             if (! $cart->ship_to_country_id) {
                 $cart->ship_to_country_id = $country_id;
                 $cart->ship_to_state_id = $state_id;
-                $cart->shipping_zone_id = isset($shipping_zones[$cart->id]->id) ? $shipping_zones[$cart->id]->id : null;
-
-                if (! $cart->is_digital && $shipping_options[$cart->id] != 'NaN') {
-                    $cart->shipping_rate_id = $cart->is_free_shipping() ? null : optional($shipping_options[$cart->id]->first())->id;
-                }
-
-                if ($cart->shipping_zone_id) {
-                    $cart->taxrate = $cart->shippingZone ? optional($cart->shippingZone->tax)->taxrate : $cart->taxrate;
-                    $cart->taxes = $cart->get_tax_amount();
-                }
-
-                $cart->save();
             }
 
-            if ($cart->shipping_rate_id) {
-                $shippingRate = ShippingRate::select('id', 'rate')->where([
-                    ['id', '=', $cart->shipping_rate_id],
-                    ['shipping_zone_id', '=', $cart->shipping_zone_id],
-                ])->first();
+            if (isset($shipping_zones[$cart->id]->id)) {
+                $cart->shipping_zone_id = $shipping_zones[$cart->id]->id;
+                $cart->taxrate = $cart->shippingZone ? optional($cart->shippingZone->tax)->taxrate : $cart->taxrate;
+                $cart->taxes = $cart->get_tax_amount();
+            }
 
-                if (is_incevio_package_loaded('shippo')) {
-                    $shippingRate = getShippingRates($cart->shop_id, $cart)->get($cart->shipping_rate_id);
-                }
-
-                if ($shippingRate) {
-                    $cart->shipping_rate_id = $shippingRate->id;
-                    $cart->shipping = $shippingRate->rate;
-                } elseif ($cart->is_free_shipping()) {
-                    $cart->shipping_rate_id = null;
-                    $cart->shipping = 0;
-                }
+            if (! $cart->is_digital) {
+                $calculator->applyToCart($cart);
+                $shipping_options[$cart->id] = $calculator->shippingOptionsPayload($cart);
+            } else {
+                $cart->shipping = 0;
+                $cart->shipping_rate_id = null;
+                $shipping_options[$cart->id] = collect();
             }
 
             $cart->handling = $cart->get_handling_cost();
@@ -139,10 +121,22 @@ class CartController extends Controller
             }
         }
 
+        $this->annotateCartDeliveryRange($carts);
+
+        // One-store checkout: only the selected cart is checked out at a time.
+        $wantedId = $expressId ? (int) $expressId : (int) $request->query('cart');
+        $activeCart = $wantedId
+            ? $carts->firstWhere('id', $wantedId)
+            : null;
+        if (! $activeCart && $carts->isNotEmpty()) {
+            $activeCart = $carts->first(fn ($c) => empty($c->out_of_range) && empty($c->needs_delivery_location))
+                ?? $carts->first();
+        }
+        $expressId = $activeCart?->id;
+
         $states = [];
-        $firstCart = $carts->first();
-        if ($firstCart && $firstCart->ship_to_country_id) {
-            $states = ListHelper::states($firstCart->ship_to_country_id);
+        if ($activeCart && $activeCart->ship_to_country_id) {
+            $states = ListHelper::states($activeCart->ship_to_country_id);
         }
 
         if (is_incevio_package_loaded('packaging')) {
@@ -160,14 +154,69 @@ class CartController extends Controller
 
             $platformDefaultPackaging = getPlatformDefaultPackaging();
 
-            // $shippingRate = getShippingRates($cart->shop_id, $cart)->get($cart->shipping_rate_id);
-
-            // dd($shippingRate);
-
-            return view('theme::cart', compact('carts', 'business_areas', 'shipping_zones', 'shipping_options', 'platformDefaultPackaging', 'expressId', 'customer', 'paymentMethods', 'states'));
+            return view('theme::cart', compact('carts', 'activeCart', 'business_areas', 'shipping_zones', 'shipping_options', 'platformDefaultPackaging', 'expressId', 'customer', 'paymentMethods', 'states'));
         }
 
-        return view('theme::cart', compact('carts', 'business_areas', 'shipping_zones', 'shipping_options', 'expressId', 'customer', 'paymentMethods', 'states'));
+        return view('theme::cart', compact('carts', 'activeCart', 'business_areas', 'shipping_zones', 'shipping_options', 'expressId', 'customer', 'paymentMethods', 'states'));
+    }
+
+    /**
+     * Flag each cart as in/out of the shop service radius for the buyer location.
+     */
+    protected function annotateCartDeliveryRange($carts): void
+    {
+        $catalog = app(\App\Services\Hyperlocal\HyperlocalCatalogService::class);
+        $buyer = app(\App\Services\Hyperlocal\BuyerLocationService::class);
+        $buyer->ensureDeliveryLocation();
+
+        foreach ($carts as $cart) {
+            $cart->out_of_range = false;
+            $cart->needs_delivery_location = false;
+            $cart->delivery_distance_km = null;
+            $cart->service_radius_km = null;
+
+            if ($cart->is_digital || ! $catalog->isEnabled() || ! $cart->shop) {
+                continue;
+            }
+
+            $lat = $buyer->latitude();
+            $lng = $buyer->longitude();
+
+            // Prefer explicit ship-to address coordinates when present.
+            $shipTo = $cart->relationLoaded('shippingAddress')
+                ? $cart->shippingAddress
+                : ($cart->ship_to ? \App\Models\Address::find($cart->ship_to) : null);
+            if ($shipTo && $shipTo->latitude && $shipTo->longitude) {
+                $lat = (float) $shipTo->latitude;
+                $lng = (float) $shipTo->longitude;
+            }
+
+            $shop = $cart->shop;
+            $store = $shop->storeAddress();
+            $radius = (float) ($shop->service_radius_km ?: config('hyperlocal.default_shop_service_radius_km', 5));
+            $cart->service_radius_km = $radius;
+
+            if (! $lat || ! $lng) {
+                $cart->needs_delivery_location = true;
+
+                continue;
+            }
+
+            if (! $store || ! $store->latitude || ! $store->longitude) {
+                $cart->out_of_range = true;
+
+                continue;
+            }
+
+            $distance = app(\App\Services\Geo\DistanceService::class)->distanceKm(
+                (float) $store->latitude,
+                (float) $store->longitude,
+                (float) $lat,
+                (float) $lng
+            );
+            $cart->delivery_distance_km = round($distance, 1);
+            $cart->out_of_range = $distance > $radius;
+        }
     }
 
     /**

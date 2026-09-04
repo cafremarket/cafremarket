@@ -58,6 +58,10 @@ class CartResource extends JsonResource
             'label' => $this->getLabelText(),
             'shop' => $this->shop ? new ShopLightResource($this->shop) : null,
             'items' => OrderItemResource::collection($this->inventories),
+            'out_of_range' => (bool) ($this->out_of_range ?? false),
+            'needs_delivery_location' => (bool) ($this->needs_delivery_location ?? false),
+            'delivery_distance_km' => $this->delivery_distance_km ?? null,
+            'service_radius_km' => $this->service_radius_km ?? null,
         ];
     }
 

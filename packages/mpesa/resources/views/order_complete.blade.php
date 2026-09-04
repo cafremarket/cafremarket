@@ -1,7 +1,7 @@
 @extends('theme::layouts.main')
 
 @section('content')
-  @include('theme::headers.order_detail')
+  @include('theme::headers.order_complete')
   @include('theme::contents.order_complete')
   <p id="mpesa-wait-msg" class="text-center text-muted my-3"></p>
   @include('theme::sections.recent_views')

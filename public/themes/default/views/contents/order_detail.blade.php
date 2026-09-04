@@ -6,14 +6,15 @@
   $paymentSummaryColspan = max(1, intdiv($paymentTableCols, 3));
   $paymentSummaryLastColspan = max(1, $paymentTableCols - 2 * $paymentSummaryColspan);
 @endphp
-<section id="payment-detail-section" name="payment-detail-section" class="account-section order-detail-page mb-3">
+<div class="sf-detail-page order-detail-page">
+<section id="payment-detail-section" name="payment-detail-section" class="account-section mb-3">
   <div class="container">
     <div class="row">
       <div class="col-12 px-3 px-md-0">
-        <h4 class="title mb-3 mb-md-4">@lang('theme.payment_detail')</h4>
-
-        <div class="table-responsive order-detail-table-wrap">
-          <table class="table border order-detail-stack-table" id="buyer-payment-detail-table">
+        <div class="sf-panel">
+          <div class="sf-panel__head">@lang('theme.payment_detail')</div>
+          <div class="sf-panel__body table-responsive order-detail-table-wrap">
+          <table class="table order-detail-stack-table" id="buyer-payment-detail-table">
             <tbody>
               <tr class="buyer-payment-info-head">
                 <td>@lang('theme.price')</td>
@@ -87,7 +88,7 @@
                       <div class="emola-resend-actions">
                         {!! Form::button('<i class="fa fa-refresh"></i> ' . trans('theme.emola_resend_button'), [
                             'type' => 'button',
-                            'class' => 'btn btn-primary btn-block emola-resend-submit',
+                            'class' => 'btn sf-btn-primary btn-block emola-resend-submit',
                             'data-confirm' => trans('theme.emola_resend_confirm'),
                         ]) !!}
                         <button type="button"
@@ -129,7 +130,7 @@
                             <div class="wire-proof-actions">
                               <a href="{{ route('attachment.view', $attachment) }}" target="_blank" class="btn btn-sm btn-default">@lang('theme.button.open')</a>
                               @if ($isImage)
-                                <a href="javascript:void(0)" class="btn btn-sm btn-primary customer-wire-proof-preview"
+                                <a href="javascript:void(0)" class="btn btn-sm sf-btn-primary customer-wire-proof-preview"
                                   data-src="{{ route('attachment.view', $attachment) }}"
                                   data-name="{{ $attachment->name }}">
                                   @lang('app.preview')
@@ -156,7 +157,7 @@
                         <div class="wire-proof-actions">
                           <a href="{{ $proofUrl }}" target="_blank" class="btn btn-sm btn-default">@lang('theme.button.open')</a>
                           @if ($proofIsImage)
-                            <a href="javascript:void(0)" class="btn btn-sm btn-primary customer-wire-proof-preview"
+                            <a href="javascript:void(0)" class="btn btn-sm sf-btn-primary customer-wire-proof-preview"
                               data-src="{{ $proofUrl }}"
                               data-name="{{ $proofName }}">
                               @lang('app.preview')
@@ -172,6 +173,7 @@
               @endif
             </tbody>
           </table>
+          </div>
         </div>
       </div><!-- /.col-md-12 -->
     </div><!-- /.row -->
@@ -179,14 +181,14 @@
 </section>
 
 @if ($order->refunds->count())
-  <section id="refund-detail-section" name="refund-detail-section" class="account-section order-detail-page mb-3">
+  <section id="refund-detail-section" name="refund-detail-section" class="account-section mb-3">
     <div class="container">
       <div class="row">
         <div class="col-12 px-3 px-md-0">
-          <h4 class="title mb-4">@lang('theme.refunds')</h4>
-
-          <div class="table-responsive">
-            <table class="table border order-detail-stack-table" id="buyer-payment-detail-table">
+          <div class="sf-panel">
+            <div class="sf-panel__head">@lang('theme.refunds')</div>
+            <div class="sf-panel__body table-responsive">
+            <table class="table order-detail-stack-table" id="buyer-payment-detail-table">
               <tbody>
                 <tr class="buyer-payment-info-head">
                   <td>{{ trans('theme.return_goods') }}</td>
@@ -207,6 +209,7 @@
                 @endforeach
               </tbody>
             </table>
+            </div>
           </div>
         </div><!-- /.col-md-12 -->
       </div><!-- /.row -->
@@ -218,7 +221,7 @@
   @include('wallet::_order_page_credit_rewards', ['order' => $order])
 @endif
 
-<section id="order-detail-section" name="order-detail-section" class="account-section order-detail-page">
+<section id="order-detail-section" name="order-detail-section" class="account-section">
   <div class="container">
     <div class="row">
       <div class="col-12 px-3 px-md-0">
@@ -252,19 +255,26 @@
           @endif
         </div>
 
-        <h4 class="title mb-3 mb-md-4 d-none d-md-block">
-          @lang('theme.order_detail')
-
-          @if ($order->auction_bid_id)
-            <span class="label label-primary ml-2"><i class="fa fa-gavel"></i> {{ trans('packages.auction.winner') }}</span>
-          @endif
-        </h4>
-
-        <h4 class="title mb-3 d-md-none">@lang('theme.order_detail')</h4>
-
-        <div class="table-responsive order-detail-table-wrap">
-          <table class="table border order-detail-stack-table" id="buyer-order-table" name="buyer-order-table">
+        <div class="sf-panel">
+          <div class="sf-panel__head">
+            <span>
+              @lang('theme.order_detail')
+              @if ($order->auction_bid_id)
+                <span class="label label-primary ml-2"><i class="fa fa-gavel"></i> {{ trans('packages.auction.winner') }}</span>
+              @endif
+            </span>
+          </div>
+          <div class="sf-panel__body table-responsive order-detail-table-wrap">
+          <table class="table order-detail-stack-table" id="buyer-order-table" name="buyer-order-table">
             <tbody>
+              @unless ($order->is_digital)
+                <tr class="order-detail-location-row">
+                  <td colspan="3" class="order-detail-location-cell">
+                    @include('theme::partials.order_delivery_location', ['order' => $order, 'compact' => true])
+                  </td>
+                </tr>
+              @endunless
+
               <tr class="buyer-payment-info-head bg-light order-detail-address-head">
                 <td>@lang('theme.shipping_address'):</td>
                 <td colspan="2">@lang('theme.billing_address'):</td>
@@ -274,10 +284,10 @@
                   @if ($order->is_digital)
                     @lang('theme.donwloadable')
                   @else
-                    {!! $order->shipping_address !!}
+                    {!! address_str_to_html($order->shipping_address) !!}
                   @endif
                 </td>
-                <td colspan="2" data-label="@lang('theme.billing_address')">{!! $order->billing_address !!}</td>
+                <td colspan="2" data-label="@lang('theme.billing_address')">{!! address_str_to_html($order->billing_address) !!}</td>
               </tr>
 
               <tr class="order-info-head order-detail-meta-row">
@@ -400,8 +410,6 @@
                           {!! Form::model($order, ['method' => 'PUT', 'route' => ['order.cancel', $order]]) !!}
                           {!! Form::button('<i class="fas fa-times-circle-o"></i> ' . trans('theme.cancel_order'), ['type' => 'submit', 'class' => 'confirm btn btn-default btn-block flat', 'data-confirm' => trans('theme.confirm_action.cant_undo')]) !!}
                           {!! Form::close() !!}
-                        @elseif($order->canRequestCancellation())
-                          <a href="{{ route('cancellation.form', ['order' => $order, 'action' => 'cancel']) }}" class="modalAction btn btn-default btn-sm btn-block"><i class="fas fa-times"></i> @lang('theme.cancel_items')</a>
                         @endif
 
                         @if ($order->canTrack())
@@ -417,7 +425,7 @@
                         @endif
 
                         @if ($order->canEvaluate())
-                          <a href="{{ route('order.feedback', $order) }}" class="btn btn-primary btn-sm btn-block">
+                          <a href="{{ route('order.feedback', $order) }}" class="btn sf-btn-primary btn-sm btn-block">
                             @lang('theme.button.give_feedback')
                           </a>
                         @endif
@@ -429,7 +437,7 @@
 
                           @unless ($order->goods_received)
                             {!! Form::model($order, ['method' => 'PUT', 'route' => ['goods.received', $order]]) !!}
-                            {!! Form::button(trans('theme.button.confirm_goods_received'), ['type' => 'submit', 'class' => 'confirm btn btn-primary btn-block flat', 'data-confirm' => trans('theme.confirm_action.goods_received')]) !!}
+                            {!! Form::button(trans('theme.button.confirm_goods_received'), ['type' => 'submit', 'class' => 'confirm btn sf-btn-primary btn-block flat', 'data-confirm' => trans('theme.confirm_action.goods_received')]) !!}
                             {!! Form::close() !!}
                           @endunless
                         @endif
@@ -466,32 +474,34 @@
               @endif
             </tbody>
           </table>
+          </div>
         </div>
       </div><!-- /.col-md-12 -->
     </div><!-- /.row -->
   </div><!-- /.container -->
 </section>
 
-<section id="message-section" name="message-section" class="account-section order-detail-page">
+<section id="message-section" name="message-section" class="account-section">
   <div class="container mb-3">
     <div class="row">
       <div class="col-12 px-3 px-md-0">
-        <h4 class="title mb-3">@lang('theme.section_headings.contact_seller')</h4>
-
+        <div class="sf-panel">
+          <div class="sf-panel__head">@lang('theme.section_headings.contact_seller')</div>
+          <div class="sf-panel__body" style="padding:16px 18px;">
         <div class="message-list">
           <div class="row">
-            {!! Form::open(['route' => ['order.conversation', $order], 'files' => true, 'id' => 'conversation-form', 'data-toggle' => 'validator', 'class' => 'order-detail-message-form w-100']) !!}
+            {!! Form::open(['route' => ['order.conversation', $order], 'files' => true, 'id' => 'conversation-form', 'data-toggle' => 'validator', 'class' => 'order-detail-message-form sf-form w-100']) !!}
             <div class="col-12 col-md-6">
-              <div class="form-group">
-                {!! Form::label('message', trans('theme.write_your_message')) !!}
-                {!! Form::textarea('message', null, ['class' => 'form-control form-control flat', 'placeholder' => trans('theme.leave_message_to_seller'), 'rows' => '4', 'maxlength' => 500, 'required']) !!}
+              <div class="sf-form-group">
+                {!! Form::label('message', trans('theme.write_your_message'), ['class' => 'sf-form-label']) !!}
+                {!! Form::textarea('message', null, ['class' => 'form-control sf-input', 'placeholder' => trans('theme.leave_message_to_seller'), 'rows' => '4', 'maxlength' => 500, 'required']) !!}
                 <div class="help-block with-errors"></div>
               </div>
             </div>
 
             <div class="col-12 col-md-6">
-              <div class="form-group">
-                {!! Form::label('photoInput', trans('theme.button.upload_photo')) !!}
+              <div class="sf-form-group">
+                {!! Form::label('photoInput', trans('theme.button.upload_photo'), ['class' => 'sf-form-label']) !!}
                 {!! Form::file('photo') !!}
                 <span class="help-block small">@lang('theme.help.upload_photo')</span>
               </div>
@@ -503,80 +513,72 @@
                   </label>
                 </div>
               @endunless
-              {!! Form::button(trans('theme.button.send_message'), ['type' => 'submit', 'class' => 'btn btn-info btn-block btn-md-inline py-2 px-5 order-detail-send-btn']) !!}
+              {!! Form::button(trans('theme.button.send_message'), ['type' => 'submit', 'class' => 'btn sf-btn-primary btn-block btn-md-inline order-detail-send-btn']) !!}
             </div>
             {!! Form::close() !!}
           </div> <!-- /.row -->
 
           @if ($order->conversation)
-            <div class="message-list-header">
-              <h4>@lang('theme.message_history')</h4>
+            <div class="sf-panel__head mt-3" style="margin:16px -18px 0;border-radius:0;border-left:0;border-right:0;">
+              <span>@lang('theme.message_history')</span>
             </div>
 
+            <div class="sf-message-thread mt-3">
             @foreach ($order->conversation->replies->sortByDesc('created_at') as $msg)
-              <div class="row message-list-item {{ $msg->customer_id ? 'message-buyer message-me' : 'message-seller' }}">
-                <div class="col-2 pr-1">
-                  @unless ($msg->customer_id)
-                    <div class="message-user-info">
-                      <div class="message-user-name" title="seller">{{ $order->shop ? $order->shop->getQualifiedName(10) : trans('theme.seller') }}</div>
-
-                      <div class="message-date">{{ $msg->created_at->toDayDateTimeString() }}</div>
-                    </div>
-                  @endunless
-                </div>
-
-                <div class="col-8">
-                  <div class="message-content-wrapper">
-                    <div class="message-content">{!! strip_tags($msg->reply) !!}</div>
-
+              <div class="sf-message-bubble {{ $msg->customer_id ? 'sf-message-bubble--me' : '' }}">
+                <div>
+                  <div class="sf-message-bubble__meta">
+                    <strong>
+                      @if ($msg->customer_id)
+                        @lang('theme.me')
+                      @else
+                        {{ $order->shop ? $order->shop->getQualifiedName(10) : trans('theme.seller') }}
+                      @endif
+                    </strong>
+                    {{ $msg->created_at->toDayDateTimeString() }}
+                  </div>
+                  <div class="sf-message-bubble__body">
+                    {!! strip_tags($msg->reply) !!}
                     @if ($attachment = optional($msg->attachments)->first())
-                      <a href="{{ get_storage_file_url($attachment->path, 'original') }}" class="pull-right message-attachment" target="_blank" rel="noopener">
-                        <img src="{{ get_storage_file_url($attachment->path, 'tiny') }}" class="img-sm thumbnail">
-                      </a>
+                      <div class="sf-message-bubble__attach">
+                        <a href="{{ get_storage_file_url($attachment->path, 'original') }}" target="_blank" rel="noopener">
+                          <img src="{{ get_storage_file_url($attachment->path, 'tiny') }}" class="img-sm thumbnail" alt="">
+                        </a>
+                      </div>
                     @endif
                   </div>
-                </div>
-
-                <div class="col-2 pl-1">
-                  @if ($msg->customer_id)
-                    <div class="message-user-info">
-                      <div class="message-user-name" title="me">@lang('theme.me')</div>
-                      <div class="message-date">{{ $msg->created_at->toDayDateTimeString() }}</div>
-                    </div>
-                  @endif
                 </div>
               </div>
             @endforeach
 
-            <div class="row message-list-item message-buyer message-me">
-              <div class="col-2 pr-1">
-              </div>
-
-              <div class="col-8">
-                <div class="message-content-wrapper">
-                  <div class="message-content">{{ strip_tags($order->conversation->message) }}</div>
-
+            <div class="sf-message-bubble sf-message-bubble--me">
+              <div>
+                <div class="sf-message-bubble__meta">
+                  <strong>@lang('theme.me')</strong>
+                  {{ $order->conversation->created_at->toDayDateTimeString() }}
+                </div>
+                <div class="sf-message-bubble__body">
+                  {{ strip_tags($order->conversation->message) }}
                   @if ($attachment = optional($order->conversation->attachments)->first())
-                    <a href="{{ get_storage_file_url($attachment->path, 'original') }}" class="pull-right message-attachment" target="_blank" rel="noopener">
-                      <img src="{{ get_storage_file_url($attachment->path, 'tiny') }}" class="img-sm thumbnail">
-                    </a>
+                    <div class="sf-message-bubble__attach">
+                      <a href="{{ get_storage_file_url($attachment->path, 'original') }}" target="_blank" rel="noopener">
+                        <img src="{{ get_storage_file_url($attachment->path, 'tiny') }}" class="img-sm thumbnail" alt="">
+                      </a>
+                    </div>
                   @endif
                 </div>
               </div>
-
-              <div class="col-2 pl-1">
-                <div class="message-user-info">
-                  <div class="message-user-name" title="me">@lang('theme.me')</div>
-                  <div class="message-date">{{ $order->conversation->created_at->toDayDateTimeString() }}</div>
-                </div>
-              </div>
+            </div>
             </div>
           @endif
         </div><!-- /.message-list -->
+          </div>
+        </div>
       </div><!-- /.col-md-12 -->
     </div><!-- /.row -->
   </div><!-- /.container -->
 </section>
+</div>
 <!-- END CONTENT SECTION -->
 
 <style>
@@ -589,11 +591,12 @@
   }
 
   .order-detail-mobile-summary {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #e8edf2;
+    border-radius: 14px;
     padding: 14px 16px;
     margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
   }
 
   .order-detail-mobile-summary__row {
@@ -606,7 +609,7 @@
   }
 
   .order-detail-mobile-summary__row + .order-detail-mobile-summary__row {
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid #eef2f7;
   }
 
   .emola-resend-panel {
@@ -624,6 +627,7 @@
 
   .emola-resend-actions .btn {
     margin: 0;
+    border-radius: 8px;
   }
 
   .order-detail-product-layout {
@@ -650,8 +654,8 @@
   }
 
   .wire-proof-item {
-    border: 1px solid #e5e5e5;
-    border-radius: 6px;
+    border: 1px solid #e8edf2;
+    border-radius: 10px;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -751,187 +755,87 @@
     }
 
     .order-detail-stack-table .order-detail-meta-cell h5 {
-      font-size: 14px;
+      margin: 0 !important;
+      font-size: 13px;
       line-height: 1.45;
-      word-break: break-word;
-    }
-
-    .order-detail-stack-table .order-detail-meta-cell h5 span {
-      display: block;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #777;
-      margin-bottom: 2px;
     }
 
     .order-detail-stack-table .order-detail-product-cell {
-      padding-top: 14px;
+      border-bottom: none !important;
+      padding-bottom: 4px;
     }
 
-    .order-detail-stack-table .order-detail-product-layout {
-      flex-direction: column;
+    .order-detail-product-layout {
+      flex-direction: row;
     }
 
-    .order-detail-stack-table .order-body .product-img-wrap {
-      display: block;
+    .order-detail-product-layout .product-img-wrap {
+      width: 64px;
+      flex-shrink: 0;
+    }
+
+    .order-detail-product-layout .product-img-wrap img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .order-detail-stack-table .order-detail-actions-cell {
+      border-top: 1px solid #e9ecef !important;
+      padding-top: 12px;
+    }
+
+    .order-detail-stack-table .order-detail-actions-cell .btn {
       margin-bottom: 8px;
+      border-radius: 8px;
     }
 
-    .order-detail-stack-table .order-body .product-img-wrap img {
-      max-width: 72px;
-      height: auto;
-    }
-
-    .order-detail-stack-table td.order-detail-actions-cell {
-      display: block !important;
-      width: 100% !important;
-      padding: 12px;
-      background: #fafafa;
-      border-top: 2px solid #e9ecef !important;
-    }
-
-    .order-detail-stack-table td.order-detail-actions-cell .btn {
-      font-size: 14px;
-      padding: 10px 12px;
-    }
-
-    .order-detail-stack-table tr.message_from_seller td,
-    .order-detail-stack-table tr.order-info-footer td {
-      display: block;
-      text-align: left;
-    }
-
-    .emola-resend-panel {
-      max-width: none;
-    }
-
-    .wire-proof-item {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .wire-proof-actions {
-      width: 100%;
-    }
-
-    .wire-proof-actions .btn {
-      flex: 1 1 auto;
-    }
-
-    .order-detail-message-form .order-detail-send-btn {
-      width: 100%;
-    }
-
-    .message-list .message-list-item {
+    .order-detail-message-form .form-group,
+    .order-detail-message-form .sf-form-group {
       margin-bottom: 12px;
     }
 
-    .message-list .message-list-item > [class*="col-"] {
+    .order-detail-send-btn {
+      width: 100%;
+    }
+
+    .message-list-item .col-2 {
+      display: none;
+    }
+
+    .message-list-item .col-8 {
       width: 100%;
       max-width: 100%;
       flex: 0 0 100%;
-      padding-left: 12px;
-      padding-right: 12px;
-    }
-
-    .message-list .message-list-item .col-8 {
-      order: 2;
-    }
-
-    .message-list .message-list-item .col-2 {
-      order: 1;
-      margin-bottom: 6px;
-    }
-
-    .message-list .message-list-item .message-content-wrapper {
-      text-align: left;
-    }
-
-    .message-list .message-list-item.message-me .message-content-wrapper {
-      text-align: right;
-    }
-
-    .message-list .message-attachment {
-      float: none !important;
-      display: inline-block;
-      margin-top: 8px;
-    }
-
-    .page-header .breadcrumb {
-      font-size: 12px;
-      flex-wrap: wrap;
-    }
-  }
-
-  @media (min-width: 768px) {
-    .emola-resend-panel {
-      flex-direction: row;
-      align-items: flex-end;
-      flex-wrap: wrap;
-      max-width: none;
-    }
-
-    .emola-resend-field {
-      flex: 1 1 200px;
-      min-width: 180px;
-      margin-bottom: 0;
-    }
-
-    .emola-resend-actions {
-      flex-direction: row;
-      flex-wrap: wrap;
-    }
-
-    .emola-resend-actions .btn {
-      width: auto;
-    }
-
-    .order-detail-send-btn.btn-block {
-      display: inline-block;
-      width: auto;
     }
   }
 </style>
 
-<div class="modal fade" id="customerWireProofPreviewModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="customerWireProofPreviewModal" tabindex="-1" role="dialog" aria-labelledby="customerWireProofPreviewLabel">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h4 class="modal-title" id="customerWireProofPreviewTitle">@lang('app.preview')</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="customerWireProofPreviewLabel">@lang('app.preview')</h4>
       </div>
       <div class="modal-body text-center">
-        <img id="customerWireProofPreviewImage" src="" alt="Payment proof">
+        <img id="customerWireProofPreviewImage" src="" alt="">
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  (function() {
-    'use strict';
-    document.addEventListener('click', function(e) {
-      var trigger = e.target.closest('.customer-wire-proof-preview');
-      if (!trigger) return;
-
-      var src = trigger.getAttribute('data-src');
-      var name = trigger.getAttribute('data-name') || '@lang('app.preview')';
-      if (!src) return;
-
-      var img = document.getElementById('customerWireProofPreviewImage');
-      var title = document.getElementById('customerWireProofPreviewTitle');
-      if (!img || !title) return;
-
-      img.setAttribute('src', src);
-      title.textContent = name;
-
-      if (window.jQuery && window.jQuery.fn && window.jQuery.fn.modal) {
-        e.preventDefault();
-        window.jQuery('#customerWireProofPreviewModal').modal('show');
-      }
+  $(function() {
+    $('body').on('click', '.customer-wire-proof-preview', function(e) {
+      e.preventDefault();
+      var src = $(this).data('src');
+      var name = $(this).data('name') || '';
+      $('#customerWireProofPreviewImage').attr('src', src).attr('alt', name);
+      $('#customerWireProofPreviewLabel').text(name || @json(trans('app.preview')));
+      $('#customerWireProofPreviewModal').modal('show');
     });
-  })();
+  });
 </script>
+

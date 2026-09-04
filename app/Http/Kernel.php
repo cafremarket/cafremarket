@@ -21,9 +21,6 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
 
-        // The Application Middlewares
-        \App\Http\Middleware\CheckForInstallation::class,
-
         // SEO
     ];
 
@@ -85,7 +82,6 @@ class Kernel extends HttpKernel
         'dashboard' => \App\Http\Middleware\DashboardSetup::class,
         'demoCheck' => \App\Http\Middleware\DemoRestrictionCheck::class,
         'ajax' => \App\Http\Middleware\AllowOnlyAjaxRequests::class,
-        'install' => \App\Http\Middleware\CanInstall::class,
         'checkout' => \App\Http\Middleware\CheckForGuestCheckoutMode::class,
         'checkBillingInfo' => \App\Http\Middleware\CheckIfBillingInfoRequired::class,
         'xssSanitizer' => \App\Http\Middleware\XssSanitizer::class,

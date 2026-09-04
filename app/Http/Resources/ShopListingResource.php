@@ -35,7 +35,7 @@ class ShopListingResource extends JsonResource
             'sold_item_count' => $this->total_item_sold,
             'total_sold_amount' => $this->total_sold_amount,
             'active_listings_count' => $this->inventories_count,
-            'pickup_enabled' => $this->config->pickup_enabled,
+            'pickup_enabled' => false,
             'member_since' => date('F j, Y', strtotime($this->created_at)),
             'rating' => $this->rating(),
             // 'feedbacks' => FeedbackResource::collection($this->feedbacks),

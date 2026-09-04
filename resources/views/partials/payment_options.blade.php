@@ -7,6 +7,11 @@
     // When admin get paid but still give option to vendors on/off a active payment method.
     $active_payment_methods = isset($shop) && !vendor_get_paid_directly() && vendor_can_on_off_payment_method() ? $shop->paymentMethods->pluck('id')->toArray() : [];
 
+    // Prepaid only — hide Cash on Delivery
+    $paymentMethods = $paymentMethods->reject(function ($paymentMethod) {
+        return $paymentMethod->code === 'cod';
+    });
+
     // Don't show manual payment options for downloadables
     if ((isset($contain_digital_carts) && $contain_digital_carts) || $cart->is_digital) {
         $paymentMethods = $paymentMethods->reject(function ($paymentMethod) {
@@ -71,43 +76,6 @@
 @if (is_incevio_package_loaded('wallet') || is_incevio_package_loaded('mpesa'))
   @include('partials.checkout_platform_fee_box')
 @endif
-
-{{-- Warehouse adddress --}}
-<div id="payInPerson" class="hide">
-  <h3 class="widget-title">{{ trans('theme.pickup') }}</h3>
-  @php
-    $warehouseIds = [];
-  @endphp
-
-  @foreach ($cart->inventories as $key => $inventory)
-    @if ($inventory->warehouse)
-      @if (!in_array($inventory->warehouse_id, $warehouseIds))
-        @php
-          $warehouseIds[] = $inventory->warehouse_id;
-        @endphp
-
-        <ul class="shopping-cart-summary">
-          <li class="text-left">
-            <span>{{ trans('theme.notify.business_days') }}</span>
-            <span></span>
-          </li>
-          <li class="text-left">
-            @foreach ($inventory->warehouse->business_days as $buseiness_day)
-              <span class="badge badge-dark">{{ $buseiness_day }}</span>
-            @endforeach
-          </li>
-          <li>
-            {{ trans('theme.pickup_time') . ': ' . $inventory->warehouse->opening_time . '-' . $inventory->warehouse->close_time }}
-          </li>
-          <li>
-            {!! trans('theme.address') . ': ' . $inventory->warehouse->address->toHtml() !!}
-          </li>
-        </ul>
-      @endif
-    @endif
-  @endforeach
-</div>
-{{-- End warreHouse address --}}
 
 <p id="payment-instructions" class="text-primary my-3">
   <i class="fa fa-info-circle"></i>

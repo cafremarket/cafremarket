@@ -360,23 +360,14 @@ class CartController extends Controller
      */
     public function shipping(Request $request, Cart $cart)
     {
-        $country_id = $request->ship_to_country_id ?? $cart->ship_to_country_id;
-        $state_id = $request->ship_to_state_id ?? $cart->ship_to_state_id;
+        $destLat = $request->input('latitude') ?? $request->input('lat');
+        $destLng = $request->input('longitude') ?? $request->input('lng');
 
-        // Get country and state info from user's IP (default to Mozambique when unresolved)
-        if (! $country_id) {
-            $geoip = geoip($request->ip());
-            $country_id = $geoip->iso_code ?? get_default_geoip_country_iso();
-            $state_id = $geoip->state;
-        }
-
-        $zone = get_shipping_zone_of($cart->shop_id, $country_id, $state_id);
-
-        if (! isset($zone->id)) {
-            return response()->json(['message' => trans('theme.notify.seller_doesnt_ship')], 404);
-        }
-
-        return $this->get_shipping_options($cart, $zone);
+        return $this->get_shipping_options(
+            $cart,
+            is_numeric($destLat) ? (float) $destLat : null,
+            is_numeric($destLng) ? (float) $destLng : null
+        );
     }
 
     /**
@@ -453,26 +444,20 @@ class CartController extends Controller
     }
 
     /**
-     * Return available shipping options for the cart
+     * Location-based shipping options (single calculated option; cart uses max item charge).
      *
-     * @param  cart  $cart
-     * @param  shipping zone  $zone
-     * @return array|null
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    private function get_shipping_options($cart, $zone = null)
+    private function get_shipping_options($cart, ?float $destLat = null, ?float $destLng = null)
     {
-        if (! $zone) {
-            return null;
-        }
+        $calculator = app(\App\Services\Shipping\ShippingCalculator::class);
+        $calculator->applyToCart($cart, $destLat, $destLng);
+        $cart->handling = $cart->get_handling_cost();
+        $cart->grand_total = $cart->calculate_grand_total();
+        $cart->save();
 
-        $shipping_options = getShippingRates($zone->id, $cart);
-
-        if ($cart->is_free_shipping()) {
-            $free_shipping[] = json_decode(json_encode(getFreeShippingObject($zone)), false);
-
-            $shipping_options = collect($free_shipping)->merge($shipping_options);
-        }
-
-        return ShippingOptionResource::collection($shipping_options);
+        return ShippingOptionResource::collection(
+            $calculator->shippingOptionsPayload($cart, $destLat, $destLng)
+        );
     }
 }

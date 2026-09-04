@@ -768,7 +768,7 @@ return [
   'customer_address' => 'آدرس مشتری',
   'no_pickup_options' => 'این فروشنده گزینه پیکاپ را ارائه نمی دهد.',
   'maximum_download_limit_reached' => 'شما به حداکثر میزان بارگیری رسیده اید',
-  'trust_badge' => 'نشان اعتماد',
+
   'coupon_code_size' => 'اندازه کد کوپن',
   'why_feedback_important' => 'چرا بازخورد شما مهم است؟',
   'already_given_feedback' => 'شما قبلاً بازخورد داده اید!',

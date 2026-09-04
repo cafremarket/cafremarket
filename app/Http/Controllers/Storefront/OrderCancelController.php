@@ -19,6 +19,11 @@ class OrderCancelController extends Controller
      */
     public function showForm(OrderDetailRequest $request, Order $order, $action = 'cancel')
     {
+        // Cancel-items requests are temporarily disabled; returns remain available.
+        if ($action === 'cancel') {
+            return redirect()->back()->with('error', trans('theme.cancel_items_disabled'));
+        }
+
         $reasons = CancellationReason::orderBy('id')->front()->pluck('detail', 'id');
 
         return view('theme::modals._item_cancel', compact('order', 'reasons', 'action'))->render();
@@ -29,6 +34,10 @@ class OrderCancelController extends Controller
      */
     public function saveCancelRequest(OrderCancellationRequest $request, Order $order)
     {
+        if (($request->input('action') ?: 'cancel') !== 'return') {
+            return redirect()->back()->with('error', trans('theme.cancel_items_disabled'));
+        }
+
         if ($order->cancellation) {
             $order->cancellation->update($request->all());
 

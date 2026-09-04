@@ -1,66 +1,53 @@
 @if ($gift_cards->count() > 0)
-  <div class="table-responsive">
-    <table class="table" id="buyer-order-table">
-      <thead>
-      <tr>
-        <th>{{ trans('theme.value') }}</th>
-        <th>{{ trans('theme.serial_number') }}</th>
-        <th>{{ trans('theme.support_partial_use') }}</th>
-        <th width="30%">{{ trans('theme.validity') }}</th>
-      </tr>
-      </thead>
-      <tbody>
-      @foreach ($gift_cards as $gift)
-        <tr>
-          <td class="text-center">
-            <div class="customer-gift-card-lists {{ $gift->expiry_time && $gift->expiry_time < \Carbon\Carbon::now() ? 'customer-gift-card-expired' : '' }}">
-              <div class="gift-card-item">
-                <span class="customer-gift-card-value"><i class="fas fa-gift"></i> {{ get_formated_currency($gift->value) }}</span>
-              </div>
-            </div>
-          </td>
-          <td class="text-center vertical-center">{{ $gift->serial_number }}</td>
-          <td class="text-center vertical-center small">
-            @if ($gift->partial_use)
-              <span class="label label-outline">@lang('theme.yes')</span>
-            @else
-              <span class="label label-default">@lang('theme.no')</span>
-            @endif
-          </td>
-          <td class="vertical-center">
-            @if ($gift->expiry_time)
-              @if ($gift->expiry_time && $gift->expiry_time < \Carbon\Carbon::now())
-                <span class="text-muted small">{{ trans('theme.expired_at') }}: {{ $gift->expiry_time->format('M j,y g:i a') }}</span>
-              @elseif($gift->activation_time < \Carbon\Carbon::now())
-                <span class="text-muted small">{{ trans('theme.use_before') }}:</span>
-                {{ $gift->expiry_time->format('M j,y g:i a') }}
-              @elseif($gift->activation_time > \Carbon\Carbon::now())
-                <span class="text-muted small">{{ trans('theme.use_between') }}:</span>
-                {{ $gift->activation_time->format('M j,y g:i a') }}<br/>
-                <span class="text-muted small"> @lang('theme.and') </span>
-                {{ $gift->expiry_time->format('M j,y g:i a') }}
-              @else
-                <span class="text-muted small">{{ trans('theme.invalid') }}</span>
-              @endif
+  <div class="sf-coupon-grid">
+    @foreach ($gift_cards as $gift)
+      @php
+        $expired = $gift->expiry_time && $gift->expiry_time < \Carbon\Carbon::now();
+      @endphp
+
+      <article class="sf-gift-card {{ $expired ? 'sf-gift-card--expired' : '' }}">
+        <div class="sf-gift-card__value">
+          <i class="fas fa-gift" aria-hidden="true"></i> {{ get_formated_currency($gift->value) }}
+        </div>
+        <div class="sf-gift-card__serial">{{ $gift->serial_number }}</div>
+        <div class="sf-gift-card__meta mb-2">
+          @lang('theme.support_partial_use'):
+          @if ($gift->partial_use)
+            <span class="label label-outline">@lang('theme.yes')</span>
+          @else
+            <span class="label label-default">@lang('theme.no')</span>
+          @endif
+        </div>
+        <div class="sf-gift-card__meta">
+          @if ($gift->expiry_time)
+            @if ($gift->expiry_time && $gift->expiry_time < \Carbon\Carbon::now())
+              {{ trans('theme.expired_at') }}: {{ $gift->expiry_time->format('M j,y g:i a') }}
+            @elseif($gift->activation_time < \Carbon\Carbon::now())
+              {{ trans('theme.use_before') }}: {{ $gift->expiry_time->format('M j,y g:i a') }}
             @elseif($gift->activation_time > \Carbon\Carbon::now())
-              <span class="text-muted small">{{ trans('theme.valid_from') }}:</span>
+              {{ trans('theme.use_between') }}:
               {{ $gift->activation_time->format('M j,y g:i a') }}
+              @lang('theme.and')
+              {{ $gift->expiry_time->format('M j,y g:i a') }}
             @else
-              <span class="text-muted small">{{ trans('theme.lifetime') }}</span>
+              {{ trans('theme.invalid') }}
             @endif
-          </td>
-        </tr>
-      @endforeach
-      </tbody>
-    </table>
+          @elseif($gift->activation_time > \Carbon\Carbon::now())
+            {{ trans('theme.valid_from') }}: {{ $gift->activation_time->format('M j,y g:i a') }}
+          @else
+            {{ trans('theme.lifetime') }}
+          @endif
+        </div>
+      </article>
+    @endforeach
   </div>
-  <hr />
 @else
-  <p class="lead text-center my-5">
-    @lang('theme.nothing_found')
-  </p>
+  <div class="sf-empty-state">
+    <i class="fas fa-gift" aria-hidden="true"></i>
+    <p>@lang('theme.nothing_found')</p>
+  </div>
 @endif
 
 <div class="row pagenav-wrapper mb-3">
   {{ $gift_cards->links('theme::layouts.pagination') }}
-</div><!-- /.row .pagenav-wrapper -->
+</div>

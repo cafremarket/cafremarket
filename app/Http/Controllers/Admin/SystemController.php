@@ -79,11 +79,6 @@ class SystemController extends Controller
             }
         }
 
-        if ($request->hasFile('trust_badge')) {
-            $system->updateImage($request->file('trust_badge'), 'feature');
-            Cache::forget('trust_badge_img');
-        }
-
         event(new SystemInfoUpdated($system));
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));

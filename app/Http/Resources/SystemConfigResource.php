@@ -80,7 +80,7 @@ class SystemConfigResource extends JsonResource
             'address_show_country' => (bool) $this->address_show_country,
             'address_show_map' => (bool) $this->address_show_map,
             'allow_guest_checkout' => (bool) $this->allow_guest_checkout,
-            'enable_chat' => (bool) $this->enable_chat,
+            'enable_chat' => true,
             'vendor_get_paid' => (bool) vendor_get_paid_directly(),
             'currency' => [
                 'name' => $this->currency['name'],

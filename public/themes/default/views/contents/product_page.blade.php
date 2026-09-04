@@ -11,8 +11,26 @@
           ->first();
   }
 
-  $shipping_zone = $shipping_country ? get_shipping_zone_of($item->shop_id, $shipping_country->id, optional($shipping_state)->id) : null;
-  $shipping_options = isset($shipping_zone->id) ? getShippingRates($shipping_zone->id) : 'NaN';
+  // Location-based shipping (free / fixed / km) using selected delivery address
+  $buyerLocation = app(\App\Services\Hyperlocal\BuyerLocationService::class);
+  $buyerLocation->ensureDeliveryLocation();
+  $delivery_label = buyer_delivery_address_label()
+      ?: (trans('theme.select_delivery_location') !== 'theme.select_delivery_location'
+          ? trans('theme.select_delivery_location')
+          : 'Select delivery location');
+
+  $shipping_zone = null;
+  $shipping_options = get_item_location_shipping_options($item);
+  $pdp_shipping = $shipping_options instanceof \Illuminate\Support\Collection ? $shipping_options->first() : null;
+  $pdp_out_of_range = (bool) optional($pdp_shipping)->out_of_range;
+  $pdp_ship_rate = $pdp_shipping ? (float) ($pdp_shipping->rate ?? 0) : 0;
+  $pdp_handling = (float) (getHandelingCostOf($item->shop_id) ?: 0);
+  $pdp_ship_value = ($pdp_out_of_range || $item->free_shipping || $pdp_ship_rate <= 0) ? 0 : ($pdp_ship_rate + $pdp_handling);
+  $pdp_ship_label = $pdp_out_of_range
+      ? (trans('theme.out_of_delivery_range') ?: 'Out of delivery range')
+      : ($pdp_ship_value <= 0
+          ? ($pdp_shipping->name ?? trans('theme.free_shipping'))
+          : get_formated_currency($pdp_ship_value));
 @endphp
 
 <div class="sf-pdp">
@@ -49,7 +67,7 @@
               </div>
 
               {{ Form::hidden('shipping_zone_id', isset($shipping_zone->id) ? $shipping_zone->id : null, ['id' => 'shipping-zone-id']) }}
-              {{ Form::hidden('shipping_rate_id', null, ['id' => 'shipping-rate-id']) }}
+              {{ Form::hidden('shipping_rate_id', 'location', ['id' => 'shipping-rate-id']) }}
               {{ Form::hidden('shipto_country_id', $shipping_country->id ?? null, ['id' => 'shipto-country-id']) }}
               {{ Form::hidden('shipto_state_id', optional($shipping_state)->id, ['id' => 'shipto-state-id']) }}
 
@@ -57,25 +75,24 @@
                 <div id="calculation-section" class="sf-pdp__calc">
                   <div class="row">
                     <div class="col-3">
-                      <span class="info-label" data-options='@json($shipping_options === "NaN" ? [] : $shipping_options)' id="shipping-options">@lang('theme.shipping'):</span>
+                      <span class="info-label" data-options='@json($shipping_options)' id="shipping-options">@lang('theme.shipping'):</span>
                     </div>
                     <div class="col-9 pl-1">
-                      <span id="summary-shipping-cost" data-value="0"></span>
-                      <div id="product-info-shipping-detail">
-                        <span>{{ strtolower(trans('theme.to')) }}
-                          <a id="shipTo" class="ship_to" data-country="{{ $shipping_country->id ?? '' }}" data-state="{{ optional($shipping_state)->id }}" href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.change_shipping_location') }}">
-                            {{ $shipping_state ? $shipping_state->name : ($geoip->country ?? '') }}
-                          </a>
-                          <select id="width_tmp_select">
-                            <option id="width_tmp_option"></option>
-                          </select>
-                        </span>
-                        <span class="dynamic-shipping-rates" data-toggle="popover" title="{{ trans('theme.shipping_options') }}">
-                          <span id="summary-shipping-carrier"></span>
-                          <small class="ml-1 text-success"><i class="fas fa-caret-circle-down"></i></small>
-                        </span>
-                      </div>
-                      <small id="delivery-time"></small>
+                      <span id="summary-shipping-cost" data-value="{{ $pdp_ship_value }}" class="{{ $pdp_out_of_range ? 'text-danger' : ($pdp_ship_value > 0 ? 'lead' : 'text-muted') }}">{{ $pdp_ship_label }}</span>
+                      @if ($pdp_out_of_range)
+                        <div class="notice notice-danger notice-sm mt-2 mb-0">
+                          {{ $pdp_shipping->delivery_takes ?? (trans('theme.out_of_delivery_range') ?: 'Out of delivery range') }}
+                        </div>
+                      @elseif ($delivery_label)
+                        <div id="product-info-shipping-detail">
+                          <span class="text-muted">{{ strtolower(trans('theme.to')) }}
+                            <span id="shipTo" class="ship_to_label">{{ Str::limit($delivery_label, 42) }}</span>
+                          </span>
+                        </div>
+                      @endif
+                      @unless ($pdp_out_of_range)
+                        <small id="delivery-time" class="text-muted">{{ $pdp_shipping->delivery_takes ?? '' }}</small>
+                      @endunless
                     </div>
                   </div>
 
@@ -100,7 +117,7 @@
                       <span class="info-label">@lang('theme.total'):</span>
                     </div>
                     <div class="col-9 pl-0">
-                      <span id="summary-total" class="text-muted">{{ trans('theme.notify.will_calculated_on_select') }}</span>
+                      <span id="summary-total" class="text-muted">{{ trans('theme.notify.calculating') }}</span>
                     </div>
                   </div>
                 </div>
@@ -117,12 +134,18 @@
 
             <div class="sf-pdp__cta flex-between-center flex-wrap sp-btns">
               @unless ($item->auctionable)
-                <a href="{{ route('direct.checkout', $item->slug) }}" class="btn btn-primary btn-lg{{ $item->stock_quantity < 1 ? ' disabled' : '' }}" id="buy-now-btn"{{ $item->stock_quantity < 1 ? ' aria-disabled=true' : '' }}>
-                  <i class="fal fa-rocket-launch"></i> @lang('theme.button.buy_now')
-                </a>
-                <a data-link="{{ route('cart.addItem', $item->slug) }}" class="btn btn-lg add-to-card-now-btn sc-add-to-cart{{ $item->stock_quantity < 1 ? ' disabled' : '' }}">
-                  <i class="fal fa-shopping-cart"></i> @lang('theme.button.add_to_cart')
-                </a>
+                @if (!empty($pdp_out_of_range))
+                  <button type="button" class="btn btn-danger btn-lg" disabled>
+                    <i class="fal fa-map-marker-alt"></i> {{ trans('theme.out_of_delivery_range') }}
+                  </button>
+                @else
+                  <a href="{{ route('direct.checkout', $item->slug) }}" class="btn btn-primary btn-lg{{ $item->stock_quantity < 1 ? ' disabled' : '' }}" id="buy-now-btn"{{ $item->stock_quantity < 1 ? ' aria-disabled=true' : '' }}>
+                    <i class="fal fa-rocket-launch"></i> @lang('theme.button.buy_now')
+                  </a>
+                  <a data-link="{{ route('cart.addItem', $item->slug) }}" class="btn btn-lg add-to-card-now-btn sc-add-to-cart{{ $item->stock_quantity < 1 ? ' disabled' : '' }}">
+                    <i class="fal fa-shopping-cart"></i> @lang('theme.button.add_to_cart')
+                  </a>
+                @endif
               @endunless
 
               @if (is_incevio_package_loaded('comparison'))
@@ -158,6 +181,15 @@
 
               <div class="mt-2">
                 @include('theme::layouts.ratings', ['ratings' => $item->shop->ratings, 'count' => $item->shop->ratings_count, 'shop' => $item->shop])
+              </div>
+
+              <div class="sf-pdp__seller-actions mt-3">
+                <a href="javascript:void(0);" class="btn sf-btn-primary btn-sm btn-block sf-open-livechat">
+                  <i class="fas fa-comment"></i> @lang('theme.button.chat_now')
+                </a>
+                <a href="javascript:void(0);" class="btn btn-default btn-sm btn-block" data-toggle="modal" data-target="{{ Auth::guard('customer')->check() ? '#contactSellerModal' : '#loginModal' }}">
+                  <i class="far fa-envelope"></i> @lang('theme.button.contact_seller')
+                </a>
               </div>
             </div>
 

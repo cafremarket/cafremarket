@@ -14,45 +14,57 @@
 @endphp
 @if ($customerTransactionFee > 0)
   <tr>
-    @if ($invoiceTableColumns === 3)
+    @if ($invoiceTableColumns === 2)
+      <td>@lang('invoice.transaction_fee')</td>
+      <td style="text-align: right;">{{ get_formated_currency($customerTransactionFee, 2, $order->currency_id) }}</td>
+    @elseif ($invoiceTableColumns === 3)
       <td colspan="2">@lang('invoice.transaction_fee')</td>
-      <td>{{ get_formated_currency($customerTransactionFee, 2) }}</td>
+      <td>{{ get_formated_currency($customerTransactionFee, 2, $order->currency_id) }}</td>
     @else
       <td colspan="2" style="background-color: white;"></td>
       <td>@lang('invoice.transaction_fee')</td>
-      <td>{{ get_formated_currency($customerTransactionFee, 2) }}</td>
+      <td>{{ get_formated_currency($customerTransactionFee, 2, $order->currency_id) }}</td>
     @endif
   </tr>
-  <tr>
-    @if ($invoiceTableColumns === 3)
+  <tr @if ($invoiceTableColumns === 2) class="grand" @endif>
+    @if ($invoiceTableColumns === 2)
+      <td><strong>@lang($totalPaidLabel)</strong></td>
+      <td style="text-align: right;"><strong>{{ get_formated_currency($customerTotalPaid, 2, $order->currency_id) }}</strong></td>
+    @elseif ($invoiceTableColumns === 3)
       <td colspan="2" style="background: #e6f2ff"><strong>@lang($totalPaidLabel)</strong></td>
-      <td style="background: #e6f2ff"><strong>{{ get_formated_currency($customerTotalPaid, 2) }}</strong></td>
+      <td style="background: #e6f2ff"><strong>{{ get_formated_currency($customerTotalPaid, 2, $order->currency_id) }}</strong></td>
     @else
       <td colspan="2" style="background-color: white;"></td>
       <td style="background: #e6f2ff">@lang($totalPaidLabel)</td>
-      <td style="background: #e6f2ff">{{ get_formated_currency($customerTotalPaid, 2) }}</td>
+      <td style="background: #e6f2ff">{{ get_formated_currency($customerTotalPaid, 2, $order->currency_id) }}</td>
     @endif
   </tr>
 @endif
 @if ($isMobilePayment && $vendorCommission > 0)
   <tr>
-    @if ($invoiceTableColumns === 3)
+    @if ($invoiceTableColumns === 2)
+      <td>@lang('invoice.marketplace_commission')</td>
+      <td style="text-align: right;">{{ get_formated_currency($vendorCommission, 2, $order->currency_id) }}</td>
+    @elseif ($invoiceTableColumns === 3)
       <td colspan="2">@lang('invoice.marketplace_commission')</td>
-      <td>{{ get_formated_currency($vendorCommission, 2) }}</td>
+      <td>{{ get_formated_currency($vendorCommission, 2, $order->currency_id) }}</td>
     @else
       <td colspan="2" style="background-color: white;"></td>
       <td>@lang('invoice.marketplace_commission')</td>
-      <td>{{ get_formated_currency($vendorCommission, 2) }}</td>
+      <td>{{ get_formated_currency($vendorCommission, 2, $order->currency_id) }}</td>
     @endif
   </tr>
   <tr>
-    @if ($invoiceTableColumns === 3)
+    @if ($invoiceTableColumns === 2)
+      <td>@lang('invoice.vendor_net')</td>
+      <td style="text-align: right;">{{ get_formated_currency($vendorNet, 2, $order->currency_id) }}</td>
+    @elseif ($invoiceTableColumns === 3)
       <td colspan="2">@lang('invoice.vendor_net')</td>
-      <td>{{ get_formated_currency($vendorNet, 2) }}</td>
+      <td>{{ get_formated_currency($vendorNet, 2, $order->currency_id) }}</td>
     @else
       <td colspan="2" style="background-color: white;"></td>
       <td>@lang('invoice.vendor_net')</td>
-      <td>{{ get_formated_currency($vendorNet, 2) }}</td>
+      <td>{{ get_formated_currency($vendorNet, 2, $order->currency_id) }}</td>
     @endif
   </tr>
 @endif

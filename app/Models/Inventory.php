@@ -112,6 +112,10 @@ class Inventory extends Inspectable
         'width',
         'height',
         'free_shipping',
+        'shipping_type',
+        'shipping_fixed_rate',
+        'shipping_per_km_rate',
+        'shipping_base_fee',
         'stuff_pick',
         'available_from',
         'expiry_date',
@@ -147,6 +151,18 @@ class Inventory extends Inspectable
             $builder->with(['translations' => function ($query) {
                 $query->where('lang', app()->getLocale())->whereNotNull('translation');
             }]);
+        });
+
+        static::saving(function (Inventory $inventory) {
+            $type = strtolower(trim((string) ($inventory->shipping_type ?? '')));
+            if ($type === 'inherit' || $type === '') {
+                $inventory->shipping_type = null;
+            }
+            if ($type === 'free') {
+                $inventory->free_shipping = true;
+            } elseif (in_array($type, ['fixed', 'km'], true)) {
+                $inventory->free_shipping = false;
+            }
         });
     }
 

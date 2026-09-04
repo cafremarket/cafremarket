@@ -1,24 +1,26 @@
-<div id="zcart_chat">
+<div id="zcart_chat" class="sf-livechat">
   <div id="chat-window" class="chat">
     <div class="chat_header">
       <div class="chat_option">
         <div class="header_img">
-          <img src="{{ get_storage_file_url(optional($shop->image)->path, 'thumbnail') }}" />
+          <img src="{{ get_storage_file_url(optional($shop->image)->path, 'thumbnail') }}" alt="{{ $shop->name }}" />
         </div>
-        <span id="chat_head">{{ $shop->name }}</span> <br>
-        <span class="agent">{{ $agent->getName() }}</span> <span class="online">({{ $agent_status }})</span>
+        <div class="chat_header_text">
+          <span id="chat_head">{{ $shop->name }}</span>
+          <span class="agent">{{ optional($agent)->getName() ?? trans('theme.seller') }} <span class="online">· {{ $agent_status }}</span></span>
+        </div>
+        <button type="button" class="chat_header_close" id="sf_livechat_close" aria-label="Close chat">&times;</button>
       </div>
     </div>
 
     <div id="chat_conversation" class="chat_converse">
-      {{-- <a id="chat_second_screen" class="fchat"><i class="fas fa-arrow-right"></i></a> --}}
       @unless (Auth::guard('customer')->check())
-        <p>
-          {!! trans('theme.login_to_chat') !!}
-          <a href="javascript:void(0)" class="btn btn-primary" data-toggle="modal" data-target="#loginModal">{{ trans('theme.button.login') }}</a>
-        </p>
+        <div class="chat_login_prompt">
+          <p>{!! trans('theme.login_to_chat') !!}</p>
+          <a href="javascript:void(0)" class="btn btn-primary chat_login_btn" data-toggle="modal" data-target="#loginModal">{{ trans('theme.button.login') }}</a>
+        </div>
       @else
-        <p class="text-primary">{!! trans('theme.connecting') !!}</p>
+        <p class="chat_connecting text-primary">{!! trans('theme.connecting') !!}</p>
       @endunless
     </div>
 
@@ -64,7 +66,7 @@
             </label>
             <input id="chatBoxMsg" name="chat_message" type="text" placeholder="Send a message" class="chat_field chat_message chat-composer-msg" aria-label="Chat message input" autocomplete="off">
             <button type="button" id="fchat_send" class="chat-composer-btn chat-composer-btn--send" aria-label="Send message">
-              <span class="chat-composer-btn-icon" aria-hidden="true"><i class="fa fa-paper-plane-o"></i></span>
+              <span class="chat-composer-btn-icon" aria-hidden="true"><i class="fa fa-paper-plane"></i></span>
             </button>
           </div>
         </div>
@@ -72,7 +74,7 @@
     @endif
   </div>
 
-  <a id="chatbox" class="fchat">
+  <a id="chatbox" class="fchat sf-livechat-fab" aria-label="Open chat">
     <i class="chat-icon fas fa-comment"></i>
   </a>
 </div>
@@ -283,10 +285,71 @@
         return wrap;
       }
 
-      function buildChatNode(message, isAdmin, attachments) {
+      function formatChatClock(isoOrDate) {
+        try {
+          var d = isoOrDate ? new Date(isoOrDate) : new Date();
+          if (isNaN(d.getTime())) d = new Date();
+          return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function formatChatDayLabel(isoOrDate) {
+        try {
+          var d = isoOrDate ? new Date(isoOrDate) : new Date();
+          if (isNaN(d.getTime())) return '';
+          var today = new Date();
+          var yday = new Date();
+          yday.setDate(today.getDate() - 1);
+          var sameDay = function(a, b) {
+            return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+          };
+          if (sameDay(d, today)) return 'Today';
+          if (sameDay(d, yday)) return 'Yesterday';
+          return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function chatDayKey(isoOrDate) {
+        try {
+          var d = isoOrDate ? new Date(isoOrDate) : new Date();
+          if (isNaN(d.getTime())) return '';
+          var m = d.getMonth() + 1;
+          var day = d.getDate();
+          return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function ensureStorefrontDaySep(isoOrDate) {
+        var $box = $("#chat_conversation");
+        if (!$box.length) return;
+        var key = chatDayKey(isoOrDate);
+        if (!key) return;
+        var last = $box.children('.chat-day-sep').last();
+        if (last.length && String(last.attr('data-day')) === key) return;
+        $box.append(
+          $('<div>').addClass('chat-day-sep').attr('data-day', key).append(
+            $('<span>').text(formatChatDayLabel(isoOrDate))
+          )
+        );
+      }
+
+      function buildChatNode(message, isAdmin, attachments, meta) {
+        meta = meta || {};
         var payload = getSharedPayload(message);
         var cls = isAdmin ? 'chat_msg_item chat_msg_item_admin' : 'chat_msg_item chat_msg_item_user';
         var node = $('<span>').addClass(cls);
+        if (meta.replyId) {
+          node.attr('data-reply-id', meta.replyId);
+        }
+        if (meta.createdAt) {
+          node.attr('data-created-at', meta.createdAt);
+        }
 
         var attBlock = buildAttachmentBlock(attachments);
         if (attBlock) {
@@ -298,28 +361,32 @@
           if (text && text !== '[attachment]') {
             node.append($('<span>').addClass('chat-msg-text').text(text));
           }
-          return node;
+        } else {
+          if (isAdmin) {
+            agent_avatar.clone().prependTo(node);
+          }
+
+          var wrap = $('<div>').addClass('chat-shared-product-wrap');
+          var card = $('<div>').addClass('chat-shared-product');
+          $('<img>').addClass('chat-shared-product-img').attr('src', payload.image || '').attr('alt', payload.title || 'product').attr('loading', 'lazy').appendTo(card);
+          var body = $('<div>').addClass('chat-shared-product-body').appendTo(card);
+          $('<div>').addClass('chat-shared-product-title').text(payload.title || '').appendTo(body);
+          $('<div>').addClass('chat-shared-product-price').text(payload.price || '').appendTo(body);
+          $('<a>').addClass('chat-shared-product-link').attr('href', payload.url || '#').attr('target', '_blank').text('View').appendTo(body);
+          wrap.append(card);
+          node.append(wrap);
         }
 
-        if (isAdmin) {
-          agent_avatar.clone().prependTo(node);
-        }
-
-        var wrap = $('<div>').addClass('chat-shared-product-wrap');
-        var card = $('<div>').addClass('chat-shared-product');
-        $('<img>').addClass('chat-shared-product-img').attr('src', payload.image || '').attr('alt', payload.title || 'product').attr('loading', 'lazy').appendTo(card);
-        var body = $('<div>').addClass('chat-shared-product-body').appendTo(card);
-        $('<div>').addClass('chat-shared-product-title').text(payload.title || '').appendTo(body);
-        $('<div>').addClass('chat-shared-product-price').text(payload.price || '').appendTo(body);
-        $('<a>').addClass('chat-shared-product-link').attr('href', payload.url || '#').attr('target', '_blank').text('View').appendTo(body);
-        wrap.append(card);
-        node.append(wrap);
+        var clock = meta.time || formatChatClock(meta.createdAt || new Date().toISOString());
+        node.append($('<time>').addClass('chat-msg-time').attr('datetime', meta.createdAt || '').text(clock));
 
         return node;
       }
 
       // Expose for websocket callback script block below.
       window.buildChatNode = buildChatNode;
+      window.ensureStorefrontDaySep = ensureStorefrontDaySep;
+      window.formatChatClock = formatChatClock;
 
       if (shareStorageKey && window.sessionStorage.getItem(shareStorageKey) === '1') {
         $('.chat-product-share').hide();
@@ -365,6 +432,32 @@
         toggleFchat();
       });
 
+      $('#sf_livechat_close').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if ($('#chat-window').hasClass('is-visible')) {
+          toggleFchat();
+        }
+      });
+
+      // Open chat from product/seller page buttons without toggling closed.
+      window.openStorefrontLiveChat = function() {
+        if (!$('#chat-window').hasClass('is-visible')) {
+          toggleFchat();
+        } else if (typeof updateScroll === 'function') {
+          updateScroll();
+        }
+      };
+
+      $(document).off('click.sfOpenLiveChat', '.sf-open-livechat').on('click.sfOpenLiveChat', '.sf-open-livechat', function(e) {
+        e.preventDefault();
+        if (typeof window.openStorefrontLiveChat === 'function') {
+          window.openStorefrontLiveChat();
+        } else {
+          $('#chatbox').trigger('click');
+        }
+      });
+
       function hideProductSharePreview() {
         $('.chat-product-share').slideUp(120);
         if (shareStorageKey) {
@@ -404,20 +497,41 @@
         return h;
       }
 
-      function handleChatSendComplete(httpStatus, pendingNode) {
+      function handleChatSendComplete(httpStatus, pendingNode, xhrOrBody) {
         isSendingMessage = false;
         $("#fchat_send").removeClass('hidden');
 
         var response = '';
         var shouldAppendResponse = true;
+        var body = null;
+        try {
+          if (xhrOrBody && xhrOrBody.responseText) {
+            body = JSON.parse(xhrOrBody.responseText);
+          } else if (xhrOrBody && typeof xhrOrBody === 'object' && !xhrOrBody.statusText) {
+            body = xhrOrBody;
+          }
+        } catch (e) {
+          body = null;
+        }
 
         switch (httpStatus) {
           case 200:
             clearAttachmentPreview();
-            pendingNode.removeAttr('data-pending');
+            if (pendingNode && pendingNode.length) {
+              pendingNode.removeAttr('data-pending');
+              if (body && body.reply_id) {
+                pendingNode.attr('data-reply-id', body.reply_id);
+              }
+              if (body && body.created_at) {
+                pendingNode.attr('data-created-at', body.created_at);
+              }
+              if (body && (body.time || body.created_at)) {
+                pendingNode.find('.chat-msg-time').text(body.time || formatChatClock(body.created_at));
+              }
+            }
             shouldAppendResponse = false;
-            setTimeout(loadOldChat, 100);
-            setTimeout(loadOldChat, 600);
+            // Soft refresh once so history stays consistent — no double optimistic+history bubble.
+            setTimeout(loadOldChat, 350);
             break;
 
           case 401:
@@ -479,10 +593,14 @@
         if (msg === '' && !hasFile) return;
 
         var fdFile = hasFile && fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
+        var nowIso = new Date().toISOString();
 
         // Optimistic UI: show message immediately, persist in background.
-        var pendingNode = buildChatNode(msg || (hasFile ? "{{ trans('theme.attachment') }}" : ''), false, null)
-          .attr('data-pending', '1');
+        ensureStorefrontDaySep(nowIso);
+        var pendingNode = buildChatNode(msg || (hasFile ? "{{ trans('theme.attachment') }}" : ''), false, null, {
+          createdAt: nowIso,
+          time: formatChatClock(nowIso),
+        }).attr('data-pending', '1');
         $("#chat_conversation").append(pendingNode);
         updateScroll();
         $("#chatBoxMsg").val('');
@@ -510,9 +628,13 @@
               credentials: 'same-origin',
               headers: chatSendHeadersForFetch(),
             }).then(function(res) {
-              handleChatSendComplete(res.status, pendingNode);
+              return res.json().then(function(json) {
+                handleChatSendComplete(res.status, pendingNode, json);
+              }).catch(function() {
+                handleChatSendComplete(res.status, pendingNode, null);
+              });
             }).catch(function() {
-              handleChatSendComplete(0, pendingNode);
+              handleChatSendComplete(0, pendingNode, null);
             });
           } else {
             $.ajax({
@@ -523,7 +645,7 @@
               contentType: false,
               beforeSend: setChatAjaxHeaders,
               complete: function(xhr) {
-                handleChatSendComplete(xhr.status, pendingNode);
+                handleChatSendComplete(xhr.status, pendingNode, xhr);
               },
             });
           }
@@ -540,7 +662,7 @@
           },
           beforeSend: setChatAjaxHeaders,
           complete: function(xhr) {
-            handleChatSendComplete(xhr.status, pendingNode);
+            handleChatSendComplete(xhr.status, pendingNode, xhr);
           },
         });
       }
@@ -581,30 +703,34 @@
 
             if (result) {
               var replies = result.replies || [];
-              var convMsg = String(result.message != null ? result.message : '').trim();
-              var skipFirstReply = false;
-              var firstAttachments = result.attachments;
-
-              if (replies.length && !replies[0].user_id) {
-                var r0 = String(replies[0].reply != null ? replies[0].reply : '').trim();
-                if (r0 === convMsg) {
-                  skipFirstReply = true;
-                  if (replies[0].attachments && replies[0].attachments.length) {
-                    firstAttachments = replies[0].attachments;
+              // conversation.message is an inbox preview (last text) — never render it as a bubble when replies exist.
+              if (!replies.length) {
+                var legacyAt = result.created_at || new Date().toISOString();
+                ensureStorefrontDaySep(legacyAt);
+                $("#chat_conversation").append(buildChatNode(result.message, false, result.attachments, {
+                  createdAt: legacyAt,
+                  time: formatChatClock(legacyAt),
+                }));
+              } else {
+                var lastDay = null;
+                replies.forEach(function(reply) {
+                  var at = reply.created_at || result.updated_at || new Date().toISOString();
+                  var day = chatDayKey(at);
+                  if (day && day !== lastDay) {
+                    lastDay = day;
+                    $("#chat_conversation").append(
+                      $('<div>').addClass('chat-day-sep').attr('data-day', day).append(
+                        $('<span>').text(formatChatDayLabel(at))
+                      )
+                    );
                   }
-                }
+                  $("#chat_conversation").append(buildChatNode(reply.reply, !!reply.user_id, reply.attachments, {
+                    replyId: reply.id,
+                    createdAt: at,
+                    time: formatChatClock(at),
+                  }));
+                });
               }
-
-              $("#chat_conversation").append(buildChatNode(result.message, false, firstAttachments));
-
-              replies.forEach(function(reply, idx) {
-                if (skipFirstReply && idx === 0) return;
-                if (reply.user_id) {
-                  $("#chat_conversation").append(buildChatNode(reply.reply, true, reply.attachments));
-                } else {
-                  $("#chat_conversation").append(buildChatNode(reply.reply, false, reply.attachments));
-                }
-              });
             } else {
               var response = $('<span>').addClass('chat_msg_item chat_msg_item_admin').text("{!! trans('theme.chat_welcome') !!}");
               agent_avatar.prependTo(response);
@@ -629,15 +755,25 @@
         var wsHost = '{{ config('chat_socket.client_host') }}';
         var wsPort = '{{ (int) config('chat_socket.port') }}';
         var wsPath = '{{ trim((string) config('chat_socket.client_path', '')) }}';
-        if (wsPath && wsPath.charAt(0) !== '/') {
-          wsPath = '/' + wsPath;
-        }
-        var wsUrl = wsScheme + '://' + wsHost + (wsPath ? wsPath : (':' + wsPort));
-        if (!wsPath && (wsScheme === 'wss' || wsScheme === 'https')) {
-          wsUrl = wsScheme + '://' + wsHost;
-        } else if (!wsPath && (wsScheme === 'ws' || wsScheme === 'http') && (String(wsPort) === '80' || !wsPort)) {
-          wsUrl = wsScheme + '://' + wsHost;
-        }
+        (function() {
+          wsScheme = String(wsScheme || 'ws').replace(/:$/, '');
+          wsHost = String(wsHost || '127.0.0.1').trim();
+          wsPath = String(wsPath || '').trim();
+          if (wsHost === '0.0.0.0' || wsHost.indexOf('0.0.0.0:') === 0) {
+            wsHost = '127.0.0.1' + (wsHost.indexOf(':') > -1 ? wsHost.substring(wsHost.indexOf(':')) : '');
+          }
+          if (wsPath && wsPath.charAt(0) !== '/') {
+            wsPath = '/' + wsPath;
+          }
+          var hostHasPort = /:\d+$/.test(wsHost);
+          window.__chatWsUrl = wsScheme + '://' + wsHost;
+          if (wsPath) {
+            window.__chatWsUrl += wsPath;
+          } else if (!hostHasPort && wsPort && !(wsScheme === 'ws' && String(wsPort) === '80') && !(wsScheme === 'wss' && String(wsPort) === '443')) {
+            window.__chatWsUrl += ':' + wsPort;
+          }
+        })();
+        var wsUrl = window.__chatWsUrl;
         var socket = null;
         function connectSocket() {
           try {
@@ -685,7 +821,15 @@
                   return $('<span>').addClass('chat_msg_item chat_msg_item_admin').text(message || '');
                 };
 
-            var response = renderer(result.text || '', true, result.attachments || []);
+            if (typeof window.ensureStorefrontDaySep === 'function') {
+              window.ensureStorefrontDaySep(result.created_at || new Date().toISOString());
+            }
+
+            var response = renderer(result.text || '', true, result.attachments || [], {
+              replyId: result.reply_id,
+              createdAt: result.created_at,
+              time: result.time || (typeof window.formatChatClock === 'function' ? window.formatChatClock(result.created_at) : ''),
+            });
             if (result.reply_id && response && response.attr) {
               response.attr('data-reply-id', result.reply_id);
             }
@@ -710,1146 +854,5 @@
   </script>
 @endif
 
-<style type="text/css">
-  #zcart_chat {
-    bottom: 0;
-    position: fixed;
-    margin: 1em;
-    right: 0;
-    z-index: 998;
-  }
+@include('liveChat::partials.livechat_styles')
 
-  #zcart_chat #chat_conversation {
-    display: block;
-  }
-
-  #zcart_chat .btn {
-    display: block;
-    margin: 10px auto;
-  }
-
-  #zcart_chat ul li {
-    list-style: none;
-  }
-
-  #zcart_chat .fchat {
-    display: block;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    text-align: center;
-    color: #f0f0f0;
-    margin: 25px auto 0;
-    box-shadow: 0 0 4px rgba(0, 0, 0, .14), 0 4px 8px rgba(0, 0, 0, .28);
-    cursor: pointer;
-    -webkit-transition: all .1s ease-out;
-    transition: all .1s ease-out;
-    position: relative;
-    z-index: 998;
-    overflow: hidden;
-    background: #42a5f5;
-  }
-
-  #zcart_chat .fchat>i {
-    font-size: 2em;
-    line-height: 55px;
-    -webkit-transition: all .2s ease-out;
-    -webkit-transition: all .2s ease-in-out;
-    transition: all .2s ease-in-out;
-  }
-
-  #zcart_chat .fchat:not(:last-child) {
-    width: 0;
-    height: 0;
-    margin: 20px auto 0;
-    opacity: 0;
-    visibility: hidden;
-    line-height: 40px;
-  }
-
-  #zcart_chat .fchat:not(:last-child)>i {
-    font-size: 1.4em;
-    line-height: 40px;
-  }
-
-  #zcart_chat .fchat:not(:last-child).is-visible {
-    width: 40px;
-    height: 40px;
-    margin: 15px auto 10;
-    opacity: 1;
-    visibility: visible;
-  }
-
-  #zcart_chat .fchat:nth-last-child(1) {
-    -webkit-transition-delay: 25ms;
-    transition-delay: 25ms;
-  }
-
-  #zcart_chat .fchat:not(:last-child):nth-last-child(2) {
-    -webkit-transition-delay: 20ms;
-    transition-delay: 20ms;
-  }
-
-  #zcart_chat .fchat:not(:last-child):nth-last-child(3) {
-    -webkit-transition-delay: 40ms;
-    transition-delay: 40ms;
-  }
-
-  #zcart_chat .fchat:not(:last-child):nth-last-child(4) {
-    -webkit-transition-delay: 60ms;
-    transition-delay: 60ms;
-  }
-
-  #zcart_chat .fchat:not(:last-child):nth-last-child(5) {
-    -webkit-transition-delay: 80ms;
-    transition-delay: 80ms;
-  }
-
-  #zcart_chat .fchat(:last-child):active,
-  #zcart_chat .fchat(:last-child):focus,
-  #zcart_chat .fchat(:last-child):hover {
-    box-shadow: 0 0 6px rgba(0, 0, 0, .16), 0 6px 12px rgba(0, 0, 0, .32);
-  }
-
-  /*Chatbox*/
-  #zcart_chat .chat {
-    position: fixed;
-    right: 85px;
-    bottom: 20px;
-    width: 400px;
-    font-size: 12px;
-    line-height: 22px;
-    font-family: 'Roboto';
-    font-weight: 500;
-    -webkit-font-smoothing: antialiased;
-    font-smoothing: antialiased;
-    display: none;
-    box-shadow: 1px 1px 100px 2px rgba(0, 0, 0, 0.22);
-    border-radius: 4px;
-    -webkit-transition: all .2s ease-out;
-    -webkit-transition: all .2s ease-in-out;
-    transition: all .2s ease-in-out;
-  }
-
-  #zcart_chat .chat_header {
-    /* margin: 10px; */
-    font-size: 13px;
-    font-family: 'Roboto';
-    font-weight: 500;
-    color: #f3f3f3;
-    height: 55px;
-    background: #42a5f5;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    padding-top: 8px;
-  }
-
-  #zcart_chat .chat_header2 {
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-  }
-
-  #zcart_chat .chat_header .span {
-    float: right;
-  }
-
-  #zcart_chat .chat.is-visible {
-    display: block;
-    -webkit-animation: zoomIn .2s cubic-bezier(.42, 0, .58, 1);
-    animation: zoomIn .2s cubic-bezier(.42, 0, .58, 1);
-  }
-
-  #zcart_chat .is-hide {
-    opacity: 0
-  }
-
-  #zcart_chat .chat_option {
-    float: left;
-    font-size: 15px;
-    list-style: none;
-    position: relative;
-    height: 100%;
-    width: 100%;
-    text-align: relative;
-    margin-right: 10px;
-    letter-spacing: 0.5px;
-    font-weight: 400
-  }
-
-  #zcart_chat .header_img {
-    background-color: #fff;
-    max-width: 56px;
-    border-radius: 50%;
-    line-height: 50px;
-    float: left;
-    margin: -20px 10px 10px 10px;
-    border: 3px solid rgba(0, 0, 0, 0.21);
-  }
-
-  #zcart_chat .header_img img {
-    border-radius: 50%;
-    max-width: 50px;
-    max-height: 50px;
-    text-align: center;
-    vertical-align: middle;
-  }
-
-  #zcart_chat .change_img img {
-    width: 35px;
-    margin: 0px 20px 0px 20px;
-  }
-
-  #zcart_chat .chat_option .agent {
-    font-size: 12px;
-    font-weight: 300;
-  }
-
-  #zcart_chat .chat_option .online {
-    opacity: 0.7;
-    font-size: 11px;
-    font-weight: 300;
-  }
-
-  #zcart_chat .chat_color {
-    display: block;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    margin: 10px;
-    float: left;
-  }
-
-  #zcart_chat p,
-  #zcart_chat a {
-    -webkit-animation: zoomIn .5s cubic-bezier(.42, 0, .58, 1);
-    animation: zoomIn .5s cubic-bezier(.42, 0, .58, 1);
-  }
-
-  #zcart_chat p {
-    display: block;
-    text-align: center;
-    padding: 10px 20px;
-    margin-top: 40px;
-    color: #888
-  }
-
-  #zcart_chat .chat_field:not(.chat-composer-msg) {
-    position: relative;
-    margin: 5px 0 5px 0;
-    width: 50%;
-    font-family: 'Roboto';
-    font-size: 12px;
-    line-height: 30px;
-    font-weight: 500;
-    color: #4b4b4b;
-    -webkit-font-smoothing: antialiased;
-    font-smoothing: antialiased;
-    border: none;
-    outline: none;
-    display: inline-block;
-  }
-
-  #zcart_chat .chat_field.chat_message {
-    height: 30px;
-    resize: none;
-    overflow-y: auto;
-    font-size: 13px;
-    font-weight: 400;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  /* Prevent numeric spinner controls in chat input area */
-  #zcart_chat input[type=number]::-webkit-outer-spin-button,
-  #zcart_chat input[type=number]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  #zcart_chat input[type=number] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-
-  #zcart_chat .chat_category {
-    text-align: left;
-  }
-
-  #zcart_chat .chat_category {
-    margin: 20px;
-    background: rgba(0, 0, 0, 0.03);
-    padding: 10px;
-  }
-
-  #zcart_chat .chat_category ul li {
-    width: 80%;
-    height: 30px;
-    background: #fff;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
-    border-radius: 3px;
-    border: 1px solid #e0e0e0;
-    font-size: 13px;
-    cursor: pointer;
-    line-height: 30px;
-    color: #888;
-    text-align: center;
-  }
-
-  #zcart_chat .chat_category li:hover {
-    background: #83c76d;
-    color: #fff;
-  }
-
-  #zcart_chat .chat_category li.active {
-    background: #83c76d;
-    color: #fff;
-  }
-
-  #zcart_chat .chat-product-share {
-    background: #fff;
-    border-top: 1px solid #eee;
-    padding: 8px;
-    box-sizing: border-box;
-  }
-
-  #zcart_chat .chat-product-share-title {
-    font-size: 11px;
-    color: #666;
-    margin-bottom: 6px;
-  }
-
-  #zcart_chat .chat-product-share-card {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: nowrap;
-  }
-
-  #zcart_chat .chat-product-share-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    margin-left: auto;
-  }
-
-  #zcart_chat .chat-product-share-dismiss {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    min-height: 30px;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #bbb;
-    border-radius: 50%;
-    background: #f0f0f0;
-    color: #333;
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1;
-    cursor: pointer;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  #zcart_chat .chat-product-share-dismiss:hover {
-    background: #e0e0e0;
-    border-color: #999;
-    color: #000;
-  }
-
-  #zcart_chat .chat-product-share-media img {
-    width: 34px;
-    height: 34px;
-    border-radius: 4px;
-    object-fit: cover;
-  }
-
-  #zcart_chat .chat-product-share-body {
-    flex: 1;
-    min-width: 0;
-  }
-
-  #zcart_chat .chat-product-share-name {
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #333;
-  }
-
-  #zcart_chat .chat-product-share-price {
-    font-size: 12px;
-    color: #ff6a00;
-    font-weight: 600;
-  }
-
-  #zcart_chat .chat-product-share-btn {
-    border: 0;
-    background: #ff7a00;
-    color: #fff;
-    border-radius: 16px;
-    padding: 6px 12px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  #zcart_chat .chat-attachment-preview {
-    display: none;
-    clear: both;
-    width: 100%;
-    box-sizing: border-box;
-    background: #f0f4f8;
-    border-top: 1px solid #dde3ea;
-    border-left: 3px solid #ff7a00;
-    padding: 8px 10px;
-  }
-
-  #zcart_chat .chat-attachment-preview.chat-attachment-preview--visible {
-    display: block;
-  }
-
-  #zcart_chat .chat-attachment-preview-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  #zcart_chat .chat-attachment-preview-label {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #666;
-  }
-
-  #zcart_chat .chat-attachment-preview-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    max-width: 100%;
-  }
-
-  #zcart_chat .chat-attachment-preview-img {
-    display: none;
-    width: 44px;
-    height: 44px;
-    border-radius: 4px;
-    object-fit: cover;
-    flex-shrink: 0;
-    border: 1px solid #ccc;
-    background: #fff;
-  }
-
-  #zcart_chat .chat-attachment-preview-icon {
-    display: none;
-    flex-shrink: 0;
-    width: 44px;
-    text-align: center;
-    color: #42a5f5;
-    font-size: 26px;
-    line-height: 44px;
-  }
-
-  #zcart_chat .chat-attachment-preview-name {
-    flex: 1;
-    min-width: 0;
-    font-size: 12px;
-    font-weight: 500;
-    color: #333;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: left;
-  }
-
-  #zcart_chat .chat-attachment-preview-remove {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #bbb;
-    border-radius: 50%;
-    background: #fff;
-    color: #555;
-    font-size: 18px;
-    line-height: 26px;
-    cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  #zcart_chat .chat-attachment-preview-remove:hover {
-    background: #eee;
-    color: #111;
-  }
-
-  #zcart_chat .chat-shared-product-wrap {
-    position: relative;
-    display: inline-block;
-    max-width: 100%;
-  }
-
-  #zcart_chat .chat-shared-product {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    min-width: 180px;
-  }
-
-  #zcart_chat .chat-shared-product-img {
-    width: 38px;
-    height: 38px;
-    max-width: 100%;
-    flex-shrink: 0;
-    border-radius: 4px;
-    object-fit: cover;
-    background: #fff;
-  }
-
-  #zcart_chat .chat-shared-product-body {
-    min-width: 0;
-  }
-
-  #zcart_chat .chat-shared-product-title {
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  #zcart_chat .chat-shared-product-price {
-    font-size: 11px;
-    color: #ff8c1a;
-    margin-top: 2px;
-  }
-
-  #zcart_chat .chat-shared-product-link {
-    display: inline-block;
-    margin-top: 3px;
-    font-size: 11px;
-    color: #fff;
-    text-decoration: underline;
-  }
-
-  #zcart_chat .chat-sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  #zcart_chat .chat-composer-inner {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  #zcart_chat .chat-composer-row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  #zcart_chat .fchat_field.chat-composer {
-    position: relative;
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 6px 8px 8px;
-    text-align: left;
-    background: #fff;
-    border-bottom-right-radius: 4px;
-    border-bottom-left-radius: 4px;
-    clear: both;
-  }
-
-  #zcart_chat .chat-composer-btn--attach {
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-  }
-
-  #zcart_chat .chat-composer-file-input {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    opacity: 0;
-    cursor: pointer;
-    font-size: 0;
-    line-height: 0;
-    z-index: 2;
-  }
-
-  #zcart_chat .chat-composer-btn {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-    color: #888;
-    cursor: pointer;
-    box-shadow: none;
-    line-height: 1;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  #zcart_chat label.chat-composer-btn {
-    margin-bottom: 0;
-  }
-
-  #zcart_chat .chat-composer-btn:hover,
-  #zcart_chat .chat-composer-btn:focus {
-    color: #42a5f5;
-    outline: none;
-  }
-
-  #zcart_chat .chat-composer-btn-icon {
-    font-size: 18px;
-    line-height: 1;
-  }
-
-  #zcart_chat .chat-composer-msg {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: auto !important;
-    margin: 0 !important;
-  }
-
-  #zcart_chat .fchat_field:not(.chat-composer) {
-    width: 100%;
-    display: inline-block;
-    text-align: center;
-    background: #fff;
-    border-bottom-right-radius: 4px;
-    border-bottom-left-radius: 4px;
-  }
-
-  #zcart_chat .fchat_field2 {
-    bottom: 0px;
-    position: absolute;
-    border-bottom-right-radius: 0px;
-    border-bottom-left-radius: 0px;
-    z-index: 999;
-  }
-
-  #zcart_chat .fchat_field a,
-  #zcart_chat .fchat_field button {
-    display: inline-block;
-    text-align: center;
-    border: 0;
-    background: transparent;
-    outline: none;
-    box-shadow: none;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  #zcart_chat .fchat_field label.chat-composer-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    background: transparent;
-    outline: none;
-    box-shadow: none;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  #zcart_chat #fchat_camera {
-    float: left;
-    background: rgba(0, 0, 0, 0);
-  }
-
-  #zcart_chat .chat-attachment-block {
-    margin-bottom: 4px;
-    max-width: 100%;
-    min-width: 0;
-  }
-
-  #zcart_chat .chat-attachment-block .chat-att-media {
-    display: block;
-    max-width: 100%;
-    line-height: 0;
-  }
-
-  #zcart_chat .chat-att-thumb {
-    max-width: 100%;
-    width: auto;
-    height: auto;
-    max-height: 220px;
-    border-radius: 4px;
-    object-fit: contain;
-    vertical-align: middle;
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  #zcart_chat .chat-att-link {
-    font-size: 11px;
-    color: #42a5f5;
-    word-break: break-all;
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item .chat-attachment-block {
-    max-width: 100%;
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item .chat-att-thumb {
-    max-width: 100%;
-    height: auto;
-  }
-
-  #zcart_chat #chat_conversation {
-    position: relative;
-    background: #fff;
-    margin: 0px;
-    height: 300px;
-    min-height: 0;
-    font-size: 12px;
-    line-height: 18px;
-    overflow-y: auto;
-    width: 100%;
-    float: right;
-    padding: 10px 0;
-  }
-
-  #zcart_chat .chat_converse_full_screen {
-    height: 100%;
-    max-height: 800px
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item {
-    position: relative;
-    margin: 2px 0;
-    padding: 8px 10px;
-    max-width: 65%;
-    display: block;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    -webkit-animation: zoomIn .5s cubic-bezier(.42, 0, .58, 1);
-    animation: zoomIn .5s cubic-bezier(.42, 0, .58, 1);
-    clear: both;
-    z-index: 999;
-  }
-
-  #zcart_chat .status {
-    margin: 45px -50px 0 0;
-    float: right;
-    display: block;
-    font-size: 11px;
-    opacity: 0.3;
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item .chat_avatar {
-    height: 34px;
-    line-height: 34px;
-    border: 1px solid #d3d3d3;
-    position: absolute;
-    top: 0;
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item.chat_msg_item_admin .chat_avatar {
-    left: -42px;
-    background: rgba(0, 0, 0, 0.03);
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item.chat_msg_item_user .chat_avatar {
-    right: -42px;
-    background: rgba(0, 0, 0, 0.6);
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item .chat_avatar,
-  #zcart_chat .chat_avatar img {
-    max-width: 34px;
-    max-height: 34px;
-    text-align: center;
-    vertical-align: middle;
-    border-radius: 50%;
-    opacity: 0.9;
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item.chat_msg_item_admin {
-    margin-left: 47px;
-    float: left;
-    border-radius: 10px 10px 10px 0px;
-    background: rgba(0, 0, 0, 0.07);
-    color: #666;
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item.chat_msg_item_user {
-    margin-right: 10px;
-    float: right;
-    border-radius: 10px 10px 0px 10px;
-    background: #42a5f5;
-    color: #eceff1;
-  }
-
-  #zcart_chat .chat .chat_converse .chat_msg_item.chat_msg_item_admin:before {
-    content: '';
-    position: absolute;
-    top: 15px;
-    left: -12px;
-    z-index: 998;
-    border: 6px solid transparent;
-    border-right-color: rgba(255, 255, 255, .4);
-  }
-
-  #zcart_chat .chat_form .get-notified label {
-    color: #077ad6;
-    font-weight: 600;
-    font-size: 11px;
-  }
-
-  #zcart_chat input {
-    position: relative;
-    width: 90%;
-    font-family: 'Roboto';
-    font-size: 12px;
-    line-height: 20px;
-    font-weight: 500;
-    color: #4b4b4b;
-    -webkit-font-smoothing: antialiased;
-    font-smoothing: antialiased;
-    outline: none;
-    background: #fff;
-    display: inline-block;
-    resize: none;
-    padding: 5px;
-    border-radius: 3px;
-  }
-
-  #zcart_chat .chat_form .get-notified input {
-    margin: 2px 0 0 0;
-    border: 1px solid #83c76d;
-  }
-
-  #zcart_chat .chat_form .get-notified i {
-    background: #83c76d;
-    width: 30px;
-    height: 32px;
-    font-size: 18px;
-    color: #fff;
-    line-height: 30px;
-    font-weight: 600;
-    text-align: center;
-    margin: 2px 0 0 -30px;
-    position: absolute;
-    border-radius: 3px;
-  }
-
-  #zcart_chat .chat_form .message_form {
-    margin: 10px 0 0 0;
-  }
-
-  #zcart_chat .chat_form .message_form input {
-    margin: 5px 0 5px 0;
-    border: 1px solid #e0e0e0;
-  }
-
-  #zcart_chat .chat_form .message_form textarea {
-    margin: 5px 0 5px 0;
-    border: 1px solid #e0e0e0;
-    position: relative;
-    width: 90%;
-    font-family: 'Roboto';
-    font-size: 12px;
-    line-height: 20px;
-    font-weight: 500;
-    color: #4b4b4b;
-    -webkit-font-smoothing: antialiased;
-    font-smoothing: antialiased;
-    outline: none;
-    background: #fff;
-    display: inline-block;
-    resize: none;
-    padding: 5px;
-    border-radius: 3px;
-  }
-
-  #zcart_chat .chat_form .message_form button {
-    margin: 5px 0 5px 0;
-    border: 1px solid #e0e0e0;
-    position: relative;
-    width: 95%;
-    font-family: 'Roboto';
-    font-size: 12px;
-    line-height: 20px;
-    font-weight: 500;
-    color: #fff;
-    -webkit-font-smoothing: antialiased;
-    font-smoothing: antialiased;
-    outline: none;
-    background: #fff;
-    display: inline-block;
-    resize: none;
-    padding: 5px;
-    border-radius: 3px;
-    background: #83c76d;
-    cursor: pointer;
-  }
-
-  #zcart_chat strong.chat_time {
-    padding: 0 1px 1px 0;
-    font-weight: 500;
-    font-size: 8px;
-    display: block;
-  }
-
-  /*Chatbox scrollbar*/
-
-  /*::-webkit-scrollbar {
- width: 6px;
- }
-
- ::-webkit-scrollbar-track {
- border-radius: 0;
- }
-
- ::-webkit-scrollbar-thumb {
- margin: 2px;
- border-radius: 10px;
- background: rgba(0, 0, 0, 0.2);
- }*/
-  /*Element state*/
-
-  #zcart_chat .is-active {
-    -webkit-transform: rotate(180deg);
-    transform: rotate(180deg);
-    -webkit-transition: all 1s ease-in-out;
-    transition: all 1s ease-in-out;
-  }
-
-  #zcart_chat .is-float {
-    box-shadow: 0 0 6px rgba(0, 0, 0, .16), 0 6px 12px rgba(0, 0, 0, .32);
-  }
-
-  #zcart_chat .is-loading {
-    display: block;
-    -webkit-animation: load 1s cubic-bezier(0, .99, 1, 0.6) infinite;
-    animation: load 1s cubic-bezier(0, .99, 1, 0.6) infinite;
-  }
-
-  /*Animation*/
-
-  @-webkit-keyframes zoomIn {
-    0% {
-      -webkit-transform: scale(0);
-      transform: scale(0);
-      opacity: 0.0;
-    }
-
-    100% {
-      -webkit-transform: scale(1);
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  @keyframes zoomIn {
-    0% {
-      -webkit-transform: scale(0);
-      transform: scale(0);
-      opacity: 0.0;
-    }
-
-    100% {
-      -webkit-transform: scale(1);
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  @-webkit-keyframes load {
-    0% {
-      -webkit-transform: scale(0);
-      transform: scale(0);
-      opacity: 0.0;
-    }
-
-    50% {
-      -webkit-transform: scale(1.5);
-      transform: scale(1.5);
-      opacity: 1;
-    }
-
-    100% {
-      -webkit-transform: scale(1);
-      transform: scale(1);
-      opacity: 0;
-    }
-  }
-
-  @keyframes load {
-    0% {
-      -webkit-transform: scale(0);
-      transform: scale(0);
-      opacity: 0.0;
-    }
-
-    50% {
-      -webkit-transform: scale(1.5);
-      transform: scale(1.5);
-      opacity: 1;
-    }
-
-    100% {
-      -webkit-transform: scale(1);
-      transform: scale(1);
-      opacity: 0;
-    }
-  }
-
-  /* SMARTPHONES PORTRAIT */
-
-  @media only screen and (min-width: 300px) {
-    #zcart_chat .chat {
-      width: 250px;
-    }
-  }
-
-  /* SMARTPHONES LANDSCAPE */
-  @media only screen and (min-width: 480px) {
-    #zcart_chat .chat {
-      width: 300px;
-    }
-
-    #zcart_chat .chat_field:not(.chat-composer-msg) {
-      width: 65%;
-    }
-  }
-
-  /* TABLETS PORTRAIT */
-  @media only screen and (min-width: 768px) {
-    #zcart_chat .chat {
-      width: 300px;
-    }
-
-    #zcart_chat .chat_field:not(.chat-composer-msg) {
-      width: 65%;
-    }
-  }
-
-  /* TABLET LANDSCAPE / DESKTOP */
-  @media only screen and (min-width: 1024px) {
-    #zcart_chat .chat {
-      width: 300px;
-    }
-
-    #zcart_chat .chat_field:not(.chat-composer-msg) {
-      width: 65%;
-    }
-  }
-
-  /*Color Options*/
-
-  #zcart_chat .blue .fchat {
-    background: #42a5f5;
-    color: #fff;
-  }
-
-  #zcart_chat .blue .chat {
-    background: #42a5f5;
-    color: #999;
-  }
-
-
-  /* Ripple */
-
-  #zcart_chat .ink {
-    display: block;
-    position: absolute;
-    background: rgba(38, 50, 56, 0.4);
-    border-radius: 100%;
-    -moz-transform: scale(0);
-    -ms-transform: scale(0);
-    webkit-transform: scale(0);
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  }
-
-  /*animation effecid	#zcart_chat .ink.animate {
- -webkit-animation: ripple 0.5s ease-in-out;
-  animation: ripple 0.5s ease-in-out;
- }
-
- @-webkit-keyframes ripple {
- /*scale the element to 250% to safely cover the entire link and fade it out*/
-
-  100% {
-    opacity: 0;
-    -moz-transform: scale(5);
-    -ms-transform: scale(5);
-    webkit-transform: scale(5);
-    -webkit-transform: scale(5);
-    transform: scale(5);
-  }
-  }
-
-  @keyframes ripple {
-    /*scale the element to 250% to safely cover the entire link and fade it out*/
-
-    100% {
-      opacity: 0;
-      -moz-transform: scale(5);
-      -ms-transform: scale(5);
-      webkit-transform: scale(5);
-      -webkit-transform: scale(5);
-      transform: scale(5);
-    }
-  }
-
-  ::-webkit-input-placeholder {
-    /* Chrome */
-    color: #bbb;
-  }
-
-  :-ms-input-placeholder {
-    /* IE 10+ */
-    color: #bbb;
-  }
-
-  ::-moz-placeholder {
-    /* Firefox 19+ */
-    color: #bbb;
-  }
-
-  :-moz-placeholder {
-    /* Firefox 4 - 18 */
-    color: #bbb;
-  }
-</style>

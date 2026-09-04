@@ -11,7 +11,7 @@
   "license": "Copyright reserved to the Incevio",
   "dependency": "",
   "warning": "This plugin requires <a href='https://pusher.com/' target='_blank'>Pusher</a> to sync chat messages on both ends.",
-  "active": false,
+  "active": true,
   "provider": "LiveChat\\LiveChatServiceProvider",
   "compatible": "2.13.0",
   "version": "1.1.0"

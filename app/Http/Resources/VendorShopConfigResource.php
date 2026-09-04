@@ -43,7 +43,7 @@ class VendorShopConfigResource extends JsonResource
             'notify_new_order' => (bool) $this->notify_new_order,
             'notify_abandoned_checkout' => (bool) $this->notify_abandoned_checkout,
             'notify_new_disput' => (bool) $this->notify_new_disput,
-            'enable_live_chat' => (bool) $this->enable_live_chat,
+            'enable_live_chat' => true,
             'notify_new_chat' => (bool) $this->notify_new_chat,
             'maintenance_mode' => (bool) $this->maintenance_mode,
             'pending_verification' => (bool) $this->pending_verification,

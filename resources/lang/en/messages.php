@@ -301,7 +301,6 @@ return [
     'misconfigured_plugin' => 'The :package needs to configure correctly! Please check the documentation and configure it correctly or contact support if need help.',
     'misconfigured_payment' => 'The :payment is misconfigured and needs to configure correctly! Please check the documentation and configure it correctly or contact support if need help.',
     'manual_payment_configure_help' => 'Set the manual payment instructions on settings. Without this configuration manual payment will not work.',
-    'confirm_regenerate_key' => 'Regenerating the application keys will enforce you to rebuild your application apps otherwise your apps won\'n work',
     'custom_css_added' => 'Custom css added successfully',
     'custom_css_updated' => 'Custom css updated successfully',
     'custom_css_deleted' => 'Custom css deleted successfully',

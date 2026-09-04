@@ -93,6 +93,8 @@
                 </div>
               </div>
 
+              @include('merchant.config.partials._shipping_settings')
+
               @include('merchant.config.partials._toggle_row', [
                 'field' => 'auto_archive_order',
                 'label' => trans('app.auto_archive_order'),

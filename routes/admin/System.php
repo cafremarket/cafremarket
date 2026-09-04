@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\ApplicationKeyController;
 use App\Http\Controllers\Admin\SystemController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,16 +54,4 @@ Route::name('system.')->prefix('system')->group(function () {
         SystemController::class,
         'backup',
     ])->name('backup');
-
 });
-
-// Application key for mobile app
-Route::get('generate-key', [
-    ApplicationKeyController::class,
-    'confirm',
-])->name('key.confirm');
-
-Route::post('generate-key', [
-    ApplicationKeyController::class,
-    'generate',
-])->name('key.generate');

@@ -193,12 +193,6 @@
           </li>
         </ul>
 
-        @if ($trust_badge = get_trust_badge_url())
-          <div class="text-center my-4">
-            <img src="{{ $trust_badge }}" alt="{{ trans('theme.trust_badge') }}"/>
-          </div>
-        @endif
-
         <div class="text-center mb-3 d-flex justify-content-around checkout-btns">
           <a class="btn btn-primary py-2 px-4" href="{{ route('cart.index') }}">
             {{ trans('theme.button.update_cart') }}
@@ -224,53 +218,8 @@
                 <span id="checkoutpage_shipping_form_title">{{ trans('theme.ship_to') }}</span>
               </label>
             </div>
-
-            @if ($shop->isPickupEnabled())
-              <!-- Pickup option shows only when shop has a warehouse and pickup is enabled by admin -->
-              <div class="col-6 p-0 justify-content-between">
-                <input class="form-check-input" type="radio" name="fulfilment_type" id="fulfilment_type_pickup" value="{{ \App\Models\Order::FULFILMENT_TYPE_PICKUP }}">
-                <label for="fulfilment_type_pickup">
-                  <i class="far fa-shopping-basket"></i>
-                  <span id="checkoutpage_shipping_form_title">{{ trans('theme.pickup_from') }}</span>
-                </label>
-              </div>
-            @endif
           </div>
         @endif
-
-        <div class="form-group mb-4 hidden" id="pickup_details">
-          <div class="row warehouse-address-list">
-            @forelse ($shop->warehouses as $warehouse)
-              <div class="col-sm-12 col-md-6 p-0-{{ $loop->iteration % 2 == 1 ? 'right' : 'left' }} textClass">
-                <div class="address-list-item">
-                  <i class="fa fa-home"></i><strong> {!! $warehouse->name !!} </strong><br>
-                  <i class="fa fa-map-marker"></i> <em>{{ trans('app.address') }} :</em>
-                  {!! $warehouse->address->toHtml(', ', false) !!}
-
-                  <p><em>{{ trans('theme.pickup_time') }} :</em></p>
-
-                  @if (is_array($warehouse->business_days))
-                    <i class="fa fa-calendar"></i> {{ implode(', ', $warehouse->business_days) }}<br />
-                  @endif
-
-                  @if ($warehouse->opening_time && $warehouse->close_time)
-                    <i class="fa fa-clock-o"></i> {{ $warehouse->opening_time }} - {{ $warehouse->close_time }}
-                  @endif
-
-                  <input type="radio" class="warehouse_id" name="warehouse_id" value="{{ $warehouse->id }}">
-                </div>
-              </div>
-              @if ($loop->iteration % 2 == 0)
-                <div class="clearfix"></div>
-              @endif
-            @empty
-              <div class="col-sm-12">
-                <h4 class="my-3 text-info">{{ trans('theme.no_pickup_options') }}</h4>
-              </div>
-            @endforelse
-          </div>
-          <hr class="dotted" />
-        </div>
 
         @if (isset($customer))
           {{ trans('theme.customer_address') }}

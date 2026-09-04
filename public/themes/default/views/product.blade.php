@@ -42,12 +42,8 @@
 @endsection
 
 @section('scripts')
-  @if (is_incevio_package_loaded('liveChat') && is_chat_enabled($item->shop))
-    @if (isset($item->shop->fb_page_id))
-      @include('liveChat::facebook.script', ['fb_page_id' => $item->shop->fb_page_id]);
-    @else
-      @include('liveChat::livechat', ['shop' => $item->shop, 'agent' => $item->shop->owner, 'agent_status' => trans('theme.online'), 'product' => $item])
-    @endif
+  @if ($item->shop)
+    @include('liveChat::livechat', ['shop' => $item->shop, 'agent' => $item->shop->owner ?? $item->shop->config->supportAgent ?? Auth::user(), 'agent_status' => trans('theme.online'), 'product' => $item])
   @endif
 
   @include('theme::modals.ship_to')

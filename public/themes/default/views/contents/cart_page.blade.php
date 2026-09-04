@@ -16,7 +16,33 @@
         <p>{{ trans('theme.shopping_cart') }}</p>
       </header>
 
-      @foreach ($carts as $cart)
+      @if ($carts->count() > 1)
+        <div class="sf-checkout__stores">
+          <p class="sf-checkout__stores-hint">{{ trans('theme.checkout_one_store_at_a_time') }}</p>
+          <div class="sf-checkout__store-tabs" role="tablist">
+            @foreach ($carts as $storeCart)
+              <a href="{{ route('cart.index', $storeCart->id) }}"
+                 class="sf-checkout__store-tab {{ optional($activeCart)->id == $storeCart->id ? 'is-active' : '' }} {{ !empty($storeCart->out_of_range) ? 'is-oor' : '' }}"
+                 role="tab"
+                 aria-selected="{{ optional($activeCart)->id == $storeCart->id ? 'true' : 'false' }}">
+                <span class="sf-checkout__store-tab-name">{{ optional($storeCart->shop)->name ?? ('Store #'.$storeCart->shop_id) }}</span>
+                <span class="sf-checkout__store-tab-meta">{{ $storeCart->item_count }} {{ \Illuminate\Support\Str::plural('item', $storeCart->item_count) }}</span>
+                @if (!empty($storeCart->needs_delivery_location))
+                  <span class="sf-checkout__store-badge sf-checkout__store-badge--warn">{{ trans('theme.set_location') ?? 'Set location' }}</span>
+                @elseif (!empty($storeCart->out_of_range))
+                  <span class="sf-checkout__store-badge sf-checkout__store-badge--danger">{{ trans('theme.out_of_delivery_range') }}</span>
+                @endif
+              </a>
+            @endforeach
+          </div>
+        </div>
+      @endif
+
+      @php
+        $cart = $activeCart ?? $carts->first();
+      @endphp
+
+      @if ($cart)
         @php
           $cart_total = 0;
           $shop = $cart->shop;
@@ -54,11 +80,32 @@
               }
               $selectedAddress = $pre_select ?: $customer->addresses->first();
           }
+
+          $cartBlocked = !empty($cart->out_of_range) || !empty($cart->needs_delivery_location);
         @endphp
+
+        @if (!empty($cart->needs_delivery_location))
+          <div class="notice notice-warning notice-sm mb-3 sf-checkout__oor">
+            <strong>{{ trans('theme.warning') }}</strong>
+            {{ trans('theme.notify.set_location_for_delivery') }}
+          </div>
+        @elseif (!empty($cart->out_of_range))
+          <div class="notice notice-danger notice-sm mb-3 sf-checkout__oor">
+            <strong>{{ trans('theme.out_of_delivery_range') }}</strong>
+            {{ trans('theme.notify.product_out_of_delivery_range', [
+              'store' => optional($shop)->name ?? 'This store',
+              'distance' => $cart->delivery_distance_km ?? '—',
+              'radius' => $cart->service_radius_km ?? '—',
+            ]) }}
+            @if ($carts->count() > 1)
+              <div class="mt-2">{{ trans('theme.notify.switch_store_to_checkout') }}</div>
+            @endif
+          </div>
+        @endif
 
         {!! Form::open(['route' => ['order.create', $cart], 'id' => 'formId' . $cart->id, 'name' => 'checkoutForm', 'files' => true, 'data-toggle' => 'validator', 'autocomplete' => 'off', 'novalidate', 'class' => 'sf-checkout__form']) !!}
 
-        <div class="row shopping-cart-wrapper sf-checkout__card mb-4 {{ $expressId == $cart->id ? 'selected' : '' }}" id="cartId{{ $cart->id }}" data-cart="{{ $cart->id }}" data-cart-type="{{ $cart->is_digital ? 'digital' : 'physical' }}">
+        <div class="row shopping-cart-wrapper sf-checkout__card mb-4 selected" id="cartId{{ $cart->id }}" data-cart="{{ $cart->id }}" data-cart-type="{{ $cart->is_digital ? 'digital' : 'physical' }}" data-out-of-range="{{ !empty($cart->out_of_range) ? '1' : '0' }}">
           <div class="col-lg-8 px-3 py-3">
             {{ Form::hidden('cart_id', $cart->id, ['id' => 'checkout-id']) }}
             {{ Form::hidden('cart_id_ref', $cart->id, ['id' => 'cart-id' . $cart->id]) }}
@@ -85,6 +132,9 @@
                   {!! $shop->getQualifiedName(10) !!}
                 </a>
               </div>
+              @if ($carts->count() > 1)
+                <span class="sf-checkout__change-store text-muted small">{{ trans('theme.change_store_hint') }}</span>
+              @endif
             </div>
 
             <div class="table-responsive">
@@ -218,40 +268,8 @@
                     <input class="form-check-input" type="radio" name="fulfilment_type" id="fulfilment_type_deliver" value="{{ \App\Models\Order::FULFILMENT_TYPE_DELIVER }}" checked>
                     <span><i class="far fa-shipping-fast"></i> {{ trans('theme.ship_to') }}</span>
                   </label>
-                  @if ($shop->isPickupEnabled())
-                    <label class="sf-checkout__fulfil-opt">
-                      <input class="form-check-input" type="radio" name="fulfilment_type" id="fulfilment_type_pickup" value="{{ \App\Models\Order::FULFILMENT_TYPE_PICKUP }}">
-                      <span><i class="far fa-shopping-basket"></i> {{ trans('theme.pickup_from') }}</span>
-                    </label>
-                  @endif
                 </div>
               @endif
-
-              <div class="form-group mb-4 hidden" id="pickup_details">
-                <div class="row warehouse-address-list">
-                  @forelse ($shop->warehouses ?? [] as $warehouse)
-                    <div class="col-sm-12 col-md-6 textClass">
-                      <div class="address-list-item">
-                        <i class="fa fa-home"></i><strong> {!! $warehouse->name !!} </strong><br>
-                        <i class="fa fa-map-marker"></i> <em>{{ trans('app.address') }} :</em>
-                        {!! $warehouse->address->toHtml(', ', false) !!}
-                        <p><em>{{ trans('theme.pickup_time') }} :</em></p>
-                        @if (is_array($warehouse->business_days))
-                          <i class="fa fa-calendar"></i> {{ implode(', ', $warehouse->business_days) }}<br />
-                        @endif
-                        @if ($warehouse->opening_time && $warehouse->close_time)
-                          <i class="fa fa-clock-o"></i> {{ $warehouse->opening_time }} - {{ $warehouse->close_time }}
-                        @endif
-                        <input type="radio" class="warehouse_id" name="warehouse_id" value="{{ $warehouse->id }}">
-                      </div>
-                    </div>
-                  @empty
-                    <div class="col-sm-12">
-                      <h4 class="my-3 text-info">{{ trans('theme.no_pickup_options') }}</h4>
-                    </div>
-                  @endforelse
-                </div>
-              </div>
 
               @if (isset($customer) && $customer)
                 <div class="sf-checkout__address-head">
@@ -392,7 +410,13 @@
             </div>
 
             <div class="cart-payment-options sf-checkout__pay">
-              @if (allow_checkout())
+              @if ($cartBlocked)
+                <button type="button" class="btn btn-danger btn-block" disabled>
+                  {{ !empty($cart->needs_delivery_location)
+                    ? (trans('theme.notify.set_location_for_delivery') ?: 'Set your delivery location')
+                    : (trans('theme.out_of_delivery_range') ?: 'Out of delivery range') }}
+                </button>
+              @elseif (allow_checkout())
                 @include('partials.payment_options', ['shop' => $shop, 'cart' => $cart, 'customer' => $customer, 'paymentMethods' => $cartPaymentMethods])
               @elseif (is_panel_user_on_storefront())
                 <button type="button" class="btn btn-primary btn-block" disabled title="{{ panel_user_storefront_message() }}">
@@ -405,12 +429,6 @@
               @endif
             </div>
 
-            @if ($trust_badge = get_trust_badge_url())
-              <div class="text-center my-4">
-                <img src="{{ $trust_badge }}" alt="{{ trans('theme.trust_badge') }}"/>
-              </div>
-            @endif
-
             <a class="btn btn-default btn-block" href="{{ url('/') }}">{{ trans('theme.button.continue_shopping') }}</a>
           </div>
         </div>
@@ -420,7 +438,7 @@
         @if (config('services.google.gtm_container_id'))
           @include('scripts.dataLayer.cart_page')
         @endif
-      @endforeach
+      @endif
     @else
       <div class="row">
         <div class="col-12">

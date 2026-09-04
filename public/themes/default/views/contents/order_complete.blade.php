@@ -1,120 +1,148 @@
-<section>
+@php
+  $orders = isset($orders) ? $orders : [$order];
+@endphp
+
+<section class="sf-order-confirm">
   <div class="container">
-    <div class="row">
-      <div class="col-md-8 col-md-offset-2">
-        @php
-          $orders = isset($orders) ? $orders : [$order]; // Ensure $orders is always an array
-        @endphp
-
-        @foreach ($orders as $order)
-          @php
-            $is_mpesa_pending = (optional($order->paymentMethod)->code === 'mpesa' && !$order->isPaid());
-            $payment_instructions = null;
-            if (optional($order->paymentMethod)->type == \App\Models\PaymentMethod::TYPE_MANUAL) {
-                if (vendor_get_paid_directly()) {
-                    $payment_method = $order->shop->config->manualPaymentMethods->where('id', $order->payment_method_id)->first();
-
-                    $payment_instructions = optional($payment_method)->pivot->payment_instructions;
-                } else {
-                    $payment_instructions = get_from_option_table('wallet_payment_instructions_' . $order->paymentMethod->code);
-                }
+    @foreach ($orders as $order)
+      @php
+        $is_mpesa_pending = optional($order->paymentMethod)->code === 'mpesa' && ! $order->isPaid();
+        $payment_instructions = null;
+        if (optional($order->paymentMethod)->type == \App\Models\PaymentMethod::TYPE_MANUAL) {
+            if (vendor_get_paid_directly()) {
+                $payment_method = optional($order->shop->config)->manualPaymentMethods
+                    ->where('id', $order->payment_method_id)
+                    ->first();
+                $payment_instructions = optional($payment_method)->pivot->payment_instructions;
+            } else {
+                $payment_instructions = get_from_option_table('wallet_payment_instructions_' . $order->paymentMethod->code);
             }
-          @endphp
+        }
+        $orderTransactionFee = (float) ($order->subscription_transaction_fee ?? 0) + (float) ($order->platform_payment_fee ?? 0);
+        $orderTotalPaid = round((float) $order->grand_total + $orderTransactionFee, 2);
+      @endphp
 
+      <div class="sf-order-confirm__hero {{ $is_mpesa_pending ? 'is-pending' : 'is-success' }}">
+        <div class="sf-order-confirm__icon" aria-hidden="true">
           @if ($is_mpesa_pending)
-            <p class="lead">@lang('mpesa::lang.complete_on_phone')</p>
-            <p class="text-muted">@lang('mpesa::lang.redirect_when_paid')</p>
-            <p class="text-info my-4">
-              <strong>@lang('theme.payment_status'): </strong> @lang('mpesa::lang.waiting_for_payment')
-            </p>
+            <i class="fas fa-mobile-alt"></i>
           @else
-            <p class="lead">@lang('theme.notify.order_placed_thanks')</p>
+            <i class="fas fa-check"></i>
           @endif
-
-          @if ($payment_instructions)
-            <p class="text-primary mb-4">
-              <strong>@lang('theme.payment_instruction'): </strong>
-              {!! $payment_instructions !!}
-            </p>
+        </div>
+        <div class="sf-order-confirm__hero-copy">
+          @if ($is_mpesa_pending)
+            <h1>@lang('mpesa::lang.complete_on_phone')</h1>
+            <p>@lang('mpesa::lang.redirect_when_paid')</p>
+          @else
+            <h1>@lang('theme.notify.order_placed_thanks')</h1>
+            <p>@lang('theme.order_confirm_subtitle')</p>
           @endif
+        </div>
+      </div>
 
-          @if (!$is_mpesa_pending)
-          <p class="text-danger my-4">
-            <strong>@lang('theme.payment_status'): </strong> {!! $order->paymentStatusName() !!}
-          </p>
-          @endif
-
-          @if ($order->is_digital)
-            <p class="my-4">
-              @if (\Auth::guard('customer')->check())
-                @lang('messages.download_link_loggedin_customer')
+      <div class="sf-order-confirm__meta">
+        <div class="sf-order-confirm__meta-item">
+          <span>@lang('theme.order_id')</span>
+          <strong>{{ $order->order_number }}</strong>
+        </div>
+        <div class="sf-order-confirm__meta-item">
+          <span>@lang('theme.payment_status')</span>
+          <strong>
+            @if ($is_mpesa_pending)
+              @lang('mpesa::lang.waiting_for_payment')
+            @else
+              {!! $order->paymentStatusName() !!}
+            @endif
+          </strong>
+        </div>
+        <div class="sf-order-confirm__meta-item">
+          <span>@lang('theme.order_amount')</span>
+          <strong>{{ get_formated_currency($orderTransactionFee > 0 ? $orderTotalPaid : $order->grand_total, 2, $order->currency_id) }}</strong>
+        </div>
+        @if ($order->shop)
+          <div class="sf-order-confirm__meta-item">
+            <span>@lang('theme.sold_by')</span>
+            <strong>
+              @if ($order->shop->slug)
+                <a href="{{ route('show.store', $order->shop->slug) }}">{{ $order->shop->name }}</a>
               @else
-                @lang('messages.download_link_guest_customer')
+                {{ $order->shop->name }}
               @endif
-            </p>
+            </strong>
+          </div>
+        @endif
+      </div>
 
-            @foreach ($order->inventories as $item)
-              <h3>{{ trans('theme.download_links_of') . ': ' . $item->title }}</h3>
+      @if ($payment_instructions)
+        <div class="sf-order-confirm__notice">
+          <strong>@lang('theme.payment_instruction'):</strong>
+          {!! $payment_instructions !!}
+        </div>
+      @endif
 
-              <ul class="my-3">
+      @include('theme::partials.order_delivery_location', ['order' => $order])
+
+      @if ($order->is_digital)
+        <div class="sf-order-confirm__panel">
+          <h3>@lang('theme.download')</h3>
+          <p class="text-muted">
+            @if (\Auth::guard('customer')->check())
+              @lang('messages.download_link_loggedin_customer')
+            @else
+              @lang('messages.download_link_guest_customer')
+            @endif
+          </p>
+          @foreach ($order->inventories as $item)
+            <div class="sf-order-confirm__download">
+              <h4>{{ trans('theme.download_links_of') . ': ' . $item->title }}</h4>
+              <ul>
                 @foreach ($item->attachments as $attachment)
+                  @php
+                    $downloadUrl = route('order.attachment.download', [
+                        'attachment' => $attachment,
+                        'order' => $order->id,
+                        'inventory' => $item->id,
+                    ]);
+                  @endphp
                   <li>
-                    {{ route('order.attachment.download', ['attachment' => $attachment, 'order' => $order->id, 'inventory' => $item->id]) }}
-                    <button class="btn btn-sm ml-3" onclick="navigator.clipboard.writeText('{{ route('order.attachment.download', ['attachment' => $attachment, 'order' => $order->id, 'inventory' => $item->id]) }}')">{{ trans('theme.copy_to_clipboard') }}</button>
+                    <a href="{{ $downloadUrl }}">{{ $attachment->name ?? $downloadUrl }}</a>
+                    <button type="button" class="btn btn-sm btn-default" onclick="navigator.clipboard.writeText('{{ $downloadUrl }}')">
+                      {{ trans('theme.copy_to_clipboard') }}
+                    </button>
                   </li>
                 @endforeach
               </ul>
+            </div>
+          @endforeach
+        </div>
+      @else
+        <div class="sf-order-confirm__panel">
+          <h3>@lang('theme.ordered_items')</h3>
+          <ul class="sf-order-confirm__items">
+            @foreach ($order->inventories as $item)
+              <li>
+                <img src="{{ get_product_img_src($item, 'tiny') }}" alt="{{ $item->title }}" loading="lazy">
+                <div>
+                  <strong>{{ $item->pivot->item_description ?? $item->title }}</strong>
+                  <span>{{ get_formated_currency($item->pivot->unit_price, 2, $order->currency_id) }} × {{ $item->pivot->quantity }}</span>
+                </div>
+              </li>
             @endforeach
-          @elseif ($order->pickup())
-            <p class="fs-3 mb-2">
-              <i class="fa fa-map-marker"></i> {{ trans('theme.pickup_from') }} : <br />
-              <em>{!! address_str_to_html($order->warehouse->address->toString()) !!}</em>
-            </p>
+          </ul>
+        </div>
+      @endif
 
-            @if ($order->warehouse->pickup_instruction)
-              <p class="text-primary mb-2">
-                <strong>{{ trans('app.form.pickup_instruction') }} </strong>
-              </p>
-
-              <div class="mb-4">
-                {!! $order->warehouse->pickup_instruction !!}
-              </div>
-            @endif
-
-            @if (is_array($order->warehouse->business_days))
-              <p class="fs-3 mb-2 mt-10">
-                <i class="fa fa-calendar"></i> {{ trans('theme.notify.business_days') }} : <em>{{ implode(', ', $order->warehouse->business_days) }}</em>
-              </p>
-            @endif
-
-            @if ($order->warehouse->opening_time && $order->warehouse->close_time)
-              <p class="fs-3 mb-2">
-                <i class="fa fa-clock-o"></i> {{ trans('theme.pickup_time') }} : <em>{{ $order->warehouse->opening_time }} - {{ $order->warehouse->close_time }}</em>
-              </p>
-            @endif
-
-            <p class="fs-3 mb-2">
-              <i class="fas fa-info-circle"></i> {{ trans('theme.notify.order_number') }} : <em>{{ $order->order_number }}</em>
-            </p>
-          @else
-            <p>
-              <i class="fas fa-info-circle"></i> {{ trans('theme.notify.order_will_ship_to') }} : <em>{!! $order->shipping_address !!}</em>
-            </p>
-          @endif
-
-          <p class="lead text-center my-5">
-            @if ($loop->last)
-              <a class="btn btn-primary" href="{{ url('/') }}">{{ trans('theme.button.continue_shopping') }}</a>
-            @endif
-
-            @if (\Auth::guard('customer')->check())
-              <a class="btn btn-default" href="{{ route('order.detail', $order) }}">@lang('theme.button.order_detail')</a>
-            @endif
-          </p>
-        @endforeach
-      </div><!-- /.col-md-8 -->
-    </div><!-- /.row -->
-  </div> <!-- /.container -->
+      <div class="sf-order-confirm__cta">
+        @if (\Auth::guard('customer')->check())
+          <a class="btn btn-primary" href="{{ route('order.detail', $order) }}">@lang('theme.button.order_detail')</a>
+        @endif
+        @if ($loop->last)
+          <a class="btn btn-default" href="{{ url('/') }}">{{ trans('theme.button.continue_shopping') }}</a>
+        @endif
+      </div>
+    @endforeach
+  </div>
 </section>
 
 @if (config('services.google.gtm_container_id'))

@@ -3,12 +3,13 @@
     {!! Form::model($banner, ['method' => 'PUT', 'route' => ['admin.web_banner.update', $banner->id], 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      {{ trans('app.edit_web_banner') }}
+      <strong>{{ trans('app.edit_web_banner') }}</strong>
     </div>
     <div class="modal-body">
       @include('admin.web_banner._form')
     </div>
     <div class="modal-footer">
+      <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">{{ trans('app.cancel') }}</button>
       {!! Form::submit(trans('app.form.update'), ['class' => 'btn btn-flat btn-new']) !!}
     </div>
     {!! Form::close() !!}

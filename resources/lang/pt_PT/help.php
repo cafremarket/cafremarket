@@ -18,7 +18,6 @@ return [
 
 'custom_css_guideline' => 'Personalize facilmente a aparência do seu marketplace aplicando os seus próprios estilos CSS. Se quiser alterar a cor de fundo da barra de navegação principal, do botão de pesquisa ou do rodapé, é assim que pode fazê-lo.',
 
-'trust_badge_size' => 'O tamanho da imagem do selo de confiança deve ser 32x32px e .png.',
 
 'add_input_field' => 'Adicionar campo de entrada',
 
@@ -803,9 +802,6 @@ return [
     'disabled_when_vendor_get_paid_directly' => 'Can not be enabled when vendor get paid directly!',
 
     'confirm_uninstall_package' => 'All data related to the :package will be lost forever! You cannot revert these data.',
-
-    'verify_license_key' => 'We sent the license key to your email when you made purchase. If you don\'t find it, please contact the support with details.',
-
     'promotional_tagline' => 'The promotional tagline will be placed on the main navigation.',
 
     'promo_banner' => 'The promotional banner will be placed on the top section of the site.',
@@ -873,23 +869,10 @@ return [
     'read_carefully' => 'Read carefully!',
 
     'email_fill_notice' => 'Email has many functional work like notification, forgot password etc so try to keep this field fillable',
-
-    'uninstall_license_incevio' => 'Before uninstalling the license from your system, you need to delete the installation from incevio.com self support portal.',
-
-    'uninstall_app_license' => 'Uninstalling the license will allow you to re-install. This will invalidate the current installation and immediately redirect you to the installation page. To prevent any unforeseen issues, kindly remove the old installation database and files if you\'re installing in a different location.',
-
     'cant_revert_action' => 'You can\'t revert this action.',
-
-    'update_app_license' => 'Updates the license if IP address of your server was changed, so script continues to work on new IP.',
-
-    'reset_app_license' => 'Uninstalling the license will allow you to re-install the script and the current installation will stop working immediately. Please remove the old installation files to avoid unexpected issues with new installation.<br/><b>You can\'t revert this action.</b>',
-
     'need_help' => 'Need help? Click here',
 
     'warning' => 'Warning',
-
-    'regenerate_app_key' => 'Generate the secret keys to establish a secure communication channel between your marketplace and mobile app for sharing sensitive information. These keys are crucial during the mobile app build process. Once the app is built and published, please refrain from changing these values to prevent app crashes.',
-
     'download_limit' => 'Set the number, how many times you want to permit to download this product for per customer after purchase. Keep it empty if want to permit unlimited download',
 
     'shop_payout_instruction' => 'Enter payout account information and instructions for payout here. These instructions will be shown to admin when you will request for payment',

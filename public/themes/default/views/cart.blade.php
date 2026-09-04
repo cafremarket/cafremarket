@@ -16,7 +16,7 @@
 
   @include('theme::scripts.dynamic_checkout')
 
-  @if ($carts->count() > 0)
+  @if (($activeCart ?? null) || (isset($carts) && $carts->count() > 0))
     @include('scripts.checkout')
   @endif
 

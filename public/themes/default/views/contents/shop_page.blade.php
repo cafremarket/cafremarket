@@ -40,7 +40,10 @@
         @endif
 
         <div class="sf-store__actions">
-          <a href="javascript:void(0);" class="sf-store__btn sf-store__btn--primary contact-seller-btn" data-toggle="modal" data-target="{{ Auth::guard('customer')->check() ? '#contactSellerModal' : '#loginModal' }}">
+          <a href="javascript:void(0);" class="sf-store__btn sf-store__btn--primary sf-open-livechat">
+            <i class="fas fa-comment"></i> @lang('theme.button.chat_now')
+          </a>
+          <a href="javascript:void(0);" class="sf-store__btn sf-store__btn--ghost contact-seller-btn" data-toggle="modal" data-target="{{ Auth::guard('customer')->check() ? '#contactSellerModal' : '#loginModal' }}">
             <i class="far fa-envelope"></i> @lang('theme.button.contact_seller')
           </a>
           <a href="{{ route('shop.products', $shop->slug) }}" class="sf-store__btn sf-store__btn--ghost">

@@ -25,11 +25,6 @@ class Package extends BaseModel
         'compatible',
         'dependency',
         'active',
-        'license_key',
-        'installation_key',
-        'installation_hash',
-        'lcd',
-        'lrd',
     ];
 
     /**

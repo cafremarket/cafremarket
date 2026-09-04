@@ -21,6 +21,7 @@ class AjaxController extends Controller
             $allowed_functions = [
                 'get_shipping_zone_of',
                 'getShippingRates',
+                'get_item_location_shipping_options',
                 'getShopConfig',
                 'get_item_details_of',
                 'get_storage_file_url',

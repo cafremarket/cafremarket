@@ -29,7 +29,7 @@ class SystemsSeeder extends BaseSeeder
             // 'time_format' => '12h',
             // 'time_separator' => ':',
             'timezone_id' => '35',
-            'currency_id' => 148,
+            'currency_id' => DB::table('currencies')->where('iso_code', 'MZN')->value('id'),
             'length_unit' => 'cm',
             'weight_unit' => 'gm',
             'valume_unit' => 'liter',
@@ -64,26 +64,31 @@ class SystemsSeeder extends BaseSeeder
             'instagram_link' => 'https://www.instagram.com/',
             'youtube_link' => 'https://www.youtube.com/',
 
-            // Address Defults
+            // Address defaults (Mozambique preferred)
             'address_show_map' => 1,
-            'address_default_country' => 840, // Country id
-            'address_default_state' => 453, // State id
+            'address_default_country' => DB::table('countries')->where('iso_code', 'MZ')->value('id')
+                ?? DB::table('countries')->where('iso_code', 'IN')->value('id'),
+            'address_default_state' => DB::table('states')
+                ->where('iso_code', 'MPM')
+                ->whereIn('country_id', DB::table('countries')->where('iso_code', 'MZ')->pluck('id'))
+                ->value('id'),
             'address_show_country' => 1,
 
             'created_at' => Carbon::Now(),
             'updated_at' => Carbon::Now(),
         ]);
 
-        $country_id = DB::table('countries')->inRandomOrder()->first()->id;
-        $state = DB::table('states')->where('country_id', $country_id)->first();
+        $country_id = DB::table('countries')->where('iso_code', 'MZ')->value('id')
+            ?? DB::table('countries')->where('iso_code', 'IN')->value('id');
+        $state = DB::table('states')->where('country_id', $country_id)->orderBy('name')->first();
 
         DB::table('addresses')->insert([
             'address_type' => 'Primary',
             'address_line_1' => 'Platform Address',
             'state_id' => $state ? $state->id : null,
-            'zip_code' => 63585,
+            'zip_code' => '1100',
             'country_id' => $country_id,
-            'city' => 'Hollywood',
+            'city' => 'Maputo',
             'addressable_id' => 1,
             'addressable_type' => \App\Models\System::class,
             'created_at' => Carbon::Now(),

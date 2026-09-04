@@ -240,26 +240,7 @@
                   </div>
                 </div> <!-- /.row -->
 
-                <div class="row">
-                  <div class="col-sm-7 text-right">
-                    <div class="form-group">
-                      {!! Form::label('enable_chat', trans('app.enable_live_chat') . ':', ['class' => 'with-help control-label']) !!}
-                      <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.enable_live_chat_on_platform') }}"></i>
-                    </div>
-                  </div>
-
-                  <div class="col-sm-4">
-                    @if ($can_update)
-                      <div class="handle horizontal text-center">
-                        <a href="javascript:void(0)" data-link="{{ route('admin.setting.system.config.toggle', 'enable_chat') }}" type="button" class="btn btn-md btn-secondary btn-toggle {{ $system->enable_chat ? 'active' : '' }}" data-toggle="button" aria-pressed="{{ $system->enable_chat ? 'true' : 'false' }}" autocomplete="off">
-                          <div class="btn-handle"></div>
-                        </a>
-                      </div>
-                    @else
-                      <span>{{ $system->vendor_can_view_customer_info ? trans('app.on') : trans('app.off') }}</span>
-                    @endif
-                  </div>
-                </div>
+                {{-- Live chat is always enabled; platform on/off toggle removed. --}}
 
                 <div class="form-group">
                   {!! Form::label('smart_form_id_for_vendor_additional_info', trans('app.smart_form_id_for_vendor_additional_info') . ':', ['class' => 'with-help col-sm-6 control-label']) !!}

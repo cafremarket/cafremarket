@@ -23,6 +23,7 @@ class Banner extends BaseModel
      */
     protected $casts = [
         'effect' => 'boolean',
+        'hide_text' => 'boolean',
     ];
 
     /**
@@ -41,6 +42,7 @@ class Banner extends BaseModel
         'shop_id',
         'order',
         'effect',
+        'hide_text',
     ];
 
     /**

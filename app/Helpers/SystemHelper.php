@@ -659,19 +659,18 @@ if (! function_exists('crosscheckAndUpdateOldCartInfo')) {
             $cart->taxrate = getTaxRate($request->tax_id);
         }
 
-        // Shipping
-        if (! $cart->is_digital && $request->shipping_rate_id) {
-            $shippingRates = getShippingRates($cart->shipping_zone_id, $cart);
-            $shippingRate = $shippingRates->where('id', $request->shipping_rate_id)->first();
-
-            if ($shippingRate && ! $cart->isPickup()) {
-                $cart->shipping_rate_id = $shippingRate->id;
-                $cart->shipping = $shippingRate->rate;
-                $cart->shipping_zone_id = $shippingRate->shipping_zone_id;
-            } elseif ($cart->is_free_shipping()) {
-                $cart->shipping_rate_id = null;
-                $cart->shipping = 0;
-            }
+        // Location-based shipping (free / fixed / km) — max of item charges
+        if (! $cart->is_digital) {
+            $destLat = $request->input('latitude') ?? $request->input('lat');
+            $destLng = $request->input('longitude') ?? $request->input('lng');
+            app(\App\Services\Shipping\ShippingCalculator::class)->applyToCart(
+                $cart,
+                is_numeric($destLat) ? (float) $destLat : null,
+                is_numeric($destLng) ? (float) $destLng : null
+            );
+        } else {
+            $cart->shipping = 0;
+            $cart->shipping_rate_id = null;
         }
 
         // Packaging

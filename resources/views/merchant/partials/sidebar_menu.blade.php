@@ -68,6 +68,33 @@
   </div>
 @endif
 
+{{-- Orders --}}
+@if (Auth::user()->isMerchant() || Gate::allows('index', \App\Models\Order::class))
+  <div class="mp-nav-group {{ mp_is_any(['merchant/order*']) ? 'is-open' : '' }}">
+    <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is_any(['merchant/order*']) ? 'true' : 'false' }}">
+      <i class="fa fa-shopping-cart"></i>
+      <span>{{ trans('nav.orders') ?? 'Orders' }}</span>
+      <i class="fa fa-chevron-down mp-nav-group__chevron"></i>
+    </button>
+    <div class="mp-nav-group__items">
+      <div class="mp-nav-group__items-inner">
+        <a href="{{ mp_url('merchant/order/order') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/order/order*') ? 'is-active' : '' }}">
+          <i class="fa fa-list-alt"></i>
+          <span>{{ trans('nav.orders') ?? 'Orders' }}</span>
+        </a>
+        <a href="{{ mp_url('merchant/order/cart') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/order/cart*') ? 'is-active' : '' }}">
+          <i class="fa fa-cart-arrow-down"></i>
+          <span>{{ trans('nav.carts') ?? 'Carts' }}</span>
+        </a>
+        <a href="{{ mp_url('merchant/order/cancellation') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/order/cancellation*') ? 'is-active' : '' }}">
+          <i class="fa fa-times-circle"></i>
+          <span>{{ trans('nav.cancellations') ?? 'Cancellations' }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+@endif
+
 {{-- Delivery --}}
 @if (Auth::user()->isMerchant())
   <div class="mp-nav-group {{ mp_is_any(['merchant/admin/deliveryboy*']) ? 'is-open' : '' }}">
@@ -143,25 +170,12 @@
   </div>
 @endif
 
-{{-- Support / Chat --}}
-@if (is_incevio_package_loaded('liveChat') && Gate::allows('index', \Incevio\Package\LiveChat\Models\ChatConversation::class))
-  <div class="mp-nav-group {{ mp_is_any(['merchant/support/chat*']) ? 'is-open' : '' }}">
-    <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is_any(['merchant/support/chat*']) ? 'true' : 'false' }}">
-      <i class="fa fa-support"></i>
-      <span>{{ trans('nav.support') ?? 'Support' }}</span>
-      <i class="fa fa-chevron-down mp-nav-group__chevron"></i>
-    </button>
-    <div class="mp-nav-group__items">
-      <div class="mp-nav-group__items-inner">
-        @can('index', \Incevio\Package\LiveChat\Models\ChatConversation::class)
-          <a href="{{ mp_url('merchant/support/chat') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/support/chat*') ? 'is-active' : '' }}">
-            <i class="fa fa-comments"></i>
-            <span>{{ trans('nav.chats') }}</span>
-          </a>
-        @endcan
-      </div>
-    </div>
-  </div>
+{{-- Live Chat --}}
+@if (is_incevio_package_loaded('liveChat'))
+  <a href="{{ mp_url('merchant/support/chat') }}" class="mp-sidebar__link {{ mp_is('merchant/support/chat*') ? 'is-active' : '' }}">
+    <i class="fa fa-comments"></i>
+    <span>{{ trans('nav.chats') ?? 'Chat' }}</span>
+  </a>
 @endif
 
 {{-- Reports --}}

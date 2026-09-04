@@ -66,6 +66,12 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
             include 'admin/InventoryProduct.php';
         });
 
+        // Order Routes for Merchant panel (mirrors admin.order.*)
+        Route::name('order.')->prefix('order')->group(function () {
+            include 'admin/Order.php';
+            include 'admin/Cart.php';
+        });
+
         Route::name('setting.')->prefix('setting')->group(function () {
             include 'admin/UserRole.php';
 
@@ -90,17 +96,17 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
                 Route::get('chat', [
                     \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,
                     'index',
-                ])->name('chat.index');
+                ])->name('chat_conversation.index');
 
                 Route::get('chat/{chat}', [
                     \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,
                     'show',
-                ])->name('chat.show');
+                ])->name('chat_conversation.show');
 
                 Route::post('chat/{chat}/reply', [
                     \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,
                     'reply',
-                ])->name('chat.reply');
+                ])->name('chat_conversation.reply');
             }
         });
     });

@@ -34,4 +34,11 @@ return [
     'vendor_net' => 'Net credited to seller',
     'additional_info' => 'Additional info',
     'footer_note' => 'This is a computer generated invoice and requires no signature.',
+    'seller_info' => 'Seller information',
+    'delivery_address' => 'Delivery address',
+    'order_status' => 'Order status',
+    'fulfilment' => 'Fulfilment',
+    'delivery' => 'Delivery',
+    'buyer_note' => 'Buyer note',
+    'scan_to_view_order' => 'Scan to view order',
 ];

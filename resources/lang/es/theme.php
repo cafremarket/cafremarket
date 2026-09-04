@@ -768,7 +768,7 @@ return [
   'customer_address' => 'Dirección del cliente',
   'no_pickup_options' => 'Este vendedor no ofrece opción de recogida.',
   'maximum_download_limit_reached' => 'Has alcanzado el límite de descarga máximo',
-  'trust_badge' => 'Insignia de confianza',
+
   'coupon_code_size' => 'Tamaño del código de cupón',
   'why_feedback_important' => '¿Por qué es importante sus comentarios?',
   'already_given_feedback' => '¡Ya diste comentarios!',

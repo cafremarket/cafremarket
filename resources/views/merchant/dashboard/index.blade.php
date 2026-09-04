@@ -93,7 +93,7 @@
             <tr>
               <td>
                 @can('view', $order)
-                  <a href="{{ route('merchant.order.order.show', $order->id) }}">{{ $order->order_number }}</a>
+                  <a href="{{ mp_route('admin.order.order.show', $order->id) }}">{{ $order->order_number }}</a>
                 @else
                   {{ $order->order_number }}
                 @endcan

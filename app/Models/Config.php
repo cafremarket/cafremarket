@@ -83,6 +83,10 @@ class Config extends BaseModel
         'order_number_suffix',
         'default_tax_id',
         'order_handling_cost',
+        'shipping_type',
+        'shipping_fixed_rate',
+        'shipping_per_km_rate',
+        'shipping_base_fee',
         'credit_back_percentage',
         'auto_archive_order',
         'default_payment_method_id',
@@ -392,10 +396,11 @@ class Config extends BaseModel
 
     /**
      * Check if pickup is enabled for the shop.
+     * Pickup fulfilment is disabled system-wide.
      */
     public function isPickupEnabled(): bool
     {
-        return (bool) $this->pickup_enabled;
+        return false;
     }
 
     /**
@@ -405,7 +410,7 @@ class Config extends BaseModel
      */
     public function isChatEnabled()
     {
-        return $this->enable_live_chat;
+        return true;
     }
 
     /**

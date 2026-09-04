@@ -9,7 +9,6 @@
     <div class="admin-alert admin-alert--info">
       <strong><i class="fa fa-info"></i> {{ trans('app.info') }}</strong>
       {!! trans('messages.not_accessible_on_demo') !!}
-      <a href="https://incevio.com/plugins" target="_blank">You can get all available plugins here.</a>
     </div>
   @else
     <div class="admin-alert admin-alert--warning">
@@ -74,7 +73,6 @@
             @elseif($can_load)
               @if (config('app.demo') == true)
                 <span class="text-muted small" title="{!! trans('messages.demo_restriction') !!}" data-toggle="tooltip"><i class="fa fa-wrench"></i> {{ trans('app.install') }}</span>
-                <a href="https://incevio.com/plugins" class="small" target="_blank">Check it here</a>
               @else
                 <a href="javascript:void(0)" data-link="{{ route('admin.package.initiate', $package['slug']) }}" class="ajax-modal-btn btn btn-default btn-sm"><i class="fa fa-wrench"></i> {{ trans('app.install') }}</a>
               @endif
@@ -112,7 +110,7 @@
       @empty
         <tr>
           <td colspan="3" class="text-center text-muted">
-            You don't have any package yet. <a href="https://incevio.com/plugins" target="_blank">Get available plugins here.</a>
+            No packages found in the packages directory.
           </td>
         </tr>
       @endforelse
@@ -120,31 +118,4 @@
   </table>
 
   @include('admin.partials.ui.card_end')
-
-  <div class="row admin-package-promos">
-    <div class="col-md-6">
-      <div class="admin-promo-card admin-promo-card--success">
-        <div class="admin-promo-card__head"><i class="fa fa-rocket"></i> More Packages Available!</div>
-        <div class="admin-promo-card__body">
-          We're developing more and more packages with useful functionality extensions.
-          <br><br>
-          <a href="https://incevio.com/plugins" class="btn btn-primary btn-sm" target="_blank">
-            All Available Packages <i class="fa fa-external-link"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="admin-promo-card">
-        <div class="admin-promo-card__head"><i class="fa fa-rocket"></i> Looking for a custom package?</div>
-        <div class="admin-promo-card__body">
-          Send us an email for any kind of modification or custom work as we know the code better than everyone.
-          <br><br>
-          <a href="https://incevio.com/contact" class="btn btn-default btn-sm" target="_blank">
-            Contact Us <i class="fa fa-external-link"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
 @endsection

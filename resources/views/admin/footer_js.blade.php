@@ -1404,21 +1404,16 @@
     });
     //END Popover
 
-    if ($('#uploadBtn').length) {
-      document.getElementById("uploadBtn").onchange = function() {
-        document.getElementById("uploadFile").value = this.value;
-      };
-    }
-    if ($('#uploadBtn1').length) {
-      document.getElementById("uploadBtn1").onchange = function() {
-        document.getElementById("uploadFile1").value = this.value;
-      };
-    }
-    if ($('#uploadBtn2').length) {
-      document.getElementById("uploadBtn2").onchange = function() {
-        document.getElementById("uploadFile2").value = this.value;
-      };
-    }
+    // Show selected filename for classic upload widgets (works for AJAX modals too).
+    $(document).on('change', '#uploadBtn, #uploadBtn1, #uploadBtn2', function () {
+      var id = this.id || '';
+      var targetId = id === 'uploadBtn' ? 'uploadFile'
+        : (id === 'uploadBtn1' ? 'uploadFile1' : 'uploadFile2');
+      var target = document.getElementById(targetId);
+      if (!target) return;
+      var file = this.files && this.files[0];
+      target.value = file ? file.name : (this.value || '');
+    });
 
     //SEARCH OPTIONS
     var $search_rows = $('#search_table tr');

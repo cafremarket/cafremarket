@@ -48,7 +48,7 @@ class ShopLightResource extends JsonResource
             'email' => $this->email,
             'rating' => $this->rating(),
             'member_since' => date('F j, Y', strtotime($this->created_at)),
-            'pickup_enabled' => $this->config->pickup_enabled,
+            'pickup_enabled' => false,
             'feedbacks_count' => $this->rating() ? $this->avgFeedback->count : 0,
             'feedbacks' => $this->when($request->is('api/order/*'), function () {
                 $feedback = \App\Models\Feedback::find($this->feedback_id);

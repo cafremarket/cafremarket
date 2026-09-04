@@ -1,207 +1,184 @@
-<section>
+<section class="sf-detail-page">
   <div class="container mb-5">
-    <div class="row">
-      <div class="col-md-4 bg-light">
-        <p class="section-title lead mb-3">{!! trans('theme.section_headings.how_to_open_a_dispute') !!}</p>
-        <h4 class="mb-2">{!! trans('theme.help.first_step') !!}:</h4>
-        <p class="mb-4">{!! trans('theme.help.how_to_open_a_dispute_first_step') !!}</p>
+    <div class="sf-dispute-layout">
+      <aside class="sf-dispute-help">
+        <p class="lead">{!! trans('theme.section_headings.how_to_open_a_dispute') !!}</p>
+        <h4>{!! trans('theme.help.first_step') !!}:</h4>
+        <p>{!! trans('theme.help.how_to_open_a_dispute_first_step') !!}</p>
 
-        <h4 class="mb-2">{!! trans('theme.help.second_step') !!}:</h4>
-        <p class="mb-4">{!! trans('theme.help.how_to_open_a_dispute_second_step') !!}</p>
+        <h4>{!! trans('theme.help.second_step') !!}:</h4>
+        <p>{!! trans('theme.help.how_to_open_a_dispute_second_step') !!}</p>
 
-        <h4 class="mb-2">{!! trans('theme.help.third_step') !!}:</h4>
-        <p class="mb-4">{!! trans('theme.help.how_to_open_a_dispute_third_step') !!}</p>
-      </div>
+        <h4>{!! trans('theme.help.third_step') !!}:</h4>
+        <p>{!! trans('theme.help.how_to_open_a_dispute_third_step') !!}</p>
+      </aside>
 
-      <div class="col-md-8">
+      <div>
         @php
           $progress = $order->dispute ? $order->dispute->progress() : 0;
         @endphp
-        <div class="step-wizard-wrapper mb-3">
-          <div class="step-wizard">
-            <div class="progress">
-              <div class="progressbar empty"></div>
-              <div id="prog" class="progressbar" style=""></div>
-              <div id="prog" class="progressbar" style="width: {{ $progress }}%;"></div>
+        <div class="sf-panel mb-3">
+          <div class="sf-panel__body" style="padding:18px;">
+            <div class="step-wizard-wrapper">
+              <div class="step-wizard">
+                <div class="progress">
+                  <div class="progressbar empty"></div>
+                  <div id="prog" class="progressbar" style="width: {{ $progress }}%;"></div>
+                </div>
+                <ul>
+                  <li class="{{ $progress > 33 ? 'done' : 'active' }}">
+                    <a id="step1">
+                      <span class="step">1</span>
+                      <span class="title">{!! trans('theme.open_a_dispute') !!}</span>
+                    </a>
+                  </li>
+                  <li class="{{ $progress > 66 ? 'done' : ($progress > 33 ? 'active' : '') }}">
+                    <a id="step2">
+                      <span class="step">2</span>
+                      <span class="title">{!! trans('theme.seller_helps_you') !!}</span>
+                    </a>
+                  </li>
+                  <li class="{{ $progress == 100 ? 'done' : ($progress > 66 ? 'active' : '') }}">
+                    <a id="step3">
+                      <span class="step">3</span>
+                      <span class="title">{!! trans('theme.marketplace_steps_in', ['marketplace' => get_platform_title()]) !!}<br />
+                        <i class="small hidden-xs">{!! trans('theme.help.when_marketplace_steps_in') !!}</i>
+                      </span>
+                    </a>
+                  </li>
+                  <li class="{{ $progress == 100 ? 'done' : '' }}">
+                    <a id="step4">
+                      <span class="step">4</span>
+                      <span class="title">{!! trans('theme.dispute_finished') !!}</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
-            <ul>
-              <li class="{{ $progress > 33 ? 'done' : 'active' }}">
-                <a id="step1">
-                  <span class="step">1</span>
-                  <span class="title">{!! trans('theme.open_a_dispute') !!}</span>
-                </a>
-              </li>
-              <li class="{{ $progress > 66 ? 'done' : ($progress > 33 ? 'active' : '') }}">
-                <a id="step2">
-                  <span class="step">2</span>
-                  <span class="title">{!! trans('theme.seller_helps_you') !!}</span>
-                </a>
-              </li>
-              <li class="{{ $progress == 100 ? 'done' : ($progress > 66 ? 'active' : '') }}">
-                <a id="step3">
-                  <span class="step">3</span>
-                  <span class="title">{!! trans('theme.marketplace_steps_in', ['marketplace' => get_platform_title()]) !!}<br />
-                    <i class="small hidden-xs">{!! trans('theme.help.when_marketplace_steps_in') !!}</i>
-                  </span>
-                </a>
-              </li>
-              <li class="{{ $progress == 100 ? 'done' : '' }}">
-                <a id="step4">
-                  <span class="step">4</span>
-                  <span class="title">{!! trans('theme.dispute_finished') !!}</span>
-                </a>
-              </li>
-            </ul>
           </div>
-        </div> <!-- /.step-wizard-wrapper -->
+        </div>
 
         @if ($order->dispute)
-          <div class="table-responsive">
-            <table class="table" id="buyer-order-table">
-              <thead>
-              <tr>
-                <th colspan="3">{!! trans('theme.dispute_detail') !!}</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr class="order-info-head">
-                <td width="50%">
-                  <h5 class="mb-2">
-                    <span>{!! trans('theme.store') !!}:</span>
+          <div class="sf-panel">
+            <div class="sf-panel__head">{!! trans('theme.dispute_detail') !!}</div>
+            <div class="sf-panel__body" style="padding:0;">
+              <div class="sf-detail-meta-grid">
+                <div class="sf-detail-meta-grid__item">
+                  <span>{!! trans('theme.store') !!}</span>
+                  <div>
                     @if ($order->shop->slug)
-                      <a href="{{ route('show.store', $order->shop->slug) }}"> {{ $order->shop->name }}</a>
+                      <a href="{{ route('show.store', $order->shop->slug) }}">{{ $order->shop->name }}</a>
                     @else
                       {!! trans('theme.seller') !!}
                     @endif
-                  </h5>
-                  <h5>
-                    <span>{!! trans('theme.status') !!}</span>
-                    {!! $order->dispute->statusName() !!}
-                  </h5>
-                </td>
-                <td width="25%" class="order-amount">
-                  <h5 class="mb-2">
-                    <span>{!! trans('theme.refund_amount') !!}: </span>
-                    {{ get_formated_currency($order->dispute->refund_amount, 2, $order->currency_id) }}
-                  </h5>
-                  <h5>
+                  </div>
+                  <div class="mt-2">{!! $order->dispute->statusName() !!}</div>
+                </div>
+                <div class="sf-detail-meta-grid__item">
+                  <span>{!! trans('theme.refund_amount') !!}</span>
+                  <strong>{{ get_formated_currency($order->dispute->refund_amount, 2, $order->currency_id) }}</strong>
+                  <div class="mt-2">
                     <span>{!! trans('theme.return_goods') !!}:</span>
                     {{ $order->dispute->return_goods == 1 ? trans('theme.yes') : trans('theme.no') }}
-                  </h5>
-                </td>
-                <td width="25%" class="store-info">
-                  <h5 class="mb-2">
-                    <span>{!! trans('theme.order_id') !!}: </span>
-                    <a href="{{ route('order.detail', $order) }}">{{ $order->order_number }}</a>
-                  </h5>
-                  <h5>
+                  </div>
+                </div>
+                <div class="sf-detail-meta-grid__item">
+                  <span>{!! trans('theme.order_id') !!}</span>
+                  <strong><a href="{{ route('order.detail', $order) }}">{{ $order->order_number }}</a></strong>
+                  <div class="mt-2">
                     <span>{!! trans('theme.order_received') !!}:</span>
                     {{ $order->dispute->order_received == 1 ? trans('theme.yes') : trans('theme.no') }}
-                  </h5>
-                </td>
-              </tr> <!-- /.order-info-head -->
-              <tr class="order-body">
-                <td colspan="3">
-                  <p class="lead">
-                    <span>{!! trans('theme.reason') !!}:
-                    </span>{{ $order->dispute->dispute_type->detail }}
-                  </p>
+                  </div>
+                </div>
+              </div>
 
-                  @if ($order->dispute->description)
-                    <div class="mb-5">
-                      {{ $order->dispute->description }}
-                      @if (count($order->dispute->attachments))
-                        <small class="pull-right">
-                          {{ trans('app.attachments') . ': ' }}
-                          @foreach ($order->dispute->attachments as $attachment)
-                            <a href="{{ route('attachment.download', $attachment->path) }}"><i class="fas fa-file"></i></a>
-                          @endforeach
-                        </small>
-                      @endif
-                    </div>
-                  @endif
+              <div style="padding:16px 18px;border-top:1px solid #eef2f7;">
+                <p class="lead mb-3">
+                  <strong>{!! trans('theme.reason') !!}:</strong>
+                  {{ $order->dispute->dispute_type->detail }}
+                </p>
 
-                  @if ($order->dispute->replies->count() > 0)
+                @if ($order->dispute->description)
+                  <div class="mb-4">
+                    {{ $order->dispute->description }}
+                    @if (count($order->dispute->attachments))
+                      <small class="pull-right">
+                        {{ trans('app.attachments') . ': ' }}
+                        @foreach ($order->dispute->attachments as $attachment)
+                          <a href="{{ route('attachment.download', $attachment->path) }}"><i class="fas fa-file"></i></a>
+                        @endforeach
+                      </small>
+                    @endif
+                  </div>
+                @endif
+
+                @if ($order->dispute->replies->count() > 0)
+                  <div class="sf-message-thread mb-3">
                     @foreach ($order->dispute->replies as $reply)
-                      <div class="row">
-                        <div class="col-md-2 pr-1 no-print">
-                          @if ($reply->user_id)
-                            @if ($reply->user->image)
-                              <img src="{{ get_storage_file_url(optional($reply->user->image)->path, 'thumbnail') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-                            @else
-                              <img src="{{ get_gravatar_url($reply->user->email, 'thumbnail') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-                            @endif
-
-                            {{ $reply->user->getName() }}
-                          @endif
-                        </div>
-
-                        <div class="col-md-8 p-0">
-                          <blockquote style="font-size: 1em;" class="{{ $reply->customer_id ? 'blockquote-reverse' : '' }}">
+                      <div class="sf-message-bubble {{ $reply->customer_id ? 'sf-message-bubble--me' : '' }}">
+                        <div>
+                          <div class="sf-message-bubble__meta">
+                            <strong>
+                              @if ($reply->user_id)
+                                {{ $reply->user->getName() }}
+                              @elseif ($reply->customer_id)
+                                {{ $reply->customer->getName() }}
+                              @endif
+                            </strong>
+                            {{ $reply->updated_at->diffForHumans() }}
+                          </div>
+                          <div class="sf-message-bubble__body">
                             {{ $reply->reply }}
-
                             @if (count($reply->attachments))
-                              <small class="no-print">
-                                {{ trans('app.attachments') . ': ' }}
+                              <div class="sf-message-bubble__attach">
                                 @foreach ($reply->attachments as $attachment)
-                                  <a href="{{ route('attachment.download', $attachment) }}"><i class="fas fa-file"></i></a>
+                                  <a href="{{ route('attachment.download', $attachment) }}" class="btn btn-default btn-xs">
+                                    <i class="fas fa-file"></i>
+                                  </a>
                                 @endforeach
-                              </small>
+                              </div>
                             @endif
-
-                            <footer>{{ $reply->updated_at->diffForHumans() }}</footer>
-                          </blockquote>
-                        </div>
-
-                        <div class="col-md-2 pl-1 no-print">
-                          @if ($reply->customer_id)
-                            @if ($reply->customer->image)
-                              <img src="{{ get_storage_file_url(optional($reply->customer->image)->path, 'thumbnail') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-                            @else
-                              <img src="{{ get_gravatar_url($reply->customer->email, 'thumbnail') }}" class="img-circle img-sm" alt="{{ trans('app.avatar') }}">
-                            @endif
-
-                            {{ $reply->customer->getName() }}
-                          @endif
+                          </div>
                         </div>
                       </div>
                     @endforeach
-                  @endif
-
-                  <div class="text-center my-3">
-                    @if ($order->dispute->isClosed())
-                      <a class="btn btn-danger rounded-0" href=" javascript:void(0);" data-toggle="modal" data-target="#disputeAppealModal">{!! trans('theme.button.appeal') !!}</a>
-                    @else
-                      <a class="btn btn-info rounded-0" href=" javascript:void(0);" data-toggle="modal" data-target="#disputeResponseModal">{!! trans('theme.button.response') !!}</a>
-
-                      {!! Form::open(['route' => ['dispute.markAsSolved', $order->dispute], 'class' => 'form-btn']) !!}
-                      {!! Form::button(trans('theme.mark_as_solved'), ['type' => 'submit', 'class' => 'confirm btn btn-primary flat']) !!}
-                      {!! Form::close() !!}
-                    @endif
                   </div>
-                </td>
-              </tr> <!-- /.order-body -->
-              </tbody>
-            </table>
+                @endif
+
+                <div class="text-center my-3">
+                  @if ($order->dispute->isClosed())
+                    <a class="btn btn-danger" href="javascript:void(0);" data-toggle="modal" data-target="#disputeAppealModal">{!! trans('theme.button.appeal') !!}</a>
+                  @else
+                    <a class="btn btn-default" href="javascript:void(0);" data-toggle="modal" data-target="#disputeResponseModal">{!! trans('theme.button.response') !!}</a>
+
+                    {!! Form::open(['route' => ['dispute.markAsSolved', $order->dispute], 'class' => 'form-btn d-inline-block']) !!}
+                    {!! Form::button(trans('theme.mark_as_solved'), ['type' => 'submit', 'class' => 'confirm btn sf-btn-primary flat']) !!}
+                    {!! Form::close() !!}
+                  @endif
+                </div>
+              </div>
+            </div>
           </div>
         @else
-          <p class="text-center">
-            <a href="{{ route('order.detail', $order) . '#message-section' }}" class="btn btn-primary">{!! trans('theme.button.contact_seller') !!}</a>
+          <div class="sf-panel">
+            <div class="sf-panel__body" style="padding:24px;text-align:center;">
+              <a href="{{ route('order.detail', $order) . '#message-section' }}" class="btn sf-btn-primary">{!! trans('theme.button.contact_seller') !!}</a>
 
-            @unless ($order->dispute)
-              <a href="javascript:void(0);" data-toggle="modal" data-target="#disputeOpenModal" class="btn btn-black">{!! trans('theme.button.open_dispute') !!}</a>
-            @endunless
-          </p>
+              @unless ($order->dispute)
+                <a href="javascript:void(0);" data-toggle="modal" data-target="#disputeOpenModal" class="btn btn-default">{!! trans('theme.button.open_dispute') !!}</a>
+              @endunless
 
-          <hr />
+              <hr />
 
-          <h4 class="pb-2">{!! trans('theme.button.refund_request') !!}:</h4>
-          <p class="text-muted pb-4"> {!! trans('theme.help.reason_to_refund_request') !!}</p>
+              <h4 class="pb-2">{!! trans('theme.button.refund_request') !!}:</h4>
+              <p class="text-muted pb-4">{!! trans('theme.help.reason_to_refund_request') !!}</p>
 
-          <h4 class="pb-2">{!! trans('theme.button.return_goods') !!}:</h4>
-          <p class="text-muted">{!! trans('theme.help.reason_to_return_goods') !!}</p>
+              <h4 class="pb-2">{!! trans('theme.button.return_goods') !!}:</h4>
+              <p class="text-muted">{!! trans('theme.help.reason_to_return_goods') !!}</p>
+            </div>
+          </div>
         @endif
-      </div><!-- /.col-md-8 -->
-    </div><!-- /.row -->
-  </div><!-- /.container -->
+      </div>
+    </div>
+  </div>
 </section>

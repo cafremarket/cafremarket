@@ -217,7 +217,7 @@ class OrderController extends Controller
             $flashMessage = trans('app.waiting_for_payment');
         }
 
-        return redirect()->route('order.detail.number', ['order_number' => $this->toRouteSafeOrderNumber($order->order_number)])
+        return redirect()->route('order.confirmation', ['order_number' => $this->toRouteSafeOrderNumber($order->order_number)])
             ->with($flashKey, $flashMessage);
     }
 
@@ -283,7 +283,7 @@ class OrderController extends Controller
 
         safe_dispatch_order_event(new OrderCreated($order), 'OrderCreated (payment return)');
 
-        return redirect()->route('order.detail.number', ['order_number' => $this->toRouteSafeOrderNumber($order->order_number)])
+        return redirect()->route('order.confirmation', ['order_number' => $this->toRouteSafeOrderNumber($order->order_number)])
             ->with('success', trans('theme.notify.order_placed'));
     }
 
@@ -337,7 +337,7 @@ class OrderController extends Controller
      */
     public function detail(OrderDetailRequest $request, Order $order)
     {
-        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod']);
+        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod', 'shop']);
 
         return view('theme::order_detail', compact('order'));
     }
@@ -434,9 +434,30 @@ class OrderController extends Controller
             ->latest('id')
             ->firstOrFail();
 
-        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod']);
+        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod', 'shop']);
 
         return view('theme::order_detail', compact('order'));
+    }
+
+    /**
+     * Post-checkout order confirmation (location-aware delivery summary).
+     */
+    public function confirmation(Request $request, $order_number)
+    {
+        $customer = auth('customer')->user();
+        if (! $customer) {
+            return redirect()->route('homepage', ['login' => 1]);
+        }
+
+        $order = Order::withTrashed()
+            ->where('order_number', $order_number)
+            ->where('customer_id', $customer->id)
+            ->latest('id')
+            ->firstOrFail();
+
+        $order->load(['inventories.image', 'inventories.attachments', 'paymentMethod', 'shop']);
+
+        return view('theme::order_complete', compact('order'));
     }
 
     /**

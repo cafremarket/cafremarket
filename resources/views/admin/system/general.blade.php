@@ -25,13 +25,6 @@
           </a>
         </li>
 
-        <li>
-          <a href="#app_keys_config_tab" data-toggle="tab">
-            <i class="fa fa-lock hidden-sm"></i>
-            {{ trans('app.app_keys_config') }}
-          </a>
-        </li>
-
       </ul>
 
       <div class="tab-content">
@@ -195,21 +188,6 @@
                   </div>
                 </div>
 
-                <div class="form-group">
-                  <label for="exampleInputFile" class="with-help col-sm-3 control-label"> {{ trans('app.form.trust_badge') }}</label>
-
-                  <div class="col-md-6 nopadding">
-                    <input id="uploadFile2" placeholder="{{ trans('app.placeholder.trust_badge') }}" class="form-control" disabled="disabled" style="height: 28px;" />
-                  </div>
-
-                  <div class="col-md-2 nopadding-left mb-2">
-                    <div class="fileUpload btn btn-primary btn-block btn-flat">
-                      <span>{{ trans('app.form.upload') }}</span>
-                      <input type="file" name="trust_badge" id="trust_logo" class="upload" />
-                    </div>
-                  </div>
-
-                </div>
               @endif
 
               <p class="help-block">* {{ trans('app.form.required_fields') }}</p>
@@ -269,10 +247,6 @@
                 <img src="{{ get_storage_file_url(optional($system->logoImage)->path) }}" class="brand-logo" style="max-width: 90%" alt="{{ trans('app.logo') }}">
               </div>
 
-              <div class="form-group text-center">
-                <label class="with-help control-label"> {{ trans('app.trust_badge') }}: </label>
-                <img src="{{ get_storage_file_url(optional($system->featureImage)->path) }}" class="brand-logo" style="max-width: 90%" alt="{{ trans('app.trust_badge') }}">
-              </div>
             </div>
             {!! Form::close() !!}
           </div>
@@ -354,116 +328,6 @@
           <div class="spacer50"></div>
         </div><!-- /.tab-pane -->
 
-        <div class="tab-pane" id="app_keys_config_tab">
-          <div class="row">
-            @if (Auth::guard('web')->user()->isSuperAdmin())
-              @unless (config('app.demo') == true)
-                <div class="col-sm-6 col-sm-offset-3 text-justify">
-                  <h3> <i class="fa fa-exclamation-triangle"></i> {{ trans('help.warning') }}!</h3>
-                  <p class="text-danger lead">
-                    {!! trans('help.regenerate_app_key') !!}
-                  </p>
-
-                  <div class="spacer10"></div>
-                  <div class="form-group">
-                    <label for="">{{ trans('app.zcart_application_key') }}</label>
-                    <div class="input-group">
-                      <input type="password" id="key" class="form-control" value="{{ config('system.encryption_credential.zcart_api_key') }}" readonly>
-                      <span class="input-group-addon fa fa-clipboard" onclick="copy_to_clipboard(this)" data-key="copy-key"> {{ trans('app.copy') }}</span>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="">{{ trans('app.zcart_application_secret') }}</label>
-                    <div class="input-group">
-                      <input type="password" id="secret" class="form-control" value="{{ config('system.encryption_credential.zcart_encryption_key') }}" readonly>
-                      <span class="input-group-addon fa fa-clipboard" onclick="copy_to_clipboard(this)" data-key="copy-secret"> {{ trans('app.copy') }}</span>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="">{{ trans('app.zcart_application_iv') }}</label>
-                    <div class="input-group">
-                      <input type="password" id="iv" class="form-control" value="{{ config('system.encryption_credential.zcart_encryption_iv') }}" readonly>
-                      <span class="input-group-addon fa fa-clipboard" onclick="copy_to_clipboard(this)" data-key="copy-iv"> {{ trans('app.copy') }}</span>
-                    </div>
-                  </div>
-
-                  @if (config('app.demo') == true)
-                    <div class="alert alert-warning" id="zcart_application_key_warning">
-                      {{ trans('messages.demo_restriction') }}
-                    </div>
-                  @endif
-
-                  <p class="text-danger lead">
-                    <i class="fa fa-exclamation-triangle"></i>
-                    {!! trans('help.cant_revert_action') !!}
-                  </p>
-
-                  <input type="button" id="toggleBtn" value="{{ trans('app.show') }}" onclick="show_application_key()" class="btn btn-default btn-lg" {{ config('app.demo') == true ? 'disabled' : '' }}>
-
-                  <a href="javascript:void(0)" data-link="{{ route('admin.setting.key.confirm') }}" class="ajax-modal-btn btn btn-danger btn-lg">
-                    {{ trans('app.regenerate_key') }}
-                  </a>
-                </div><!-- /.col-sm-4 -->
-              @endunless
-            @endif
-          </div><!-- /.row -->
-          <div class="spacer50"></div>
-        </div><!-- /.tab-pane -->
-
       </div><!-- /.tab-content -->
   @include('admin.partials.ui.card_tabbed_end')
 @endsection
-
-@push('script')
-  <script>
-    const show_application_key = () => {
-      @if (config('app.demo') == true)
-        alert("{{ trans('messages.demo_restriction') }}");
-        return;
-      @endif
-
-      var upass = document.getElementById('upass');
-      var toggleBtn = document.getElementById('toggleBtn');
-      if (key.type == "password" && secret.type == "password" && iv.type == "password") {
-        key.type = "text";
-        secret.type = "text";
-        iv.type = "text";
-        toggleBtn.value = "{{ trans('app.hide') }}";
-      } else {
-        key.type = "password";
-        secret.type = "password";
-        iv.type = "password";
-        toggleBtn.value = "{{ trans('app.show') }}";
-      }
-    }
-    const copy_to_clipboard = (object) => {
-      @if (config('app.demo') == true)
-        alert("{{ trans('messages.demo_restriction') }}");
-        return;
-      @endif
-
-      const id = $(object).attr('data-key');
-      let data = '';
-      switch (id) {
-        case 'copy-key':
-          data = "{{ config('system.encryption_credential.zcart_api_key') }}";
-          $(object).html("{{ trans('app.copied') }}")
-          break;
-        case 'copy-secret':
-          $(object).html("{{ trans('app.copied') }}")
-          data = "{{ config('system.encryption_credential.zcart_encryption_key') }}";
-          break;
-        case 'copy-iv':
-          $(object).html("{{ trans('app.copied') }}")
-          data = "{{ config('system.encryption_credential.zcart_encryption_iv') }}";
-          break;
-        default:
-          break;
-      }
-
-      navigator.clipboard.writeText(data);
-
-      navigator.clipboard.writeText(data);
-    }
-  </script>
-@endpush

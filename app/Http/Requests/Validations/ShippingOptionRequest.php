@@ -24,7 +24,13 @@ class ShippingOptionRequest extends Request
     public function rules()
     {
         return [
-            'zone' => 'required',
+            'cart' => 'nullable',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'lat' => 'nullable|numeric',
+            'lng' => 'nullable|numeric',
+            // legacy clients may still send zone — ignored for pricing
+            'zone' => 'nullable',
         ];
     }
 }

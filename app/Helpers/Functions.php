@@ -1285,6 +1285,177 @@ if (! function_exists('pdf_dompdf_storage_image_src')) {
     }
 }
 
+if (! function_exists('pdf_invoice_qr_data_uri')) {
+    /**
+     * Build a PNG QR code (data URI) for DomPDF, with an optional centered logo.
+     * Uses BaconQrCode + GD so Imagick is not required.
+     *
+     * Prefer pdf_invoice_qr_image_src() for DomPDF — data URIs are often blocked.
+     */
+    function pdf_invoice_qr_data_uri(string $payload, ?string $logoAbsolutePath = null, int $pixelSize = 160): string
+    {
+        $binary = pdf_invoice_qr_png_binary($payload, $logoAbsolutePath, $pixelSize);
+        if ($binary === null) {
+            return pdf_dompdf_transparent_pixel_data_uri();
+        }
+
+        return 'data:image/png;base64,'.base64_encode($binary);
+    }
+}
+
+if (! function_exists('pdf_invoice_qr_image_src')) {
+    /**
+     * Absolute filesystem path to a PNG QR for DomPDF &lt;img src&gt; (under storage/app).
+     */
+    function pdf_invoice_qr_image_src(string $payload, ?string $logoAbsolutePath = null, int $pixelSize = 160): string
+    {
+        $binary = pdf_invoice_qr_png_binary($payload, $logoAbsolutePath, $pixelSize);
+        if ($binary === null) {
+            return pdf_dompdf_transparent_pixel_data_uri();
+        }
+
+        $dir = storage_path('app'.DIRECTORY_SEPARATOR.'pdf_qr');
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+        }
+
+        $file = $dir.DIRECTORY_SEPARATOR.'qr_'.md5($payload.'|'.($logoAbsolutePath ?? '').'|'.$pixelSize).'.png';
+        if (! is_file($file) || filesize($file) < 32) {
+            @file_put_contents($file, $binary);
+        }
+
+        return is_readable($file) ? $file : pdf_dompdf_transparent_pixel_data_uri();
+    }
+}
+
+if (! function_exists('pdf_invoice_qr_png_binary')) {
+    /**
+     * Raw PNG bytes for an invoice QR (optional centered logo).
+     */
+    function pdf_invoice_qr_png_binary(string $payload, ?string $logoAbsolutePath = null, int $pixelSize = 160): ?string
+    {
+        if ($payload === '') {
+            return null;
+        }
+
+        try {
+            $qr = \BaconQrCode\Encoder\Encoder::encode(
+                $payload,
+                \BaconQrCode\Common\ErrorCorrectionLevel::H()
+            );
+            $matrix = $qr->getMatrix();
+            $modules = $matrix->getWidth();
+            $quiet = 2;
+            $scale = max(4, (int) floor($pixelSize / max(1, $modules + ($quiet * 2))));
+            $dimension = ($modules + ($quiet * 2)) * $scale;
+
+            $image = imagecreatetruecolor($dimension, $dimension);
+            if ($image === false) {
+                return null;
+            }
+
+            imagealphablending($image, true);
+            $white = imagecolorallocate($image, 255, 255, 255);
+            $black = imagecolorallocate($image, 0, 0, 0);
+            imagefilledrectangle($image, 0, 0, $dimension, $dimension, $white);
+
+            for ($y = 0; $y < $modules; $y++) {
+                for ($x = 0; $x < $modules; $x++) {
+                    if ($matrix->get($x, $y) === 1) {
+                        $x1 = ($x + $quiet) * $scale;
+                        $y1 = ($y + $quiet) * $scale;
+                        imagefilledrectangle(
+                            $image,
+                            $x1,
+                            $y1,
+                            $x1 + $scale - 1,
+                            $y1 + $scale - 1,
+                            $black
+                        );
+                    }
+                }
+            }
+
+            if ($logoAbsolutePath && is_readable($logoAbsolutePath)) {
+                $logo = pdf_gd_load_image($logoAbsolutePath);
+                if ($logo) {
+                    $logoBox = (int) round($dimension * 0.22);
+                    $logoBox = max(28, min($logoBox, (int) ($dimension * 0.28)));
+                    $pad = 3;
+                    $box = $logoBox + ($pad * 2);
+                    $ox = (int) (($dimension - $box) / 2);
+                    $oy = $ox;
+                    imagefilledrectangle($image, $ox, $oy, $ox + $box - 1, $oy + $box - 1, $white);
+
+                    $lw = imagesx($logo);
+                    $lh = imagesy($logo);
+                    $ratio = min($logoBox / max(1, $lw), $logoBox / max(1, $lh));
+                    $dw = max(1, (int) round($lw * $ratio));
+                    $dh = max(1, (int) round($lh * $ratio));
+                    $dx = $ox + (int) (($box - $dw) / 2);
+                    $dy = $oy + (int) (($box - $dh) / 2);
+                    imagecopyresampled($image, $logo, $dx, $dy, 0, 0, $dw, $dh, $lw, $lh);
+                    imagedestroy($logo);
+                }
+            }
+
+            ob_start();
+            imagepng($image);
+            $binary = ob_get_clean();
+            imagedestroy($image);
+
+            return (is_string($binary) && $binary !== '') ? $binary : null;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return null;
+        }
+    }
+}
+
+if (! function_exists('pdf_gd_load_image')) {
+    /**
+     * Load a local image into a GD resource for PDF compositing.
+     *
+     * @return \GdImage|resource|null
+     */
+    function pdf_gd_load_image(string $absolutePath)
+    {
+        if (! is_readable($absolutePath)) {
+            return null;
+        }
+
+        $info = @getimagesize($absolutePath);
+        if (! is_array($info) || empty($info[2])) {
+            return null;
+        }
+
+        return match ((int) $info[2]) {
+            IMAGETYPE_JPEG => @imagecreatefromjpeg($absolutePath) ?: null,
+            IMAGETYPE_PNG => @imagecreatefrompng($absolutePath) ?: null,
+            IMAGETYPE_GIF => @imagecreatefromgif($absolutePath) ?: null,
+            IMAGETYPE_WEBP => (function_exists('php_gd_can_read_webp') && php_gd_can_read_webp())
+                ? (@imagecreatefromwebp($absolutePath) ?: null)
+                : null,
+            default => null,
+        };
+    }
+}
+
+if (! function_exists('pdf_platform_logo_path')) {
+    /**
+     * Absolute filesystem path to the platform logo for DomPDF (null if unavailable).
+     */
+    function pdf_platform_logo_path(): ?string
+    {
+        $system = \App\Models\System::orderBy('id', 'asc')->first();
+        $path = optional($system?->logoImage)->path
+            ?? optional($system?->iconImage)->path;
+
+        return pdf_compatible_local_image_path($path);
+    }
+}
+
 if (! function_exists('get_placeholder_img')) {
     function get_placeholder_img($size = 'small', $txt = null)
     {
@@ -1500,21 +1671,6 @@ if (! function_exists('get_icon_url')) {
         }
 
         return default_brand_icon_url($size);
-    }
-}
-
-if (! function_exists('get_trust_badge_url')) {
-    function get_trust_badge_url()
-    {
-        return Cache::rememberForever('trust_badge_img', function () {
-            $system = System::orderBy('id', 'asc')->first();
-
-            if ($badge = $system->featureImage) {
-                return get_storage_file_url($badge->path, 'full');
-            }
-
-            return null;
-        });
     }
 }
 
@@ -2824,6 +2980,93 @@ if (! function_exists('getFreeShippingObject')) {
     }
 }
 
+if (! function_exists('get_item_location_shipping_options')) {
+    /**
+     * PDP / listing shipping estimate using free|fixed|km (replaces zone rates).
+     *
+     * @param  \App\Models\Inventory  $item
+     * @return \Illuminate\Support\Collection
+     */
+    function get_item_location_shipping_options($item, $lat = null, $lng = null)
+    {
+        if (is_numeric($item)) {
+            $item = \App\Models\Inventory::with(['shop.config'])->find($item);
+        }
+
+        if (! $item) {
+            return collect();
+        }
+
+        $calculator = app(\App\Services\Shipping\ShippingCalculator::class);
+        $item->loadMissing(['shop.config']);
+
+        // Prefer explicit coords, then the buyer's selected delivery location (header address).
+        if (! is_numeric($lat) || ! is_numeric($lng)) {
+            $buyer = app(\App\Services\Hyperlocal\BuyerLocationService::class);
+            $buyer->ensureDeliveryLocation();
+            $lat = $buyer->latitude();
+            $lng = $buyer->longitude();
+        } else {
+            $lat = (float) $lat;
+            $lng = (float) $lng;
+        }
+
+        $distanceKm = $calculator->distanceFromShop($item->shop, $lat, $lng);
+        $amount = $calculator->calculateForItem($item, optional($item->shop)->config, $distanceKm);
+        $handling = (float) (getHandelingCostOf($item->shop_id) ?: 0);
+        $total = $amount > 0 ? $amount + $handling : 0;
+
+        $shopRadius = (float) (optional($item->shop)->service_radius_km
+            ?: config('hyperlocal.default_shop_service_radius_km', 5));
+        $outOfRange = false;
+        if (hyperlocal_enabled() && $distanceKm !== null) {
+            $outOfRange = $distanceKm > $shopRadius;
+        }
+
+        $label = $outOfRange
+            ? (trans('theme.out_of_delivery_range') ?: 'Out of delivery range')
+            : ($total <= 0
+                ? (trans('theme.free_shipping') ?: 'Free shipping')
+                : (trans('app.shipping') ?: 'Shipping'));
+
+        if (! $outOfRange && $distanceKm !== null && $total > 0) {
+            $label .= ' ('.round($distanceKm, 1).' km)';
+        }
+
+        $distanceLabel = null;
+        if ($outOfRange) {
+            $distanceLabel = trans('theme.notify.product_out_of_delivery_range', [
+                'store' => optional($item->shop)->name ?? 'Store',
+                'distance' => round($distanceKm, 1),
+                'radius' => round($shopRadius, 1),
+            ]);
+        } elseif ($distanceKm !== null) {
+            $distanceLabel = round($distanceKm, 1).' km';
+        } elseif (! $lat || ! $lng) {
+            $distanceLabel = trans('theme.notify.shipping_select_location') ?: 'Select your delivery location';
+        } else {
+            $distanceLabel = trans('theme.notify.shipping_based_on_location') ?: 'Based on delivery distance';
+        }
+
+        return collect([(object) [
+            'id' => 'location',
+            'name' => $label,
+            'shipping_zone_id' => null,
+            'carrier_id' => null,
+            'carrier' => (object) ['name' => ' '],
+            'carrier_name' => trans('app.shipping') ?? 'Shipping',
+            'rate' => $outOfRange ? null : round($amount, 6),
+            'based_on' => 'location',
+            'minimum' => 0,
+            'maximum' => $shopRadius,
+            'delivery_takes' => $distanceLabel,
+            'distance_km' => $distanceKm,
+            'out_of_range' => $outOfRange,
+            'service_radius_km' => $shopRadius,
+        ]]);
+    }
+}
+
 if (! function_exists('getShippingCost')) {
     /**
      * Return shipping Cost for the given id
@@ -3387,11 +3630,11 @@ if (! function_exists('is_address_autocomplete_on')) {
 
 if (! function_exists('is_chat_enabled')) {
     /**
-     * Check if the chat window is enabled for the shop
+     * Live chat is always enabled for storefront shops (no on/off toggle).
      */
     function is_chat_enabled(Shop $shop)
     {
-        return config('system_settings.enable_chat') && $shop->config->isChatEnabled();
+        return (bool) optional($shop)->id;
     }
 }
 
@@ -3452,13 +3695,19 @@ if (! function_exists('get_vendor_chat_room_id')) {
      */
     function get_vendor_chat_room_id($shop = null)
     {
-        $shop = $shop ?? Auth::user()->merchantId();
+        $shop = $shop ?? optional(Auth::user())->merchantId();
 
         if ($shop instanceof Shop) {
-            return $shop->slug;
+            return (string) $shop->slug;
         }
 
-        return Shop::find($shop)->slug;
+        if (! $shop) {
+            return '';
+        }
+
+        $model = Shop::find($shop);
+
+        return $model ? (string) $model->slug : '';
     }
 }
 

@@ -1775,9 +1775,10 @@
     "priority": 100,
     "iso_code": "MZN",
     "name": "Mozambican Metical",
-    "symbol": "MTn",
+    "symbol": "MT",
     "alternate_symbols": [
-      "MZN"
+      "MZN",
+      "MTn"
     ],
     "subunit": "Centavo",
     "subunit_to_unit": 100,

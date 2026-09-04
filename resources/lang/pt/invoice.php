@@ -34,4 +34,11 @@ return [
     'vendor_net' => 'Líquido creditado ao vendedor',
     'additional_info' => 'Informações Adicionais',
     'footer_note' => 'Esta é uma fatura gerada automaticamente e não requer assinatura.',
-    ];
+    'seller_info' => 'Informações do vendedor',
+    'delivery_address' => 'Endereço de entrega',
+    'order_status' => 'Estado do pedido',
+    'fulfilment' => 'Cumprimento',
+    'delivery' => 'Entrega',
+    'buyer_note' => 'Nota do comprador',
+    'scan_to_view_order' => 'Digitalize para ver o pedido',
+];

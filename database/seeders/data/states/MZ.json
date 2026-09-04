@@ -1,0 +1,13 @@
+[
+  { "iso_code": "P", "name": "Cabo Delgado" },
+  { "iso_code": "G", "name": "Gaza" },
+  { "iso_code": "I", "name": "Inhambane" },
+  { "iso_code": "B", "name": "Manica" },
+  { "iso_code": "L", "name": "Maputo Province" },
+  { "iso_code": "MPM", "name": "Maputo City" },
+  { "iso_code": "N", "name": "Nampula" },
+  { "iso_code": "A", "name": "Niassa" },
+  { "iso_code": "S", "name": "Sofala" },
+  { "iso_code": "T", "name": "Tete" },
+  { "iso_code": "Q", "name": "Zambezia" }
+]

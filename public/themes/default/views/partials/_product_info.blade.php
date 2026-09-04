@@ -120,6 +120,9 @@
           <i class="far fa-cubes"></i> @lang('theme.more_items_from_this_seller', ['seller' => $item->shop->name])
         </a>
       @else
+        <a href="javascript:void(0);" class="btn btn-link sf-open-livechat">
+          <i class="fas fa-comment"></i> @lang('theme.button.chat_now')
+        </a>
         <a href="javascript:void(0);" class="btn btn-link" data-toggle="modal" data-target="{{ Auth::guard('customer')->check() ? '#contactSellerModal' : '#loginModal' }}">
           <i class="far fa-envelope"></i> @lang('theme.button.contact_seller')
         </a>

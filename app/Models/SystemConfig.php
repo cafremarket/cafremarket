@@ -127,7 +127,7 @@ class SystemConfig extends BaseModel
      */
     public static function isChatEnabled()
     {
-        return (bool) config('system_settings.enable_chat');
+        return true;
     }
 
     /**

@@ -776,7 +776,7 @@ return [
   'customer_address' => 'গ্রাহকের ঠিকানা',
   'no_pickup_options' => 'এই বিক্রেতা একটি পিক আপ বিকল্প প্রস্তাব না.',
   'maximum_download_limit_reached' => 'আপনি সর্বাধিক ডাউনলোড সীমাতে পৌঁছেছেন',
-  'trust_badge' => 'ট্রাস্ট ব্যাজ',
+
   'coupon_code_size' => 'কুপন কোড আকার',
   'why_feedback_important' => 'আপনার মতামত কেন গুরুত্বপূর্ণ?',
   'already_given_feedback' => 'আপনি ইতিমধ্যে মতামত দিয়েছেন!',

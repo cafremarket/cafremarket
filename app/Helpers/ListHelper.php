@@ -232,7 +232,6 @@ class ListHelper
     public static function fulfilment_types()
     {
         return [
-            Order::FULFILMENT_TYPE_PICKUP => trans('app.fulfilment_type.pickup'),
             Order::FULFILMENT_TYPE_DELIVER => trans('app.fulfilment_type.deliver'),
             Order::FULFILMENT_TYPE_POS => trans('app.fulfilment_type.pos'),
         ];
@@ -1612,7 +1611,10 @@ class ListHelper
     public static function countries()
     {
         return Cache::rememberForever('countries_pluck', function () {
-            return DB::table('countries')->orderBy('name', 'asc')->pluck('name', 'id');
+            return DB::table('countries')
+                ->where('active', BaseModel::ACTIVE)
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id');
         });
     }
 

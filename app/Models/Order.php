@@ -727,10 +727,26 @@ class Order extends BaseModel
     // Update the goods_received field when customer confirm or change status
     public function mark_as_goods_received()
     {
-        return $this->update([
+        $alreadyDelivered = (bool) $this->goods_received
+            && (int) $this->order_status_id >= static::STATUS_DELIVERED;
+
+        $this->update([
             'order_status_id' => static::STATUS_DELIVERED,
             'goods_received' => 1,
         ]);
+
+        // Credit store Cafrepay wallet only after successful delivery (prepaid orders).
+        if (! $alreadyDelivered && $this->isPaid() && is_incevio_package_loaded('wallet')) {
+            if (! vendor_get_paid_directly()) {
+                (new \Incevio\Package\Wallet\Services\OrderWalletService)->payVendor($this, true);
+            }
+
+            if ($this->customer_id && is_wallet_credit_reward_enabled()) {
+                (new \Incevio\Package\Wallet\Services\OrderWalletService)->initiateReward($this);
+            }
+        }
+
+        return $this;
     }
 
     // Update the feedback_given field when customer leave feedback for the shop
@@ -777,20 +793,33 @@ class Order extends BaseModel
             return false;
         }
 
-        // Allowed until fulfilment
-        if ($minutes === null) {
-            return $this->canRequestCancellation();
+        if (! $this->isEligibleForBuyerCancellation()) {
+            return false;
         }
 
-        return $this->canRequestCancellation() && $this->created_at->addMinutes($minutes) > Carbon::now();
+        // Allowed until fulfilment
+        if ($minutes === null) {
+            return true;
+        }
+
+        return $this->created_at->addMinutes($minutes) > Carbon::now();
     }
 
     /**
-     * Check if the order has been Canceled
+     * Check if the buyer can request cancelling specific items via the vendor.
+     * Temporarily disabled — re-enable by restoring the eligibility check below.
      *
      * @return bool
      */
     public function canRequestCancellation()
+    {
+        return false;
+    }
+
+    /**
+     * Shared eligibility for buyer-initiated cancel / cancel-items flows.
+     */
+    public function isEligibleForBuyerCancellation(): bool
     {
         return ! $this->isCanceled() && ! $this->isFulfilled() && ! $this->cancellation;
     }
@@ -1018,15 +1047,7 @@ class Order extends BaseModel
 
         $this->save();
 
-        if (is_incevio_package_loaded('wallet')) {
-            if (! vendor_get_paid_directly()) {   // Deposit the order amount into vendor's wallet
-                (new \Incevio\Package\Wallet\Services\OrderWalletService)->payVendor($this);
-            }
-
-            if ($this->customer_id && is_wallet_credit_reward_enabled()) {  // Calculate the initiate rewards
-                (new \Incevio\Package\Wallet\Services\OrderWalletService)->initiateReward($this);
-            }
-        }
+        // Vendor Cafrepay wallet is credited only after the order is delivered.
 
         if (is_incevio_package_loaded('affiliate')) {
             $release_in_days = config('system_settings.affiliate_commission_release_in_days');
