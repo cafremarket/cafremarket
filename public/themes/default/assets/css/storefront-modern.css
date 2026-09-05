@@ -2976,6 +2976,66 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   border-color: var(--primary-color, #ff6600);
 }
 
+.sf-pdp__video {
+  margin-top: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.sf-pdp__video video {
+  display: block;
+  width: 100%;
+  max-height: 480px;
+  background: #000;
+}
+
+.sf-pdp__video-thumb-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 64px;
+  height: 64px;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sf-pdp__video-thumb-btn i {
+  font-size: 16px;
+}
+
+.sf-pdp__video-thumb-btn.is-active {
+  border-color: var(--primary-color, #ff6600);
+}
+
+.product-video-field__preview {
+  margin-bottom: 10px;
+}
+
+.product-video-field__preview video {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  background: #000;
+  border-radius: 8px;
+}
+
+.product-video-field__delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-weight: normal;
+}
+
+
 .sf-pdp .product-info-title {
   font-size: 1.55rem;
   font-weight: 800;
@@ -4409,14 +4469,23 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   }
 }
 
-/* ========== Homepage banners: full-bleed ========== */
-.banner-block.banner-block--full {
+/* ========== Homepage banners ========== */
+.banner-block {
   width: 100%;
+  margin: 1.5rem 0;
+}
+
+.banner-block + .banner-block {
+  margin-top: 1.75rem;
+}
+
+/* Full-bleed (single / slider) */
+.banner-block.banner-block--full {
   max-width: 100%;
-  margin: 0;
   padding: 0;
 }
 
+.banner-block--full .banner-block__inner,
 .banner-block--full .banner-block__bleed {
   width: 100%;
   max-width: 100%;
@@ -4455,10 +4524,6 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   text-decoration: none;
 }
 
-.banner-block--full .image-banner--image-only .banner-box {
-  /* Image-only: no text overlay */
-}
-
 .banner-block--full .image-banner--image-only .banner-overlay {
   display: none !important;
 }
@@ -4470,14 +4535,55 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   }
 }
 
-/* 3 banners per row */
+/* 3 banners per row — contained with gaps (not full-bleed) */
+.banner-block.banner-block--third {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.banner-block--third .banner-block__inner {
+  width: 100%;
+}
+
 .banner-block--third .row {
   display: flex;
   flex-wrap: wrap;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+.banner-block--third [class*="col-"] {
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-bottom: 16px;
+}
+
+.banner-block--third .image-banner {
+  height: 100%;
+}
+
+.banner-block--third .banner-box {
+  border-radius: 10px;
+  overflow: hidden;
+  height: 100%;
 }
 
 .banner-block--third .banner-box img {
+  width: 100%;
+  display: block;
   min-height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.banner-block--third .banner-box-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  height: 100%;
 }
 
 /* Colour-based banners */
@@ -4533,4 +4639,5 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
 .banner-block--slider .slick-dots {
   bottom: 12px;
 }
+
 

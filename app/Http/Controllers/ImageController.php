@@ -35,6 +35,12 @@ class ImageController extends Controller
             return $this->rawStorageFileResponse($path);
         }
 
+        // Product videos — never run through Glide.
+        $videoPrefix = Str::finish(product_video_storage_dir(), '/');
+        if (Str::startsWith($path, $videoPrefix) || Str::startsWith($path, 'videos/')) {
+            return $this->rawStorageFileResponse($path);
+        }
+
         try {
             $image = $this->pathIsForSvgImage($path)
                 ? $this->getSvgImageResponse($path)

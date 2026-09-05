@@ -475,6 +475,13 @@
           </span>
         </div>
       </div>
+
+      <div class="wc-panel">
+        <div class="wc-panel__title">{{ trans('app.product_video') }}</div>
+        <div class="wc-panel__body">
+          @include('admin.product._video_field')
+        </div>
+      </div>
     </div>
 
     {{-- ================= SIDEBAR ================= --}}

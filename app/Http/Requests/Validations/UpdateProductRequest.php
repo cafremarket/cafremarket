@@ -95,6 +95,8 @@ class UpdateProductRequest extends Request
             'offer_start' => 'nullable|date|required_with:offer_price',
             'offer_end' => 'nullable|date|required_with:offer_price|after:offer_start',
             'image' => 'mimes:jpg,jpeg,png,gif,svg',
+            'video' => ['nullable', 'file', new \App\Rules\ProductVideoFile],
+            'delete_video' => 'nullable|boolean',
         ];
 
         $rules['sku'] = 'bail|nullable|composite_unique:inventories,sku,shop_id:'.$shop_id.','.$inventoryId;

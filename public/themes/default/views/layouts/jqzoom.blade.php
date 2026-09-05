@@ -37,4 +37,62 @@
       </a>
     </li>
   @endforeach
+
+  @php
+    $productVideoUrl = optional($item->product)->hasVideo()
+      ? get_product_video_url($item->product->video_path)
+      : null;
+  @endphp
+
+  @if ($productVideoUrl)
+    <li class="sf-pdp__video-thumb">
+      <button type="button" class="sf-pdp__video-thumb-btn" data-product-video="{{ $productVideoUrl }}" aria-label="{{ trans('theme.product_video') }}">
+        <i class="fas fa-play"></i>
+        <span>{{ trans('theme.video') }}</span>
+      </button>
+    </li>
+  @endif
 </ul> <!-- /.jqzoom-thumbs -->
+
+@if ($productVideoUrl)
+  <div class="sf-pdp__video" id="product-video-player" hidden>
+    <video controls playsinline preload="metadata" controlslist="nodownload">
+      <source src="{{ $productVideoUrl }}">
+      {{ trans('theme.browser_does_not_support_video') }}
+    </video>
+  </div>
+  <script>
+    (function () {
+      var thumbBtn = document.querySelector('[data-product-video]');
+      var playerWrap = document.getElementById('product-video-player');
+      var mainImgWrap = document.querySelector('.sf-pdp__gallery .clearfix');
+      if (!thumbBtn || !playerWrap) return;
+
+      thumbBtn.addEventListener('click', function () {
+        if (mainImgWrap) mainImgWrap.style.display = 'none';
+        playerWrap.hidden = false;
+        var video = playerWrap.querySelector('video');
+        if (video) {
+          video.play().catch(function () {});
+        }
+        document.querySelectorAll('.jqzoom-thumbs a').forEach(function (a) {
+          a.classList.remove('zoomThumbActive');
+        });
+        thumbBtn.classList.add('is-active');
+      });
+
+      document.querySelectorAll('.jqzoom-thumbs a[data-rel]').forEach(function (a) {
+        a.addEventListener('click', function () {
+          playerWrap.hidden = true;
+          var video = playerWrap.querySelector('video');
+          if (video) {
+            video.pause();
+          }
+          if (mainImgWrap) mainImgWrap.style.display = '';
+          thumbBtn.classList.remove('is-active');
+        });
+      });
+    })();
+  </script>
+@endif
+

@@ -4529,6 +4529,27 @@ body.login-page .login-box:has(.admin-auth-card) {
   color: #1d4ed8;
 }
 
+.product-video-field__preview {
+  margin-bottom: 10px;
+}
+
+.product-video-field__preview video {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  background: #000;
+  border-radius: 8px;
+}
+
+.product-video-field__delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-weight: normal;
+}
+
+
 .wb-form__aside-card {
   padding: 14px 16px;
   background: #f8fafc;

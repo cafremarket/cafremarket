@@ -1125,6 +1125,27 @@ if (! function_exists('attachment_storage_dir')) {
     }
 }
 
+if (! function_exists('product_video_storage_dir')) {
+    function product_video_storage_dir(): string
+    {
+        return 'videos/products';
+    }
+}
+
+if (! function_exists('get_product_video_url')) {
+    /**
+     * Public URL for a product video path (served via image route as raw file).
+     */
+    function get_product_video_url(?string $path): ?string
+    {
+        if (! $path || ! \Illuminate\Support\Facades\Storage::exists($path)) {
+            return null;
+        }
+
+        return url('image/'.$path);
+    }
+}
+
 if (! function_exists('image_storage_dir')) {
     function image_storage_dir()
     {

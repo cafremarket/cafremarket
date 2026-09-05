@@ -113,6 +113,11 @@
             </div>
           </fieldset>
 
+          <fieldset>
+            <legend>{{ trans('app.product_video') }}</legend>
+            @include('admin.product._video_field')
+          </fieldset>
+
           <p class="help-block">* {{ trans('app.form.required_fields') }}</p>
 
           <div class="box-tools pull-right admin-card__actions">

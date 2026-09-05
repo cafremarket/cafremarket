@@ -2,8 +2,7 @@
 {{-- Header --}}
 @slot('header')
 @component('mail::header', ['url' => config('app.url')])
-<img src="{{ get_logo_url('system', 'full') }}" width="200px" class="brand-logo" alt="{{ get_platform_title() }}" title="{{ get_platform_title() }}">
-{{-- {{ get_platform_title() }} --}}
+<img src="{{ get_logo_url('system', 'full') }}" width="180" class="brand-logo" alt="{{ get_platform_title() }}" title="{{ get_platform_title() }}">
 @endcomponent
 @endslot
 
@@ -22,7 +21,11 @@
 {{-- Footer --}}
 @slot('footer')
 @component('mail::footer')
-&copy; {{ date('Y') }} {{ get_platform_title() }}. All rights reserved.
+**{{ get_platform_title() }}**
+
+[Visit website]({{ config('app.url') }})
+
+© {{ date('Y') }} {{ get_platform_title() }}. All rights reserved.
 @endcomponent
 @endslot
 @endcomponent

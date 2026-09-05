@@ -67,6 +67,7 @@ class Product extends Inspectable
         'gtin',
         'gtin_type',
         'description',
+        'video_path',
         'min_price',
         'max_price',
         'origin_country',
@@ -302,5 +303,38 @@ class Product extends Inspectable
                 ->orWhere('mpn', 'like', $like)
                 ->orWhere('gtin', 'like', $like);
         });
+    }
+
+    public function hasVideo(): bool
+    {
+        return filled($this->video_path)
+            && \Illuminate\Support\Facades\Storage::exists($this->video_path);
+    }
+
+    /**
+     * Save or replace the single product video (one per product).
+     */
+    public function saveProductVideo(\Illuminate\Http\UploadedFile $file): void
+    {
+        $this->deleteProductVideo();
+
+        $dir = product_video_storage_dir();
+        $ext = strtolower($file->getClientOriginalExtension() ?: 'mp4');
+        $path = $dir.'/'.uniqid('pv_', true).'.'.$ext;
+
+        \Illuminate\Support\Facades\Storage::put($path, file_get_contents($file->getRealPath()));
+
+        $this->forceFill(['video_path' => $path])->save();
+    }
+
+    public function deleteProductVideo(): void
+    {
+        if ($this->video_path && \Illuminate\Support\Facades\Storage::exists($this->video_path)) {
+            \Illuminate\Support\Facades\Storage::delete($this->video_path);
+        }
+
+        if ($this->video_path) {
+            $this->forceFill(['video_path' => null])->save();
+        }
     }
 }

@@ -56,6 +56,8 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
 
     public function store(Request $request)
     {
+        $request->request->remove('video_path');
+
         if (! $request->filled('shop_id') && Auth::check()) {
             $shopId = Auth::user()->merchantId();
 
@@ -74,18 +76,35 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
             $product->syncTags($product, $request->input('tag_list'));
         }
 
+        $this->syncProductVideo($request, $product);
+
         return $product;
     }
 
     public function update(Request $request, $id)
     {
+        $request->request->remove('video_path');
+
         $product = parent::update($request, $id);
 
         $product->categories()->sync($request->input('category_list', []));
 
         $product->syncTags($product, $request->input('tag_list', []));
 
+        $this->syncProductVideo($request, $product);
+
         return $product;
+    }
+
+    protected function syncProductVideo(Request $request, Product $product): void
+    {
+        if ($request->boolean('delete_video')) {
+            $product->deleteProductVideo();
+        }
+
+        if ($request->hasFile('video')) {
+            $product->saveProductVideo($request->file('video'));
+        }
     }
 
     public function destroy($product)
@@ -96,6 +115,7 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
 
         $product->detachTags($product->id, 'product');
 
+        $product->deleteProductVideo();
         $product->flushImages();
 
         if ($product->hasFeedbacks()) {
@@ -112,6 +132,7 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
         foreach ($products as $product) {
             $product->detachTags($product->id, 'product');
 
+            $product->deleteProductVideo();
             $product->flushImages();
 
             if ($product->hasFeedbacks()) {
@@ -129,6 +150,7 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
         foreach ($products as $product) {
             $product->detachTags($product->id, 'product');
 
+            $product->deleteProductVideo();
             $product->flushImages();
 
             if ($product->hasFeedbacks()) {

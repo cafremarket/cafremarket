@@ -7,12 +7,28 @@
   .password-input-wrap > input[type="text"] {
     padding-right: 44px !important;
   }
-  .password-input-wrap.has-feedback > .form-control {
-    padding-right: 68px !important;
+  .password-input-wrap.has-feedback > .form-control,
+  .password-input-wrap.has-feedback > input[type="password"],
+  .password-input-wrap.has-feedback > input[type="text"] {
+    padding-right: 76px !important;
   }
-  .password-input-wrap.has-feedback .form-control-feedback {
-    right: 36px;
+  .password-input-wrap .form-control-feedback {
+    position: absolute;
+    top: 0;
+    right: 40px;
+    z-index: 3;
+    display: block;
+    width: 34px;
+    height: 100%;
+    line-height: inherit;
+    text-align: center;
     pointer-events: none;
+  }
+  .password-input-wrap .form-control-feedback:before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
   .password-toggle-btn {
     position: absolute;
@@ -41,6 +57,19 @@
     font-size: 16px;
     pointer-events: none;
   }
+
+  /* AdminLTE login: keep lock + eye from stacking on the same spot */
+  .login-box-body .password-input-wrap.has-feedback > .form-control,
+  .register-box-body .password-input-wrap.has-feedback > .form-control {
+    padding-right: 80px !important;
+  }
+  .login-box-body .password-input-wrap .form-control-feedback,
+  .register-box-body .password-input-wrap .form-control-feedback {
+    width: 34px;
+    height: 100%;
+    line-height: normal;
+    right: 42px;
+  }
 </style>
 
 <script>
@@ -61,13 +90,25 @@
       var wrap = document.createElement('div');
       wrap.className = 'password-input-wrap';
 
-      if (input.closest('.form-group.has-feedback')) {
+      var parent = input.parentNode;
+      var feedback = null;
+      var sibling = input.nextElementSibling;
+      if (sibling && sibling.classList && sibling.classList.contains('form-control-feedback')) {
+        feedback = sibling;
+      } else if (parent) {
+        feedback = parent.querySelector(':scope > .form-control-feedback');
+      }
+
+      if (feedback || input.closest('.form-group.has-feedback')) {
         wrap.classList.add('has-feedback');
       }
 
-      var parent = input.parentNode;
       parent.insertBefore(wrap, input);
       wrap.appendChild(input);
+
+      if (feedback) {
+        wrap.appendChild(feedback);
+      }
 
       var btn = document.createElement('button');
       btn.type = 'button';

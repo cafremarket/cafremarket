@@ -72,6 +72,8 @@ class CreateProductRequest extends Request
             'min_price' => 'nullable|numeric|min:0',
             'max_price' => 'nullable|numeric|min:'.$this->min_price ?? 0,
             'images.*' => 'mimes:jpg,jpeg,png,gif,svg',
+            'video' => ['nullable', 'file', new \App\Rules\ProductVideoFile],
+            'delete_video' => 'nullable|boolean',
             'sku' => 'bail|nullable|composite_unique:inventories,sku,shop_id:'.$user->merchantId(),
             'sale_price' => 'nullable|numeric|min:0',
             'offer_price' => 'nullable|numeric',

@@ -43,6 +43,8 @@ class CreateCatalogProductRequest extends Request
             'min_price' => 'nullable|numeric|min:0',
             'max_price' => 'nullable|numeric|min:'.$this->min_price ?? 0,
             'images.*' => 'mimes:jpg,jpeg,png,gif,svg',
+            'video' => ['nullable', 'file', new \App\Rules\ProductVideoFile],
+            'delete_video' => 'nullable|boolean',
         ];
     }
 

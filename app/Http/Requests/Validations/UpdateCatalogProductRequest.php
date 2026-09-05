@@ -32,6 +32,8 @@ class UpdateCatalogProductRequest extends Request
             'active' => 'required',
             'min_price' => 'nullable|numeric|min:0',
             'max_price' => 'nullable|numeric|min:'.$this->min_price ?? 0,
+            'video' => ['nullable', 'file', new \App\Rules\ProductVideoFile],
+            'delete_video' => 'nullable|boolean',
         ];
     }
 

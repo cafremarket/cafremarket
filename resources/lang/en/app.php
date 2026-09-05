@@ -1027,6 +1027,7 @@ return [
         'delete' => 'Delete',
         'delete_avatar' => 'Delete avatar',
         'delete_image' => 'Delete image',
+        'delete_video' => 'Delete video',
         'delete_logo' => 'Delete logo',
         'delete_pattern' => 'Delete pattern',
         'save' => 'Save',
@@ -1846,6 +1847,8 @@ return [
     'inventory' => 'Inventory',
     'advanced' => 'Advanced',
     'product_gallery' => 'Product gallery',
+    'product_video' => 'Product video',
+
     'select_language' => 'Select Language',
     'model_translations_bulk_upload' => ':model Translations Bulk Upload',
     'username' => 'Username',
