@@ -212,6 +212,7 @@ return [
     'address_change_request_not_pending' => 'This address change request is no longer pending review.',
     'address_change_request_approved' => 'The store address change has been approved.',
     'address_change_request_rejected' => 'The store address change has been rejected.',
+    'admin_cannot_update_shop_address' => 'Admins cannot change a store address directly. Review and approve a store address change request instead.',
     'slug_change_request_pending' => 'Your store URL change request is pending admin approval. You will be notified once it is reviewed.',
     'slug_change_request_submitted' => 'Your store URL change request has been submitted. An admin will review it before the new URL goes live.',
     'slug_change_request_not_pending' => 'This store URL change request is no longer pending review.',

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
+use Illuminate\Validation\Rule;
 
 class RegisterCustomerRequest extends Request
 {
@@ -25,7 +26,13 @@ class RegisterCustomerRequest extends Request
     {
         $rules = [
             'name' => 'required|min:3|max:255',
-            'email' => 'required|email|max:255|unique:customers',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                // Soft-deleted (trash) emails can be reclaimed as a new active account.
+                Rule::unique('customers', 'email')->whereNull('deleted_at'),
+            ],
             'password' => 'required|string|min:6|confirmed',
             'agree' => 'required',
         ];
@@ -35,7 +42,13 @@ class RegisterCustomerRequest extends Request
         }
 
         if (is_incevio_package_loaded('otp-login')) {
-            $rules['phone'] = 'required|string|max:255|unique:customers';
+            // Email/password app register may send only a country code — do not require phone.
+            $rules['phone'] = [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('customers', 'phone')->whereNull('deleted_at'),
+            ];
         }
 
         return $rules;

@@ -131,11 +131,10 @@
                 <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.verify', $shop) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.verify_store') }}" data-toggle="tooltip"><i class="fa fa-check-circle text-green"></i></a>
               @endif
               <a href="{{ route('admin.vendor.shop.translate.form', ['shop' => $shop, 'language' => $translation_language]) }}" class="admin-action-btn" title="{{ trans('app.manage_translations') }}" data-toggle="tooltip"><em class="fa fa-language"></em></a>
-              @if ($shop->primaryAddress)
-                <a href="javascript:void(0)" data-link="{{ route('address.edit', $shop->primaryAddress->id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.update_address') }}" data-toggle="tooltip"><i class="fa fa-map-marker"></i></a>
-              @else
-                <a href="javascript:void(0)" data-link="{{ route('address.create', ['shop', $shop->id]) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.add_address') }}" data-toggle="tooltip"><i class="fa fa-plus-square-o"></i></a>
-              @endif
+            @endcan
+            @can('update', $shop->owner)
+              <a href="javascript:void(0)" data-link="{{ route('admin.vendor.merchant.edit', $shop->owner_id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.merchant') }}" data-toggle="tooltip"><i class="fa fa-user"></i></a>
+              <a href="javascript:void(0)" data-link="{{ route('admin.vendor.merchant.changePassword', $shop->owner_id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.change_password') }}" data-toggle="tooltip"><i class="fa fa-lock"></i></a>
             @endcan
             @can('delete', $shop)
               {!! Form::open(['route' => ['admin.vendor.shop.trash', $shop->id], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}

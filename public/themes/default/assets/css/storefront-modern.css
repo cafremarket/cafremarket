@@ -3019,11 +3019,16 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   margin-bottom: 10px;
 }
 
+.product-video-field__preview[hidden],
+.product-video-field__empty[hidden] {
+  display: none !important;
+}
+
 .product-video-field__preview video {
   display: block;
   width: 100%;
-  max-height: 220px;
-  background: #000;
+  max-height: 260px;
+  background: #0f172a;
   border-radius: 8px;
 }
 
@@ -3033,6 +3038,24 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   gap: 6px;
   margin-top: 8px;
   font-weight: normal;
+}
+
+.product-video-field__empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 18px 14px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.product-video-field__empty .fa {
+  font-size: 18px;
+  color: #94a3b8;
 }
 
 

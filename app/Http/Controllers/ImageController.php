@@ -68,7 +68,33 @@ class ImageController extends Controller
             abort(404);
         }
 
-        return $this->disk->response($path);
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $videoMimes = [
+            'mp4' => 'video/mp4',
+            'webm' => 'video/webm',
+            'mov' => 'video/quicktime',
+            'm4v' => 'video/x-m4v',
+        ];
+
+        $headers = [
+            'Accept-Ranges' => 'bytes',
+            'Cache-Control' => 'public, max-age=86400',
+        ];
+
+        if (isset($videoMimes[$ext])) {
+            $headers['Content-Type'] = $videoMimes[$ext];
+        } else {
+            try {
+                $mime = $this->disk->mimeType($path);
+                if (is_string($mime) && $mime !== '') {
+                    $headers['Content-Type'] = $mime;
+                }
+            } catch (\Throwable $e) {
+                // Keep disk default Content-Type.
+            }
+        }
+
+        return $this->disk->response($path, null, $headers);
     }
 
     private function pathIsForSvgImage($path)

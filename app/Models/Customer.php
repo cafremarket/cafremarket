@@ -383,4 +383,41 @@ class Customer extends CustomerWallet
     {
         return $query->where('active', 1);
     }
+
+    /**
+     * Create a customer, or restore a soft-deleted one with the same email
+     * and overwrite it as a fresh active account.
+     */
+    public static function createOrReclaimFromTrash(array $data): self
+    {
+        $email = $data['email'] ?? null;
+        if (! $email) {
+            return static::create($data);
+        }
+
+        $trashed = static::onlyTrashed()
+            ->where('email', $email)
+            ->latest('id')
+            ->first();
+
+        if (! $trashed) {
+            return static::create($data);
+        }
+
+        $trashed->restore();
+
+        $data['active'] = 1;
+        $trashed->fill($data);
+
+        // Drop stale phone when the new registration did not supply one.
+        if (! array_key_exists('phone', $data)) {
+            $trashed->phone = null;
+        }
+
+        $trashed->remember_token = null;
+        $trashed->api_token = null;
+        $trashed->save();
+
+        return $trashed->fresh();
+    }
 }

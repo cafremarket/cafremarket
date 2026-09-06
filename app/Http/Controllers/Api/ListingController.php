@@ -76,6 +76,12 @@ class ListingController extends Controller
                 $listings = get_featured_items($shop_id);
                 break;
 
+            case 'nearby-featured':
+                $listings = $catalog->nearbyFeaturedItems(
+                    (int) config('mobile_app.popular.take.trending', 8)
+                );
+                break;
+
             case 'top_selling_shop_items':
                 $shop = Shop::where('slug', $slug)->approved()
                     ->withCount([
@@ -441,6 +447,12 @@ class ListingController extends Controller
      */
     private function get_shipping_options($item, $country_id, $state)
     {
+        if (hyperlocal_enabled()) {
+            return ShippingOptionResource::collection(
+                get_item_location_shipping_options($item)
+            );
+        }
+
         $zone = get_shipping_zone_of($item->shop_id, $country_id, $state);
 
         if (! $zone || ! isset($zone->id)) {
@@ -467,6 +479,20 @@ class ListingController extends Controller
      */
     public function shipTo(Request $request, Inventory $item)
     {
+        if (hyperlocal_enabled()) {
+            $shipping_options = ShippingOptionResource::collection(
+                get_item_location_shipping_options(
+                    $item,
+                    $request->input('lat'),
+                    $request->input('lng')
+                )
+            );
+
+            return response()->json([
+                'shipping_options' => $shipping_options,
+            ], 200);
+        }
+
         $shipping_options = $this->get_shipping_options($item, $request->country_id, $request->state_id);
 
         if (! $shipping_options) {

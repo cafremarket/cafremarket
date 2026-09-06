@@ -73,14 +73,21 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        // Never surface SMTP / recipient rejection errors as 500 pages.
+        // Never surface SMTP / recipient rejection errors to API clients.
+        // Log only — mail failures must not replace the real API response payload.
         if (function_exists('is_mail_transport_error') && is_mail_transport_error($exception)) {
-            if ($request->expectsJson() || $request->ajax()) {
+            Log::warning('Mail transport error suppressed for response: '.$exception->getMessage(), [
+                'exception' => $exception::class,
+                'path' => $request->path(),
+            ]);
+
+            if ($request->expectsJson() || $request->ajax() || $request->is('api/*')) {
+                // Mail must never decide API success/failure. Log only.
+                // Return empty 204-style ack is wrong for clients; use generic 500
+                // only when mail escaped mid-request (should be rare after afterResponse).
                 return response()->json([
-                    'success' => true,
-                    'mail_warning' => true,
-                    'message' => trans('messages.mail_send_failed_soft'),
-                ], 200);
+                    'message' => trans('api.something_went_wrong'),
+                ], 500);
             }
 
             return redirect()
@@ -147,7 +154,10 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         if ($request->expectsJson()) {
-            return response()->json(['error' => trans('responses.unauthenticated')], 401);
+            return response()->json([
+                'error' => trans('responses.unauthenticated'),
+                'message' => trans('api.auth_required'),
+            ], 401);
         }
 
         $guard = Arr::get($exception->guards(), 0);

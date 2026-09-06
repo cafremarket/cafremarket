@@ -294,6 +294,7 @@ return [
     'address_change_request_not_pending' => 'Este pedido de alteração de endereço já não está pendente de revisão.',
     'address_change_request_approved' => 'A alteração de endereço da loja foi aprovada.',
     'address_change_request_rejected' => 'A alteração de endereço da loja foi rejeitada.',
+    'admin_cannot_update_shop_address' => 'Os administradores não podem alterar o endereço da loja diretamente. Aprove um pedido de alteração de endereço da loja.',
     'verification_option_your_part' => 'Your submission',
     'verification_option_admin_part' => 'Admin approval',
     'verification_phone_saved' => 'Phone number saved successfully.',

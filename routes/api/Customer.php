@@ -49,6 +49,7 @@ Route::middleware('customerApp')->group(function () {
     Route::get('trending-categories', [CategoryController::class, 'trendingCategories']);
     Route::get('category-grps', [CategoryController::class, 'categoryGroup']);
     Route::get('category-subgrps/{group?}', [CategoryController::class, 'categorySubGroup']);
+    Route::get('categories/group/{group}', [CategoryController::class, 'categoriesOfGroup']);
     Route::get('categories/{sub_group?}', [CategoryController::class, 'index']);
 
     // Shops
@@ -82,6 +83,10 @@ Route::middleware('customerApp')->group(function () {
     Route::post('listing/{item}/shipTo', [ListingController::class, 'shipTo']);
     Route::get('listing/{slug}/feedbacks', [FeedbackController::class, 'show_item_feedbacks']);
     Route::get('recently_viewed_items', [ListingController::class, 'recently_viewed']);
+
+    // Location lookup (public — same geocode as web; save stays auth-only)
+    Route::get('customer/location/search', [CustomerLocationController::class, 'searchAddress']);
+    Route::post('customer/location/reverse-geocode', [CustomerLocationController::class, 'reverseGeocode']);
 
     // Deals
     Route::prefix('deals')->group(function () {

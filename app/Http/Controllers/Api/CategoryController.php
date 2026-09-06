@@ -73,6 +73,24 @@ class CategoryController extends Controller
         return CategoryResource::collection($categories);
     }
 
+    /**
+     * Leaf categories under a category group (subgroups flattened — matches storefront browse).
+     */
+    public function categoriesOfGroup($group)
+    {
+        $subGroupIds = CategorySubGroup::query()
+            ->where('category_group_id', $group)
+            ->pluck('id');
+
+        $categories = Category::active()
+            ->whereIn('category_sub_group_id', $subGroupIds)
+            ->with(['coverImage', 'featureImage'])
+            ->orderBy('order', 'asc')
+            ->get();
+
+        return CategoryResource::collection($categories);
+    }
+
     public function trendingCategories()
     {
         $categories = get_trending_categories();

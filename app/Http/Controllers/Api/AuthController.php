@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 // use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Support\Str;
 
@@ -29,10 +30,10 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
-            'accepts_marketing' => $request->subscribe,
+            'accepts_marketing' => $request->boolean('accepts_marketing') || $request->boolean('subscribe'),
             'fcm_token' => $request->fcm_token,
             'verification_token' => Str::random(40),
-            'active' => 0,
+            'active' => 1,
         ];
 
         // Prepare buyerGroup details
@@ -43,25 +44,58 @@ class AuthController extends Controller
             $data['buyer_group_requested_id'] = $request->buyer_group_id;
         }
 
-        if (is_incevio_package_loaded('otp-login')) {
-            $data['phone'] = $request->phone;
-
-            send_otp_code($data['phone']);
+        if (is_incevio_package_loaded('otp-login') && $request->filled('phone')) {
+            $phone = preg_replace('/\s+/', '', (string) $request->phone);
+            // Ignore country-code-only values (e.g. "+880") so they don't block unique phone.
+            if (strlen(preg_replace('/\D+/', '', $phone)) >= 8) {
+                $data['phone'] = $phone;
+            }
         }
 
-        $customer = Customer::create($data);
+        $customer = Customer::createOrReclaimFromTrash($data);
 
-        // Sent email address verification notice to customer
-        safe_notify($customer, new EmailVerificationNotification($customer), 'api register verification');
-
-        $customer->generateToken();
-
-        event(new Registered($customer));
+        $jwt = $customer->generateToken();
 
         // Create address
         if ($request->address_line_1) {
-            $customer->addresses()->create($request->all()); // Save address
+            $customer->addresses()->create($request->all());
         }
+
+        if (empty($customer->jwt_access_token) && is_string($jwt) && $jwt !== '') {
+            $customer->setTransientJwtAccessToken($jwt);
+        }
+
+        $customerId = $customer->id;
+        $phone = $data['phone'] ?? null;
+
+        // Mail / OTP / welcome must run AFTER the API response so SMTP failures
+        // never replace the registration payload (token + user).
+        dispatch(function () use ($customerId, $phone) {
+            $customer = Customer::find($customerId);
+            if (! $customer) {
+                return;
+            }
+
+            if ($phone) {
+                try {
+                    send_otp_code($phone);
+                } catch (\Throwable $e) {
+                    Log::warning('OTP send failed after API register: '.$e->getMessage());
+                }
+            }
+
+            safe_notify(
+                $customer,
+                new EmailVerificationNotification($customer),
+                'api register verification'
+            );
+
+            try {
+                event(new Registered($customer));
+            } catch (\Throwable $e) {
+                Log::warning('Customer Registered event failed after API register: '.$e->getMessage());
+            }
+        })->afterResponse();
 
         return new CustomerResource($customer);
     }
@@ -95,7 +129,11 @@ class AuthController extends Controller
         $customer = Customer::where('email', $credentials['email'])->first();
 
         if ($customer && Hash::check($credentials['password'], $customer->password)) {
-            $customer->generateToken();
+            if (! $customer->active) {
+                return response()->json(['message' => trans('api.account_inactive')], 403);
+            }
+
+            $jwt = $customer->generateToken();
 
             if ($request->filled('fcm_token')) {
                 $customer->fcm_token = FCMService::normalizeToken($request->fcm_token) ?: null;
@@ -103,6 +141,11 @@ class AuthController extends Controller
             }
 
             app(BuyerLocationService::class)->ensureDeliveryLocation($customer);
+
+            // Subsequent saves can drop the in-memory JWT attribute used by the resource.
+            if (empty($customer->jwt_access_token) && is_string($jwt) && $jwt !== '') {
+                $customer->setTransientJwtAccessToken($jwt);
+            }
 
             return new CustomerResource($customer);
         }

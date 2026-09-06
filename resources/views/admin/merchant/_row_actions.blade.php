@@ -9,12 +9,6 @@
 @can('update', $merchant)
   @include('admin.partials.ui.action_btn', ['href' => route('admin.vendor.merchant.edit', $merchant->id), 'icon' => 'fa-edit', 'title' => trans('app.edit'), 'modal' => true])
   @include('admin.partials.ui.action_btn', ['href' => route('admin.vendor.merchant.changePassword', $merchant->id), 'icon' => 'fa-lock', 'title' => trans('app.change_password'), 'modal' => true])
-
-  @if ($merchant->primaryAddress)
-    @include('admin.partials.ui.action_btn', ['href' => route('address.edit', $merchant->primaryAddress->id), 'icon' => 'fa-map-marker', 'title' => trans('app.update_address'), 'modal' => true])
-  @else
-    @include('admin.partials.ui.action_btn', ['href' => route('address.create', ['user', $merchant->id]), 'icon' => 'fa-plus-square-o', 'title' => trans('app.add_address'), 'modal' => true])
-  @endif
 @endcan
 
 @can('delete', $merchant)

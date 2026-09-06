@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
 {
@@ -76,7 +77,13 @@ class RegisterController extends Controller
     {
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:customers',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('customers', 'email')->whereNull('deleted_at'),
+            ],
             'password' => 'required|string|min:6|confirmed',
         ];
 
@@ -85,7 +92,11 @@ class RegisterController extends Controller
         }
 
         if (is_incevio_package_loaded('otp-login')) {
-            $rules['phone'] = 'required|string|unique:customers';
+            $rules['phone'] = [
+                'required',
+                'string',
+                Rule::unique('customers', 'phone')->whereNull('deleted_at'),
+            ];
         }
 
         // When recaptcha in configured
@@ -128,6 +139,7 @@ class RegisterController extends Controller
             'email' => $request->input('email'),
             'password' => $request->input('password'),
             'verification_token' => Str::random(40),
+            'active' => 1,
         ];
 
         if (is_incevio_package_loaded('buyerGroup')) {
@@ -161,12 +173,12 @@ class RegisterController extends Controller
 
             $data['phone'] = $phone;
 
-            Customer::create($data);
+            Customer::createOrReclaimFromTrash($data);
 
             return redirect()->route('phoneverification.notice')->with(['phone_number' => $phone]);
         }
 
-        $customer = Customer::create($data);
+        $customer = Customer::createOrReclaimFromTrash($data);
 
         if (is_incevio_package_loaded('zipcode')) {
             $customer->addresses()->create($request->all());

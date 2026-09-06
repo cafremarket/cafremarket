@@ -139,6 +139,8 @@ return [
     'product_images' => 'Customers will see this images only if the merchant\'s listing has no images to display.',
     'product_video' => 'Optional product video shown on the storefront gallery. One video per product.',
     'product_video_limits' => 'Max 30 seconds, max 10 MB. Formats: MP4, WebM, MOV. Uploading a new file replaces the existing video.',
+    'product_video_preview_hint' => 'Choose a video file to preview it here before saving.',
+    'product_video_current' => 'Current product video. Upload a new file to replace it, or check delete to remove it.',
     'product_active' => 'Merchants will find active items only.',
     'product_slug' => 'This will be used as your product URL, You can not change it later. Be creative to choose the slug for your product',
     'product_description' => 'Customers will see this. This is the core and common product description.',

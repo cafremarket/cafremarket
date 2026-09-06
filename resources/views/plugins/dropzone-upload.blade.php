@@ -189,6 +189,13 @@
           }
         }
 
+        // Product video (serializeArray skips file inputs)
+        formData.delete('video');
+        var videoInput = $("#form-ajax-upload").find('#product_video_input, input[name="video"]')[0];
+        if (videoInput && videoInput.files && videoInput.files[0]) {
+          formData.append('video', videoInput.files[0]);
+        }
+
         if (typeof apply_busy_filter === 'function') {
           apply_busy_filter();
         }

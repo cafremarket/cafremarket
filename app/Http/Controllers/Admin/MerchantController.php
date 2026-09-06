@@ -40,15 +40,13 @@ class MerchantController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * Merchants and shops are managed on one admin page (shops index).
+     *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        $merchants = $this->merchant->all();
-
-        $trashes = $this->merchant->trashOnly();
-
-        return view('admin.merchant.index', compact('merchants', 'trashes'));
+        return redirect()->route('admin.vendor.shop.index');
     }
 
     /**

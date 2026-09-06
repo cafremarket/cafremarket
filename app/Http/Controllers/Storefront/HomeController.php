@@ -302,7 +302,7 @@ class HomeController extends Controller
 
         $item->load([
             'product' => function ($q) use ($item) {
-                $q->select('id', 'brand', 'model_number', 'mpn', 'gtin', 'gtin_type', 'origin_country', 'slug', 'description', 'downloadable', 'manufacturer_id', 'sale_count', 'created_at')
+                $q->select('id', 'brand', 'model_number', 'mpn', 'gtin', 'gtin_type', 'origin_country', 'slug', 'description', 'video_path', 'downloadable', 'manufacturer_id', 'sale_count', 'created_at')
                     ->with([
                         'categories:id,slug,name,shop_id,category_sub_group_id',
                     ])
@@ -400,7 +400,7 @@ class HomeController extends Controller
             ->with([
                 'images:path,imageable_id,imageable_type',
                 'product' => function ($q) {
-                    $q->select('id', 'slug', 'downloadable')
+                    $q->select('id', 'slug', 'downloadable', 'video_path')
                         ->withCount(['inventories' => function ($query) {
                             $query->whereNull('parent_id')->available();
                         }]);

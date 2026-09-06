@@ -25,6 +25,8 @@ class AddressResource extends JsonResource
             'country' => new CountryResource($this->country),
             'state' => new StateResource($this->state),
             'phone' => $this->phone,
+            'latitude' => $this->latitude !== null ? (float) $this->latitude : null,
+            'longitude' => $this->longitude !== null ? (float) $this->longitude : null,
         ];
     }
 }

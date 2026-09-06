@@ -124,7 +124,7 @@ class ProductController extends Controller
         try {
             $product = DB::transaction(function () use ($request) {
 
-        $storedProduct = Product::create($request->all());
+        $storedProduct = Product::create($request->except(['video', 'images', 'image', 'digital_file', 'delete_video']));
 
         // Can have multiple images
         if ($request->hasFile('images')) {
@@ -136,6 +136,14 @@ class ProductController extends Controller
         // When got a single image
         if ($request->hasFile('image')) {
             $storedProduct->saveImage($request->image);
+        }
+
+        if ($request->boolean('delete_video')) {
+            $storedProduct->deleteProductVideo();
+        }
+
+        if ($request->hasFile('video')) {
+            $storedProduct->saveProductVideo($request->file('video'));
         }
 
         if ($request->has('category_list')) {
@@ -376,7 +384,7 @@ class ProductController extends Controller
             $product->saveAttachments($request->file('digital_file'));
         }
 
-        $product->update($request->all());
+        $product->update($request->except(['video', 'images', 'image', 'digital_file', 'delete_image', 'delete_video']));
 
         if ($request->input('delete_image')) {
             if (is_array($request->delete_image)) {
@@ -398,6 +406,14 @@ class ProductController extends Controller
         // When got a single image
         if ($request->hasFile('image')) {
             $product->updateImage($request->image);
+        }
+
+        if ($request->boolean('delete_video')) {
+            $product->deleteProductVideo();
+        }
+
+        if ($request->hasFile('video')) {
+            $product->saveProductVideo($request->file('video'));
         }
 
         $inventoryId = Inventory::where('product_id', $id)->whereNull('parent_id')->pluck('id')->first();

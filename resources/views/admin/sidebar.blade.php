@@ -320,15 +320,7 @@
           </a>
           <ul class="treeview-menu">
             @can('index', \App\Models\Shop::class)
-              <li class="{{ Request::is('admin/seller/merchant*') ? 'active' : '' }}">
-                <a href="{{ url('admin/seller/merchant') }}">
-                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.merchants') }}
-                </a>
-              </li>
-            @endcan
-
-            @can('index', \App\Models\Shop::class)
-              <li class="{{ Request::is('admin/seller/shop*') && !Request::is('admin/seller/shop/verifications*') ? 'active' : '' }}">
+              <li class="{{ ((Request::is('admin/seller/shop*') && !Request::is('admin/seller/shop/verifications*') && !Request::is('admin/seller/shop/address-change-requests*') && !Request::is('admin/seller/shop/slug-change-requests*')) || Request::is('admin/seller/merchant*')) ? 'active' : '' }}">
                 <a href="{{ url('admin/seller/shop') }}">
                   <i class="fa fa-angle-double-right"></i> {{ trans('nav.shops') }}
                 </a>

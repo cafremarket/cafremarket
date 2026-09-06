@@ -116,7 +116,7 @@ class CatalogProductController extends Controller
     {
         $this->authorize('create', Product::class); // Check permission
 
-        $product = Product::create($request->all());
+        $product = Product::create($request->except(['video', 'images', 'image', 'digital_file', 'delete_video']));
 
         // Can have multiple images
         if ($request->hasFile('images')) {
@@ -128,6 +128,14 @@ class CatalogProductController extends Controller
         // When got a single image
         if ($request->hasFile('image')) {
             $product->saveImage($request->image);
+        }
+
+        if ($request->boolean('delete_video')) {
+            $product->deleteProductVideo();
+        }
+
+        if ($request->hasFile('video')) {
+            $product->saveProductVideo($request->file('video'));
         }
 
         if ($request->has('category_list')) {
@@ -209,7 +217,7 @@ class CatalogProductController extends Controller
 
         $this->authorize('update', $product); // Check permission
 
-        $product->update($request->all());
+        $product->update($request->except(['video', 'images', 'image', 'digital_file', 'delete_image', 'delete_video']));
 
         if ($request->has('category_list')) {
             $product->categories()->sync($request->input('category_list'));
@@ -246,6 +254,14 @@ class CatalogProductController extends Controller
         // When got a single image
         if ($request->hasFile('image')) {
             $product->updateImage($request->image);
+        }
+
+        if ($request->boolean('delete_video')) {
+            $product->deleteProductVideo();
+        }
+
+        if ($request->hasFile('video')) {
+            $product->saveProductVideo($request->file('video'));
         }
 
         $request->session()->flash('success', trans('messages.updated', ['model' => $this->model]));

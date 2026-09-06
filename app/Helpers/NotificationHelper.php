@@ -117,7 +117,13 @@ if (! function_exists('safe_notify')) {
         }
 
         try {
-            $notifiable->notify($notification);
+            // Prefer immediate send so transport errors are caught here and never
+            // escape as HTTP responses (queued sync drivers can bubble otherwise).
+            if (method_exists($notifiable, 'notifyNow')) {
+                $notifiable->notifyNow($notification);
+            } else {
+                $notifiable->notify($notification);
+            }
 
             return true;
         } catch (\Throwable $e) {
