@@ -278,34 +278,6 @@
       </table>
   @include('admin.partials.ui.card_end')
 
-  <fieldset id="offerDates" hidden>
-    <legend>{{ trans('app.offer_dates') }}</legend>
-    <div class="row">
-      <div class="col-lg-3 col-md-6 nopadding-right">
-        <div class="form-group">
-          {!! Form::label('offer_start', trans('app.form.offer_start'), ['class' => 'with-help']) !!}
-          <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.offer_start') }}"></i>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-            {!! Form::text('offer_start', null, ['class' => 'form-control datetimepicker', 'placeholder' => trans('app.placeholder.offer_start')]) !!}
-          </div>
-          <div class="help-block with-errors"></div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 nopadding-left">
-        <div class="form-group">
-          {!! Form::label('offer_end', trans('app.form.offer_end'), ['class' => 'with-help']) !!}
-          <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.offer_end') }}"></i>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-            {!! Form::text('offer_end', null, ['class' => 'form-control datetimepicker', 'placeholder' => trans('app.placeholder.offer_end')]) !!}
-          </div>
-          <div class="help-block with-errors"></div>
-        </div>
-      </div>
-    </div>
-  </fieldset>
-
   @include('admin.inventory._key_features')
 
   @include('admin.inventory._cross_selling_fields')
@@ -416,32 +388,6 @@
         }
         return false;
       });
-
-      // Display Offer dates
-      $('input.offerPrice').each(function() {
-        if ($(this).val() != '') {
-          $("#offerDates").show();
-          $('#offer_start').attr('required', 'required');
-          $('#offer_end').attr('required', 'required');
-          return false;
-        }
-      });
-      $(".offerPrice,.deleteThisRow").keyup(checkOfferPrice);
-      $(".deleteThisRow").click(checkOfferPrice);
-
-      function checkOfferPrice() {
-        $('input[name^="offer_price"]').each(function() {
-          if ($(this).val()) {
-            $("#offerDates").show();
-            $('#offer_start').attr('required', 'required');
-            $('#offer_end').attr('required', 'required');
-            return false;
-          }
-          $('#offer_start').removeAttr('required');
-          $('#offer_end').removeAttr('required');
-          $("#offerDates").hide();
-        });
-      }
 
       // Appy styleing for images upload button
       $("input:file").change(function() {

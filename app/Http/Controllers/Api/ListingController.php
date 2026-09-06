@@ -548,9 +548,9 @@ class ListingController extends Controller
         }
 
         if ($request->has('has_offers')) {
-            $products = $products->where('offer_price', '>', 0)
-                ->where('offer_start', '<', $now)
-                ->where('offer_end', '>', $now);
+            $products = $products->filter(function ($product) {
+                return $product->hasOffer();
+            });
         }
 
         if ($request->has('condition')) {

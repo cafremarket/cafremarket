@@ -257,8 +257,6 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
                 'purchase_price' => $purchase_prices[$key] ?? null,
                 'sale_price' => $sale_prices[$key] ?? 0,
                 'offer_price' => ! empty($offer_prices[$key]) ? $offer_prices[$key] : null,
-                'offer_start' => ! empty($offer_prices[$key]) ? $request->input('offer_start') : null,
-                'offer_end' => ! empty($offer_prices[$key]) ? $request->input('offer_end') : null,
                 'slug' => Str::slug($request->input('slug').' '.$sku, '-'),
                 'parent_id' => $parent_id,
             ];

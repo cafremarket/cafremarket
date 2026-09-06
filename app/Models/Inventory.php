@@ -476,9 +476,7 @@ class Inventory extends Inspectable
     {
         if (
             ($this->offer_price > 0) &&
-            ($this->offer_price < $this->sale_price) &&
-            ($this->offer_start < Carbon::now()) &&
-            ($this->offer_end > Carbon::now())
+            ($this->offer_price < $this->sale_price)
         ) {
             return true;
         }
@@ -863,11 +861,8 @@ class Inventory extends Inspectable
      */
     public function scopeHasOffer($query)
     {
-        return $query->where([
-            ['offer_price', '>', 0],
-            ['offer_start', '<', Carbon::now()],
-            ['offer_end', '>', Carbon::now()],
-        ])->whereColumn('offer_price', '<', 'sale_price');
+        return $query->where('offer_price', '>', 0)
+            ->whereColumn('offer_price', '<', 'sale_price');
     }
 
     /**

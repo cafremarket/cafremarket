@@ -377,12 +377,8 @@ foreach ($variants as &$value) {
     function setSalePrice(item) {
       let offer_price = Number.parseFloat(item.offer_price);
       let sale_price = Number.parseFloat(item.sale_price);
-      let now = Date.now();
 
-      if (
-        (offer_price > 0) && (offer_price < sale_price) &&
-        (Date.parse(item.offer_start) < now) && (Date.parse(item.offer_end) > now)
-      ) {
+      if (offer_price > 0 && offer_price < sale_price) {
         unitPrice = Number(item.offer_price); // Update the unit price for calculation
         let off = ((Number(item.sale_price) - Number(item.offer_price)) * 100) / Number(item.sale_price);
         itemWrapper.find('.old-price').show().html(getFormatedPrice(item.sale_price));
@@ -451,15 +447,10 @@ foreach ($variants as &$value) {
 
       @if (is_incevio_package_loaded('wholesale'))
         const offerPrice = Number('{{ $item->offer_price }}');
-        const offerStart = new Date('{{ $item->offer_start }}');
-        const offerEnd = new Date('{{ $item->offer_end }}');
-        const now = new Date();
-
         const isOfferValid = offerPrice > 0 && offerPrice < getWholeSaleUnitPrice();
-        const isOfferActive = offerStart <= now && offerEnd >= now;
         const isQuantityEnoughForWholeSale = qtt >= minimumQuantityForWholeSale();
 
-        if (!isOfferValid || !isOfferActive) {
+        if (!isOfferValid) {
           if (isQuantityEnoughForWholeSale) {
             return getWholeSaleUnitPrice() * Number(qtt);
           }

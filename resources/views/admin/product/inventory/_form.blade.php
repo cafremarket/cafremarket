@@ -66,7 +66,7 @@
 
         <div class="wc-product-data__wrap">
           <ul class="wc-product-data__tabs" role="tablist">
-            <li class="active">
+            <li class="wc-tab-general {{ $productType === 'variable' ? 'hide' : 'active' }}">
               <a href="#wc_tab_general" data-toggle="tab"><i class="fa fa-money"></i> {{ trans('app.general') }}</a>
             </li>
             <li>
@@ -75,7 +75,7 @@
             <li class="wc-tab-shipping">
               <a href="#wc_tab_shipping" data-toggle="tab"><i class="fa fa-truck"></i> {{ trans('app.shipping') }}</a>
             </li>
-            <li class="wc-tab-attributes {{ $productType === 'simple' ? 'hide' : '' }}">
+            <li class="wc-tab-attributes {{ $productType === 'simple' ? 'hide' : '' }} {{ $productType === 'variable' ? 'active' : '' }}">
               <a href="#wc_tab_attributes" data-toggle="tab"><i class="fa fa-tags"></i> {{ trans('app.attributes') }}</a>
             </li>
             <li>
@@ -84,8 +84,8 @@
           </ul>
 
           <div class="tab-content wc-product-data__panels">
-            {{-- GENERAL: pricing --}}
-            <div class="tab-pane active" id="wc_tab_general">
+            {{-- GENERAL: pricing (simple products only — variable products manage price/offer per variant) --}}
+            <div class="tab-pane {{ $productType === 'variable' ? '' : 'active' }}" id="wc_tab_general">
               <div class="wc-option-group">
                 <p class="wc-hint wc-simple-only">{{ trans('help.woo_simple_pricing') }}</p>
                 <p class="wc-hint wc-variable-only hide">{{ trans('help.woo_variable_pricing') }}</p>
@@ -121,27 +121,6 @@
                     @if (get_currency_suffix())
                       <span class="input-group-addon">{{ get_currency_suffix() }}</span>
                     @endif
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-sm-6">
-                    <div class="form-group">
-                      {!! Form::label('offer_start', trans('app.form.offer_start')) !!}
-                      {!! Form::text('offer_start', isset($inventory) ? $inventory->offer_start : null, [
-                        'class' => 'form-control datetimepicker',
-                        'placeholder' => trans('app.placeholder.offer_start'),
-                      ]) !!}
-                    </div>
-                  </div>
-                  <div class="col-sm-6">
-                    <div class="form-group">
-                      {!! Form::label('offer_end', trans('app.form.offer_end')) !!}
-                      {!! Form::text('offer_end', isset($inventory) ? $inventory->offer_end : null, [
-                        'class' => 'form-control datetimepicker',
-                        'placeholder' => trans('app.placeholder.offer_end'),
-                      ]) !!}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -357,7 +336,7 @@
             </div>
 
             {{-- ATTRIBUTES / VARIATIONS --}}
-            <div class="tab-pane" id="wc_tab_attributes">
+            <div class="tab-pane {{ $productType === 'variable' ? 'active' : '' }}" id="wc_tab_attributes">
               <div class="wc-option-group">
                 @include('admin.product.inventory._attributes_tab')
               </div>

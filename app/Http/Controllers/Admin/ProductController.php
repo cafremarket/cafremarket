@@ -175,8 +175,6 @@ class ProductController extends Controller
             'sale_price' => $request->sale_price,
             'available_form' => $request->available_form,
             'offer_price' => $request->offer_price,
-            'offer_start' => $request->offer_start,
-            'offer_end' => $request->offer_end,
             'shipping_weight' => $request->shipping_weight,
             'free_shipping' => $request->free_shipping,
             'available_from' => $request->available_from,
@@ -200,6 +198,7 @@ class ProductController extends Controller
             $skus = $request->input('skus');
             $stock_quantities = $request->input('stock_quantities');
             $sale_prices = $request->input('sale_prices');
+            $offer_prices = $request->input('offer_prices', []);
             $images = $request->file('variant_images');
             $variants = $request->input('variants');
             $tag_lists = $request->input('tag_list');
@@ -224,9 +223,6 @@ class ProductController extends Controller
                 'warehouse_id' => $request->input('warehouse_id'),
                 'supplier_id' => $request->input('supplier_id'),
                 'purchase_price' => $request->input('purchase_price'),
-                'offer_price' => $request->input('offer_price'),
-                'offer_start' => $request->offer_start,
-                'offer_end' => $request->offer_end,
                 'shipping_weight' => $request->input('shipping_weight'),
                 'free_shipping' => $request->input('free_shipping'),
                 'available_from' => $request->input('available_from'),
@@ -245,6 +241,7 @@ class ProductController extends Controller
                 $skus,
                 $stock_quantities,
                 $sale_prices,
+                $offer_prices,
                 $images,
                 $variants,
                 $commonInfo,
@@ -257,6 +254,7 @@ class ProductController extends Controller
                     'sku' => $skus[$key],
                     'stock_quantity' => $stock_quantities[$key] ?? 0,
                     'sale_price' => $sale_prices[$key] ?? 0,
+                    'offer_price' => $offer_prices[$key] ?? null,
                     'slug' => generate_unique_listing_slug($request->input('slug').' '.$skus[$key]),
                 ]);
 
@@ -430,9 +428,6 @@ class ProductController extends Controller
             'description' => $request->description,
             'purchase_price' => $request->purchase_price,
             'available_form' => $request->available_form,
-            'offer_price' => $request->offer_price,
-            'offer_start' => $request->offer_start,
-            'offer_end' => $request->offer_end,
             'shipping_weight' => $request->shipping_weight,
             'free_shipping' => $request->free_shipping,
             'available_from' => $request->available_from,
@@ -447,6 +442,7 @@ class ProductController extends Controller
         $variant_skus = $request->get('variant_skus');
         $variant_quantities = $request->get('variant_quantities');
         $variant_prices = $request->get('variant_prices');
+        $variant_offer_prices = $request->get('variant_offer_prices', []);
         $variant_images = $request->file('variant_images');
 
         $oldVariants = Inventory::where('parent_id', $inventoryId)->get();
@@ -465,6 +461,7 @@ class ProductController extends Controller
                     'sku' => $variant_sku,
                     'stock_quantity' => $variant_quantities[$key],
                     'sale_price' => $variant_prices[$key],
+                    'offer_price' => $variant_offer_prices[$key] ?? null,
                 ];
 
                 // Merge the common info and dynamic info to data array

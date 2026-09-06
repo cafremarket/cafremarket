@@ -76,8 +76,6 @@ class CreateInventoryWithVariantRequest extends Request
             'stock_quantity.*' => 'bail|required|integer',
             'offer_price.*' => 'sometimes|nullable|numeric',
             'available_from' => 'nullable|date',
-            'offer_start' => 'nullable|required_with:offer_price.*|date',
-            'offer_end' => 'nullable|required_with:offer_price.*|date|after:offer_start.*',
             'image.*' => 'mimes:jpg,jpeg,png,gif,svg,webp',
         ];
 
@@ -99,10 +97,6 @@ class CreateInventoryWithVariantRequest extends Request
     {
         $messages = [
             'variants.*.required' => trans('validation.variants_required'),
-            'offer_start.*.required_with' => trans('validation.offer_start_required'),
-            'offer_start.after' => trans('validation.offer_start_after'),
-            'offer_end.required_with' => trans('validation.offer_end_required'),
-            'offer_end.after' => trans('validation.offer_end_after'),
         ];
 
         foreach ($this->input('sku', []) as $key => $val) {

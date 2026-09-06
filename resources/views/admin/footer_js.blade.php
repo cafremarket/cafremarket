@@ -1650,22 +1650,6 @@
     });
     // END Ajax Form Submit
 
-    // Offer Price form
-    var errHelp = '<div class="help-block with-errors"></div>';
-    $('#offer_price').keyup(
-      function() {
-        var offerPrice = this.value;
-        if (offerPrice !== "") {
-          $('#offer_start').attr('required', 'required');
-          $('#offer_end').attr('required', 'required');
-        } else {
-          $('#offer_start').removeAttr('required');
-          $('#offer_end').removeAttr('required');
-        }
-      }
-    );
-    //END Offer Price form
-
     // Collapsible fieldset
     $(function() {
       $('fieldset.collapsible > legend').prepend('<span class="btn-box-tool"><i class="fa fa-toggle-up"></i></span>');

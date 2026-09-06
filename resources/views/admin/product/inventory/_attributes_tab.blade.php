@@ -7,6 +7,8 @@
 @endphp
 
 <div class="product-attributes-tab">
+  @include('admin.product.inventory._variant_manage_modal')
+
   <p class="wc-hint">
     {{ trans('help.optional_variants_hint') }}
     <a href="{{ mp_url('merchant/catalog/attribute') }}" target="_blank">{{ trans('app.manage_attributes') }}</a>

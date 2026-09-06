@@ -261,31 +261,6 @@
             </div> <!-- /.col-md-* -->
           </div> <!-- /.row -->
 
-          <div class="row">
-            <div class="col-md-6 nopadding-right">
-              <div class="form-group">
-                {!! Form::label('offer_start', trans('app.form.offer_start'), ['class' => 'with-help']) !!}
-                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.offer_start') }}"></i>
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                  {!! Form::text('offer_start', null, ['class' => 'form-control datetimepicker', 'placeholder' => trans('app.placeholder.offer_start')]) !!}
-                </div>
-                <div class="help-block with-errors"></div>
-              </div> <!-- /.form-group -->
-            </div> <!-- /.col-md-* -->
-
-            <div class="col-md-6 nopadding-left">
-              <div class="form-group">
-                {!! Form::label('offer_end', trans('app.form.offer_end'), ['class' => 'with-help']) !!}
-                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.offer_end') }}"></i>
-                <div class="input-group">
-                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                  {!! Form::text('offer_end', null, ['class' => 'form-control datetimepicker', 'placeholder' => trans('app.placeholder.offer_end')]) !!}
-                </div>
-                <div class="help-block with-errors"></div>
-              </div> <!-- /.form-group -->
-            </div> <!-- /.col-md-* -->
-          </div> <!-- /.row -->
         </div> <!-- /#js-direct-sale -->
 
         @if (is_incevio_package_loaded('auction'))

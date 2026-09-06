@@ -168,12 +168,7 @@
                     </td>
                     <td>
                       @if ($listing->hasOffer())
-                        @php
-                          $offer_price_help = trans('help.offer_starting_time') . ': ' . $listing->offer_start->diffForHumans() . ' ' . trans('app.and') . ' ' . trans('help.offer_ending_time') . ': ' . $listing->offer_end->diffForHumans();
-                        @endphp
-
-                        <del class="text-muted">{{ get_formated_currency($listing->sale_price, 2, config('system_settings.currency.id')) }}</del>
-                        <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ $offer_price_help }}"><sup><i class="fa fa-question-circle"></i></sup></small><br />
+                        <del class="text-muted">{{ get_formated_currency($listing->sale_price, 2, config('system_settings.currency.id')) }}</del><br />
                       @endif
                       {{ get_formated_currency($listing->current_sale_price(), 2, config('system_settings.currency.id')) }}
                     </td>

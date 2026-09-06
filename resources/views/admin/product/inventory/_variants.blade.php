@@ -1,108 +1,84 @@
+@php
+  // Show every SKU that belongs to this product, including the default/parent
+  // variant — it has no other editable UI now that the General tab is hidden
+  // for variable products, so excluding it here made it unmanageable.
+  $allVariants = $product->inventories->sortBy(fn ($v) => $v->parent_id === null ? 0 : 1)->values();
+@endphp
 <table class="table table-default table-variants-editor" id="variantsTable">
-  @foreach ($product->inventories->whereNotNull('parent_id') as $variant)
+  @foreach ($allVariants as $variant)
     @if ($loop->first)
       <thead>
         <tr>
-          <th>
-            {{ trans('app.sl_number') }}
-          </th>
-
-          @foreach ($variant->attributes as $attr)
-            <th>
-              {{ $attr->name }}
-            </th>
-          @endforeach
-
-          <th>
-            {{ trans('app.form.image') }}
-            <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.variant_image') }}"><sup><i class="fa fa-question"></i></sup></small>
-          </th>
-
-          <th>
-            {{ trans('app.form.sku') }}
-            <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.sku') }}"><sup><i class="fa fa-question"></i></sup></small>
-          </th>
-
-          <th>
-            {{ trans('app.form.stock_quantity') }}
-            <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.stock_quantity') }}"><sup><i class="fa fa-question"></i></sup></small>
-          </th>
-
-          <th>
-            {{ trans('app.form.sale_price') }}
-            <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.sale_price') }}"><sup><i class="fa fa-question"></i></sup></small>
-          </th>
-
-          <th><i class="fa fa-trash-o"></i></th>
+          <th>{{ trans('app.sl_number') }}</th>
+          <th>{{ trans('app.form.image') }}</th>
+          <th>{{ trans('app.variant') }}</th>
+          <th>{{ trans('app.form.sku') }}</th>
+          <th>{{ trans('app.form.stock_quantity') }}</th>
+          <th>{{ trans('app.form.sale_price') }}</th>
+          <th>{{ trans('app.offer_pricing') }}</th>
+          <th></th>
         </tr>
       </thead>
 
       <tbody>
     @endif
 
+    @php
+      $hasOffer = ! empty($variant->offer_price);
+    @endphp
+
     <tr class="variant-row">
+      <td>{{ $loop->iteration }}</td>
+
       <td>
-        <div class="form-group">{{ $loop->iteration }}</div>
+        <img src="{{ $variant->image ? get_storage_file_url(optional($variant->image)->path, 'mini') : url('images/placeholders/no_img.png') }}"
+             class="variant-summary-thumb" alt="{{ $variant->title }}">
       </td>
 
-      @foreach ($variant->attributeValues as $attrVal)
-        <td>
-          {{ $attrVal->value }}
-        </td>
-      @endforeach
+      <td>
+        <span class="variant-attrs-label">
+          @foreach ($variant->attributeValues as $attrVal)
+            <span class="label label-primary">{{ $attrVal->value }}</span>
+          @endforeach
+        </span>
+        @if (is_null($variant->parent_id))
+          <span class="label label-default" title="{{ trans('help.default_variant_selection') }}">{{ trans('app.is_default') }}</span>
+        @endif
+      </td>
+
+      <td><span class="variant-summary-sku">{{ $variant->sku }}</span></td>
+      <td><span class="variant-summary-qty">{{ $variant->stock_quantity }}</span></td>
+      <td><span class="variant-summary-price">{{ get_currency_prefix() }}{{ number_format((float) $variant->sale_price, 2) }}</span></td>
 
       <td>
+        <span class="variant-summary-offer {{ $hasOffer ? '' : 'hide' }}">
+          {{ get_currency_prefix() }}{{ number_format((float) $variant->offer_price, 2) }}
+        </span>
+        <span class="text-muted variant-summary-offer-empty {{ $hasOffer ? 'hide' : '' }}">&mdash;</span>
+      </td>
+
+      <td class="text-nowrap">
         {{ Form::hidden('variant_ids[' . $variant->id . ']', $variant->id) }}
 
-        <label class="img-btn-with-preview">
-          {{ Form::file('variant_images[' . $variant->id . ']', ['class' => 'variant-img']) }}
-          @if ($variant->image)
-            <img src="{{ get_storage_file_url(optional($variant->image)->path, 'mini') }}" class="img-md" alt="{{ $variant->title }}">
-          @else
-            <img src="{{ url('images/placeholders/no_img.png') }}" class="img-md" alt="{{ $variant->title }}">
-          @endif
-        </label>
-      </td>
+        <button type="button" class="btn btn-xs btn-default manageVariantBtn" data-toggle="modal" data-target="#variantManageModal">
+          <i class="fa fa-cog"></i> {{ trans('app.manage') }}
+        </button>
+        @unless (is_null($variant->parent_id))
+          <i class="fa fa-close deleteThisRow text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.delete_this_combination') }}"></i>
+        @endunless
 
-      <td>
-        <div class="form-group">
-          {!! Form::text('variant_skus[' . $variant->id . ']', $variant->sku, ['class' => 'form-control variant-sku', 'placeholder' => trans('app.placeholder.sku'), 'required']) !!}
-        </div>
-      </td>
-
-      <td>
-        <div class="form-group">
-          @include('admin.partials._qty_stepper', [
-            'name' => 'variant_quantities[' . $variant->id . ']',
-            'value' => $variant->stock_quantity,
-            'class' => 'form-control variant-qtt',
-            'min' => 0,
-            'step' => '1',
-            'required' => true,
-            'placeholder' => trans('app.placeholder.stock_quantity'),
-          ])
-        </div>
-      </td>
-
-      <td>
-        <div class="form-group">
-          @include('admin.partials._qty_stepper', [
-            'name' => 'variant_prices[' . $variant->id . ']',
-            'value' => number_format((float) $variant->sale_price, 2, '.', ''),
-            'class' => 'form-control variant-price',
-            'min' => 0,
-            'step' => '0.01',
-            'required' => true,
-            'placeholder' => trans('app.placeholder.sale_price'),
-            'prefix' => get_currency_prefix() ?: config('system_settings.currency.symbol', '$'),
-          ])
-        </div>
-      </td>
-
-      <td>
-        <div class="form-group text-muted">
-          <i class="fa fa-close deleteThisRow" data-toggle="tooltip" data-placement="top" title="{{ trans('help.delete_this_combination') }}"></i>
-        </div>
+        @include('admin.product.inventory._variant_fields', [
+          'imageName' => 'variant_images[' . $variant->id . ']',
+          'imageUrl' => $variant->image ? get_storage_file_url(optional($variant->image)->path, 'mini') : null,
+          'skuName' => 'variant_skus[' . $variant->id . ']',
+          'skuValue' => $variant->sku,
+          'qtyName' => 'variant_quantities[' . $variant->id . ']',
+          'qtyValue' => $variant->stock_quantity,
+          'priceName' => 'variant_prices[' . $variant->id . ']',
+          'priceValue' => number_format((float) $variant->sale_price, 2, '.', ''),
+          'offerPriceName' => 'variant_offer_prices[' . $variant->id . ']',
+          'offerPriceValue' => $variant->offer_price,
+        ])
       </td>
     </tr>
 
@@ -116,8 +92,4 @@
   <a href="{{ route('admin.stock.product.addVariant', $product) }}" class="btn btn-default">
     <i class="fa fa-plus"></i> {{ trans('app.add_new_variant') }}
   </a>
-
-  {{-- <a href="{{ route('admin.catalog.product.addVariant', $product) }}" class="btn btn-default">
-    <i class="fa fa-plus"></i> {{ trans('app.add_another_attribute') }}
-  </a> --}}
 </p>

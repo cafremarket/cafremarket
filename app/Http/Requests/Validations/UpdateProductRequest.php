@@ -92,8 +92,8 @@ class UpdateProductRequest extends Request
             'available_from' => 'nullable|date',
             'min_price' => 'nullable|numeric|min:0',
             'max_price' => 'nullable|numeric|min:'.$this->min_price ?? 0,
-            'offer_start' => 'nullable|date|required_with:offer_price',
-            'offer_end' => 'nullable|date|required_with:offer_price|after:offer_start',
+            'variant_offer_prices.*' => 'nullable|numeric|min:0',
+            'offer_prices.*' => 'nullable|numeric|min:0',
             'image' => 'mimes:jpg,jpeg,png,gif,svg',
             'video' => ['nullable', 'file', new \App\Rules\ProductVideoFile],
             'delete_video' => 'nullable|boolean',
@@ -119,9 +119,6 @@ class UpdateProductRequest extends Request
     {
         return [
             'category_list.required' => trans('validation.category_list_required'),
-            'offer_start.after_or_equal' => trans('validation.offer_start_after'),
-            'required_with.required' => trans('validation.offer_end_required'),
-            'offer_end.after' => trans('validation.offer_end_after'),
         ];
     }
 }

@@ -435,8 +435,6 @@ class InventoryController extends Controller
             'purchase_price' => $request->purchase_price,
             'available_form' => $request->available_form,
             'offer_price' => $request->offer_price,
-            'offer_start' => $request->offer_start,
-            'offer_end' => $request->offer_end,
             'shipping_weight' => $request->shipping_weight,
             'free_shipping' => $request->free_shipping,
             'available_from' => $request->available_from,

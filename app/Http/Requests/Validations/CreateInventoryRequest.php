@@ -51,8 +51,6 @@ class CreateInventoryRequest extends Request
             'offer_price' => 'nullable|numeric',
             'available_from' => 'nullable|date',
             'auction_end' => 'nullable|date|after:available_from',
-            'offer_start' => 'nullable|date|required_with:offer_price',
-            'offer_end' => 'nullable|date|required_with:offer_price|after:offer_start',
             'slug' => 'required|alpha_dash|unique:inventories,slug',
             'image' => 'mimes:jpg,jpeg,png,gif,svg',
         ];
@@ -77,12 +75,7 @@ class CreateInventoryRequest extends Request
      */
     public function messages()
     {
-        $msg = [
-            'offer_start.required_with' => trans('validation.offer_start_required'),
-            'offer_start.after_or_equal' => trans('validation.offer_start_after'),
-            'offer_end.required_with' => trans('validation.offer_end_required'),
-            'offer_end.after' => trans('validation.offer_end_after'),
-        ];
+        $msg = [];
 
         return $msg;
     }

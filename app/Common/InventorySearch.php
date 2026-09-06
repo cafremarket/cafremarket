@@ -142,9 +142,9 @@ trait InventorySearch
         }
 
         if ($request->has('has_offers')) {
-            $items = $items->where('offer_price', '>', 0)
-                ->where('offer_start', '<', $now)
-                ->where('offer_end', '>', $now);
+            $items = $items->filter(function ($item) {
+                return $item->hasOffer();
+            });
         }
 
         if ($request->has('sort_by')) {

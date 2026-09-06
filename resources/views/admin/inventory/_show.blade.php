@@ -322,20 +322,6 @@
                   <th>{{ trans('app.no_offer_available') }}</th>
                 </tr>
               @endif
-              @if ($inventory->offer_start)
-                <tr>
-                  <th class="text-right">{{ trans('app.offer_start') }}:</th>
-                  <td style="width: 75%;">
-                    {{ $inventory->offer_start->toDayDateTimeString() . ' - ' . $inventory->offer_start->diffForHumans() }}
-                  </td>
-                </tr>
-              @endif
-              @if ($inventory->offer_end)
-                <tr>
-                  <th class="text-right">{{ trans('app.offer_end') }}:</th>
-                  <td style="width: 75%;">{{ $inventory->offer_end->toDayDateTimeString() . ' - ' . $inventory->offer_end->diffForHumans() }}</td>
-                </tr>
-              @endif
             </table>
           </div>
           <!-- /.tab-pane -->

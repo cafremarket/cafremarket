@@ -50,11 +50,6 @@ class QuickInventoryUpdateRequest extends Request
      */
     public function messages()
     {
-        return [
-            'required_with.required' => trans('validation.offer_start_required'),
-            'offer_start.after_or_equal' => trans('validation.offer_start_after'),
-            'required_with.required' => trans('validation.offer_end_required'),
-            'offer_end.after' => trans('validation.offer_end_after'),
-        ];
+        return [];
     }
 }

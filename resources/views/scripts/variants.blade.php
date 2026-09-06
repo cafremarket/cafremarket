@@ -90,6 +90,7 @@
           success: function(variants) {
             $('#combinationsPlaceholder').html(variants);
             $('a[href="#wc_tab_attributes"]').tab('show');
+
             if ($('#combinationsPlaceholder').offset()) {
               $('html, body').animate({
                 scrollTop: $('#combinationsPlaceholder').offset().top - 80
@@ -117,6 +118,8 @@
           }
 
           $(this).find('.variant-qtt').val(quantity);
+
+          updateVariantRowSummary($(row));
         });
       });
 
@@ -142,6 +145,89 @@
         }
       });
 
+      // ===== Manage-variant modal: reads/writes a row's real .variant-fields inputs =====
+      var $variantManageModal = $('#variantManageModal');
+      var $variantModalSlot = $variantManageModal.find('.variant-manage-modal__slot');
+      var currentVariantRow = null;
+
+      function currencySymbol() {
+        return {!! json_encode(get_currency_prefix() ?: config('system_settings.currency.symbol', '$')) !!};
+      }
+
+      function updateVariantRowSummary($row) {
+        var $fields = $row.find('.variant-fields');
+        if (!$fields.length) return;
+
+        var sku = $fields.find('.variant-sku').val();
+        var qty = $fields.find('.variant-qtt').val();
+        var price = $fields.find('.variant-price').val();
+        var offerEnabled = $fields.find('.variant-offer-toggle').attr('data-enabled') === '1';
+        var offerPrice = $fields.find('.variant-offer-price').val();
+        var imgSrc = $fields.find('.variant-img-preview').attr('src');
+
+        $row.find('.variant-summary-sku').text(sku || '—');
+        $row.find('.variant-summary-qty').text((qty !== undefined && qty !== '') ? qty : '—');
+        $row.find('.variant-summary-price').text((price !== undefined && price !== '') ? currencySymbol() + parseFloat(price).toFixed(2) : '—');
+        if (imgSrc) {
+          $row.find('.variant-summary-thumb').attr('src', imgSrc);
+        }
+
+        if (offerEnabled && offerPrice) {
+          $row.find('.variant-summary-offer').removeClass('hide').text(currencySymbol() + parseFloat(offerPrice).toFixed(2));
+          $row.find('.variant-summary-offer-empty').addClass('hide');
+        } else {
+          $row.find('.variant-summary-offer').addClass('hide').text('');
+          $row.find('.variant-summary-offer-empty').removeClass('hide');
+        }
+      }
+
+      function syncOfferToggleVisibility($fields, enabled) {
+        var $toggle = $fields.find('.variant-offer-toggle');
+        if (enabled === undefined) {
+          enabled = $toggle.attr('data-enabled') === '1';
+        }
+        $fields.find('.variant-offer-fields').toggleClass('hide', !enabled);
+        if (!enabled) {
+          $fields.find('.variant-offer-price').val('');
+        }
+      }
+
+      $(document).on('click', '.variant-offer-toggle', function(e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var enabled = !($btn.attr('data-enabled') === '1');
+
+        $btn.attr('data-enabled', enabled ? '1' : '0');
+        $btn.toggleClass('btn-primary', enabled).toggleClass('btn-default', !enabled);
+        $btn.find('i').toggleClass('fa-toggle-on', enabled).toggleClass('fa-toggle-off', !enabled);
+
+        syncOfferToggleVisibility($btn.closest('.variant-fields'), enabled);
+      });
+
+      $(document).on('click', '.manageVariantBtn', function(e) {
+        e.preventDefault();
+        var $row = $(this).closest('tr.variant-row');
+        var $fields = $row.find('.variant-fields');
+        if (!$fields.length) return;
+
+        currentVariantRow = $row;
+        $variantModalSlot.empty().append($fields);
+        $variantManageModal.find('.variant-manage-modal__attrs').html($row.find('.variant-attrs-label').html() || '');
+      });
+
+      $variantManageModal.on('hidden.bs.modal', function() {
+        if (!currentVariantRow) return;
+        var $fields = $variantModalSlot.children('.variant-fields');
+        currentVariantRow.append($fields.detach());
+        updateVariantRowSummary(currentVariantRow);
+        currentVariantRow = null;
+      });
+
+      // Initial summary paint for existing variants (server-rendered rows)
+      $('#variantsTable tr.variant-row').each(function() {
+        updateVariantRowSummary($(this));
+      });
+
       // Prefetch options if categories/attributes already selected (edit form)
       if (($('select[name="category_list[]"]').val() || []).length || ($('#product_attrs_list').val() || []).length) {
         loadAttributeOptions({ silent: true });
@@ -163,8 +249,16 @@
       function applyProductType(type, switchTab) {
         var isVariable = type === 'variable';
         $('.wc-tab-attributes').toggleClass('hide', !isVariable);
+        $('.wc-tab-general').toggleClass('hide', isVariable);
         $('.wc-simple-only').toggleClass('hide', isVariable);
         $('.wc-variable-only').toggleClass('hide', !isVariable);
+
+        // Variable products price/offer per variant (in the manage modal) — the shared
+        // General-tab fields no longer apply, so keep them from leaking into the submit.
+        if (isVariable) {
+          $('#wc_tab_general input[name="offer_price"]').val('');
+        }
+
         if (switchTab) {
           if (isVariable) {
             $('a[href="#wc_tab_attributes"]').tab('show');

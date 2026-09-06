@@ -78,8 +78,7 @@ class CreateProductRequest extends Request
             'sale_price' => 'nullable|numeric|min:0',
             'offer_price' => 'nullable|numeric',
             'available_from' => 'nullable|date',
-            'offer_start' => 'nullable|date|required_with:offer_price',
-            'offer_end' => 'nullable|date|required_with:offer_price|after:offer_start',
+            'offer_prices.*' => 'nullable|numeric|min:0',
         ];
     }
 
@@ -92,10 +91,6 @@ class CreateProductRequest extends Request
     {
         return [
             'category_list.required' => trans('validation.category_list_required'),
-            'offer_start.required_with' => trans('validation.offer_start_required'),
-            'offer_start.after_or_equal' => trans('validation.offer_start_after'),
-            'offer_end.required_with' => trans('validation.offer_end_required'),
-            'offer_end.after' => trans('validation.offer_end_after'),
         ];
     }
 }
