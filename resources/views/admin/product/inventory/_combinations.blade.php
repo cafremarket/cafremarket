@@ -1,6 +1,6 @@
 <legend>{{ trans('app.variants') }}</legend>
 <p class="help-block">{{ trans('help.default_variant_selection') }}</p>
-<table class="table table-default" id="variantsTable">
+<table class="table table-default table-variants-editor" id="variantsTable">
   <thead>
     <tr>
       <th>{{ trans('app.sl_number') }}</th>
@@ -49,7 +49,7 @@
     </tr>
   </thead>
 
-  <tbody style="zoom: 0.80;">
+  <tbody>
     @foreach ($combinations as $combination)
       <tr class="variant-row">
         <td>
@@ -91,7 +91,15 @@
 
         <td>
           <div class="form-group">
-            {!! Form::number('stock_quantities[' . $loop->index . ']', null, ['class' => 'form-control variant-qtt', 'placeholder' => trans('app.placeholder.stock_quantity'), 'required']) !!}
+            @include('admin.partials._qty_stepper', [
+              'name' => 'stock_quantities[' . $loop->index . ']',
+              'value' => null,
+              'class' => 'form-control variant-qtt',
+              'min' => 0,
+              'step' => '1',
+              'required' => true,
+              'placeholder' => trans('app.placeholder.stock_quantity'),
+            ])
           </div>
         </td>
 
@@ -114,10 +122,16 @@
  --}}
         <td>
           <div class="form-group">
-            <div class="input-group">
-              <span class="input-group-addon">{{ config('system_settings.currency.symbol', '$') }}</span>
-              {!! Form::number('sale_prices[' . $loop->index . ']', null, ['class' => 'form-control variant-price', 'step' => 'any', 'placeholder' => trans('app.placeholder.sale_price'), 'required']) !!}
-            </div>
+            @include('admin.partials._qty_stepper', [
+              'name' => 'sale_prices[' . $loop->index . ']',
+              'value' => null,
+              'class' => 'form-control variant-price',
+              'min' => 0,
+              'step' => '0.01',
+              'required' => true,
+              'placeholder' => trans('app.placeholder.sale_price'),
+              'prefix' => get_currency_prefix() ?: config('system_settings.currency.symbol', '$'),
+            ])
           </div>
         </td>
 

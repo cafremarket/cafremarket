@@ -1,4 +1,4 @@
-<table class="table table-default" id="variantsTable">
+<table class="table table-default table-variants-editor" id="variantsTable">
   @foreach ($product->inventories->whereNotNull('parent_id') as $variant)
     @if ($loop->first)
       <thead>
@@ -37,7 +37,7 @@
         </tr>
       </thead>
 
-      <tbody style="zoom: 0.80;">
+      <tbody>
     @endif
 
     <tr class="variant-row">
@@ -72,16 +72,30 @@
 
       <td>
         <div class="form-group">
-          {!! Form::number('variant_quantities[' . $variant->id . ']', $variant->stock_quantity, ['class' => 'form-control variant-qtt', 'placeholder' => trans('app.placeholder.stock_quantity'), 'required']) !!}
+          @include('admin.partials._qty_stepper', [
+            'name' => 'variant_quantities[' . $variant->id . ']',
+            'value' => $variant->stock_quantity,
+            'class' => 'form-control variant-qtt',
+            'min' => 0,
+            'step' => '1',
+            'required' => true,
+            'placeholder' => trans('app.placeholder.stock_quantity'),
+          ])
         </div>
       </td>
 
       <td>
         <div class="form-group">
-          <div class="input-group">
-            <span class="input-group-addon">{{ config('system_settings.currency.symbol', '$') }}</span>
-            {!! Form::number('variant_prices[' . $variant->id . ']', $variant->sale_price, ['class' => 'form-control variant-price', 'step' => 'any', 'placeholder' => trans('app.placeholder.sale_price'), 'required']) !!}
-          </div>
+          @include('admin.partials._qty_stepper', [
+            'name' => 'variant_prices[' . $variant->id . ']',
+            'value' => number_format((float) $variant->sale_price, 2, '.', ''),
+            'class' => 'form-control variant-price',
+            'min' => 0,
+            'step' => '0.01',
+            'required' => true,
+            'placeholder' => trans('app.placeholder.sale_price'),
+            'prefix' => get_currency_prefix() ?: config('system_settings.currency.symbol', '$'),
+          ])
         </div>
       </td>
 
