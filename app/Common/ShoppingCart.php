@@ -12,6 +12,7 @@ use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\Hyperlocal\HyperlocalCatalogService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -329,25 +330,31 @@ trait ShoppingCart
         }
 
         // Save the order
+        // Use getAttributes() — NOT toArray(). Loaded relations like shipTo() are
+        // serialized under the same snake_case key ("ship_to") and would overwrite
+        // the address ID with an array (Array to string conversion on insert).
         $order = new Order;
         $order->fill(
-            array_merge($cart->toArray(), [
-                'customer_id' => $this->getCartOwnerId($request, $cart),
-                'payment_method_id' => $request->payment_method_id ?? $cart->payment_method_id,
-                'grand_total' => $cart->calculate_grand_total(),
-                'order_number' => get_formated_order_number($cart->shop_id),
-                'carrier_id' => $cart->carrier() ? $cart->carrier->id : null,
-                'shipping_address' => $request->shipping_address ?? $cart->shipping_address,
-                'billing_address' => $request->shipping_address ?? $cart->shipping_address,
-                'email' => $request->email ?? $cart->email,
-                'customer_phone_number' => $request->phone,
-                'buyer_note' => $request->buyer_note,
-                'device_id' => $request->device_id ?? $cart->device_id,
-                'fulfilment_type' => Order::FULFILMENT_TYPE_DELIVER,
-                'warehouse_id' => null,
-                'customer_latitude' => $customerLat,
-                'customer_longitude' => $customerLng,
-            ])
+            array_merge(
+                Arr::only($cart->getAttributes(), $order->getFillable()),
+                [
+                    'customer_id' => $this->getCartOwnerId($request, $cart),
+                    'payment_method_id' => $request->payment_method_id ?? $cart->payment_method_id,
+                    'grand_total' => $cart->calculate_grand_total(),
+                    'order_number' => get_formated_order_number($cart->shop_id),
+                    'carrier_id' => $cart->carrier() ? $cart->carrier->id : null,
+                    'shipping_address' => $request->shipping_address ?? $cart->getAttribute('shipping_address'),
+                    'billing_address' => $request->shipping_address ?? $cart->getAttribute('shipping_address'),
+                    'email' => $request->email ?? $cart->email,
+                    'customer_phone_number' => is_array($request->phone) ? null : $request->phone,
+                    'buyer_note' => is_array($request->buyer_note) ? null : $request->buyer_note,
+                    'device_id' => $request->device_id ?? $cart->device_id,
+                    'fulfilment_type' => Order::FULFILMENT_TYPE_DELIVER,
+                    'warehouse_id' => null,
+                    'customer_latitude' => $customerLat,
+                    'customer_longitude' => $customerLng,
+                ]
+            )
         )->save();
 
         // Delivery only — pickup fulfilment is disabled system-wide.
