@@ -26,9 +26,9 @@
 
   // For Categories
   elseif (Request::is('categories/*') || Request::is('categorygrp/*') || Request::is('category/*')) {
-      $category = $category ?? ($categorySubGroup ?? $categoryGroup);
-      $SEOtitle = $category->meta_title ?? $SEOtitle;
-      $SEOdescription = $category->meta_description ?? $SEOdescription;
+      $category = $category ?? $categorySubGroup ?? $categoryGroup ?? null;
+      $SEOtitle = optional($category)->meta_title ?? $SEOtitle;
+      $SEOdescription = optional($category)->meta_description ?? $SEOdescription;
   }
 
   // For Shops

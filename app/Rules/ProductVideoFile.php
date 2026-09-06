@@ -5,6 +5,7 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 
 class ProductVideoFile implements ValidationRule
 {
@@ -48,6 +49,12 @@ class ProductVideoFile implements ValidationRule
     private function probeDuration(string $path): ?float
     {
         if (! is_file($path)) {
+            return null;
+        }
+
+        if (! function_exists('shell_exec') || in_array('shell_exec', array_map('trim', explode(',', (string) ini_get('disable_functions'))), true)) {
+            Log::debug('ProductVideoFile: shell_exec unavailable, skipping ffprobe duration check.');
+
             return null;
         }
 
