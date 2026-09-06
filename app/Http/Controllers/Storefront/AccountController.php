@@ -14,7 +14,6 @@ use App\Models\Customer;
 // use App\Events\Profile\ProfileUpdated;
 // use App\Events\Profile\PasswordUpdated;
 use App\Models\Merchant;
-use App\Models\Wishlist;
 use App\Services\Geo\GeocodeService;
 use App\Services\Hyperlocal\BuyerLocationService;
 use Illuminate\Database\Eloquent\Builder;
@@ -54,13 +53,9 @@ class AccountController extends Controller
                     $query->select(['id', 'customer_id', 'shop_id', 'order_number', 'currency_id', 'item_count', 'grand_total', 'order_status_id', 'created_at'])
                         ->with(['shop:id,slug,name', 'shop.image'])->latest()->take(5);
                 },
-                'wishlists' => function ($query) {
-                    $query->with('inventory:id,slug,title', 'inventory.images')->latest()->take(5);
-                },
             ])
             ->withCount([
                 'orders',
-                'wishlists',
                 'messages' => function ($query) {
                     $query->unread();
                 },
@@ -137,23 +132,6 @@ class AccountController extends Controller
     }
 
     /**
-     * Return wishlist
-     *
-     * @return collection
-     */
-    private function wishlist()
-    {
-        return Wishlist::mine()
-            ->whereHas('inventory', function ($q) {
-                $q->available();
-            })->with([
-                'inventory',
-                'inventory.feedbacks:rating,feedbackable_id,feedbackable_type',
-                'inventory.images:path,imageable_id,imageable_type',
-            ])->paginate(10);
-    }
-
-    /**
      * Return disputes
      *
      * @return collection
@@ -182,7 +160,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Return wishlist
+     * Return events
      *
      * @return collection
      */

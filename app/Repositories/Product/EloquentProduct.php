@@ -21,11 +21,15 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
     {
         if (Auth::user()->isFromPlatform()) {
             return $this->model->with('categories', 'shop.logo', 'featureImage', 'image')
-                ->withCount('inventories')->get();
+                ->withCount(['inventories' => function ($q) {
+                    $q->whereNull('parent_id');
+                }])->get();
         }
 
         return $this->model->mine()->with('categories', 'featureImage', 'image')
-            ->withCount('inventories')->get();
+            ->withCount(['inventories' => function ($q) {
+                $q->whereNull('parent_id');
+            }])->get();
     }
 
     public function find($id)

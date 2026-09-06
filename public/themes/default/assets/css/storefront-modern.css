@@ -1,6 +1,6 @@
-/* Cafrepay storefront modernization — uses existing theme CSS variables */
+/* Cafrepay storefront modernization â uses existing theme CSS variables */
 
-/* ── Site header & logo (shared on public + account pages) ───────── */
+/* ââ Site header & logo (shared on public + account pages) âââââââââ */
 .sf-site-header {
   background: #fff;
   border-bottom: 1px solid #e8edf2;
@@ -135,7 +135,7 @@
   }
 }
 
-/* ── Skeleton loading ─────────────────────────────────────────────── */
+/* ââ Skeleton loading âââââââââââââââââââââââââââââââââââââââââââââââ */
 @keyframes sf-shimmer {
   0% { background-position: -400px 0; }
   100% { background-position: 400px 0; }
@@ -222,7 +222,7 @@
   margin-bottom: 12px;
 }
 
-/* ── Homepage location hero ───────────────────────────────────────── */
+/* ââ Homepage location hero âââââââââââââââââââââââââââââââââââââââââ */
 .home-location-hero {
   background: linear-gradient(135deg, var(--primary-color, #ff6600) 0%, var(--primary-dark, #cc5200) 100%);
   color: #fff;
@@ -351,7 +351,7 @@
   margin-top: 10px;
 }
 
-/* ── Account sidebar ──────────────────────────────────────────────── */
+/* ââ Account sidebar ââââââââââââââââââââââââââââââââââââââââââââââââ */
 .sf-account-layout {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -532,7 +532,7 @@
   transform: rotate(180deg);
 }
 
-/* ── Mobile storefront nav (clean drawer) ─────────────────────────── */
+/* ââ Mobile storefront nav (clean drawer) âââââââââââââââââââââââââââ */
 @media (max-width: 991px) {
   .sf-mobile-drawer.main-menu.mobile-mega-menu {
     display: flex !important;
@@ -728,14 +728,14 @@
   }
 }
 
-/* Legacy mobile nav classes — keep hidden */
+/* Legacy mobile nav classes â keep hidden */
 .sf-mobile-nav,
 .main-menu-top,
 .main-menu-bottom {
   display: none !important;
 }
 
-/* ── Dashboard content ────────────────────────────────────────────── */
+/* ââ Dashboard content ââââââââââââââââââââââââââââââââââââââââââââââ */
 .sf-dashboard-welcome {
   background: #fff;
   border-radius: 14px;
@@ -964,7 +964,7 @@ a.sf-btn-primary:focus,
   display: none !important;
 }
 
-/* ── Responsive ───────────────────────────────────────────────────── */
+/* ââ Responsive âââââââââââââââââââââââââââââââââââââââââââââââââââââ */
 /* Homepage: address selector lives in hero, hide header duplicate */
 body.sf-homepage .top-nav-left .delivery-location-chip {
   display: none;
@@ -980,7 +980,7 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Account pages — panel wrapper for inner tabs */
+/* Account pages â panel wrapper for inner tabs */
 .sf-account-content > .row:first-child,
 .sf-account-content > form:first-child {
   margin-bottom: 16px;
@@ -1057,7 +1057,7 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   }
 }
 
-/* ── Footer ───────────────────────────────────────────────────────── */
+/* ââ Footer âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
 .sf-footer {
   margin-top: 40px;
 }
@@ -1357,7 +1357,7 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   }
 }
 
-/* ── Empty stores state ─────────────────────────────────────────────── */
+/* ââ Empty stores state âââââââââââââââââââââââââââââââââââââââââââââââ */
 .sf-empty-stores {
   background: #fff;
   border: 1px dashed #e0e0e0;
@@ -1387,7 +1387,7 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   margin: 0 auto 8px;
 }
 
-/* ── Stores listing page ──────────────────────────────────────────── */
+/* ââ Stores listing page ââââââââââââââââââââââââââââââââââââââââââââ */
 .sf-stores-page {
   background: #f8fafc;
 }
@@ -1469,7 +1469,7 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   pointer-events: none;
 }
 
-/* Homepage nearby stores — paginated grid (no "view all" link) */
+/* Homepage nearby stores â paginated grid (no "view all" link) */
 .sf-home-stores-section {
   padding-top: 36px;
   scroll-margin-top: 110px;
@@ -1532,7 +1532,7 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   height: 100%;
 }
 
-/* Legacy alias — keep until cached CSS clears */
+/* Legacy alias â keep until cached CSS clears */
 .sf-vendors-page,
 .sf-vendors-grid,
 .sf-vendors-view-all,
@@ -1554,7 +1554,7 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
   margin-right: 4px;
 }
 
-/* ── Account page shell (dashboard redesign) ─────────────────────── */
+/* ââ Account page shell (dashboard redesign) âââââââââââââââââââââââ */
 .sf-dashboard-page {
   background: #f8fafc;
   padding-top: 28px;
@@ -2016,7 +2016,7 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   color: #0f172a;
 }
 
-/* ── Address wizard (create / edit modal) ─────────────────────────── */
+/* ââ Address wizard (create / edit modal) âââââââââââââââââââââââââââ */
 .sf-address-modal {
   border: none;
   border-radius: 20px;
@@ -2557,7 +2557,7 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   font-size: 0.8rem;
 }
 
-/* ── Wallet (Cafre-pay) dashboard ─────────────────────────────────── */
+/* ââ Wallet (Cafre-pay) dashboard âââââââââââââââââââââââââââââââââââ */
 .sf-wallet-page {
   display: flex;
   flex-direction: column;
@@ -2628,7 +2628,7 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   }
 }
 
-/* ── Store page ───────────────────────────────────────────────────── */
+/* ââ Store page âââââââââââââââââââââââââââââââââââââââââââââââââââââ */
 .sf-store {
   background: #f4f6f8;
   padding-bottom: 48px;
@@ -2899,7 +2899,7 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   }
 }
 
-/* ── Product page ─────────────────────────────────────────────────── */
+/* ââ Product page âââââââââââââââââââââââââââââââââââââââââââââââââââ */
 .sf-pdp {
   background: #f4f6f8;
   padding-bottom: 40px;
@@ -3390,7 +3390,7 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   }
 }
 
-/* ── Order confirmation + delivery location ─────────────────────── */
+/* ââ Order confirmation + delivery location âââââââââââââââââââââââ */
 .sf-order-confirm {
   padding: 8px 0 48px;
 }
@@ -4535,7 +4535,7 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   }
 }
 
-/* 3 banners per row — contained with gaps (not full-bleed) */
+/* 3 banners per row â contained with gaps (not full-bleed) */
 .banner-block.banner-block--third {
   max-width: 1400px;
   margin-left: auto;
@@ -4641,3 +4641,174 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
 }
 
 
+
+/* Product share — aligned with wishlist / chat actions */
+.product-info-actions .col-6 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.product-info-actions .btn-link,
+.product-info-actions .sf-share__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  line-height: 1.4;
+  white-space: normal;
+  text-align: left;
+  border-radius: 0;
+}
+
+.product-info-actions .sf-share__trigger:hover,
+.product-info-actions .sf-share__trigger:focus {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  text-decoration: underline;
+  outline: none;
+}
+
+.sf-share {
+  margin-top: 0;
+}
+
+.sf-share-modal .modal-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 16px 20px;
+}
+
+.sf-share-modal .modal-title {
+  font-size: 18px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sf-share-modal .modal-body {
+  padding: 20px;
+}
+
+.sf-share-modal__product {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.sf-share-modal__thumb {
+  flex: 0 0 72px;
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3f3f3;
+}
+
+.sf-share-modal__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sf-share-modal__meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.sf-share-modal__name {
+  margin: 0 0 6px;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.sf-share-modal__desc {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.sf-share-modal__price {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.sf-share-modal__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.sf-share-modal__link-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sf-share-modal__link-row .form-control {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.sf-share-modal__copy {
+  white-space: nowrap;
+}
+
+.sf-share-modal__copied {
+  font-size: 12px;
+  margin: 0 0 12px;
+}
+
+.sf-share-modal__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.sf-share-modal__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  font-size: 13px;
+  background: #fff;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.sf-share-modal__action:hover,
+.sf-share-modal__action:focus {
+  background: #f7f7f7;
+  border-color: rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  color: inherit;
+}
+
+@media (max-width: 575px) {
+  .sf-share-modal__link-row {
+    flex-direction: column;
+  }
+
+  .sf-share-modal__actions {
+    grid-template-columns: 1fr;
+  }
+}

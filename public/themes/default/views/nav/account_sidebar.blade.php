@@ -35,13 +35,6 @@
         </a>
       </li>
 
-      <li class="{{ $tab == 'wishlist' ? 'active' : '' }}">
-        <a href="{{ route('account', 'wishlist') }}">
-          <span class="sf-account-nav__icon"><i class="fas fa-heart" aria-hidden="true"></i></span>
-          <span>@lang('theme.nav.my_wishlist')</span>
-        </a>
-      </li>
-
       <li class="{{ $tab == 'disputes' ? 'active' : '' }}">
         <a href="{{ route('account', 'disputes') }}">
           <span class="sf-account-nav__icon"><i class="fas fa-undo-alt" aria-hidden="true"></i></span>

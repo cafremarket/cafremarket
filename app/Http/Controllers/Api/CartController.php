@@ -38,7 +38,10 @@ class CartController extends Controller
             },
             'inventories.image',
             'coupon:id,shop_id,name,code,value,type',
+            'shippingAddress',
         ])->get();
+
+        app(\App\Services\Cart\CartDeliveryRangeService::class)->annotate($carts);
 
         return CartResource::collection($carts);
     }
@@ -52,6 +55,9 @@ class CartController extends Controller
     public function show(Request $request, Cart $cart)
     {
         if (crosscheckCartOwnership($request, $cart)) {
+            $cart->loadMissing(['shop.config', 'inventories.image', 'coupon', 'shippingAddress']);
+            app(\App\Services\Cart\CartDeliveryRangeService::class)->annotate(collect([$cart]));
+
             return new CartResource($cart);
         }
 
@@ -316,6 +322,9 @@ class CartController extends Controller
         $cart->grand_total = $cart->calculate_grand_total();
         $cart->save();
 
+        $cart->loadMissing(['shop', 'shippingAddress']);
+        app(\App\Services\Cart\CartDeliveryRangeService::class)->annotate(collect([$cart]));
+
         return response()->json([
             'message' => trans('api.cart_updated'),
             'cart' => new CartResource($cart),
@@ -428,14 +437,8 @@ class CartController extends Controller
         $cart->grand_total = $cart->calculate_grand_total();
         $cart->save();
 
-        // The coupon is valid
-        // $disc_amnt = 'percent' == $coupon->type ? ($cart->total * ($coupon->value / 100)) : $coupon->value;
-
-        // Update the cart with coupon value
-        // $cart->discount = $disc_amnt < $cart->total ? $disc_amnt : $cart->total; // Discount the amount or the cart total
-        // $cart->coupon_id = $coupon->id;
-        // $cart->grand_total = $cart->calculate_grand_total();
-        // $cart->save();
+        $cart->loadMissing(['shop', 'shippingAddress']);
+        app(\App\Services\Cart\CartDeliveryRangeService::class)->annotate(collect([$cart]));
 
         return response()->json([
             'message' => trans('theme.coupon_applied'),

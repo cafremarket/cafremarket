@@ -177,13 +177,17 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
     {
         $product = json_decode($request->input('product'));
 
+        if (! is_object($product) || empty($product->id)) {
+            throw new \InvalidArgumentException(trans('responses.invalid_data'));
+        }
+
         // Common information
         $commonInfo = [
             'user_id' => $request->user()->id, // Set user_id
             'shop_id' => $request->user()->merchantId(), // Set shop_id
-            'title' => $request->has('title') ? $request->input('title') : $product->name,
+            'title' => $request->has('title') ? $request->input('title') : ($product->name ?? null),
             'product_id' => $product->id,
-            'brand' => $product->brand,
+            'brand' => $product->brand ?? null,
             'warehouse_id' => $request->input('warehouse_id'),
             'supplier_id' => $request->input('supplier_id'),
             'shipping_width' => $request->input('shipping_width'),
@@ -204,41 +208,63 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
         ];
 
         // Arrays
-        $skus = $request->input('sku');
-        $conditions = $request->input('condition');
-        $stock_quantities = $request->input('stock_quantity');
-        $purchase_prices = $request->input('purchase_price');
-        $sale_prices = $request->input('sale_price');
-        $offer_prices = $request->input('offer_price');
+        $skus = $request->input('sku', []);
+        $conditions = $request->input('condition', []);
+        $stock_quantities = $request->input('stock_quantity', []);
+        $purchase_prices = $request->input('purchase_price', []);
+        $sale_prices = $request->input('sale_price', []);
+        $offer_prices = $request->input('offer_price', []);
         $images = $request->file('image');
+
+        if (! is_array($skus) || count($skus) === 0) {
+            throw new \InvalidArgumentException(trans('validation.variants_required'));
+        }
 
         // Relations
         $tag_lists = $request->input('tag_list');
-        $variants = $request->input('variants');
+        $variants = $request->input('variants', []);
         if (is_incevio_package_loaded('packaging')) {
             $packaging_lists = $request->input('packaging_list');
         }
 
         $isFirst = true;
         $parent_id = null;
+        $defaultKey = $request->input('default_variant');
+        if ($defaultKey === null || ! array_key_exists($defaultKey, $skus)) {
+            $defaultKey = array_key_first($skus);
+        }
+
+        // Create the default variant first so it becomes the parent listing SKU.
+        $orderedKeys = array_keys($skus);
+        usort($orderedKeys, function ($a, $b) use ($defaultKey) {
+            if ((string) $a === (string) $defaultKey) {
+                return -1;
+            }
+            if ((string) $b === (string) $defaultKey) {
+                return 1;
+            }
+
+            return $a <=> $b;
+        });
 
         // Preparing data and insert records.
         $dynamicInfo = [];
-        foreach ($skus as $key => $sku) {
+        foreach ($orderedKeys as $key) {
+            $sku = $skus[$key];
             $dynamicInfo = [
-                'sku' => $skus[$key],
-                'stock_quantity' => $stock_quantities[$key],
-                'purchase_price' => $purchase_prices[$key],
-                'sale_price' => $sale_prices[$key],
-                'offer_price' => ($offer_prices[$key]) ? $offer_prices[$key] : null,
-                'offer_start' => ($offer_prices[$key]) ? $request->input('offer_start') : null,
-                'offer_end' => ($offer_prices[$key]) ? $request->input('offer_end') : null,
+                'sku' => $sku,
+                'stock_quantity' => $stock_quantities[$key] ?? 0,
+                'purchase_price' => $purchase_prices[$key] ?? null,
+                'sale_price' => $sale_prices[$key] ?? 0,
+                'offer_price' => ! empty($offer_prices[$key]) ? $offer_prices[$key] : null,
+                'offer_start' => ! empty($offer_prices[$key]) ? $request->input('offer_start') : null,
+                'offer_end' => ! empty($offer_prices[$key]) ? $request->input('offer_end') : null,
                 'slug' => Str::slug($request->input('slug').' '.$sku, '-'),
                 'parent_id' => $parent_id,
             ];
 
             if (config('system_settings.show_item_conditions')) {
-                $dynamicInfo['condition'] = $conditions[$key];
+                $dynamicInfo['condition'] = $conditions[$key] ?? null;
             }
 
             // Merge the common info and dynamic info to data array
@@ -253,12 +279,12 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
             }
 
             // Sync Attributes
-            if ($variants[$key]) {
+            if (! empty($variants[$key])) {
                 $this->setAttributes($inventory, $variants[$key]);
             }
 
             // Sync packaging
-            if (is_incevio_package_loaded('packaging') && $packaging_lists) {
+            if (is_incevio_package_loaded('packaging') && ! empty($packaging_lists)) {
                 $inventory->packagings()->sync($packaging_lists);
             }
 

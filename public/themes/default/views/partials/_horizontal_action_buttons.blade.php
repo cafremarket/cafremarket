@@ -8,10 +8,6 @@
   </a>
 @endif
 
-<a href="javascript:void(0);" data-link="{{ route('wishlist.add', $item) }}" class="button add-to-wishlist" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.button.add_to_wishlist') }}">
-  <i class="fal fa-heart"></i>
-</a>
-
 <a href="javascript:void(0);" data-link="{{ route('cart.addItem', $item->slug) }}" class="button button-cart btn-primary sc-add-to-cart px-4" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.button.add_to_cart') }}">
   <i class="fal fa-shopping-cart"></i>
   <span class="d-sm-none">{{ trans('theme.add_to_cart') }}</span>

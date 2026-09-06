@@ -35,14 +35,12 @@
             @endif
 
             <div class="box-action-vertical">
-              @include('theme::partials._btn_quick_view')
+        @include('theme::partials._btn_quick_view')
 
-              @if (is_incevio_package_loaded('comparison'))
-                @include('comparison::_btn_add_to_compare')
-              @endif
-
-              @include('theme::partials._btn_wishlist')
-            </div>
+        @if (is_incevio_package_loaded('comparison'))
+          @include('comparison::_btn_add_to_compare')
+        @endif
+      </div>
 
             <div class="box-action">
               <div class="box-action-price my-2">

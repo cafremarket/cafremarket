@@ -60,7 +60,6 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\Ticket::class => \App\Policies\TicketPolicy::class,
         \App\Models\User::class => \App\Policies\UserPolicy::class,
         \App\Models\Warehouse::class => \App\Policies\WarehousePolicy::class,
-        \App\Models\Wishlist::class => \App\Policies\WishlistPolicy::class,
     ];
 
     /**

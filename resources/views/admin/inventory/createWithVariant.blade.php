@@ -29,7 +29,11 @@
     'bodyClass' => '',
     'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
   ])
-      {{ Form::hidden('product', $product) }}
+      {{ Form::hidden('product', json_encode([
+          'id' => $product->id,
+          'name' => $product->name,
+          'brand' => $product->brand,
+      ])) }}
 
       <div class="row">
         <div class="col-md-12">
@@ -160,6 +164,9 @@
         <thead>
           <tr>
             <th>{{ trans('app.sl_number') }}</th>
+            <th>{{ trans('app.is_default') }}
+              <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.default_variant_selection') }}"><sup><i class="fa fa-question"></i></sup></small>
+            </th>
             <th>{{ trans('app.form.variants') }}
               <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.variants') }}"><sup><i class="fa fa-question"></i></sup></small>
             </th>
@@ -199,6 +206,14 @@
             <tr>
               <td>
                 <div class="form-group">{{ $i + 1 }}</div>
+              </td>
+              <td class="text-center">
+                <div class="form-group" style="margin-top: 8px;">
+                  <label class="radio-inline" title="{{ trans('help.default_variant_selection') }}">
+                    <input type="radio" name="default_variant" value="{{ $i }}" {{ $i === 0 ? 'checked' : '' }}>
+                    {{ trans('app.is_default') }}
+                  </label>
+                </div>
               </td>
               <td>
                 <div class="form-group">
@@ -390,7 +405,15 @@
 
       // Remove table rows
       $(".deleteThisRow").click(function(event) {
-        $($(this).closest("tr")).remove();
+        var row = $(this).closest("tr");
+        var wasDefault = row.find('input[name="default_variant"]').is(':checked');
+        row.remove();
+        if (wasDefault) {
+          var firstRadio = $('#variantsTable input[name="default_variant"]').first();
+          if (firstRadio.length) {
+            firstRadio.prop('checked', true);
+          }
+        }
         return false;
       });
 

@@ -374,7 +374,7 @@ class demoSeeder extends BaseSeeder
 
         $this->call(BannersSeeder::class);
 
-        // \App\Models\Wishlist::factory()->count($this->count)->create();
+        // Wishlist factory removed with wishlist module.
         \App\Models\Feedback::factory()->count($this->veryLongCount)->create();
 
         $this->call(EmailTemplateSeeder::class);

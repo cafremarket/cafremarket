@@ -249,13 +249,6 @@
               @endif
 
               <li>
-                <a href="{{ route('account', 'wishlist') }}" aria-label="{{ trans('theme.your_wishlist') }}">
-                  <i class="fal fa-heart" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.your_wishlist') }}"></i>
-                  <span id="globalWishlistItemCount" class="badge {{ ($wishlist_item_count ?? 0) == 0 ? 'hidden' : '' }}">{{ $wishlist_item_count ?? 0 }}</span>
-                </a>
-              </li>
-
-              <li>
                 <a href="{{ route('cart.index') }}" aria-label="{{ trans('theme.your_cart') }}">
                   <i class="fal fa-shopping-cart" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.your_cart') }}"></i>
                   <span id="globalCartItemCount" class="badge {{ ($cart_item_count ?? 0) == 0 ? 'hidden' : '' }}">{{ $cart_item_count ?? 0 }}</span>

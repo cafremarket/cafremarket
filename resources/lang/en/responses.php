@@ -8,6 +8,7 @@ return [
     'denied' => 'Permission denied!',
     404 => 'This content is not available or you don\'t have permission to access this area',
     'error' => 'Action failed! There is something wrong on server side',
+    'post_too_large' => 'Upload is too large for the server. Reduce image sizes or contact support to raise the upload limit.',
     'timeout' => 'Action failed! The request timeout',
     'reordered' => 'Successfully reordered',
     'no_files_to_upload' => 'No files found for upload.',

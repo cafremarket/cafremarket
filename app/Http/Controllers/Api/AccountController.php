@@ -8,7 +8,6 @@ use App\Events\Customer\PasswordUpdated;
 // use App\Helpers\ListHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\SelfPasswordUpdateRequest;
-// use App\Http\Resources\WishlistResource;
 use App\Http\Resources\CouponResource;
 // use App\Http\Resources\OrderResource;
 // use App\Http\Resources\OrderCollection;
@@ -32,7 +31,7 @@ class AccountController extends Controller
     {
         $customer = Customer::where('id', Auth::guard('api')->user()->id)->with('image')
             ->withCount([
-                'orders', 'wishlists',
+                'orders',
                 'disputes' => function ($query) {
                     $query->open();
                 },

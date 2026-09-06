@@ -1,6 +1,8 @@
 @php
   use App\Models\Banner;
 
+  $bannerRoute = $bannerRoute ?? 'admin.web_banner';
+  $rowBadge = $rowBadge ?? trans('app.homepage');
   $columnsUsed = (int) $groupBanners->sum('columns');
   $rowLabel = trans('help.web_banner_group_'.$group->id, ['default' => $group->name]);
   $rowHint = trans('help.web_banner_group_'.$group->id.'_hint', ['default' => '']);
@@ -17,7 +19,7 @@
     <div class="wb-row__heading">
       <div class="wb-row__title-wrap">
         <h4 class="wb-row__title">{{ $rowLabel }}</h4>
-        <span class="wb-row__badge">{{ trans('app.homepage') }}</span>
+        <span class="wb-row__badge">{{ $rowBadge }}</span>
         @if ($groupBanners->isNotEmpty())
           <span class="wb-row__badge wb-row__badge--type">{{ $typeLabel }}</span>
         @endif
@@ -38,7 +40,7 @@
       @endif
       @can('create', $bannerModel)
         <a href="javascript:void(0)"
-           data-link="{{ route('admin.web_banner.create', ['group_id' => $group->id]) }}"
+           data-link="{{ route($bannerRoute.'.create', ['group_id' => $group->id]) }}"
            class="ajax-modal-btn btn btn-sm btn-default btn-flat">
           <i class="fa fa-plus"></i> {{ trans('app.add_banner') }}
         </a>
@@ -52,7 +54,7 @@
       <p>{{ trans('app.no_banner_in_group') }}</p>
       @can('create', $bannerModel)
         <a href="javascript:void(0)"
-           data-link="{{ route('admin.web_banner.create', ['group_id' => $group->id]) }}"
+           data-link="{{ route($bannerRoute.'.create', ['group_id' => $group->id]) }}"
            class="ajax-modal-btn btn btn-new btn-flat btn-sm">
           <i class="fa fa-plus"></i> {{ trans('app.add_banner') }}
         </a>
@@ -76,14 +78,14 @@
               <div class="wb-card__actions">
                 @can('update', $banner)
                   <a href="javascript:void(0)"
-                     data-link="{{ route('admin.web_banner.edit', $banner->id) }}"
+                     data-link="{{ route($bannerRoute.'.edit', $banner->id) }}"
                      class="wb-card__btn ajax-modal-btn"
                      title="{{ trans('app.edit') }}">
                     <i class="fa fa-pencil"></i> {{ trans('app.edit') }}
                   </a>
                 @endcan
                 @can('delete', $banner)
-                  {!! Form::open(['route' => ['admin.web_banner.destroy', $banner->id], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}
+                  {!! Form::open(['route' => [$bannerRoute.'.destroy', $banner->id], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}
                   <button type="submit" class="wb-card__btn wb-card__btn--danger confirm ajax-silent" title="{{ trans('app.delete') }}">
                     <i class="fa fa-trash"></i>
                   </button>

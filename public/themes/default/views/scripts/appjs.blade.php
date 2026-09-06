@@ -430,39 +430,7 @@
         });
       });
 
-      // Add-to-wishlist
-      $(".add-to-wishlist").off().on("click", function(e) {
-        e.preventDefault();
-
-        $.ajax({
-          url: $(this).data('link'),
-          type: 'get',
-          complete: function(xhr, textStatus) {
-            if (200 == xhr.status) {
-              @if (config('services.google.gtm_container_id'))
-                var responseData = xhr.responseJSON;
-                @include('scripts.dataLayer.add_to_wishlist')
-              @endif
-              @include('theme::layouts.notification', ['message' => trans('theme.item_added_to_wishlist'), 'type' => 'success', 'icon' => 'check-circle'])
-              increaseWishlistItem(1);
-            } else if (401 == xhr.status) {
-              if (typeof window.openCustomerLoginModal === 'function') {
-                window.openCustomerLoginModal();
-              } else {
-                location.href = @json(route('homepage', ['login' => 1]));
-              }
-            } else if (404 == xhr.status) {
-              @include('theme::layouts.notification', ['message' => trans('theme.item_not_available'), 'type' => 'warning', 'icon' => 'info-circle'])
-            } else if (409 == xhr.status) {
-              @include('theme::layouts.notification', ['message' => trans('theme.notify.item_added_already_in_wishlist'), 'type' => 'info', 'icon' => 'info-circle'])
-            } else {
-              @include('theme::layouts.notification', ['message' => trans('theme.notify.failed'), 'type' => 'warning', 'icon' => 'times-circle'])
-            }
-          },
-        });
-      });
-
-      // Bootstrap fixes
+      // Add to cart from product list / quick actions      // Bootstrap fixes
       $('[data-toggle="tooltip"]').tooltip();
 
       // i-Check plugin

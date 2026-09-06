@@ -121,6 +121,8 @@ trait Authorizable
     private $appearance_modules = [
         'theme',
         'banner',
+        'web_banner',
+        'app_banner',
         'slider',
         'custom_css',
         'appearance',

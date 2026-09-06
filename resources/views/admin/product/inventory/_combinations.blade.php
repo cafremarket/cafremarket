@@ -1,8 +1,13 @@
 <legend>{{ trans('app.variants') }}</legend>
+<p class="help-block">{{ trans('help.default_variant_selection') }}</p>
 <table class="table table-default" id="variantsTable">
   <thead>
     <tr>
       <th>{{ trans('app.sl_number') }}</th>
+
+      <th>{{ trans('app.is_default') }}
+        <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.default_variant_selection') }}"><sup><i class="fa fa-question"></i></sup></small>
+      </th>
 
       <th>{{ trans('app.form.variants') }}
         <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.variants') }}"><sup><i class="fa fa-question"></i></sup></small>
@@ -49,6 +54,15 @@
       <tr class="variant-row">
         <td>
           <div class="form-group">{{ $loop->iteration }}</div>
+        </td>
+
+        <td class="text-center">
+          <div class="form-group" style="margin-top: 8px;">
+            <label class="radio-inline" title="{{ trans('help.default_variant_selection') }}">
+              <input type="radio" name="default_variant" value="{{ $loop->index }}" {{ $loop->first ? 'checked' : '' }}>
+              {{ trans('app.is_default') }}
+            </label>
+          </div>
         </td>
 
         <td>

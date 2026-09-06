@@ -72,13 +72,15 @@ class ShopController extends Controller
             ])
             ->withCount([
                 'inventories' => function ($q) {
-                    $q->where('active', 1);
+                    $q->where('active', 1)->whereNull('parent_id');
                 },
             ])
             // Keep shops page inclusive: show approved sellers even if they
             // haven't completed all "go live" requirements yet.
             ->approved()
-            ->whereHas('inventories')
+            ->whereHas('inventories', function ($q) {
+                $q->where('active', 1)->whereNull('parent_id');
+            })
             ->paginate(16)
             ->appends(request()->query());
 
@@ -104,7 +106,7 @@ class ShopController extends Controller
         $shop = Shop::where('slug', $slug)->approved()
             ->withCount([
                 'inventories' => function ($q) {
-                    $q->where('active', 1);
+                    $q->where('active', 1)->whereNull('parent_id');
                 },
             ])
             ->firstOrFail();
@@ -161,7 +163,7 @@ class ShopController extends Controller
         $now = Carbon::now();
         $shop = Shop::where('slug', $slug)->approved()->withCount([
             'inventories' => function ($q) {
-                $q->where('active', 1);
+                $q->where('active', 1)->whereNull('parent_id');
             },
         ])->firstOrFail();
 
@@ -171,6 +173,7 @@ class ShopController extends Controller
         }
 
         $all_products = Inventory::where('shop_id', $shop->id)
+            ->whereNull('parent_id')
             ->with([
                 'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                 'image:path,imageable_id,imageable_type',
@@ -218,7 +221,7 @@ class ShopController extends Controller
     {
         $shop = Shop::where('slug', $slug)->approved()->withCount([
             'inventories' => function ($q) {
-                $q->where('active', 1);
+                $q->where('active', 1)->whereNull('parent_id');
             },
         ])->firstOrFail();
 
@@ -274,7 +277,7 @@ class ShopController extends Controller
     {
         $shop = Shop::where('slug', $slug)->approved()->withCount([
             'inventories' => function ($q) {
-                $q->where('active', 1);
+                $q->where('active', 1)->whereNull('parent_id');
             },
         ])->firstOrFail();
 

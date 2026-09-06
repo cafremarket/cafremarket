@@ -39,6 +39,7 @@ class ProductResource extends JsonResource
             'origin' => optional($this->origin)->name,
             'listing_count' => $this->inventories_count,
             'description' => $this->description,
+            'video' => $this->video_path ? get_product_video_url($this->video_path) : null,
             'available_from' => date('F j, Y', strtotime($this->created_at)),
             'sku' => optional($inventory)->sku,
             'condition' => optional($inventory)->condition,

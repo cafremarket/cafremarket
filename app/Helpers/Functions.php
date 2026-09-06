@@ -24,7 +24,6 @@ use App\Models\State;
 use App\Models\System;
 use App\Models\Tax;
 use App\Models\User;
-use App\Models\Wishlist;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -2834,23 +2833,6 @@ if (! function_exists('cart_ids_from_cookie')) {
     function cart_ids_from_cookie()
     {
         return isset($_COOKIE['cart_ids']) ? explode(',', $_COOKIE['cart_ids']) : [];
-    }
-}
-
-if (! function_exists('wishlist_item_count')) {
-    /**
-     * Get cart item count for customer.
-     */
-    function wishlist_item_count()
-    {
-        // return Cache::rememberForever('cart_item_count', function() {
-
-        if (Auth::guard('customer')->check()) {
-
-            $customer_id = Auth::guard('customer')->user()->id;
-
-            return Wishlist::where('customer_id', $customer_id)->count();
-        }
     }
 }
 

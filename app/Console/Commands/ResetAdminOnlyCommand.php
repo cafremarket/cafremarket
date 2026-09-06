@@ -101,7 +101,6 @@ class ResetAdminOnlyCommand extends Command
             'translation_products',
             'translation_manufacturers',
             'translation_shops',
-            'wishlists',
             'visitors',
             'notifications',
             'password_resets',

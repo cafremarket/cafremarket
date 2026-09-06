@@ -77,10 +77,6 @@
                           <span class="d-none d-sm-inline-block">{{ trans('theme.add_to_cart') }}</span>
                         </a>
 
-                        <a href="javascript:void(0);" data-link="{{ route('wishlist.add', $deal_of_the_day) }}" class="add-to-wishlist">
-                          <i class="far fa-heart"></i> {{ trans('theme.button.add_to_wishlist') }}
-                        </a>
-
                         @if (is_incevio_package_loaded('comparison'))
                           {{-- @include('comparison::_btn_add_to_compare', ['item' => $deal_of_the_day]) --}}
 

@@ -63,6 +63,7 @@ class HomeController extends Controller
         $banners = Cache::rememberForever('banners', function () {
             return Banner::with('featureImage:path,imageable_id,imageable_type')
                 ->whereNull('shop_id')
+                ->forWeb()
                 ->orderBy('order', 'asc')->get()
                 ->groupBy('group_id')->toArray();
         });
@@ -306,7 +307,9 @@ class HomeController extends Controller
                         'categories:id,slug,name,shop_id,category_sub_group_id',
                     ])
                     ->withCount(['inventories' => function ($query) use ($item) {
-                        $query->where('shop_id', '!=', $item->shop_id)->available();
+                        $query->where('shop_id', '!=', $item->shop_id)
+                            ->whereNull('parent_id')
+                            ->available();
                     }]);
             },
             'attributeValues' => function ($q) {
@@ -314,7 +317,11 @@ class HomeController extends Controller
                     ->with('attribute:id,name,attribute_type_id,order');
             },
             'shop' => function ($q) {
-                $q->withCount('inventories')
+                $q->withCount([
+                    'inventories' => function ($query) {
+                        $query->whereNull('parent_id');
+                    },
+                ])
                     ->with([
                         'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                         'latestFeedbacks' => function ($q) {
@@ -345,6 +352,14 @@ class HomeController extends Controller
 
         $item_attrs = $attr_pivots->where('inventory_id', $item->id)
             ->pluck('attribute_value_id')->toArray();
+
+        // Parent listing often has no attributes; preselect the first attributed SKU
+        // so Colour/Size options render selected and cart URLs point at a real variant.
+        if (empty($item_attrs) && $variants->isNotEmpty()) {
+            $defaultVariant = $variants->first();
+            $item_attrs = $attr_pivots->where('inventory_id', $defaultVariant->id)
+                ->pluck('attribute_value_id')->toArray();
+        }
 
         $attributes = Attribute::select('id', 'name', 'attribute_type_id', 'order')
             ->whereIn('id', $attr_pivots->pluck('attribute_id'))
@@ -387,7 +402,7 @@ class HomeController extends Controller
                 'product' => function ($q) {
                     $q->select('id', 'slug', 'downloadable')
                         ->withCount(['inventories' => function ($query) {
-                            $query->available();
+                            $query->whereNull('parent_id')->available();
                         }]);
                 },
             ])
@@ -414,7 +429,15 @@ class HomeController extends Controller
             ])
             ->orderBy('order')->get();
 
-        return view('theme::modals.quickview', compact('item', 'attributes'))->render();
+        $item_attrs = $attr_pivots->where('inventory_id', $item->id)
+            ->pluck('attribute_value_id')->toArray();
+
+        if (empty($item_attrs) && $variants->isNotEmpty()) {
+            $item_attrs = $attr_pivots->where('inventory_id', $variants->first()->id)
+                ->pluck('attribute_value_id')->toArray();
+        }
+
+        return view('theme::modals.quickview', compact('item', 'attributes', 'item_attrs', 'variants'))->render();
     }
 
     /**

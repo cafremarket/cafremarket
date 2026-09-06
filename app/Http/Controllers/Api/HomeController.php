@@ -91,6 +91,7 @@ class HomeController extends Controller
 
         $banners = Banner::with(['featureImage'])
             ->where('shop_id', $shop_id)
+            ->when($shop_id === null, fn ($q) => $q->forApp())
             ->orderBy('order', 'asc')
             ->get();
 
@@ -137,7 +138,9 @@ class HomeController extends Controller
                     // Keep count aligned with storefront: listing is active and already available.
                     // Do not apply Inventory::available() here because it also applies shop->active()
                     // and zipcode filters, which hides valid approved shops in app vendor list.
+                    // Count parent products only (skip variant child SKUs).
                     $q->where('active', 1)
+                        ->whereNull('parent_id')
                         ->where('available_from', '<=', now());
                 },
             ])
@@ -167,6 +170,7 @@ class HomeController extends Controller
             ->withCount([
                 'inventories' => function ($q) {
                     $q->where('active', 1)
+                        ->whereNull('parent_id')
                         ->where('available_from', '<=', now());
                 },
             ])
@@ -353,7 +357,13 @@ class HomeController extends Controller
      */
     public function countries()
     {
-        $countries = Country::select('id', 'name', 'iso_code')->get();
+        $isos = config('system.marketplace_country_isos', ['IN', 'MZ']);
+
+        $countries = Country::select('id', 'name', 'iso_code')
+            ->active()
+            ->whereIn('iso_code', $isos)
+            ->orderBy('name')
+            ->get();
 
         return CountryResource::collection($countries);
     }

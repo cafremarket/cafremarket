@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
+use App\Models\Product;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class CreateInventoryWithVariantRequest extends Request
 {
@@ -13,22 +15,36 @@ class CreateInventoryWithVariantRequest extends Request
      */
     public function authorize()
     {
-        $tempObj = json_decode($this->input('product'));
-
-        if (! isset($tempObj)) {
-            $json_compatable_string = $this->makeStringJsonCompatible($this->input('product'));
-            $tempObj = json_decode($json_compatable_string);
+        // Oversized POST (post_max_size) leaves $_POST empty — fail with a clear message.
+        if ($this->isPostSizeExceeded()) {
+            return false;
         }
 
-        if (is_object($tempObj) && $tempObj->id) {
-            return $this->user()->shop->canAddThisInventory($tempObj);
+        $productPayload = $this->resolvedProductPayload();
+
+        if ($productPayload && ! empty($productPayload->id)) {
+            return (bool) $this->user()?->shop?->canAddThisInventory($productPayload);
         }
 
-        if ($tempObj == null & $this->input('product') != null) {
-            \Log::error('Invalid json string error for string: '.$this->input('product'));
+        if ($this->filled('product')) {
+            \Log::error('Invalid product payload for storeWithVariant', [
+                'product' => \Illuminate\Support\Str::limit((string) $this->input('product'), 500),
+            ]);
         }
 
         return false;
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    protected function failedAuthorization()
+    {
+        if ($this->isPostSizeExceeded()) {
+            throw new AuthorizationException(trans('responses.post_too_large'));
+        }
+
+        throw new AuthorizationException(trans('responses.denied'));
     }
 
     /**
@@ -62,7 +78,7 @@ class CreateInventoryWithVariantRequest extends Request
             'available_from' => 'nullable|date',
             'offer_start' => 'nullable|required_with:offer_price.*|date',
             'offer_end' => 'nullable|required_with:offer_price.*|date|after:offer_start.*',
-            'image.*' => 'mimes:jpg,jpeg,png,gif,svg',
+            'image.*' => 'mimes:jpg,jpeg,png,gif,svg,webp',
         ];
 
         if (is_incevio_package_loaded('pharmacy')) {
@@ -89,12 +105,12 @@ class CreateInventoryWithVariantRequest extends Request
             'offer_end.after' => trans('validation.offer_end_after'),
         ];
 
-        foreach ($this->sku as $key => $val) {
+        foreach ($this->input('sku', []) as $key => $val) {
             $messages['sku.'.$key.'.unique'] = trans('validation.sku-unique', ['attribute' => $key + 1, 'value' => $val]);
             $messages['sku.'.$key.'.distinct'] = trans('validation.sku-distinct', ['attribute' => $key + 1]);
         }
 
-        foreach ($this->offer_price as $key => $val) {
+        foreach ($this->input('offer_price', []) as $key => $val) {
             $messages['offer_price.'.$key.'.numeric'] = $val.' '.trans('validation.offer_price-numeric');
         }
 
@@ -102,24 +118,98 @@ class CreateInventoryWithVariantRequest extends Request
     }
 
     /**
+     * Resolve compact product object used by authorize / repository.
+     */
+    public function resolvedProductPayload(): ?object
+    {
+        $raw = $this->input('product');
+
+        if (is_string($raw) && $raw !== '') {
+            $decoded = json_decode($raw);
+
+            if (! is_object($decoded)) {
+                $decoded = json_decode($this->makeStringJsonCompatible($raw));
+            }
+
+            if (is_object($decoded) && ! empty($decoded->id)) {
+                // Refresh name/brand from DB when payload is compact.
+                $product = Product::query()->select('id', 'name', 'brand', 'shop_id')->find($decoded->id);
+                if ($product) {
+                    return (object) [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'brand' => $product->brand,
+                        'shop_id' => $product->shop_id,
+                    ];
+                }
+
+                return $decoded;
+            }
+        }
+
+        if ($this->filled('product_id')) {
+            $product = Product::query()->select('id', 'name', 'brand', 'shop_id')->find($this->input('product_id'));
+            if ($product) {
+                return (object) [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'brand' => $product->brand,
+                    'shop_id' => $product->shop_id,
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    private function isPostSizeExceeded(): bool
+    {
+        $contentLength = (int) $this->server('CONTENT_LENGTH', 0);
+        if ($contentLength <= 0) {
+            return false;
+        }
+
+        $postMax = $this->phpSizeToBytes((string) ini_get('post_max_size'));
+
+        // Empty request body with a large Content-Length usually means PHP discarded the POST.
+        return $postMax > 0
+            && $contentLength > $postMax
+            && empty($this->all())
+            && empty($this->allFiles());
+    }
+
+    private function phpSizeToBytes(string $value): int
+    {
+        $value = trim($value);
+        if ($value === '' || $value === '0') {
+            return 0;
+        }
+
+        $unit = strtolower(substr($value, -1));
+        $number = (float) $value;
+
+        return (int) match ($unit) {
+            'g' => $number * 1024 * 1024 * 1024,
+            'm' => $number * 1024 * 1024,
+            'k' => $number * 1024,
+            default => (float) $value,
+        };
+    }
+
+    /**
      * Make string json compatible by removing any unescaped double quotes in the passed json string.
-     * As the string contains font-family property, where the font-family value may contain double quotes.
-     * Without escaping the double quotes, the json string will be invalid due to encoding issues.
      *
      * @return string
      */
     private function makeStringJsonCompatible($string)
     {
-        $regex = '/font-family: (.*?);/'; // regex to get only font-family property value
+        $regex = '/font-family: (.*?);/';
 
-        // Replace font-family property value with escaped double quotes
-        $filtered_string = preg_replace_callback($regex, function ($matches) {
+        return preg_replace_callback($regex, function ($matches) {
             $font_family = $matches[1];
-            $font_family_escaped = str_replace('"', '"', $font_family); // Escape unescaped quotation marks
+            $font_family_escaped = str_replace('"', '"', $font_family);
 
             return "font-family: $font_family_escaped;";
         }, $string);
-
-        return $filtered_string;
     }
 }

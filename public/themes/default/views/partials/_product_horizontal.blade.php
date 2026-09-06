@@ -33,8 +33,6 @@
         @if (is_incevio_package_loaded('comparison'))
           @include('comparison::_btn_add_to_compare')
         @endif
-
-        @include('theme::partials._btn_wishlist')
       </div>
 
       {{-- @if (empty($hover)) --}}

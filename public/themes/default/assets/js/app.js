@@ -4894,19 +4894,6 @@ function setCartItemCount(value = 0) {
 	return;
 }
 
-// Update global wishlist item count
-function increaseWishlistItem(value = 1) {
-	return setWishlistItemCount(getWishlistItemCount() + value);
-}
-
-function getWishlistItemCount() {
-	return Number(jQuery("#globalWishlistItemCount").text());
-}
-function setWishlistItemCount(value = 0) {
-	jQuery('#globalWishlistItemCount').removeClass('hidden').text(value);
-	return;
-}
-
 // Helper functions for Filter
 function getFormatedUrlStr(sourceURL, opt) {
 	var url = removeQueryStringParameter(sourceURL, 'page'); //Reset the pagination;

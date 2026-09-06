@@ -21,6 +21,10 @@ class Banner extends BaseModel
      *
      * @var array
      */
+    public const CHANNEL_WEB = 'web';
+
+    public const CHANNEL_APP = 'app';
+
     public const TYPE_SINGLE = 'single';
 
     public const TYPE_SLIDER = 'slider';
@@ -50,11 +54,24 @@ class Banner extends BaseModel
         'group_id',
         'columns',
         'shop_id',
+        'channel',
         'order',
         'effect',
         'hide_text',
         'display_type',
     ];
+
+    public function scopeForWeb($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('channel', self::CHANNEL_WEB)->orWhereNull('channel');
+        });
+    }
+
+    public function scopeForApp($query)
+    {
+        return $query->where('channel', self::CHANNEL_APP);
+    }
 
     /**
      * Get the group for the banner.

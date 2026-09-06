@@ -130,8 +130,16 @@
         reader.readAsDataURL(this.files[0]);
       });
 
-      $('body').on('click', '.deleteThisRow', function() {
-        $(this).closest('tr').remove();
+                $('body').on('click', '.deleteThisRow', function() {
+        var row = $(this).closest('tr');
+        var wasDefault = row.find('input[name="default_variant"]').is(':checked');
+        row.remove();
+        if (wasDefault) {
+          var firstRadio = $('#variantsTable input[name="default_variant"]').first();
+          if (firstRadio.length) {
+            firstRadio.prop('checked', true);
+          }
+        }
       });
 
       // Prefetch options if categories/attributes already selected (edit form)

@@ -246,11 +246,16 @@ class Statistics
 
     public static function shop_inventories_count($shop_id = null)
     {
+        // Count listing parents only (child attribute SKUs are not separate products).
         if ($shop_id) {
-            return \DB::table('inventories')->where('shop_id', $shop_id)->count();
+            return \DB::table('inventories')
+                ->where('shop_id', $shop_id)
+                ->whereNull('parent_id')
+                ->whereNull('deleted_at')
+                ->count();
         }
 
-        return Inventory::mine()->count();
+        return Inventory::mine()->whereNull('parent_id')->count();
     }
 
     public static function unread_msg_count()

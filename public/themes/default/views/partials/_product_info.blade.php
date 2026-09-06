@@ -107,11 +107,11 @@
     </div> <!-- /.col-* -->
   </div> <!-- /.row -->
 
-  <div class="row mb-2">
+  <div class="row mb-2 product-info-actions">
     <div class="col-6 pr-1">
-      <a href="javascript:void(0);" data-link="{{ route('wishlist.add', $item) }}" class="btn btn-link add-to-wishlist">
-        <i class="far fa-heart"></i> @lang('theme.button.add_to_wishlist')
-      </a>
+      @unless (Request::is('*/quickView'))
+        @include('theme::partials._btn_shares', ['shareTriggerOnly' => true])
+      @endunless
     </div> <!-- /.col-* -->
 
     <div class="col-6 pl-1">
@@ -135,4 +135,6 @@
   @include('wholesale::product_page_price_table')
 @endif
 
-@include('theme::partials._btn_shares')
+@unless (Request::is('*/quickView'))
+  @include('theme::partials._btn_shares', ['shareModalOnly' => true])
+@endunless

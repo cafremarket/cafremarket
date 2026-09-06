@@ -28,12 +28,13 @@
     $selectedLayout = (string) Banner::LAYOUT_FULL;
   }
   $selectedColor = old('bg_color', isset($banner) ? ($banner->bg_color ?: '#f97316') : '#f97316');
+  $formNote = $formNote ?? trans('help.web_banner_form_note');
 @endphp
 
 <div class="wb-form">
   <div class="wb-form__note">
     <i class="fa fa-info-circle"></i>
-    <span>{{ trans('help.web_banner_form_note') }}</span>
+    <span>{{ $formNote }}</span>
   </div>
 
   <div class="wb-form__grid">

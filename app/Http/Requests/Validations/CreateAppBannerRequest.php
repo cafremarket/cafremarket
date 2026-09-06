@@ -6,7 +6,7 @@ use App\Http\Requests\Request;
 use App\Models\Banner;
 use Illuminate\Validation\Rule;
 
-class UpdateWebBannerRequest extends Request
+class CreateAppBannerRequest extends Request
 {
     public function authorize(): bool
     {
@@ -15,6 +15,8 @@ class UpdateWebBannerRequest extends Request
 
     public function rules(): array
     {
+        $isColour = $this->input('display_type') === Banner::TYPE_COLOUR;
+
         return [
             'group_id' => 'required|in:group_1,group_2,group_3',
             'title' => 'max:255',
@@ -23,7 +25,7 @@ class UpdateWebBannerRequest extends Request
             'display_type' => ['required', Rule::in([Banner::TYPE_SINGLE, Banner::TYPE_SLIDER, Banner::TYPE_COLOUR])],
             'columns' => ['required', Rule::in([Banner::LAYOUT_FULL, Banner::LAYOUT_THIRD])],
             'bg_color' => 'nullable|string|max:20',
-            'images.feature' => 'nullable|mimes:jpg,jpeg,png,gif,svg,webp',
+            'images.feature' => ($isColour ? 'nullable' : 'required').'|mimes:jpg,jpeg,png,gif,svg,webp',
         ];
     }
 
@@ -38,7 +40,7 @@ class UpdateWebBannerRequest extends Request
 
         $this->merge([
             'shop_id' => null,
-            'channel' => Banner::CHANNEL_WEB,
+            'channel' => Banner::CHANNEL_APP,
             'hide_text' => $this->boolean('hide_text'),
             'display_type' => $displayType,
             'columns' => $columns,
@@ -50,6 +52,7 @@ class UpdateWebBannerRequest extends Request
     {
         return [
             'group_id.required' => trans('validation.banner_group_id_required'),
+            'images.feature.required' => trans('validation.banner_image_required'),
         ];
     }
 }

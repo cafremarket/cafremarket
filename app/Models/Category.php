@@ -91,6 +91,7 @@ class Category extends BaseModel
     public function listings()
     {
         return $this->belongsToMany(Inventory::class, 'category_product', null, 'product_id', null, 'product_id')
+            ->whereNull('inventories.parent_id')
             ->groupBy('inventories.product_id', 'inventories.shop_id');
     }
 

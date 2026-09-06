@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Closure;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -106,6 +107,24 @@ class Handler extends ExceptionHandler
                 ->to($request->headers->get('referer') ?: $fallback)
                 ->withInput($request->except(['password', 'password_confirmation', '_token']))
                 ->with('error', trans('messages.session_expired_retry'));
+        }
+
+        if ($exception instanceof AuthorizationException && ! $request->expectsJson() && ! $request->ajax()) {
+            $message = $exception->getMessage() ?: trans('responses.denied');
+
+            return redirect()
+                ->back()
+                ->withInput($request->except(['password', 'password_confirmation', '_token']))
+                ->with('error', $message);
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            if ($exception instanceof AuthorizationException) {
+                return response()->json([
+                    'message' => $exception->getMessage() ?: trans('responses.denied'),
+                    'error' => $exception->getMessage() ?: trans('responses.denied'),
+                ], 403);
+            }
         }
 
         if ($request->expectsJson()) {

@@ -105,10 +105,6 @@
               </div> <!-- /.product-img-wrap -->
 
               <div class="product-actions btn-group radius">
-                <a class="btn btn-default add-to-wishlist" href="javascript:void(0);" data-link="{{ route('wishlist.add', $item) }}" data-toggle="tooltip" title="@lang('theme.button.add_to_wishlist')" aria-label="@lang('theme.button.add_to_wishlist')">
-                  <i class="far fa-heart"></i> <span>@lang('theme.button.add_to_wishlist')</span>
-                </a>
-
                 @if (is_incevio_package_loaded('comparison'))
                   @include('comparison::_product_list_compare_btn')
                 @endif

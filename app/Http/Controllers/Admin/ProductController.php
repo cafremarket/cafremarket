@@ -186,19 +186,31 @@ class ProductController extends Controller
             'product_id' => $storedProduct->id,
         ];
 
-        $inventoryRequest = new Request($inventoryData);
-
-        $product = $this->inventory->store($inventoryRequest);
-
+        // Variable product: only attributed variants are SKUs. The chosen default
+        // becomes the parent listing — do not create an extra shell inventory row.
         if ($request->filled('variants') && $request->filled('skus')) {
-            // Common information
+            $skus = $request->input('skus');
+            $stock_quantities = $request->input('stock_quantities');
+            $sale_prices = $request->input('sale_prices');
+            $images = $request->file('variant_images');
+            $variants = $request->input('variants');
+            $tag_lists = $request->input('tag_list');
+            $packaging_lists = is_incevio_package_loaded('packaging')
+                ? $request->input('packaging_list')
+                : null;
+
+            $defaultKey = $request->input('default_variant');
+            if ($defaultKey === null || ! array_key_exists($defaultKey, $skus)) {
+                $defaultKey = array_key_first($skus);
+            }
+            $defaultKey = is_numeric($defaultKey) ? (int) $defaultKey : $defaultKey;
+
             $commonInfo = [
-                'parent_id' => $product->id,
                 'user_id' => $request->user_id,
                 'shop_id' => $request->shop_id,
                 'title' => $request->name,
                 'product_id' => $storedProduct->id,
-                'brand' => $product->brand,
+                'brand' => $request->brand,
                 'condition' => $request->condition,
                 'condition_note' => $request->condition_note,
                 'warehouse_id' => $request->input('warehouse_id'),
@@ -208,6 +220,7 @@ class ProductController extends Controller
                 'offer_start' => $request->offer_start,
                 'offer_end' => $request->offer_end,
                 'shipping_weight' => $request->input('shipping_weight'),
+                'free_shipping' => $request->input('free_shipping'),
                 'available_from' => $request->input('available_from'),
                 'active' => $request->input('active'),
                 'tax_id' => $request->input('tax_id'),
@@ -220,60 +233,59 @@ class ProductController extends Controller
                 'meta_description' => $request->input('meta_description'),
             ];
 
-            // Arrays
-            $skus = $request->input('skus');
-
-            $stock_quantities = $request->input('stock_quantities');
-
-            $sale_prices = $request->input('sale_prices');
-
-            $images = $request->file('variant_images');
-
-            // Relations
-            if (is_incevio_package_loaded('packaging')) {
-                $packaging_lists = $request->input('packaging_list');
-            }
-
-            $tag_lists = $request->input('tag_list');
-
-            $variants = $request->input('variants');
-
-            // Preparing data and insert records.
-            $dynamicInfo = [];
-            foreach ($skus as $key => $sku) {
-                $dynamicInfo = [
+            $createVariant = function ($key, $parentId) use (
+                $skus,
+                $stock_quantities,
+                $sale_prices,
+                $images,
+                $variants,
+                $commonInfo,
+                $request,
+                $tag_lists,
+                $packaging_lists
+            ) {
+                $data = array_merge($commonInfo, [
+                    'parent_id' => $parentId,
                     'sku' => $skus[$key],
-                    'stock_quantity' => $stock_quantities[$key],
-                    'sale_price' => $sale_prices[$key],
-                    'slug' => generate_unique_listing_slug($request->input('slug').' '.$sku),
-                ];
+                    'stock_quantity' => $stock_quantities[$key] ?? 0,
+                    'sale_price' => $sale_prices[$key] ?? 0,
+                    'slug' => generate_unique_listing_slug($request->input('slug').' '.$skus[$key]),
+                ]);
 
-                // Merge the common info and dynamic info to data array
-                $data = array_merge($dynamicInfo, $commonInfo);
-
-                // Insert the record
                 $inventory = Inventory::create($data);
 
-                // Sync Attributes
-                if ($variants[$key]) {
+                if (! empty($variants[$key])) {
                     $this->setAttributes($inventory, $variants[$key]);
                 }
 
-                // Sync packaging
-                if (is_incevio_package_loaded('packaging') && $packaging_lists) {
+                if (is_incevio_package_loaded('packaging') && ! empty($packaging_lists)) {
                     $inventory->packagings()->sync($packaging_lists);
                 }
 
-                // Sync tags
                 if ($tag_lists) {
                     $inventory->syncTags($inventory, $tag_lists);
                 }
 
-                // Save Images
                 if (isset($images[$key])) {
                     $inventory->saveImage($images[$key]);
                 }
+
+                return $inventory;
+            };
+
+            $parent = $createVariant($defaultKey, null);
+
+            foreach ($skus as $key => $sku) {
+                if ((string) $key === (string) $defaultKey) {
+                    continue;
+                }
+                $createVariant($key, $parent->id);
             }
+
+            $product = $parent;
+        } else {
+            $inventoryRequest = new Request($inventoryData);
+            $product = $this->inventory->store($inventoryRequest);
         }
 
         return $product;

@@ -8,10 +8,20 @@
 
   // For Products
   if (isset($item)) {
+      $SEOurl = function_exists('storefront_product_url') ? storefront_product_url($item) : url()->current();
       $SEOtitle = $item->meta_title ?? $item->title;
-      $SEOdescription = $item->meta_description ?? substr(strip_tags($item->description), 0, $character_limit);
-      $SEOimage = get_product_img_src($item, 'full');
-      $SEOkeywords = implode(', ', $item->tags->pluck('name')->toArray());
+      $rawDesc = $item->meta_description
+          ?? ($item->description ? strip_tags($item->description) : null)
+          ?? (optional($item->product)->description ? strip_tags($item->product->description) : null)
+          ?? $SEOdescription;
+      $SEOdescription = \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', (string) $rawDesc)), $character_limit ?: 160, '');
+      $SEOimage = get_product_img_src($item, 'full') ?: $SEOimage;
+      $SEOkeywords = $item->relationLoaded('tags') || method_exists($item, 'tags')
+          ? implode(', ', $item->tags->pluck('name')->filter()->toArray())
+          : $SEOkeywords;
+      if ($SEOkeywords === '' || $SEOkeywords === null) {
+          $SEOkeywords = $SEOtitle;
+      }
   }
 
   // For Categories
@@ -137,31 +147,44 @@
 
   @if (isset($item))
     <meta property="og:type" content="product">
-    <meta name="product:availability" content="{{ $item->stock_quantity > 0 ? trans('theme.in_stock') : trans('theme.out_of_stock') }}">
-    <meta name="product:price:currency" content="{{ get_system_currency() }}">
-    <meta name="product:price:amount" content="{{ get_formated_currency($item->current_sale_price(), config('system_settings.decimals',10)) }}">
-    <meta name="product:brand" content="{{ $item->product->manufacturer->name }}">
+    <meta property="product:availability" content="{{ $item->stock_quantity > 0 ? 'in stock' : 'out of stock' }}">
+    <meta property="product:price:currency" content="{{ get_system_currency() }}">
+    <meta property="product:price:amount" content="{{ number_format((float) $item->current_sale_price(), 2, '.', '') }}">
+    @if (optional(optional($item->product)->manufacturer)->name)
+      <meta property="product:brand" content="{{ $item->product->manufacturer->name }}">
+    @elseif (! empty($item->brand))
+      <meta property="product:brand" content="{{ $item->brand }}">
+    @endif
+    @if (optional($item->shop)->name)
+      <meta property="product:retailer_item_id" content="{{ $item->sku }}">
+      <meta property="og:see_also" content="{{ $SEOurl }}">
+    @endif
 
     @php
-      $item_images = $item->images->count() ? $item->images : $item->product->images;
+      $item_images = ($item->images && $item->images->count())
+          ? $item->images
+          : (optional($item->product)->images ?? collect());
 
-      if (isset($variants)) {
-          // Remove images of current items from the variants imgs
+      if (isset($variants) && $variants) {
           $other_images = $variants
               ->pluck('images')
               ->flatten(1)
-              ->filter(function ($value, $key) use ($item) {
-                  return $value->imageable_id != $item->id;
+              ->filter(function ($value) use ($item) {
+                  return $value && optional($value)->imageable_id != $item->id && ! empty(optional($value)->path);
               });
-          $item_images = $item_images->concat($other_images);
+          $item_images = collect($item_images)->concat($other_images);
       }
+
+      $ogImages = collect($item_images)->pluck('path')->filter()->unique()->values();
     @endphp
 
-    @foreach ($item_images as $img)
-      @continue(!$img->path)
-
-      <meta property="og:image" content="{{ get_storage_file_url($img->path, 'full') }}">
-    @endforeach
+    @forelse ($ogImages as $imgPath)
+      <meta property="og:image" content="{{ get_storage_file_url($imgPath, 'full') }}">
+      <meta property="og:image:alt" content="{{ $SEOtitle }}">
+    @empty
+      <meta property="og:image" content="{{ $SEOimage }}">
+      <meta property="og:image:alt" content="{{ $SEOtitle }}">
+    @endforelse
   @else
     <meta property="og:type" content="{{ 'website' }}">
     <meta property="og:image" content="{{ $SEOimage }}">
@@ -185,17 +208,18 @@
   <meta name="twitter:image:alt" content="{{ $SEOtitle }}">
 
   @if (isset($item))
-    <meta name="twitter:card" content="product">
-    <meta name="twitter:label1" content="price">
-    <meta name="twitter:data1" content="{{ $item->current_sale_price() }}">
-    <meta name="twitter:label2" content="availability">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:label1" content="Price">
+    <meta name="twitter:data1" content="{{ get_formated_currency($item->current_sale_price()) }}">
+    <meta name="twitter:label2" content="Availability">
     <meta name="twitter:data2" content="{{ $item->stock_quantity > 0 ? trans('theme.in_stock') : trans('theme.out_of_stock') }}">
-    <meta name="twitter:label3" content="currency">
-    <meta name="twitter:data3" content="{{ get_system_currency() }}">
-    <meta name="twitter:label4" content="brand">
-    <meta name="twitter:data4" content="{{ $item->product->manufacturer->name }}">
-    <meta name="twitter:label4" content="seller">
-    <meta name="twitter:data4" content="{{ $item->shop->name }}">
+    @php
+      $shareBrand = optional(optional($item->product)->manufacturer)->name ?: ($item->brand ?? optional($item->shop)->name);
+    @endphp
+    @if ($shareBrand)
+      <meta name="twitter:label3" content="Brand">
+      <meta name="twitter:data3" content="{{ $shareBrand }}">
+    @endif
   @elseif(config('seo.meta.twitter_card') !== '')
     <meta name="twitter:card" content="{{ config('seo.meta.twitter_card') }}">
   @endif
@@ -208,27 +232,34 @@
     <!-- Microdata Product Page-->
     <script type="application/ld+json">
       {
-        "@context": "http://schema.org",
+        "@context": "https://schema.org",
         "@type": "Product",
-        "name": "{{ $SEOtitle }}",
-        "description": "{{ $SEOdescription }}",
-        "image": "{{ $SEOimage }}",
-        "brand": {
-          "@type": "Brand",
-          "name": "{{ $item->product->manufacturer->name }}"
-        },
-        "sku": "{{ $item->sku }}",
-        @if ($item->product->gtin_type && $item->product->gtin)
-          "{{ $item->product->gtin_type }}": "{{ $item->product->gtin }}",
+        "name": @json($SEOtitle),
+        "description": @json($SEOdescription),
+        "image": @json($SEOimage),
+        "sku": @json($item->sku),
+        @if (optional(optional($item->product)->manufacturer)->name)
+          "brand": {
+            "@type": "Brand",
+            "name": @json($item->product->manufacturer->name)
+          },
+        @elseif (! empty($item->brand))
+          "brand": {
+            "@type": "Brand",
+            "name": @json($item->brand)
+          },
+        @endif
+        @if (optional($item->product)->gtin_type && optional($item->product)->gtin)
+          "{{ $item->product->gtin_type }}": @json($item->product->gtin),
         @endif
         "offers": {
           "@type": "Offer",
-          "url": "{{ $SEOurl }}",
-          "availability": "http://schema.org/InStock",
-          "priceCurrency": "{{ get_system_currency() }}",
-          "price": "{{ number_format($item->current_sale_price(), 2, '.', '') }}"
+          "url": @json($SEOurl),
+          "availability": "{{ $item->stock_quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}",
+          "priceCurrency": @json(get_system_currency()),
+          "price": "{{ number_format((float) $item->current_sale_price(), 2, '.', '') }}"
         }
-        @if ($item->feedbacks_count > 0)
+        @if (($item->feedbacks_count ?? 0) > 0)
           ,
           "aggregateRating": {
             "@type": "AggregateRating",

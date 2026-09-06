@@ -40,6 +40,7 @@ return [
     'theme_options' => 'Theme Options',
     'banners' => 'Banners',
     'web_banners' => 'Web Banners',
+    'app_banners' => 'App Banners',
     'sliders' => 'Sliders',
     'shipping' => 'Shipping',
     'packaging' => 'Packaging',

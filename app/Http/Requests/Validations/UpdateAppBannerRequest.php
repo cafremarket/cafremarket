@@ -6,7 +6,7 @@ use App\Http\Requests\Request;
 use App\Models\Banner;
 use Illuminate\Validation\Rule;
 
-class UpdateWebBannerRequest extends Request
+class UpdateAppBannerRequest extends Request
 {
     public function authorize(): bool
     {
@@ -38,7 +38,7 @@ class UpdateWebBannerRequest extends Request
 
         $this->merge([
             'shop_id' => null,
-            'channel' => Banner::CHANNEL_WEB,
+            'channel' => Banner::CHANNEL_APP,
             'hide_text' => $this->boolean('hide_text'),
             'display_type' => $displayType,
             'columns' => $columns,

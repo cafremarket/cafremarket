@@ -19,7 +19,6 @@ use App\Http\Controllers\Api\NearbyShopController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\PaymentCredentialController;
-use App\Http\Controllers\Api\WishlistController;
 use Illuminate\Support\Facades\Route;
 use Incevio\Package\LiveChat\Http\Controllers\Api\ConversationController;
 use Incevio\Package\OtpLogin\Http\Controllers\Api\PhoneVerificationController;
@@ -148,11 +147,6 @@ Route::middleware('customerApp')->group(function () {
         // Coupons
         Route::get('coupons', [AccountController::class, 'coupons']);
         Route::post('cart/{cart}/applyCoupon', [CartController::class, 'validateCoupon']);
-
-        // Wishlist
-        Route::get('wishlist', [WishlistController::class, 'index']);
-        Route::get('wishlist/{slug}/add', [WishlistController::class, 'add']);
-        Route::delete('wishlist/{wishlist}/remove', [WishlistController::class, 'remove']);
 
         // Orders
         Route::get('orders', [OrderController::class, 'index']);

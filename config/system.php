@@ -46,6 +46,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Marketplace country ISO codes
+    |--------------------------------------------------------------------------
+    |
+    | Address, product origin, and related dropdowns only offer these countries.
+    |
+    */
+    'marketplace_country_isos' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', env('MARKETPLACE_COUNTRY_ISOS', 'IN,MZ'))
+    ))),
+
+    /*
+    |--------------------------------------------------------------------------
     | Customer can register
     |--------------------------------------------------------------------------
     |

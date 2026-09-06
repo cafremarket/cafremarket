@@ -81,7 +81,6 @@ class Storefront
 
         View::share('recently_viewed_items', ListHelper::recentlyViewedItems());
         View::share('cart_item_count', cart_item_count());
-        View::share('wishlist_item_count', wishlist_item_count());
         View::share('hidden_menu_items', hidden_menu_items());
         View::share('top_bar_banner', get_top_bar_banner_data());
 

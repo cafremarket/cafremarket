@@ -304,13 +304,31 @@ class InventoryController extends Controller
      */
     public function storeWithVariant(CreateInventoryWithVariantRequest $request)
     {
-        if (json_decode($request->input('product')) == null) { // If the json string is invalid
-            $request->merge([
-                'product' => $this->makeStringJsonCompatible($request->product),
-            ]);
-        }
+        try {
+            if (json_decode($request->input('product')) == null) {
+                $request->merge([
+                    'product' => $this->makeStringJsonCompatible($request->product),
+                ]);
+            }
 
-        $this->inventory->storeWithVariant($request);
+            // Prefer compact/resolved product payload (id, name, brand).
+            if (method_exists($request, 'resolvedProductPayload')) {
+                $resolved = $request->resolvedProductPayload();
+                if ($resolved) {
+                    $request->merge(['product' => json_encode($resolved)]);
+                }
+            }
+
+            $this->inventory->storeWithVariant($request);
+        } catch (\Throwable $e) {
+            \Log::error('storeWithVariant failed: '.$e->getMessage(), [
+                'exception' => $e,
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', $e->getMessage() ?: trans('responses.error'));
+        }
 
         return redirect()->route('admin.stock.inventory.index')
             ->with('success', trans('messages.created', ['model' => $this->model]));

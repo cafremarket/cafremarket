@@ -125,7 +125,7 @@ class ListingController extends Controller
 
         $item->load([
             'product' => function ($q) {
-                $q->select('id', 'name', 'slug', 'model_number', 'downloadable', 'brand', 'mpn', 'gtin', 'gtin_type', 'description', 'origin_country', 'manufacturer_id', 'created_at')
+                $q->select('id', 'name', 'slug', 'model_number', 'downloadable', 'brand', 'mpn', 'gtin', 'gtin_type', 'description', 'video_path', 'origin_country', 'manufacturer_id', 'created_at')
                     ->withCount(['inventories' => function ($query) {
                         $query->available();
                     }]);
@@ -142,42 +142,46 @@ class ListingController extends Controller
 
         $variants = Inventory::select(['id'])
             ->where(['product_id' => $item->product_id, 'shop_id' => $item->shop_id])
-            ->with(['images', 'attributes.attributeType', 'attributeValues'])
+            ->with([
+                'images',
+                'attributeValues' => function ($q) {
+                    $q->select('id', 'attribute_values.attribute_id', 'value', 'color')
+                        ->with('attribute.attributeType');
+                },
+            ])
             ->where('active', 1)
-            ->where('available_from', '<=', now())
+            ->where('stock_quantity', '>', 0)
             ->whereHas('shop', function ($q) {
                 $q->approved();
             })
             ->get();
 
-        $attrs = $variants->pluck('attributes')->flatten(1)->sortBy('id')->values()->toArray();
-        $attrVs = $variants->pluck('attributeValues')->flatten(1)->sortBy('attribute_id')->values()->toArray();
-
-        $tempArr = [];
-        foreach ($attrs as $key => $attr) {
-            $tempArr[] = [
-                'id' => $attr['id'],
-                'type' => $attr['attribute_type']['type'],
-                'name' => $attr['name'],
-                'value' => [
-                    'id' => $attrVs[$key]['id'],
-                    'name' => $attrVs[$key]['value'],
-                    'color' => $attrVs[$key]['color'],
-                ],
-            ];
+        // Prefer attributed SKUs when the product uses options (skip parent shell).
+        if ($variants->contains(fn ($v) => $v->attributeValues->isNotEmpty())) {
+            $variants = $variants->filter(fn ($v) => $v->attributeValues->isNotEmpty())->values();
         }
 
-        $uniqueAttrs = array_unique($tempArr, SORT_REGULAR);
+        // Parent shell often has no attributes — seed selected options from first SKU.
+        if ($item->attributeValues->isEmpty() && $variants->isNotEmpty()) {
+            $item->setRelation('attributeValues', $variants->first()->attributeValues);
+        }
 
         $attributes = [];
-        foreach ($uniqueAttrs as $attr) {
-            $attributes[$attr['id']]['name'] = $attr['name'];
-            $attributes[$attr['id']]['type'] = $attr['type'];
-            $attributes[$attr['id']]['value'][$attr['value']['id']] =
-                [
-                    'name' => $attr['value']['name'],
-                    'color' => $attr['value']['color'],
+        foreach ($variants as $variant) {
+            foreach ($variant->attributeValues as $attrValue) {
+                $attr = $attrValue->attribute;
+                if (! $attr) {
+                    continue;
+                }
+
+                $type = optional($attr->attributeType)->type;
+                $attributes[$attr->id]['name'] = $attr->name;
+                $attributes[$attr->id]['type'] = $type;
+                $attributes[$attr->id]['value'][$attrValue->id] = [
+                    'name' => $attrValue->value,
+                    'color' => $attrValue->color,
                 ];
+            }
         }
 
         // Shipping Zone (default to Mozambique when GeoIP not in business areas)
@@ -216,7 +220,6 @@ class ListingController extends Controller
         $item = Inventory::select(ListHelper::common_select_attr('inventory'))
             ->where('slug', $slug)
             ->where('active', 1)
-            ->where('available_from', '<=', now())
             ->whereHas('shop', function ($q) {
                 $q->approved();
             })
@@ -230,18 +233,22 @@ class ListingController extends Controller
                 $q->select('id', 'attribute_values.attribute_id', 'value', 'color');
             }])
             ->where('active', 1)
-            ->where('available_from', '<=', now())
+            ->where('stock_quantity', '>', 0)
             ->whereHas('shop', function ($q) {
                 $q->approved();
             })
             ->get();
+
+        if ($variants->contains(fn ($v) => $v->attributeValues->isNotEmpty())) {
+            $variants = $variants->filter(fn ($v) => $v->attributeValues->isNotEmpty())->values();
+        }
 
         $attributes = $request->input('attributes');
 
         foreach ($variants as $variant) {
             $temp = $variant->attributeValues->pluck('id')->toArray();
 
-            if (! (bool) array_diff($temp, $attributes)) {
+            if (! (bool) array_diff($temp, $attributes ?? []) && count($temp) === count($attributes ?? [])) {
                 return new ItemLightResource($variant);
             }
         }
@@ -259,7 +266,7 @@ class ListingController extends Controller
     {
         $product = Product::where('slug', $slug)->with([
             'inventories' => function ($q) {
-                $q->available();
+                $q->available()->whereNull('parent_id');
             },
             // 'inventories.attributeValues.attribute',
             'inventories.avgFeedback:rating,count,feedbackable_id,feedbackable_type',
@@ -342,6 +349,7 @@ class ListingController extends Controller
         $shop = Shop::where('slug', $slug)->approved()
             ->withCount(['inventories' => function ($q) {
                 $q->where('active', 1)
+                    ->whereNull('parent_id')
                     ->where('available_from', '<=', now());
             }])->firstOrFail();
 
@@ -385,6 +393,7 @@ class ListingController extends Controller
 
         $listings = Inventory::whereIn('product_id', $ids)->filter($request->all())
             ->active()
+            ->whereNull('parent_id')
             ->whereHas('shop', function ($q) {
                 $q->select(['id', 'current_billing_plan', 'active'])->active();
             })
@@ -484,7 +493,8 @@ class ListingController extends Controller
 
         $products = Inventory::search($term)->where('active', 1)->paginate(0);
 
-        $products = $products->where('available_from', '<=', $now);
+        // Parent products only — do not list each variant SKU as its own card.
+        $products = $products->whereNull('parent_id')->where('available_from', '<=', $now);
 
         // Hide out-of-stock items when enabled
         if (config('system_settings.hide_out_of_stock_items')) {

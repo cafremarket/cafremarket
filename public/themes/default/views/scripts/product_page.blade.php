@@ -36,6 +36,14 @@ foreach ($variants as &$value) {
         setShippingOptions(); // Set shipping options
       }
 
+      // Sync price/stock/cart URLs to the currently selected attribute combination
+      // (defer so color/radio pickers finish initializing first)
+      setTimeout(function() {
+        if ($('.product-attribute-selector').length) {
+          $('.product-attribute-selector').first().trigger('change');
+        }
+      }, 0);
+
       // Do appropriate actions and Update order detail
       $(document).on("click", ".popover-submit-btn", function() {
         // Return if the item is OUT OF STOCK
@@ -96,13 +104,13 @@ foreach ($variants as &$value) {
       });
     });
 
-    // Social share btns
+    // Social share popup windows (from share modal)
     let popupSize = {
       width: 780,
       height: 550
     };
     $(document).on('click', '.social-share-btn', function(e) {
-      event.preventDefault();
+      e.preventDefault();
       let verticalPos = Math.floor(($(window).width() - popupSize.width) / 2),
         horisontalPos = Math.floor(($(window).height() - popupSize.height) / 2);
 
@@ -113,7 +121,31 @@ foreach ($variants as &$value) {
 
       if (popup) {
         popup.focus();
-        e.preventDefault();
+      }
+    });
+
+    $(document).on('click', '.sf-share-modal__copy', function() {
+      let target = $($(this).data('copy-target'));
+      let link = target.val();
+      let $msg = $(this).closest('.modal-body').find('.sf-share-modal__copied');
+
+      function showCopied() {
+        $msg.removeClass('hide').addClass('show');
+        setTimeout(function() {
+          $msg.removeClass('show').addClass('hide');
+        }, 2000);
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(showCopied).catch(function() {
+          target.select();
+          document.execCommand('copy');
+          showCopied();
+        });
+      } else {
+        target.select();
+        document.execCommand('copy');
+        showCopied();
       }
     });
 

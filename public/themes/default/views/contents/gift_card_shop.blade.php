@@ -15,10 +15,6 @@
         </div>
 
         <div class="product-actions btn-group">
-          <a class="btn btn-default rounded-0 add-to-wishlist" href="javascript:void(0);" data-link="{{ route('wishlist.add', $item) }}" aria-label="@lang('theme.button.add_to_wishlist')">
-            <i class="far fa-heart" data-toggle="tooltip" title="@lang('theme.button.add_to_wishlist')"></i> <span>@lang('theme.button.add_to_wishlist')</span>
-          </a>
-
           <a class="btn btn-default rounded-0 itemQuickView" href="javascript:void(0);" data-link="{{ storefront_product_quickview_url($item) }}" rel="nofollow noindex" aria-label="@lang('theme.button.quick_view')">
             <i class="far fa-eye" data-toggle="tooltip" title="@lang('theme.button.quick_view')"></i> <span>@lang('theme.button.quick_view')</span>
           </a>

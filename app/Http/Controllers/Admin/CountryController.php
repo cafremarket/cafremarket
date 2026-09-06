@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Common\Authorizable;
+use App\Helpers\ListHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateCountryRequest;
 use App\Http\Requests\Validations\UpdateCountryRequest;
@@ -67,7 +68,7 @@ class CountryController extends Controller
     {
         Country::create($request->all());
 
-        // Clear countries from cache
+        ListHelper::flushCountryCaches();
         Cache::forget('countries_cached');
 
         return back()->with('success', trans('messages.created', ['model' => $this->model]));
@@ -100,7 +101,7 @@ class CountryController extends Controller
 
         $country->update($request->all());
 
-        // Clear countries from cache
+        ListHelper::flushCountryCaches();
         Cache::forget('countries_cached');
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model]));

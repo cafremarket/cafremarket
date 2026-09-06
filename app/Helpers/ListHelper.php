@@ -1287,11 +1287,12 @@ class ListHelper
      */
     public static function latest_shop_items(Shop $shop, $limit = 10)
     {
-        return Cache::remember('latest_items_v2_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
+        return Cache::remember('latest_items_v3_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
             return Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('shop_id', $shop->id)
                 ->where('active', 1)
+                ->whereNull('parent_id')
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                     'image:path,imageable_id,imageable_type',
@@ -1310,11 +1311,12 @@ class ListHelper
      */
     public static function top_selling_shop_items(Shop $shop, $limit = 10)
     {
-        return Cache::remember('top_selling_items_v2_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
+        return Cache::remember('top_selling_items_v3_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
             return Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('shop_id', $shop->id)
                 ->where('active', 1)
+                ->whereNull('parent_id')
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                     'image:path,imageable_id,imageable_type',
@@ -1330,19 +1332,34 @@ class ListHelper
      */
     public static function variants_of_product($item, $shop = null)
     {
-        $variants = Inventory::available()
+        // Lighter than scopeAvailable(): once a listing is open, sibling SKUs must
+        // still load for the attribute selector (shop "go live" / available_from
+        // can hide children and leave the picker empty).
+        $variants = Inventory::query()
             ->select(static::common_select_attr('inventory'))
             ->where('product_id', $item->product_id)
-            ->where('stock_quantity', '>', 0);
+            ->where('active', 1)
+            ->where('stock_quantity', '>', 0)
+            ->whereHas('shop', function ($query) {
+                $query->approved();
+            });
 
         if ($shop) {
             $variants = $variants->where('shop_id', $shop);
         }
 
-        return $variants->with([
+        $variants = $variants->with([
             'images:path,imageable_id,imageable_type',
             'attributeValues:id,value,color',
         ])->get();
+
+        // Parent shell rows often have no attributes; keep only attributed SKUs
+        // so Colour/Size options match correctly in the picker.
+        if ($variants->contains(fn ($v) => $v->attributeValues->isNotEmpty())) {
+            return $variants->filter(fn ($v) => $v->attributeValues->isNotEmpty())->values();
+        }
+
+        return $variants;
     }
 
     /**
@@ -1585,37 +1602,59 @@ class ListHelper
 
     /**
      * Get country list for form dropdown.
+     * Always limited to marketplace countries (India + Mozambique).
      *
      * @return Collection
      */
     public static function active_business_areas()
     {
-        $key = 'active_business_areas_'.(config('system_settings.worldwide_business_area') ? 'ww' : 'local');
+        $key = 'active_business_areas_'.(config('system_settings.worldwide_business_area') ? 'ww' : 'local').'_v2';
 
         return Cache::rememberForever($key, function () {
-            $countries = DB::table('countries');
-
-            if (! config('system_settings.worldwide_business_area')) {
-                $countries->where('active', BaseModel::ACTIVE);
-            }
-
-            return $countries->orderBy('name', 'asc')->pluck('name', 'id');
+            return self::marketplaceCountriesQuery()
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id');
         });
     }
 
     /**
-     * Get country list for form dropdown.
+     * Get country list for form dropdown (addresses, product origin, etc.).
+     * Same marketplace-only list as address forms.
      *
      * @return Collection
      */
     public static function countries()
     {
-        return Cache::rememberForever('countries_pluck', function () {
-            return DB::table('countries')
-                ->where('active', BaseModel::ACTIVE)
+        return Cache::rememberForever('countries_pluck_v2', function () {
+            return self::marketplaceCountriesQuery()
                 ->orderBy('name', 'asc')
                 ->pluck('name', 'id');
         });
+    }
+
+    /**
+     * Base query for marketplace-supported countries (India + Mozambique).
+     */
+    public static function marketplaceCountriesQuery()
+    {
+        $isos = config('system.marketplace_country_isos', ['IN', 'MZ']);
+
+        return DB::table('countries')
+            ->where('active', BaseModel::ACTIVE)
+            ->whereIn('iso_code', $isos);
+    }
+
+    /**
+     * Flush cached country dropdowns (call after country admin changes).
+     */
+    public static function flushCountryCaches(): void
+    {
+        Cache::forget('countries_pluck');
+        Cache::forget('countries_pluck_v2');
+        Cache::forget('active_business_areas_ww');
+        Cache::forget('active_business_areas_local');
+        Cache::forget('active_business_areas_ww_v2');
+        Cache::forget('active_business_areas_local_v2');
     }
 
     /**

@@ -121,7 +121,7 @@ class CartController extends Controller
             }
         }
 
-        $this->annotateCartDeliveryRange($carts);
+        app(\App\Services\Cart\CartDeliveryRangeService::class)->annotate($carts);
 
         // One-store checkout: only the selected cart is checked out at a time.
         $wantedId = $expressId ? (int) $expressId : (int) $request->query('cart');
@@ -158,65 +158,6 @@ class CartController extends Controller
         }
 
         return view('theme::cart', compact('carts', 'activeCart', 'business_areas', 'shipping_zones', 'shipping_options', 'expressId', 'customer', 'paymentMethods', 'states'));
-    }
-
-    /**
-     * Flag each cart as in/out of the shop service radius for the buyer location.
-     */
-    protected function annotateCartDeliveryRange($carts): void
-    {
-        $catalog = app(\App\Services\Hyperlocal\HyperlocalCatalogService::class);
-        $buyer = app(\App\Services\Hyperlocal\BuyerLocationService::class);
-        $buyer->ensureDeliveryLocation();
-
-        foreach ($carts as $cart) {
-            $cart->out_of_range = false;
-            $cart->needs_delivery_location = false;
-            $cart->delivery_distance_km = null;
-            $cart->service_radius_km = null;
-
-            if ($cart->is_digital || ! $catalog->isEnabled() || ! $cart->shop) {
-                continue;
-            }
-
-            $lat = $buyer->latitude();
-            $lng = $buyer->longitude();
-
-            // Prefer explicit ship-to address coordinates when present.
-            $shipTo = $cart->relationLoaded('shippingAddress')
-                ? $cart->shippingAddress
-                : ($cart->ship_to ? \App\Models\Address::find($cart->ship_to) : null);
-            if ($shipTo && $shipTo->latitude && $shipTo->longitude) {
-                $lat = (float) $shipTo->latitude;
-                $lng = (float) $shipTo->longitude;
-            }
-
-            $shop = $cart->shop;
-            $store = $shop->storeAddress();
-            $radius = (float) ($shop->service_radius_km ?: config('hyperlocal.default_shop_service_radius_km', 5));
-            $cart->service_radius_km = $radius;
-
-            if (! $lat || ! $lng) {
-                $cart->needs_delivery_location = true;
-
-                continue;
-            }
-
-            if (! $store || ! $store->latitude || ! $store->longitude) {
-                $cart->out_of_range = true;
-
-                continue;
-            }
-
-            $distance = app(\App\Services\Geo\DistanceService::class)->distanceKm(
-                (float) $store->latitude,
-                (float) $store->longitude,
-                (float) $lat,
-                (float) $lng
-            );
-            $cart->delivery_distance_km = round($distance, 1);
-            $cart->out_of_range = $distance > $radius;
-        }
     }
 
     /**

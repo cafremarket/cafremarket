@@ -34,11 +34,6 @@
         <span class="sf-mobile-drawer__icon"><i class="fal fa-shopping-bag" aria-hidden="true"></i></span>
         <span>{{ trans('theme.nav.my_orders') }}</span>
       </a>
-
-      <a href="{{ route('account', 'wishlist') }}" class="sf-mobile-drawer__link">
-        <span class="sf-mobile-drawer__icon"><i class="fal fa-heart" aria-hidden="true"></i></span>
-        <span>{{ trans('theme.wishlist') }}</span>
-      </a>
     @else
       <a href="javascript:void(0);" data-toggle="modal" data-target="#loginModal" class="sf-mobile-drawer__link sf-mobile-drawer__link--login">
         <span class="sf-mobile-drawer__icon"><i class="fal fa-sign-in" aria-hidden="true"></i></span>

@@ -41,6 +41,7 @@ class CreateWebBannerRequest extends Request
 
         $this->merge([
             'shop_id' => null,
+            'channel' => Banner::CHANNEL_WEB,
             'hide_text' => $this->boolean('hide_text'),
             'display_type' => $displayType,
             'columns' => $columns,

@@ -24,7 +24,6 @@ class DashboardResource extends JsonResource
             'active' => $this->active,
             'accepts_marketing' => $this->accepts_marketing,
             'orders_count' => $this->orders_count,
-            'wishlists_count' => $this->wishlists_count,
             'disputes_count' => $this->disputes_count,
             'coupons_count' => $this->coupons_count,
             'member_since' => $this->created_at->diffForHumans(),

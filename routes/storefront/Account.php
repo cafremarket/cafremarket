@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Storefront\AccountController;
-use App\Http\Controllers\Storefront\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('dashboard', '/my/dashboard');
@@ -22,14 +21,6 @@ Route::middleware('xssSanitizer')->group(function () {
     Route::get('my/{tab?}', [
         AccountController::class, 'index',
     ])->name('account');
-
-    Route::get('wishlist/{item}', [
-        WishlistController::class, 'add',
-    ])->name('wishlist.add')->middleware(['ajax']);
-
-    Route::delete('wishlist/{wishlist}', [
-        WishlistController::class, 'remove',
-    ])->name('wishlist.remove');
 
     Route::put('my/password/update', [
         AccountController::class, 'password_update',

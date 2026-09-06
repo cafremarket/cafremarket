@@ -500,6 +500,12 @@
             <span>{{ trans('nav.web_banners') }}</span>
           </a>
         </li>
+        <li class="{{ Request::is('admin/app-banners*') ? 'active' : '' }}">
+          <a href="{{ route('admin.app_banner.index') }}">
+            <i class="fa fa-mobile"></i>
+            <span>{{ trans('nav.app_banners') }}</span>
+          </a>
+        </li>
       @endif
 
       @if ((new \App\Helpers\Authorize(Auth::user(), 'customize_appearance'))->check())

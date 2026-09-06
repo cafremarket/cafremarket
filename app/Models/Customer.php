@@ -185,14 +185,6 @@ class Customer extends CustomerWallet
     }
 
     /**
-     * Get the user wishlists.
-     */
-    public function wishlists()
-    {
-        return $this->hasMany(Wishlist::class);
-    }
-
-    /**
      * Get the user orders.
      */
     public function orders()

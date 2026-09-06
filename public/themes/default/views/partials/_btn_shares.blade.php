@@ -1,28 +1,95 @@
-<div class="share">
-  <span>
-    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::fullUrl()) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'facebook'])"><i class="fa fa-facebook-f"></i></a>
+@php
+  $shareUrl = isset($item) ? storefront_product_url($item) : Request::fullUrl();
+  $shareTitle = $item->meta_title ?? $item->title ?? '';
+  $shareDesc = $item->meta_description
+    ?? \Illuminate\Support\Str::limit(trim(strip_tags($item->description ?? '')), 160, '');
+  $shareImage = get_product_img_src($item, 'full');
+  $sharePrice = get_formated_currency($item->current_sale_price());
+  $shareText = trim($shareTitle . ($shareDesc ? ' — ' . $shareDesc : '') . ' ' . $shareUrl);
+  $shareTriggerOnly = $shareTriggerOnly ?? false;
+  $shareModalOnly = $shareModalOnly ?? false;
+@endphp
 
-    <a href="https://twitter.com/intent/tweet?url={{ urlencode(Request::fullUrl()) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'twitter'])"><i class="fa fa-twitter"></i></a>
+@unless ($shareModalOnly)
+  <a href="javascript:void(0);"
+    class="btn btn-link sf-share__trigger"
+    data-toggle="modal"
+    data-target="#productShareModal"
+    role="button"
+    aria-label="{{ trans('theme.share') }}"
+    title="{{ trans('theme.share') }}">
+    <i class="fa fa-share-alt" aria-hidden="true"></i> {{ trans('theme.share') }}
+  </a>
+@endunless
 
-    <a href="http://www.reddit.com/submit?{{ http_build_query(['url' => Request::fullUrl(), 'title' => $item->title]) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'reddit'])"><i class="fa fa-reddit"></i></a>
+@unless ($shareTriggerOnly)
+<div class="modal fade" id="productShareModal" tabindex="-1" role="dialog" aria-labelledby="productShareModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content sf-share-modal">
+      <div class="modal-header">
+        <h4 class="modal-title" id="productShareModalTitle">
+          <i class="fa fa-share-alt"></i> {{ trans('theme.share_product') }}
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
-    <a href="https://pinterest.com/pin/create/button/?{{ http_build_query(['url' => Request::fullUrl(), 'media' => get_product_img_src($item, 'full'), 'description' => $item->title]) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'pinterest'])"><i class="fa fa-pinterest"></i></a>
+      <div class="modal-body">
+        <div class="sf-share-modal__product">
+          <div class="sf-share-modal__thumb">
+            <img src="{{ $shareImage }}" alt="{{ $shareTitle }}">
+          </div>
+          <div class="sf-share-modal__meta">
+            <h5 class="sf-share-modal__name">{{ $shareTitle }}</h5>
+            @if ($shareDesc)
+              <p class="sf-share-modal__desc">{{ $shareDesc }}</p>
+            @endif
+            <div class="sf-share-modal__price">{{ $sharePrice }}</div>
+          </div>
+        </div>
 
-    <a href="https://plus.google.com/share?url={{ urlencode(Request::fullUrl()) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'google+'])"><i class="fa fa-google-plus"></i></a>
+        <label class="sf-share-modal__label" for="productShareLink">{{ trans('theme.product_link') }}</label>
+        <div class="sf-share-modal__link-row">
+          <input type="text"
+            id="productShareLink"
+            class="form-control"
+            value="{{ $shareUrl }}"
+            readonly
+            aria-label="{{ trans('theme.product_link') }}">
+          <button type="button" class="btn btn-primary sf-share-modal__copy" data-copy-target="#productShareLink">
+            <i class="fa fa-copy"></i> {{ trans('theme.copy_link') }}
+          </button>
+        </div>
+        <p class="sf-share-modal__copied text-success hide" role="status">{{ trans('theme.link_copied') }}</p>
 
-    <a href="http://www.linkedin.com/shareArticle?{{ http_build_query(['url' => Request::fullUrl(), 'title' => $item->title, 'mini' => true]) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'linkedin'])"><i class="fa fa-linkedin-in"></i></a>
-
-    <a href="http://www.tumblr.com/share?{{ http_build_query(['u' => Request::fullUrl(), 't' => $item->title, 'v' => 3]) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'tumblr'])"><i class="fa fa-tumblr"></i></a>
-
-    <a href="http://vk.com/share.php?{{ http_build_query(['url' => Request::fullUrl(), 'title' => $item->title, 'image' => get_product_img_src($item, 'full'), 'noparse' => false]) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'vk'])"><i class="fa fa-vk"></i></a>
-
-    <a href="http://www.digg.com/submit?{{ http_build_query(['url' => Request::fullUrl(), 'title' => $item->title]) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'digg'])"><i class="fa fa-digg"></i></a>
-
-    {{--    <a href="http://www.viadeo.com/?{{ http_build_query(['url' => Request::fullUrl(),'title' => $item->title,'image' => get_product_img_src($item, 'full')]) }}" class="social-share-btn" target="_blank" rel="noopener" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on',['name' => 'viadeo'])"><i class="fa fa-viadeo"></i></a> --}}
-
-    <a href="whatsapp://send?text={{ rawurlencode($item->title . ' | ' . Request::fullUrl()) }}" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'WhatsApp'])"><i class="fa fa-whatsapp"></i></a>
-
-    <a href="mailto:?subject={{ $item->title }}&amp;body={{ Request::fullUrl() }}" data-toggle="tooltip" data-placement="top" title="@lang('theme.share_on', ['name' => 'email'])"><i class="far fa-envelope"></i></a>
-  </span>
-  <div class="addthis_native_toolbox"></div>
+        <div class="sf-share-modal__actions">
+          <a class="sf-share-modal__action social-share-btn"
+            href="https://wa.me/?text={{ rawurlencode($shareText) }}"
+            target="_blank" rel="noopener noreferrer">
+            <i class="fa fa-whatsapp"></i>
+            <span>WhatsApp</span>
+          </a>
+          <a class="sf-share-modal__action social-share-btn"
+            href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}"
+            target="_blank" rel="noopener noreferrer">
+            <i class="fa fa-facebook"></i>
+            <span>Facebook</span>
+          </a>
+          <a class="sf-share-modal__action social-share-btn"
+            href="https://twitter.com/intent/tweet?{{ http_build_query(['url' => $shareUrl, 'text' => $shareTitle]) }}"
+            target="_blank" rel="noopener noreferrer">
+            <i class="fa fa-twitter"></i>
+            <span>X</span>
+          </a>
+          <a class="sf-share-modal__action"
+            href="mailto:?subject={{ rawurlencode($shareTitle) }}&body={{ rawurlencode($shareText) }}">
+            <i class="fa fa-envelope"></i>
+            <span>{{ trans('theme.email') }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+@endunless
