@@ -23,10 +23,6 @@ class BlockMerchantFromAdmin
             return $next($request);
         }
 
-        if ($request->session()->has('impersonated')) {
-            return $next($request);
-        }
-
         $path = trim($request->path(), '/');
 
         if (isset($this->pathMap[$path])) {

@@ -72,6 +72,14 @@ class LoginController extends Controller
         return view('auth.admin_login');
     }
 
+    /**
+     * /login is retired in favor of the single admin-styled /admin/login page.
+     */
+    public function showLoginForm()
+    {
+        return redirect()->route('admin.login');
+    }
+
     public function login(Request $request)
     {
         if (is_incevio_package_loaded('otp-login') && $request->input('phone')) {
@@ -203,7 +211,7 @@ class LoginController extends Controller
 
         $request->session()->invalidate();
 
-        return ($this->loggedOut($request) ?? redirect($this->redirectPath()))
+        return redirect()->to('/')
             ->withCookie(app(JwtAuthService::class)->forgetCookie('web'));
     }
 }

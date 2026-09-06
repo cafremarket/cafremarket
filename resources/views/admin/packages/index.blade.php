@@ -31,7 +31,7 @@
       </tr>
     </thead>
     <tbody>
-      @forelse ($installables as $package)
+      @foreach ($installables as $package)
         @php
           $dependencies = $package['dependency'];
           $can_load = !(bool) $dependencies;
@@ -107,13 +107,7 @@
             </span>
           </td>
         </tr>
-      @empty
-        <tr>
-          <td colspan="3" class="text-center text-muted">
-            No packages found in the packages directory.
-          </td>
-        </tr>
-      @endforelse
+      @endforeach
     </tbody>
   </table>
 

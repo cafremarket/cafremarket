@@ -73,10 +73,13 @@ class SystemController extends Controller
         if ($request->hasFile('logo')) {
             $system->updateImage($request->file('logo'), 'logo');
 
-            // Flush all logo sizes
+            // Flush all logo sizes. 'full' is not a configured thumbnail preset
+            // (it serves the original, unresized image) so it must be forgotten
+            // explicitly — it is never a key in config('image.sizes').
             foreach (config('image.sizes') as $size => $value) {
                 Cache::forget('system_logo_img_'.$size);
             }
+            Cache::forget('system_logo_img_full');
         }
 
         event(new SystemInfoUpdated($system));

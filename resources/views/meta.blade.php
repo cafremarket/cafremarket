@@ -27,20 +27,31 @@
   // For Categories
   elseif (Request::is('categories/*') || Request::is('categorygrp/*') || Request::is('category/*')) {
       $category = $category ?? $categorySubGroup ?? $categoryGroup ?? null;
+      if (! $category) {
+          \Illuminate\Support\Facades\Log::debug('meta.blade.php: category/categorySubGroup/categoryGroup all missing for a category-like URL.', ['url' => url()->current()]);
+      }
       $SEOtitle = optional($category)->meta_title ?? $SEOtitle;
       $SEOdescription = optional($category)->meta_description ?? $SEOdescription;
   }
 
   // For Shops
   elseif (Request::is('shop/*')) {
-      $SEOtitle = $shop->getName() ?? $SEOtitle;
-      $SEOdescription = $shop->description ? substr(strip_tags($shop->description), 0, $character_limit) : $SEOdescription;
+      $shop = $shop ?? null;
+      if (! $shop) {
+          \Illuminate\Support\Facades\Log::debug('meta.blade.php: $shop missing for a shop/* URL.', ['url' => url()->current()]);
+      }
+      $SEOtitle = optional($shop)->getName() ?? $SEOtitle;
+      $SEOdescription = optional($shop)->description ? substr(strip_tags($shop->description), 0, $character_limit) : $SEOdescription;
   }
 
   // For Brands
   elseif (Request::is('brand/*')) {
-      $SEOtitle = $brand->getName() ?? $SEOtitle;
-      $SEOdescription = $brand->description ? substr(strip_tags($brand->description), 0, $character_limit) : $SEOdescription;
+      $brand = $brand ?? null;
+      if (! $brand) {
+          \Illuminate\Support\Facades\Log::debug('meta.blade.php: $brand missing for a brand/* URL.', ['url' => url()->current()]);
+      }
+      $SEOtitle = optional($brand)->getName() ?? $SEOtitle;
+      $SEOdescription = optional($brand)->description ? substr(strip_tags($brand->description), 0, $character_limit) : $SEOdescription;
   }
 
   // For blogs

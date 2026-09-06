@@ -1,7 +1,7 @@
 <aside class="mp-sidebar" id="mp-sidebar">
   <div class="mp-sidebar__brand">
     @if (system_has_custom_logo())
-      <img src="{{ get_logo_url('system', 'tiny') }}" alt="{{ get_platform_title() }}">
+      <img src="{{ get_logo_url('system', 'logo') }}" alt="{{ get_platform_title() }}">
     @endif
     <span>{{ optional(Auth::user()->shop)->name ?? trans('app.merchant') }}</span>
   </div>

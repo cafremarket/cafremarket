@@ -80,7 +80,7 @@
       </tr>
     </thead>
     <tbody>
-      @forelse ($campaigns as $campaign)
+      @foreach ($campaigns as $campaign)
         <tr>
           <td>
             <a href="javascript:void(0)" data-link="{{ route('admin.promotion.push_campaign.show', $campaign) }}" class="ajax-modal-btn">
@@ -113,11 +113,7 @@
             {!! Form::close() !!}
           </td>
         </tr>
-      @empty
-        <tr>
-          <td colspan="7" class="text-center text-muted">No push campaigns yet. Create one to send promotions.</td>
-        </tr>
-      @endforelse
+      @endforeach
     </tbody>
   </table>
 

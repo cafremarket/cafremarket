@@ -6,7 +6,6 @@ use App\Common\Authorizable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SecretLoginRequest;
 use App\Models\Dashboard;
-use App\Models\Shop;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
@@ -29,17 +28,15 @@ class DashboardController extends Controller
     /**
      * Display Dashboard of the logged in users.
      *
+     * Merchants never reach this controller: the blockMerchantFromAdmin
+     * middleware redirects them (including impersonated sessions) to the
+     * merchant panel before routing gets here — see BlockMerchantFromAdmin.
+     *
      * @return \Illuminate\View\View
      */
     public function index()
     {
-        if (Auth::user()->isFromPlatform()) {
-            return view('admin.dashboard.platform');
-        }
-
-        $shop = Shop::with('activities.causer')->find(Auth::guard('web')->user()->shop_id);
-
-        return view('admin.dashboard.merchant', compact('shop'));
+        return view('admin.dashboard.platform');
     }
 
     /**

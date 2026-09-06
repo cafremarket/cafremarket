@@ -42,7 +42,7 @@
       </tr>
     </thead>
     <tbody>
-      @forelse ($logs as $log)
+      @foreach ($logs as $log)
         <tr>
           <td class="small">{{ optional($log->created_at)->toDayDateTimeString() }}</td>
           <td>{{ $log->to ?: '-' }}</td>
@@ -56,11 +56,7 @@
             {!! Form::close() !!}
           </td>
         </tr>
-      @empty
-        <tr>
-          <td colspan="6" class="text-center text-muted">{{ trans('app.no_data_found') }}</td>
-        </tr>
-      @endforelse
+      @endforeach
     </tbody>
   </table>
 
