@@ -19,6 +19,13 @@
         @endphp
         <div class="sf-panel mb-3">
           <div class="sf-panel__body" style="padding:18px;">
+            @if ($order->dispute)
+              <p class="mb-3">
+                <span class="label label-info">Ticket {{ $order->dispute->ticketRef() }}</span>
+                {!! $order->dispute->statusName() !!}
+                <span class="label label-default">Raised by {{ $order->dispute->raisedByLabel() }}</span>
+              </p>
+            @endif
             <div class="step-wizard-wrapper">
               <div class="step-wizard">
                 <div class="progress">

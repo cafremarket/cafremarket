@@ -178,6 +178,12 @@
   </a>
 @endif
 
+{{-- Dispute Tickets --}}
+<a href="{{ route('merchant.support.dispute.index') }}" class="mp-sidebar__link {{ mp_is('merchant/support/dispute*') ? 'is-active' : '' }}">
+  <i class="fa fa-ticket"></i>
+  <span>{{ trans('nav.disputes') ?? 'Disputes' }}</span>
+</a>
+
 {{-- Reports --}}
 @if (Auth::user()->isMerchant())
   <div class="mp-nav-group {{ mp_is_any(['merchant/shop/report*']) ? 'is-open' : '' }}">

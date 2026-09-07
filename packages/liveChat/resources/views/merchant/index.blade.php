@@ -25,17 +25,23 @@
             @forelse($chats as $conversation)
               @php
                 $lastMessage = (string) $conversation->last_message();
-                $sharePrefix = '[product_share]';
-                if (str_starts_with($lastMessage, $sharePrefix)) {
-                    $shared = json_decode(substr($lastMessage, strlen($sharePrefix)), true);
+                $productPrefix = '[product_share]';
+                $orderPrefix = '[order_share]';
+                if (str_starts_with($lastMessage, $productPrefix)) {
+                    $shared = json_decode(substr($lastMessage, strlen($productPrefix)), true);
                     $preview = '[Product] '.($shared['title'] ?? 'Shared item');
+                } elseif (str_starts_with($lastMessage, $orderPrefix)) {
+                    $shared = json_decode(substr($lastMessage, strlen($orderPrefix)), true);
+                    $preview = '[Order] '.($shared['order_number'] ?? $shared['title'] ?? 'Shared order');
                 } else {
                     $preview = strip_tags($lastMessage);
                 }
               @endphp
               <button type="button"
                       class="mpc-row sidebarBody {{ $conversation->isUnread() ? 'is-unread' : '' }}"
-                      id="chat-{{ $conversation->customer_id }}"
+                      id="chat-{{ $conversation->id }}"
+                      data-conversation-id="{{ $conversation->id }}"
+                      data-customer-id="{{ $conversation->customer_id }}"
                       data-link="{{ route('merchant.support.chat_conversation.show', $conversation, false) }}"
                       data-name="{{ $conversation->customer->getName() }}">
                 <img src="{{ get_avatar_src($conversation->customer, 'mini') }}" alt="">
@@ -85,7 +91,6 @@
   var room = root.getAttribute('data-ws-room') || '';
   var sending = false;
   var socket = null;
-  var socketConnected = false;
 
   function qs(sel, el) { return (el || document).querySelector(sel); }
   function qsa(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
@@ -100,9 +105,7 @@
     try {
       var d = iso ? new Date(iso) : new Date();
       if (isNaN(d.getTime())) return '';
-      var h = d.getHours();
-      var m = d.getMinutes();
-      var ap = h >= 12 ? 'PM' : 'AM';
+      var h = d.getHours(), m = d.getMinutes(), ap = h >= 12 ? 'PM' : 'AM';
       h = h % 12; if (!h) h = 12;
       return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
     } catch (e) { return ''; }
@@ -128,26 +131,57 @@
   function showError(msg) {
     var el = qs('#mpc-send-error');
     if (!el) return;
-    if (!msg) {
-      el.hidden = true;
-      el.textContent = '';
-      return;
-    }
-    el.hidden = false;
-    el.textContent = msg;
+    el.hidden = !msg;
+    el.textContent = msg || '';
   }
 
   function parseShare(text) {
-    var prefix = '[product_share]';
-    if (!text || text.indexOf(prefix) !== 0) return null;
-    try { return JSON.parse(text.slice(prefix.length)); } catch (e) { return null; }
+    if (!text || typeof text !== 'string') return null;
+    var kinds = [
+      { prefix: '[order_share]', type: 'order' },
+      { prefix: '[product_share]', type: 'product' }
+    ];
+    for (var i = 0; i < kinds.length; i++) {
+      if (text.indexOf(kinds[i].prefix) !== 0) continue;
+      try {
+        var data = JSON.parse(text.slice(kinds[i].prefix.length));
+        if (data && typeof data === 'object') {
+          data._shareType = kinds[i].type;
+          return data;
+        }
+      } catch (e) {}
+      return null;
+    }
+    return null;
+  }
+
+  function previewText(text, attachments) {
+    var share = parseShare(text);
+    if (share) {
+      if (share._shareType === 'order') {
+        return '[Order] ' + (share.order_number || share.title || 'Shared order');
+      }
+      return '[Product] ' + (share.title || 'Shared item');
+    }
+    if (attachments && attachments.length) {
+      var plain = String(text || '').replace(/<[^>]*>/g, '').trim().toLowerCase();
+      if (!plain || plain === '[attachment]') return '[Attachment]';
+    }
+    return String(text || '').slice(0, 72);
   }
 
   function bubbleHtml(text, outgoing, meta) {
     meta = meta || {};
     var share = parseShare(text);
     var body = '';
-    if (share) {
+    if (share && share._shareType === 'order') {
+      var line = [share.total, share.status].filter(Boolean).join(' · ');
+      body = '<div class="mpc-share mpc-share--order">' +
+        (share.image ? '<img src="' + esc(share.image) + '" alt="">' : '') +
+        '<div><div class="mpc-share__title">' + esc(share.title || ('Order #' + (share.order_number || ''))) + '</div>' +
+        (line ? '<div class="mpc-share__price">' + esc(line) + '</div>' : '') +
+        '<a href="' + esc(share.url || '#') + '" target="_blank" rel="noopener">View order</a></div></div>';
+    } else if (share) {
       body = '<div class="mpc-share"><img src="' + esc(share.image || '') + '" alt=""><div>' +
         '<div class="mpc-share__title">' + esc(share.title || '') + '</div>' +
         '<div class="mpc-share__price">' + esc(share.price || '') + '</div>' +
@@ -193,13 +227,38 @@
     box.appendChild(sep);
   }
 
-  function updateRowPreview(customerId, text, timeLabel) {
-    var row = qs('#chat-' + customerId);
+  function findRow(conversationId, customerId) {
+    var id = conversationId != null && conversationId !== '' ? String(conversationId) : '';
+    var cid = customerId != null && customerId !== '' ? String(customerId) : '';
+    if (id) {
+      var byId = qs('#chat-' + id) || qs('.mpc-row[data-conversation-id="' + id + '"]');
+      if (byId) return byId;
+    }
+    if (cid) {
+      return qs('#chat-' + cid) || qs('.mpc-row[data-customer-id="' + cid + '"]');
+    }
+    return null;
+  }
+
+  function updateRowPreview(conversationId, customerId, text, timeLabel, attachments) {
+    var row = findRow(conversationId, customerId);
     if (!row) return;
     var ex = row.querySelector('.excerpt');
     var tm = row.querySelector('.time-meta');
-    if (ex) ex.textContent = String(text || '').replace(/^\[product_share\].*/, '[Product]').slice(0, 72);
+    if (ex) ex.textContent = previewText(text, attachments).slice(0, 72);
     if (tm) tm.textContent = timeLabel || 'just now';
+  }
+
+  function openMatches(result) {
+    var open = qs('.mpc-thread__head');
+    if (!open) return false;
+    var openConv = open.getAttribute('data-conversation-id') || String(open.id || '').replace('openChatbox-', '');
+    var openCust = open.getAttribute('data-customer-id') || '';
+    var rid = result.conversation_id != null ? String(result.conversation_id) : '';
+    var cid = result.customer_id != null ? String(result.customer_id) : '';
+    if (rid && openConv && rid === openConv) return true;
+    if (cid && openCust && cid === openCust) return true;
+    return false;
   }
 
   function loadConversation(link, row) {
@@ -207,7 +266,6 @@
     var pane = qs('#chatConversation');
     pane.innerHTML = '<div class="mpc__placeholder"><div class="mpc__placeholder-icon"><i class="fa fa-circle-o-notch fa-spin"></i></div><p>Loading…</p></div>';
     setThreadOpen(true);
-
     qsa('.mpc-row').forEach(function (r) { r.classList.remove('is-active'); });
     if (row) {
       row.classList.add('is-active');
@@ -215,14 +273,9 @@
       var dot = row.querySelector('.mpc-row__dot');
       if (dot) dot.remove();
     }
-
     fetch(link, {
       credentials: 'same-origin',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'text/html',
-        'X-CSRF-TOKEN': csrf
-      }
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html', 'X-CSRF-TOKEN': csrf }
     }).then(function (res) {
       if (!res.ok) throw new Error('Failed to load conversation (' + res.status + ')');
       return res.text();
@@ -246,12 +299,7 @@
     var clearBtn = qs('#mpc-attach-clear');
     var backBtn = qs('#mpc-back-list');
 
-    if (backBtn) {
-      backBtn.addEventListener('click', function () {
-        setThreadOpen(false);
-      });
-    }
-
+    if (backBtn) backBtn.addEventListener('click', function () { setThreadOpen(false); });
     if (fileInput) {
       fileInput.addEventListener('change', function () {
         if (!fileInput.files || !fileInput.files.length) {
@@ -268,12 +316,10 @@
         if (preview) preview.hidden = true;
       });
     }
-
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       sendReply(form);
     });
-
     var ta = qs('textarea[name="message"]', form);
     if (ta) {
       ta.addEventListener('keydown', function (e) {
@@ -288,7 +334,6 @@
 
   function sendReply(form) {
     if (sending) return;
-
     var ta = qs('textarea[name="message"]', form);
     var fileInput = qs('input[name="photo"]', form);
     var msg = (ta && ta.value ? ta.value : '').trim();
@@ -307,7 +352,8 @@
     if (btn) btn.disabled = true;
 
     var head = qs('.mpc-thread__head');
-    var customerId = head ? head.getAttribute('data-customer-id') : '';
+    var conversationId = head ? (head.getAttribute('data-conversation-id') || String(head.id || '').replace('openChatbox-', '')) : '';
+    var customerId = head ? (head.getAttribute('data-customer-id') || '') : '';
     var nowIso = new Date().toISOString();
     var box = qs('#conversationBox');
 
@@ -318,10 +364,9 @@
     if (box && pendingNode) box.appendChild(pendingNode);
     scrollBox();
 
-    // Clear typed text immediately
     if (ta) ta.value = '';
-    var preview = qs('#mpc-attach-preview');
-    if (preview) preview.hidden = true;
+    var attachPreview = qs('#mpc-attach-preview');
+    if (attachPreview) attachPreview.hidden = true;
 
     var fd = new FormData();
     fd.append('message', msg);
@@ -331,17 +376,13 @@
       fileInput.value = '';
     }
 
-    updateRowPreview(customerId, msg || '[Attachment]', clock(nowIso));
+    updateRowPreview(conversationId, customerId, msg || '[Attachment]', clock(nowIso));
 
     fetch(url, {
       method: 'POST',
       body: fd,
       credentials: 'same-origin',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json',
-        'X-CSRF-TOKEN': csrf
-      }
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf }
     }).then(function (res) {
       return res.text().then(function (text) {
         var data = null;
@@ -351,15 +392,12 @@
     }).then(function (result) {
       sending = false;
       if (btn) btn.disabled = false;
-
       if (!result.ok) {
         if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
         if (ta) ta.value = msg;
         showError('Could not send (HTTP ' + result.status + '). Try again.');
-        if (window.console) console.error('[merchant-chat] send failed', result.status, result.text);
         return;
       }
-
       var data = result.data || {};
       if (pendingNode) {
         pendingNode.removeAttribute('data-pending');
@@ -379,25 +417,21 @@
         }
       }
       scrollBox();
-      if (window.console) console.log('[merchant-chat] sent ok reply_id=', data.reply_id);
-    }).catch(function (err) {
+    }).catch(function () {
       sending = false;
       if (btn) btn.disabled = false;
       if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
       if (ta) ta.value = msg;
       showError('Network error. Message not sent.');
-      if (window.console) console.error('[merchant-chat] network error', err);
     });
   }
 
-  // Inbox click
   qs('#leftsidebar').addEventListener('click', function (e) {
     var row = e.target.closest('.mpc-row');
     if (!row) return;
     loadConversation(row.getAttribute('data-link'), row);
   });
 
-  // Search
   var search = qs('#mpc-search');
   if (search) {
     search.addEventListener('input', function () {
@@ -410,7 +444,6 @@
     });
   }
 
-  // WebSocket (optional realtime)
   (function initWs() {
     var scheme = @json(config('chat_socket.scheme', 'ws'));
     var host = @json(config('chat_socket.client_host', '127.0.0.1'));
@@ -423,28 +456,52 @@
     else if (port && !/:\d+$/.test(host)) url += ':' + port;
     if (!room || typeof WebSocket === 'undefined') return;
 
+    function appendIncoming(result, outgoing) {
+      if (result.reply_id && qs('#conversationBox [data-reply-id="' + result.reply_id + '"]')) return;
+      ensureDay(result.created_at);
+      var box = qs('#conversationBox');
+      var wrap = document.createElement('div');
+      wrap.innerHTML = bubbleHtml(result.text, outgoing, {
+        replyId: result.reply_id,
+        createdAt: result.created_at,
+        time: result.time,
+        attachments: result.attachments
+      });
+      if (box && wrap.firstChild) box.appendChild(wrap.firstChild);
+      scrollBox();
+    }
+
+    function markUnread(row) {
+      if (!row) return;
+      row.classList.add('is-unread');
+      if (!row.querySelector('.mpc-row__dot')) {
+        var b = row.querySelector('.mpc-row__bottom');
+        if (b) {
+          var dot = document.createElement('span');
+          dot.className = 'mpc-row__dot';
+          b.appendChild(dot);
+        }
+      }
+    }
+
     function connect() {
       try { socket = new WebSocket(url); } catch (e) { return; }
       socket.onopen = function () {
-        socketConnected = true;
-        socket.send(JSON.stringify({ event: 'subscribe', room: room }));
+        socket.send(JSON.stringify({ action: 'subscribe', room: room }));
       };
-      socket.onclose = function () {
-        socketConnected = false;
-        setTimeout(connect, 4000);
-      };
+      socket.onclose = function () { setTimeout(connect, 4000); };
       socket.onmessage = function (ev) {
         var payload;
         try { payload = JSON.parse(ev.data); } catch (e) { return; }
+        if (payload && payload.ok && (payload.subscribed || payload.pong)) return;
         if (!payload || payload.event !== 'chat.message') return;
         var result = payload.data || payload.payload || payload;
         if (typeof result === 'string') {
           try { result = JSON.parse(result); } catch (e) { return; }
         }
         var sender = result.sender_type;
-        var open = qs('.mpc-thread__head');
-        var openId = open ? open.getAttribute('data-customer-id') : null;
-        var cid = result.customer_id != null ? String(result.customer_id) : '';
+        var convId = result.conversation_id != null ? String(result.conversation_id) : '';
+        var custId = result.customer_id != null ? String(result.customer_id) : '';
 
         if (sender === 'merchant') {
           if (result.reply_id && qs('#conversationBox [data-reply-id="' + result.reply_id + '"]')) return;
@@ -454,54 +511,20 @@
             pendingMine.removeAttribute('data-pending');
             return;
           }
-          if (openId && cid && openId === cid) {
-            ensureDay(result.created_at);
-            var box = qs('#conversationBox');
-            var wrap = document.createElement('div');
-            wrap.innerHTML = bubbleHtml(result.text, true, {
-              replyId: result.reply_id,
-              createdAt: result.created_at,
-              time: result.time,
-              attachments: result.attachments
-            });
-            if (box && wrap.firstChild) box.appendChild(wrap.firstChild);
-            scrollBox();
-          }
-          updateRowPreview(cid, result.text, result.time || clock(result.created_at));
+          if (openMatches(result)) appendIncoming(result, true);
+          updateRowPreview(convId, custId, result.text, result.time || clock(result.created_at), result.attachments);
           return;
         }
 
         if (sender !== 'customer') return;
-
         if (result.reply_id && qs('#conversationBox [data-reply-id="' + result.reply_id + '"]')) return;
 
-        if (openId && cid && openId === cid) {
-          ensureDay(result.created_at);
-          var box2 = qs('#conversationBox');
-          var wrap2 = document.createElement('div');
-          wrap2.innerHTML = bubbleHtml(result.text, false, {
-            replyId: result.reply_id,
-            createdAt: result.created_at,
-            time: result.time,
-            attachments: result.attachments
-          });
-          if (box2 && wrap2.firstChild) box2.appendChild(wrap2.firstChild);
-          scrollBox();
-        } else if (cid) {
-          var row = qs('#chat-' + cid);
-          if (row) {
-            row.classList.add('is-unread');
-            if (!row.querySelector('.mpc-row__dot')) {
-              var b = row.querySelector('.mpc-row__bottom');
-              if (b) {
-                var dot = document.createElement('span');
-                dot.className = 'mpc-row__dot';
-                b.appendChild(dot);
-              }
-            }
-          }
+        if (openMatches(result)) {
+          appendIncoming(result, false);
+        } else {
+          markUnread(findRow(convId, custId));
         }
-        updateRowPreview(cid, result.text, result.time || clock(result.created_at));
+        updateRowPreview(convId, custId, result.text, result.time || clock(result.created_at), result.attachments);
       };
     }
     connect();

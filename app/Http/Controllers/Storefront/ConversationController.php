@@ -13,131 +13,186 @@ use App\Models\Message;
 use App\Models\Order;
 use App\Models\Reply;
 use App\Models\Shop;
+use App\Services\OrderChatSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Incevio\Package\LiveChat\Models\ChatConversation;
 
 class ConversationController extends Controller
 {
     /**
-     * Contact seller.
+     * Contact seller — uses unified LiveChat when available.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function contact(ContactSellerRequest $request, $slug)
     {
-        $shop = Shop::select(['id'])->where('slug', $slug)->approved()->first();
+        $shop = Shop::select(['id'])->where('slug', $slug)->approved()->firstOrFail();
+        $customerId = Auth::guard('customer')->id();
 
-        if (! $shop) {
-            return redirect()->back()->with('error', trans('theme.notify.store_not_available'));
+        if (
+            is_incevio_package_loaded('liveChat')
+            && class_exists(ChatConversation::class)
+            && Schema::hasTable('chat_conversations')
+        ) {
+            $text = trim((string) $request->input('message'));
+            $subject = trim((string) $request->input('subject'));
+            if ($subject !== '') {
+                $text = ($text !== '' ? $subject."\n\n".$text : $subject);
+            }
+
+            $conversation = ChatConversation::query()
+                ->where('shop_id', $shop->id)
+                ->where('customer_id', $customerId)
+                ->when(
+                    Schema::hasColumn('chat_conversations', 'order_id'),
+                    fn ($q) => $q->whereNull('order_id')
+                )
+                ->first();
+
+            if ($conversation) {
+                $conversation->bumpLastMessage($text, true);
+                $conversation->replies()->create([
+                    'customer_id' => $customerId,
+                    'user_id' => null,
+                    'reply' => $text,
+                    'read' => false,
+                ]);
+            } else {
+                $attrs = [
+                    'shop_id' => $shop->id,
+                    'customer_id' => $customerId,
+                    'message' => $text,
+                    'status' => ChatConversation::STATUS_NEW,
+                ];
+                if (Schema::hasColumn('chat_conversations', 'order_id')) {
+                    $attrs['order_id'] = null;
+                }
+                $conversation = ChatConversation::create($attrs);
+                $conversation->replies()->create([
+                    'customer_id' => $customerId,
+                    'user_id' => null,
+                    'reply' => $text,
+                    'read' => false,
+                ]);
+            }
+
+            if ($request->filled('product_id') && function_exists('livechat_build_product_share_message') === false) {
+                // Product share is handled on product pages via LiveChat widget.
+            }
+
+            return back()->with('success', trans('theme.notify.message_sent'));
         }
 
-        $message = new Message([
-            'customer_id' => Auth::guard('customer')->user()->id,
-            'subject' => $request->input('subject'),
-            'message' => $request->input('message'),
-            'product_id' => $request->input('product_id'),
-            'customer_status' => Message::STATUS_READ,
-        ]);
+        $message = new Message;
+        $message->shop_id = $shop->id;
+        $message->subject = $request->subject;
+        $message->message = $request->message;
+        $message->customer_id = $customerId;
+        $message->product_id = $request->product_id;
+        $message->order_id = null;
+        $message->status = Message::STATUS_NEW;
+        $message->save();
 
-        $shop->messages()->save($message);
+        if ($request->hasFile('photo')) {
+            $message->saveAttachments($request->file('photo'));
+        }
 
         event(new NewMessage($message));
 
-        return redirect()->back()->with('success', trans('theme.notify.message_sent'));
-    }
-
-    public function show(Message $message)
-    {
-        $tab = 'message';
-        // $$tab = $message->load(['replies.repliable', 'replies.attachments' => function ($q) {
-        //     $q->withCount('attachments');
-        // }]);
-        $$tab = $message->load(['replies.repliable', 'replies.attachments']);
-
-        $message->markAsRead();
-
-        return view('theme::dashboard', compact('tab', $tab));
+        return back()->with('success', trans('theme.notify.message_sent'));
     }
 
     /**
-     * Start a order conversation.
+     * Show a legacy Message thread (when LiveChat inbox is not used).
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Request $request, Message $message)
+    {
+        abort_unless(
+            (int) $message->customer_id === (int) Auth::guard('customer')->id(),
+            403
+        );
+
+        $message->markAsRead();
+        $message->load(['replies.attachments', 'attachments', 'shop']);
+
+        return view('theme::contents.message', compact('message'));
+    }
+
+    /**
+     * Reply on a legacy Message thread.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function reply(ReplyMyMessageRequest $request, Message $message)
     {
-        $reply = $message->replies()->create($request->all());
+        abort_unless(
+            (int) $message->customer_id === (int) Auth::guard('customer')->id(),
+            403
+        );
 
-        // Update parent message
+        $userId = Auth::user()->id;
+        $isCustomer = Auth::guard('customer')->check();
+
+        $reply = new Reply;
+        $reply->reply = $request->input('reply');
+
+        if ($isCustomer) {
+            $reply->customer_id = $userId;
+        } else {
+            $reply->user_id = $userId;
+        }
+
+        $message->replies()->save($reply);
         $message->hasNewReply();
+
+        if ($request->hasFile('photo')) {
+            $reply->saveAttachments($request->file('photo'));
+        }
 
         event(new MessageReplied($reply));
 
-        return redirect()->back()->with('success', trans('theme.notify.message_sent'));
+        return back()->with('success', trans('theme.notify.message_sent'));
     }
 
     /**
-     * Start a order conversation.
+     * Contact seller about an order — same LiveChat as product chat.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function order_conversation(OrderConversationRequest $request, Order $order)
     {
-        $user_id = Auth::user()->id;
+        $userId = Auth::user()->id;
+        $isCustomer = Auth::guard('customer')->check();
 
-        if ($order->conversation) {
-            $msg = new Reply;
-            $msg->reply = $request->input('message');
+        $replyText = trim((string) ($request->input('message') ?? ''));
+        $shareOrder = $request->boolean('share_order', true);
+        $attachment = $request->hasFile('photo') ? $request->file('photo') : null;
 
-            if (Auth::guard('customer')->check()) {
-                $msg->customer_id = $user_id;
-            } else {
-                $msg->user_id = $user_id;
-            }
-
-            $reply = $order->conversation->replies()->save($msg);
-
-            // Update parent message
-            $order->conversation->update([
-                'status' => Message::STATUS_NEW,
-                'label' => Message::LABEL_INBOX,
-            ]);
-
-            event(new MessageReplied($reply));
-        } else {
-            $msg = new Message;
-            $msg->message = $request->input('message');
-            $msg->shop_id = $order->shop_id;
-
-            if (Auth::guard('customer')->check()) {
-                $msg->subject = trans('theme.defaults.new_message_from', ['sender' => Auth::user()->getName()]);
-                $msg->customer_id = $user_id;
-            } else {
-                $msg->user_id = $user_id;
-            }
-
-            $conversation = $order->conversation()->save($msg);
-
-            event(new NewMessage($conversation));
-        }
-
-        // Update the order if goods_received
         if ($request->has('goods_received')) {
             $order->mark_as_goods_received();
         }
 
-        if ($request->hasFile('photo')) {
-            $msg->saveAttachments($request->file('photo'));
-        }
+        OrderChatSyncService::sendToShopChat(
+            $order->fresh(['shop', 'customer', 'inventories.image']),
+            $replyText,
+            $isCustomer ? 'customer' : 'merchant',
+            $shareOrder || $replyText !== '',
+            $isCustomer ? null : $userId,
+            $attachment
+        );
 
         return back()->with('success', trans('theme.notify.message_sent'));
     }
 
     /**
-     * archive message convesation
+     * Archive a legacy message conversation.
      *
      * @param  Request  $request
      * @return \Illuminate\Http\Response

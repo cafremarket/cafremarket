@@ -6,9 +6,11 @@ use App\Common\Attachable;
 use App\Common\Repliable;
 use App\Models\BaseModel;
 use App\Models\Customer;
+use App\Models\Order;
 use App\Models\Shop;
 use App\Services\ChatSocketPublisher;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 
 class ChatConversation extends BaseModel
 {
@@ -60,6 +62,43 @@ class ChatConversation extends BaseModel
     public function shop()
     {
         return $this->belongsTo(Shop::class);
+    }
+
+    /**
+     * Linked order when this is an order-related chat thread.
+     */
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    /**
+     * Product / general storefront chats (no order).
+     */
+    public function scopeProductChats($query)
+    {
+        if (Schema::hasColumn($this->getTable(), 'order_id')) {
+            return $query->whereNull('order_id');
+        }
+
+        return $query;
+    }
+
+    /**
+     * Order-related chats only.
+     */
+    public function scopeOrderChats($query)
+    {
+        if (Schema::hasColumn($this->getTable(), 'order_id')) {
+            return $query->whereNotNull('order_id');
+        }
+
+        return $query->whereRaw('0 = 1');
+    }
+
+    public function isOrderChat(): bool
+    {
+        return ! empty($this->order_id);
     }
 
     /**

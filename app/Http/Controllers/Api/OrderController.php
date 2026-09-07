@@ -8,12 +8,11 @@ use App\Http\Requests\Validations\OrderDetailRequest;
 use App\Http\Resources\ConversationResource;
 use App\Http\Resources\OrderLightResource;
 use App\Http\Resources\OrderResource;
-use App\Models\Message;
 use App\Exceptions\PaymentFailedException;
 use App\Models\Order;
-use App\Models\Reply;
 use App\Services\Emola\EmolaOrderPaymentService;
 use App\Services\Geo\DistanceService;
+use App\Services\OrderChatSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -57,87 +56,85 @@ class OrderController extends Controller
     }
 
     /**
-     * Display order conversation page.
+     * Load the unified LiveChat for this order's shop + customer.
      *
-     *
-     * @return ConversationResource
+     * @return ConversationResource|\Illuminate\Http\JsonResponse
      */
     public function conversation(OrderDetailRequest $request, Order $order)
     {
-        $order->load(['shop:id,name,slug', 'conversation.replies', 'conversation.replies.attachments']);
+        $chat = OrderChatSyncService::findShopChat($order);
 
-        if (! $order->conversation) {
+        if (! $chat) {
             return response()->json([
                 'message' => trans('api.welcome_chat'),
             ]);
         }
 
-        return new ConversationResource($order->conversation);
+        $chat->markPeerRepliesAsRead('customer');
+
+        return new ConversationResource($chat->fresh(['replies.attachments', 'shop', 'customer']));
     }
 
     /**
-     * Start/Replay a order conversation.
+     * Send into the same LiveChat used for product/seller chat (not Message).
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return ConversationResource
+     * @return ConversationResource|\Illuminate\Http\JsonResponse
      */
     public function save_conversation(OrderDetailRequest $request, Order $order)
     {
-        $user_id = Auth::user()->id;
+        $userId = Auth::user()->id;
+        $isCustomer = Auth::guard('api')->check();
 
         $replyText = trim((string) ($request->input('message') ?? ''));
-        if ($replyText === '' && ($request->hasFile('photo') || $request->filled('photo'))) {
-            $replyText = ' ';
+        $shareOrder = $request->boolean('share_order', true);
+
+        $attachment = null;
+        if ($request->hasFile('photo')) {
+            $attachment = $request->file('photo');
+        } elseif ($request->filled('photo')) {
+            try {
+                $attachment = create_file_from_base64($request->get('photo'));
+            } catch (\Throwable $e) {
+                report($e);
+
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'Could not store attachment.',
+                ], 422);
+            }
         }
 
-        if ($order->conversation) {
-            $msg = new Reply;
-            $msg->reply = $replyText;
-
-            if (Auth::guard('api')->check()) {
-                $msg->customer_id = $user_id;
-            } else {
-                $msg->user_id = $user_id;
-            }
-
-            $order->conversation->replies()->save($msg);
-        } else {
-            $msg = new Message;
-            $msg->message = $replyText;
-            $msg->shop_id = $order->shop_id;
-
-            if (Auth::guard('api')->check()) {
-                $msg->subject = trans('theme.defaults.new_message_from', ['sender' => Auth::user()->getName()]);
-                $msg->customer_id = $user_id;
-            } else {
-                $msg->user_id = $user_id;
-            }
-
-            $order->conversation()->save($msg);
+        if ($replyText === '' && ! $attachment && ! $shareOrder) {
+            return response()->json([
+                'message' => trans('validation.required', ['attribute' => 'message']),
+            ], 422);
         }
 
-        // Update the order if goods_received
         if ($request->has('goods_received')) {
             $order->goods_received();
         }
 
         try {
-            if ($request->hasFile('photo')) {
-                $msg->saveAttachments($request->file('photo'));
-            } elseif ($request->filled('photo')) {
-                $msg->saveAttachments(create_file_from_base64($request->get('photo')));
-            }
+            $chat = OrderChatSyncService::sendToShopChat(
+                $order->fresh(['shop', 'customer', 'inventories.image']),
+                $replyText,
+                $isCustomer ? 'customer' : 'merchant',
+                $shareOrder,
+                $isCustomer ? null : $userId,
+                $attachment
+            );
         } catch (\Throwable $e) {
             report($e);
 
             return response()->json([
-                'message' => $e->getMessage() ?: 'Could not store attachment.',
+                'message' => $e->getMessage() ?: 'Could not send message.',
             ], 422);
         }
 
-        $order->load(['shop:id,name,slug', 'conversation.replies', 'conversation.replies.attachments']);
+        if (! $chat) {
+            return response()->json(['message' => trans('api.something_went_wrong')], 500);
+        }
 
-        return new ConversationResource($order->conversation);
+        return new ConversationResource($chat);
     }
 
     /**

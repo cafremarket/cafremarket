@@ -16,7 +16,7 @@ use Incevio\Package\LiveChat\Models\ChatConversation;
 class AdminChatController extends Controller
 {
     /**
-     * List shop chat conversations.
+     * List shop chat conversations (unified inbox — product + order shares).
      */
     public function index(Request $request)
     {
@@ -104,6 +104,7 @@ class AdminChatController extends Controller
             'conversation_id' => $chat->id,
             'reply_id' => $reply->id,
             'customer_id' => $chat->customer_id,
+            'shop_id' => $chat->shop_id,
             'time' => $clock,
             'created_at' => $createdAt,
             'attachments' => $attachmentsPayload,

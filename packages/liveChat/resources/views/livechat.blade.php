@@ -45,6 +45,51 @@
           </div>
         </div>
       @endisset
+      @isset($order)
+        @php
+          try {
+              $orderSharePayload = livechat_build_order_share_payload($order);
+          } catch (\Throwable $e) {
+              report($e);
+              $orderSharePayload = [
+                  'order_id' => $order->id,
+                  'order_number' => $order->order_number,
+                  'title' => 'Order #'.$order->order_number,
+                  'status' => '',
+                  'total' => '',
+                  'url' => url('/order/'.$order->id),
+                  'image' => '',
+              ];
+          }
+        @endphp
+        <div class="chat-product-share chat-order-share">
+          <div class="chat-product-share-title">Share this order with the seller</div>
+          <div class="chat-product-share-card">
+            <div class="chat-product-share-media">
+              @if (!empty($orderSharePayload['image']))
+                <img src="{{ $orderSharePayload['image'] }}" alt="{{ $orderSharePayload['title'] }}">
+              @else
+                <i class="fa fa-shopping-bag" style="font-size:22px;opacity:.5;"></i>
+              @endif
+            </div>
+            <div class="chat-product-share-body">
+              <div class="chat-product-share-name">{{ $orderSharePayload['title'] }}</div>
+              <div class="chat-product-share-price">
+                {{ $orderSharePayload['total'] }}
+                @if (!empty($orderSharePayload['status']))
+                  · {{ $orderSharePayload['status'] }}
+                @endif
+              </div>
+            </div>
+            <div class="chat-product-share-actions">
+              <button id="fchat_share_order" class="chat-product-share-btn" type="button" aria-label="Share order details">
+                Share
+              </button>
+              <button type="button" id="fchat_dismiss_order_share" class="chat-product-share-dismiss" aria-label="Dismiss order preview">&times;</button>
+            </div>
+          </div>
+        </div>
+      @endisset
       <div class="fchat_field chat-composer">
         <div class="chat-composer-inner">
           <div id="chat-attachment-preview" class="chat-attachment-preview" aria-live="polite" aria-hidden="true" style="display:none">
@@ -138,9 +183,12 @@
       var chatPoller = null;
       var isSendingMessage = false;
       var sharePrefix = '[product_share]';
+      var orderSharePrefix = '[order_share]';
       @php
         $chatSharePayload = null;
         $chatShareStorageKey = null;
+        $chatOrderSharePayload = null;
+        $chatOrderShareStorageKey = null;
         if (isset($product)) {
             $chatSharePayload = [
                 'title' => $product->title,
@@ -150,10 +198,30 @@
             ];
             $chatShareStorageKey = 'chat_shared_product_'.$product->id;
         }
+        if (isset($order)) {
+            try {
+                $chatOrderSharePayload = livechat_build_order_share_payload($order);
+            } catch (\Throwable $e) {
+                report($e);
+                $chatOrderSharePayload = [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'title' => 'Order #'.$order->order_number,
+                    'status' => '',
+                    'total' => '',
+                    'url' => url('/order/'.$order->id),
+                    'image' => '',
+                ];
+            }
+            $chatOrderShareStorageKey = 'chat_shared_order_'.$order->id;
+        }
       @endphp
       var shareProductPayload = @json($chatSharePayload);
       var shareStorageKey = @json($chatShareStorageKey);
       var shareProductMessage = shareProductPayload ? (sharePrefix + JSON.stringify(shareProductPayload)) : null;
+      var shareOrderPayload = @json($chatOrderSharePayload);
+      var shareOrderStorageKey = @json($chatOrderShareStorageKey);
+      var shareOrderMessage = shareOrderPayload ? (orderSharePrefix + JSON.stringify(shareOrderPayload)) : null;
 
       var ChatAttachmentPreview = (function() {
         var objectUrl = null;
@@ -244,21 +312,32 @@
       function getSharedPayload(message) {
         if (message == null || message === '') return null;
         var raw = String(message).replace(/^\uFEFF/, '');
-        var idx = raw.indexOf(sharePrefix);
-        if (idx === -1) return null;
-        var rest = raw.substring(idx + sharePrefix.length).trim();
-        try {
-          return JSON.parse(rest);
-        } catch (e) {
-          var start = rest.indexOf('{');
-          var end = rest.lastIndexOf('}');
-          if (start === -1 || end === -1 || end <= start) return null;
+        var prefixes = [sharePrefix, orderSharePrefix];
+        for (var p = 0; p < prefixes.length; p++) {
+          var prefix = prefixes[p];
+          var idx = raw.indexOf(prefix);
+          if (idx === -1) continue;
+          var rest = raw.substring(idx + prefix.length).trim();
           try {
-            return JSON.parse(rest.substring(start, end + 1));
-          } catch (e2) {
-            return null;
+            var parsed = JSON.parse(rest);
+            if (parsed && typeof parsed === 'object') {
+              parsed.__shareType = prefix === orderSharePrefix ? 'order' : 'product';
+              return parsed;
+            }
+          } catch (e) {
+            var start = rest.indexOf('{');
+            var end = rest.lastIndexOf('}');
+            if (start === -1 || end === -1 || end <= start) continue;
+            try {
+              var parsed2 = JSON.parse(rest.substring(start, end + 1));
+              if (parsed2 && typeof parsed2 === 'object') {
+                parsed2.__shareType = prefix === orderSharePrefix ? 'order' : 'product';
+                return parsed2;
+              }
+            } catch (e2) {}
           }
         }
+        return null;
       }
 
       function buildAttachmentBlock(attachments) {
@@ -367,12 +446,18 @@
           }
 
           var wrap = $('<div>').addClass('chat-shared-product-wrap');
-          var card = $('<div>').addClass('chat-shared-product');
-          $('<img>').addClass('chat-shared-product-img').attr('src', payload.image || '').attr('alt', payload.title || 'product').attr('loading', 'lazy').appendTo(card);
+          var card = $('<div>').addClass('chat-shared-product' + (payload.__shareType === 'order' ? ' chat-shared-order' : ''));
+          if (payload.image) {
+            $('<img>').addClass('chat-shared-product-img').attr('src', payload.image || '').attr('alt', payload.title || '').attr('loading', 'lazy').appendTo(card);
+          }
           var body = $('<div>').addClass('chat-shared-product-body').appendTo(card);
           $('<div>').addClass('chat-shared-product-title').text(payload.title || '').appendTo(body);
-          $('<div>').addClass('chat-shared-product-price').text(payload.price || '').appendTo(body);
-          $('<a>').addClass('chat-shared-product-link').attr('href', payload.url || '#').attr('target', '_blank').text('View').appendTo(body);
+          var subtitle = payload.__shareType === 'order'
+            ? ((payload.total || '') + (payload.status ? ' · ' + payload.status : ''))
+            : (payload.price || '');
+          $('<div>').addClass('chat-shared-product-price').text(subtitle).appendTo(body);
+          $('<a>').addClass('chat-shared-product-link').attr('href', payload.url || '#').attr('target', '_blank')
+            .text(payload.__shareType === 'order' ? 'View order' : 'View').appendTo(body);
           wrap.append(card);
           node.append(wrap);
         }
@@ -389,7 +474,10 @@
       window.formatChatClock = formatChatClock;
 
       if (shareStorageKey && window.sessionStorage.getItem(shareStorageKey) === '1') {
-        $('.chat-product-share').hide();
+        $('.chat-product-share').not('.chat-order-share').hide();
+      }
+      if (shareOrderStorageKey && window.sessionStorage.getItem(shareOrderStorageKey) === '1') {
+        $('.chat-order-share').hide();
       }
 
       // When send button clicked
@@ -459,9 +547,16 @@
       });
 
       function hideProductSharePreview() {
-        $('.chat-product-share').slideUp(120);
+        $('.chat-product-share').not('.chat-order-share').slideUp(120);
         if (shareStorageKey) {
           window.sessionStorage.setItem(shareStorageKey, '1');
+        }
+      }
+
+      function hideOrderSharePreview() {
+        $('.chat-order-share').slideUp(120);
+        if (shareOrderStorageKey) {
+          window.sessionStorage.setItem(shareOrderStorageKey, '1');
         }
       }
 
@@ -470,11 +565,29 @@
         hideProductSharePreview();
       });
 
+      $('#fchat_dismiss_order_share').on('click', function(e) {
+        e.preventDefault();
+        hideOrderSharePreview();
+      });
+
       $("#fchat_share_product").on('click', function() {
         if (!shareProductMessage) return;
         sendTheMessage(shareProductMessage);
         hideProductSharePreview();
       });
+
+      $("#fchat_share_order").on('click', function() {
+        if (!shareOrderMessage) return;
+        sendTheMessage(shareOrderMessage);
+        hideOrderSharePreview();
+      });
+
+      if (shareStorageKey && window.sessionStorage.getItem(shareStorageKey) === '1') {
+        hideProductSharePreview();
+      }
+      if (shareOrderStorageKey && window.sessionStorage.getItem(shareOrderStorageKey) === '1') {
+        hideOrderSharePreview();
+      }
 
       function setChatAjaxHeaders(xhr) {
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');

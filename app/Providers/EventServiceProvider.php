@@ -75,6 +75,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\Dispute\DisputeCreated::class => [
             \App\Listeners\Dispute\SendAcknowledgementNotification::class,
             \App\Listeners\Dispute\NotifyMerchantDisputeCreated::class,
+            \App\Listeners\Dispute\NotifyAdminDisputeCreated::class,
         ],
         \App\Events\Dispute\DisputeUpdated::class => [
             \App\Listeners\Dispute\NotifyCustomerDisputeUpdated::class,

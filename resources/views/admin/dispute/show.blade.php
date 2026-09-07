@@ -88,7 +88,7 @@
 
         @if ($dispute->replies->count() > 0)
           <div class="admin-detail-view__replies">
-            <strong>{{ trans('app.conversations') }}</strong>
+            <strong>{{ trans('app.ticket_updates') ?? 'Ticket updates' }}</strong>
             @foreach ($dispute->replies as $reply)
               @include('admin.partials._reply_conversations')
             @endforeach

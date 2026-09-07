@@ -41,7 +41,7 @@ class InventoryFilter extends ModelFilter
         return $this->where('auctionable', 1);
     }
 
-    public function newArraivals($new_arrivals)
+    public function newArrivals($new_arrivals)
     {
         $range = Carbon::now()->subDays(config('system.filter.new_arrival', 7));
 

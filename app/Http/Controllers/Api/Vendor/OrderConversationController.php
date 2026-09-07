@@ -5,64 +5,71 @@ namespace App\Http\Controllers\Api\Vendor;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\OrderDetailRequest;
 use App\Http\Resources\ConversationResource;
-use App\Models\Message;
 use App\Models\Order;
-use App\Models\Reply;
+use App\Services\OrderChatSyncService;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Order “conversation” endpoints are aliases of the unified LiveChat
+ * (one ChatConversation per shop + customer). Order context is shared
+ * via [order_share] — no separate Message/order thread.
+ */
 class OrderConversationController extends Controller
 {
     /**
-     * Display order conversation page.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  App\Models\Order  $order
-     * @return \Illuminate\Http\Response
+     * Load the shop↔customer LiveChat for this order.
      */
     public function index(OrderDetailRequest $request, Order $order)
     {
-        $order->load(['customer', 'conversation.replies', 'conversation.replies.attachments']);
+        $chat = OrderChatSyncService::findShopChat($order);
 
-        if (! $order->conversation) {
+        if (! $chat) {
             return response()->json(['message' => trans('api.contact_customer')], 200);
         }
 
-        return new ConversationResource($order->conversation);
+        $chat->markPeerRepliesAsRead('merchant');
+
+        return new ConversationResource($chat->fresh(['replies.attachments', 'shop', 'customer']));
     }
 
     /**
-     * Start/Replay a order conversation.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  App\Models\Order  $order
-     * @return \Illuminate\Http\Response
+     * Reply in the same LiveChat used for product/seller chat.
      */
     public function respond(OrderDetailRequest $request, Order $order)
     {
-        $user_id = Auth::guard('vendor_api')->user()->id;
+        $userId = Auth::guard('vendor_api')->user()->id;
 
-        if ($order->conversation) {
-            $msg = new Reply;
-            $msg->reply = $request->input('message');
-            $msg->user_id = $user_id;
+        $replyText = trim((string) ($request->input('message') ?? $request->query('message') ?? ''));
+        $shareOrder = $request->boolean('share_order', true);
 
-            $order->conversation->replies()->save($msg);
-        } else {
-            $msg = new Message;
-            $msg->message = $request->input('message');
-            $msg->shop_id = $order->shop_id;
-            $msg->user_id = $user_id;
-
-            $order->conversation()->save($msg);
-        }
-
+        $attachment = null;
         if ($request->has('attachments')) {
-            $attachments = create_file_from_base64($request->get('attachments'));
-            $msg->saveAttachments($attachments);
+            $attachment = create_file_from_base64($request->get('attachments'));
+        } elseif ($request->hasFile('photo')) {
+            $attachment = $request->file('photo');
+        } elseif ($request->filled('photo')) {
+            $attachment = create_file_from_base64($request->get('photo'));
         }
 
-        $order->load(['customer', 'conversation.replies', 'conversation.replies.attachments']);
+        if ($replyText === '' && ! $attachment && ! $shareOrder) {
+            return response()->json([
+                'message' => trans('validation.required', ['attribute' => 'message']),
+            ], 422);
+        }
 
-        return new ConversationResource($order->conversation);
+        $chat = OrderChatSyncService::sendToShopChat(
+            $order->fresh(['shop', 'customer', 'inventories.image']),
+            $replyText,
+            'merchant',
+            $shareOrder,
+            $userId,
+            $attachment
+        );
+
+        if (! $chat) {
+            return response()->json(['message' => trans('api.something_went_wrong')], 500);
+        }
+
+        return new ConversationResource($chat);
     }
 }

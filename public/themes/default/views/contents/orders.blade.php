@@ -164,12 +164,6 @@
                     <i class="fas fa-undo"></i> @lang('theme.return_items')
                   </a>
                 @endif
-
-                @unless ($order->goods_received)
-                  {!! Form::model($order, ['method' => 'PUT', 'route' => ['goods.received', $order]]) !!}
-                  {!! Form::button(trans('theme.button.confirm_goods_received'), ['type' => 'submit', 'class' => 'confirm btn sf-btn-primary btn-sm btn-block flat', 'data-confirm' => trans('theme.confirm_action.goods_received')]) !!}
-                  {!! Form::close() !!}
-                @endunless
               @endif
             @endunless
           </div>

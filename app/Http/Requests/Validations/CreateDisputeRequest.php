@@ -39,6 +39,9 @@ class CreateDisputeRequest extends Request
             'order_id' => $order->id,
             'shop_id' => $order->shop_id,
             'customer_id' => $order->customer_id,
+            'raised_by' => $this->user() instanceof Customer
+                ? \App\Models\Dispute::RAISED_BY_CUSTOMER
+                : \App\Models\Dispute::RAISED_BY_VENDOR,
         ]);
 
         return [

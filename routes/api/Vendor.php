@@ -235,9 +235,10 @@ Route::prefix('vendor')->group(function () {
 
         // Order conversations
 
-        // Disputes
+        // Disputes (ticket system)
         Route::get('disputes', [DisputeController::class, 'index']);
         Route::get('dispute/{dispute}', [DisputeController::class, 'show']);
+        Route::post('order/{order}/dispute', [DisputeController::class, 'store']);
         Route::post('dispute/{dispute}/response', [DisputeController::class, 'response']);
 
         // Cancellation

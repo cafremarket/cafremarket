@@ -15,6 +15,7 @@ use App\Services\ChatSocketPublisher;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Incevio\Package\LiveChat\Http\Requests\ChatConversationRequest;
 use Incevio\Package\LiveChat\Http\Requests\SaveChatConversationRequest;
 use Incevio\Package\LiveChat\Http\Requests\ViewChatConversationRequest;
@@ -73,7 +74,13 @@ class ConversationController extends Controller
             $conversation = ChatConversation::where([
                 'customer_id' => Auth::guard('api')->id(),
                 'shop_id' => $shop->id,
-            ])->with(['replies.attachments'])->first();
+            ])
+                ->when(
+                    Schema::hasColumn('chat_conversations', 'order_id'),
+                    fn ($q) => $q->whereNull('order_id')
+                )
+                ->with(['replies.attachments'])
+                ->first();
 
             if ($conversation) {
                 $conversation->load(['replies.attachments']);
@@ -115,7 +122,12 @@ class ConversationController extends Controller
             $conversation = ChatConversation::where([
                 'customer_id' => $request->customer_id,
                 'shop_id' => $shop->id,
-            ])->first();
+            ])
+                ->when(
+                    Schema::hasColumn('chat_conversations', 'order_id'),
+                    fn ($q) => $q->whereNull('order_id')
+                )
+                ->first();
 
             if ($conversation) {
                 $conversation->bumpLastMessage($replyText, true);

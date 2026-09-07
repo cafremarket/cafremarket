@@ -118,15 +118,41 @@ class AccountController extends Controller
     // }
 
     /**
-     * Return inbox
+     * Return inbox — LiveChat seller conversations (same source as the customer app).
      *
-     * @return collection
+     * @return \Illuminate\Support\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     private function messages()
     {
+        if (
+            is_incevio_package_loaded('livechat')
+            && class_exists(\Incevio\Package\LiveChat\Models\ChatConversation::class)
+        ) {
+            return \Incevio\Package\LiveChat\Models\ChatConversation::query()
+                ->where('customer_id', Auth::guard('customer')->id())
+                ->with([
+                    'shop:id,name,slug',
+                    'shop.logo:path,imageable_id,imageable_type',
+                    'lastReply',
+                    'order:id,order_number',
+                ])
+                ->withCount([
+                    // Unread for customer = merchant replies not yet read
+                    'replies as unread_count' => function ($q) {
+                        $q->whereNull('customer_id')
+                            ->where(function ($inner) {
+                                $inner->whereNull('read')
+                                    ->orWhere('read', false)
+                                    ->orWhere('read', 0);
+                            });
+                    },
+                ])
+                ->latest('updated_at')
+                ->get();
+        }
+
         return Auth::guard('customer')->user()->messages()
             ->with(['shop:id,name,slug', 'shop.image:path,imageable_id,imageable_type', 'item:id,slug,sku', 'order:id,order_number', 'lastReply:reply,read,updated_at,repliable_id'])
-            // ->orderBy('created_at', 'desc')
             ->withCount('replies', 'attachments')
             ->paginate(10);
     }

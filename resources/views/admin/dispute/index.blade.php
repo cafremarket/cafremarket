@@ -6,16 +6,18 @@
 
 @section('content')
   @include('admin.partials.ui.card_start', [
-    'title' => trans('app.disputes'),
-    'icon' => 'fa-gavel',
+    'title' => Auth::user()->isFromPlatform() ? 'Open Dispute Tickets' : trans('app.disputes'),
+    'icon' => 'fa-ticket',
     'bodyClass' => 'responsive-table',
   ])
 
   <table class="table table-hover admin-table table-no-sort">
     <thead>
       <tr>
+        <th>Ticket</th>
         <th>{{ trans('app.customer') }}</th>
         <th>{{ trans('app.type') }}</th>
+        <th>Raised by</th>
         <th>{{ trans('app.refund_requested') }}</th>
         <th>{{ trans('app.response') }}</th>
         <th>{{ trans('app.updated_at') }}</th>
@@ -26,6 +28,10 @@
       @foreach ($disputes as $dispute)
         <tr>
           <td>
+            <strong>{{ $dispute->ticketRef() }}</strong>
+            {!! $dispute->statusName() !!}
+          </td>
+          <td>
             <div class="admin-table__shop-cell">
               <img src="{{ get_avatar_src($dispute->customer, 'tiny') }}" class="img-circle img-sm admin-table__avatar" alt="">
               <div>
@@ -33,15 +39,16 @@
                 @if (Auth::user()->isFromPlatform() && $dispute->shop)
                   <br><span class="text-muted">{{ trans('app.vendor') . ': ' . optional($dispute->shop)->name }}</span>
                 @endif
+                @if ($dispute->order)
+                  <br><span class="text-muted">{{ trans('app.order') }}: {{ $dispute->order->order_number }}</span>
+                @endif
               </div>
             </div>
           </td>
           <td>
-            @if (!Auth::user()->isFromPlatform())
-              {!! $dispute->statusName() !!}
-            @endif
             <a href="{{ route('admin.support.dispute.show', $dispute->id) }}">{{ $dispute->dispute_type->detail }}</a>
           </td>
+          <td>{{ $dispute->raisedByLabel() }}</td>
           <td>{{ get_formated_currency($dispute->refund_amount, 2, $dispute->order->currency_id) }}</td>
           <td><span class="label label-default">{{ $dispute->replies_count }}</span></td>
           <td>{{ $dispute->updated_at->diffForHumans() }}</td>

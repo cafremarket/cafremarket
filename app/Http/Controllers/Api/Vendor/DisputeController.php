@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
+use App\Events\Dispute\DisputeCreated;
 use App\Events\Dispute\DisputeUpdated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Validations\CreateDisputeRequest;
 use App\Http\Requests\Validations\ResponseDisputeRequest;
 use App\Http\Resources\DisputeResource;
 use App\Models\Dispute;
+use App\Models\Order;
 use App\Models\System;
 use App\Notifications\SuperAdmin\AppealedDisputeReplied as AppealedDisputeRepliedNotification;
 use App\Notifications\SuperAdmin\DisputeAppealed as DisputeAppealedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DisputeController extends Controller
 {
@@ -26,6 +30,32 @@ class DisputeController extends Controller
         $disputes = $disputes->paginate(config('mobile_app.view_listing_per_page', 8));
 
         return DisputeResource::collection($disputes);
+    }
+
+    /**
+     * Vendor raises a dispute ticket on an order (ticket system, not chat).
+     */
+    public function store(CreateDisputeRequest $request, Order $order)
+    {
+        if ($order->dispute) {
+            return response()->json([
+                'message' => 'A dispute ticket already exists for this order.',
+            ], 422);
+        }
+
+        $payload = $request->all();
+        $payload['raised_by'] = Dispute::RAISED_BY_VENDOR;
+        $payload['status'] = Dispute::STATUS_NEW;
+
+        $dispute = $order->dispute()->create($payload);
+
+        if ($request->hasFile('attachments')) {
+            $dispute->saveAttachments($request->file('attachments'));
+        }
+
+        event(new DisputeCreated($dispute));
+
+        return new DisputeResource($dispute->load('shop:id,name,slug'));
     }
 
     public function show(Request $request, Dispute $dispute)

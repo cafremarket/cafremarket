@@ -108,6 +108,32 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
                     'reply',
                 ])->name('chat_conversation.reply');
             }
+
+            // Dispute tickets (ticket workflow — not chat)
+            Route::get('dispute', [
+                \App\Http\Controllers\Merchant\DisputeController::class,
+                'index',
+            ])->name('dispute.index');
+
+            Route::get('dispute/create', [
+                \App\Http\Controllers\Merchant\DisputeController::class,
+                'create',
+            ])->name('dispute.create');
+
+            Route::post('dispute/order/{order}', [
+                \App\Http\Controllers\Merchant\DisputeController::class,
+                'store',
+            ])->name('dispute.store');
+
+            Route::get('dispute/{dispute}', [
+                \App\Http\Controllers\Merchant\DisputeController::class,
+                'show',
+            ])->name('dispute.show');
+
+            Route::post('dispute/{dispute}/response', [
+                \App\Http\Controllers\Merchant\DisputeController::class,
+                'response',
+            ])->name('dispute.response');
         });
     });
 

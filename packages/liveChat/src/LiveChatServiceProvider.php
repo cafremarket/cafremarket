@@ -44,5 +44,11 @@ class LiveChatServiceProvider extends ServiceProvider
         foreach (glob(__DIR__ . '/Helpers/*.php') as $filename) {
             require_once($filename);
         }
+
+        // Ensure controllers added after last composer dump are loadable (classmap packages).
+        $customerChat = __DIR__ . '/Http/Controllers/CustomerChatController.php';
+        if (is_file($customerChat) && ! class_exists(\Incevio\Package\LiveChat\Http\Controllers\CustomerChatController::class, false)) {
+            require_once $customerChat;
+        }
     }
 }

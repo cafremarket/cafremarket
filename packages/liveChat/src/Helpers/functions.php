@@ -152,3 +152,27 @@ if (! function_exists('livechat_socket_attachments_payload')) {
         })->values()->all();
     }
 }
+
+if (! function_exists('livechat_order_share_prefix')) {
+    function livechat_order_share_prefix(): string
+    {
+        return '[order_share]';
+    }
+}
+
+if (! function_exists('livechat_build_order_share_payload')) {
+    /**
+     * @return array<string, mixed>
+     */
+    function livechat_build_order_share_payload(\App\Models\Order $order): array
+    {
+        return \App\Services\OrderChatSyncService::buildOrderSharePayload($order);
+    }
+}
+
+if (! function_exists('livechat_build_order_share_message')) {
+    function livechat_build_order_share_message(\App\Models\Order $order): string
+    {
+        return \App\Services\OrderChatSyncService::buildOrderShareMessage($order);
+    }
+}

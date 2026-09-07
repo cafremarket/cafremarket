@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Incevio\Package\LiveChat\Http\Controllers\AdminChatController;
 use Incevio\Package\LiveChat\Http\Controllers\ChatController;
+use Incevio\Package\LiveChat\Http\Controllers\CustomerChatController;
 
 Route::middleware(['web', 'xssSanitizer'])->group(function () {
 
@@ -16,6 +17,19 @@ Route::middleware(['web', 'xssSanitizer'])->group(function () {
         ])->name('start');
     });
 
+    // Customer dashboard multi-seller inbox (mirrors app MessagesScreen)
+    Route::middleware(['auth:customer'])
+        ->name('customer.chat.')
+        ->prefix('my/chat')
+        ->group(function () {
+            Route::get('{chat}', [
+                CustomerChatController::class, 'show',
+            ])->name('show');
+
+            Route::post('{chat}/reply', [
+                CustomerChatController::class, 'reply',
+            ])->name('reply');
+        });
 
     //admin suport chat route
     Route::middleware(['auth', 'subscribed', 'checkBillingInfo'])

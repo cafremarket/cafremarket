@@ -45,11 +45,17 @@ class DisputeController extends Controller
             ->withCount('replies')->orderBy('created_at', 'desc');
 
         if (Auth::user()->isFromPlatform()) {
-            $disputes = $query->appealed()->get();
-            $closed = $query->closed()->get();
+            // Admin manages the full dispute ticket queue (open + closed).
+            $disputes = (clone $query)->open()->get();
+            $closed = (clone $query)->closed()->get();
         } else {
             $disputes = $query->mine()->open()->get();
-            $closed = $query->mine()->closed()->get();
+            $closed = Dispute::with('dispute_type', 'order', 'customer.avatarImage', 'shop')
+                ->withCount('replies')
+                ->mine()
+                ->closed()
+                ->orderBy('created_at', 'desc')
+                ->get();
         }
 
         return view('admin.dispute.index', compact('disputes', 'closed'));

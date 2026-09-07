@@ -57,6 +57,8 @@ class Dispute extends BaseModel
         'shop_id',
         'dispute_type_id',
         'customer_id',
+        'raised_by',
+        'ticket_number',
         'order_id',
         'product_id',
         'description',
@@ -65,6 +67,48 @@ class Dispute extends BaseModel
         'refund_amount',
         'status',
     ];
+
+    public const RAISED_BY_CUSTOMER = 'customer';
+
+    public const RAISED_BY_VENDOR = 'vendor';
+
+    public const RAISED_BY_ADMIN = 'admin';
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (Dispute $dispute) {
+            if (empty($dispute->ticket_number)) {
+                $dispute->ticket_number = static::generateTicketNumber();
+            }
+            if (empty($dispute->raised_by)) {
+                $dispute->raised_by = static::RAISED_BY_CUSTOMER;
+            }
+        });
+    }
+
+    public static function generateTicketNumber(): string
+    {
+        return 'DSP-'.strtoupper(dechex(time())).'-'.random_int(100, 999);
+    }
+
+    public function raisedByLabel(): string
+    {
+        switch ($this->raised_by) {
+            case static::RAISED_BY_VENDOR:
+                return trans('app.vendor') ?: 'Vendor';
+            case static::RAISED_BY_ADMIN:
+                return trans('app.admin') ?: 'Admin';
+            default:
+                return trans('app.customer') ?: 'Customer';
+        }
+    }
+
+    public function ticketRef(): string
+    {
+        return $this->ticket_number ?: ('#'.$this->id);
+    }
 
     /**
      * Get the shop associated with the model.

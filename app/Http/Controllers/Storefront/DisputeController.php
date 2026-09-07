@@ -59,7 +59,11 @@ class DisputeController extends Controller
      */
     public function open_dispute(CreateDisputeRequest $request, Order $order)
     {
-        $dispute = $order->dispute()->create($request->all());
+        $payload = $request->all();
+        $payload['raised_by'] = Dispute::RAISED_BY_CUSTOMER;
+        $payload['status'] = Dispute::STATUS_NEW;
+
+        $dispute = $order->dispute()->create($payload);
 
         event(new DisputeCreated($dispute));
 

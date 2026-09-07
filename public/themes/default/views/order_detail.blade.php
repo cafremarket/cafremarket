@@ -12,6 +12,15 @@
 @endsection
 
 @section('scripts')
+  @if (is_incevio_package_loaded('liveChat') && $order->shop)
+    @include('liveChat::livechat', [
+      'shop' => $order->shop,
+      'agent' => $order->shop->owner ?? optional($order->shop->config)->supportAgent,
+      'agent_status' => trans('theme.online'),
+      'order' => $order,
+    ])
+  @endif
+
   @if ($order->canResendEmolaPayment())
     <script>
       $(function() {

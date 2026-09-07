@@ -19,7 +19,7 @@ class SearchController extends Controller
     {
         $now = Carbon::now();
 
-        $query = Inventory::search($request->get('search'))->where('active', 1)->paginate(0);
+        $query = Inventory::search($request->get('q'))->where('active', 1)->paginate(0);
 
         // Parent products only — do not list each variant SKU as its own card.
         $query = $query->whereNull('parent_id')->where('available_from', '<=', $now);
@@ -70,6 +70,22 @@ class SearchController extends Controller
 
         if ($request->has('price_max')) {
             $products = $products->where('sale_price', '<=', $request->input('price_max'));
+        }
+
+        // Sort — mirrors InventoryFilter::sortBy() used by the category/shop/brand listings.
+        switch ($request->get('sort_by')) {
+            case 'newest':
+                $products = $products->sortByDesc('created_at');
+                break;
+            case 'oldest':
+                $products = $products->sortBy('created_at');
+                break;
+            case 'price_asc':
+                $products = $products->sortBy('sale_price');
+                break;
+            case 'price_desc':
+                $products = $products->sortByDesc('sale_price');
+                break;
         }
 
         $products = $products->paginate(config('mobile_app.view_listing_per_page', 8));

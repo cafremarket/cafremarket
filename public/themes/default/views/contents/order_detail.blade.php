@@ -434,12 +434,6 @@
                           @if ($order->canRequestReturn())
                             <a href="{{ route('cancellation.form', ['order' => $order, 'action' => 'return']) }}" class="modalAction btn btn-default btn-sm btn-block"><i class="fas fa-undo"></i> @lang('theme.return_items')</a>
                           @endif
-
-                          @unless ($order->goods_received)
-                            {!! Form::model($order, ['method' => 'PUT', 'route' => ['goods.received', $order]]) !!}
-                            {!! Form::button(trans('theme.button.confirm_goods_received'), ['type' => 'submit', 'class' => 'confirm btn sf-btn-primary btn-block flat', 'data-confirm' => trans('theme.confirm_action.goods_received')]) !!}
-                            {!! Form::close() !!}
-                          @endunless
                         @endif
                       @endunless
 
@@ -488,98 +482,25 @@
         <div class="sf-panel">
           <div class="sf-panel__head">@lang('theme.section_headings.contact_seller')</div>
           <div class="sf-panel__body" style="padding:16px 18px;">
-        <div class="message-list">
-          <div class="row">
-            {!! Form::open(['route' => ['order.conversation', $order], 'files' => true, 'id' => 'conversation-form', 'data-toggle' => 'validator', 'class' => 'order-detail-message-form sf-form w-100']) !!}
-            <div class="col-12 col-md-6">
-              <div class="sf-form-group">
-                {!! Form::label('message', trans('theme.write_your_message'), ['class' => 'sf-form-label']) !!}
-                {!! Form::textarea('message', null, ['class' => 'form-control sf-input', 'placeholder' => trans('theme.leave_message_to_seller'), 'rows' => '4', 'maxlength' => 500, 'required']) !!}
-                <div class="help-block with-errors"></div>
-              </div>
-            </div>
-
-            <div class="col-12 col-md-6">
-              <div class="sf-form-group">
-                {!! Form::label('photoInput', trans('theme.button.upload_photo'), ['class' => 'sf-form-label']) !!}
-                {!! Form::file('photo') !!}
-                <span class="help-block small">@lang('theme.help.upload_photo')</span>
-              </div>
-
-              @unless ($order->order_status_id == \App\Models\Order::STATUS_DELIVERED)
-                <div class="checkbox">
-                  <label>
-                    {!! Form::checkbox('goods_received', 1, null, ['class' => 'i-check-blue']) !!} {{ trans('theme.goods_received') }}
-                  </label>
-                </div>
-              @endunless
-              {!! Form::button(trans('theme.button.send_message'), ['type' => 'submit', 'class' => 'btn sf-btn-primary btn-block btn-md-inline order-detail-send-btn']) !!}
-            </div>
-            {!! Form::close() !!}
-          </div> <!-- /.row -->
-
-          @if ($order->conversation)
-            <div class="sf-panel__head mt-3" style="margin:16px -18px 0;border-radius:0;border-left:0;border-right:0;">
-              <span>@lang('theme.message_history')</span>
-            </div>
-
-            <div class="sf-message-thread mt-3">
-            @foreach ($order->conversation->replies->sortByDesc('created_at') as $msg)
-              <div class="sf-message-bubble {{ $msg->customer_id ? 'sf-message-bubble--me' : '' }}">
-                <div>
-                  <div class="sf-message-bubble__meta">
-                    <strong>
-                      @if ($msg->customer_id)
-                        @lang('theme.me')
-                      @else
-                        {{ $order->shop ? $order->shop->getQualifiedName(10) : trans('theme.seller') }}
-                      @endif
-                    </strong>
-                    {{ $msg->created_at->toDayDateTimeString() }}
-                  </div>
-                  <div class="sf-message-bubble__body">
-                    {!! strip_tags($msg->reply) !!}
-                    @if ($attachment = optional($msg->attachments)->first())
-                      <div class="sf-message-bubble__attach">
-                        <a href="{{ get_storage_file_url($attachment->path, 'original') }}" target="_blank" rel="noopener">
-                          <img src="{{ get_storage_file_url($attachment->path, 'tiny') }}" class="img-sm thumbnail" alt="">
-                        </a>
-                      </div>
-                    @endif
-                  </div>
-                </div>
-              </div>
-            @endforeach
-
-            <div class="sf-message-bubble sf-message-bubble--me">
-              <div>
-                <div class="sf-message-bubble__meta">
-                  <strong>@lang('theme.me')</strong>
-                  {{ $order->conversation->created_at->toDayDateTimeString() }}
-                </div>
-                <div class="sf-message-bubble__body">
-                  {{ strip_tags($order->conversation->message) }}
-                  @if ($attachment = optional($order->conversation->attachments)->first())
-                    <div class="sf-message-bubble__attach">
-                      <a href="{{ get_storage_file_url($attachment->path, 'original') }}" target="_blank" rel="noopener">
-                        <img src="{{ get_storage_file_url($attachment->path, 'tiny') }}" class="img-sm thumbnail" alt="">
-                      </a>
-                    </div>
-                  @endif
-                </div>
-              </div>
-            </div>
-            </div>
-          @endif
-        </div><!-- /.message-list -->
+            <p class="text-muted" style="margin-top:0;">
+              Chat with the seller in the same live chat. You can share this order’s details like a product card.
+            </p>
+            @if (is_incevio_package_loaded('liveChat') && $order->shop)
+              <button type="button" class="btn sf-btn-primary sf-open-livechat">
+                <i class="fa fa-comments"></i> {{ trans('theme.button.contact_seller') ?? 'Contact seller' }}
+              </button>
+              <span class="help-block" style="display:block;margin-top:8px;">
+                After chat opens, tap <strong>Share</strong> on the order card to send order details.
+              </span>
+            @else
+              <p class="text-muted">{{ trans('theme.chat_unavailable') ?? 'Seller chat is currently unavailable.' }}</p>
+            @endif
           </div>
         </div>
-      </div><!-- /.col-md-12 -->
-    </div><!-- /.row -->
-  </div><!-- /.container -->
+      </div>
+    </div>
+  </div>
 </section>
-</div>
-<!-- END CONTENT SECTION -->
 
 <style>
   .order-detail-page .title {

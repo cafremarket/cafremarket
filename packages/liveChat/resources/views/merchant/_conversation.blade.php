@@ -1,5 +1,6 @@
 @php
-  $sharePrefix = '[product_share]';
+  $productSharePrefix = '[product_share]';
+  $orderSharePrefix = '[order_share]';
   $threadItems = [];
   if ($chat->replies->isNotEmpty()) {
       foreach ($chat->replies as $reply) {
@@ -24,14 +25,20 @@
   $replyUrl = route('merchant.support.chat_conversation.reply', $chat, false);
 @endphp
 
-<header class="mpc-thread__head" id="openChatbox-{{ $chat->customer_id }}" data-customer-id="{{ $chat->customer_id }}" data-conversation-id="{{ $chat->id }}">
+<header class="mpc-thread__head" id="openChatbox-{{ $chat->id }}" data-customer-id="{{ $chat->customer_id }}" data-conversation-id="{{ $chat->id }}" data-order-id="{{ $chat->order_id }}">
   <button type="button" class="mpc-thread__back" id="mpc-back-list" aria-label="Back">
     <i class="fa fa-arrow-left"></i>
   </button>
   <img src="{{ get_avatar_src($chat->customer, 'mini') }}" class="mpc-thread__avatar" alt="">
   <div class="mpc-thread__peer">
     <strong>{{ $chat->customer->getName() }}</strong>
-    <span>{{ trans('app.customer') ?? 'Customer' }}</span>
+    <span>
+      @if ($chat->order_id && optional($chat->order)->order_number)
+        Order #{{ $chat->order->order_number }}
+      @else
+        {{ trans('app.customer') ?? 'Customer' }}
+      @endif
+    </span>
   </div>
 </header>
 
@@ -39,10 +46,17 @@
   @forelse ($threadItems as $item)
     @php
       $dayKey = livechat_day_key($item['at']);
-      $share = is_string($item['text']) && str_starts_with($item['text'], $sharePrefix)
-          ? json_decode(substr($item['text'], strlen($sharePrefix)), true)
-          : null;
-      $plain = trim((string) $item['text']);
+      $shareType = null;
+      $share = null;
+      $rawText = is_string($item['text']) ? $item['text'] : '';
+      if (str_starts_with($rawText, $orderSharePrefix)) {
+          $share = json_decode(substr($rawText, strlen($orderSharePrefix)), true);
+          $shareType = 'order';
+      } elseif (str_starts_with($rawText, $productSharePrefix)) {
+          $share = json_decode(substr($rawText, strlen($productSharePrefix)), true);
+          $shareType = 'product';
+      }
+      $plain = trim($rawText);
       $atts = $item['attachments'];
       $hidePlain = $atts->isNotEmpty() && ($plain === '' || $plain === '[attachment]');
       $bubble = $item['is_customer'] ? 'mpc-bubble--in' : 'mpc-bubble--out';
@@ -55,7 +69,22 @@
 
     <div class="mpc-bubble {{ $bubble }}" @if ($item['id']) data-reply-id="{{ $item['id'] }}" @endif data-created-at="{{ optional($item['at'])->toIso8601String() }}">
       <div class="mpc-bubble__body">
-        @if (is_array($share))
+        @if (is_array($share) && $shareType === 'order')
+          <div class="mpc-share mpc-share--order">
+            @if (!empty($share['image']))
+              <img src="{{ $share['image'] }}" alt="">
+            @endif
+            <div>
+              <div class="mpc-share__title">{{ $share['title'] ?? ('Order #'.($share['order_number'] ?? '')) }}</div>
+              <div class="mpc-share__price">
+                @if (!empty($share['total'])){{ $share['total'] }}@endif
+                @if (!empty($share['total']) && !empty($share['status'])) · @endif
+                @if (!empty($share['status'])){{ $share['status'] }}@endif
+              </div>
+              <a href="{{ $share['url'] ?? '#' }}" target="_blank" rel="noopener">View order</a>
+            </div>
+          </div>
+        @elseif (is_array($share))
           <div class="mpc-share">
             <img src="{{ $share['image'] ?? '' }}" alt="">
             <div>
