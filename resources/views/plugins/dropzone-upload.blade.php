@@ -246,11 +246,6 @@
               $form.find(".is-invalid").removeClass("is-invalid");
 
               var firstInvalidEl = null;
-              // DEBUG (temporary): log validation payload + matching.
-              console.group('[Debug][Admin product editor] Validation 422 payload');
-              console.log('responseJSON:', response);
-              console.log('response.errors:', response && response.errors);
-              console.groupEnd();
 
               function pickFieldElement(fieldKey) {
                 // 1) Exact match for the error key (rare)
@@ -295,8 +290,6 @@
                   labelText = labelText ? labelText.replace(/\*\s*$/, '').trim() : '';
                   labelText = labelText ? labelText.replace(/:\s*$/, '').trim() : '';
                   var displayName = labelText || fieldKey;
-
-                  console.log('[Debug][Admin product editor] fieldKey=', fieldKey, 'displayName=', displayName, 'pickedElName=', $el.attr('name'));
 
                   err += '<strong>' + displayName + ':</strong> ' + msgArr[0] + '<br/>';
                 } else {

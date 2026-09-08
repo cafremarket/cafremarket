@@ -39,10 +39,23 @@
                 $dayDeals = $deals->get($key, collect());
                 $isToday = $day->isToday();
                 $inventoryIds = $dayDeals->pluck('inventory_id')->values()->all();
+                $productMeta = $dayDeals->map(function ($deal) {
+                  if (! $deal->inventory) {
+                    return null;
+                  }
+                  $inv = $deal->inventory;
+                  return [
+                    'id' => (int) $inv->id,
+                    'title' => $inv->product->name ?? $inv->title ?? ('#'.$inv->id),
+                    'shop' => $inv->shop->name ?? '',
+                    'sku' => $inv->sku ?? '',
+                  ];
+                })->filter()->values()->all();
               @endphp
               <td class="deal-day {{ $inMonth ? '' : 'muted' }} {{ $isToday ? 'today' : '' }}"
                   data-date="{{ $key }}"
-                  data-inventory-ids="{{ json_encode($inventoryIds) }}">
+                  data-inventory-ids="{{ json_encode($inventoryIds) }}"
+                  data-products="{{ e(json_encode($productMeta)) }}">
                 <div class="deal-day-header">
                   <strong>{{ $day->day }}</strong>
                   @if ($isToday)<span class="label label-info">Today</span>@endif
@@ -210,6 +223,12 @@
     max-width: 100%;
     font-size: 12px;
   }
+  .deal-chip-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 420px;
+  }
   .deal-chip button {
     border: 0;
     background: transparent;
@@ -231,7 +250,7 @@
     var csrf = $('meta[name="csrf-token"]').attr('content');
 
     var shopsLoaded = false;
-    var chosen = {}; // id -> {id, title, sku, price}
+    var chosen = {}; // id -> {id, title, shop, sku, price}
     var searchTimer = null;
     var productCache = {};
 
@@ -241,6 +260,20 @@
 
     function setSaveEnabled() {
       $('#deal-modal-save').prop('disabled', chosenIds().length === 0);
+    }
+
+    function chipLabel(item) {
+      var title = item.title || ('#' + item.id);
+      var parts = [title];
+      if (item.shop) parts.push(item.shop);
+      if (item.sku) parts.push(item.sku);
+      return parts.join(' · ');
+    }
+
+    function currentShopName() {
+      var $opt = $('#deal-modal-shop option:selected');
+      var val = $('#deal-modal-shop').val();
+      return val ? ($opt.text() || '') : '';
     }
 
     function renderSelected() {
@@ -253,14 +286,14 @@
       }
       var html = '';
       ids.forEach(function (id) {
-        var item = chosen[id];
         html += '<span class="deal-chip" data-id="' + id + '">' +
-          '<span></span><button type="button" aria-label="Remove">&times;</button></span>';
+          '<span class="deal-chip-label"></span>' +
+          '<button type="button" aria-label="Remove">&times;</button></span>';
       });
       $box.html(html);
       $box.find('.deal-chip').each(function () {
         var id = String($(this).data('id'));
-        $(this).find('span').first().text(chosen[id].title || ('#' + id));
+        $(this).find('.deal-chip-label').text(chipLabel(chosen[id] || { id: id }));
       });
       setSaveEnabled();
     }
@@ -278,12 +311,14 @@
 
     function renderProducts(items) {
       var $list = $('#deal-modal-list');
+      var shopName = currentShopName();
       if (!items.length) {
         $list.html('<p class="text-muted" style="padding:12px;">No products found for this store.</p>');
         return;
       }
       var html = '';
       items.forEach(function (item) {
+        item.shop = item.shop || shopName;
         productCache[String(item.id)] = item;
         html += '<label class="product-picker-row">' +
           '<input type="checkbox" name="deal-product" value="' + item.id + '">' +
@@ -296,7 +331,10 @@
       $list.find('.product-picker-row').each(function (i) {
         var item = items[i];
         $(this).find('strong').text(item.title || '');
-        $(this).find('small').text(item.sku || '');
+        var metaBits = [];
+        if (item.sku) metaBits.push(item.sku);
+        if (shopName) metaBits.push(shopName);
+        $(this).find('small').text(metaBits.join(' · '));
         $(this).find('.price').text(item.price || '');
         if (chosen[String(item.id)]) {
           $(this).find('input').prop('checked', true);
@@ -320,13 +358,20 @@
         });
     }
 
-    function openModal(date, existingIds) {
+    function openModal(date, existingProducts) {
       $('#deal-modal-date').val(date);
       $('#deal-modal-date-label').text(date);
       chosen = {};
-      (existingIds || []).forEach(function (id) {
-        id = String(id);
-        chosen[id] = { id: id, title: 'Product #' + id };
+      (existingProducts || []).forEach(function (item) {
+        if (!item || !item.id) return;
+        var id = String(item.id);
+        chosen[id] = {
+          id: id,
+          title: item.title || '',
+          shop: item.shop || '',
+          sku: item.sku || '',
+          price: item.price || ''
+        };
       });
       renderSelected();
       $('#deal-modal-shop').val('');
@@ -339,10 +384,10 @@
     }
 
     $(document).on('click', 'td.deal-day', function () {
-      var ids = $(this).attr('data-inventory-ids');
-      var parsed = [];
-      try { parsed = JSON.parse(ids || '[]') || []; } catch (e) { parsed = []; }
-      openModal($(this).data('date'), parsed);
+      var raw = $(this).attr('data-products');
+      var products = [];
+      try { products = JSON.parse(raw || '[]') || []; } catch (e) { products = []; }
+      openModal($(this).data('date'), products);
     });
 
     $('#deal-modal-shop').on('change', loadProducts);
@@ -354,10 +399,11 @@
     $('#deal-modal-list').on('change', 'input[name="deal-product"]', function () {
       var id = String($(this).val());
       if ($(this).is(':checked')) {
-        var item = productCache[id] || { id: id, title: 'Product #' + id };
+        var item = productCache[id] || {};
         chosen[id] = {
           id: id,
-          title: item.title || ('Product #' + id),
+          title: item.title || '',
+          shop: item.shop || currentShopName(),
           sku: item.sku || '',
           price: item.price || ''
         };

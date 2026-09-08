@@ -4,7 +4,6 @@ namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
 use App\Models\Inventory;
-use Illuminate\Support\Str;
 
 class UpdateProductRequest extends Request
 {
@@ -20,8 +19,7 @@ class UpdateProductRequest extends Request
 
     protected function prepareForValidation()
     {
-        // Inventory fields are optional in the unified editor.
-        // On update, if merchant leaves them blank, keep existing inventory values.
+        // Price/stock default to 0 when left blank. SKU is optional but never auto-generated.
         $productId = $this->route('product');
         $inventory = $productId
             ? Inventory::where('product_id', $productId)->pluck('id')->first()
@@ -30,24 +28,13 @@ class UpdateProductRequest extends Request
 
         $salePriceInput = $this->input('sale_price');
         $stockQtyInput = $this->input('stock_quantity');
-        $skuInput = trim((string) $this->input('sku', ''));
         $conditionInput = trim((string) $this->input('condition', ''));
 
         $this->merge([
-            'sale_price' => filled(trim((string) $salePriceInput)) ? $salePriceInput : ($inventory?->sale_price ?? 0),
-            'stock_quantity' => filled(trim((string) $stockQtyInput)) ? $stockQtyInput : ($inventory?->stock_quantity ?? 1),
+            'sale_price' => filled(trim((string) $salePriceInput)) ? $salePriceInput : 0,
+            'stock_quantity' => filled(trim((string) $stockQtyInput)) ? $stockQtyInput : 0,
             'condition' => $conditionInput !== '' ? $conditionInput : ($inventory?->condition ?? 'New'),
         ]);
-
-        if ($skuInput === '') {
-            $sku = $inventory?->sku;
-            if (! $sku) {
-                $name = trim((string) ($this->input('name') ?: 'product'));
-                $generated = Str::upper(Str::slug($name, '_'));
-                $sku = ($generated !== '' ? $generated : 'SKU') . '-' . Str::upper(Str::random(6));
-            }
-            $this->merge(['sku' => $sku]);
-        }
 
         $desiredSlug = trim((string) ($this->input('slug') ?: $this->input('name') ?: 'product'));
         $this->merge([

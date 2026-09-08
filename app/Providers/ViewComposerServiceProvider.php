@@ -347,7 +347,8 @@ class ViewComposerServiceProvider extends ServiceProvider
 
                 $view->with('gtin_types', ListHelper::gtin_types());
 
-                $view->with('countries', ListHelper::countries());
+                // Country of origin is informational — not limited to marketplace-supported countries.
+                $view->with('countries', ListHelper::allCountries());
 
                 $view->with('warehouses', ListHelper::warehouses());
 

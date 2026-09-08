@@ -1523,8 +1523,8 @@ class ListHelper
     }
 
     /**
-     * Get country list for form dropdown (addresses, product origin, etc.).
-     * Same marketplace-only list as address forms.
+     * Get country list for form dropdown (addresses, shipping zones, etc.).
+     * Limited to marketplace-supported countries.
      *
      * @return Collection
      */
@@ -1532,6 +1532,22 @@ class ListHelper
     {
         return Cache::rememberForever('countries_pluck_v2', function () {
             return self::marketplaceCountriesQuery()
+                ->orderBy('name', 'asc')
+                ->pluck('name', 'id');
+        });
+    }
+
+    /**
+     * Full world country list — for informational fields (e.g. a product's
+     * country of origin) that aren't limited to where the marketplace operates.
+     *
+     * @return Collection
+     */
+    public static function allCountries()
+    {
+        return Cache::rememberForever('countries_pluck_all', function () {
+            return DB::table('countries')
+                ->where('active', BaseModel::ACTIVE)
                 ->orderBy('name', 'asc')
                 ->pluck('name', 'id');
         });
@@ -1556,6 +1572,7 @@ class ListHelper
     {
         Cache::forget('countries_pluck');
         Cache::forget('countries_pluck_v2');
+        Cache::forget('countries_pluck_all');
         Cache::forget('active_business_areas_ww');
         Cache::forget('active_business_areas_local');
         Cache::forget('active_business_areas_ww_v2');

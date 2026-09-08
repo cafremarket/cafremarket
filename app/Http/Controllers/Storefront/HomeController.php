@@ -74,8 +74,9 @@ class HomeController extends Controller
 
         $nearbyShopsPaginator = $catalog->nearbyShopsPaginated();
 
-        $featuredItems = get_featured_items();
-        $dealOfTheDay = get_deal_of_the_day();
+        // Curated lists, then keep only products from shops deliverable to the buyer location.
+        $featuredItems = $catalog->filterInventories(get_featured_items())->values();
+        $dealOfTheDay = $catalog->filterInventories(get_deal_of_the_day())->values();
 
         return view('theme::index', compact(
             'banners',

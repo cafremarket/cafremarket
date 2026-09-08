@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
-use Illuminate\Support\Str;
 
 class CreateProductRequest extends Request
 {
@@ -27,28 +26,20 @@ class CreateProductRequest extends Request
         $user = $this->user();
         $shop = $user->merchantShop();
 
-        // Inventory fields are optional in the unified editor.
-        // Provide safe defaults so storage/model layer won't fail.
+        // Price/stock are optional in the unified editor and default to 0 when left blank.
+        // SKU is optional too, but it is never auto-generated on the user's behalf.
         $salePrice = $this->input('sale_price');
         $stockQty = $this->input('stock_quantity');
-        $sku = trim((string) $this->input('sku', ''));
 
         $this->merge([
             'sale_price' => filled(trim((string) $salePrice)) ? $salePrice : 0,
-            'stock_quantity' => filled(trim((string) $stockQty)) ? $stockQty : 1,
+            'stock_quantity' => filled(trim((string) $stockQty)) ? $stockQty : 0,
             'condition' => filled(trim((string) $this->input('condition', ''))) ? $this->input('condition') : 'New',
             'available_from' => filled(trim((string) $this->input('available_from', '')))
                 ? $this->input('available_from')
                 : now()->subDay()->format('Y-m-d H:i:s'),
             'active' => $this->filled('active') ? (int) $this->input('active') : 1,
         ]);
-
-        if ($sku === '') {
-            $name = trim((string) ($this->input('name') ?: $this->input('shop_name') ?: 'product'));
-            $generated = Str::upper(Str::slug($name, '_'));
-            $sku = ($generated !== '' ? $generated : 'SKU') . '-' . Str::upper(Str::random(6));
-            $this->merge(['sku' => $sku]);
-        }
 
         $desiredSlug = trim((string) ($this->input('slug') ?: $this->input('name') ?: 'product'));
         $this->merge([

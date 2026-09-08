@@ -4058,7 +4058,7 @@ if (! function_exists('get_featured_items')) {
             return collect([]);
         }
 
-        // Curated homepage picks must not be wiped by zipcode/session filters.
+        // Active curated listings (radius filtering happens at the request layer).
         $items = Inventory::query()
             ->whereIn('inventories.id', $ids)
             ->where('inventories.active', 1)
