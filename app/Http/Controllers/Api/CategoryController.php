@@ -68,9 +68,7 @@ class CategoryController extends Controller
 
     public function featuredCategories()
     {
-        $categories = get_featured_category();
-
-        return CategoryResource::collection($categories);
+        return CategoryResource::collection(collect([]));
     }
 
     /**
@@ -93,8 +91,6 @@ class CategoryController extends Controller
 
     public function trendingCategories()
     {
-        $categories = get_trending_categories();
-
-        return CategoryResource::collection($categories);
+        return CategoryResource::collection(collect([]));
     }
 }

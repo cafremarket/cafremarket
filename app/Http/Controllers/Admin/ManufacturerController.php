@@ -213,13 +213,6 @@ class ManufacturerController extends Controller
      */
     private function clearBrandCache($id = null)
     {
-        // Clear when the id is not given, in case of mass delete
-        if (! $id || in_array($id, get_featured_brand_ids())) {
-            // Clear featured_brands from cache
-            Cache::forget('featured_brand_ids');
-            Cache::forget('featured_brands');
-        }
-
         return null;
     }
 }

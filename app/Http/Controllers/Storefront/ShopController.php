@@ -123,21 +123,11 @@ class ShopController extends Controller
                 ->groupBy('group_id')->toArray();
         });
 
-        // Deal of the day;
-        $deal_of_the_day = get_deal_of_the_day($shop->id);
-
-        $featured_items = null;
-
         // Top Selling Items
         $top_items = ListHelper::top_selling_shop_items($shop, 10);
 
         // Recently Added Items
         $recent = ListHelper::latest_shop_items($shop, 10);
-
-        // Best deal under the amount
-        $deals_under = Cache::rememberForever('deals_under'.$shop->id, function () use ($shop) {
-            return ListHelper::best_find_under(best_finds_under($shop->id), 20, $shop->id);
-        });
 
         $sliders = Cache::rememberForever('sliders'.$shop->id, function () use ($shop) {
             return Slider::orderBy('order', 'asc')
@@ -149,7 +139,7 @@ class ShopController extends Controller
                 ->get()->toArray();
         });
 
-        return view('theme::shop', compact('shop', 'sliders', 'banners', 'featured_items', 'top_items', 'deal_of_the_day', 'deals_under', 'recent'));
+        return view('theme::shop', compact('shop', 'sliders', 'banners', 'top_items', 'recent'));
     }
 
     /**

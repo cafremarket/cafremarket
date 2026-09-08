@@ -55,7 +55,6 @@ class ItemResource extends JsonResource
             'offer_start' => $this->hasOffer() ? (string) $this->offer_start : null,
             'offer_end' => $this->hasOffer() ? (string) $this->offer_end : null,
             'shipping_weight' => get_formated_weight($this->shipping_weight),
-            'is_in_deals' => $this->isInDeals(),
             'attributes' => AttributeColorResource::collection($this->whenLoaded('attributeValues')->unique('attribute_id')),
             'images' => ImageResource::collection($this->whenLoaded('images')),
             'image_id' => $this->when($this->whenLoaded('image'), optional($this->image)->id),

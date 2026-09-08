@@ -254,6 +254,14 @@
         'data': 'title',
         'name': 'title'
       },
+      @if (is_catalog_enabled())
+      {
+        'data': 'type',
+        'name': 'type',
+        'orderable': false,
+        'searchable': false
+      },
+      @endif
       {
         'data': 'condition',
         'name': 'condition',
@@ -1068,9 +1076,29 @@
       minimumInputLength: 3,
       allowClear: true
     });
-    //End Products Search for Select2
+    //End Inventories Search for Select2
 
-    // Inventories Search for Select2
+    // Deal / Featured product picker — one listing per product (no variant dump)
+    $('.searchDealProductForSelect').select2({
+      ajax: {
+        url: "{{ route('search.findDealProduct') }}",
+        dataType: 'json',
+        delay: 250,
+        processResults: function(data) {
+          return {
+            results: data
+          };
+        },
+        cache: true
+      },
+      placeholder: "{!! trans('app.placeholder.search_product') !!}",
+      minimumInputLength: 2,
+      allowClear: true,
+      width: '100%'
+    });
+    // End Deal / Featured product picker
+
+    // Categories Search for Select2
     $('.searchCategoryForSelect').select2({
       ajax: {
         url: "{{ route('search.findCategory') }}",

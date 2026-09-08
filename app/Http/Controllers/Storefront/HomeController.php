@@ -74,6 +74,9 @@ class HomeController extends Controller
 
         $nearbyShopsPaginator = $catalog->nearbyShopsPaginated();
 
+        $featuredItems = get_featured_items();
+        $dealOfTheDay = get_deal_of_the_day();
+
         return view('theme::index', compact(
             'banners',
             'sliders',
@@ -81,6 +84,8 @@ class HomeController extends Controller
             'latitude',
             'longitude',
             'buyerAddress',
+            'featuredItems',
+            'dealOfTheDay',
         ));
     }
 

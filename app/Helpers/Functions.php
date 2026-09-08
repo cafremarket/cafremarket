@@ -373,27 +373,6 @@ if (! function_exists('get_gerder_list')) {
     }
 }
 
-if (! function_exists('get_promotional_tagline')) {
-    function get_promotional_tagline()
-    {
-        return Cache::rememberForever('promotional_tagline', function () {
-            return get_from_option_table('promotional_tagline', []);
-        });
-    }
-}
-
-if (! function_exists('get_top_bar_banner_data')) {
-    /**
-     * Get top bar banner data
-     */
-    function get_top_bar_banner_data()
-    {
-        return Cache::rememberForever('top_bar_banner', function () {
-            return get_from_option_table('top_bar_banner');
-        });
-    }
-}
-
 if (! function_exists('get_option_table_name')) {
     function get_option_table_name()
     {
@@ -3734,31 +3713,30 @@ if (! function_exists('multi_tag_explode')) {
     }
 }
 
-if (! function_exists('get_featured_items')) {
+if (! function_exists('get_nearby_featured_items')) {
     /**
-     * Get featured Products
-     *
-     * @return array
+     * Get up to N popular products from nearby shop IDs.
      */
-    function get_featured_items($shop_id = null)
+    function get_nearby_featured_items(array $shopIds, int $limit = 5)
     {
-        $field = 'featured_items'.$shop_id;
+        if (empty($shopIds)) {
+            return collect();
+        }
 
-        return Cache::rememberForever($field, function () use ($field) {
-            $items = get_from_option_table($field, []);
-
-            if (! empty($items)) {
-                return Inventory::whereIn('id', $items)
-                    ->where('active', 1)
-                    ->where('available_from', '<=', Carbon::now())
-                    ->with([
-                        'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                        'image:path,imageable_id,imageable_type',
-                    ])->get();
-            }
-
-            return $items;
-        });
+        return Inventory::query()
+            ->whereIn('shop_id', $shopIds)
+            ->where('active', 1)
+            ->where('available_from', '<=', Carbon::now())
+            ->with([
+                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'image:path,imageable_id,imageable_type',
+                'shop:id,name,slug',
+            ])
+            ->orderByDesc('sold_quantity')
+            ->limit($limit)
+            ->get()
+            ->unique('id')
+            ->values();
     }
 }
 
@@ -3893,280 +3871,6 @@ if (! function_exists('hyperlocal_browse_gate_view')) {
     }
 }
 
-if (! function_exists('get_nearby_featured_items')) {
-    /**
-     * Get up to N featured products from nearby shop IDs.
-     */
-    function get_nearby_featured_items(array $shopIds, int $limit = 5)
-    {
-        if (empty($shopIds)) {
-            return collect();
-        }
-
-        $items = collect();
-
-        foreach ($shopIds as $shopId) {
-            $featured = get_featured_items($shopId);
-            if ($featured && count($featured)) {
-                $items = $items->merge($featured);
-            }
-        }
-
-        if ($items->count() < $limit) {
-            $existingIds = $items->pluck('id')->filter()->toArray();
-
-            $fallback = Inventory::query()
-                ->whereIn('shop_id', $shopIds)
-                ->where('active', 1)
-                ->where('available_from', '<=', Carbon::now())
-                ->when(! empty($existingIds), fn ($q) => $q->whereNotIn('id', $existingIds))
-                ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                    'image:path,imageable_id,imageable_type',
-                    'shop:id,name,slug',
-                ])
-                ->orderByDesc('sold_quantity')
-                ->limit($limit - $items->count())
-                ->get();
-
-            $items = $items->merge($fallback);
-        }
-
-        return $items->unique('id')->take($limit)->values();
-    }
-}
-
-if (! function_exists('get_featured_brand_ids')) {
-    /**
-     * Get featured brand ids
-     *
-     * @return array
-     */
-    function get_featured_brand_ids()
-    {
-        return Cache::rememberForever('featured_brand_ids', function () {
-            return get_from_option_table('featured_brands', []);
-        });
-    }
-}
-
-if (! function_exists('get_featured_brands')) {
-    /**
-     * Get featured brands
-     *
-     * @return array
-     */
-    function get_featured_brands()
-    {
-        if (! $featured_brands = get_featured_brand_ids()) {
-            return collect([]);
-        }
-
-        return Cache::rememberForever('featured_brands', function () use ($featured_brands) {
-            return Manufacturer::select('id', 'name', 'slug', 'description')
-                ->whereIn('id', $featured_brands)
-                ->with('featureImage:path,imageable_id,imageable_type')
-                ->get();
-        });
-    }
-}
-
-if (! function_exists('get_featured_vendor_ids')) {
-    /**
-     * Get featured vendor ids
-     *
-     * @return array
-     */
-    function get_featured_vendor_ids()
-    {
-        return Cache::rememberForever('featured_vendor_ids', function () {
-            return get_from_option_table('featured_vendors', []);
-        });
-    }
-}
-
-if (! function_exists('get_featured_vendors')) {
-    /**
-     * Get featured vendors
-     *
-     * @return array
-     */
-    function get_featured_vendors()
-    {
-        return Cache::rememberForever('featured_vendors', function () {
-            $featured_vendors = get_featured_vendor_ids();
-
-            $baseQuery = Shop::select('id', 'name', 'slug', 'id_verified', 'phone_verified', 'address_verified')
-                ->active()
-                ->whereHas('inventories', function ($q) {
-                    $q->available();
-                })
-                ->with([
-                    'inventories' => function ($q) {
-                        $q->select(ListHelper::common_select_attr('inventory'))
-                            ->available()
-                            ->with([
-                                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                                'image:path,imageable_id,imageable_type',
-                            ])
-                            ->where('parent_id', null)
-                            ->inRandomOrder()->take(30);
-                    },
-                    'logoImage:path,imageable_id,imageable_type',
-                ]);
-
-            if ($featured_vendors) {
-                $shops = (clone $baseQuery)->whereIn('id', $featured_vendors)->get();
-                if ($shops->isNotEmpty()) {
-                    return $shops->take(3);
-                }
-            }
-
-            return $baseQuery->inRandomOrder()->take(3)->get();
-        });
-    }
-}
-
-if (! function_exists('get_featured_category')) {
-    /**
-     * Get featured category
-     *
-     * @return array
-     */
-    function get_featured_category()
-    {
-        return Cache::rememberForever('featured_categories', function () {
-            return Category::select('id', 'name', 'slug')
-                ->with('featureImage:path,imageable_id,imageable_type')
-                ->withCount('listings')
-                ->orderBy('order', 'asc')
-                ->featured()->get();
-        });
-    }
-}
-
-if (! function_exists('get_main_nav_categories')) {
-    /**
-     * Get featured brands
-     *
-     * @return array
-     */
-    function get_main_nav_categories()
-    {
-        return Cache::rememberForever('main_nav_categories', function () {
-            $ids = get_from_option_table('main_nav_categories', []);
-
-            return Category::findMany($ids, ['id', 'slug', 'name']);
-        });
-    }
-}
-
-if (! function_exists('hidden_menu_items')) {
-    /**
-     * get hide menu item
-     *
-     * @return array|mixed|null
-     */
-    function hidden_menu_items()
-    {
-        return Cache::rememberForever('hidden_menu_items', function () {
-            return get_from_option_table('hidden_menu_items', []);
-        });
-    }
-}
-
-if (! function_exists('get_trending_category_ids')) {
-    /**
-     * Get trending category ids
-     *
-     * @return array
-     */
-    function get_trending_category_ids()
-    {
-        return Cache::rememberForever('trending_category_ids', function () {
-            return get_from_option_table('trending_categories', []);
-        });
-    }
-}
-
-if (! function_exists('get_trending_categories')) {
-    /**
-     * Get trending categories
-     *
-     * @return array
-     */
-    function get_trending_categories()
-    {
-        $trending_ids = get_trending_category_ids();
-
-        if (! $trending_ids) {
-            return [];
-        }
-
-        return Cache::rememberForever('trending_categories', function () use ($trending_ids) {
-            return Category::whereIn('id', $trending_ids)->get();
-        });
-    }
-}
-
-if (! function_exists('get_trending_categories_with_items')) {
-    /**
-     * Get trending_categories
-     *
-     * @return array
-     */
-    function get_trending_categories_with_items()
-    {
-        if (! $trending_ids = get_trending_category_ids()) {
-            return collect([]);
-        }
-
-        return Cache::remember('trending_categories_with_items', config('cache.remember.trending_category_items', 86400), function () use ($trending_ids) {
-            return Category::select('id', 'name', 'slug', 'order')
-                ->whereIn('id', $trending_ids)
-                ->whereHas('listings')
-                ->with([
-                    'listings' => function ($q) {
-                        $q->select(ListHelper::common_select_attr('inventory'))
-                            ->available()
-                            ->with([
-                                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                                'image:path,imageable_id,imageable_type',
-                            ])
-                            ->whereNull('parent_id')
-                            // Prefer ordered listings over random (random scans are expensive).
-                            ->orderByDesc('inventories.id')
-                            ->limit(config('system.popular.take.trending', 20))
-                            ->get();
-                    },
-                ])->get();
-        });
-    }
-}
-
-if (! function_exists('get_deal_of_the_day')) {
-    /**
-     * Get get_deal_of_the_day
-     *
-     * @return inventory
-     */
-    function get_deal_of_the_day($shop_id = null)
-    {
-        $field = 'deal_of_the_day'.$shop_id;
-
-        return Cache::rememberForever($field, function () use ($field) {
-            return Inventory::where('id', get_from_option_table($field))
-                ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                    'images:path,imageable_id,imageable_type',
-                ])
-                ->where('active', 1)
-                ->where('available_from', '<=', Carbon::now())
-                ->first();
-        });
-    }
-}
-
 if (! function_exists('create_file_from_base64')) {
     /**
      * Decode a data-URL or raw base64 payload into a temporary UploadedFile (chat, checkout, etc.).
@@ -4280,60 +3984,107 @@ if (! function_exists('is_social_login_configured')) {
     }
 }
 
-if (! function_exists('get_flash_deals')) {
+if (! function_exists('get_deal_of_the_day')) {
     /**
-     * Get Flash Deals
+     * Get Deal of the Day inventory listings for a given date (defaults to today).
+     * Returns a collection (multiple products per day are supported).
      *
-     * @return array | null
+     * @param  \Carbon\Carbon|string|null  $date
+     * @return \Illuminate\Support\Collection
      */
-    function get_flash_deals()
+    function get_deal_of_the_day($date = null)
     {
-        $flash_deals = Cache::rememberForever('flashdeals', function () {
-            $deals = get_from_option_table('flashdeal_items', []);
+        $day = $date instanceof \Carbon\Carbon
+            ? $date->toDateString()
+            : ($date ? \Carbon\Carbon::parse($date)->toDateString() : now()->toDateString());
 
-            // Return null when the list is empty
-            if (empty($deals)) {
-                return null;
+        return Cache::remember('deal_of_the_day_items_'.$day, now()->addMinutes(30), function () use ($day) {
+            $ids = \App\Models\DealOfTheDay::where('deal_date', $day)
+                ->orderBy('id')
+                ->pluck('inventory_id')
+                ->map(function ($id) {
+                    return (int) $id;
+                })
+                ->unique()
+                ->values()
+                ->all();
+
+            if (empty($ids)) {
+                return collect([]);
             }
 
-            $items = [];
+            $items = Inventory::query()
+                ->whereIn('inventories.id', $ids)
+                ->where('inventories.active', 1)
+                ->whereNull('inventories.deleted_at')
+                ->whereHas('shop', function ($q) {
+                    $q->approved();
+                })
+                ->where(function ($q) {
+                    $q->whereNull('available_from')
+                        ->orWhere('available_from', '<=', now());
+                })
+                ->select(ListHelper::common_select_attr('inventory'))
+                ->with([
+                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'image:path,imageable_id,imageable_type',
+                ])
+                ->get()
+                ->keyBy('id');
 
-            // Get general deals
-            if (! empty($deals['listings'])) {
-                $items['listings'] = Inventory::available()
-                    ->whereIn('id', $deals['listings'])
-                    ->select(ListHelper::common_select_attr('inventory'))
-                    ->with([
-                        'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                        'image:path,imageable_id,imageable_type',
-                    ])
-                    ->get();
-            }
-
-            // Get featured deals
-            if (! empty($deals['featured'])) {
-                $items['featured'] = Inventory::available()
-                    ->whereIn('id', $deals['featured'])
-                    ->with([
-                        'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                        'image:path,imageable_id,imageable_type',
-                    ])
-                    ->get();
-            }
-
-            return array_merge($deals, $items);
+            return collect($ids)->map(function ($id) use ($items) {
+                return $items->get($id);
+            })->filter()->values();
         });
+    }
+}
 
-        if (
-            ! Request::is('admin/*') &&
-            $flash_deals &&
-            $flash_deals['start_time']->isPast() &&
-            $flash_deals['end_time']->isFuture()
-        ) {
-            return $flash_deals;
+if (! function_exists('get_featured_items')) {
+    /**
+     * Homepage curated featured product listings.
+     *
+     * @param  int|null  $shop_id
+     * @return \Illuminate\Support\Collection
+     */
+    function get_featured_items($shop_id = null)
+    {
+        $ids = get_from_option_table('featured_items'.($shop_id ?: ''), []);
+        if (empty($ids) || ! is_array($ids)) {
+            return collect([]);
         }
 
-        return null;
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        if (empty($ids)) {
+            return collect([]);
+        }
+
+        // Curated homepage picks must not be wiped by zipcode/session filters.
+        $items = Inventory::query()
+            ->whereIn('inventories.id', $ids)
+            ->where('inventories.active', 1)
+            ->whereNull('inventories.deleted_at')
+            ->whereHas('shop', function ($q) {
+                $q->approved();
+            })
+            ->where(function ($q) {
+                $q->whereNull('available_from')
+                    ->orWhere('available_from', '<=', now());
+            })
+            ->when($shop_id, function ($q) use ($shop_id) {
+                $q->where('shop_id', $shop_id);
+            })
+            ->select(ListHelper::common_select_attr('inventory'))
+            ->with([
+                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'image:path,imageable_id,imageable_type',
+            ])
+            ->get()
+            ->keyBy('id');
+
+        // Preserve admin selection order
+        return collect($ids)->map(function ($id) use ($items) {
+            return $items->get($id);
+        })->filter()->values();
     }
 }
 
@@ -4349,22 +4100,6 @@ if (! function_exists('get_custom_css')) {
 
         return Cache::rememberForever($field, function () use ($field) {
             return get_from_option_table($field) ?? '';
-        });
-    }
-}
-
-if (! function_exists('best_finds_under')) {
-    /**
-     * Get best finds under value
-     *
-     * @return string
-     */
-    function best_finds_under($shop_id = null)
-    {
-        $field = 'best_finds_under'.$shop_id;
-
-        return Cache::rememberForever($field, function () use ($field) {
-            return get_from_option_table($field, 99);
         });
     }
 }

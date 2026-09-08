@@ -444,23 +444,8 @@ class GuestCustomerApiTest extends TestCase
         $this->getJson('/api/recently_viewed_items')->assertOk();
     }
 
-    public function test_flash_deals_route()
-    {
-        $this->getJson('/api/deals/flash-deals')->assertOk();
-    }
-
-    public function test_under_the_price_route()
-    {
-        $this->getJson('/api/deals/under-the-price')->assertOk();
-    }
-
     public function test_deal_of_the_day_route()
     {
         $this->getJson('/api/deals/deal-of-the-day')->assertOk();
-    }
-
-    public function test_tagline_route()
-    {
-        $this->getJson('/api/deals/tagline')->assertOk();
     }
 }

@@ -164,6 +164,68 @@ class SearchController extends Controller
         return Response::json($results);
     }
 
+    /**
+     * One listing per product for deal / featured pickers (prefer parent/main SKU).
+     */
+    public function findDealProductForSelect(Request $request)
+    {
+        $term = trim((string) $request->input('q'));
+        $results = [];
+
+        if (mb_strlen($term) < 2) {
+            return Response::json($results);
+        }
+
+        $like = '%'.$term.'%';
+
+        $query = Inventory::query()
+            ->select('inventories.*')
+            ->with(['shop:id,name', 'product:id,name'])
+            ->leftJoin('products', 'products.id', '=', 'inventories.product_id')
+            ->leftJoin('shops', 'shops.id', '=', 'inventories.shop_id')
+            ->where('inventories.active', 1)
+            ->whereNull('inventories.deleted_at')
+            ->where(function ($q) use ($like) {
+                $q->where('inventories.title', 'LIKE', $like)
+                    ->orWhere('inventories.sku', 'LIKE', $like)
+                    ->orWhere('products.name', 'LIKE', $like)
+                    ->orWhere('shops.name', 'LIKE', $like);
+            })
+            ->orderByRaw('CASE WHEN inventories.parent_id IS NULL THEN 0 ELSE 1 END')
+            ->orderBy('inventories.title');
+
+        if (Auth::user()->isFromMerchant()) {
+            $query->where('inventories.shop_id', Auth::user()->shop_id);
+        }
+
+        $items = $query->limit(80)->get();
+
+        $seen = [];
+        foreach ($items as $item) {
+            $key = ($item->product_id ?: 0).':'.($item->shop_id ?: 0);
+            if (isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
+
+            $name = $item->product->name ?? $item->title;
+            $shop = $item->shop->name ?? '';
+            $price = get_formated_currency($item->current_sale_price());
+            $label = trim($name.($shop ? ' | '.$shop : '').' | '.$price);
+
+            $results[] = [
+                'id' => $item->id,
+                'text' => $label,
+            ];
+
+            if (count($results) >= 20) {
+                break;
+            }
+        }
+
+        return Response::json($results);
+    }
+
     public function findCategoryForSelect(Request $request)
     {
         $term = $request->input('q');

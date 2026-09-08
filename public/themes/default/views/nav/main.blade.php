@@ -13,12 +13,6 @@
               <i class="fal fa-map-marker-alt"></i> {{ trans('theme.set_delivery_location') }}
             </a>
           @endif
-
-          {{-- @unless (empty($promotional_tagline['text']))
-            <a style="text-decoration: none" href="{{ $promotional_tagline['action_url'] ?? 'javascript:void(0)' }}">
-              {!! $promotional_tagline['text'] !!}
-            </a>
-          @endunless --}}
         </div> <!-- /.top-nav-left -->
 
         <div class="top-nav-right">

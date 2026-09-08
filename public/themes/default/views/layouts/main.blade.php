@@ -107,10 +107,7 @@
       </div>
     @endif
 
-    <!-- Top promo bar -->
-    @include('front_top_promo')
-
-    <!-- Announcement -->
+    <!-- Header start -->
     @if (is_incevio_package_loaded('announcement'))
       @include('announcement::announcement')
     @endif
@@ -153,7 +150,7 @@
     @include('theme::auth.modals')
   @endunless
 
-  <script src="{{ theme_asset_url('js/app.js') }}"></script>
+  <script src="{{ theme_asset_url('js/app.js') }}?v={{ is_file(theme_assets_path('js/app.js')) ? filemtime(theme_assets_path('js/app.js')) : time() }}"></script>
 
   {{--  Toast notification --}}
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">

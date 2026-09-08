@@ -138,6 +138,9 @@ class InventoryController extends Controller
             ->editColumn('title', function ($inventory) use ($type) {
                 return view('admin.inventory.partials.title', compact('inventory', 'type'));
             })
+            ->editColumn('type', function ($inventory) {
+                return $inventory->type;
+            })
             ->editColumn('condition', function ($inventory) {
                 return view('admin.inventory.partials.condition', compact('inventory'));
             })

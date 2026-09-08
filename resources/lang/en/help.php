@@ -420,7 +420,7 @@ return [
     'you_can_use_span_tag' => 'You can use <span> tag to highlight important words.',
     'social_auth' => 'If enable social login option will show on customer login and register page',
     'slider_text_position' => 'Set your content position on slider. default position right',
-    'deal_of_the_day' => 'Just one item can be set as deal of the day.',
+    'deal_of_the_day' => 'You can plan multiple products per day on the Deal of the Day calendar.',
     'show_merchant_info_as_vendor' => 'Show seller name and other information on vendor list page and profile page.',
     'pay_in_person' => 'If enable self pickup will be active.',
     'pay_online' => 'If enable online payment wil be active.',

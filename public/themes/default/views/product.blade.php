@@ -48,7 +48,6 @@
 
   @include('theme::modals.ship_to')
   @include('theme::scripts.product_page')
-  @include('scripts.flash_deal')
 
   @if (is_incevio_package_loaded('auction') && $item->auctionable)
     @include('auction::frontend.script')

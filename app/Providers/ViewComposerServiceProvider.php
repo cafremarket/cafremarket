@@ -101,8 +101,6 @@ class ViewComposerServiceProvider extends ServiceProvider
 
         $this->composeProductForm();
 
-        $this->composePromotionOptions();
-
         $this->composeRefundInitiationForm();
 
         $this->composeRoleForm();
@@ -361,43 +359,6 @@ class ViewComposerServiceProvider extends ServiceProvider
 
                 if (is_incevio_package_loaded('packaging')) {
                     $view->with('packagings', ListHelper::packagings());
-                }
-            }
-        );
-    }
-
-    /**
-     * compose partial view of Promotion index
-     */
-    private function composePromotionOptions()
-    {
-        View::composer(
-
-            'admin.promotions.options',
-
-            function ($view) {
-                $view->with('featured_items', get_featured_items(Auth::user()->shop_id));
-
-                $view->with('deal_of_the_day', ListHelper::deal_of_the_day(Auth::user()->shop_id));
-
-                $view->with('best_finds_under', best_finds_under(Auth::user()->shop_id));
-
-                if (Auth::user()->isFromPlatform()) {
-                    $view->with('tagline', get_from_option_table('promotional_tagline'));
-
-                    $view->with('top_bar_banner', get_top_bar_banner_data());
-
-                    $view->with('featured_brands', get_featured_brands());
-
-                    $view->with('featured_vendors', get_featured_vendors());
-
-                    $view->with('featured_categories', ListHelper::featured_categories());
-
-                    $view->with('trending_categories', ListHelper::trending_categories());
-
-                    $view->with('main_nav_categories', get_main_nav_categories());
-
-                    $view->with('hidden_menu_items', hidden_menu_items());
                 }
             }
         );

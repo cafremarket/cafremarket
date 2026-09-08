@@ -529,22 +529,6 @@ class Inventory extends Inspectable
     }
 
     /**
-     * Check if the item is in flash deals
-     *
-     * @return bool
-     */
-    public function isInDeals()
-    {
-        $flashdeals = get_flash_deals();
-
-        if (isset($flashdeals['listings']) && $flashdeals['listings']->find($this->id)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Check if the product was imported from Shopify
      *
      * @return bool

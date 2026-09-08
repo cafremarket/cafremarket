@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ListHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\DealOfTheDayResource;
 use App\Http\Resources\ImageResource;
 use App\Http\Resources\ItemResource;
 use App\Http\Resources\ListingResource;
@@ -12,129 +11,35 @@ use App\Models\Inventory;
 use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\Hyperlocal\HyperlocalCatalogService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class DealController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Today's Deal of the Day (calendar-based, multiple products).
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function flashDeals(HyperlocalCatalogService $catalog, BuyerLocationService $buyerLocation)
+    public function dealOfTheDay(HyperlocalCatalogService $catalog, BuyerLocationService $buyerLocation)
     {
         $buyerLocation->syncFromCustomer();
-        $flashdeals = get_flash_deals();
+        $items = get_deal_of_the_day();
 
-        // Check if the deal is still valid
-        if (
-            $flashdeals &&
-            $flashdeals['start_time']->isPast() &&
-            $flashdeals['end_time']->isFuture()
-        ) {
-            $listings = null;
-            $featured = null;
-
-            if ($flashdeals['listings']) {
-                $listings = $catalog->isEnabled()
-                    ? $catalog->filterInventories(collect($flashdeals['listings']))
-                    : collect($flashdeals['listings']);
-                $listings = ListingResource::collection($listings);
-            }
-
-            if ($flashdeals['featured']) {
-                $featured = $catalog->isEnabled()
-                    ? $catalog->filterInventories(collect($flashdeals['featured']))
-                    : collect($flashdeals['featured']);
-                $featured = ListingResource::collection($featured);
-            }
-
-            // return $flashdeals;
-            return [
-                'listings' => $listings,
-                'featured' => $featured,
-                'meta' => [
-                    'deal_title' => trans('theme.flash_deals'),
-                    'end_time' => $flashdeals['end_time'],
-                ],
-            ];
+        if ($items->isEmpty()) {
+            return response()->json(['data' => []]);
         }
 
-        return [];
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function underPrice(Request $request, HyperlocalCatalogService $catalog, BuyerLocationService $buyerLocation)
-    {
-        $buyerLocation->syncFromCustomer();
-        $shop_id = null;
-
-        if ($request->has('shop_id')) {
-            $shop_id = $request->get('shop_id');
+        if ($catalog->isEnabled()) {
+            $items = $catalog->filterInventories($items)->values();
         }
 
-        $price = best_finds_under($shop_id);
-
-        $listings = Cache::remember('deals_under'.$shop_id.hyperlocal_location_cache_suffix(), config('cache.remember.deals', 0), function () use ($price, $shop_id) {
-            return ListHelper::best_find_under($price, 20, $shop_id);
-        });
-
-        if ($catalog->isEnabled() && ! $shop_id) {
-            $listings = $catalog->filterInventories(collect($listings));
-        }
-
-        return ListingResource::collection($listings)->additional([
+        return response()->json([
+            'data' => ListingResource::collection($items),
             'meta' => [
-                'deal_title' => trans('theme.best_find_under', ['amount' => get_formated_currency($price)]),
-                'deals_under_price' => $price,
+                'deal_date' => now()->toDateString(),
+                'deal_title' => trans('app.deal_of_the_day'),
+                'count' => $items->count(),
             ],
         ]);
-    }
-
-    /**
-     * Display deal of the day;
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function dealOfTheDay(Request $request, HyperlocalCatalogService $catalog, BuyerLocationService $buyerLocation)
-    {
-        $buyerLocation->syncFromCustomer();
-        $shop_id = null;
-
-        if ($request->has('shop_id')) {
-            $shop_id = $request->get('shop_id');
-        }
-
-        $item = get_deal_of_the_day($shop_id);
-
-        if ($item && $catalog->isEnabled() && ! $shop_id && ! $catalog->isShopDeliverable((int) $item->shop_id)) {
-            $item = null;
-        }
-
-        if (! $item) {
-            return response()->json(['data' => null]);
-        }
-
-        return new DealOfTheDayResource($item);
-    }
-
-    /**
-     * Tahline of the marketplace
-     *
-     * @return void
-     */
-    public function tagline()
-    {
-        $tagline = get_promotional_tagline();
-
-        return [
-            'tagline' => $tagline['text'],
-            'link' => url($tagline['action_url']),
-        ];
     }
 
     /**

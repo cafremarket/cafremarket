@@ -402,12 +402,6 @@
               </li>
             @endcan
 
-            <li class="{{ Request::is('admin/promotions*') ? 'active' : '' }}">
-              <a href="{{ url('admin/promotions') }}">
-                <i class="fa fa-angle-double-right"></i> {{ trans('nav.promotions') }}
-              </a>
-            </li>
-
             {{-- @can('index', \App\Models\GiftCard::class)
                   <li class="{{ Request::is('admin/promotion/giftCard*') ? 'active' : '' }}">
                     <a href="{{ url('admin/promotion/giftCard') }}">
@@ -549,22 +543,26 @@
         </li>
       @endif
 
-      {{-- Flash deal merge into promotions --}}
-      @if (Auth::user()->isAdmin() || (new \App\Helpers\Authorize(Auth::user(), 'manage_flash_deal'))->check())
+      {{-- Marketing: Deal of the Day, Featured Products, push, trending --}}
+      @if (Auth::user()->isAdmin())
         @unless (Auth::user()->isFromMerchant())
           <li class="nav-section"><span class="nav-section-label">{{ trans('nav.promotions') ?? 'Marketing' }}</span></li>
         @endunless
-        <li class="treeview {{ Request::is('admin/promotions*') || Request::is('admin/flashdeal*') || Request::is('admin/promotion/push-campaign*') ? 'active' : '' }}">
+        <li class="treeview {{ Request::is('admin/deal-of-the-day*') || Request::is('admin/featured-products*') || Request::is('admin/promotion/push-campaign*') || Request::is('admin/promotions/trendingKeywords*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
             <i class="fa fa-bullhorn"></i>
-            <span>{{ trans('nav.promotions') }}</span>
+            <span>{{ trans('nav.promotions') ?? 'Marketing' }}</span>
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            @if (Auth::user()->isAdmin())
-              <li class="{{ Request::is('admin/promotions*') ? 'active' : '' }}">
-                <a href="{{ url('admin/promotions') }}">
-                  <i class="fa fa-angle-double-right"></i> <span>{{ trans('nav.promotions') }}</span>
+              <li class="{{ Request::is('admin/deal-of-the-day*') ? 'active' : '' }}">
+                <a href="{{ route('admin.dealOfTheDay') }}">
+                  <i class="fa fa-angle-double-right"></i> <span>{{ trans('app.deal_of_the_day') }}</span>
+                </a>
+              </li>
+              <li class="{{ Request::is('admin/featured-products*') ? 'active' : '' }}">
+                <a href="{{ route('admin.featuredProducts') }}">
+                  <i class="fa fa-angle-double-right"></i> <span>{{ trans('app.featured_items') }}</span>
                 </a>
               </li>
               <li class="{{ Request::is('admin/promotion/push-campaign*') ? 'active' : '' }}">
@@ -572,21 +570,12 @@
                   <i class="fa fa-angle-double-right"></i> <span>{{ trans('nav.push_notifications') }}</span>
                 </a>
               </li>
-            @endif
 
-            @if (Auth::user()->isAdmin() && is_incevio_package_loaded('trendingKeywords'))
+            @if (is_incevio_package_loaded('trendingKeywords'))
               <li class="{{ Request::is('admin/promotions/trendingKeywords*') ? 'active' : '' }}">
                 <a href="{{ route('admin.promotion.trendingKeywords') }}">
                   <i class="fa fa-angle-double-right"></i> {{ trans('packages.trendingKeywords.trending_keywords') }}
                   @include('partials._addon_badge')
-                </a>
-              </li>
-            @endif
-
-            @if ((new \App\Helpers\Authorize(Auth::user(), 'manage_flash_deal'))->check())
-              <li class="{{ Request::is('admin/flashdeal*') ? 'active' : '' }}">
-                <a href="{{ route('admin.flashdeal') }}">
-                  <i class="fa fa-angle-double-right"></i> {{ trans('theme.flash_deal') }}
                 </a>
               </li>
             @endif

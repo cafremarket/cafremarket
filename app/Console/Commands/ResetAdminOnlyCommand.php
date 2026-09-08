@@ -143,16 +143,10 @@ class ResetAdminOnlyCommand extends Command
         if (Schema::hasTable('options')) {
             DB::table('options')
                 ->whereIn('option_name', [
-                    'featured_items',
-                    'featured_vendors',
-                    'featured_brands',
-                    'flash_deals',
-                    'deal_of_the_day',
-                    'best_finds_under',
+                    'flashdeal_items',
                 ])
-                ->orWhere('option_name', 'like', 'featured_items%')
                 ->delete();
-            $this->line('  Cleared homepage option cache');
+            $this->line('  Cleared obsolete flash deal options');
         }
 
         Schema::enableForeignKeyConstraints();

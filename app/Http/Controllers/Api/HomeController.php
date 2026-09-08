@@ -225,9 +225,7 @@ class HomeController extends Controller
      */
     public function featuredBrands()
     {
-        $brands = get_featured_brands();
-
-        return ManufacturerLightResource::collection($brands);
+        return ManufacturerLightResource::collection(collect([]));
     }
 
     /**

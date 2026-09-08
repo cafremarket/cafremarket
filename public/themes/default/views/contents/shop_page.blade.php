@@ -104,30 +104,12 @@
           </section>
         @endif
 
-        @include('theme::sections.deal_of_the_day')
         @include('theme::sections.recently_added')
 
         @if (!empty($banners['group_2']))
           <div class="sf-store__banners">
             @include('theme::sections.banners', ['banners' => $banners['group_2']])
           </div>
-        @endif
-
-        @if (isset($deals_under) && count($deals_under))
-          <section class="sf-store__shelf">
-            <header class="sf-store__shelf-head">
-              <h2>{{ trans('theme.best_find_under', ['amount' => get_formated_currency(get_from_option_table('best_finds_under' . $shop->id))]) }}</h2>
-              <div class="sf-store__shelf-nav">
-                <button type="button" class="left-arrow slider-arrow slick-arrow best-deal-left"><i class="fal fa-chevron-left"></i></button>
-                <button type="button" class="right-arrow slider-arrow slick-arrow best-deal-right"><i class="fal fa-chevron-right"></i></button>
-              </div>
-            </header>
-            <div class="best-deals-items">
-              <div class="best-deals-items-inner">
-                @include('theme::partials._product_horizontal', ['products' => $deals_under, 'title' => 1, 'ratings' => 1, 'hover' => 1])
-              </div>
-            </div>
-          </section>
         @endif
       </div>
 

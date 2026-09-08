@@ -5433,3 +5433,39 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
     grid-template-columns: 1fr;
   }
 }
+
+/* Homepage featured products — always-visible horizontal row (no Slick) */
+.featured-items-inner {
+  display: flex !important;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  gap: 0;
+  width: 100%;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.featured-items-inner .items-slider {
+  flex: 0 0 226px;
+  max-width: 226px;
+  width: 226px;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+@media screen and (max-width: 767px) {
+  .featured-items-inner .items-slider {
+    flex: 0 0 48%;
+    max-width: 48%;
+    width: 48%;
+  }
+}
+
+/* Deal of the Day uses the same product card row as Featured */
+.deal-of-the-day-items {
+  overflow-x: visible;
+}

@@ -45,7 +45,6 @@ Route::middleware('customerApp')->group(function () {
     Route::get('blog/{slug}', [BlogController::class, 'show']);
 
     // Categories
-    Route::get('featured-categories', [CategoryController::class, 'featuredCategories']);
     Route::get('trending-categories', [CategoryController::class, 'trendingCategories']);
     Route::get('category-grps', [CategoryController::class, 'categoryGroup']);
     Route::get('category-subgrps/{group?}', [CategoryController::class, 'categorySubGroup']);
@@ -66,7 +65,6 @@ Route::middleware('customerApp')->group(function () {
 
     // Brands
     Route::get('brands', [HomeController::class, 'allBrands']);
-    Route::get('brands/featured', [HomeController::class, 'featuredBrands']);
     Route::get('brand/{slug}', [HomeController::class, 'brand']);
     Route::get('brand/{slug}/listings', [ListingController::class, 'brand']);
 
@@ -90,10 +88,7 @@ Route::middleware('customerApp')->group(function () {
 
     // Deals
     Route::prefix('deals')->group(function () {
-        Route::get('flash-deals', [DealController::class, 'flashDeals']);
-        Route::get('under-the-price', [DealController::class, 'underPrice']);
         Route::get('deal-of-the-day', [DealController::class, 'dealOfTheDay']);
-        Route::get('tagline', [DealController::class, 'tagline']);
     });
 
     // CART

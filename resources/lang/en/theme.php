@@ -889,6 +889,7 @@ return [
     'show_product_page' => 'Visit the product page.',
     'slider_image' => 'Slider Image',
     'featured_items' => 'Featured Items',
+    'featured_items_subtitle' => 'Handpicked products, just for you',
     'qtt_sold_of' => ':sold of :qtt sold',
     'system_picked_item' => 'Specially Picked For You',
     'listed_at' => 'Listed at',

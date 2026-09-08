@@ -232,39 +232,6 @@ class SeedFromSQLDump extends Command
             $order->created_at = Carbon::now()->subDays(rand(2, 60))->format('Y-m-d h:i a');
             $order->save();
         }
-
-        // Update flash deals
-        if ($option = DB::table(get_option_table_name())->where('option_name', 'flashdeal_items')->first()) {
-            $deal_end_time = Carbon::now()->addDays(rand(2, 7));
-
-            // Unserialize the data
-            $data = unserialize($option->option_value);
-
-            // Update the desired field
-            $data['end_time'] = $deal_end_time;
-
-            // Update the record in the database
-            DB::table(get_option_table_name())
-                ->where('option_name', 'flashdeal_items')
-                ->update([
-                    'option_value' => serialize($data), // Serialize the data again
-                    'updated_at' => now(),
-                ]);
-
-            // Update the flash items offer price and offer ends date
-            $items = array_merge($data['listings'], $data['featured']);
-
-            DB::table('inventories')->whereIn('id', $items)->lazyById()
-                ->each(function ($temp) use ($deal_end_time) {
-                    DB::table('inventories')
-                        ->where('id', $temp->id)
-                        ->update([
-                            'offer_price' => $temp->sale_price - rand(($temp->sale_price / 4), ($temp->sale_price / 2)),
-                            'offer_start' => Carbon::now()->format('Y-m-d h:i:a'),
-                            'offer_end' => $deal_end_time->format('Y-m-d h:i:a'),
-                        ]);
-                });
-        }
     }
 
     private function updateOtherData()

@@ -10,10 +10,15 @@ include 'admin/Auth.php';
 Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('admin')->group(function () {
     // Addon package manager removed — custom features are built in-house.
     // include 'admin/Package.php';
-    include 'admin/Promos.php';
 
-    // flash deals
-    include 'admin/FlashDeal.php';
+    // Deal of the Day calendar
+    include 'admin/DealOfTheDay.php';
+
+    // Featured Products (homepage curated)
+    include 'admin/FeaturedProducts.php';
+
+    // Store → product picker AJAX
+    include 'admin/ProductPicker.php';
 
     // Markerplace Admin only routes
     Route::middleware(['userType:admin'])->group(function () {

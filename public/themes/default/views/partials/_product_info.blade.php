@@ -1,17 +1,5 @@
 <div class="product-info">
-  @if ($item->isInDeals())
-    <div class="flash-sell-timer product-deal-header ml-0 mb-2">
-      <div class="flash-sell-timer-time bg-transparent w-100">
-        <span class="ends_in_text">
-          <span class="flashSellBg">
-            {{ trans('theme.flash_sale') }}
-          </span>
-          {{ trans('theme.ends_in') }} :
-        </span>
-        <span class="deal-counter-days">0</span> {{ trans('theme.flash_deal_days') }} : <span class="deal-counter-hours">00</span> {{ trans('theme.hrs') }} : <span class="deal-counter-minutes">00</span> {{ trans('theme.mins') }} : <span class="deal-counter-seconds">00</span> {{ trans('theme.sec') }}
-      </div>
-    </div>
-  @elseif($item->auctionable && $item->auction_end->isFuture())
+  @if ($item->auctionable && $item->auction_end->isFuture())
     @include('auction::frontend.timer')
   @endif
 

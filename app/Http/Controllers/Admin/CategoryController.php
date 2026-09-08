@@ -266,13 +266,5 @@ class CategoryController extends Controller
         $ids = is_array($id) ? $id : [$id];
 
         Cache::forget('all_categories');
-
-        if (
-            Cache::has('featured_categories') &&
-            ! empty(array_intersect(Cache::get('featured_categories')->pluck('id')->toArray(), $ids))
-        ) {
-            // Clear featured_categories from cache
-            Cache::forget('featured_categories');
-        }
     }
 }

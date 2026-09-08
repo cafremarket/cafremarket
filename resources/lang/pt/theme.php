@@ -808,6 +808,7 @@ return [
     'show_product_page' => 'Visite a página do produto.',
     'slider_image' => 'Imagem do deslizador',
     'featured_items' => 'Itens em destaque',
+    'featured_items_subtitle' => 'Selecionados especialmente para si',
     'qtt_sold_of' => ':sold of :qtt sold',
     'system_picked_item' => 'Especialmente selecionados para si',
     'listed_at' => 'Listados em',

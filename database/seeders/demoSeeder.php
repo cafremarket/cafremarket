@@ -416,30 +416,6 @@ class demoSeeder extends BaseSeeder
                 'autoload' => 1,
                 'created_at' => $this->now,
                 'updated_at' => $this->now,
-            ], [
-                'option_name' => 'promotional_tagline',
-                'option_value' => serialize(['text' => $taglines[array_rand($taglines)], 'action_url' => '/']),
-                'autoload' => 1,
-                'created_at' => $this->now,
-                'updated_at' => $this->now,
-            ], [
-                'option_name' => 'featured_items',
-                'option_value' => serialize($this->get_random_element($inventories_ids, 10)),
-                'autoload' => 1,
-                'created_at' => $this->now,
-                'updated_at' => $this->now,
-            ], [
-                'option_name' => 'featured_brands',
-                'option_value' => serialize($this->get_random_element($manufacturers, 3)),
-                'autoload' => 1,
-                'created_at' => $this->now,
-                'updated_at' => $this->now,
-            ], [
-                'option_name' => 'deal_of_the_day',
-                'option_value' => $max_qtt_item->id,
-                'autoload' => 1,
-                'created_at' => $this->now,
-                'updated_at' => $this->now,
             ],
         ]);
 
@@ -447,8 +423,6 @@ class demoSeeder extends BaseSeeder
         if (count($images_data) > 0) {
             DB::table('images')->insert($images_data);
         }
-
-        $this->call(FlashdealOptionsSeeder::class);
 
         $this->call(PostDemoSeeder::class);
     }

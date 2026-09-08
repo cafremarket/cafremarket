@@ -24,6 +24,10 @@ Route::middleware('ajax')->name('search.')->group(function () {
         SearchController::class, 'findInventoryForSelect',
     ])->name('findInventory');
 
+    Route::get('search/findDealProduct', [
+        SearchController::class, 'findDealProductForSelect',
+    ])->name('findDealProduct');
+
     Route::get('search/findCategory', [
         SearchController::class, 'findCategoryForSelect',
     ])->name('findCategory');

@@ -26,7 +26,10 @@
     @include('theme::sections.banners', ['banners' => $banners['group_3']])
   @endif
 
-  {{-- 4. Nearby stores based on delivery address --}}
+  @include('theme::sections.deal_of_the_day')
+  @include('theme::sections.featured_products')
+
+  {{-- Nearby stores based on delivery address --}}
   @include('theme::sections.nearby_stores')
 @endsection
 

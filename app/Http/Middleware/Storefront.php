@@ -58,11 +58,6 @@ class Storefront
 
         // View::share('active_announcement', ListHelper::activeAnnouncement());
 
-        if (active_theme() == 'legacy') {
-            View::share('featured_categories', get_featured_category());
-        }
-
-        View::share('promotional_tagline', get_promotional_tagline());
         View::share('pages', ListHelper::pages(\App\Models\Page::VISIBILITY_PUBLIC));
         View::share('all_categories', ListHelper::categoriesForTheme(true));
         View::share('search_category_list', ListHelper::search_categories());
@@ -81,8 +76,6 @@ class Storefront
 
         View::share('recently_viewed_items', ListHelper::recentlyViewedItems());
         View::share('cart_item_count', cart_item_count());
-        View::share('hidden_menu_items', hidden_menu_items());
-        View::share('top_bar_banner', get_top_bar_banner_data());
 
         // View::share('top_vendors', ListHelper::top_vendors(5));
 

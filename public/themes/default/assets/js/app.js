@@ -4438,8 +4438,10 @@ var SimpleBar = function () { "use strict"; var e = function (t, i) { return e =
 // STICKY HEADER
 $(window).on('load', function () {
 	var header = document.getElementById("header-main");
-	var promo = document.getElementById('top-promo-banner');
-	var offset = header.offsetTop + promo.offsetHeight;
+	if (!header) {
+		return;
+	}
+	var offset = header.offsetTop;
 
 	window.addEventListener('scroll', function () {
 		if (window.pageYOffset > offset) {
@@ -4689,37 +4691,6 @@ if (sectionTitle) {
 
 	});
 
-	//promo banner hide
-	// Define the expiration time for the cookie (e.g., 24 hours)
-	const expire_at = new Date(Date.now() + (24 * 60 * 60 * 1000));
-
-	// Function to get a specific cookie by name
-	function getCookie(cookieName) {
-		let cookie = {};
-		document.cookie.split(';').forEach(function (el) {
-			let [key, value] = el.split('=');
-			cookie[key.trim()] = value;
-		});
-		return cookie[cookieName];
-	}
-
-	// Check the cookie value
-	const cookieValue = getCookie('promo_banner_hidden');
-
-	// Check if the cookie is not set or is not equal to "true"
-	if (cookieValue !== "true") {
-		// Show the promo content by removing the "hidden" class
-		$("#promo-content-container").removeClass('hidden');
-	}
-
-	// Handle the action when the user interacts with the promo banner
-	$('#top-promo-banner .close-button').click(function () {
-		// Hide the promo content and set a cookie to remember that the user has closed the banner
-		$("#promo-content-container").addClass('hidden');
-
-		document.cookie = `promo_banner_hidden=true; expires=${expire_at.toUTCString()}`;
-	});
-
 	// Slick sliders
 	function initSlickSliders(rtl = false) {
 		// Main slider
@@ -4844,17 +4815,36 @@ if (sectionTitle) {
 			prevArrow: '.auction-right',
 		}));
 
-		// Flash Deal items slider
-		$('.flashdeal-items-inner').css('display', 'block').slick($.extend({}, slickOptions, {
-			nextArrow: '.flashdeal-right',
-			prevArrow: '.flashdeal-left',
-		}));
-
 		// Recent items slider
 		$('.recent-items-inner').css('display', 'block').slick($.extend({}, slickOptions, {
 			nextArrow: '.recent-right',
 			prevArrow: '.recent-left',
 		}));
+
+		// Featured + Deal of the Day: CSS flex rows (no Slick — avoids .slick-slider { visibility:hidden })
+		(function initHorizontalProductScroll() {
+			var step = 240;
+			function scrollRow($row, delta) {
+				if (!$row.length) return;
+				$row.stop().animate({ scrollLeft: $row.scrollLeft() + delta }, 250);
+			}
+			$('.featured-items-left').off('click.featuredScroll').on('click.featuredScroll', function (e) {
+				e.preventDefault();
+				scrollRow($('.featured-items-inner').not('.deal-of-the-day-items').first(), -step);
+			});
+			$('.featured-items-right').off('click.featuredScroll').on('click.featuredScroll', function (e) {
+				e.preventDefault();
+				scrollRow($('.featured-items-inner').not('.deal-of-the-day-items').first(), step);
+			});
+			$('.deal-day-left').off('click.dealScroll').on('click.dealScroll', function (e) {
+				e.preventDefault();
+				scrollRow($('.deal-of-the-day-items').first(), -step);
+			});
+			$('.deal-day-right').off('click.dealScroll').on('click.dealScroll', function (e) {
+				e.preventDefault();
+				scrollRow($('.deal-of-the-day-items').first(), step);
+			});
+		})();
 
 		// Shop profile page slider
 		$('#shop-page-slider').slick({
