@@ -14,6 +14,7 @@
   // Location-based shipping (free / fixed / km) using selected delivery address
   $buyerLocation = app(\App\Services\Hyperlocal\BuyerLocationService::class);
   $buyerLocation->ensureDeliveryLocation();
+  $sf_pdp_shop_distance = app(\App\Services\Hyperlocal\HyperlocalCatalogService::class)->shopDistance($item->shop_id);
   $delivery_label = buyer_delivery_address_label()
       ?: (trans('theme.select_delivery_location') !== 'theme.select_delivery_location'
           ? trans('theme.select_delivery_location')
@@ -45,7 +46,7 @@
 
         <div class="col-xl-4 col-md-6">
           <div class="sf-pdp__buy product-single">
-            @include('theme::partials._product_info', ['item' => $item])
+            @include('theme::partials._product_info', ['item' => $item, 'distance' => $sf_pdp_shop_distance])
 
             <div class="product-info-options sf-pdp__options">
               <div class="select-box-wrapper">
@@ -178,6 +179,12 @@
               <a href="{{ route('show.store', $item->shop->slug) }}" class="seller-info-name">
                 {!! $item->shop->getQualifiedName() !!}
               </a>
+
+              @if (! empty($sf_pdp_shop_distance))
+                <p class="sf-pdp__seller-distance">
+                  <i class="fal fa-map-marker-alt"></i> {{ format_distance_km($sf_pdp_shop_distance) }}
+                </p>
+              @endif
 
               <div class="mt-2">
                 @include('theme::layouts.ratings', ['ratings' => $item->shop->ratings, 'count' => $item->shop->ratings_count, 'shop' => $item->shop])

@@ -27,12 +27,6 @@
             @endif
             <div class="accent-line"></div>
           </div>
-
-          @if ($isNearby ?? false)
-            <a href="{{ route('shops', ['scope' => 'all']) }}" class="btn btn-outline-primary btn-round btn-sm mt-2 sf-stores-view-all">
-              {{ trans('theme.view_all_stores') }}
-            </a>
-          @endif
         </div>
 
         @if ($shops->isEmpty())

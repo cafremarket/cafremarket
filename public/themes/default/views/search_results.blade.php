@@ -1,129 +1,156 @@
 @extends('theme::layouts.main')
 
 @section('content')
-  <!-- HEADER SECTION -->
-  <div class="container">
-    <header class="page-header">
-      <div class="row">
-        <div class="col-md-12">
-          <ol class="breadcrumb nav-breadcrumb">
-            @include('theme::headers.lists.home')
+  <div class="sf-search-page">
+    <section class="sf-search-hero">
+      <div class="container">
+        <ol class="breadcrumb nav-breadcrumb sf-search-breadcrumb">
+          @include('theme::headers.lists.home')
 
-            @if (Request::has('ingrp'))
-              <li class="active">{{ $category->name }}</li>
-            @elseif(Request::has('insubgrp') && Request::get('insubgrp') != 'all')
-              <li>
-                <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->group->slug }}">
-                  {{ $category->group->name }}
-                </a>
-              </li>
-
-              <li class="active">{{ $category->name }}</li>
-            @elseif(Request::has('in'))
-              <li>
-                <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->subGroup->group->slug }}">
-                  {{ $category->subGroup->group->name }}
-                </a>
-              </li>
-
-              <li>
-                <a class="link-filter-opt" data-name="insubgrp" data-value="{{ $category->subGroup->slug }}">
-                  {{ $category->subGroup->name }}
-                </a>
-              </li>
-              <li class="active">{{ $category->name }}</li>
-            @endif
-
-            <li class="active">
-              "<strong class="text-primary">{{ Request::get('q') }}</strong>"
-              <span class="ml-1">({{ trans('app.search_result_found', ['count' => $products->total()]) }})</span>
+          @if ($category && Request::has('ingrp'))
+            <li class="active">{{ $category->name }}</li>
+          @elseif($category && Request::has('insubgrp') && Request::get('insubgrp') != 'all')
+            <li>
+              <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->group->slug }}">
+                {{ $category->group->name }}
+              </a>
             </li>
-          </ol>
-        </div> <!-- /.col -->
-      </div> <!-- /.row -->
-    </header>
-  </div> <!-- /.container -->
+            <li class="active">{{ $category->name }}</li>
+          @elseif($category && Request::has('in'))
+            <li>
+              <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->subGroup->group->slug }}">
+                {{ $category->subGroup->group->name }}
+              </a>
+            </li>
+            <li>
+              <a class="link-filter-opt" data-name="insubgrp" data-value="{{ $category->subGroup->slug }}">
+                {{ $category->subGroup->name }}
+              </a>
+            </li>
+            <li class="active">{{ $category->name }}</li>
+          @endif
+        </ol>
 
-  <!-- CONTENT SECTION -->
-  <section>
-    <div class="container category-single-page">
-      @if (! empty($require_location))
-        <div class="hyperlocal-location-gate mb-4">
-          <i class="fal fa-map-marker-alt fa-3x text-primary mb-3"></i>
-          <h3>{{ trans('theme.set_delivery_location') }}</h3>
-          <p class="text-muted">{{ trans('theme.set_location_to_shop') }}</p>
-          <button type="button" class="btn btn-primary js-open-address-setup">
-            {{ trans('theme.confirm_location') }}
-          </button>
-        </div>
-      @else
-      <div class="row mb-3">
-        <div class="col-md-12">
-          <form action="{{ route('inCategoriesSearch') }}" method="GET" class="form-inline flex-wrap align-items-end">
+        <div class="sf-search-hero__inner">
+          <div class="sf-search-hero__text">
+            <h1>
+              @if (Request::filled('q'))
+                &ldquo;{{ Request::get('q') }}&rdquo;
+              @else
+                {{ trans('theme.all_categories') ?? 'All products' }}
+              @endif
+            </h1>
+            @if (empty($require_location))
+              <p>{{ trans('app.search_result_found', ['count' => $products->total()]) }}</p>
+            @endif
+          </div>
+
+          <form action="{{ route('inCategoriesSearch') }}" method="GET" class="sf-search-hero__form">
             @foreach (['in', 'insubgrp', 'ingrp'] as $catParam)
               @if (Request::filled($catParam))
                 <input type="hidden" name="{{ $catParam }}" value="{{ Request::get($catParam) }}">
               @endif
             @endforeach
-            <div class="form-group mr-2 mb-2">
+
+            <label class="sf-search-hero__field">
+              <i class="fal fa-search"></i>
               <input
                 type="text"
                 name="q"
-                class="form-control"
-                placeholder="{{ trans('theme.search_keyword') ?? 'Search keyword' }}"
                 value="{{ Request::get('q') }}"
+                placeholder="{{ trans('theme.search_keyword') ?? 'Search keyword' }}"
                 required
               >
-            </div>
-            <div class="form-group mr-2 mb-2">
-              <input
-                type="text"
-                name="location"
-                class="form-control"
-                placeholder="{{ trans('theme.location') ?? 'Location' }}"
-                value="{{ Request::get('location') }}"
-              >
-            </div>
-            <div class="form-group mr-2 mb-2">
-              <input
-                type="text"
-                name="province"
-                class="form-control"
-                placeholder="{{ trans('theme.province') ?? 'Province' }}"
-                value="{{ Request::get('province') }}"
-              >
-            </div>
-            <div class="form-group mr-2 mb-2">
-              <label class="d-block small text-muted mb-0">{{ trans('theme.country') ?? 'Country' }}</label>
-              <select name="country_id" class="form-control" style="min-width: 160px;" onchange="this.form.submit()">
-                <option value="" @selected(! request()->filled('country_id'))>{{ trans('theme.all_countries') ?? 'All countries' }}</option>
-                @foreach ($searchCountries ?? [] as $cid => $cname)
-                  <option value="{{ $cid }}" @selected((string) Request::get('country_id') === (string) $cid)>{{ $cname }}</option>
-                @endforeach
-              </select>
-            </div>
-            <div class="form-group mr-2 mb-2">
-              <label class="d-block small text-muted mb-0" title="{{ trans('theme.search_by_shipping_zone_help') ?? 'Only show items from shops that ship to this state/region' }}">
-                {{ trans('theme.ships_to_zone') ?? 'Ships to (zone)' }}
-              </label>
-              <select name="state_id" class="form-control" style="min-width: 180px;">
-                <option value="" @selected(! request()->filled('state_id'))>{{ trans('theme.any_state') ?? 'Any state / region' }}</option>
-                @foreach ($searchStates ?? [] as $sid => $sname)
-                  <option value="{{ $sid }}" @selected((string) Request::get('state_id') === (string) $sid)>{{ $sname }}</option>
-                @endforeach
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary mb-2">{{ trans('theme.button.search') ?? 'Search' }}</button>
+            </label>
+
+            <button type="submit" class="sf-btn-primary sf-search-hero__submit">
+              {{ trans('theme.button.search') ?? 'Search' }}
+            </button>
           </form>
         </div>
+
+        @if (empty($require_location))
+          <button type="button" class="home-location-picker sf-search-hero__location js-open-address-setup" aria-label="{{ trans('theme.set_delivery_location') }}">
+            <span class="home-location-picker__icon"><i class="fal fa-map-marker-alt"></i></span>
+            <span class="home-location-picker__body">
+              <span class="home-location-picker__label">{{ trans('theme.deliver_to') }}</span>
+              @if (buyer_delivery_address_label())
+                <span class="home-location-picker__value">{{ Str::limit(buyer_delivery_address_label(), 42) }}</span>
+              @else
+                <span class="home-location-picker__value is-empty">{{ trans('theme.set_delivery_location') }}</span>
+              @endif
+            </span>
+            <span class="home-location-picker__action">{{ trans('theme.change') }}</span>
+          </button>
+        @endif
       </div>
+    </section>
 
-      @include('theme::contents.product_list', ['colum' => 3])
+    <div class="container">
+      @if (! empty($require_location))
+        <div class="sf-empty-stores text-center py-5">
+          <div class="sf-empty-stores__icon">
+            <i class="fal fa-map-marker-alt"></i>
+          </div>
+          <h3 class="sf-empty-stores__title">{{ trans('theme.set_delivery_location') }}</h3>
+          <p class="sf-empty-stores__text">{{ trans('theme.set_location_to_shop') }}</p>
+          <button type="button" class="btn sf-btn-primary btn-round mt-2 js-open-address-setup">
+            {{ trans('theme.confirm_location') }}
+          </button>
+        </div>
+      @else
+        <div class="sf-search-layout">
+          <div class="sf-search-sidebar-col">
+            @include('theme::partials._search_filters')
+          </div>
+
+          <div class="sf-search-content-col">
+            <div class="sf-search-topbar">
+              <div class="sf-search-topbar__toggles">
+                <label class="sf-search-toggle">
+                  <input name="free_shipping" class="i-check filter_opt_checkbox" type="checkbox" {{ Request::has('free_shipping') ? 'checked' : '' }}>
+                  <span>{{ trans('theme.free_shipping') }}</span>
+                </label>
+
+                <label class="sf-search-toggle">
+                  <input name="has_offers" class="i-check filter_opt_checkbox" type="checkbox" {{ Request::has('has_offers') ? 'checked' : '' }}>
+                  <span>{{ trans('theme.has_offers') }}</span>
+                </label>
+
+                <label class="sf-search-toggle">
+                  <input name="new_arrivals" class="i-check filter_opt_checkbox" type="checkbox" {{ Request::has('new_arrivals') ? 'checked' : '' }}>
+                  <span>{{ trans('theme.new_arrivals') }}</span>
+                </label>
+
+                @if (is_incevio_package_loaded('auction'))
+                  <label class="sf-search-toggle">
+                    <input name="auction" class="i-check filter_opt_checkbox" type="checkbox" {{ Request::has('auction') ? 'checked' : '' }}>
+                    <span>{{ trans('packages.auction.auction') }}</span>
+                  </label>
+                @endif
+              </div>
+
+              <div class="sf-search-sort">
+                <label for="filter_opt_sort">{{ trans('theme.sort_by') }}</label>
+                <select name="sort_by" class="sf-search-sort__select" id="filter_opt_sort">
+                  <option value="best_match">{{ trans('theme.best_match') }}</option>
+                  <option value="nearest" {{ Request::get('sort_by') == 'nearest' ? 'selected' : '' }}>{{ trans('theme.nearest') }}</option>
+                  <option value="farthest" {{ Request::get('sort_by') == 'farthest' ? 'selected' : '' }}>{{ trans('theme.farthest') }}</option>
+                  <option value="newest" {{ Request::get('sort_by') == 'newest' ? 'selected' : '' }}>{{ trans('theme.newest') }}</option>
+                  <option value="oldest" {{ Request::get('sort_by') == 'oldest' ? 'selected' : '' }}>{{ trans('theme.oldest') }}</option>
+                  <option value="price_asc" {{ Request::get('sort_by') == 'price_asc' ? 'selected' : '' }}>{{ trans('theme.price') }}: {{ trans('theme.low_to_high') }}</option>
+                  <option value="price_desc" {{ Request::get('sort_by') == 'price_desc' ? 'selected' : '' }}>{{ trans('theme.price') }}: {{ trans('theme.high_to_low') }}</option>
+                </select>
+              </div>
+            </div>
+
+            @include('theme::partials._search_product_grid')
+          </div>
+        </div>
       @endif
+    </div>
+  </div>
 
-    </div> <!-- /.container -->
-  </section>
-
-  <!-- BROWSING ITEMS -->
+  {{-- BROWSING ITEMS --}}
   @include('theme::sections.recent_views')
 @endsection

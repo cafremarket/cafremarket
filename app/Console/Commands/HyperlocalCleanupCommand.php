@@ -86,7 +86,6 @@ class HyperlocalCleanupCommand extends Command
         }
 
         $defaults = [
-            'default_buyer_search_radius_km' => config('hyperlocal.default_buyer_search_radius_km', 10),
             'max_delivery_assignment_radius_km' => config('hyperlocal.max_delivery_assignment_radius_km', 15),
             'rider_accept_timeout_min' => config('hyperlocal.rider_accept_timeout_min', 5),
         ];

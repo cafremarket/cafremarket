@@ -1,65 +1,65 @@
-<div class="modal-dialog modal-xl" role="document">
-  <div class="modal-content">
-    <a class="close" data-dismiss="modal" aria-hidden="true">&times;</a>
-    <div class="row sc-product-item">
-      <div class="col-md-5 col-sm-6 pl-1 pt-1">
+<div class="modal-dialog modal-xl sf-quickview-dialog" role="document">
+  <div class="modal-content sf-quickview">
+    <button type="button" class="sf-quickview__close" data-dismiss="modal" aria-label="{{ trans('theme.button.close') ?? 'Close' }}">
+      <i class="fal fa-times"></i>
+    </button>
+
+    <div class="row sc-product-item sf-quickview__body">
+      <div class="col-md-5 col-sm-6 sf-quickview__gallery">
         @include('theme::layouts.jqzoom', ['item' => $item])
       </div>
 
-      <div class="col-md-7 col-sm-6">
-        <div class="product-single mb-5">
+      <div class="col-md-7 col-sm-6 sf-quickview__info">
+        <div class="product-single">
           @include('theme::partials._product_info', ['zoomID' => 'quickViewZoom', 'item' => $item])
 
-          <hr class="dotted" />
+          @if ($item->key_features)
+            <div class="sf-quickview__features">
+              <h4>{!! trans('theme.section_headings.key_features') !!}</h4>
+              <ul class="key-feature-list">
+                @foreach (unserialize($item->key_features) as $key_feature)
+                  <li>
+                    <i class="fal fa-check-double"></i>
+                    <span>{{ $key_feature }}</span>
+                  </li>
+                @endforeach
+              </ul>
+            </div>
+          @endif
 
-          <div class="row product-attribute">
-            @if (is_incevio_package_loaded('wholesale') && !$item->wholesale_prices->isEmpty())
-              <div class="col-5 pr-0">
-                @include('wholesale::quickview_price_table')
-              </div>
+          @if (is_incevio_package_loaded('wholesale') && !$item->wholesale_prices->isEmpty())
+            <div class="sf-quickview__wholesale">
+              @include('wholesale::quickview_price_table')
+            </div>
+          @endif
+
+          <div class="sf-quickview__actions">
+            @if ($item->auctionable)
+              <a href="{{ storefront_product_url($item) }}" class="btn sf-btn-primary btn-lg">
+                <i class="fal fa-gavel"></i> {{ trans('packages.auction.place_bid') }}
+              </a>
+            @else
+              <a href="{{ route('direct.checkout', $item->slug) }}" class="btn sf-btn-primary btn-lg" id="buy-now-btn">
+                <i class="fas fa-rocket"></i> @lang('theme.button.buy_now')
+              </a>
+
+              <a href="javascript:void(0);" data-link="{{ route('cart.addItem', $item->slug) }}" class="btn btn-default btn-lg sc-add-to-cart" data-dismiss="modal">
+                <i class="fas fa-shopping-bag"></i> @lang('theme.button.add_to_cart')
+              </a>
             @endif
 
-            <div class="{{ is_incevio_package_loaded('wholesale') && !$item->wholesale_prices->isEmpty() ? 'col-7' : 'col-12' }} pr-0">
-              @if ($item->key_features)
-                <div class="section-title">
-                  <h4 class="px-0">{!! trans('theme.section_headings.key_features') !!}</h4>
-                </div>
-
-                <ul class="key-feature-list">
-                  @foreach (unserialize($item->key_features) as $key_feature)
-                    <li>
-                      <i class="fal fa-check-double"></i>
-                      <span>{{ $key_feature }}</span>
-                    </li>
-                  @endforeach
-                </ul>
-              @endif
-
-              <a href="{{ storefront_product_url($item) }}" class="btn btn-default rounded mt-3 ml-3">
-                @lang('theme.button.view_product_details')
-              </a>
-            </div><!-- /.col-sm-9 .col-6 -->
-          </div><!-- /.row -->
-
-          <hr class="dotted my-4" />
-
-          <a href="javascript:void(0);" data-link="{{ route('cart.addItem', $item->slug) }}" class="btn btn-primary rounded px-4 py-2 sc-add-to-cart" data-dismiss="modal">
-            <i class="fas fa-shopping-bag mr-2"></i>
-            @lang('theme.button.add_to_cart')
-          </a>
-
-          <a href="{{ route('direct.checkout', $item->slug) }}" class="btn btn-primary rounded px-5 py-2" id="buy-now-btn">
-            <i class="fas fa-rocket mr-2"></i>
-            @lang('theme.button.buy_now')
-          </a>
+            <a href="{{ storefront_product_url($item) }}" class="btn btn-link sf-quickview__view-details">
+              @lang('theme.button.view_product_details') <i class="fal fa-arrow-right"></i>
+            </a>
+          </div>
 
           @if ($item->product->inventories_count > 1)
-            <a href="{{ storefront_product_offers_url($item) }}" class="btn btn-sm btn-link">
+            <a href="{{ storefront_product_offers_url($item) }}" class="sf-quickview__offers-link">
               @lang('theme.view_more_offers', ['count' => $item->product->inventories_count])
             </a>
           @endif
-        </div><!-- /.product-single -->
+        </div>
       </div>
     </div>
-  </div><!-- /.modal-content -->
-</div><!-- /.modal-dialog -->
+  </div>
+</div>

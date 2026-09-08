@@ -101,6 +101,11 @@ class ListingController extends Controller
 
         if ($catalog->isEnabled() && ! $shop_id) {
             $listings = $catalog->filterInventories(collect($listings))->values();
+
+            // Featured products: nearest store's products first, farthest store's products last.
+            if ($list === 'featured') {
+                $listings = $catalog->sortByShopDistance($listings);
+            }
         }
 
         return ListingResource::collection($listings);

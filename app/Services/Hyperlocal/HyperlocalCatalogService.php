@@ -114,7 +114,83 @@ class HyperlocalCatalogService
             return collect();
         }
 
-        return get_nearby_featured_items($shopIds, $limit);
+        return $this->sortByShopDistance(get_nearby_featured_items($shopIds))
+            ->take($limit)
+            ->values();
+    }
+
+    /**
+     * Distance (km) of each shop from the buyer, keyed by shop id.
+     */
+    public function shopDistances(): Collection
+    {
+        return $this->nearbyShopsWithDistance()->pluck('distance_km', 'shop.id');
+    }
+
+    /**
+     * Distance (km) from the buyer to a single shop. Cheaper than shopDistances()
+     * for single-item pages (product page, quick view) that only need one shop —
+     * it does not fetch/sort every nearby shop.
+     */
+    public function shopDistance(int $shopId): ?float
+    {
+        $lat = $this->buyerLocation->latitude();
+        $lng = $this->buyerLocation->longitude();
+
+        if (! $lat || ! $lng) {
+            return null;
+        }
+
+        $shop = Shop::find($shopId);
+
+        if (! $shop) {
+            return null;
+        }
+
+        $address = $shop->storeAddress();
+
+        if (! $address || ! $address->latitude || ! $address->longitude) {
+            return null;
+        }
+
+        return app(\App\Services\Geo\DistanceService::class)->distanceKm(
+            $lat,
+            $lng,
+            (float) $address->latitude,
+            (float) $address->longitude
+        );
+    }
+
+    /**
+     * Order a collection of inventories by their shop's distance from the buyer:
+     * nearest store's products first, farthest store's products last (or the
+     * reverse, with $descending). Items whose shop has no known distance are
+     * always pushed to the end, in their original order.
+     */
+    public function sortByShopDistance(Collection $items, bool $descending = false): Collection
+    {
+        $distances = $this->shopDistances();
+
+        if ($distances->isEmpty()) {
+            return $items->values();
+        }
+
+        // Stable sort (PHP 8+ sort functions are stable) keeps items with an
+        // unknown distance — or equal distances — in their original relative order.
+        // Unknown-distance items sort last regardless of direction, by ranking
+        // them past every real distance on both ends of the sortBy comparator.
+        return $items
+            ->values()
+            ->sortBy(function ($item) use ($distances, $descending) {
+                $distance = $distances->get($item->shop_id);
+
+                if ($distance === null) {
+                    return PHP_FLOAT_MAX;
+                }
+
+                return $descending ? -$distance : $distance;
+            })
+            ->values();
     }
 
     public function nearbyShopsWithDistance(): Collection

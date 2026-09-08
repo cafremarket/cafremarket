@@ -14,13 +14,11 @@ class NearbyShopController extends Controller
         $request->validate([
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between:-180,180',
-            'radius_km' => 'nullable|numeric|min:1|max:100',
         ]);
 
         $results = $nearbyShopService->find(
             (float) $request->lat,
-            (float) $request->lng,
-            $request->filled('radius_km') ? (float) $request->radius_km : null
+            (float) $request->lng
         );
 
         return response()->json([
@@ -37,9 +35,6 @@ class NearbyShopController extends Controller
                     ]
                 );
             })->values(),
-            'radius_km' => $request->filled('radius_km')
-                ? (float) $request->radius_km
-                : $nearbyShopService->defaultSearchRadius(),
         ]);
     }
 

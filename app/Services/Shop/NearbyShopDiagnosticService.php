@@ -13,14 +13,12 @@ class NearbyShopDiagnosticService
     ) {
     }
 
-    public function analyze(?float $latitude, ?float $longitude, ?float $radiusKm = null): array
+    public function analyze(?float $latitude, ?float $longitude): array
     {
-        $radiusKm = $radiusKm ?? $this->nearbyShops->defaultSearchRadius();
-
         $nearbyIds = collect();
         if ($latitude !== null && $longitude !== null) {
             $nearbyIds = $this->nearbyShops
-                ->find($latitude, $longitude, $radiusKm)
+                ->find($latitude, $longitude)
                 ->pluck('shop.id')
                 ->map(fn ($id) => (int) $id);
         }
@@ -35,12 +33,11 @@ class NearbyShopDiagnosticService
             ->orderBy('name')
             ->get();
 
-        $rows = $shops->map(function (Shop $shop) use ($latitude, $longitude, $radiusKm, $nearbyIds) {
+        $rows = $shops->map(function (Shop $shop) use ($latitude, $longitude, $nearbyIds) {
             return $this->analyzeShop(
                 $shop,
                 $latitude,
                 $longitude,
-                $radiusKm,
                 $nearbyIds->contains((int) $shop->id)
             );
         });
@@ -50,7 +47,6 @@ class NearbyShopDiagnosticService
         }
 
         return [
-            'radius_km' => $radiusKm,
             'default_shop_radius_km' => (float) config('hyperlocal.default_shop_service_radius_km', 5),
             'shops' => $rows,
             'summary' => [
@@ -67,14 +63,12 @@ class NearbyShopDiagnosticService
         Shop $shop,
         ?float $latitude,
         ?float $longitude,
-        float $radiusKm,
         bool $showsInNearby
     ): array {
         $address = $shop->storeAddress();
         $hasLocation = $address && $address->latitude && $address->longitude;
         $shopRadius = (float) ($shop->service_radius_km ?: config('hyperlocal.default_shop_service_radius_km', 5));
         $distanceKm = null;
-        $withinBuyerRadius = null;
         $withinShopRadius = null;
 
         if ($hasLocation && $latitude !== null && $longitude !== null) {
@@ -84,11 +78,10 @@ class NearbyShopDiagnosticService
                 (float) $address->latitude,
                 (float) $address->longitude
             );
-            $withinBuyerRadius = $distanceKm <= $radiusKm;
-            $withinShopRadius = $distanceKm <= min($shopRadius, $radiusKm);
+            $withinShopRadius = $distanceKm <= $shopRadius;
         }
 
-        $issues = $this->collectIssues($shop, $hasLocation, $distanceKm, $radiusKm, $shopRadius);
+        [$issues, $warnings] = $this->collectIssues($shop, $hasLocation, $distanceKm, $shopRadius);
 
         return [
             'id' => $shop->id,
@@ -108,7 +101,6 @@ class NearbyShopDiagnosticService
             'config_ecommerce' => $shop->config && (bool) $shop->config->active_ecommerce,
             'passes_active_scope' => Shop::query()->active()->where('shops.id', $shop->id)->exists(),
             'distance_km' => $distanceKm,
-            'within_buyer_radius' => $withinBuyerRadius,
             'within_shop_radius' => $withinShopRadius,
             'shows_in_nearby' => $showsInNearby,
             'issues' => $issues,
@@ -116,11 +108,13 @@ class NearbyShopDiagnosticService
         ];
     }
 
+    /**
+     * @return array{0: array<int, string>, 1: array<int, string>} [issues, warnings]
+     */
     protected function collectIssues(
         Shop $shop,
         bool $hasLocation,
         ?float $distanceKm,
-        float $radiusKm,
         float $shopRadius
     ): array {
         $issues = [];
@@ -160,18 +154,19 @@ class NearbyShopDiagnosticService
             }
         }
 
-        if ($distanceKm !== null) {
-            if ($distanceKm > $radiusKm) {
-                $issues[] = sprintf('Outside buyer search radius (%.1f km > %.1f km)', $distanceKm, $radiusKm);
-            } elseif ($distanceKm > $shopRadius) {
-                $issues[] = sprintf('Outside shop service radius (%.1f km > %.1f km)', $distanceKm, $shopRadius);
-            }
+        if ($distanceKm !== null && $distanceKm > $shopRadius) {
+            // Browsing/listing has no radius cutoff anymore — this only affects checkout.
+            $warnings[] = sprintf(
+                'Outside shop service radius (%.1f km > %.1f km) — checkout will be blocked for this store',
+                $distanceKm,
+                $shopRadius
+            );
         }
 
         if (empty($issues) && ! Shop::query()->active()->where('shops.id', $shop->id)->exists()) {
             $issues[] = 'Does not pass active shop scope (check config, address, payment, or subscription)';
         }
 
-        return $issues;
+        return [$issues, $warnings];
     }
 }

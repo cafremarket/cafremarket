@@ -37,7 +37,7 @@ class ProductSearchRequest extends Request
             'new_arrivals' => 'sometimes|accepted',
             'free_shipping' => 'sometimes|accepted',
             'item_condition' => Rule::in(Inventory::CONDITIONS),
-            'sort_by' => Rule::in(['price_asc', 'price_desc', 'newest', 'oldest']),
+            'sort_by' => Rule::in(['price_asc', 'price_desc', 'newest', 'oldest', 'nearest', 'farthest']),
         ];
     }
 

@@ -3717,12 +3717,13 @@ if (! function_exists('get_nearby_featured_items')) {
     /**
      * Get up to N popular products from nearby shop IDs.
      */
-    function get_nearby_featured_items(array $shopIds, int $limit = 5)
+    function get_nearby_featured_items(array $shopIds)
     {
         if (empty($shopIds)) {
             return collect();
         }
 
+        // Unordered/unlimited here — caller sorts by shop distance (near first, far last) and takes the limit.
         return Inventory::query()
             ->whereIn('shop_id', $shopIds)
             ->where('active', 1)
@@ -3731,8 +3732,6 @@ if (! function_exists('get_nearby_featured_items')) {
                 'image:path,imageable_id,imageable_type',
                 'shop:id,name,slug',
             ])
-            ->orderByDesc('sold_quantity')
-            ->limit($limit)
             ->get()
             ->unique('id')
             ->values();

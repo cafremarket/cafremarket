@@ -27,19 +27,13 @@ class ShopController extends Controller
     {
         $buyerLocation->ensureDeliveryLocation();
 
-        $scope = $request->get('scope', 'nearby');
         $customer = auth('customer')->user();
 
         if ($customer?->preferred_address_id && $request->hasAny(['lat', 'lng', 'address_text'])) {
             return redirect()->route('shops', $request->except(['lat', 'lng', 'address_text']));
         }
 
-        if (
-            ! $customer?->preferred_address_id
-            && $request->filled('lat')
-            && $request->filled('lng')
-            && $scope !== 'all'
-        ) {
+        if (! $customer?->preferred_address_id && $request->filled('lat') && $request->filled('lng')) {
             $buyerLocation->save(
                 (float) $request->get('lat'),
                 (float) $request->get('lng'),
@@ -48,46 +42,15 @@ class ShopController extends Controller
             );
         }
 
-        if ($buyerLocation->hasLocation() && $scope !== 'all') {
-            $nearby = $catalog->nearbyShopsWithDistance();
-            $shops = $nearby->pluck('shop');
-            $distances = $nearby->mapWithKeys(fn ($row) => [$row['shop']->id => $row['distance_km']]);
-
-            return view('theme::stores_list', [
-                'shops' => $shops,
-                'distances' => $distances,
-                'isNearby' => true,
-            ]);
-        }
-
-        $shops = Shop::select('id', 'owner_id', 'slug', 'name', 'id_verified', 'phone_verified', 'address_verified', 'total_item_sold', 'total_sold_amount', 'created_at')
-            ->with([
-                'config',
-                'logoImage',
-                'owner:id,name,nice_name,email',
-                'owner.avatarImage:path,imageable_id,imageable_type',
-                // 'address:id,city,country_id,state_id,addressable_id,addressable_type',
-                // 'address.state:id,name',
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-            ])
-            ->withCount([
-                'inventories' => function ($q) {
-                    $q->where('active', 1)->whereNull('parent_id');
-                },
-            ])
-            // Keep shops page inclusive: show approved sellers even if they
-            // haven't completed all "go live" requirements yet.
-            ->approved()
-            ->whereHas('inventories', function ($q) {
-                $q->where('active', 1)->whereNull('parent_id');
-            })
-            ->paginate(16)
-            ->appends(request()->query());
+        // Every store, sorted nearest-first / farthest-last. No "view all" bypass.
+        $nearby = $catalog->nearbyShopsWithDistance();
+        $shops = $nearby->pluck('shop');
+        $distances = $nearby->mapWithKeys(fn ($row) => [$row['shop']->id => $row['distance_km']]);
 
         return view('theme::stores_list', [
             'shops' => $shops,
-            'distances' => [],
-            'isNearby' => false,
+            'distances' => $distances,
+            'isNearby' => true,
         ]);
     }
 

@@ -13,12 +13,11 @@ class NearbyShopService
     }
 
     /**
-     * Find shops near a buyer location, sorted by distance.
+     * Find shops near a buyer location, sorted by distance (nearest first, farthest last).
+     * No radius cutoff — every shop with a resolvable location is included.
      */
-    public function find(float $latitude, float $longitude, ?float $radiusKm = null): Collection
+    public function find(float $latitude, float $longitude): Collection
     {
-        $radiusKm = $radiusKm ?? $this->defaultSearchRadius();
-
         $shops = Shop::query()
             ->approved()
             ->active()
@@ -43,7 +42,7 @@ class NearbyShopService
             ->get();
 
         return $shops
-            ->map(function ($shop) use ($latitude, $longitude, $radiusKm) {
+            ->map(function ($shop) use ($latitude, $longitude) {
                 $address = $shop->storeAddress();
 
                 if (! $address || ! $address->latitude || ! $address->longitude) {
@@ -56,12 +55,6 @@ class NearbyShopService
                     (float) $address->latitude,
                     (float) $address->longitude
                 );
-
-                $shopRadius = (float) ($shop->service_radius_km ?: config('hyperlocal.default_shop_service_radius_km', 5));
-
-                if ($distanceKm > $radiusKm || $distanceKm > $shopRadius) {
-                    return null;
-                }
 
                 return [
                     'shop' => $shop,
@@ -95,11 +88,5 @@ class NearbyShopService
         $shopRadius = (float) ($shop->service_radius_km ?: config('hyperlocal.default_shop_service_radius_km', 5));
 
         return $distance <= $shopRadius;
-    }
-
-    public function defaultSearchRadius(): float
-    {
-        return (float) (config('system_settings.default_buyer_search_radius_km')
-            ?? config('hyperlocal.default_buyer_search_radius_km', 10));
     }
 }

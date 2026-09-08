@@ -96,8 +96,8 @@
 
     <div class="note">
       Hyperlocal: <strong>{{ $hyperlocalEnabled ? 'Enabled' : 'Disabled' }}</strong>.
-      Buyer search radius: <strong>{{ number_format($radiusKm, 1) }} km</strong>.
-      Default shop service radius: <strong>{{ number_format($report['default_shop_radius_km'], 1) }} km</strong>.
+      Store browsing has no radius cutoff — every store with a location shows, nearest first.
+      Default shop service radius (checkout only): <strong>{{ number_format($report['default_shop_radius_km'], 1) }} km</strong>.
       @if ($latitude && $longitude)
         Your test location: <strong>{{ number_format($latitude, 6) }}, {{ number_format($longitude, 6) }}</strong>
         @if ($addressText) — {{ $addressText }} @endif
@@ -114,10 +114,6 @@
       <div>
         <label for="lng">Longitude</label>
         <input type="text" name="lng" id="lng" value="{{ $longitude }}" placeholder="32.5832">
-      </div>
-      <div>
-        <label for="radius">Search radius (km)</label>
-        <input type="number" step="0.1" min="1" name="radius" id="radius" value="{{ $radiusKm }}">
       </div>
       <div>
         <label for="address_text">Address label (optional)</label>
@@ -181,8 +177,7 @@
               @if ($shop['distance_km'] !== null)
                 <strong>{{ number_format($shop['distance_km'], 2) }} km</strong><br>
                 <span style="color:var(--muted)">
-                  Buyer: {{ $shop['within_buyer_radius'] ? 'Yes' : 'No' }}<br>
-                  Shop: {{ $shop['within_shop_radius'] ? 'Yes' : 'No' }}
+                  Within shop's delivery radius: {{ $shop['within_shop_radius'] ? 'Yes' : 'No' }}
                 </span>
               @else
                 —

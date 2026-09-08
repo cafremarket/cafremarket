@@ -108,8 +108,7 @@ class HomeController extends Controller
         if ($request->filled('lat') && $request->filled('lng')) {
             $results = $nearbyShopService->find(
                 (float) $request->lat,
-                (float) $request->lng,
-                $request->filled('radius_km') ? (float) $request->radius_km : null
+                (float) $request->lng
             );
 
             return response()->json([

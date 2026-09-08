@@ -8,8 +8,14 @@
       <i class="fal fa-crown small"></i> {{ $item->product->manufacturer->name }}
     </span>
   @else
+    @php
+      $sf_pdp_info_distance = $distance ?? app(\App\Services\Hyperlocal\HyperlocalCatalogService::class)->shopDistance($item->shop_id);
+    @endphp
     <a href="{{ route('show.store', $item->shop->slug) }}" class="product-info-seller-name">
       <i class="far fa-store"></i> {!! $item->shop->getQualifiedName() !!}
+      @if (! empty($sf_pdp_info_distance))
+        <span class="product-info-seller-distance">&middot; {{ format_distance_km($sf_pdp_info_distance) }}</span>
+      @endif
     </a>
   @endif
 

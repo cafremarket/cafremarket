@@ -165,10 +165,24 @@ trait InventorySearch
                     $items = $items->sortByDesc('sale_price');
                     break;
 
+                case 'nearest':
+                    $items = $catalog->sortByShopDistance($items);
+                    break;
+
+                case 'farthest':
+                    $items = $catalog->sortByShopDistance($items, descending: true);
+                    break;
+
                 case 'best_match':
                 default:
+                    if ($catalog->isEnabled()) {
+                        // Location-based design: nearest store's products first, farthest last.
+                        $items = $catalog->sortByShopDistance($items);
+                    }
                     break;
             }
+        } elseif ($catalog->isEnabled()) {
+            $items = $catalog->sortByShopDistance($items);
         }
 
         if ($request->has('condition')) {
