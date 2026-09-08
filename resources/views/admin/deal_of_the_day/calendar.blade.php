@@ -48,6 +48,7 @@
                     'id' => (int) $inv->id,
                     'title' => $inv->product->name ?? $inv->title ?? ('#'.$inv->id),
                     'shop' => $inv->shop->name ?? '',
+                    'shop_id' => (int) ($inv->shop_id ?? 0),
                     'sku' => $inv->sku ?? '',
                   ];
                 })->filter()->values()->all();
@@ -223,6 +224,20 @@
     max-width: 100%;
     font-size: 12px;
   }
+  .product-picker-row.is-selected {
+    background: #eef7ff;
+  }
+  .product-picker-row .selected-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: #3c8dbc;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
   .deal-chip-label {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -318,10 +333,12 @@
       }
       var html = '';
       items.forEach(function (item) {
+        var id = String(item.id);
         item.shop = item.shop || shopName;
-        productCache[String(item.id)] = item;
-        html += '<label class="product-picker-row">' +
-          '<input type="checkbox" name="deal-product" value="' + item.id + '">' +
+        productCache[id] = item;
+        var isChosen = !!chosen[id];
+        html += '<label class="product-picker-row' + (isChosen ? ' is-selected' : '') + '">' +
+          '<input type="checkbox" name="deal-product" value="' + item.id + '"' + (isChosen ? ' checked' : '') + '>' +
           '<img src="' + (item.image || '') + '" alt="">' +
           '<div class="meta"><strong></strong><small></small></div>' +
           '<div class="price"></div>' +
@@ -330,15 +347,16 @@
       $list.html(html);
       $list.find('.product-picker-row').each(function (i) {
         var item = items[i];
-        $(this).find('strong').text(item.title || '');
+        var $strong = $(this).find('strong');
+        $strong.text(item.title || '');
+        if (chosen[String(item.id)]) {
+          $strong.append(' <span class="selected-badge">Selected</span>');
+        }
         var metaBits = [];
         if (item.sku) metaBits.push(item.sku);
         if (shopName) metaBits.push(shopName);
         $(this).find('small').text(metaBits.join(' · '));
         $(this).find('.price').text(item.price || '');
-        if (chosen[String(item.id)]) {
-          $(this).find('input').prop('checked', true);
-        }
       });
     }
 
@@ -362,6 +380,7 @@
       $('#deal-modal-date').val(date);
       $('#deal-modal-date-label').text(date);
       chosen = {};
+      var firstShopId = null;
       (existingProducts || []).forEach(function (item) {
         if (!item || !item.id) return;
         var id = String(item.id);
@@ -369,17 +388,33 @@
           id: id,
           title: item.title || '',
           shop: item.shop || '',
+          shop_id: item.shop_id || '',
           sku: item.sku || '',
           price: item.price || ''
         };
+        if (!firstShopId && item.shop_id) {
+          firstShopId = String(item.shop_id);
+        }
       });
       renderSelected();
-      $('#deal-modal-shop').val('');
-      $('#deal-modal-search').prop('disabled', true).val('');
-      $('#deal-modal-list').html('<p class="text-muted" style="padding:12px;">Select a store to load products.</p>');
+      $('#deal-modal-search').val('');
       $('#dealAssignModal').modal('show');
+
+      var afterShops = function () {
+        if (firstShopId) {
+          $('#deal-modal-shop').val(firstShopId);
+          loadProducts();
+        } else {
+          $('#deal-modal-shop').val('');
+          $('#deal-modal-search').prop('disabled', true);
+          $('#deal-modal-list').html('<p class="text-muted" style="padding:12px;">Select a store to load products.</p>');
+        }
+      };
+
       if (!shopsLoaded) {
-        loadShops();
+        loadShops().then(afterShops);
+      } else {
+        afterShops();
       }
     }
 

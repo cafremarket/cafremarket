@@ -105,6 +105,18 @@
     font-weight: normal;
   }
   .product-picker-row:hover { background: #f7f9fc; }
+  .product-picker-row.is-selected { background: #eef7ff; }
+  .product-picker-row .selected-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: #3c8dbc;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
   .product-picker-row img {
     width: 40px;
     height: 40px;
@@ -185,11 +197,16 @@
     }
     var html = '';
     items.forEach(function (item) {
-      var disabled = !!already[String(item.id)];
+      var id = String(item.id);
+      var isAlready = !!already[id];
+      var isDraft = !!draft[id];
+      var checked = isAlready || isDraft;
       var inputType = mode === 'single' ? 'radio' : 'checkbox';
       var name = rootId + '-choice';
-      html += '<label class="product-picker-row' + (disabled ? ' text-muted' : '') + '">' +
-        '<input type="' + inputType + '" name="' + name + '" value="' + item.id + '"' + (disabled ? ' disabled' : '') + '>' +
+      html += '<label class="product-picker-row' + (checked ? ' is-selected' : '') + '">' +
+        '<input type="' + inputType + '" name="' + name + '" value="' + item.id + '"' +
+          (checked ? ' checked' : '') +
+          (isAlready ? ' data-already="1"' : '') + '>' +
         '<img src="' + (item.image || '') + '" alt="">' +
         '<div class="meta"><strong></strong><small></small></div>' +
         '<div class="price"></div>' +
@@ -198,7 +215,12 @@
     $list.html(html);
     $list.find('.product-picker-row').each(function (i) {
       var item = items[i];
-      $(this).find('strong').text(item.title || '');
+      var id = String(item.id);
+      var $strong = $(this).find('strong');
+      $strong.text(item.title || '');
+      if (already[id]) {
+        $strong.append(' <span class="selected-badge">Selected</span>');
+      }
       $(this).find('small').text(item.sku || '');
       $(this).find('.price').text(item.price || '');
       $(this).data('item', item);
@@ -259,6 +281,20 @@
     var $row = $(this).closest('.product-picker-row');
     var item = $row.data('item');
     if (!item) return;
+    var id = String(item.id);
+    var already = selectedIds();
+
+    // Unchecking an already-selected product removes it from the saved chips.
+    if (!this.checked && already[id]) {
+      $selected.find('.product-picker-chip[data-id="' + id + '"]').remove();
+      renderSelectedEmpty();
+      $row.removeClass('is-selected');
+      $row.find('.selected-badge').remove();
+      delete draft[id];
+      updateConfirm();
+      return;
+    }
+
     if (mode === 'single') {
       draft = {};
       if (this.checked) draft[item.id] = item;
@@ -266,6 +302,7 @@
       if (this.checked) draft[item.id] = item;
       else delete draft[item.id];
     }
+    $row.toggleClass('is-selected', this.checked);
     updateConfirm();
   });
 
