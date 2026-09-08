@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PromotionAccessRequest;
 use App\Models\Inventory;
 use App\Models\Shop;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ProductPickerController extends Controller
@@ -33,7 +32,8 @@ class ProductPickerController extends Controller
     }
 
     /**
-     * Active listings for a store (one row per product — prefer main/parent SKU).
+     * Listings for a store — same visibility rules as merchant Active Products
+     * (active flag), without storefront-only filters that hide admin-visible items.
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -47,30 +47,52 @@ class ProductPickerController extends Controller
         $shopId = (int) $request->shop_id;
         $term = trim((string) $request->get('q', ''));
 
+        $shop = Shop::query()->find($shopId);
+
+        // Match merchant stock list: main listings only, active = on.
+        // Do NOT filter by available_from / expiry here — those are storefront
+        // rules and hide products that sellers still see as Active.
         $query = Inventory::query()
-            ->select('inventories.*')
-            ->with(['product:id,name', 'image:path,imageable_id,imageable_type'])
-            ->leftJoin('products', 'products.id', '=', 'inventories.product_id')
-            ->where('inventories.shop_id', $shopId)
-            ->where('inventories.active', 1)
-            ->whereNull('inventories.deleted_at')
-            ->where(function ($q) {
-                $q->whereNull('inventories.available_from')
-                    ->orWhere('inventories.available_from', '<=', Carbon::now());
-            })
-            ->orderByRaw('CASE WHEN inventories.parent_id IS NULL THEN 0 ELSE 1 END')
-            ->orderBy('inventories.title');
+            ->with([
+                'product:id,name',
+                'shop:id,name',
+                'image:path,imageable_id,imageable_type',
+            ])
+            ->where('shop_id', $shopId)
+            ->where('active', Inventory::ACTIVE)
+            ->whereNull('parent_id')
+            ->orderBy('title');
 
         if ($term !== '') {
             $like = '%'.$term.'%';
             $query->where(function ($q) use ($like) {
-                $q->where('inventories.title', 'LIKE', $like)
-                    ->orWhere('inventories.sku', 'LIKE', $like)
-                    ->orWhere('products.name', 'LIKE', $like);
+                $q->where('title', 'LIKE', $like)
+                    ->orWhere('sku', 'LIKE', $like)
+                    ->orWhereHas('product', function ($pq) use ($like) {
+                        $pq->where('name', 'LIKE', $like);
+                    });
             });
         }
 
-        $rows = $query->limit(200)->get();
+        $rows = $query->limit(300)->get();
+
+        // If nothing matched (e.g. only variant rows / edge cases), fall back
+        // to any active inventory for the shop so admin can still pick.
+        if ($rows->isEmpty()) {
+            $fallback = Inventory::query()
+                ->with([
+                    'product:id,name',
+                    'shop:id,name',
+                    'image:path,imageable_id,imageable_type',
+                ])
+                ->where('shop_id', $shopId)
+                ->where('active', Inventory::ACTIVE)
+                ->orderByRaw('CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END')
+                ->orderBy('title')
+                ->limit(300)
+                ->get();
+            $rows = $fallback;
+        }
 
         $seen = [];
         $data = [];
@@ -84,13 +106,23 @@ class ProductPickerController extends Controller
             $data[] = [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
+                'shop_id' => (int) $item->shop_id,
+                'shop' => $item->shop->name ?? ($shop->name ?? ''),
                 'title' => $item->product->name ?? $item->title,
                 'sku' => $item->sku,
+                'stock' => (int) $item->stock_quantity,
                 'price' => get_formated_currency($item->current_sale_price()),
                 'image' => get_inventory_img_src($item, 'tiny'),
             ];
         }
 
-        return response()->json(['data' => $data]);
+        return response()->json([
+            'data' => $data,
+            'meta' => [
+                'shop_id' => $shopId,
+                'shop_name' => $shop->name ?? '',
+                'count' => count($data),
+            ],
+        ]);
     }
 }

@@ -39,6 +39,10 @@ class CreateProductRequest extends Request
                 ? $this->input('available_from')
                 : now()->subDay()->format('Y-m-d H:i:s'),
             'active' => $this->filled('active') ? (int) $this->input('active') : 1,
+            // The `sku` DB column is NOT NULL. Laravel's ConvertEmptyStringsToNull
+            // middleware turns a blank input into null before we get here, so
+            // re-coerce it back to '' (not a generated value) to satisfy the column.
+            'sku' => (string) $this->input('sku', ''),
         ]);
 
         $desiredSlug = trim((string) ($this->input('slug') ?: $this->input('name') ?: 'product'));

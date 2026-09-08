@@ -696,9 +696,9 @@
     "semantic_hash": ""
   },
   "app/Helpers/Functions.php": {
-    "mtime": 1788886372.4344783,
-    "seen": 1788886795.0106754,
-    "ast_hash": "4ae78b3a31280952303eb9f53fc99c8b",
+    "mtime": 1788888235.0956888,
+    "seen": 1788888290.2330892,
+    "ast_hash": "5fbbf0d2dc4931eb07a8211964ae8c00",
     "semantic_hash": ""
   },
   "app/Helpers/InventoryHelper.php": {
@@ -1344,9 +1344,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Api/DealController.php": {
-    "mtime": 1788886060.767709,
-    "seen": 1788886795.0239642,
-    "ast_hash": "84a06d2313016e5b0da05f6fa497a642",
+    "mtime": 1788887359.0689168,
+    "seen": 1788888290.2445583,
+    "ast_hash": "a125127cd65ebd19841f60c629c58275",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Api/DeliveryBoy/AccountController.php": {
@@ -1884,9 +1884,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Storefront/HomeController.php": {
-    "mtime": 1788886046.4649293,
-    "seen": 1788886795.036207,
-    "ast_hash": "d30337f0f0f7dd811d7b0c3376d49a7b",
+    "mtime": 1788888234.2410786,
+    "seen": 1788888290.2550182,
+    "ast_hash": "c8f4c9315267da1cb0e44de63e0ca7e3",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Storefront/LocationController.php": {
@@ -17538,9 +17538,9 @@
     "semantic_hash": ""
   },
   "public/themes/default/assets/js/app.js": {
-    "mtime": 1788887105.974283,
-    "seen": 1788887165.8883822,
-    "ast_hash": "1e0dd771afa2d8837ba1096d43f04e25",
+    "mtime": 1788887515.98173,
+    "seen": 1788888290.5145478,
+    "ast_hash": "69a4e78ab4533323b5600efc2e395b94",
     "semantic_hash": ""
   },
   "public/themes/default/assets/js/custom.js": {
@@ -18576,9 +18576,9 @@
     "semantic_hash": ""
   },
   "public/themes/default/views/sections/deal_of_the_day.blade.php": {
-    "mtime": 1788887159.344824,
-    "seen": 1788887165.9114273,
-    "ast_hash": "c3652ba365f56f36194d9fa73bd7d290",
+    "mtime": 1788887358.9382088,
+    "seen": 1788888290.5350876,
+    "ast_hash": "96cb3431e98e4b8efcdb48c3fe4c6446",
     "semantic_hash": ""
   },
   "public/themes/default/views/sections/digital_products.blade.php": {
@@ -18846,9 +18846,9 @@
     "semantic_hash": ""
   },
   "resources/lang/en/help.php": {
-    "mtime": 1788704278.95452,
-    "seen": 1788704765.4970415,
-    "ast_hash": "883b0f8018914013d7e8c0d5c521ba68",
+    "mtime": 1788887387.6211221,
+    "seen": 1788888290.5418792,
+    "ast_hash": "2ac8ac993dc86a40e73fc98f503c13b0",
     "semantic_hash": ""
   },
   "resources/lang/en/invoice.php": {
@@ -26658,9 +26658,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/DealOfTheDayController.php": {
-    "mtime": 1788885814.2445955,
-    "seen": 1788886795.0156903,
-    "ast_hash": "334a83b10153ca32e647e897901e638e",
+    "mtime": 1788887298.486323,
+    "seen": 1788888290.2371361,
+    "ast_hash": "4fc6771ed21da24cfb490a20883c67bd",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/FeaturedProductsController.php": {
@@ -26682,15 +26682,15 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_09_08_160000_create_deal_of_the_day_table.php": {
-    "mtime": 1788885612.070783,
-    "seen": 1788886795.1437445,
-    "ast_hash": "61166030d1241dad502f2e77546ba9c3",
+    "mtime": 1788887516.050405,
+    "seen": 1788888290.3470109,
+    "ast_hash": "18511cedac70b34b771bbfc639a5ebd0",
     "semantic_hash": ""
   },
   "resources/views/admin/deal_of_the_day/calendar.blade.php": {
-    "mtime": 1788886418.0847628,
-    "seen": 1788886795.3441126,
-    "ast_hash": "cde8a5aff160b1558e91f8ec3f7cb39f",
+    "mtime": 1788887353.4700122,
+    "seen": 1788888290.5702722,
+    "ast_hash": "768acd112a70ae7089537ed26d6ecc6d",
     "semantic_hash": ""
   },
   "resources/views/admin/featured_products/index.blade.php": {
@@ -26721,6 +26721,12 @@
     "mtime": 1788886304.3426943,
     "seen": 1788886795.4028282,
     "ast_hash": "5781e32554838dc80de3aa22619670d4",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_08_220000_allow_multiple_deal_of_the_day_products.php": {
+    "mtime": 1788887816.7217872,
+    "seen": 1788888290.3470132,
+    "ast_hash": "a309a6fce90f5a2d57a27c9ea4ce0386",
     "semantic_hash": ""
   }
 }

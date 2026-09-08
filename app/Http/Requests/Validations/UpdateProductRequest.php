@@ -34,6 +34,10 @@ class UpdateProductRequest extends Request
             'sale_price' => filled(trim((string) $salePriceInput)) ? $salePriceInput : 0,
             'stock_quantity' => filled(trim((string) $stockQtyInput)) ? $stockQtyInput : 0,
             'condition' => $conditionInput !== '' ? $conditionInput : ($inventory?->condition ?? 'New'),
+            // The `sku` DB column is NOT NULL. Laravel's ConvertEmptyStringsToNull
+            // middleware turns a blank input into null before we get here, so
+            // re-coerce it back to '' (not a generated value) to satisfy the column.
+            'sku' => (string) $this->input('sku', ''),
         ]);
 
         $desiredSlug = trim((string) ($this->input('slug') ?: $this->input('name') ?: 'product'));
