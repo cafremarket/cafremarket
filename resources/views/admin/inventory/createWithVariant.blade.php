@@ -66,22 +66,12 @@
 
         <div class="col-lg-3 col-md-6 nopadding-right">
           <div class="form-group">
-            {!! Form::label('available_from', trans('app.form.available_from'), ['class' => 'with-help']) !!}
-            <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.available_from') }}"></i>
-            <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-              {!! Form::text('available_from', null, ['class' => 'form-control datetimepicker', 'placeholder' => trans('app.placeholder.available_from')]) !!}
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 nopadding-left">
-          <div class="form-group">
             {!! Form::label('active', trans('app.form.status') . '*', ['class' => 'with-help']) !!}
             <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.seller_inventory_status') }}"></i>
             {!! Form::select('active', ['1' => trans('app.active'), '0' => trans('app.inactive')], 1, ['class' => 'form-control select2-normal', 'placeholder' => trans('app.placeholder.select'), 'required']) !!}
             <div class="help-block with-errors"></div>
           </div>
+          {!! Form::hidden('available_from', now()->subMinute()->format('Y-m-d h:i a')) !!}
         </div>
       </div>
 

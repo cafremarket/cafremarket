@@ -477,11 +477,7 @@
             ]) !!}
           </div>
           <div class="form-group">
-            {!! Form::label('available_from', trans('app.form.available_from')) !!}
-            {!! Form::text('available_from', isset($inventory) ? $inventory->available_from : null, [
-              'class' => 'datetimepicker form-control',
-              'placeholder' => trans('app.placeholder.available_from'),
-            ]) !!}
+            {!! Form::hidden('available_from', now()->subMinute()->format('Y-m-d h:i a')) !!}
           </div>
           <button type="submit" class="btn btn-primary btn-block btn-lg">
             <i class="fa fa-check"></i>

@@ -243,7 +243,7 @@ class ProcessInventoryCsvBulkUpload implements ShouldQueue
             'meta_description' => $data['meta_description'],
             'free_shipping' => strtoupper($data['free_shipping']) == 'TRUE' ? 1 : 0,
             'shipping_weight' => $data['shipping_weight'],
-            'available_from' => date('Y-m-d h:i a', strtotime($data['available_from'])),
+            'available_from' => now()->subMinute()->format('Y-m-d h:i a'),
             'warehouse_id' => $data['warehouse_id'],
             'supplier_id' => $data['supplier_id'],
             'active' => strtoupper($data['active']) == 'TRUE' ? 1 : 0,

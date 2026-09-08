@@ -3726,7 +3726,6 @@ if (! function_exists('get_nearby_featured_items')) {
         return Inventory::query()
             ->whereIn('shop_id', $shopIds)
             ->where('active', 1)
-            ->where('available_from', '<=', Carbon::now())
             ->with([
                 'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                 'image:path,imageable_id,imageable_type',
@@ -4020,10 +4019,7 @@ if (! function_exists('get_deal_of_the_day')) {
                 ->whereHas('shop', function ($q) {
                     $q->approved();
                 })
-                ->where(function ($q) {
-                    $q->whereNull('available_from')
-                        ->orWhere('available_from', '<=', now());
-                })
+                
                 ->select(ListHelper::common_select_attr('inventory'))
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
@@ -4066,10 +4062,7 @@ if (! function_exists('get_featured_items')) {
             ->whereHas('shop', function ($q) {
                 $q->approved();
             })
-            ->where(function ($q) {
-                $q->whereNull('available_from')
-                    ->orWhere('available_from', '<=', now());
-            })
+            
             ->when($shop_id, function ($q) use ($shop_id) {
                 $q->where('shop_id', $shop_id);
             })

@@ -29,7 +29,7 @@ class NearbyShopDiagnosticService
             ->with(['config:shop_id,maintenance_mode,active_ecommerce,pending_verification'])
             ->withCount([
                 'inventories as active_inventories_count' => function ($q) {
-                    $q->where('active', 1)->where('available_from', '<=', now());
+                    $q->where('active', 1);
                 },
             ])
             ->orderBy('name')

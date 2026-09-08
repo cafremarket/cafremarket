@@ -32,8 +32,8 @@
             <td style="width: 75%;">{{ $inventory->active ? trans('app.active') : trans('app.inactive') }}</td>
           </tr>
           <tr>
-            <th class="text-right">{{ trans('app.available_from') }}:</th>
-            <td style="width: 75%;">{{ $inventory->available_from->toFormattedDateString() }}</td>
+            <th class="text-right">{{ trans('app.listed_at') ?? 'Listed' }}:</th>
+            <td style="width: 75%;">{{ optional($inventory->created_at)->toFormattedDateString() }}</td>
           </tr>
           <tr>
             <th class="text-right">{{ trans('app.updated_at') }}:</th>

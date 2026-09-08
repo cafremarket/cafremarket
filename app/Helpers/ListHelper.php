@@ -1000,7 +1000,6 @@ class ListHelper
         $items = Inventory::query()
             ->select(static::common_select_attr('inventory'))
             ->where('active', 1)
-            ->where('available_from', '<=', Carbon::now())
             ->whereNull('parent_id')
             ->with([
                 'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
@@ -1127,10 +1126,7 @@ class ListHelper
             $items = Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('active', 1)
-                ->where(function ($q) {
-                    $q->whereNull('available_from')
-                        ->orWhere('available_from', '<=', Carbon::now());
-                })
+                
                 ->whereNull('parent_id')
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
@@ -1163,10 +1159,7 @@ class ListHelper
             $items = Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('active', 1)
-                ->where(function ($q) {
-                    $q->whereNull('available_from')
-                        ->orWhere('available_from', '<=', Carbon::now());
-                })
+                
                 ->whereNull('parent_id')
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
@@ -1288,7 +1281,6 @@ class ListHelper
 
         return Inventory::whereIn('product_id', $productIDs)
             ->where('active', 1)
-            ->where('available_from', '<=', Carbon::now())
             ->whereHas('shop', function ($query) {
                 $query->approved();
             })
@@ -1317,7 +1309,6 @@ class ListHelper
 
         $items = Inventory::whereIn('id', $linked_items)
             ->where('active', 1)
-            ->where('available_from', '<=', Carbon::now())
             ->whereHas('shop', function ($query) {
                 $query->approved();
             })
@@ -1343,7 +1334,6 @@ class ListHelper
         return Inventory::where('product_id', $item->product_id)
             ->where('id', '!=', $item->id)
             ->where('active', 1)
-            ->where('available_from', '<=', Carbon::now())
             ->whereHas('shop', function ($query) {
                 $query->approved();
             })
@@ -1398,7 +1388,6 @@ class ListHelper
 
             return Inventory::whereIn('id', $products)
                 ->where('active', 1)
-                ->where('available_from', '<=', Carbon::now())
                 ->whereHas('shop', function ($query) {
                     $query->approved();
                 })

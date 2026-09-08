@@ -86,8 +86,7 @@ class ListingController extends Controller
                 $shop = Shop::where('slug', $slug)->approved()
                     ->withCount([
                         'inventories' => function ($q) {
-                            $q->where('active', 1)
-                                ->where('available_from', '<=', now());
+                            $q->where('active', 1);
                         },
                     ])
                     ->firstOrFail();
@@ -117,7 +116,6 @@ class ListingController extends Controller
     {
         $item = Inventory::where('slug', $slug)
             ->where('active', 1)
-            ->where('available_from', '<=', now())
             ->whereHas('shop', function ($q) {
                 $q->approved();
             })
@@ -355,8 +353,7 @@ class ListingController extends Controller
         $shop = Shop::where('slug', $slug)->approved()
             ->withCount(['inventories' => function ($q) {
                 $q->where('active', 1)
-                    ->whereNull('parent_id')
-                    ->where('available_from', '<=', now());
+                    ->whereNull('parent_id');
             }])->firstOrFail();
 
         // Check shop maintenance_mode
@@ -369,7 +366,6 @@ class ListingController extends Controller
             // Align with storefront shop products endpoint. Avoid scopeAvailable()
             // because it additionally enforces shop->active() + zipcode filtering.
             ->where('active', 1)
-            ->where('available_from', '<=', now())
             ->with([
                 'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                 'image:path,imageable_id,imageable_type',
@@ -520,7 +516,7 @@ class ListingController extends Controller
         $products = Inventory::search($term)->where('active', 1)->paginate(0);
 
         // Parent products only — do not list each variant SKU as its own card.
-        $products = $products->whereNull('parent_id')->where('available_from', '<=', $now);
+        $products = $products->whereNull('parent_id');
 
         // Hide out-of-stock items when enabled
         if (config('system_settings.hide_out_of_stock_items')) {

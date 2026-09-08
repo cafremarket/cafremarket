@@ -24,12 +24,12 @@ class NearbyShopService
             ->active()
             ->when(config('hyperlocal.require_inventory_for_nearby', false), function ($query) {
                 $query->whereHas('inventories', function ($q) {
-                    $q->where('active', 1)->where('available_from', '<=', now());
+                    $q->where('active', 1);
                 });
             })
             ->withCount([
                 'inventories as active_inventories_count' => function ($q) {
-                    $q->where('active', 1)->where('available_from', '<=', now());
+                    $q->where('active', 1);
                 },
             ])
             ->with([

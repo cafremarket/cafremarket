@@ -22,7 +22,7 @@ class SearchController extends Controller
         $query = Inventory::search($request->get('q'))->where('active', 1)->paginate(0);
 
         // Parent products only — do not list each variant SKU as its own card.
-        $query = $query->whereNull('parent_id')->where('available_from', '<=', $now);
+        $query = $query->whereNull('parent_id');
 
         // Hide out-of-stock items when enabled
         if (config('system_settings.hide_out_of_stock_items')) {

@@ -140,8 +140,7 @@ class HomeController extends Controller
                     // and zipcode filters, which hides valid approved shops in app vendor list.
                     // Count parent products only (skip variant child SKUs).
                     $q->where('active', 1)
-                        ->whereNull('parent_id')
-                        ->where('available_from', '<=', now());
+                        ->whereNull('parent_id');
                 },
             ])
             // Keep mobile vendor list behavior aligned with storefront shops page.
@@ -170,8 +169,7 @@ class HomeController extends Controller
             ->withCount([
                 'inventories' => function ($q) {
                     $q->where('active', 1)
-                        ->whereNull('parent_id')
-                        ->where('available_from', '<=', now());
+                        ->whereNull('parent_id');
                 },
             ])
             ->firstOrFail();

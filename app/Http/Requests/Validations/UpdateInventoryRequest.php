@@ -64,7 +64,7 @@ class UpdateInventoryRequest extends Request
             'base_price' => 'nullable|required_without:sale_price|numeric|min:'.$min_price.($max_price ? '|max:'.$max_price : ''),
             'offer_price' => 'nullable|numeric',
             'available_from' => 'nullable|date',
-            'auction_end' => 'nullable|date|after:available_from',
+            'auction_end' => 'nullable|date',
             'image' => 'mimes:jpg,jpeg,png,gif,svg',
         ];
 

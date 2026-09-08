@@ -36,23 +36,15 @@
 
           <div class="col-md-4 nopadding-left">
             <div class="form-group">
-              {!! Form::label('available_from', trans('app.form.available_from'), ['class' => 'with-help']) !!}
-              <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.available_from') }}"></i>
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                {!! Form::text('available_from', null, ['class' => 'datetimepicker form-control', 'placeholder' => trans('app.placeholder.available_from')]) !!}
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-{{ config('system_settings.show_item_conditions') ? 6 : 9 }} nopadding-right">
-            <div class="form-group">
               {!! Form::label('sku', trans('app.form.sku') . '*', ['class' => 'with-help']) !!}
               <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.sku') }}"></i>
               {!! Form::text('sku', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.sku'), 'required']) !!}
               <div class="help-block with-errors"></div>
             </div>
           </div>
+
+          {{-- available_from removed: listings go live with Status only --}}
+          {!! Form::hidden('available_from', now()->subMinute()->format('Y-m-d h:i a')) !!}
 
           @if (config('system_settings.show_item_conditions'))
             <div class="col-md-3 nopadding">

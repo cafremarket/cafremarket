@@ -419,10 +419,6 @@ class Inventory extends Inspectable
             return trans('app.not_set');
         }
 
-        if ($this->available_from->isFuture()) {
-            return trans('app.scheduled');
-        }
-
         if ($this->auction_end->isFuture()) {
             return trans('packages.auction.auction_running');
         }
@@ -441,7 +437,7 @@ class Inventory extends Inspectable
      */
     public function isAuctionRunning()
     {
-        return $this->auction_end && $this->available_from->isPast() && $this->auction_end->isFuture();
+        return $this->auction_end && $this->auction_end->isFuture();
     }
 
     /**
@@ -659,25 +655,8 @@ class Inventory extends Inspectable
 
     public function setAvailableFromAttribute($value)
     {
-        if (! $value) {
-            $this->attributes['available_from'] = now()->subMinute()->format('Y-m-d H:i:s');
-
-            return;
-        }
-
-        if ($value instanceof \Carbon\Carbon) {
-            $this->attributes['available_from'] = $value->timezone(config('app.timezone'))->format('Y-m-d H:i:s');
-
-            return;
-        }
-
-        try {
-            $parsed = \Carbon\Carbon::createFromFormat('Y-m-d h:i a', $value);
-        } catch (\Exception $e) {
-            $parsed = \Carbon\Carbon::parse($value);
-        }
-
-        $this->attributes['available_from'] = $parsed->timezone(config('app.timezone'))->format('Y-m-d H:i:s');
+        // available_from scheduling removed — always treat listings as live now.
+        $this->attributes['available_from'] = now()->subMinute()->format('Y-m-d H:i:s');
     }
 
     public function setOfferStartAttribute($value)
@@ -808,21 +787,9 @@ class Inventory extends Inspectable
      */
     public function scopeAvailable($query)
     {
-        // return $query;
-
-        // return $query->where([
-        //     ['active', '=', 1],
-        //     ['stock_quantity', '>', 0],
-        //     ['available_from', '<=', Carbon::now()]
-        // ]);
-
         $query = $query->whereHas('shop', function ($q) {
             $q->active();
         })->where('active', '=', 1)
-            ->where(function ($q) {
-                $q->whereNull('available_from')
-                    ->orWhere('available_from', '<=', Carbon::now());
-            })
             ->zipcode();
 
         // Hide out-of-stock items when enabled
@@ -921,11 +888,7 @@ class Inventory extends Inspectable
         $now = Carbon::now();
 
         $query = $query->where('active', static::ACTIVE)
-            ->where('stock_quantity', '>', 0)
-            ->where(function ($q) use ($now) {
-                $q->whereNull('available_from')
-                    ->orWhere('available_from', '<=', $now);
-            });
+            ->where('stock_quantity', '>', 0);
 
         // Check expiry date when pharmacy plugin is enabled
         if (is_incevio_package_loaded('pharmacy')) {
@@ -945,8 +908,7 @@ class Inventory extends Inspectable
         $now = Carbon::now();
 
         return $query->where(function ($q) use ($now) {
-            $q->where('active', '!=', static::ACTIVE)
-                ->orWhere('available_from', '>', $now);
+            $q->where('active', '!=', static::ACTIVE);
 
             if (is_incevio_package_loaded('pharmacy')) {
                 $q->orWhere(function ($inner) use ($now) {
