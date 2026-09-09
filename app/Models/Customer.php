@@ -87,6 +87,18 @@ class Customer extends CustomerWallet
     protected static $logName = 'customer';
 
     /**
+     * Ensure every new customer gets a Cafrepay wallet row.
+     */
+    protected static function booted()
+    {
+        static::created(function (self $customer) {
+            if (function_exists('ensure_customer_wallet')) {
+                ensure_customer_wallet($customer);
+            }
+        });
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

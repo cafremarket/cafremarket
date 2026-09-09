@@ -65,6 +65,9 @@ class SystemController extends Controller
 
         $system->update($request->except('image', 'delete_image'));
 
+        Cache::forget('system_settings');
+        Cache::forget('system_currency');
+
         if ($request->hasFile('icon')) {
             $system->updateImage($request->file('icon'), 'icon');
             Cache::forget('favicon_img');

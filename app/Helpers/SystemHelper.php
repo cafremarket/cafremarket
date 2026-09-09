@@ -324,20 +324,37 @@ if (! function_exists('get_payment_config_info')) {
                 ];
 
             case 'zcart-wallet':
-                $config = false;
+                // Offer Cafrepay whenever wallet checkout is enabled. Balance is
+                // attached for UI/validation; do not use a bare false/0 here —
+                // paymentOptions treats a falsey "config" as "not configured"
+                // when callers inspect the inner value, and bool/int breaks
+                // additional_details array access.
+                if (! (bool) get_from_option_table('wallet_checkout')) {
+                    return null;
+                }
 
-                if ((bool) get_from_option_table('wallet_checkout')) {
-                    if (Auth::guard('customer')->check()) {
-                        $customer = Auth::guard('customer')->user();
-                    } elseif (Auth::guard('api')->check()) {
-                        $customer = Auth::guard('api')->user();
+                $customer = null;
+                if (Auth::guard('customer')->check()) {
+                    $customer = Auth::guard('customer')->user();
+                } elseif (Auth::guard('api')->check()) {
+                    $customer = Auth::guard('api')->user();
+                }
+
+                $balance = 0;
+                try {
+                    if ($customer && isset($customer->wallet)) {
+                        $balance = $customer->wallet->balance;
                     }
-
-                    $config = isset($customer->wallet) ? $customer->wallet->balance : false;
+                } catch (\Throwable $e) {
+                    $balance = 0;
                 }
 
                 return [
-                    'config' => $config,
+                    'config' => [
+                        'enabled' => true,
+                        'balance' => $balance,
+                        'additional_details' => trans('packages.wallet.pay_by_wallet'),
+                    ],
                     'msg' => trans('packages.wallet.pay_by_wallet'),
                 ];
 
@@ -837,7 +854,64 @@ if (! function_exists('cancellation_require_admin_approval')) {
 if (! function_exists('customer_has_wallet')) {
     function customer_has_wallet()
     {
-        return config('system.customer.has_wallet') && is_incevio_package_loaded(['wallet']);
+        if (! is_incevio_package_loaded(['wallet'])) {
+            return false;
+        }
+
+        $flag = config('system.customer.has_wallet');
+
+        // Explicit opt-out
+        if ($flag === false || $flag === 0 || $flag === '0' || $flag === 'false' || $flag === 'off') {
+            return false;
+        }
+
+        // Missing/empty env used to hide Cafrepay on production; treat as enabled.
+        if ($flag === null || $flag === '') {
+            return true;
+        }
+
+        return true;
+    }
+}
+
+if (! function_exists('ensure_customer_wallet')) {
+    /**
+     * Persist a default Cafrepay wallet row for the customer if missing.
+     */
+    function ensure_customer_wallet($customer): bool
+    {
+        if (! $customer || ! customer_has_wallet()) {
+            return false;
+        }
+
+        if (! \Illuminate\Support\Facades\Schema::hasTable('wallets')) {
+            return false;
+        }
+
+        try {
+            if (method_exists($customer, 'createWallet') && ! $customer->hasWallet(config('wallet.wallet.default.slug', 'default'))) {
+                $customer->createWallet([
+                    'name' => config('wallet.wallet.default.name', 'Cafre-pay'),
+                    'slug' => config('wallet.wallet.default.slug', 'default'),
+                    'balance' => 0,
+                ]);
+
+                return true;
+            }
+
+            // MorphOne + withDefault: WalletService persists the default wallet on first access.
+            app(\Incevio\Package\Wallet\Services\WalletService::class)
+                ->getWallet($customer, true);
+
+            return true;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('ensure_customer_wallet failed', [
+                'customer_id' => $customer->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 }
 

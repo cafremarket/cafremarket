@@ -60,9 +60,11 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\Customer\Registered::class => [
             \App\Listeners\Customer\SendWelcomeEmail::class,
             \App\Listeners\Customer\RegisterNewsletter::class,
+            \App\Listeners\Customer\EnsureCustomerWallet::class,
         ],
         \App\Events\Customer\CustomerCreated::class => [
             \App\Listeners\Customer\SendLoginInfo::class,
+            \App\Listeners\Customer\EnsureCustomerWallet::class,
         ],
         \App\Events\Customer\CustomerProfileUpdated::class => [
             \App\Listeners\Customer\SendProfileUpdateNotification::class,

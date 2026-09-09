@@ -212,7 +212,10 @@ class CheckoutController extends Controller
             $isActiveAndHasValidConfig = in_array($payment->code, $activePaymentCodes) && $config;
 
             if ($isActiveAndHasValidConfig) {
-                $payment->additional_details = $config['config']['additional_details'] ?? $config['msg'];
+                $inner = $config['config'] ?? null;
+                $payment->additional_details = is_array($inner)
+                    ? ($inner['additional_details'] ?? $config['msg'] ?? null)
+                    : ($config['msg'] ?? null);
             }
 
             return $isActiveAndHasValidConfig;

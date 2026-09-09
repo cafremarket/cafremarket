@@ -58,6 +58,7 @@ class CurrencyController extends Controller
         Currency::create($request->all());
 
         Cache::forget('active_currencies');
+        Cache::forget('system_currency');
 
         return back()->with('success', trans('messages.created', ['model' => $this->model]));
     }
@@ -83,6 +84,7 @@ class CurrencyController extends Controller
         $currency->update($request->all());
 
         Cache::forget('active_currencies');
+        Cache::forget('system_currency');
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model]));
     }
@@ -97,6 +99,7 @@ class CurrencyController extends Controller
         $currency->delete();
 
         Cache::forget('active_currencies');
+        Cache::forget('system_currency');
 
         return back()->with('success', trans('messages.deleted', ['model' => $this->model]));
     }
@@ -111,6 +114,7 @@ class CurrencyController extends Controller
         Currency::whereIn('id', $request->ids)->forceDelete();
 
         Cache::forget('active_currencies');
+        Cache::forget('system_currency');
 
         if ($request->ajax()) {
             return response()->json(['success' => trans('messages.deleted', ['model' => $this->model])]);

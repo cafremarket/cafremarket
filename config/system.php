@@ -115,7 +115,10 @@ return [
     |
     */
     'customer' => [
-        'has_wallet' => env('CUSTOMER_HAS_WALLET'),
+        // Default ON when unset so activating the wallet package on production
+        // still exposes Cafrepay without requiring a manual .env edit.
+        // Set CUSTOMER_HAS_WALLET=false to disable customer wallets.
+        'has_wallet' => env('CUSTOMER_HAS_WALLET', 'wallet'),
     ],
 
     /*
