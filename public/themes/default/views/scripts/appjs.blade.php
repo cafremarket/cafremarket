@@ -629,7 +629,10 @@
     return parseFloat(value).toFixed(dec);
   }
 
-  function getFormatedPrice(value = 0, trim = false) {
+  // Locale-formatted number only (no currency symbol) - use this for any
+  // visible price/total text. Keep the raw numeric value (getFormatedValue)
+  // in a data attribute for later re-reads/math - never re-parse this string.
+  function getFormatedNumber(value = 0) {
     var dec = {{ $dec }};
     var decMark = @json(config('system_settings.currency.decimal_mark', '.'));
     var thousandsSep = @json(config('system_settings.currency.thousands_separator', ','));
@@ -637,9 +640,12 @@
     var parts = value.split('.');
 
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
-    value = dec > 0 ? parts.join(decMark) : parts[0];
 
-    return "{{ get_currency_prefix() }}" + value + "{{ get_currency_suffix() }}";
+    return dec > 0 ? parts.join(decMark) : parts[0];
+  }
+
+  function getFormatedPrice(value = 0, trim = false) {
+    return "{{ get_currency_prefix() }}" + getFormatedNumber(value) + "{{ get_currency_suffix() }}";
   }
 
   /*

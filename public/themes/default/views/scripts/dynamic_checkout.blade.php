@@ -288,7 +288,7 @@
 
         // Set Item Price
         var total = $('#item-price' + cart + '-' + item).data('value') * qtt;
-        $('#item-total' + cart + '-' + item).text(getFormatedValue(total));
+        $('#item-total' + cart + '-' + item).data('value', total).text(getFormatedNumber(total));
 
         // Set Item Weight
         var itemWeight = unitWeight * qtt;
@@ -437,13 +437,13 @@
 
           var options = '<table class="table table-striped">' +
             '<tr><td><div class="radio"><label id="1"><input type="radio" name="packaging_option" id="{{ trans('theme.basic_packaging') }}" value="' + getFormatedValue(0) + '" ' + preChecked + '>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ trans('theme.basic_packaging') }}</label></div></td>' +
-            '<td><span>{{ get_currency_prefix() }}' + getFormatedValue(0) + '{{ get_currency_suffix() }}</span></td></tr>';
+            '<td><span>{{ get_currency_prefix() }}' + getFormatedNumber(0) + '{{ get_currency_suffix() }}</span></td></tr>';
 
           $(this).data('options').forEach(function(item) {
             preChecked = String(current) == String(item.name) ? 'checked' : '';
 
             options += '<tr><td><div class="radio"><label id="' + item.id + '"><input type="radio" name="packaging_option" id="' + item.name + '" value="' + getFormatedValue(item.cost) + '" ' + preChecked + '>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + item.name + '</label></div></td>' +
-              '<td><span>{{ get_currency_prefix() }}' + getFormatedValue(item.cost) + '{{ get_currency_suffix() }}</span></td></tr>';
+              '<td><span>{{ get_currency_prefix() }}' + getFormatedNumber(item.cost) + '{{ get_currency_suffix() }}</span></td></tr>';
           });
           options += '</table>';
 
@@ -486,7 +486,7 @@
             if (free_shipping) {
               options += '<tr><td><div class="radio"><label id="0"><input type="radio" name="shipping_option" id="{{ trans('theme.free_shipping') }}" value="' + getFormatedValue(0) + '" ' + preChecked + '>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ trans('theme.free_shipping') }}</label></div></td>' +
                 '<td>&nbsp;</td><td>&nbsp;</td>' +
-                '<td><span>{{ get_currency_prefix() }}' + getFormatedValue(0) + '{{ get_currency_suffix() }}</span></td></tr>';
+                '<td><span>{{ get_currency_prefix() }}' + getFormatedNumber(0) + '{{ get_currency_suffix() }}</span></td></tr>';
             }
 
             filtered.forEach(function(item) {
@@ -496,7 +496,7 @@
               options += '<tr><td><div class="radio"><label id="' + item.id + '"><input type="radio" name="shipping_option" id="' + item.name + '" value="' + getFormatedValue(item.rate) + '" ' + preChecked + '>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + item.name + '</label></div></td>' +
                 '<td>' + item.carrier.name + '</td>' +
                 '<td><small class"text-muted">' + item.delivery_takes + '</small></td>' +
-                '<td><span>{{ get_currency_prefix() }}' + getFormatedValue(shippingRate) + '{{ get_currency_suffix() }}</span></td></tr>';
+                '<td><span>{{ get_currency_prefix() }}' + getFormatedNumber(shippingRate) + '{{ get_currency_suffix() }}</span></td></tr>';
             });
             options += '</table>';
           }
@@ -578,7 +578,7 @@
           $("#tax-section-li" + cart).hide();
         }
 
-        $('#summary-taxes' + cart).text(getFormatedValue(tax));
+        $('#summary-taxes' + cart).data('value', tax).text(getFormatedNumber(tax));
 
         calculateOrderSummary(cart);
         return;
@@ -587,10 +587,10 @@
       function calculateCartTotal(cart) {
         var total = 0;
         $('.item-total' + cart).each(function() {
-          total += Number($(this).text());
+          total += Number($(this).data('value'));
         });
 
-        $('#summary-total' + cart).text(getFormatedValue(total));
+        $('#summary-total' + cart).data('value', total).text(getFormatedNumber(total));
 
         calculateDiscount(cart);
 
@@ -599,7 +599,7 @@
 
       function calculateOrderSummary(cart) {
         var grand = getTotalAmount(cart) + getTax(cart);
-        $("#summary-grand-total" + cart).text(getFormatedValue(grand));
+        $("#summary-grand-total" + cart).data('value', grand).text(getFormatedNumber(grand));
         if (typeof refreshCheckoutPlatformFeePreview === 'function') {
           refreshCheckoutPlatformFeePreview(cart, grand);
         }
@@ -629,7 +629,7 @@
           name += ' (' + getFormatedValue(coupon.value) + '%)';
           coupon.value = (coupon.value * (totalPrice / 100));
         } else {
-          name += ' ({{ get_currency_prefix() }}' + getFormatedValue(coupon.value) + '{{ get_currency_suffix() }})';
+          name += ' ({{ get_currency_prefix() }}' + getFormatedNumber(coupon.value) + '{{ get_currency_suffix() }})';
         }
 
         if (coupon.value > 0) {
@@ -638,7 +638,7 @@
           $("#discount-section-li" + cart).hide();
         }
 
-        $('#summary-discount' + cart).text(getFormatedValue(coupon.value));
+        $('#summary-discount' + cart).data('value', coupon.value).text(getFormatedNumber(coupon.value));
         $('#summary-discount-name' + cart).text(name);
         // $('#discount-id' + cart).val(coupon.id);
       }
@@ -676,11 +676,11 @@
       };
 
       function getPackaging(cart) {
-        return Number($("#summary-packaging" + cart).text());
+        return Number($("#summary-packaging" + cart).data('value'));
       };
 
       function getShipping(cart) {
-        return Number($("#summary-shipping" + cart).text());
+        return Number($("#summary-shipping" + cart).data('value'));
       };
 
       function getShippingName(cart) {
@@ -696,21 +696,21 @@
       };
 
       function getTax(cart) {
-        return Number($("#summary-taxes" + cart).text());
+        return Number($("#summary-taxes" + cart).data('value'));
       };
 
       function getDiscount(cart) {
-        return Number($("#summary-discount" + cart).text());
+        return Number($("#summary-discount" + cart).data('value'));
       }
 
       function getOrderTotal(cart) {
-        return Number($("#summary-total" + cart).text());
+        return Number($("#summary-total" + cart).data('value'));
       };
 
       // Setters
       function setPackagingCost(cart, name, value = 0, id = '') {
         value = value ? value : 0;
-        $('#summary-packaging' + cart).text(getFormatedValue(value));
+        $('#summary-packaging' + cart).data('value', value).text(getFormatedNumber(value));
         $('#summary-packaging-name' + cart).text(name);
         $('#packaging-id' + cart).val(id);
 
@@ -754,7 +754,7 @@
       function setShippingCost(cart, name = '', value = 0, id = '') {
         var handlingCost = isFreeShipping(cart) && value == 0 ? 0 : $('#handling-cost' + cart).val();
         value = Number(value) + Number(handlingCost);
-        $('#summary-shipping' + cart).text(getFormatedValue(value));
+        $('#summary-shipping' + cart).data('value', value).text(getFormatedNumber(value));
         $('#summary-shipping-name' + cart).text(name);
         $('#shipping-rate-id' + cart).val(id);
         calculateTax(cart);
@@ -818,7 +818,7 @@
         $("#discount-section-li" + cart).hide();
 
         if ($('#coupon-raw' + cart).val()) {
-          $('#summary-discount' + cart).text(getFormatedValue(0));
+          $('#summary-discount' + cart).data('value', 0).text(getFormatedNumber(0));
           $('#summary-discount-name' + cart).text('');
           $('#coupon-raw' + cart).val('');
           // $('#discount-id' + cart).val('');

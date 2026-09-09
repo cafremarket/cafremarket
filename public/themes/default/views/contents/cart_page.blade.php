@@ -188,12 +188,8 @@
                       </td>
                       @unless ($cart->is_digital)
                         <td class="shopping-cart-item-price">
-                          <span class="d-inline-flex">
-                            {{ get_currency_prefix() }}
-                            <span id="item-price{{ $cart->id . '-' . $item->id }}" data-value="{{ $unit_price }}">
-                              {{ number_format(get_formated_price_value($unit_price), $dec, '.', '') }}
-                            </span>
-                            {{ get_currency_suffix() }}
+                          <span>
+                            {{ get_currency_prefix() }}<span id="item-price{{ $cart->id . '-' . $item->id }}" data-value="{{ $unit_price }}">{{ get_formated_decimal(get_formated_price_value($unit_price), false, $dec) }}</span>{{ get_currency_suffix() }}
                           </span>
                         </td>
                         <td>
@@ -205,12 +201,8 @@
                         </td>
                       @endunless
                       <td>
-                        <span class="d-inline-flex">
-                          {{ get_currency_prefix() }}
-                          <span id="item-total{{ $cart->id . '-' . $item->id }}" class="item-total{{ $cart->id }}">
-                            {{ number_format(get_formated_price_value($item_total), $dec, '.', '') }}
-                          </span>
-                          {{ get_currency_suffix() }}
+                        <span>
+                          {{ get_currency_prefix() }}<span id="item-total{{ $cart->id . '-' . $item->id }}" class="item-total{{ $cart->id }}" data-value="{{ get_formated_price_value($item_total) }}">{{ get_formated_decimal(get_formated_price_value($item_total), false, $dec) }}</span>{{ get_currency_suffix() }}
                         </span>
                       </td>
                       <td>
@@ -344,7 +336,7 @@
                   <span>{{ trans('theme.subtotal') }}</span>
                   <span>
                     {{ get_currency_prefix() }}
-                    <span id="summary-total{{ $cart->id }}" class="item-total{{ $cart->id }}">{{ number_format($cart_total, $dec, '.', '') }}</span>
+                    <span id="summary-total{{ $cart->id }}" data-value="{{ $cart_total }}">{{ get_formated_decimal($cart_total, false, $dec) }}</span>
                     {{ get_currency_suffix() }}
                   </span>
                 </li>
@@ -357,7 +349,7 @@
                       <em id="summary-shipping-name{{ $cart->id }}" class="small text-muted"></em>
                     </span>
                     <span>{{ get_currency_prefix() }}
-                      <span id="summary-shipping{{ $cart->id }}">{{ number_format($cart->get_shipping_cost(), $dec, '.', '') }}</span>{{ get_currency_suffix() }}
+                      <span id="summary-shipping{{ $cart->id }}" data-value="{{ $cart->get_shipping_cost() }}">{{ get_formated_decimal($cart->get_shipping_cost(), false, $dec) }}</span>{{ get_currency_suffix() }}
                     </span>
                   </li>
                   @if (is_incevio_package_loaded('packaging') && !empty(json_decode($packaging_options)))
@@ -371,8 +363,8 @@
                         </em>
                       </span>
                       <span>{{ get_currency_prefix() }}
-                        <span id="summary-packaging{{ $cart->id }}">
-                          {{ number_format($default_packaging ? get_formated_price_value($default_packaging->cost) : 0, $dec, '.', '') }}
+                        <span id="summary-packaging{{ $cart->id }}" data-value="{{ $default_packaging ? get_formated_price_value($default_packaging->cost) : 0 }}">
+                          {{ get_formated_decimal($default_packaging ? get_formated_price_value($default_packaging->cost) : 0, false, $dec) }}
                         </span>{{ get_currency_suffix() }}
                       </span>
                     </li>
@@ -383,19 +375,19 @@
                     <em id="summary-discount-name{{ $cart->id }}" class="small text-muted">{{ $cart->coupon ? $cart->coupon->name . ' (' . $cart->coupon->getFormatedAmountText() . ')' : '' }}</em>
                   </span>
                   <span>-{{ get_currency_prefix() }}
-                    <span id="summary-discount{{ $cart->id }}">{{ $cart->coupon ? number_format($cart->discount, $dec, '.', '') : number_format(0, $dec, '.', '') }}</span>{{ get_currency_suffix() }}
+                    <span id="summary-discount{{ $cart->id }}" data-value="{{ $cart->coupon ? $cart->discount : 0 }}">{{ $cart->coupon ? get_formated_decimal($cart->discount, false, $dec) : get_formated_decimal(0, false, $dec) }}</span>{{ get_currency_suffix() }}
                   </span>
                 </li>
                 <li id="tax-section-li{{ $cart->id }}" style="{{ $cart->taxes ? '' : 'display: none' }};">
                   <span>{{ trans('theme.taxes') }}</span>
                   <span>{{ get_currency_prefix() }}
-                    <span id="summary-taxes{{ $cart->id }}">{{ number_format($cart->taxes, $dec, '.', '') }}</span>{{ get_currency_suffix() }}
+                    <span id="summary-taxes{{ $cart->id }}" data-value="{{ $cart->taxes }}">{{ get_formated_decimal($cart->taxes, false, $dec) }}</span>{{ get_currency_suffix() }}
                   </span>
                 </li>
                 <li>
                   <span>{{ trans('theme.total') }}</span>
                   <span>{{ get_currency_prefix() }}
-                    <span id="summary-grand-total{{ $cart->id }}">{{ number_format(get_formated_value($cart->grand_total), $dec, '.', '') }}</span>{{ get_currency_suffix() }}
+                    <span id="summary-grand-total{{ $cart->id }}" data-value="{{ get_formated_value($cart->grand_total) }}">{{ get_formated_decimal(get_formated_value($cart->grand_total), false, $dec) }}</span>{{ get_currency_suffix() }}
                   </span>
                 </li>
                 <li id="checkout-summary-customer-fee-li{{ $cart->id }}" style="display: none;">
