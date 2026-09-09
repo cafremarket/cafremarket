@@ -100,6 +100,7 @@ Route::middleware('customerApp')->group(function () {
     Route::get('cart/{cart}/shipping', [CartController::class, 'shipping']);
     Route::post('cart/{cart}/checkout', [CheckoutController::class, 'checkout']);
     Route::get('cart/{cart}/paymentOptions', [CheckoutController::class, 'paymentOptions']);
+    Route::get('cart/{cart}/paymentOptions/debug', [CheckoutController::class, 'paymentOptionsDebug']);
 
     // Stripe
     Route::post('cart/{cart}/stripePaymentIntent', [CheckoutController::class, 'stripePaymentIntent']);

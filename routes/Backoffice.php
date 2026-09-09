@@ -146,7 +146,6 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/SubscriptionPlan.php';
             include 'admin/Country.php';
             include 'admin/State.php';
-            include 'admin/Currency.php';
             include 'admin/Language.php';
             include 'admin/Verification.php';
         });

@@ -80,30 +80,13 @@ if (! function_exists('setSystemCurrency')) {
      */
     function setSystemCurrency()
     {
-        $currency = Cache::rememberForever('system_currency', function () {
-            return DB::table('currencies')->where('id', config('system_settings.currency_id'))->first();
-        });
-
-        // Set Cashier Currency
-        // Cashier::useCurrency($currency->iso_code, $currency->symbol);
-
-        if (! $currency) {
-            $currency = DB::table('currencies')->where('iso_code', config('cashier.currency'))->first();
-        }
+        // Single hardcoded currency system (Mozambican Metical) - no DB lookup,
+        // no cache to invalidate. See config/system.php `active_currency`.
+        $currency = config('system.active_currency');
 
         config([
-            'cashier.currency' => $currency->iso_code,
-            'system_settings.currency' => [
-                'id' => $currency->id,
-                'name' => $currency->name,
-                'symbol' => $currency->symbol,
-                'iso_code' => $currency->iso_code,
-                'exchange_rate' => $currency->exchange_rate ?? 1,
-                'symbol_first' => $currency->symbol_first,
-                'decimal_mark' => $currency->decimal_mark,
-                'thousands_separator' => $currency->thousands_separator,
-                'subunit' => $currency->subunit,
-            ],
+            'cashier.currency' => $currency['iso_code'],
+            'system_settings.currency' => $currency,
         ]);
     }
 }

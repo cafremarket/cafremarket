@@ -137,6 +137,12 @@ class Cart extends BaseModel
      */
     public function bid()
     {
+        // Auction package is optional — without this guard, admin cart
+        // detail modal fatals: Class "Incevio\Package\Auction\Models\Bid" not found.
+        if (! class_exists(\Incevio\Package\Auction\Models\Bid::class)) {
+            return $this->belongsTo(static::class, 'auction_bid_id')->whereRaw('0 = 1');
+        }
+
         return $this->belongsTo(\Incevio\Package\Auction\Models\Bid::class, 'auction_bid_id');
     }
 

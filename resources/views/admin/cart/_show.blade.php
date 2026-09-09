@@ -4,11 +4,20 @@
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="position: absolute; top: 5px; right: 10px; z-index: 9;">×
       </button>
 
+      @php
+        $customer = $cart->customer;
+        $isGuest = ! $cart->customer_id || ! $customer || ! $customer->exists;
+        $customerName = $isGuest
+          ? ($customer->name ?? trans('app.guest_customer'))
+          : $customer->getName();
+        $customerEmail = $isGuest ? ($cart->email ?: '—') : ($customer->email ?: '—');
+      @endphp
+
       <div class="col-md-3 nopadding" style="margin-top: 10px;">
-        @if ($cart->customer->image)
-          <img src="{{ get_storage_file_url(optional($cart->customer->image)->path, 'small') }}" class="thumbnail" width="100%" alt="{{ trans('app.avatar') }}">
+        @if (! $isGuest && $customer->image)
+          <img src="{{ get_storage_file_url(optional($customer->image)->path, 'small') }}" class="thumbnail" width="100%" alt="{{ trans('app.avatar') }}">
         @else
-          <img src="{{ get_gravatar_url($cart->customer->email, 'small') }}" class="thumbnail" width="100%" alt="{{ trans('app.avatar') }}">
+          <img src="{{ get_gravatar_url($customerEmail !== '—' ? $customerEmail : 'guest@example.com', 'small') }}" class="thumbnail" width="100%" alt="{{ trans('app.avatar') }}">
         @endif
       </div>
       <div class="col-md-9 nopadding">
@@ -16,16 +25,18 @@
         <table class="table no-border">
           <tr>
             <th class="text-right">{{ trans('app.customer') }}:</th>
-            <td style="width: 75%;"><span class="lead">{{ $cart->customer->getName() }}</span></td>
+            <td style="width: 75%;"><span class="lead">{{ $customerName }}</span></td>
           </tr>
           <tr>
             <th class="text-right">{{ trans('app.email') }}:</th>
-            <td style="width: 75%;">{{ $cart->customer->email }}</td>
+            <td style="width: 75%;">{{ $customerEmail }}</td>
           </tr>
-          <tr>
-            <th class="text-right">{{ trans('app.member_since') }}:</th>
-            <td style="width: 75%;">{{ $cart->customer->created_at->toFormattedDateString() }}</td>
-          </tr>
+          @unless ($isGuest)
+            <tr>
+              <th class="text-right">{{ trans('app.member_since') }}:</th>
+              <td style="width: 75%;">{{ optional($customer->created_at)->toFormattedDateString() }}</td>
+            </tr>
+          @endunless
         </table>
       </div>
       <div class="clearfix"></div>
@@ -56,16 +67,16 @@
                 </tr>
               </thead>
               <tbody id="items">
-                @if (count($cart->inventories) > 0)
+                @if ($cart->inventories->count() > 0)
                   @foreach ($cart->inventories as $item)
                     <tr>
                       <td>
                         @if ($item->image)
                           <img src="{{ get_storage_file_url($item->image->path, 'tiny') }}" class="img-circle img-md" alt="{{ trans('app.image') }}">
-                        @elseif($item->product->featureImage)
+                        @elseif(optional($item->product)->featureImage)
                           <img src="{{ get_storage_file_url($item->product->featureImage->path, 'tiny') }}" class="img-circle img-md" alt="{{ trans('app.image') }}">
                         @else
-                          <img src="{{ get_storage_file_url(optional($item->product->image)->path, 'tiny') }}" class="img-circle img-md" alt="{{ trans('app.image') }}">
+                          <img src="{{ get_storage_file_url(optional(optional($item->product)->image)->path, 'tiny') }}" class="img-circle img-md" alt="{{ trans('app.image') }}">
                         @endif
                       </td>
                       <td>{{ $item->pivot->item_description }}</td>
@@ -88,7 +99,7 @@
             <table class="table no-border">
               <tr>
                 <th class="text-right">{{ trans('app.created_at') }}:</th>
-                <td style="width: 75%;">{{ $cart->created_at->toDayDateTimeString() }}</td>
+                <td style="width: 75%;">{{ optional($cart->created_at)->toDayDateTimeString() }}</td>
               </tr>
 
               <tr>
@@ -96,7 +107,7 @@
                 <td style="width: 75%;">{{ $cart->id }}</td>
               </tr>
 
-              @if ($cart->bid)
+              @if (class_exists(\Incevio\Package\Auction\Models\Bid::class) && $cart->auction_bid_id && $cart->bid)
                 <tr>
                   <th class="text-right">{{ trans('packages.auction.bid_wins_at') }}:</th>
                   <td style="width: 75%;">
@@ -125,7 +136,7 @@
               @endif
               <tr>
                 <th class="text-right">{{ trans('app.shipping_address') }}:</th>
-                <td style="width: 75%;">{{ $cart->shipping_address }}</td>
+                <td style="width: 75%;">{{ $cart->shipping_address ?: '—' }}</td>
               </tr>
               @if ($cart->message_to_customer)
                 <tr>
@@ -164,7 +175,7 @@
               </tr>
               <tr>
                 <th class="text-right">{{ trans('app.handling') }}:</th>
-                <td style="width: 75%;">{{ get_formated_currency($cart->handling, 2, config('system_settings.currency.id'), config('system_settings.currency.id')) }}</td>
+                <td style="width: 75%;">{{ get_formated_currency($cart->handling, 2, config('system_settings.currency.id')) }}</td>
               </tr>
               <tr>
                 <th class="text-right">{{ trans('app.taxes') }}:</th>
@@ -172,7 +183,7 @@
               </tr>
               <tr>
                 <th class="text-right">{{ trans('app.billing_address') }}:</th>
-                <td style="width: 75%;">{{ $cart->billing_address }}</td>
+                <td style="width: 75%;">{{ $cart->billing_address ?: '—' }}</td>
               </tr>
             </table>
           </div>

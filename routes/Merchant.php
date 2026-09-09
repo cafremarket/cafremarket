@@ -67,9 +67,10 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
         });
 
         // Order Routes for Merchant panel (mirrors admin.order.*)
+        // Cart routes intentionally omitted — abandoned carts are admin-only
+        // to avoid exposing customer cart data to stores.
         Route::name('order.')->prefix('order')->group(function () {
             include 'admin/Order.php';
-            include 'admin/Cart.php';
         });
 
         Route::name('setting.')->prefix('setting')->group(function () {

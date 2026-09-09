@@ -42,12 +42,12 @@
               <td><input id="{{ $cart_list->id }}" type="checkbox" class="massCheck"></td>
             @endcan
             <td>{{ $cart_list->created_at->diffForHumans() }}</td>
-            <td>{{ $cart_list->customer->name }}</td>
+            <td>{{ optional($cart_list->customer)->name ?? ($cart_list->email ?: trans('app.guest_customer')) }}</td>
             <td>{{ $cart_list->item_count }}</td>
             <td>{{ $cart_list->quantity }}</td>
             <td>{{ get_formated_currency($cart_list->grand_total, 2, config('system_settings.currency.id')) }}</td>
             <td class="row-options admin-row-actions">
-              @if (Gate::allows('create', \App\Models\Order::class) || Gate::allows('update', $cart_list))
+              @if ($cart_list->customer && (Gate::allows('create', \App\Models\Order::class) || Gate::allows('update', $cart_list)))
                 {!! Form::open(['route' => ['admin.order.order.create'], 'method' => 'get', 'class' => 'admin-inline-form']) !!}
                 {{ Form::hidden('customer_id', $cart_list->customer->id) }}
                 {{ Form::hidden('cart_id', $cart_list->id) }}

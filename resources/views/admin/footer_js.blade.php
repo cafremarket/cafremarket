@@ -147,10 +147,14 @@
               $('.modal-body input:text:visible:first').focus();
             })
             .fail(function(response) {
+              remove_busy_filter();
               if (401 === response.status) {
                 window.location = "{{ route('login') }}";
               } else {
                 console.log("{{ trans('responses.error') }}");
+                if (typeof toastr !== 'undefined') {
+                  toastr.error("{{ trans('responses.error') }}");
+                }
               }
             });
         }

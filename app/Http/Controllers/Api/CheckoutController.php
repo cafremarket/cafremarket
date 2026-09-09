@@ -19,12 +19,84 @@ use App\Models\PaymentMethod;
 use App\Services\Payments\PaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class CheckoutController extends Controller
 {
     use ShoppingCart;
+
+    private function walletVisibilityDebugData(Cart $cart): array
+    {
+        $shop = $cart->shop;
+        $customer = Auth::guard('customer')->user() ?: Auth::guard('api')->user();
+        $defaultWalletSlug = config('wallet.wallet.default.slug', 'default');
+        $walletTableExists = Schema::hasTable('wallets');
+        $walletRow = null;
+
+        if ($walletTableExists && $customer) {
+            $walletRow = DB::table('wallets')
+                ->where('holder_type', get_class($customer))
+                ->where('holder_id', $customer->id)
+                ->where('slug', $defaultWalletSlug)
+                ->first();
+        }
+
+        $activePaymentMethods = PaymentMethod::active()->get();
+        $activePaymentCodes = $activePaymentMethods->pluck('code')->toArray();
+
+        $shopConfig = null;
+        if (vendor_get_paid_directly()) {
+            $activePaymentMethods = $shop->paymentMethods;
+            $shopConfig = $shop;
+        }
+
+        $methods = $activePaymentMethods->map(function ($payment) use ($activePaymentCodes, $shopConfig) {
+            $config = get_payment_config_info($payment->code, $shopConfig);
+
+            return [
+                'code' => $payment->code,
+                'enabled_in_payment_methods' => in_array($payment->code, $activePaymentCodes, true),
+                'config_present' => (bool) $config,
+                'config' => $config,
+                'would_show' => $payment->code !== 'cod'
+                    && in_array($payment->code, $activePaymentCodes, true)
+                    && (bool) $config,
+            ];
+        })->values();
+
+        return [
+            'cart_id' => $cart->id,
+            'shop' => [
+                'id' => optional($shop)->id,
+                'slug' => optional($shop)->slug,
+                'vendor_get_paid_directly' => (bool) vendor_get_paid_directly(),
+                'shop_payment_method_codes' => $shop
+                    ? $shop->paymentMethods()->pluck('code')->values()
+                    : [],
+            ],
+            'customer' => [
+                'authenticated' => (bool) $customer,
+                'id' => optional($customer)->id,
+                'email' => optional($customer)->email,
+                'customer_has_wallet' => function_exists('customer_has_wallet')
+                    ? (bool) customer_has_wallet()
+                    : false,
+                'wallet_checkout_option' => (bool) get_from_option_table('wallet_checkout'),
+                'wallet_table_exists' => $walletTableExists,
+                'default_wallet_slug' => $defaultWalletSlug,
+                'wallet_row_exists' => (bool) $walletRow,
+                'wallet_balance' => $walletRow->balance ?? null,
+            ],
+            'package' => [
+                'wallet_loaded' => (bool) is_incevio_package_loaded('wallet'),
+            ],
+            'payment_methods' => $methods,
+            'wallet_method' => $methods->firstWhere('code', 'zcart-wallet'),
+        ];
+    }
 
     /**
      * Checkout the cart and process the payment.
@@ -221,7 +293,20 @@ class CheckoutController extends Controller
             return $isActiveAndHasValidConfig;
         });
 
+        if (request()->boolean('debug_wallet')) {
+            Log::info('wallet visibility debug', $this->walletVisibilityDebugData($cart));
+        }
+
         return PaymentMethodResource::collection($results);
+    }
+
+    /**
+     * Debug wallet/payment visibility for a cart without changing
+     * the normal payment options API shape consumed by the app.
+     */
+    public function paymentOptionsDebug(Cart $cart)
+    {
+        return response()->json($this->walletVisibilityDebugData($cart));
     }
 
     /**

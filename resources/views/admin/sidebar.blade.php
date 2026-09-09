@@ -682,12 +682,6 @@
               </a>
             </li>
 
-            <li class="{{ Request::is('admin/setting/currency*') ? 'active' : '' }}">
-              <a href="{{ url('admin/setting/currency') }}">
-                <i class="fa fa-angle-double-right"></i> {{ trans('nav.currencies') }}
-              </a>
-            </li>
-
             <li class="{{ Request::is('admin/setting/language*') ? 'active' : '' }}">
               <a href="{{ url('admin/setting/language') }}">
                 <i class="fa fa-angle-double-right"></i> {{ trans('app.languages') }}

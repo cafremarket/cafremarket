@@ -82,10 +82,7 @@
           <i class="fa fa-list-alt"></i>
           <span>{{ trans('nav.orders') ?? 'Orders' }}</span>
         </a>
-        <a href="{{ mp_url('merchant/order/cart') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/order/cart*') ? 'is-active' : '' }}">
-          <i class="fa fa-cart-arrow-down"></i>
-          <span>{{ trans('nav.carts') ?? 'Carts' }}</span>
-        </a>
+        {{-- Store carts hidden: customer cart data stays admin-only. --}}
         <a href="{{ mp_url('merchant/order/cancellation') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/order/cancellation*') ? 'is-active' : '' }}">
           <i class="fa fa-times-circle"></i>
           <span>{{ trans('nav.cancellations') ?? 'Cancellations' }}</span>

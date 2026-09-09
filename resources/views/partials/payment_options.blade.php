@@ -27,8 +27,8 @@
       $config = get_payment_config_info($paymentMethod->code, $config_shop);
 
       $suffix = '';
-      if ($paymentMethod->code == 'zcart-wallet' && isset($config['config'])) {
-          $suffix = ' (' . get_formated_currency($config['config']) . ')';
+      if ($paymentMethod->code == 'zcart-wallet' && isset($config['config']['balance'])) {
+          $suffix = ' (' . get_formated_currency($config['config']['balance']) . ')';
       }
 
       // Share the payment config to global level so other views can access

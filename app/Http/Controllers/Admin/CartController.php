@@ -65,6 +65,19 @@ class CartController extends Controller
     {
         $cart = $this->cart->find($id);
 
+        // Eager-load relations used by the detail modal so missing auction /
+        // product data cannot leave the AJAX modal blank.
+        if ($cart) {
+            $cart->load([
+                'customer.image',
+                'inventories.image',
+                'inventories.product.featureImage',
+                'inventories.product.image',
+                'shippingRate',
+                'coupon',
+            ]);
+        }
+
         return view('admin.cart._show', compact('cart'));
     }
 

@@ -194,6 +194,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Single (hardcoded) system currency
+    |--------------------------------------------------------------------------
+    |
+    | This system runs on a single fixed currency (Mozambican Metical). Rather
+    | than reading the active currency from the database on every request,
+    | setSystemCurrency() (app/Helpers/SystemHelper.php) uses this constant
+    | directly. The `currencies` database table and its row for MZN (id 101)
+    | are kept only for foreign keys on systems/orders/countries and order
+    | history - they are no longer read to determine the active currency.
+    |
+    */
+    'active_currency' => [
+        'id' => 101,
+        'name' => 'Mozambican Metical',
+        'symbol' => 'MT',
+        'iso_code' => 'MZN',
+        'exchange_rate' => 1,
+        'symbol_first' => false,
+        'decimal_mark' => ',',
+        'thousands_separator' => '.',
+        'subunit' => 'Centavo',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Pagination
     |--------------------------------------------------------------------------
     |

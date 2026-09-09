@@ -2301,30 +2301,28 @@ if (! function_exists('get_system_currency_value')) {
 }
 
 if (! function_exists('get_currency_prefix')) {
+    /**
+     * @param  mixed  $currency_id  Unused - kept for call-site compatibility. This is a
+     *                               single-currency system (MZN, config('system.active_currency')),
+     *                               so formatting never varies by currency/order.
+     */
     function get_currency_prefix($currency_id = null)
     {
-        $symbol = get_formated_currency_symbol($currency_id);
-
-        if ($currency_id) {
-            $currency = get_active_currencies()->find($currency_id);
-
-            return $currency->symbol_first ? $symbol : '';
-        }
+        $symbol = get_formated_currency_symbol();
 
         return config('system_settings.currency.symbol_first') ? $symbol : '';
     }
 }
 
 if (! function_exists('get_currency_suffix')) {
+    /**
+     * @param  mixed  $currency_id  Unused - kept for call-site compatibility. This is a
+     *                               single-currency system (MZN, config('system.active_currency')),
+     *                               so formatting never varies by currency/order.
+     */
     function get_currency_suffix($currency_id = null)
     {
-        $symbol = get_formated_currency_symbol($currency_id);
-
-        if ($currency_id) {
-            $currency = get_active_currencies()->find($currency_id);
-
-            return $currency->symbol_first ? '' : $symbol;
-        }
+        $symbol = get_formated_currency_symbol();
 
         return config('system_settings.currency.symbol_first') ? '' : $symbol;
     }
