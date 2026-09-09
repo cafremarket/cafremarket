@@ -41,6 +41,8 @@ class WalletServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/all.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'wallet');
+        // Without this, activating the package never creates wallets/transactions/transfers.
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         if (! $this->app->runningInConsole()) {
             return;
