@@ -118,7 +118,6 @@ class Shop extends ShopWallet
         'phone_verified',
         'address_verified',
         'service_radius_km',
-        'delivery_capability',
         'primary_address_id',
         'total_item_sold',
         'total_sold_amount',
@@ -915,16 +914,6 @@ class Shop extends ShopWallet
         return $this->addresses()->whereNotNull('latitude')->whereNotNull('longitude')->first()
             ?? $this->primaryAddress()->first()
             ?? $this->addresses()->first();
-    }
-
-    public function supportsShopDelivery(): bool
-    {
-        return in_array($this->delivery_capability, ['shop_only', 'both'], true);
-    }
-
-    public function supportsSystemDelivery(): bool
-    {
-        return in_array($this->delivery_capability, ['system_only', 'both'], true);
     }
 
     public function hasStoreLocation(): bool

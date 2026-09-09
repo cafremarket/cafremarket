@@ -10,7 +10,6 @@ use App\Models\Category;
 use App\Models\CategoryGroup;
 use App\Models\CategorySubGroup;
 use App\Models\Customer;
-use App\Models\DeliveryBoy;
 use App\Models\Dispute;
 use App\Models\Inventory;
 use App\Models\Language;
@@ -1756,7 +1755,6 @@ class ListHelper
 
         return DB::table('delivery_boys')
             ->where('shop_id', $shop_id)
-            ->where('type', DeliveryBoy::TYPE_SHOP)
             ->where('status', BaseModel::ACTIVE)
             ->orderBy('nice_name', 'asc')
             ->pluck('nice_name', 'id');

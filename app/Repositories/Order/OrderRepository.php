@@ -17,6 +17,4 @@ interface OrderRepository
     public function syncInventory($order, array $cart);
 
     public function fulfill(Request $request, $order);
-
-    public function updateOrderStatus(Request $request, $order);
 }

@@ -15,6 +15,7 @@ class OrderResource extends JsonResource
     public function toArray($request)
     {
         $vendor = $request->is('api/vendor/*');
+        $deliveryBoyGuard = $request->is('api/deliveryboy/*');
         $decimal = config('system_settings.decimals', 2);
 
         return [
@@ -94,7 +95,21 @@ class OrderResource extends JsonResource
             'shop' => $this->when(! $vendor, new ShopLightResource($this->shop, $this->feedback_id)),
             'items' => OrderItemResource::collection($this->inventories, $this->currency_id),
             'conversation' => $this->conversation,
-            'otp' => $this->otp ?? null,
+            // The rider must never see the OTP the customer is meant to read out to them.
+            'otp' => $deliveryBoyGuard ? null : ($this->otp ?? null),
+            'fulfillment_method' => $this->fulfillment_method,
+            'reached_at' => optional($this->reached_at)->toIso8601String(),
+            'delivery_status_label' => $this->deliveryStatusLabel(),
+            'courier' => $this->when($this->hasCourier(), function () {
+                return [
+                    'name' => $this->courier_name,
+                    'phone' => $this->courier_phone,
+                    'tracking_number' => $this->courier_tracking_number,
+                    'added_at' => optional($this->courier_added_at)->toIso8601String(),
+                ];
+            }),
+            'customer_latitude' => $this->when($deliveryBoyGuard, $this->customer_latitude),
+            'customer_longitude' => $this->when($deliveryBoyGuard, $this->customer_longitude),
             'wire_transfer_proofs' => $this->when(
                 optional($this->paymentMethod)->code === 'wire',
                 function () {

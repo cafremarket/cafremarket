@@ -48,11 +48,11 @@
 
       <td><span class="variant-summary-sku">{{ $variant->sku }}</span></td>
       <td><span class="variant-summary-qty">{{ $variant->stock_quantity }}</span></td>
-      <td><span class="variant-summary-price">{{ get_currency_prefix() }}{{ number_format((float) $variant->sale_price, 2) }}</span></td>
+      <td><span class="variant-summary-price">{{ get_currency_prefix() }}{{ get_formated_decimal((float) $variant->sale_price, false, 2) }}{{ get_currency_suffix() }}</span></td>
 
       <td>
         <span class="variant-summary-offer {{ $hasOffer ? '' : 'hide' }}">
-          {{ get_currency_prefix() }}{{ number_format((float) $variant->offer_price, 2) }}
+          {{ get_currency_prefix() }}{{ get_formated_decimal((float) $variant->offer_price, false, 2) }}{{ get_currency_suffix() }}
         </span>
         <span class="text-muted variant-summary-offer-empty {{ $hasOffer ? 'hide' : '' }}">&mdash;</span>
       </td>
@@ -60,7 +60,7 @@
       <td class="text-nowrap">
         {{ Form::hidden('variant_ids[' . $variant->id . ']', $variant->id) }}
 
-        <button type="button" class="btn btn-xs btn-default manageVariantBtn" data-toggle="modal" data-target="#variantManageModal">
+        <button type="button" class="btn btn-xs btn-default manageVariantBtn">
           <i class="fa fa-cog"></i> {{ trans('app.manage') }}
         </button>
         @unless (is_null($variant->parent_id))

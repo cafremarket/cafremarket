@@ -32,10 +32,9 @@ Route::prefix('deliveryboy')->namespace('DeliveryBoy')->group(function () {
         // Orders
         Route::get('orders', [OrderController::class, 'index']);
         Route::get('orders/{order}', [OrderController::class, 'show']);
-        Route::post('orders/status/{order}', [OrderController::class, 'updateOrderStatus']);
-        Route::post('orders/{order}/markasdelivered', [OrderController::class, 'markAsDelivered']);
         Route::post('orders/{order}/markaspaid', [OrderController::class, 'markAsPaid']);
-        Route::post('orders/{order}/sendotp', [OrderController::class, 'sendOtp']);
+        Route::post('orders/{order}/reached', [OrderController::class, 'reached']);
+        Route::post('orders/{order}/confirm-delivery', [OrderController::class, 'confirmDelivery']);
         Route::post('location', [LocationController::class, 'update']);
 
         // Delivery boy App Version 2.0

@@ -217,7 +217,6 @@ Route::prefix('vendor')->group(function () {
         Route::post('order/create', [OrderController::class, 'store']);
         Route::get('orders', [OrderController::class, 'index']);
         Route::get('order/{order}', [OrderController::class, 'show']);
-        Route::put('order/{order}/update_status', [OrderController::class, 'update_status']);
         Route::put('order/{order}/mark_as_paid', [OrderController::class, 'mark_as_paid']);
         Route::put('order/{order}/mark_as_unpaid', [OrderController::class, 'mark_as_unpaid']);
         Route::put('order/{order}/mark_as_fulfilled', [OrderController::class, 'mark_as_fulfilled']); // Where and why we need this route?
@@ -231,7 +230,9 @@ Route::prefix('vendor')->group(function () {
         // Fulfillment
         Route::post('order/{order}/fulfill', [OrderFulfillmentController::class, 'fulfill']);
         Route::put('order/{order}/delivered', [OrderFulfillmentController::class, 'delivered']);
+        Route::get('order/{order}/delivery_boys', [OrderFulfillmentController::class, 'delivery_boys']);
         Route::post('order/{order}/assign_delivery_boy', [OrderFulfillmentController::class, 'assign_delivery_boy']);
+        Route::post('order/{order}/courier', [OrderFulfillmentController::class, 'assign_courier']);
 
         // Order conversations
 

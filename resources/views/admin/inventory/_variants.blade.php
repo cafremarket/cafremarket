@@ -95,7 +95,8 @@
             'step' => '0.01',
             'required' => true,
             'placeholder' => trans('app.placeholder.sale_price'),
-            'prefix' => get_currency_prefix() ?: config('system_settings.currency.symbol', '$'),
+            'prefix' => get_currency_prefix(),
+            'suffix' => get_currency_suffix(),
           ])
         </div>
       </td>

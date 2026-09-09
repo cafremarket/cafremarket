@@ -158,9 +158,9 @@ final class EmolaSpec
 
         throw new PaymentFailedException(
             trans('theme.emola_deposit_charge_exceeds_partner', [
-                'amount' => number_format($chargeMzn, 0, '.', ','),
-                'max' => number_format($max, 0, '.', ','),
-                'max_base' => number_format(self::maxWalletDepositBaseMzn('emola'), 0, '.', ','),
+                'amount' => get_formated_decimal($chargeMzn, false, 0),
+                'max' => get_formated_decimal($max, false, 0),
+                'max_base' => get_formated_decimal(self::maxWalletDepositBaseMzn('emola'), false, 0),
             ])
         );
     }
@@ -248,8 +248,8 @@ final class EmolaSpec
         if ($value < $min) {
             throw new PaymentFailedException(
                 trans('theme.emola_amount_below_min', [
-                    'amount' => number_format($value, 0, '.', ','),
-                    'min' => number_format($min, 0, '.', ','),
+                    'amount' => get_formated_decimal($value, false, 0),
+                    'min' => get_formated_decimal($min, false, 0),
                 ])
             );
         }
@@ -261,9 +261,9 @@ final class EmolaSpec
 
             throw new PaymentFailedException(
                 trans($messageKey, [
-                    'amount' => number_format($value, 0, '.', ','),
-                    'max' => number_format($max, 0, '.', ','),
-                    'min' => number_format($min, 0, '.', ','),
+                    'amount' => get_formated_decimal($value, false, 0),
+                    'max' => get_formated_decimal($max, false, 0),
+                    'min' => get_formated_decimal($min, false, 0),
                 ])
             );
         }
@@ -273,8 +273,8 @@ final class EmolaSpec
         if ($movitelMax < PHP_INT_MAX && $value > $movitelMax) {
             throw new PaymentFailedException(
                 trans('theme.emola_movitel_max_exceeded', [
-                    'amount' => number_format($value, 0, '.', ','),
-                    'movitel_max' => number_format($movitelMax, 0, '.', ','),
+                    'amount' => get_formated_decimal($value, false, 0),
+                    'movitel_max' => get_formated_decimal($movitelMax, false, 0),
                 ])
             );
         }

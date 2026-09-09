@@ -289,6 +289,213 @@ class CheckoutController extends Controller
     }
 
     /**
+     * Checkout every cart for the customer/guest as a separate per-store order.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkoutAll(CheckoutCartRequest $request, PaymentGateway $payment)
+    {
+        $carts = $this->getShoppingCarts(true)->loadMissing(['shop', 'shippingAddress', 'inventories']);
+
+        if ($carts->isEmpty()) {
+            return response()->json([
+                'message' => trans('theme.notify.cart_empty'),
+            ], 422);
+        }
+
+        $deliveryRange = app(\App\Services\Cart\CartDeliveryRangeService::class);
+        $deliveryRange->annotate($carts);
+
+        foreach ($carts as $cart) {
+            if (! crosscheckCartOwnership($request, $cart)) {
+                return response()->json(['message' => trans('api.auth_required')], 403);
+            }
+
+            if (! shop_can_accept_sales($cart->shop)) {
+                return response()->json([
+                    'message' => trans('packages.wallet.vendor_sales_require_subscription'),
+                ], 422);
+            }
+
+            if (! empty($cart->needs_delivery_location)) {
+                return response()->json([
+                    'message' => trans('theme.notify.set_location_for_delivery'),
+                ], 422);
+            }
+
+            if (! empty($cart->out_of_range)) {
+                return response()->json([
+                    'message' => trans('theme.notify.product_out_of_delivery_range', [
+                        'store' => optional($cart->shop)->name ?? 'This store',
+                        'distance' => $cart->delivery_distance_km ?? '—',
+                        'radius' => $cart->service_radius_km ?? '—',
+                    ]),
+                ], 422);
+            }
+        }
+
+        // Same delivery destination required for checkout-all.
+        $shipToIds = $carts->map(fn (Cart $cart) => (int) ($cart->ship_to ?? 0))->unique()->values();
+        if ($shipToIds->count() > 1 && ! $request->filled('ship_to')) {
+            return response()->json([
+                'message' => trans('packages.checkout.checkout_all_not_possible'),
+            ], 422);
+        }
+
+        $customerId = Auth::guard('api')->id() ?: $request->input('customer_id');
+        if ($customerId) {
+            Cart::whereIn('id', $carts->pluck('id'))->update(['customer_id' => $customerId]);
+            $carts->each(fn (Cart $cart) => $cart->customer_id = $customerId);
+        }
+
+        DB::beginTransaction();
+
+        $orders = [];
+        $response = null;
+
+        try {
+            foreach ($carts as $cart) {
+                $cart = crosscheckAndUpdateOldCartInfo($request, $cart);
+                $orders[] = $this->saveOrderFromCart($request, $cart);
+            }
+
+            if (is_incevio_package_loaded('dynamic-currency')) {
+                foreach ($orders as $order) {
+                    $order['exchange_rate'] = get_dynamic_currency_attr('exchange_rate');
+                    $order['currency_id'] = get_dynamic_currency_attr('id');
+                }
+            }
+
+            // Multi-shop: charge once on the platform when vendors are paid directly.
+            $receiver = (vendor_get_paid_directly() && count($orders) > 1)
+                ? 'platform'
+                : (vendor_get_paid_directly() ? 'merchant' : 'platform');
+
+            if ($request->input('payment_status') == 'paid' && $request->has('payment_meta')) {
+                $response = $payment->setOrderInfo($orders)->verifyPaidPayment();
+            } else {
+                $paymentMethod = (string) $request->input('payment_method', '');
+                $chargeAmount = 0.0;
+
+                foreach ($orders as $order) {
+                    if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                        persist_order_checkout_fees($order, $paymentMethod);
+                        $feeBreakdown = get_customer_transaction_fee_for_order($order, $paymentMethod);
+                        $chargeAmount += (float) $feeBreakdown['total'];
+                    } else {
+                        $chargeAmount += (float) $order->grand_total;
+                    }
+                }
+
+                $paymentBuilder = $payment->setReceiver($receiver)->setOrderInfo($orders);
+
+                if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                    $paymentBuilder->setAmount((int) round($chargeAmount));
+                } else {
+                    $paymentBuilder->setAmount($chargeAmount);
+                }
+
+                $response = $paymentBuilder
+                    ->setDescription(trans('app.purchase_from', [
+                        'marketplace' => get_platform_title(),
+                    ]))
+                    ->setConfig()
+                    ->charge();
+            }
+
+            if ($response instanceof RedirectResponse) {
+                $response = (object) ['status' => PaymentService::STATUS_PENDING];
+            }
+
+            foreach ($orders as $order) {
+                switch ($response->status) {
+                    case PaymentService::STATUS_PAID:
+                        if (optional($order->paymentMethod)->code !== 'emola') {
+                            $order->markAsPaid();
+                        }
+                        break;
+
+                    case PaymentService::STATUS_PENDING:
+                        if ($order->paymentMethod->code == 'cod') {
+                            $order->order_status_id = Order::STATUS_CONFIRMED;
+                            $order->payment_status = Order::PAYMENT_STATUS_UNPAID;
+                        } else {
+                            $order->order_status_id = Order::STATUS_WAITING_FOR_PAYMENT;
+                            $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+                        }
+                        $order->save();
+                        break;
+
+                    case PaymentService::STATUS_ERROR:
+                        $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+                        $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
+                        $order->save();
+                        break;
+
+                    default:
+                        throw new PaymentFailedException(trans('theme.notify.payment_failed'));
+                }
+            }
+        } catch (PaymentFailedException $e) {
+            DB::rollback();
+
+            Log::warning($request->payment_method.' checkout_all payment failed: '.$e->getMessage());
+
+            return response()->json([
+                'error' => $e->getMessage(),
+                'carts' => CartResource::collection($carts),
+            ], 403);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            Log::error($request->payment_method.' checkout_all payment failed: '.$e->getMessage(), [
+                'exception' => $e,
+            ]);
+
+            return response()->json([
+                'error' => $e->getMessage(),
+                'carts' => CartResource::collection($carts),
+            ], 403);
+        }
+
+        DB::commit();
+
+        foreach ($carts as $cart) {
+            $cart->forceDelete();
+        }
+
+        foreach ($orders as $order) {
+            if (! $this->shouldDeferEmolaConfirmation($order, $response)) {
+                safe_dispatch_order_event(new OrderCreated($order), 'OrderCreated');
+            }
+        }
+
+        $primary = $orders[0];
+        $message = trans('theme.notify.order_placed');
+        if (! empty($response->paymentNotice)) {
+            $message = $response->paymentNotice;
+        } elseif (
+            isset($response->status) &&
+            $response->status === PaymentService::STATUS_PENDING &&
+            optional($primary->paymentMethod)->code === 'emola'
+        ) {
+            $message = trans('app.waiting_for_payment');
+        }
+
+        // Eager-load for resources
+        foreach ($orders as $order) {
+            $order->loadMissing(['shop', 'paymentMethod', 'inventories.image', 'customer']);
+        }
+
+        return response()->json([
+            'message' => $message,
+            'payment_notice' => $response->paymentNotice ?? null,
+            'order' => new OrderResource($primary),
+            'orders' => collect($orders)->map(fn (Order $order) => (new OrderResource($order))->resolve())->values(),
+        ], 200);
+    }
+
+    /**
      * Return available payment options for the cart.
      *
      * @return \Illuminate\Http\Resources\Json\JsonResource

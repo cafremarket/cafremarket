@@ -8,6 +8,7 @@ use App\Http\Requests\Validations\OrderDetailRequest;
 use App\Models\DeliveryBoy;
 use App\Models\Order;
 use App\Services\Delivery\DeliveryDispatchService;
+use App\Services\FCMService;
 use Illuminate\Http\Request;
 
 class OrderFulfillmentController extends Controller
@@ -51,47 +52,65 @@ class OrderFulfillmentController extends Controller
     }
 
     /**
-     * Return list of delivery boys
+     * Return list of the shop's own delivery boys
      *
      * @return \Illuminate\Http\Response
      */
     public function delivery_boys(Order $order, DeliveryDispatchService $dispatchService)
     {
-        $shopRiders = $dispatchService->getAvailableShopRiders($order->shop_id)
-            ->pluck('nice_name', 'id');
-
         return [
-            'shop_riders' => $shopRiders,
-            'platform_riders' => $dispatchService->findNearbyPlatformRiders($order->shop)->map(function ($rider) {
-                return [
-                    'id' => $rider->id,
-                    'name' => $rider->nice_name ?: $rider->getName(),
-                    'distance_km' => round($rider->distance_km, 2),
-                ];
-            })->values(),
+            'shop_riders' => $dispatchService->getAvailableShopRiders($order->shop_id)->pluck('nice_name', 'id'),
         ];
     }
 
     /**
-     * Assign a delivery boy
+     * Assign a shop-owned delivery boy
      *
      * @return \Illuminate\Http\Response
      */
     public function assign_delivery_boy(Request $request, Order $order, DeliveryDispatchService $dispatchService)
     {
         try {
-            if ($request->filled('platform_rider_id') || $request->boolean('use_platform')) {
-                $dispatchService->requestPlatformDelivery($order, $request->input('platform_rider_id'));
-            } else {
-                $rider = DeliveryBoy::findOrFail($request->input('delivery_boy_id'));
-                if ($rider->isPlatform()) {
-                    $dispatchService->assignPlatformRider($order, $rider);
-                } else {
-                    $dispatchService->assignShopRider($order, $rider);
-                }
-            }
+            $rider = DeliveryBoy::findOrFail($request->input('delivery_boy_id'));
+            $dispatchService->assignShopRider($order, $rider);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
+        }
+
+        return response()->json(['message' => trans('api.order_updated_successfully')], 200);
+    }
+
+    /**
+     * Add courier details for this order (self-ship / third-party courier).
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function assign_courier(Request $request, Order $order)
+    {
+        if (! $request->filled('courier_name') || ! $request->filled('courier_phone')) {
+            return response()->json(['message' => trans('app.courier_details_required')], 422);
+        }
+
+        $order->fulfillment_method = Order::FULFILLMENT_METHOD_COURIER;
+        $order->courier_name = $request->input('courier_name');
+        $order->courier_phone = $request->input('courier_phone');
+        $order->courier_tracking_number = $request->input('courier_tracking_number');
+        $order->courier_added_at = now();
+        $order->otp = Order::generateDeliveryOtp();
+
+        if ($order->order_status_id < Order::STATUS_AWAITING_DELIVERY) {
+            $order->order_status_id = Order::STATUS_AWAITING_DELIVERY;
+        }
+
+        $order->save();
+
+        $customer_token = optional($order->customer)->fcm_token;
+
+        if (! is_null($customer_token)) {
+            FCMService::send($customer_token, [
+                'title' => trans('notifications.otp_send.subject'),
+                'body' => trans('notifications.otp_send.message', ['message' => $order->otp]),
+            ]);
         }
 
         return response()->json(['message' => trans('api.order_updated_successfully')], 200);

@@ -4,9 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Address;
 use App\Models\Customer;
-use App\Models\DeliveryBoy;
 use App\Models\Shop;
-use App\Models\System;
 use App\Services\Geo\GeocodeService;
 use App\Services\Hyperlocal\BuyerLocationService;
 use Illuminate\Console\Command;
@@ -31,11 +29,8 @@ class HyperlocalCleanupCommand extends Command
             'shops_linked' => 0,
             'shops_defaults' => 0,
             'customers_synced' => 0,
-            'riders_normalized' => 0,
             'carts_removed' => 0,
         ];
-
-        $stats = array_merge($stats, $this->applySystemDefaults());
 
         if (! $this->option('skip-geocode')) {
             $stats['addresses_geocoded'] = $this->geocodeMissingAddresses($geocoder);
@@ -46,7 +41,6 @@ class HyperlocalCleanupCommand extends Command
         $stats['shops_linked'] = $this->linkShopPrimaryAddresses();
         $stats['shops_defaults'] = $this->applyShopDefaults();
         $stats['customers_synced'] = $this->syncCustomerPreferredLocations($buyerLocation);
-        $stats['riders_normalized'] = $this->normalizeDeliveryBoyTypes();
 
         if ($this->option('clear-carts') && Schema::hasTable('carts')) {
             $stats['carts_removed'] = DB::table('carts')
@@ -72,40 +66,6 @@ class HyperlocalCleanupCommand extends Command
         }
 
         return self::SUCCESS;
-    }
-
-    protected function applySystemDefaults(): array
-    {
-        $updated = 0;
-        $system = System::first();
-
-        if (! $system) {
-            $this->warn('No system row found — skipping system defaults.');
-
-            return ['system_defaults' => 0];
-        }
-
-        $defaults = [
-            'max_delivery_assignment_radius_km' => config('hyperlocal.max_delivery_assignment_radius_km', 15),
-            'rider_accept_timeout_min' => config('hyperlocal.rider_accept_timeout_min', 5),
-        ];
-
-        foreach ($defaults as $column => $value) {
-            if (! Schema::hasColumn('systems', $column)) {
-                continue;
-            }
-
-            if ($system->{$column} === null || $system->{$column} === '') {
-                $system->{$column} = $value;
-                $updated++;
-            }
-        }
-
-        if ($updated) {
-            $system->save();
-        }
-
-        return ['system_defaults' => $updated];
     }
 
     protected function geocodeMissingAddresses(GeocodeService $geocoder): int
@@ -174,11 +134,6 @@ class HyperlocalCleanupCommand extends Command
                     $dirty = true;
                 }
 
-                if (! $shop->delivery_capability) {
-                    $shop->delivery_capability = 'both';
-                    $dirty = true;
-                }
-
                 if ($dirty) {
                     $shop->save();
                     $updated++;
@@ -217,24 +172,5 @@ class HyperlocalCleanupCommand extends Command
         });
 
         return $synced;
-    }
-
-    protected function normalizeDeliveryBoyTypes(): int
-    {
-        $count = 0;
-
-        DeliveryBoy::query()->chunkById(50, function ($riders) use (&$count) {
-            foreach ($riders as $rider) {
-                $expected = $rider->shop_id ? DeliveryBoy::TYPE_SHOP : DeliveryBoy::TYPE_PLATFORM;
-
-                if ($rider->type !== $expected) {
-                    $rider->type = $expected;
-                    $rider->save();
-                    $count++;
-                }
-            }
-        });
-
-        return $count;
     }
 }

@@ -50,7 +50,7 @@
         </td>
 
         <td class="text-nowrap">
-          <button type="button" class="btn btn-xs btn-default manageVariantBtn" data-toggle="modal" data-target="#variantManageModal">
+          <button type="button" class="btn btn-xs btn-default manageVariantBtn">
             <i class="fa fa-cog"></i> {{ trans('app.manage') }}
           </button>
           <i class="fa fa-close deleteThisRow text-muted" data-toggle="tooltip" data-placement="left" title="{{ trans('help.delete_this_combination') }}"></i>

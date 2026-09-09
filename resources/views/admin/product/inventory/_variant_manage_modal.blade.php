@@ -35,4 +35,6 @@
   #variantsTable .variant-summary-offer { display: inline-block; margin-top: 4px; font-size: 11px; padding: 2px 6px; border-radius: 3px; background: #fdecea; color: #c0392b; }
   #variantsTable .variant-summary-offer.hide { display: none; }
   #variantsTable .variant-fields { display: none; }
+  #variantsTable tr.variant-row { cursor: pointer; }
+  #variantsTable tr.variant-row:hover { background-color: #f8f9fc; }
 </style>

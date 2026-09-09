@@ -33,11 +33,20 @@ class EmolaPaymentService extends PaymentService
 
     private function chargeOrder()
     {
-        $res = $this->emolaOrders->pushPaymentForOrder(
-            $this->order,
-            (string) $this->request->input('emola_number'),
-            $this->description ?: 'Pagamento',
-        );
+        $orders = is_array($this->order) ? $this->order : [$this->order];
+        $msisdn = (string) $this->request->input('emola_number');
+        $sms = $this->description ?: 'Pagamento';
+
+        if (count($orders) > 1) {
+            $res = $this->emolaOrders->pushPaymentForOrders(
+                $orders,
+                $msisdn,
+                (int) $this->amount,
+                $sms
+            );
+        } else {
+            $res = $this->emolaOrders->pushPaymentForOrder($orders[0], $msisdn, $sms);
+        }
 
         if ($res->isUssdPushAccepted()) {
             $this->status = self::STATUS_PENDING;

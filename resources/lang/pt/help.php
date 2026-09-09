@@ -457,7 +457,6 @@ return [
     'shipping_zone_carrier' => 'You can link the shipping carrier. Customer will see this at checkout.',
     'drag_pin_to_set_location' => 'Drag the pin or click on the map to set the exact store location.',
     'service_radius_km' => 'Maximum distance (in km) this shop will deliver to from its store location.',
-    'delivery_capability' => 'Choose whether this shop uses its own riders, platform riders, or both.',
     'banner_zoom_effect' => 'Efeito de zoom do banner',
 
     'web_banners_intro_title' => 'Linhas de banners da homepage',

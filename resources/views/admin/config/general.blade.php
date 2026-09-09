@@ -245,28 +245,6 @@
           </div>
           @endif
 
-          @if (Auth::user()->isFromPlatform())
-          <div class="form-group">
-            <div class="row">
-              <div class="col-sm-4 text-right">
-                {!! Form::label('delivery_capability', trans('app.delivery_capability') . ':', ['class' => 'with-help control-label']) !!}
-                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.delivery_capability') }}"></i>
-              </div>
-              <div class="col-sm-8 nopadding-left">
-                @if ($can_update)
-                  {!! Form::select('delivery_capability', [
-                    'both' => trans('app.delivery_capability_both'),
-                    'shop_only' => trans('app.delivery_capability_shop_only'),
-                    'system_only' => trans('app.delivery_capability_system_only'),
-                  ], $shop->delivery_capability ?? 'both', ['class' => 'form-control select2-normal']) !!}
-                @else
-                  <span>{{ trans('app.delivery_capability_' . ($shop->delivery_capability ?? 'both') . '_label') }}</span>
-                @endif
-              </div>
-            </div>
-          </div>
-          @endif
-
           @if ($can_update)
             <div class="row">
               <div class="col-md-4 text-right">

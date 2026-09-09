@@ -82,7 +82,6 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/User.php';
             include 'admin/Customer.php';
             include 'admin/DeliveryBoy.php';
-            include 'admin/Hyperlocal.php';
         });
 
         // Vendors Routes for Admin

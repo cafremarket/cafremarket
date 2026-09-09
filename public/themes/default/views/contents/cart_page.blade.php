@@ -2,6 +2,44 @@
   <div class="container lg-100">
     @php
       $dec = is_non_decimal_currency() ? 0 : config('system_settings.decimals', 2);
+      $isMultiStore = $carts->count() > 1;
+      $primaryCart = $activeCart ?? $carts->first();
+      $combinedSubtotal = 0;
+      $combinedGrand = 0;
+      $anyBlocked = false;
+      foreach ($carts as $c) {
+          $combinedGrand += (float) $c->grand_total;
+          if (!empty($c->out_of_range) || !empty($c->needs_delivery_location)) {
+              $anyBlocked = true;
+          }
+      }
+      // Payment methods: platform list when multi-store (single combined charge).
+      $checkoutShop = $primaryCart ? $primaryCart->shop : null;
+      $cartPaymentMethods = ($isMultiStore || ! vendor_get_paid_directly())
+          ? $paymentMethods
+          : ($checkoutShop->paymentMethods ?? $paymentMethods);
+
+      $selectedAddress = null;
+      $pre_select = null;
+      if (isset($customer) && $customer && $customer->addresses) {
+          foreach ($customer->addresses as $address) {
+              if ($pre_select !== null) {
+                  continue;
+              }
+              if ($customer->addresses->count() == 1) {
+                  $pre_select = $address;
+              } elseif (Request::has('address') && Request::get('address') == $address->id) {
+                  $pre_select = $address;
+              } elseif ($primaryCart && $primaryCart->ship_to && $primaryCart->ship_to == $address->id) {
+                  $pre_select = $address;
+              } elseif ($primaryCart && $primaryCart->ship_to_country_id == $address->country_id && $primaryCart->ship_to_state_id == $address->state_id) {
+                  $pre_select = $address;
+              } elseif ($primaryCart && $primaryCart->ship_to == null && $address->address_type === 'Shipping') {
+                  $pre_select = $address;
+              }
+          }
+          $selectedAddress = $pre_select ?: $customer->addresses->first();
+      }
     @endphp
 
     @if (Session::has('error'))
@@ -13,229 +51,36 @@
     @if ($carts->count() > 0)
       <header class="sf-checkout__intro">
         <h1>{{ trans('theme.checkout') }}</h1>
-        <p>{{ trans('theme.shopping_cart') }}</p>
+        <p>
+          {{ trans('theme.shopping_cart') }}
+          @if ($isMultiStore)
+            — {{ $carts->count() }} {{ strtolower(trans('theme.stores')) }}
+          @endif
+        </p>
       </header>
 
-      @if ($carts->count() > 1)
-        <div class="sf-checkout__stores">
-          <p class="sf-checkout__stores-hint">{{ trans('theme.checkout_one_store_at_a_time') }}</p>
-          <div class="sf-checkout__store-tabs" role="tablist">
-            @foreach ($carts as $storeCart)
-              <a href="{{ route('cart.index', $storeCart->id) }}"
-                 class="sf-checkout__store-tab {{ optional($activeCart)->id == $storeCart->id ? 'is-active' : '' }} {{ !empty($storeCart->out_of_range) ? 'is-oor' : '' }}"
-                 role="tab"
-                 aria-selected="{{ optional($activeCart)->id == $storeCart->id ? 'true' : 'false' }}">
-                <span class="sf-checkout__store-tab-name">{{ optional($storeCart->shop)->name ?? ('Store #'.$storeCart->shop_id) }}</span>
-                <span class="sf-checkout__store-tab-meta">{{ $storeCart->item_count }} {{ \Illuminate\Support\Str::plural('item', $storeCart->item_count) }}</span>
-                @if (!empty($storeCart->needs_delivery_location))
-                  <span class="sf-checkout__store-badge sf-checkout__store-badge--warn">{{ trans('theme.set_location') ?? 'Set location' }}</span>
-                @elseif (!empty($storeCart->out_of_range))
-                  <span class="sf-checkout__store-badge sf-checkout__store-badge--danger">{{ trans('theme.out_of_delivery_range') }}</span>
-                @endif
-              </a>
-            @endforeach
-          </div>
-        </div>
+      @if ($isMultiStore)
+        {!! Form::open(['route' => 'order.createAll', 'id' => 'formIdCheckoutAll', 'name' => 'checkoutForm', 'files' => true, 'data-toggle' => 'validator', 'autocomplete' => 'off', 'novalidate', 'class' => 'sf-checkout__form']) !!}
+      @else
+        {!! Form::open(['route' => ['order.create', $primaryCart], 'id' => 'formId' . $primaryCart->id, 'name' => 'checkoutForm', 'files' => true, 'data-toggle' => 'validator', 'autocomplete' => 'off', 'novalidate', 'class' => 'sf-checkout__form']) !!}
+        {{ Form::hidden('cart_id', $primaryCart->id, ['id' => 'checkout-id']) }}
       @endif
 
-      @php
-        $cart = $activeCart ?? $carts->first();
-      @endphp
-
-      @if ($cart)
-        @php
-          $cart_total = 0;
-          $shop = $cart->shop;
-          $cartPaymentMethods = vendor_get_paid_directly() ? ($shop->paymentMethods ?? collect()) : $paymentMethods;
-
-          $packaging_options = null;
-          if (!$cart->is_digital && is_incevio_package_loaded('packaging')) {
-              $packaging_options = optional($shop)->packagings;
-
-              if ($shop) {
-                  $default_packaging = $cart->shippingPackage ?? (optional($shop->packagings)->where('default', 1)->first() ?? $platformDefaultPackaging);
-              } else {
-                  $default_packaging = $cart->shippingPackage ?? $platformDefaultPackaging;
-              }
-          }
-
-          $selectedAddress = null;
-          $pre_select = null;
-          if (isset($customer) && $customer && $customer->addresses) {
-              foreach ($customer->addresses as $address) {
-                  if ($pre_select !== null) {
-                      continue;
-                  }
-                  if ($customer->addresses->count() == 1) {
-                      $pre_select = $address;
-                  } elseif (Request::has('address') && Request::get('address') == $address->id) {
-                      $pre_select = $address;
-                  } elseif ($cart->ship_to && $cart->ship_to == $address->id) {
-                      $pre_select = $address;
-                  } elseif ($cart->ship_to_country_id == $address->country_id && $cart->ship_to_state_id == $address->state_id) {
-                      $pre_select = $address;
-                  } elseif ($cart->ship_to == null && $address->address_type === 'Shipping') {
-                      $pre_select = $address;
-                  }
-              }
-              $selectedAddress = $pre_select ?: $customer->addresses->first();
-          }
-
-          $cartBlocked = !empty($cart->out_of_range) || !empty($cart->needs_delivery_location);
-        @endphp
-
-        @if (!empty($cart->needs_delivery_location))
-          <div class="notice notice-warning notice-sm mb-3 sf-checkout__oor">
-            <strong>{{ trans('theme.warning') }}</strong>
-            {{ trans('theme.notify.set_location_for_delivery') }}
-          </div>
-        @elseif (!empty($cart->out_of_range))
-          <div class="notice notice-danger notice-sm mb-3 sf-checkout__oor">
-            <strong>{{ trans('theme.out_of_delivery_range') }}</strong>
-            {{ trans('theme.notify.product_out_of_delivery_range', [
-              'store' => optional($shop)->name ?? 'This store',
-              'distance' => $cart->delivery_distance_km ?? '—',
-              'radius' => $cart->service_radius_km ?? '—',
-            ]) }}
-            @if ($carts->count() > 1)
-              <div class="mt-2">{{ trans('theme.notify.switch_store_to_checkout') }}</div>
-            @endif
-          </div>
-        @endif
-
-        {!! Form::open(['route' => ['order.create', $cart], 'id' => 'formId' . $cart->id, 'name' => 'checkoutForm', 'files' => true, 'data-toggle' => 'validator', 'autocomplete' => 'off', 'novalidate', 'class' => 'sf-checkout__form']) !!}
-
-        <div class="row shopping-cart-wrapper sf-checkout__card mb-4 selected" id="cartId{{ $cart->id }}" data-cart="{{ $cart->id }}" data-cart-type="{{ $cart->is_digital ? 'digital' : 'physical' }}" data-out-of-range="{{ !empty($cart->out_of_range) ? '1' : '0' }}">
-          <div class="col-lg-8 px-3 py-3">
-            {{ Form::hidden('cart_id', $cart->id, ['id' => 'checkout-id']) }}
-            {{ Form::hidden('cart_id_ref', $cart->id, ['id' => 'cart-id' . $cart->id]) }}
-            {{ Form::hidden('cart_weight', $cart->shipping_weight, ['id' => 'cartWeight' . $cart->id]) }}
-            {{ Form::hidden('free_shipping', $cart->is_free_shipping(), ['id' => 'freeShipping' . $cart->id]) }}
-            {{ Form::hidden('shop_id', $shop->id, ['id' => 'shop-id' . $cart->id]) }}
-            {{ Form::hidden('tax_id', isset($shipping_zones[$cart->id]->id) ? $shipping_zones[$cart->id]->tax_id : null, ['id' => 'tax-id' . $cart->id]) }}
-            {{ Form::hidden('taxrate', $cart->taxrate, ['id' => 'cart-taxrate' . $cart->id]) }}
-            {{ Form::hidden('shipping_zone_id', isset($shipping_zones[$cart->id]->id) ? $shipping_zones[$cart->id]->id : $cart->shipping_zone_id, ['id' => 'zone-id' . $cart->id]) }}
-            {{ Form::hidden('shipping_rate_id', $cart->shipping_rate_id, ['id' => 'shipping-rate-id' . $cart->id]) }}
-            {{ Form::hidden('ship_to_country_id', $cart->ship_to_country_id, ['id' => 'shipto-country-id' . $cart->id]) }}
-            {{ Form::hidden('ship_to_state_id', $cart->ship_to_state_id, ['id' => 'shipto-state-id' . $cart->id]) }}
-            {{ Form::hidden('coupon_raw', json_encode($cart->coupon), ['id' => 'coupon-raw' . $cart->id]) }}
-            {{ Form::hidden('handling_cost', $cart->handling_cost > 0 ? get_formated_price_value($cart->handling_cost) : getHandelingCostOf($cart->shop_id), ['id' => 'handling-cost' . $cart->id]) }}
-
-            @if (!$cart->is_digital && is_incevio_package_loaded('packaging'))
-              {{ Form::hidden('packaging_id', $default_packaging ? $default_packaging->id : null, ['id' => 'packaging-id' . $cart->id]) }}
-            @endif
-
-            <div class="sf-checkout__seller flex-between-center">
-              <div class="logo-wrapper">
-                @include('theme::partials._shop_logo_frame', ['shop' => $shop, 'frameSize' => 'sm', 'thumbSize' => 'tiny_thumb', 'fullSize' => 'medium'])
-                <a href="{{ route('show.store', $shop->slug) }}" class="seller-info-name ml-2">
-                  {!! $shop->getQualifiedName(10) !!}
-                </a>
-              </div>
-              @if ($carts->count() > 1)
-                <span class="sf-checkout__change-store text-muted small">{{ trans('theme.change_store_hint') }}</span>
-              @endif
+      <div class="row sf-checkout__layout">
+        <div class="col-lg-8 px-3">
+          {{-- Continuous store list: Store name & details → products → next store --}}
+          @foreach ($carts as $cart)
+            <div class="sf-checkout__card mb-3">
+              @include('theme::partials._checkout_store_block', [
+                'cart' => $cart,
+                'shipping_zones' => $shipping_zones,
+                'platformDefaultPackaging' => $platformDefaultPackaging ?? null,
+                'dec' => $dec,
+              ])
             </div>
+          @endforeach
 
-            <div class="table-responsive">
-              <table class="table shopping-cart-item-table" id="table{{ $cart->id }}">
-                <thead>
-                  <tr>
-                    <th width="90px">{{ trans('theme.image') }}</th>
-                    @if ($cart->is_digital)
-                      <th>{{ trans('theme.description') }}</th>
-                      <th>{{ trans('theme.price') }}</th>
-                    @else
-                      <th width="52%" class="hidden-sm hidden-xs">{{ trans('theme.description') }}</th>
-                      <th>{{ trans('theme.price') }}</th>
-                      <th>{{ trans('theme.quantity') }}</th>
-                      <th>{{ trans('theme.total') }}</th>
-                    @endif
-                    <th>&nbsp;</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @foreach ($cart->inventories as $item)
-                    @php
-                      if ($cart->auction_bid_id) {
-                          $unit_price = get_formated_value($cart->bid->amount_in_system_currency);
-                      } elseif (is_incevio_package_loaded('wholesale')) {
-                          $unit_price = get_wholesale_unit_price($item, $item->pivot->quantity);
-                      } else {
-                          $unit_price = get_formated_value($item->current_sale_price());
-                      }
-
-                      $item_total = $unit_price * $item->pivot->quantity;
-                      $cart_total += $item_total;
-                    @endphp
-                    <tr class="cart-item-tr">
-                      <td>
-                        <input type="hidden" class="freeShipping{{ $cart->id }}" value="{{ $item->free_shipping }}">
-                        <input type="hidden" id="unitWeight{{ $item->id }}" value="{{ $item->shipping_weight }}">
-                        {{ Form::hidden('shipping_weight[' . $item->id . ']', $item->shipping_weight * $item->pivot->quantity, ['id' => 'itemWeight' . $item->id, 'class' => 'itemWeight' . $cart->id]) }}
-                        <img class="lazy item-img" src="{{ get_product_img_src($item, 'tiny') }}" data-src="{{ get_product_img_src($item, 'medium') }}" alt="{{ $item->slug }}" title="{{ $item->slug }}" />
-                      </td>
-                      <td class="hidden-sm hidden-xs">
-                        <a href="{{ storefront_product_url($item) }}" class="product-info-title">
-                          {{ $item->pivot->item_description }}
-                          @if (is_incevio_package_loaded('wallet'))
-                            @include('wallet::_credit_back_percentage_badge', ['rw_percentage' => $item->reward_percentage])
-                          @endif
-                          @if ($item->isOutOfStock())
-                            <span class="label label-danger text-right ml-3">{{ trans('mobile.out_of_stock') }}</span>
-                          @endif
-                        </a>
-                      </td>
-                      @unless ($cart->is_digital)
-                        <td class="shopping-cart-item-price">
-                          <span>
-                            {{ get_currency_prefix() }}<span id="item-price{{ $cart->id . '-' . $item->id }}" data-value="{{ $unit_price }}">{{ get_formated_decimal(get_formated_price_value($unit_price), false, $dec) }}</span>{{ get_currency_suffix() }}
-                          </span>
-                        </td>
-                        <td>
-                          <div class="product-info-qty-item d-inline-flex">
-                            <button type="button" class="product-info-qty product-info-qty-minus">-</button>
-                            <input name="quantity[{{ $item->id }}]" id="itemQtt{{ $item->id }}" class="product-info-qty product-info-qty-input" data-cart="{{ $cart->id }}" data-item="{{ $item->id }}" data-min="{{ $item->min_order_quantity }}" data-max="{{ $item->stock_quantity }}" type="text" value="{{ $item->pivot->quantity }}">
-                            <button type="button" class="product-info-qty product-info-qty-plus">+</button>
-                          </div>
-                        </td>
-                      @endunless
-                      <td>
-                        <span>
-                          {{ get_currency_prefix() }}<span id="item-total{{ $cart->id . '-' . $item->id }}" class="item-total{{ $cart->id }}" data-value="{{ get_formated_price_value($item_total) }}">{{ get_formated_decimal(get_formated_price_value($item_total), false, $dec) }}</span>{{ get_currency_suffix() }}
-                        </span>
-                      </td>
-                      <td>
-                        @unless ($cart->auction_bid_id)
-                          <a href="javascript:void(0);" class="cart-item-remove" data-cart="{{ $cart->id }}" data-item="{{ $item->id }}" data-toggle="tooltip" title="@lang('theme.remove_item')">&times;</a>
-                        @endunless
-                      </td>
-                    </tr>
-                  @endforeach
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colspan="6">
-                      <div class="input-group w-100 radius">
-                        <span class="input-group-addon"><i class="fas fa-ticket no-fill"></i></span>
-                        <input name="coupon" value="{{ $cart->coupon ? $cart->coupon->code : null }}" id="coupon{{ $cart->id }}" class="form-control" type="text" placeholder="@lang('theme.placeholder.have_coupon_from_seller')">
-                        <span class="input-group-btn">
-                          <button class="btn btn-default apply_seller_coupon" type="button" data-cart="{{ $cart->id }}">@lang('theme.button.apply_coupon')</button>
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            @if ($cart->auction_bid_id)
-              @include('auction::frontend.notices')
-            @endif
-
-            <div class="notice notice-danger notice-sm hidden" id="store-unavailable-notice{{ $cart->id }}">
-              <strong>{{ trans('theme.warning') }}</strong> @lang('theme.notify.store_not_available')
-            </div>
+          <div class="sf-checkout__card mb-3 px-3 py-3">
             <div class="notice notice-warning notice-sm mb-3" id="checkout-notice" style="display: none;">
               <strong>{{ trans('theme.warning') }}</strong>
               <span id="checkout-notice-msg"></span>
@@ -252,7 +97,7 @@
             @endif
 
             <div class="sf-checkout__address">
-              @if ($cart->is_digital)
+              @if ($primaryCart && $primaryCart->is_digital && ! $isMultiStore)
                 <h3 class="sf-checkout__section-title">{{ trans('theme.billing_address') }}</h3>
               @else
                 <div class="sf-checkout__fulfilment">
@@ -267,7 +112,7 @@
                 <div class="sf-checkout__address-head">
                   <h3 class="sf-checkout__section-title">{{ trans('theme.customer_address') }}</h3>
                   @if ($customer->addresses->count())
-                    <button type="button" class="sf-checkout__change-addr" data-target="#sf-address-picker{{ $cart->id }}">
+                    <button type="button" class="sf-checkout__change-addr" data-target="#sf-address-picker-shared">
                       {{ trans('theme.change') }}
                     </button>
                   @endif
@@ -279,7 +124,7 @@
                   </div>
                 @endif
 
-                <div class="row customer-address-list sf-checkout__addr-picker" id="sf-address-picker{{ $cart->id }}" style="{{ $selectedAddress ? 'display:none;' : '' }}">
+                <div class="row customer-address-list sf-checkout__addr-picker" id="sf-address-picker-shared" style="{{ $selectedAddress ? 'display:none;' : '' }}">
                   @foreach ($customer->addresses as $address)
                     @php
                       $ship_to_this_address = $selectedAddress && $selectedAddress->id == $address->id;
@@ -304,12 +149,6 @@
                 <div class="checkout-shiping-address">
                   @include('theme::partials.checkout_shiping_address')
                 </div>
-                @if ($cart->has_credit_rewards())
-                  <span class="text-dark">
-                    <i class="fa fa-warning"></i>
-                    {{ trans('packages.wallet.create_an_account_to_get_reward') }}
-                  </span>
-                @endif
               @endif
 
               @if (is_incevio_package_loaded('pharmacy'))
@@ -323,113 +162,62 @@
               </div>
             </div>
           </div>
-
-          <div class="col-lg-4 px-3 py-3 sf-checkout__aside">
-            <div class="side-widget" id="cart-summary{{ $cart->id }}">
-              <h3 class="cart-summary-title"><span>{{ trans('theme.order_info') }}</span></h3>
-              <ul class="shopping-cart-summary">
-                <li>
-                  <span>@lang('theme.cart_items')</span>
-                  <span>{{ $cart->type }}</span>
-                </li>
-                <li>
-                  <span>{{ trans('theme.subtotal') }}</span>
-                  <span>
-                    {{ get_currency_prefix() }}
-                    <span id="summary-total{{ $cart->id }}" data-value="{{ $cart_total }}">{{ get_formated_decimal($cart_total, false, $dec) }}</span>
-                    {{ get_currency_suffix() }}
-                  </span>
-                </li>
-                @unless ($cart->is_digital)
-                  <li>
-                    <span>
-                      <a class="dynamic-shipping-rates" href="javascript:void(0);" data-toggle="popover" data-cart="{{ $cart->id }}" data-options="{{ $shipping_options[$cart->id] }}" id="shipping-options{{ $cart->id }}" title="{{ trans('theme.shipping') }}">
-                        <u>{{ trans('theme.shipping') }}</u>
-                      </a>
-                      <em id="summary-shipping-name{{ $cart->id }}" class="small text-muted"></em>
-                    </span>
-                    <span>{{ get_currency_prefix() }}
-                      <span id="summary-shipping{{ $cart->id }}" data-value="{{ $cart->get_shipping_cost() }}">{{ get_formated_decimal($cart->get_shipping_cost(), false, $dec) }}</span>{{ get_currency_suffix() }}
-                    </span>
-                  </li>
-                  @if (is_incevio_package_loaded('packaging') && !empty(json_decode($packaging_options)))
-                    <li>
-                      <span>
-                        <a class="packaging-options" href="javascript:void(0);" data-toggle="popover" data-cart="{{ $cart->id }}" data-options="{{ $packaging_options }}" title="{{ trans('theme.packaging') }}">
-                          <u>{{ trans('theme.packaging') }}</u>
-                        </a>
-                        <em class="small text-muted" id="summary-packaging-name{{ $cart->id }}">
-                          {{ $default_packaging ? $default_packaging->name : '' }}
-                        </em>
-                      </span>
-                      <span>{{ get_currency_prefix() }}
-                        <span id="summary-packaging{{ $cart->id }}" data-value="{{ $default_packaging ? get_formated_price_value($default_packaging->cost) : 0 }}">
-                          {{ get_formated_decimal($default_packaging ? get_formated_price_value($default_packaging->cost) : 0, false, $dec) }}
-                        </span>{{ get_currency_suffix() }}
-                      </span>
-                    </li>
-                  @endif
-                @endunless
-                <li id="discount-section-li{{ $cart->id }}" style="display: {{ $cart->coupon ? 'block' : 'none' }};">
-                  <span>{{ trans('theme.discount') }}
-                    <em id="summary-discount-name{{ $cart->id }}" class="small text-muted">{{ $cart->coupon ? $cart->coupon->name . ' (' . $cart->coupon->getFormatedAmountText() . ')' : '' }}</em>
-                  </span>
-                  <span>-{{ get_currency_prefix() }}
-                    <span id="summary-discount{{ $cart->id }}" data-value="{{ $cart->coupon ? $cart->discount : 0 }}">{{ $cart->coupon ? get_formated_decimal($cart->discount, false, $dec) : get_formated_decimal(0, false, $dec) }}</span>{{ get_currency_suffix() }}
-                  </span>
-                </li>
-                <li id="tax-section-li{{ $cart->id }}" style="{{ $cart->taxes ? '' : 'display: none' }};">
-                  <span>{{ trans('theme.taxes') }}</span>
-                  <span>{{ get_currency_prefix() }}
-                    <span id="summary-taxes{{ $cart->id }}" data-value="{{ $cart->taxes }}">{{ get_formated_decimal($cart->taxes, false, $dec) }}</span>{{ get_currency_suffix() }}
-                  </span>
-                </li>
-                <li>
-                  <span>{{ trans('theme.total') }}</span>
-                  <span>{{ get_currency_prefix() }}
-                    <span id="summary-grand-total{{ $cart->id }}" data-value="{{ get_formated_value($cart->grand_total) }}">{{ get_formated_decimal(get_formated_value($cart->grand_total), false, $dec) }}</span>{{ get_currency_suffix() }}
-                  </span>
-                </li>
-                <li id="checkout-summary-customer-fee-li{{ $cart->id }}" style="display: none;">
-                  <span>{{ trans('packages.wallet.checkout_customer_platform_fee') }}</span>
-                  <span id="checkout-summary-customer-fee{{ $cart->id }}">—</span>
-                </li>
-                <li id="checkout-summary-pay-total-li{{ $cart->id }}" style="display: none;">
-                  <span><strong>{{ trans('packages.wallet.checkout_you_will_pay') }}</strong></span>
-                  <span><strong id="checkout-summary-pay-total{{ $cart->id }}">—</strong></span>
-                </li>
-              </ul>
-            </div>
-
-            <div class="cart-payment-options sf-checkout__pay">
-              @if ($cartBlocked)
-                <button type="button" class="btn btn-danger btn-block" disabled>
-                  {{ !empty($cart->needs_delivery_location)
-                    ? (trans('theme.notify.set_location_for_delivery') ?: 'Set your delivery location')
-                    : (trans('theme.out_of_delivery_range') ?: 'Out of delivery range') }}
-                </button>
-              @elseif (allow_checkout())
-                @include('partials.payment_options', ['shop' => $shop, 'cart' => $cart, 'customer' => $customer, 'paymentMethods' => $cartPaymentMethods])
-              @elseif (is_panel_user_on_storefront())
-                <button type="button" class="btn btn-primary btn-block" disabled title="{{ panel_user_storefront_message() }}">
-                  {{ trans('theme.notify.panel_user_order_restricted') }}
-                </button>
-              @else
-                <a href="#nav-login-dialog" data-toggle="modal" data-target="#loginModal" class="btn btn-primary btn-block">
-                  {{ trans('theme.button.login') }}
-                </a>
-              @endif
-            </div>
-
-            <a class="btn btn-default btn-block" href="{{ url('/') }}">{{ trans('theme.button.continue_shopping') }}</a>
-          </div>
         </div>
 
-        {!! Form::close() !!}
+        <div class="col-lg-4 px-3 sf-checkout__aside">
+          <div class="side-widget sf-checkout__card" id="cart-summary-combined">
+            <h3 class="cart-summary-title"><span>{{ trans('theme.order_info') }}</span></h3>
+            <ul class="shopping-cart-summary">
+              @foreach ($carts as $sumCart)
+                <li>
+                  <span>{{ optional($sumCart->shop)->name ?? ('Store #'.$sumCart->shop_id) }}</span>
+                  <span>{{ get_formated_currency($sumCart->grand_total, 2) }}</span>
+                </li>
+              @endforeach
+              <li>
+                <span><strong>{{ trans('theme.total') }}</strong></span>
+                <span>
+                  <strong>
+                    {{ get_currency_prefix() }}
+                    <span id="summary-grand-total-combined" data-value="{{ get_formated_value($combinedGrand) }}">{{ get_formated_decimal(get_formated_value($combinedGrand), false, $dec) }}</span>
+                    {{ get_currency_suffix() }}
+                  </strong>
+                </span>
+              </li>
+            </ul>
+          </div>
 
-        @if (config('services.google.gtm_container_id'))
-          @include('scripts.dataLayer.cart_page')
-        @endif
+          <div class="cart-payment-options sf-checkout__pay sf-checkout__card mt-3 p-3">
+            @if ($anyBlocked)
+              <button type="button" class="btn btn-danger btn-block" disabled>
+                {{ trans('theme.notify.set_location_for_delivery') ?: 'Set your delivery location' }}
+              </button>
+            @elseif (allow_checkout())
+              @include('partials.payment_options', [
+                'shop' => $checkoutShop,
+                'cart' => $primaryCart,
+                'customer' => $customer,
+                'paymentMethods' => $cartPaymentMethods,
+              ])
+            @elseif (is_panel_user_on_storefront())
+              <button type="button" class="btn btn-primary btn-block" disabled title="{{ panel_user_storefront_message() }}">
+                {{ trans('theme.notify.panel_user_order_restricted') }}
+              </button>
+            @else
+              <a href="#nav-login-dialog" data-toggle="modal" data-target="#loginModal" class="btn btn-primary btn-block">
+                {{ trans('theme.button.login') }}
+              </a>
+            @endif
+          </div>
+
+          <a class="btn btn-default btn-block mt-2" href="{{ url('/') }}">{{ trans('theme.button.continue_shopping') }}</a>
+        </div>
+      </div>
+
+      {!! Form::close() !!}
+
+      @if (config('services.google.gtm_container_id'))
+        @include('scripts.dataLayer.cart_page')
       @endif
     @else
       <div class="row">

@@ -1,22 +1,45 @@
-/* cafremarket — Selling / merchant landing page */
+/* cafremarket — Selling / merchant landing page
+   Typography aligned with storefront (style.css + storefront-modern.css).
+   vendor.css sets html { font-size: 10px }; storefront overrides to 14px — we must too,
+   otherwise every rem-based size on these pages renders ~40% too small. */
 
 :root {
-  --sf-sell-primary: #E65100;
-  --sf-sell-primary-dark: #BF360C;
-  --sf-sell-accent: #FF8F00;
+  /* Match storefront theme tokens */
+  --primary-color: #ff6600;
+  --primary-dark: #cc5200;
+  --primary-light: #ff944d;
+  --primary-text: #333e48;
+  --secondary-text: #868e8e;
+  --primary-font: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-size: 14px;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-xxl: 21px;
+
+  --sf-sell-primary: var(--primary-color);
+  --sf-sell-primary-dark: var(--primary-dark);
+  --sf-sell-accent: var(--primary-light);
   --sf-sell-bg: #f8fafc;
   --sf-sell-surface: #ffffff;
-  --sf-sell-text: #0f172a;
-  --sf-sell-muted: #64748b;
+  --sf-sell-text: var(--primary-text);
+  --sf-sell-muted: var(--secondary-text);
   --sf-sell-border: #e2e8f0;
   --sf-sell-radius: 16px;
   --sf-sell-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
-  --sf-sell-shadow-lg: 0 20px 50px rgba(230, 81, 0, 0.15);
+  --sf-sell-shadow-lg: 0 20px 50px rgba(255, 102, 0, 0.15);
 }
 
+/* Override Bootstrap vendor.html { font-size: 10px } — same as storefront style.css */
+html {
+  font-size: var(--font-size);
+}
+
+html,
 body.sf-selling-page {
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  font-size: 17px;
+  font-family: var(--primary-font);
+  font-size: var(--font-size);
   line-height: 1.6;
   color: var(--sf-sell-text);
   background: var(--sf-sell-bg);
@@ -30,6 +53,7 @@ body.sf-selling-page h4 {
   text-transform: none;
   font-weight: 700;
   letter-spacing: -0.02em;
+  color: var(--sf-sell-text);
 }
 
 /* ── Header ─────────────────────────────────────────────── */
@@ -89,7 +113,7 @@ body.sf-selling-page h4 {
 
 .sf-sell-header__nav a {
   color: var(--sf-sell-text);
-  font-size: 1rem;
+  font-size: var(--font-size-lg);
   font-weight: 500;
   padding: 8px 14px;
   border-radius: 999px;
@@ -98,7 +122,7 @@ body.sf-selling-page h4 {
 }
 
 .sf-sell-header__nav a:hover {
-  background: rgba(230, 81, 0, 0.08);
+  background: rgba(255, 102, 0, 0.08);
   color: var(--sf-sell-primary);
 }
 
@@ -115,8 +139,9 @@ body.sf-selling-page h4 {
   gap: 8px;
   padding: 12px 22px;
   border-radius: 999px;
-  font-size: 1rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
+  font-family: inherit;
   text-decoration: none !important;
   border: none;
   cursor: pointer;
@@ -131,11 +156,11 @@ body.sf-selling-page h4 {
 .sf-sell-btn--primary {
   background: linear-gradient(135deg, var(--sf-sell-primary) 0%, var(--sf-sell-accent) 100%);
   color: #fff !important;
-  box-shadow: 0 8px 24px rgba(230, 81, 0, 0.35);
+  box-shadow: 0 8px 24px rgba(255, 102, 0, 0.35);
 }
 
 .sf-sell-btn--primary:hover {
-  box-shadow: 0 12px 28px rgba(230, 81, 0, 0.42);
+  box-shadow: 0 12px 28px rgba(255, 102, 0, 0.42);
   color: #fff !important;
 }
 
@@ -152,7 +177,7 @@ body.sf-selling-page h4 {
 
 .sf-sell-btn--lg {
   padding: 14px 28px;
-  font-size: 1rem;
+  font-size: var(--font-size-xl);
 }
 
 .sf-sell-header__toggle {
@@ -170,8 +195,8 @@ body.sf-selling-page h4 {
   position: relative;
   padding: 120px 0 80px;
   background:
-    radial-gradient(ellipse 80% 60% at 70% 0%, rgba(255, 143, 0, 0.25) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 50% at 10% 100%, rgba(230, 81, 0, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 70% 0%, rgba(255, 148, 77, 0.25) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 10% 100%, rgba(255, 102, 0, 0.18) 0%, transparent 50%),
     linear-gradient(165deg, #fff7ed 0%, #ffffff 45%, #f8fafc 100%);
   overflow: hidden;
 }
@@ -180,7 +205,7 @@ body.sf-selling-page h4 {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, rgba(230, 81, 0, 0.06) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 102, 0, 0.06) 1px, transparent 0);
   background-size: 28px 28px;
   pointer-events: none;
 }
@@ -199,15 +224,15 @@ body.sf-selling-page h4 {
   gap: 8px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(230, 81, 0, 0.1);
+  background: rgba(255, 102, 0, 0.1);
   color: var(--sf-sell-primary);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   margin-bottom: 20px;
 }
 
 .sf-sell-hero__title {
-  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-size: clamp(2rem, 4.5vw, 3rem);
   line-height: 1.12;
   margin: 0 0 18px;
   color: var(--sf-sell-text);
@@ -221,7 +246,7 @@ body.sf-selling-page h4 {
 }
 
 .sf-sell-hero__lead {
-  font-size: 1.25rem;
+  font-size: var(--font-size-xl);
   line-height: 1.65;
   color: var(--sf-sell-muted);
   max-width: 520px;
@@ -336,7 +361,7 @@ body.sf-selling-page h4 {
   flex-shrink: 0;
   padding: 10px 20px;
   border-radius: 999px;
-  font-size: 1rem;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--sf-sell-muted);
   text-decoration: none !important;
@@ -346,7 +371,7 @@ body.sf-selling-page h4 {
 
 .sf-sell-section-nav__link:hover,
 .sf-sell-section-nav__link.is-active {
-  background: rgba(230, 81, 0, 0.1);
+  background: rgba(255, 102, 0, 0.1);
   color: var(--sf-sell-primary);
 }
 
@@ -367,7 +392,7 @@ body.sf-selling-page h4 {
 
 .sf-sell-section__eyebrow {
   display: inline-block;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -376,12 +401,12 @@ body.sf-selling-page h4 {
 }
 
 .sf-sell-section__title {
-  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
   margin: 0 0 12px;
 }
 
 .sf-sell-section__subtitle {
-  font-size: 1.1875rem;
+  font-size: var(--font-size-lg);
   color: var(--sf-sell-muted);
   margin: 0;
   line-height: 1.6;
@@ -418,7 +443,7 @@ body.sf-selling-page h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(230, 81, 0, 0.12), rgba(255, 143, 0, 0.18));
+  background: linear-gradient(135deg, rgba(255, 102, 0, 0.12), rgba(255, 148, 77, 0.18));
   color: var(--sf-sell-primary);
   font-size: 1.35rem;
   margin-bottom: 18px;
@@ -526,7 +551,7 @@ body.sf-selling-page h4 {
   transform: translateX(-50%);
   background: linear-gradient(135deg, var(--sf-sell-primary), var(--sf-sell-accent));
   color: #fff;
-  font-size: 0.75rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   padding: 4px 14px;
   border-radius: 999px;
@@ -762,7 +787,7 @@ body.sf-selling-page h4 {
 
 .sf-sell-footer__links a {
   color: rgba(255, 255, 255, 0.75);
-  font-size: 0.875rem;
+  font-size: var(--font-size);
   text-decoration: none;
 }
 
@@ -808,7 +833,7 @@ body.sf-selling-page h4 {
 /* ── CTA banner ───────────────────────────────────────────── */
 .sf-sell-cta {
   padding: 56px 0;
-  background: linear-gradient(135deg, rgba(230, 81, 0, 0.08), rgba(255, 143, 0, 0.12));
+  background: linear-gradient(135deg, rgba(255, 102, 0, 0.08), rgba(255, 148, 77, 0.12));
   border-top: 1px solid var(--sf-sell-border);
   border-bottom: 1px solid var(--sf-sell-border);
 }
@@ -935,7 +960,7 @@ body.sf-selling-page h4 {
 .sf-sell-auth {
   padding: 110px 0 72px;
   background:
-    radial-gradient(ellipse 70% 50% at 80% 0%, rgba(255, 143, 0, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 80% 0%, rgba(255, 148, 77, 0.18) 0%, transparent 55%),
     linear-gradient(180deg, #fff7ed 0%, #f8fafc 100%);
   min-height: calc(100vh - 120px);
 }
@@ -1003,7 +1028,7 @@ body.sf-selling-page h4 {
 
 .sf-sell-auth__form label {
   display: block;
-  font-size: 1rem;
+  font-size: var(--font-size);
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--sf-sell-text);
@@ -1013,9 +1038,10 @@ body.sf-selling-page h4 {
 .sf-sell-auth__form .form-control,
 .sf-sell-auth__form select {
   width: 100%;
-  min-height: 52px;
+  min-height: 48px;
   padding: 12px 16px;
-  font-size: 1.0625rem;
+  font-size: var(--font-size-lg);
+  font-family: inherit;
   border: 1px solid var(--sf-sell-border);
   border-radius: 12px;
   background: #fff;
@@ -1028,7 +1054,7 @@ body.sf-selling-page h4 {
 .sf-sell-auth__form select:focus {
   outline: none;
   border-color: var(--sf-sell-primary);
-  box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.12);
 }
 
 .sf-sell-form-group--invalid label {
@@ -1124,7 +1150,7 @@ body.sf-selling-page h4 {
 
 .sf-sell-type-card.is-selected {
   border-color: var(--sf-sell-primary);
-  box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.12);
 }
 
 @media (max-width: 640px) {

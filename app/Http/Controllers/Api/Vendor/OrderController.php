@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Vendor;
 
 use App\Events\Order\OrderCreated;
-use App\Events\Order\OrderUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateOrderRequest;
 use App\Http\Requests\Validations\OrderDetailRequest;
@@ -113,25 +112,6 @@ class OrderController extends Controller
      */
     public function show(OrderDetailRequest $request, Order $order)
     {
-        return new OrderResource($order);
-    }
-
-    /**
-     * Update order status
-     *
-     * @return OrderResource
-     */
-    public function update_status(OrderDetailRequest $request, Order $order)
-    {
-        try {
-            $order->order_status_id = $request->input('status_id');
-            $order->save();
-
-            event(new OrderUpdated($order, $request->filled('notify_customer')));
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
-        }
-
         return new OrderResource($order);
     }
 

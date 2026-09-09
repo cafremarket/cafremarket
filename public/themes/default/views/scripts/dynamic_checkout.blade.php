@@ -878,8 +878,16 @@
       // Update cart info on server side
       function updateCartOnServerside(cart) {
         let temproute = "{{ route('cart.update', '_CART_') }}";
-        let formdata = $("form#formId" + cart).serializeArray();
+        let $form = $("form#formId" + cart);
+        if (!$form.length) {
+          $form = $("#cartId" + cart).closest("form");
+        }
+        if (!$form.length) {
+          $form = $("form.sf-checkout__form").first();
+        }
+        let formdata = $form.serializeArray();
 
+        
         $.ajax({
             url: temproute.replace('_CART_', cart),
             type: 'PUT',

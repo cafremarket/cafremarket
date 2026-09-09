@@ -146,7 +146,7 @@ final class EmolaResponse
 
                 return trans($themeKey, [
                     'amount' => $attempted !== null
-                        ? number_format($attempted, 0, '.', ',')
+                        ? get_formated_decimal($attempted, false, 0)
                         : '—',
                     'code' => $code,
                     'detail' => $detail !== '' ? $detail : trans('theme.emola_movitel_no_detail'),
@@ -155,7 +155,7 @@ final class EmolaResponse
 
             return trans('theme.emola_movitel_rejected_amount', [
                 'amount' => EmolaSpec::lastTransAmountMzn() !== null
-                    ? number_format(EmolaSpec::lastTransAmountMzn(), 0, '.', ',')
+                    ? get_formated_decimal(EmolaSpec::lastTransAmountMzn(), false, 0)
                     : '—',
                 'code' => $code,
                 'detail' => $detail !== '' ? $detail : trans('theme.emola_movitel_no_detail'),

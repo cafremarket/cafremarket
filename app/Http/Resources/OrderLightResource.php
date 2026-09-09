@@ -54,6 +54,8 @@ class OrderLightResource extends JsonResource
             'can_evaluate' => $this->canEvaluate(),
             'tracking_id' => $this->tracking_id,
             'tracking_url' => $this->getTrackingUrl(),
+            'fulfillment_method' => $this->fulfillment_method,
+            'delivery_status_label' => $this->deliveryStatusLabel(),
             'item_count' => $this->when($vendor, $this->inventories_count),
             'delivery_boy' => new DeliveryBoyLightResource($this->deliveryBoy),
             $this->mergeWhen(! $vendor, [

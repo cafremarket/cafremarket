@@ -74,8 +74,8 @@
               <table class="table">
                 <tr>
                   <td class="text-right">{{ trans('app.total') }}</td>
-                  <td class="text-right" width="40%">{{ get_formated_currency_symbol() }}
-                    <span id="summary-total">{{ get_formated_decimal(0, true, 2) }}</span>
+                  <td class="text-right" width="40%">{{ get_currency_prefix() }}
+                    <span id="summary-total" data-value="0">{{ get_formated_decimal(0, true, 2) }}</span>{{ get_currency_suffix() }}
                   </td>
                 </tr>
 
@@ -85,10 +85,10 @@
                       <u>{{ trans('app.discount') }}</u>
                     </a>
                   </td>
-                  <td class="text-right" width="40%"> &minus; {{ get_formated_currency_symbol() }}
-                    <span id="summary-discount">
+                  <td class="text-right" width="40%"> &minus; {{ get_currency_prefix() }}
+                    <span id="summary-discount" data-value="{{ isset($cart->discount) ? $cart->discount : 0 }}">
                       {{ isset($cart->discount) ? get_formated_decimal($cart->discount, true, 2) : get_formated_decimal(0, true, 2) }}
-                    </span>
+                    </span>{{ get_currency_suffix() }}
                   </td>
                 </tr>
 
@@ -98,8 +98,8 @@
                       <u>{{ trans('app.shipping') }}</u></a><br />
                     <em id="summary-shipping-name" class="small"></em>
                   </td>
-                  <td class="text-right" width="40%">{{ get_formated_currency_symbol() }}
-                    <span id="summary-shipping">{{ get_formated_decimal(0, true, 2) }}</span>
+                  <td class="text-right" width="40%">{{ get_currency_prefix() }}
+                    <span id="summary-shipping" data-value="0">{{ get_formated_decimal(0, true, 2) }}</span>{{ get_currency_suffix() }}
                   </td>
                 </tr>
 
@@ -110,10 +110,10 @@
                         <u>{{ trans('app.packaging') }}</u></a><br />
                       <em id="summary-packaging-name" class="small">{{ $default_packaging ? $default_packaging->name : '' }}</em>
                     </td>
-                    <td class="text-right" width="40%">{{ get_formated_currency_symbol() }}
-                      <span id="summary-packaging">
+                    <td class="text-right" width="40%">{{ get_currency_prefix() }}
+                      <span id="summary-packaging" data-value="{{ $default_packaging ? $default_packaging->cost : 0 }}">
                         {{ get_formated_decimal($default_packaging ? $default_packaging->cost : 0, true, 2) }}
-                      </span>
+                      </span>{{ get_currency_suffix() }}
                     </td>
                   </tr>
                 @endif
@@ -121,8 +121,8 @@
                 @if ((bool) get_formated_decimal(config('shop_settings.order_handling_cost')))
                   <tr>
                     <td class="text-right">{{ trans('app.handling') }}</td>
-                    <td class="text-right" width="40%">{{ get_formated_currency_symbol() }}
-                      <span id="summary-handling">{{ get_formated_decimal(config('shop_settings.order_handling_cost'), true, 2) }}</span>
+                    <td class="text-right" width="40%">{{ get_currency_prefix() }}
+                      <span id="summary-handling" data-value="{{ config('shop_settings.order_handling_cost') }}">{{ get_formated_decimal(config('shop_settings.order_handling_cost'), true, 2) }}</span>{{ get_currency_suffix() }}
                     </td>
                   </tr>
                 @endif
@@ -134,15 +134,15 @@
                       <span id="summary-taxrate"></span>%
                       </small>
                   </td>
-                  <td class="text-right" width="40%">{{ get_formated_currency_symbol() }}
-                    <span id="summary-tax">{{ get_formated_decimal(0, true, 2) }}</span>
+                  <td class="text-right" width="40%">{{ get_currency_prefix() }}
+                    <span id="summary-tax" data-value="0">{{ get_formated_decimal(0, true, 2) }}</span>{{ get_currency_suffix() }}
                   </td>
                 </tr>
 
                 <tr class="lead">
                   <td class="text-right">{{ trans('app.grand_total') }}</td>
-                  <td class="text-right" width="40%">{{ get_formated_currency_symbol() }}
-                    <span id="summary-grand-total">{{ get_formated_decimal(0, true, 2) }}</span>
+                  <td class="text-right" width="40%">{{ get_currency_prefix() }}
+                    <span id="summary-grand-total" data-value="0">{{ get_formated_decimal(0, true, 2) }}</span>{{ get_currency_suffix() }}
                   </td>
                 </tr>
               </table>
@@ -496,10 +496,10 @@
             '<td class="nopadding-right" width="10%">' +
             '<input name="cart[' + numOfRows + '][quantity]" value="1" type="number" id="qtt-' + ID + '" class="form-control itemQtt no-border" placeholder="{{ trans('app.quantity') }}" required>' +
             '</td>' +
-            '<td class="nopadding-right text-center" width="10%">{{ get_formated_currency_symbol() }}' +
-            '<span id="total-' + ID + '"  class="itemTotal">' +
-            getFormatedValue(productObj[ID].salePrice) +
-            '</span>' +
+            '<td class="nopadding-right text-center" width="10%">{{ get_currency_prefix() }}' +
+            '<span id="total-' + ID + '" class="itemTotal" data-value="' + productObj[ID].salePrice + '">' +
+            getFormatedNumber(productObj[ID].salePrice) +
+            '</span>{{ get_currency_suffix() }}' +
             '</td>' +
             '<td class="small"><i class="fa fa-trash text-muted deleteThisRow" data-toggle="tooltip" data-placement="left" title="{{ trans('help.remove_this_cart_item') }}"></i></td>' +
             '</tr>';
@@ -515,10 +515,10 @@
       function calculateItemTotal(ID) {
         // var itemTotal = getItemTotal(ID);
         var itemWeight = getItemTotalWeight(ID);
-        var itemTotal = getFormatedValue(getItemTotal(ID));
+        var itemTotal = getItemTotal(ID);
 
         $("#weight-" + ID).val(itemWeight);
-        $("#total-" + ID).text(itemTotal);
+        $("#total-" + ID).data('value', itemTotal).text(getFormatedNumber(itemTotal));
 
         calculateOrderTotal();
         return;
@@ -555,10 +555,10 @@
         var sum = 0;
         $(".itemTotal").each(
           function() {
-            sum += ($(this).text()) * 1;
+            sum += Number($(this).data('value'));
           }
         );
-        $("#summary-total").text(getFormatedValue(sum));
+        $("#summary-total").data('value', sum).text(getFormatedNumber(sum));
 
         $(".itemWeight").each(function() {
           cartWeight += ($(this).val()) * 1;
@@ -581,7 +581,7 @@
       };
 
       function setDiscount(value = 0) {
-        $('#summary-discount').text(getFormatedValue(value));
+        $('#summary-discount').data('value', value).text(getFormatedNumber(value));
         $('#cart-discount').val(value);
         calculateTax();
         return;
@@ -589,7 +589,7 @@
 
       function setShippingCost(name = '', value = 0, id = '') {
         value = value ? value : 0;
-        $('#summary-shipping').text(getFormatedValue(value));
+        $('#summary-shipping').data('value', value).text(getFormatedNumber(value));
         $("#summary-shipping-name").text(name);
         $('#cart-shipping').val(value);
         $('#shipping_rate_id').val(id);
@@ -599,7 +599,7 @@
 
       function setPackagingCost(name, value = 0, id = '') {
         value = value ? value : 0;
-        $('#summary-packaging').text(getFormatedValue(value));
+        $('#summary-packaging').data('value', value).text(getFormatedNumber(value));
         $("#summary-packaging-name").text(name);
         $('#cart-packaging').val(value);
         $('#packaging_id').val(id);
@@ -631,7 +631,7 @@
         var taxrate = getTaxrate();
 
         var tax = (total * taxrate) / 100;
-        $("#summary-tax").text(getFormatedValue(tax));
+        $("#summary-tax").data('value', tax).text(getFormatedNumber(tax));
         $("#cart-taxes").val(tax);
 
         calculateOrderSummary();
@@ -640,16 +640,16 @@
 
       function calculateOrderSummary() {
         var grand = getTotalAmount() + getTax();
-        $("#summary-grand-total").text(getFormatedValue(grand));
+        $("#summary-grand-total").data('value', grand).text(getFormatedNumber(grand));
         return;
       }
 
       function getOrderTotal() {
-        return Number($("#summary-total").text());
+        return Number($("#summary-total").data('value'));
       };
 
       function getDiscount() {
-        return Number($("#summary-discount").text());
+        return Number($("#summary-discount").data('value'));
       }
 
       function getTaxrate() {
@@ -657,11 +657,11 @@
       };
 
       function getTax() {
-        return Number($("#summary-tax").text());
+        return Number($("#summary-tax").data('value'));
       };
 
       function getShipping() {
-        return Number($("#summary-shipping").text());
+        return Number($("#summary-shipping").data('value'));
       };
 
       function getShippingName() {
@@ -669,7 +669,7 @@
       };
 
       function getHandling() {
-        return Number($("#summary-handling").text());
+        return Number($("#summary-handling").data('value'));
       };
 
       function getPackagingName() {
@@ -677,7 +677,7 @@
       };
 
       function getPackaging() {
-        return Number($("#summary-packaging").text());
+        return Number($("#summary-packaging").data('value'));
       };
 
       function getItemQtt(ID) {
@@ -699,6 +699,17 @@
       function getFormatedValue(value = 0) {
         value = value ? value : 0;
         return parseFloat(value).toFixed(2);
+      }
+
+      // Locale-formatted number only (no currency symbol) - use for any visible
+      // price/total text. Raw values for math/re-reads live in data-value attrs.
+      function getFormatedNumber(value = 0) {
+        var decMark = @json(config('system_settings.currency.decimal_mark', '.'));
+        var thousandsSep = @json(config('system_settings.currency.thousands_separator', ','));
+        value = getFormatedValue(value);
+        var parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
+        return parts.join(decMark);
       }
 
       function getTotalAmount() {

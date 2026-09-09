@@ -270,6 +270,7 @@
               @unless ($order->is_digital)
                 <tr class="order-detail-location-row">
                   <td colspan="3" class="order-detail-location-cell">
+                    @include('theme::partials.order_delivery_proof', ['order' => $order])
                     @include('theme::partials.order_delivery_location', ['order' => $order, 'compact' => true])
                   </td>
                 </tr>

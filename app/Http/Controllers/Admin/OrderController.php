@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Common\Authorizable;
 use App\Events\Order\OrderCreated;
 use App\Events\Order\OrderFulfilled;
-use App\Events\Order\OrderUpdated;
 use App\Helpers\ListHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateOrderRequest;
@@ -112,6 +111,13 @@ class OrderController extends Controller
 
         $this->authorize('view', $order); // Check permission
 
+        // Platform admins get a read-only overview — no action buttons of any
+        // kind. Assigning delivery boys/couriers, fulfilling, cancelling,
+        // refunding, etc. are the merchant's own responsibility on their panel.
+        if (Auth::user()->isFromPlatform()) {
+            return view('admin.order._show_overview', compact('order'));
+        }
+
         $address = $order->customer->primaryAddress();
 
         if (is_incevio_package_loaded('affiliate')) {
@@ -205,6 +211,21 @@ class OrderController extends Controller
         $this->authorize('view', $order); // Check permission
 
         return $order->invoice('download'); // Download the invoice
+    }
+
+    /**
+     * Download the shipping label for the order
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function shippingLabel($id)
+    {
+        $order = $this->order->find($id);
+
+        $this->authorize('view', $order); // Check permission
+
+        return $order->shippingLabelPdf('download');
     }
 
     /**
@@ -304,11 +325,15 @@ class OrderController extends Controller
     {
         $order = $this->order->find($id);
 
-        $deliveryboys = ListHelper::deliveryBoys($order->shop_id);
-        $platformRiders = $dispatchService->findNearbyPlatformRiders($order->shop);
-        $shopRidersAvailable = $dispatchService->getAvailableShopRiders($order->shop_id)->count();
+        $shopRiders = $dispatchService->getAvailableShopRiders($order->shop_id);
+        $deliveryboys = $shopRiders->mapWithKeys(function ($rider) {
+            $label = "#{$rider->id} — {$rider->getName()} ({$rider->email})";
 
-        return view('admin.order._assign_delivery_boy', compact('deliveryboys', 'order', 'platformRiders', 'shopRidersAvailable'));
+            return [$rider->id => $label];
+        });
+        $shopRidersAvailable = $shopRiders->count();
+
+        return view('admin.order._assign_delivery_boy', compact('deliveryboys', 'order', 'shopRidersAvailable'));
     }
 
     /**
@@ -323,45 +348,53 @@ class OrderController extends Controller
 
         if ($request->filled('delivery_boy_id')) {
             $rider = DeliveryBoy::findOrFail($request->delivery_boy_id);
-
-            if ($rider->isPlatform()) {
-                $dispatchService->assignPlatformRider($order, $rider);
-            } else {
-                $dispatchService->assignShopRider($order, $rider);
-            }
+            $dispatchService->assignShopRider($order, $rider);
         }
 
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
     }
 
     /**
-     * Request platform delivery for an order.
+     * Show the courier details form for an order
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View
      */
-    public function requestPlatformDelivery(Request $request, $id, DeliveryDispatchService $dispatchService)
+    public function courierForm($id)
     {
         $order = $this->order->find($id);
 
-        try {
-            $dispatchService->requestPlatformDelivery($order, $request->input('platform_rider_id'));
-        } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
-        }
-
-        return back()->with('success', trans('app.platform_delivery_requested'));
+        return view('admin.order._assign_courier', compact('order'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Add/update courier details for an order
      *
-     * @return \Illuminate\View\View
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function edit(int $orderId)
+    public function assignCourier(Request $request, $id)
     {
-        $order = $this->order->find($orderId);
+        $order = $this->order->find($id);
 
-        $this->authorize('fulfill', $order);
+        if (! $request->filled('courier_name') || ! $request->filled('courier_phone')) {
+            return back()->with('error', trans('app.courier_details_required'));
+        }
 
-        return view('admin.order._edit', compact('order'));
+        $order->fulfillment_method = Order::FULFILLMENT_METHOD_COURIER;
+        $order->courier_name = $request->input('courier_name');
+        $order->courier_phone = $request->input('courier_phone');
+        $order->courier_tracking_number = $request->input('courier_tracking_number');
+        $order->courier_added_at = now();
+        $order->otp = $order->otp ?? Order::generateDeliveryOtp();
+
+        if ((int) $order->order_status_id < Order::STATUS_AWAITING_DELIVERY) {
+            $order->order_status_id = Order::STATUS_AWAITING_DELIVERY;
+        }
+
+        $order->save();
+
+        return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
     }
 
     /**
@@ -391,45 +424,21 @@ class OrderController extends Controller
     }
 
     /**
-     * Update Order Status of the selected orders
+     * Mark a pickup order as picked up by the customer.
      *
-     * @param  $status
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * Pickup orders have no delivery boy/courier/OTP flow, so this is the vendor's
+     * only way to complete them — unlike deliver orders, there's no confirmation
+     * step to bypass here since none exists for this fulfilment type.
      */
-    public function massAssignOrderStatus(Request $request)
-    {
-        $orders = Order::whereIn('id', $request->ids)->get();
-
-        foreach ($orders as $order) {
-            $this->authorize('fulfill', $order);
-
-            $order->order_status_id = $request->status;
-            $order->save();
-
-            event(new OrderUpdated($order, $request->filled('notify_customer')));
-        }
-
-        if ($request->ajax()) {
-            return response()->json(['success' => trans('messages.updated', ['model' => $this->model_name])]);
-        }
-
-        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
-    }
-
-    /**
-     * updateOrderStatus the order
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function updateOrderStatus(Request $request, $id)
+    public function markAsPickedUp($id)
     {
         $order = $this->order->find($id);
 
-        $this->authorize('fulfill', $order); // Check permission
+        $this->authorize('fulfill', $order);
 
-        $this->order->updateOrderStatus($request, $order);
+        abort_unless($order->pickup(), 400, trans('app.order_not_pickup'));
 
-        event(new OrderUpdated($order, $request->filled('notify_customer')));
+        $order->mark_as_goods_received();
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
     }

@@ -91,8 +91,6 @@ class ViewComposerServiceProvider extends ServiceProvider
 
         $this->composeMerchantRegistrationForm();
 
-        $this->composeOrderUpdateForm();
-
         $this->composePageForm();
 
         $this->composePlatformKpi();
@@ -689,21 +687,6 @@ class ViewComposerServiceProvider extends ServiceProvider
     //         }
     //     );
     // }
-
-    /**
-     * compose partial view of order status update
-     */
-    private function composeOrderUpdateForm()
-    {
-        View::composer(
-
-            'admin.order._edit',
-
-            function ($view) {
-                $view->with('order_statuses', ListHelper::order_statuses());
-            }
-        );
-    }
 
     /**
      * compose partial view of ticket create form

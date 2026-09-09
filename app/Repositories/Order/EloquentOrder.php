@@ -114,17 +114,6 @@ class EloquentOrder extends EloquentRepository implements BaseRepository, OrderR
         return $order;
     }
 
-    public function updateOrderStatus(Request $request, $order)
-    {
-        if (! $order instanceof Order) {
-            $order = $this->model->find($order);
-        }
-
-        $order->order_status_id = $request->input('order_status_id');
-
-        return $order->save();
-    }
-
     public function updateAdminNote(Request $request, $order)
     {
         if (! $order instanceof Order) {

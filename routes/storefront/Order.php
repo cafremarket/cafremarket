@@ -10,6 +10,10 @@ Route::post('order/{cart}', [
     OrderController::class, 'create',
 ])->name('order.create')->middleware('xssSanitizer');
 
+Route::post('orders/checkout-all', [
+    OrderController::class, 'createAll',
+])->name('order.createAll')->middleware('xssSanitizer');
+
 Route::match(['GET', 'POST'], 'paymentFailed/{order}', [
     OrderController::class, 'paymentFailed',
 ])->name('payment.failed');

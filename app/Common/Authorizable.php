@@ -37,7 +37,6 @@ trait Authorizable
         'restore' => 'add',
         'massRestore' => 'add',
         'fulfill' => 'fulfill',
-        'updateOrderStatus' => 'fulfill',
         'togglePaymentStatus' => 'fulfill',
         'saveAdminNote' => 'fulfill',
         'cancellation' => 'cancel',
@@ -70,6 +69,8 @@ trait Authorizable
         'assign' => 'assign',
         'user' => 'view',
         'dashboard' => 'view',
+        'deliveryboys' => 'fulfill',
+        'shipping_label' => 'view',
     ];
 
     /**
@@ -177,6 +178,9 @@ trait Authorizable
 
         // Merge assign_deliveryboy permission into fulfill
         if ($slug == 'assign_deliveryboy') {
+            $slug = 'fulfill_order';
+        } elseif ($slug == 'initiate_courier' || $slug == 'assign_courier') {
+            // Courier assignment is part of order fulfillment, same as assign_deliveryboy above.
             $slug = 'fulfill_order';
         } elseif ($slug == 'addVariant' || $slug == 'saveVariant') {
             $slug = 'edit_product';

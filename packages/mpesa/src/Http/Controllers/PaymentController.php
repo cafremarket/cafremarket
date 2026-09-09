@@ -48,8 +48,14 @@ class PaymentController extends Controller
                                     ? (($json->output_ResponseCode === 'INS-0') || ($json->output_ResponseCode === '0'))
                                     : ((int) ($json->ResultCode ?? 1) === 0);
                                 if ($success) {
-                                    $order->markAsPaid();
-                                    event(new OrderCreated($order));
+                                    // Mark every order that shares this M-Pesa payment reference (checkout-all).
+                                    Order::where('payment_ref_id', $order->payment_ref_id)->get()
+                                        ->each(function (Order $related) {
+                                            if (! $related->isPaid()) {
+                                                $related->markAsPaid();
+                                                event(new OrderCreated($related));
+                                            }
+                                        });
 
                                     return response()->json(['paid' => true]);
                                 }

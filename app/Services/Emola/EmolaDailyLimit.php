@@ -32,9 +32,9 @@ final class EmolaDailyLimit
         if ($projected > $dailyMax) {
             throw new PaymentFailedException(
                 trans('theme.emola_daily_limit', [
-                    'max' => number_format($dailyMax, 0, '.', ','),
-                    'used' => number_format(self::todayTotal($msisdn), 0, '.', ','),
-                    'amount' => number_format($amountMzn, 0, '.', ','),
+                    'max' => get_formated_decimal($dailyMax, false, 0),
+                    'used' => get_formated_decimal(self::todayTotal($msisdn), false, 0),
+                    'amount' => get_formated_decimal($amountMzn, false, 0),
                 ])
             );
         }

@@ -442,9 +442,9 @@ class DepositController extends Controller
             : null;
         $exceedsMessage = $exceedsLimit
             ? trans('theme.emola_deposit_charge_exceeds_partner', [
-                'amount' => number_format($chargeTotal, 0, '.', ','),
-                'max' => number_format($maxCharge, 0, '.', ','),
-                'max_base' => number_format((int) $maxBase, 0, '.', ','),
+                'amount' => get_formated_decimal($chargeTotal, false, 0),
+                'max' => get_formated_decimal($maxCharge, false, 0),
+                'max_base' => get_formated_decimal((int) $maxBase, false, 0),
             ])
             : null;
 

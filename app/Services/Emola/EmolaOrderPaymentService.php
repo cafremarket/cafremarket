@@ -64,6 +64,47 @@ class EmolaOrderPaymentService
         return $res;
     }
 
+    /**
+     * Single USSD push covering multiple store orders (checkout-all).
+     *
+     * @param  array<int, Order>  $orders
+     */
+    public function pushPaymentForOrders(array $orders, string $msisdn, int $totalAmount, ?string $smsContent = null): EmolaResponse
+    {
+        $msisdn = EmolaSpec::normalizeMsisdn($msisdn);
+        $transAmount = EmolaSpec::formatTransAmount($totalAmount, EmolaSpec::CONTEXT_ORDER);
+        $amountMzn = (int) $transAmount;
+        $transId = $this->client->generateTransId();
+        $refNo = EmolaSpec::sanitizeRefNo('REF'.implode('-', array_map(fn (Order $o) => $o->id, $orders)));
+
+        $res = $this->client->pushUssdMessage([
+            'msisdn' => $msisdn,
+            'transId' => $transId,
+            'transAmount' => $transAmount,
+            'smsContent' => $smsContent ?: trans('app.purchase_from', ['marketplace' => get_platform_title()]),
+            'language' => EmolaSpec::sanitizeLanguage(app()->getLocale() === 'en' ? 'en' : 'pt'),
+            'refNo' => $refNo,
+        ]);
+
+        Log::info('eMola USSD push for multi-store orders', [
+            'order_ids' => array_map(fn (Order $o) => $o->id, $orders),
+            'trans_amount' => $transAmount,
+            'trans_id' => $transId,
+            'msisdn' => $msisdn,
+            'ussd_push_accepted' => $res->isUssdPushAccepted(),
+        ]);
+
+        foreach ($orders as $order) {
+            $this->syncOrderFromResponse($order, $res, $transId, $refNo);
+        }
+
+        if ($res->isUssdPushAccepted()) {
+            EmolaDailyLimit::recordAcceptedPush($msisdn, $amountMzn);
+        }
+
+        return $res;
+    }
+
     public function resendPaymentRequest(Order $order, string $msisdn): void
     {
         $res = $this->pushPaymentForOrder($order, $msisdn);
@@ -106,6 +147,14 @@ class EmolaOrderPaymentService
         }
 
         $this->applyPaymentFailure($order, $data['errorCode'], $data['message']);
+
+        // Also fail sibling checkout-all orders that share the same eMola transaction.
+        if ($order->emola_trans_id) {
+            Order::where('emola_trans_id', $order->emola_trans_id)
+                ->where('id', '!=', $order->id)
+                ->get()
+                ->each(fn (Order $sibling) => $this->applyPaymentFailure($sibling, $data['errorCode'], $data['message']));
+        }
 
         return false;
     }
@@ -195,15 +244,24 @@ class EmolaOrderPaymentService
 
     private function markOrderPaid(Order $order): bool
     {
-        if ($order->isPaid()) {
-            return true;
+        $siblings = collect([$order]);
+        if ($order->emola_trans_id) {
+            $siblings = Order::where('emola_trans_id', $order->emola_trans_id)->get();
         }
 
-        $order->markAsPaid();
+        $anyPaid = false;
+        foreach ($siblings as $related) {
+            if ($related->isPaid()) {
+                $anyPaid = true;
+                continue;
+            }
 
-        safe_dispatch_order_event(new OrderCreated($order), 'OrderCreated (eMola)');
+            $related->markAsPaid();
+            safe_dispatch_order_event(new OrderCreated($related), 'OrderCreated (eMola)');
+            $anyPaid = true;
+        }
 
-        return true;
+        return $anyPaid;
     }
 
     /**

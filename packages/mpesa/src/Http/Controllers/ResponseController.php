@@ -47,14 +47,16 @@ class ResponseController extends Controller
         }
 
         if ($refId) {
-            $order = Order::where('payment_ref_id', $refId)->first();
-            if ($order) {
-                if ($success) {
-                    $order->markAsPaid();
-                } else {
-                    $order->payment_status = Order::PAYMENT_STATUS_PENDING;
-                    $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
-                    $order->save();
+            $orders = Order::where('payment_ref_id', $refId)->get();
+            if ($orders->isNotEmpty()) {
+                foreach ($orders as $order) {
+                    if ($success) {
+                        $order->markAsPaid();
+                    } else {
+                        $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+                        $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
+                        $order->save();
+                    }
                 }
             } elseif ($success) {
                 $this->creditWalletDeposit($refId);

@@ -222,6 +222,189 @@ class OrderController extends Controller
     }
 
     /**
+     * Checkout every store cart on one page — creates a separate order per shop.
+     */
+    public function createAll(CheckoutCartRequest $request, PaymentGateway $payment)
+    {
+        if (is_panel_user_on_storefront()) {
+            return redirect()->route('cart.index')
+                ->with('warning', panel_user_storefront_message());
+        }
+
+        $carts = $this->getShoppingCarts()->loadMissing(['shop', 'inventories']);
+
+        if ($carts->isEmpty()) {
+            return redirect()->route('cart.index')
+                ->with('error', trans('theme.notify.cart_empty'));
+        }
+
+        app(\App\Services\Cart\CartDeliveryRangeService::class)->annotate($carts);
+
+        foreach ($carts as $cart) {
+            if (! crosscheckCartOwnership($request, $cart)) {
+                return redirect()->route('cart.index')
+                    ->with('error', trans('theme.notify.please_login_to_checkout'));
+            }
+
+            if (! shop_can_accept_sales($cart->shop)) {
+                return redirect()->route('cart.index')
+                    ->with('error', trans('packages.wallet.vendor_sales_require_subscription'));
+            }
+
+            if (! empty($cart->needs_delivery_location)) {
+                return redirect()->route('cart.index')
+                    ->with('error', trans('theme.notify.set_location_for_delivery'));
+            }
+
+            if (! empty($cart->out_of_range)) {
+                return redirect()->route('cart.index')
+                    ->with('error', trans('theme.notify.product_out_of_delivery_range', [
+                        'store' => optional($cart->shop)->name ?? 'This store',
+                        'distance' => $cart->delivery_distance_km ?? '—',
+                        'radius' => $cart->service_radius_km ?? '—',
+                    ]));
+            }
+        }
+
+        DB::beginTransaction();
+
+        $orders = [];
+        $response = null;
+
+        try {
+            foreach ($carts as $cart) {
+                $cart = crosscheckAndUpdateOldCartInfo($request, $cart);
+                $order = $this->saveOrderFromCart($request, $cart);
+                $order->fulfilment_type = $request->fulfilment_type;
+                $order->currency_id = config('system_settings.currency.id');
+
+                if (is_incevio_package_loaded('dynamic-currency')) {
+                    $order['exchange_rate'] = get_dynamic_currency_attr('exchange_rate');
+                    $order['currency_id'] = get_dynamic_currency_attr('id');
+                }
+
+                $order->save();
+                $orders[] = $order;
+            }
+
+            $receiver = (vendor_get_paid_directly() && count($orders) > 1)
+                ? PaymentService::RECEIVER_PLATFORM
+                : (vendor_get_paid_directly() ? PaymentService::RECEIVER_MERCHANT : PaymentService::RECEIVER_PLATFORM);
+
+            $paymentMethod = (string) $request->input('payment_method', '');
+            $chargeAmount = 0.0;
+
+            foreach ($orders as $order) {
+                if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                    persist_order_checkout_fees($order, $paymentMethod);
+                    $feeBreakdown = get_customer_transaction_fee_for_order($order, $paymentMethod);
+                    $chargeAmount += (float) $feeBreakdown['total'];
+                } else {
+                    $chargeAmount += (float) $order->grand_total;
+                }
+            }
+
+            $paymentBuilder = $payment->setReceiver($receiver)->setOrderInfo($orders);
+            if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                $paymentBuilder->setAmount((int) round($chargeAmount));
+            } else {
+                $paymentBuilder->setAmount($chargeAmount);
+            }
+
+            $response = $paymentBuilder
+                ->setDescription(trans('app.purchase_from', [
+                    'marketplace' => get_platform_title(),
+                ]))
+                ->setConfig()
+                ->charge();
+
+            if ($response instanceof RedirectResponse) {
+                session(['confirmed_order_ids' => collect($orders)->pluck('id')->all()]);
+                DB::commit();
+
+                return $response;
+            }
+
+            foreach ($orders as $order) {
+                switch ($response->status) {
+                    case PaymentService::STATUS_PAID:
+                        if (optional($order->paymentMethod)->code !== 'emola') {
+                            $order->markAsPaid();
+                        }
+                        break;
+
+                    case PaymentService::STATUS_PENDING:
+                        if ($order->paymentMethod->code == 'cod') {
+                            $order->order_status_id = Order::STATUS_CONFIRMED;
+                            $order->payment_status = Order::PAYMENT_STATUS_UNPAID;
+                        } else {
+                            $order->order_status_id = Order::STATUS_WAITING_FOR_PAYMENT;
+                            $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+                        }
+                        $order->save();
+                        break;
+
+                    case PaymentService::STATUS_ERROR:
+                        $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+                        $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
+                        $order->save();
+                        break;
+
+                    default:
+                        throw new PaymentFailedException(trans('theme.notify.payment_failed'));
+                }
+            }
+        } catch (PaymentFailedException $e) {
+            DB::rollback();
+
+            Log::warning($request->payment_method.' checkout-all payment failed: '.$e->getMessage());
+
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+        } catch (Exception $e) {
+            DB::rollback();
+
+            Log::error($request->payment_method.' checkout-all payment failed: '.$e->getMessage(), [
+                'exception' => $e,
+            ]);
+
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+        }
+
+        DB::commit();
+
+        foreach ($orders as $order) {
+            if (! $this->shouldDeferEmolaConfirmation($order, $response)) {
+                safe_dispatch_order_event(new OrderCreated($order), 'OrderCreated');
+            }
+        }
+
+        foreach ($carts as $cart) {
+            $cart->forceDelete();
+        }
+
+        $primary = $orders[0];
+        session(['confirmed_order_ids' => collect($orders)->pluck('id')->all()]);
+
+        $flashKey = 'success';
+        $flashMessage = trans('theme.notify.order_placed');
+
+        if (! empty($response->paymentNotice)) {
+            $flashKey = 'error';
+            $flashMessage = $response->paymentNotice;
+        } elseif (
+            isset($response->status) &&
+            $response->status === PaymentService::STATUS_PENDING &&
+            optional($primary->paymentMethod)->code === 'emola'
+        ) {
+            $flashKey = 'warning';
+            $flashMessage = trans('app.waiting_for_payment');
+        }
+
+        return redirect()->route('order.confirmation', ['order_number' => $this->toRouteSafeOrderNumber($primary->order_number)])
+            ->with($flashKey, $flashMessage);
+    }
+
+    /**
      * Return from payment gateways with payment success
      *
      * @param  \App\Models\Order  $order
@@ -265,13 +448,15 @@ class OrderController extends Controller
         $orders = explode('-', $order);
         $order = count($orders) > 1 ? $orders : $order;
         if (is_array($order)) {
+            $confirmedIds = [];
             foreach ($order as $id) {
                 $temp = Order::withTrashed()->findOrFail($id);
-
                 $temp->markAsPaid();
+                $confirmedIds[] = $temp->id;
             }
 
             $order = $temp;
+            session(['confirmed_order_ids' => $confirmedIds]);
         } else {
             // Single order
             if (! $order instanceof Order) {
@@ -457,7 +642,42 @@ class OrderController extends Controller
 
         $order->load(['inventories.image', 'inventories.attachments', 'paymentMethod', 'shop']);
 
-        return view('theme::order_complete', compact('order'));
+        // Multi-store checkout: show every order that shares the payment reference / eMola txn.
+        $orders = collect([$order]);
+        if ($order->payment_ref_id) {
+            $related = Order::withTrashed()
+                ->with(['inventories.image', 'inventories.attachments', 'paymentMethod', 'shop'])
+                ->where('customer_id', $customer->id)
+                ->where('payment_ref_id', $order->payment_ref_id)
+                ->orderBy('id')
+                ->get();
+            if ($related->count() > 1) {
+                $orders = $related;
+            }
+        } elseif ($order->emola_trans_id) {
+            $related = Order::withTrashed()
+                ->with(['inventories.image', 'inventories.attachments', 'paymentMethod', 'shop'])
+                ->where('customer_id', $customer->id)
+                ->where('emola_trans_id', $order->emola_trans_id)
+                ->orderBy('id')
+                ->get();
+            if ($related->count() > 1) {
+                $orders = $related;
+            }
+        }
+
+        $sessionIds = session()->pull('confirmed_order_ids');
+        if (is_array($sessionIds) && count($sessionIds) > 1) {
+            $orders = Order::withTrashed()
+                ->with(['inventories.image', 'inventories.attachments', 'paymentMethod', 'shop'])
+                ->where('customer_id', $customer->id)
+                ->whereIn('id', $sessionIds)
+                ->orderBy('id')
+                ->get();
+            $order = $orders->first() ?: $order;
+        }
+
+        return view('theme::order_complete', compact('order', 'orders'));
     }
 
     /**

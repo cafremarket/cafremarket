@@ -150,8 +150,19 @@
       var $variantModalSlot = $variantManageModal.find('.variant-manage-modal__slot');
       var currentVariantRow = null;
 
-      function currencySymbol() {
-        return {!! json_encode(get_currency_prefix() ?: config('system_settings.currency.symbol', '$')) !!};
+      function formatMoney(value) {
+        var dec = {{ (int) config('system_settings.decimals', 2) }};
+        var decMark = {!! json_encode(config('system_settings.currency.decimal_mark', '.')) !!};
+        var thousandsSep = {!! json_encode(config('system_settings.currency.thousands_separator', ',')) !!};
+        var prefix = {!! json_encode(get_currency_prefix()) !!};
+        var suffix = {!! json_encode(get_currency_suffix()) !!};
+
+        value = parseFloat(value || 0).toFixed(dec);
+        var parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
+        var formatted = dec > 0 ? parts.join(decMark) : parts[0];
+
+        return prefix + formatted + suffix;
       }
 
       function updateVariantRowSummary($row) {
@@ -167,13 +178,13 @@
 
         $row.find('.variant-summary-sku').text(sku || '—');
         $row.find('.variant-summary-qty').text((qty !== undefined && qty !== '') ? qty : '—');
-        $row.find('.variant-summary-price').text((price !== undefined && price !== '') ? currencySymbol() + parseFloat(price).toFixed(2) : '—');
+        $row.find('.variant-summary-price').text((price !== undefined && price !== '') ? formatMoney(price) : '—');
         if (imgSrc) {
           $row.find('.variant-summary-thumb').attr('src', imgSrc);
         }
 
         if (offerEnabled && offerPrice) {
-          $row.find('.variant-summary-offer').removeClass('hide').text(currencySymbol() + parseFloat(offerPrice).toFixed(2));
+          $row.find('.variant-summary-offer').removeClass('hide').text(formatMoney(offerPrice));
           $row.find('.variant-summary-offer-empty').addClass('hide');
         } else {
           $row.find('.variant-summary-offer').addClass('hide').text('');
@@ -204,15 +215,30 @@
         syncOfferToggleVisibility($btn.closest('.variant-fields'), enabled);
       });
 
-      $(document).on('click', '.manageVariantBtn', function(e) {
-        e.preventDefault();
-        var $row = $(this).closest('tr.variant-row');
+      function openVariantManageModal($row) {
+        if (!$row || !$row.length || !$variantManageModal.length) return;
+
         var $fields = $row.find('.variant-fields');
         if (!$fields.length) return;
 
         currentVariantRow = $row;
         $variantModalSlot.empty().append($fields);
         $variantManageModal.find('.variant-manage-modal__attrs').html($row.find('.variant-attrs-label').html() || '');
+        $variantManageModal.modal('show');
+      }
+
+      $(document).on('click', '.manageVariantBtn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openVariantManageModal($(this).closest('tr.variant-row'));
+      });
+
+      // On small screens the Manage column is often clipped — clicking the row opens the same modal.
+      $(document).on('click', '#variantsTable tr.variant-row', function(e) {
+        if ($(e.target).closest('.deleteThisRow, .manageVariantBtn, a, button, input, label, select, textarea').length) {
+          return;
+        }
+        openVariantManageModal($(this));
       });
 
       $variantManageModal.on('hidden.bs.modal', function() {

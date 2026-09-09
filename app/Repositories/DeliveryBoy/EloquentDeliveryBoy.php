@@ -45,7 +45,6 @@ class EloquentDeliveryBoy extends EloquentRepository implements BaseRepository, 
         if (! Auth::user()->isFromPlatform()) {
             $request->merge([
                 'shop_id' => Auth::user()->merchantId(),
-                'type' => DeliveryBoy::TYPE_SHOP,
             ]);
         }
 

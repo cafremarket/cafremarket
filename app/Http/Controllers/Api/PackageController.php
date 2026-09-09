@@ -14,6 +14,11 @@ class PackageController extends Controller
      */
     public function isLoaded(Request $request, $slug)
     {
+        // Multi-store "checkout all" is a built-in marketplace feature (one order per shop).
+        if ($slug === 'checkout') {
+            return response()->json(['data' => true]);
+        }
+
         return response()->json([
             'data' => (bool) is_incevio_package_loaded($slug),
         ]);

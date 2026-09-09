@@ -192,7 +192,7 @@ class OrderController extends Controller
                 ];
             }
 
-            $payload['delivery_mode'] = $order->delivery_mode;
+            $payload['delivery_status_label'] = $order->deliveryStatusLabel();
         }
 
         return response()->json($payload, 200);

@@ -46,10 +46,15 @@ class MPesaPaymentService extends PaymentService
 
         if ($refId && $success) {
             if ($this->order) {
-                $this->order->payment_ref_id = $refId;
-                $this->order->order_status_id = Order::STATUS_WAITING_FOR_PAYMENT;
-                $this->order->payment_status = Order::PAYMENT_STATUS_PENDING;
-                $this->order->save();
+                $orders = is_array($this->order) ? $this->order : [$this->order];
+                $primary = $orders[0];
+
+                foreach ($orders as $order) {
+                    $order->payment_ref_id = $refId;
+                    $order->order_status_id = Order::STATUS_WAITING_FOR_PAYMENT;
+                    $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+                    $order->save();
+                }
 
                 // API / JSON request (e.g. Flutter app): return pending status so client can poll order status
                 $path = $this->request->path();
@@ -63,7 +68,7 @@ class MPesaPaymentService extends PaymentService
                     return $this;
                 }
 
-                return redirect()->to(url('mpesa/' . $this->order->id . '/complete'));
+                return redirect()->to(url('mpesa/' . $primary->id . '/complete'));
             }
 
             // Wallet deposit: store pending deposit and redirect to wallet complete page

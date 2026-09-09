@@ -98,6 +98,7 @@ Route::middleware('customerApp')->group(function () {
     Route::get('cart/{cart}', [CartController::class, 'show']);
     Route::put('cart/{cart}/update', [CartController::class, 'update']);
     Route::get('cart/{cart}/shipping', [CartController::class, 'shipping']);
+    Route::post('cart/checkout_all', [CheckoutController::class, 'checkoutAll']);
     Route::post('cart/{cart}/checkout', [CheckoutController::class, 'checkout']);
     Route::get('cart/{cart}/paymentOptions', [CheckoutController::class, 'paymentOptions']);
     Route::get('cart/{cart}/paymentOptions/debug', [CheckoutController::class, 'paymentOptionsDebug']);

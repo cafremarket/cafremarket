@@ -78,8 +78,9 @@ class Order extends BaseModel
         'shipping_date' => 'datetime',
         'delivery_date' => 'datetime',
         'payment_date' => 'datetime',
-        'delivery_assigned_at' => 'datetime',
-        'delivery_dispatched_at' => 'datetime',
+        'reached_at' => 'datetime',
+        'courier_added_at' => 'datetime',
+        'delivered_confirmed_at' => 'datetime',
         'goods_received' => 'boolean',
         'is_digital' => 'boolean',
     ];
@@ -157,12 +158,21 @@ class Order extends BaseModel
         'affiliate_id',
         'warehouse_id', // ID of the warehouse to pickup order from
         'delivery_boy_id',
-        'delivery_mode',
-        'delivery_assigned_at',
-        'delivery_dispatched_at',
         'customer_latitude',
         'customer_longitude',
+        'fulfillment_method',
+        'reached_at',
+        'courier_name',
+        'courier_phone',
+        'courier_tracking_number',
+        'courier_added_at',
+        'delivered_confirmed_at',
+        'otp',
     ];
+
+    const FULFILLMENT_METHOD_DELIVERY_BOY = 'delivery_boy';
+
+    const FULFILLMENT_METHOD_COURIER = 'courier';
 
     /**
      * Resolve route binding including soft deleted rows.
@@ -733,6 +743,9 @@ class Order extends BaseModel
         $this->update([
             'order_status_id' => static::STATUS_DELIVERED,
             'goods_received' => 1,
+            'otp' => null,
+            'reached_at' => null,
+            'delivered_confirmed_at' => $this->delivered_confirmed_at ?? now(),
         ]);
 
         // Credit store Cafrepay wallet only after successful delivery (prepaid orders).
@@ -862,6 +875,49 @@ class Order extends BaseModel
             && ! $this->isDelivered()
             && optional($this->deliveryBoy)->current_latitude
             && optional($this->deliveryBoy)->current_longitude;
+    }
+
+    /**
+     * Whether the assigned delivery boy has reached the customer's location
+     * and is awaiting OTP confirmation.
+     */
+    public function isReached(): bool
+    {
+        return ! is_null($this->reached_at) && ! $this->isDelivered();
+    }
+
+    /**
+     * Whether courier details have been added by the vendor for this order.
+     */
+    public function hasCourier(): bool
+    {
+        return $this->fulfillment_method === self::FULFILLMENT_METHOD_COURIER
+            && ! empty($this->courier_name);
+    }
+
+    /**
+     * Human-readable delivery sub-status shown alongside the main order status,
+     * without perturbing the order_status_id sequence other apps key off of.
+     */
+    public function deliveryStatusLabel(): ?string
+    {
+        if ($this->isDelivered()) {
+            return null;
+        }
+
+        if ($this->isReached()) {
+            return trans('app.reached_destination');
+        }
+
+        return null;
+    }
+
+    /**
+     * Generate a fresh 6-digit OTP for delivery confirmation.
+     */
+    public static function generateDeliveryOtp(): string
+    {
+        return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     }
 
     /**

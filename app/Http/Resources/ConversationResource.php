@@ -18,16 +18,16 @@ class ConversationResource extends JsonResource
             ? $this->resource->lastMessagePlain()
             : (string) ($this->message ?? '');
 
-        $unreadCount = method_exists($this->resource, 'unreadCustomerRepliesCount')
-            ? $this->resource->unreadCustomerRepliesCount()
-            : 0;
-
-        $hasUnreadCountAttr = array_key_exists('unread_count', $this->resource->getAttributes());
-        $isUnread = $hasUnreadCountAttr
-            ? ((int) $unreadCount > 0)
-            : (method_exists($this->resource, 'isUnread')
-                ? (bool) $this->resource->isUnread()
-                : ((int) $unreadCount > 0));
+        // Prefer withCount(`unread_count`) when present. Never fall back to
+        // conversation `status` (NEW/UNREAD) — that flag is merchant-inbox only
+        // and stays unread after the customer has already opened the thread.
+        if (array_key_exists('unread_count', $this->resource->getAttributes())) {
+            $unreadCount = (int) $this->resource->getAttribute('unread_count');
+        } elseif (method_exists($this->resource, 'unreadCustomerRepliesCount')) {
+            $unreadCount = (int) $this->resource->unreadCustomerRepliesCount();
+        } else {
+            $unreadCount = 0;
+        }
 
         return [
             'id' => $this->id,
@@ -41,8 +41,8 @@ class ConversationResource extends JsonResource
             'order_id' => $this->when($this->order_id, (int) $this->order_id),
             'item' => $this->when($this->item, new ItemLightResource($this->item)),
             'status' => $this->status,
-            'is_unread' => (bool) $isUnread,
-            'unread_count' => (int) $unreadCount,
+            'is_unread' => $unreadCount > 0,
+            'unread_count' => $unreadCount,
             'label' => $this->label,
             'updated_at' => optional($this->updated_at)->toIso8601String(),
             'updated_at_human' => optional($this->updated_at)->diffForHumans(),

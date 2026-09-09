@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('order/{order}/invoice', [OrderController::class, 'invoice'])->name('order.invoice');
 
+Route::get('order/{order}/shipping_label', [OrderController::class, 'shippingLabel'])->name('shipping_label');
+
 Route::delete('order/emptyTrash', [OrderController::class, 'emptyTrash'])->name('order.emptyTrash');
 
 Route::get('order/{order}/adminNote', [OrderController::class, 'adminNote'])->name('order.adminNote');
@@ -21,8 +23,6 @@ Route::get('/{order}/details', [OrderController::class, 'show'])->name('details'
 Route::get('/getOrder/{paymentStatus}/{orderStatus}/{fulfilmentStatus}', [OrderController::class, 'showBulkProcess'])->name('bulkorder_process')->middleware('ajax'); // Bulk order process table
 
 Route::post('order/assignPaymentStatus/{assign}', [OrderController::class, 'massAssignPaymentStatus'])->name('order.assignPaymentStatus');
-
-Route::post('order/assignOrderStatus/{status}', [OrderController::class, 'massAssignOrderStatus'])->name('order.assignOrderStatus');
 
 Route::post('order/downloadSelected', [OrderController::class, 'downloadSelected'])->name('order.downloadSelected');
 
@@ -43,7 +43,7 @@ Route::get('order/{order}/fulfill', [OrderController::class, 'fulfillment'])->na
 
 Route::put('order/{order}/fulfill', [OrderController::class, 'fulfill'])->name('order.fulfill');
 
-Route::put('order/{order}/updateOrderStatus', [OrderController::class, 'updateOrderStatus'])->name('order.updateOrderStatus');
+Route::put('order/{order}/markAsPickedUp', [OrderController::class, 'markAsPickedUp'])->name('order.markAsPickedUp');
 
 Route::put('order/{order}/togglePaymentStatus', [OrderController::class, 'togglePaymentStatus'])->name('order.togglePaymentStatus');
 
@@ -52,6 +52,9 @@ Route::get('{order}/deliveryboys', [OrderController::class, 'deliveryBoys'])->na
 
 Route::post('{order}/deliveryboy/assign', [OrderController::class, 'assignDeliveryBoy'])->name('deliveryboy.assign');
 
-Route::post('{order}/platform-delivery', [OrderController::class, 'requestPlatformDelivery'])->name('platform_delivery.request');
+// Courier routes
+Route::get('{order}/courier', [OrderController::class, 'courierForm'])->name('courier.form');
 
-Route::resource('order', OrderController::class)->except('update'); // order resource routes
+Route::post('{order}/courier/assign', [OrderController::class, 'assignCourier'])->name('courier.assign');
+
+Route::resource('order', OrderController::class)->except(['update', 'edit']); // order resource routes

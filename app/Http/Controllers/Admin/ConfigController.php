@@ -117,10 +117,6 @@ class ConfigController extends Controller
 
         $data = $request->all();
 
-        if (! $request->user()->isFromPlatform()) {
-            unset($data['delivery_capability']);
-        }
-
         $slugChanges = app(ShopSlugChangeService::class);
         $newSlug = $request->input('slug');
         $flashMessage = null;

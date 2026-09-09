@@ -288,29 +288,6 @@
         </li>
       @endif
 
-      {{-- Platform: platform riders & dispatch (not for vendors) --}}
-      @if (Auth::user()->isFromPlatform())
-        <li class="treeview {{ Request::is('admin/admin/delivery/platform-riders*') || Request::is('admin/admin/hyperlocal*') ? 'active' : '' }}">
-          <a href="javascript:void(0)">
-            <i class="fa fa-motorcycle"></i>
-            <span>{{ trans('nav.delivery') }}</span>
-            <i class="fa fa-angle-left pull-right"></i>
-          </a>
-          <ul class="treeview-menu">
-            <li class="{{ Request::is('admin/admin/delivery/platform-riders*') ? 'active' : '' }}">
-              <a href="{{ route('admin.admin.platform_rider.index') }}">
-                <i class="fa fa-angle-double-right"></i> {{ trans('app.platform_riders') }}
-              </a>
-            </li>
-            <li class="{{ Request::is('admin/admin/hyperlocal/dispatch*') ? 'active' : '' }}">
-              <a href="{{ route('admin.admin.hyperlocal.dispatch') }}">
-                <i class="fa fa-angle-double-right"></i> {{ trans('app.dispatch_dashboard') }}
-              </a>
-            </li>
-          </ul>
-        </li>
-      @endif
-
       @if (Auth::user()->isFromPlatform() && (Gate::allows('index', \App\Models\Merchant::class) || Gate::allows('index', \App\Models\Shop::class)))
         <li class="treeview {{ Request::is('admin/seller*') ? 'active' : '' }}">
           <a href="javascript:void(0)">

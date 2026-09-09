@@ -114,8 +114,14 @@
           ? '<span class="label label-danger">' . e(trans('app.statuses.disputed')) . '</span>'
           : '';
         $orderHeaderActions = $order->orderStatus();
-        if (Gate::allows('fulfill', $order)) {
-          $orderHeaderActions .= ' <a data-link="' . route('admin.order.deliveryboys', $order->id) . '" class="ajax-modal-btn btn btn-default btn-xs btn-flat"><i class="fa fa-user"></i> ' . e(trans('app.assign_deliveryboy')) . '</a>';
+        // Allow assigning/changing the delivery boy or courier any time before the
+        // order is delivered. The current assignment is also shown in the delivery
+        // boy panel below; these buttons let the vendor change it if needed.
+        if (Gate::allows('fulfill', $order) && ! $order->isDelivered()) {
+          $deliveryBoyLabel = $order->delivery_boy_id ? trans('app.change_deliveryboy') : trans('app.assign_deliveryboy');
+          $courierLabel = $order->hasCourier() ? trans('app.change_courier') : trans('app.courier_details');
+          $orderHeaderActions .= ' <a data-link="' . route('admin.order.deliveryboys', $order->id) . '" class="ajax-modal-btn btn btn-default btn-xs btn-flat"><i class="fa fa-user"></i> ' . e($deliveryBoyLabel) . '</a>';
+          $orderHeaderActions .= ' <a data-link="' . route('admin.order.courier.form', $order->id) . '" class="ajax-modal-btn btn btn-default btn-xs btn-flat"><i class="fa fa-truck"></i> ' . e($courierLabel) . '</a>';
         }
       @endphp
 
@@ -351,10 +357,6 @@
             @endif
 
             <div class="admin-order-actions__primary">
-              <a href="javascript:void(0)" data-link="{{ route('admin.order.order.edit', $order) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-default">
-                {{ trans('app.update_status') }}
-              </a>
-
               @if ($order->isFulfilled())
                 @unless ($order->isArchived())
                   @can('archive', $order)
@@ -434,18 +436,21 @@
               <div>
                 <strong>{{ $order->deliveryBoy->getName() }}</strong>
                 <small class="text-muted">{{ $order->deliveryBoy->email }}</small>
-                @if ($order->delivery_mode)
-                  <br><span class="label label-info">{{ trans('app.delivery_mode_' . $order->delivery_mode) }}</span>
+                @if ($order->isReached())
+                  <br><span class="label label-info">{{ $order->deliveryStatusLabel() }}</span>
                 @endif
               </div>
             </div>
+          @elseif ($order->hasCourier())
+            <div class="admin-order-sidebar-panel__user">
+              <strong>{{ $order->courier_name }}</strong>
+              <br><small class="text-muted">{{ $order->courier_phone }}</small>
+              @if ($order->courier_tracking_number)
+                <br><small class="text-muted">{{ trans('app.tracking_id') }}: {{ $order->courier_tracking_number }}</small>
+              @endif
+            </div>
           @else
             <p class="text-muted">{{ trans('app.delivery_boy_not_assigned') }}</p>
-            @if ($order->shop->supportsSystemDelivery())
-              {!! Form::open(['route' => ['admin.order.platform_delivery.request', $order], 'method' => 'post']) !!}
-                <button type="submit" class="btn btn-warning btn-sm btn-flat btn-block">{{ trans('app.request_platform_delivery') }}</button>
-              {!! Form::close() !!}
-            @endif
           @endif
         @include('admin.partials.ui.card_end')
       @endif
@@ -610,20 +615,15 @@
           'title' => trans('app.shipping'),
           'icon' => 'fa-truck',
           'bodyClass' => 'admin-order-sidebar-panel',
-          'actions' => '<a href="' . route('order.shipping.label.download', $order) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-file"></i> ' . e(trans('app.download_shipping_label')) . '</a>',
+          'actions' => '<a href="' . panel_route('admin.order.shipping_label', $order) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-file"></i> ' . e(trans('app.download_shipping_label')) . '</a>',
         ])
           <dl class="admin-order-sidebar-panel__meta">
-            <dt>{{ trans('app.tracking_id') }}</dt>
-            <dd>{{ $order->tracking_id ?: '—' }}</dd>
-            <dt>{{ trans('app.carrier') }}</dt>
-            <dd><strong>{{ $order->carrier ? $order->carrier->name : ($order->shippingRate ? optional($order->shippingRate->carrier)->name : '—') }}</strong></dd>
-            <dt>{{ trans('app.total_weight') }}</dt>
-            <dd><strong>{{ get_formated_weight($order->shipping_weight) }}</strong></dd>
-            @if ($order->carrier && $order->tracking_id)
-              @php $tracking_url = getTrackingUrl($order->tracking_id, $order->carrier_id); @endphp
-              <dt>{{ trans('app.tracking_url') }}</dt>
-              <dd><a href="{{ $tracking_url }}" target="_blank">{{ $tracking_url }}</a></dd>
-            @endif
+            <dt>{{ trans('app.customer_name') }}</dt>
+            <dd><strong>{{ $order->customer->getName() }}</strong></dd>
+            <dt>{{ trans('app.phone_number') }}</dt>
+            <dd>{{ $order->customer_phone_number ?: '—' }}</dd>
+            <dt>{{ trans('app.shipping_address') }}</dt>
+            <dd>{!! address_str_to_html($order->shipping_address) !!}</dd>
           </dl>
         @include('admin.partials.ui.card_end')
       @endif
