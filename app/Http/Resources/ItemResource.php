@@ -61,7 +61,10 @@ class ItemResource extends JsonResource
             'rating' => $this->rating(),
             'feedbacks_count' => $this->rating() ? $this->avgFeedback->count : 0,
             'feedbacks' => FeedbackResource::collection($this->whenLoaded('latestFeedbacks')),
-            'shop' => new ShopLightResource($this->shop),
+            'shop' => array_merge(
+                (new ShopLightResource($this->shop))->toArray($request),
+                ['distance_km' => app(\App\Services\Hyperlocal\HyperlocalCatalogService::class)->shopDistance($this->shop_id)]
+            ),
             'product' => new ProductResource($this->product),
             'free_shipping' => $this->free_shipping,
             'stuff_pick' => $this->stuff_pick,

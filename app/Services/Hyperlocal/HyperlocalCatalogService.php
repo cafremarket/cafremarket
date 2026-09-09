@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 class HyperlocalCatalogService
 {
     protected ?array $cachedShopIds = null;
+    protected ?Collection $cachedNearbyShops = null;
 
     public function __construct(
         private BuyerLocationService $buyerLocation,
@@ -35,6 +36,16 @@ class HyperlocalCatalogService
     {
         if ($this->cachedShopIds !== null) {
             return $this->cachedShopIds;
+        }
+
+        // No override coordinates: reuse the memoized buyer-location nearby list
+        // instead of re-querying — same data as nearbyShopsWithDistance()/shopDistances().
+        if ($latitude === null && $longitude === null) {
+            return $this->cachedShopIds = $this->nearbyShopsWithDistance()
+                ->pluck('shop.id')
+                ->filter()
+                ->values()
+                ->all();
         }
 
         $lat = $latitude ?? $this->buyerLocation->latitude();
@@ -128,6 +139,22 @@ class HyperlocalCatalogService
     }
 
     /**
+     * Shop ids that are outside their own delivery radius for the current buyer —
+     * still shown while browsing (no radius cutoff), but checkout will block them.
+     * Used to flag those products/shops on cards so buyers know before they try
+     * to check out.
+     */
+    public function outOfRangeShopIds(): array
+    {
+        return $this->nearbyShopsWithDistance()
+            ->where('deliverable', false)
+            ->pluck('shop.id')
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
      * Distance (km) from the buyer to a single shop. Cheaper than shopDistances()
      * for single-item pages (product page, quick view) that only need one shop —
      * it does not fetch/sort every nearby shop.
@@ -195,14 +222,18 @@ class HyperlocalCatalogService
 
     public function nearbyShopsWithDistance(): Collection
     {
+        if ($this->cachedNearbyShops !== null) {
+            return $this->cachedNearbyShops;
+        }
+
         $lat = $this->buyerLocation->latitude();
         $lng = $this->buyerLocation->longitude();
 
         if (! $lat || ! $lng) {
-            return collect();
+            return $this->cachedNearbyShops = collect();
         }
 
-        return $this->nearbyShops->find($lat, $lng);
+        return $this->cachedNearbyShops = $this->nearbyShops->find($lat, $lng);
     }
 
     /**

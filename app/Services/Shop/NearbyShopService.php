@@ -56,10 +56,15 @@ class NearbyShopService
                     (float) $address->longitude
                 );
 
+                $shopRadius = (float) ($shop->service_radius_km ?: config('hyperlocal.default_shop_service_radius_km', 5));
+
                 return [
                     'shop' => $shop,
                     'distance_km' => $distanceKm,
-                    'deliverable' => true,
+                    // Browsing has no cutoff (the shop still shows either way), but this
+                    // tells the UI whether it's actually within the shop's own delivery
+                    // radius — checkout blocks it otherwise, so cards should warn early.
+                    'deliverable' => $distanceKm <= $shopRadius,
                 ];
             })
             ->filter()

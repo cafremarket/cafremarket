@@ -124,6 +124,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(\App\Services\Emola\EmolaClient::class);
 
+        // Shared per-request so its nearby-shops/distance lookups (used across many
+        // blade partials and API resources on the same request) hit the DB once.
+        $this->app->singleton(\App\Services\Hyperlocal\HyperlocalCatalogService::class);
+
         // On demand Image manipulation
         $this->app->singleton(
             \League\Glide\Server::class,

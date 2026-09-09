@@ -14,12 +14,20 @@ class ListingResource extends JsonResource
      */
     public function toArray($request)
     {
+        $catalog = app(\App\Services\Hyperlocal\HyperlocalCatalogService::class);
+
         return [
             'id' => $this->id,
             'slug' => $this->slug,
             'product_id' => $this->product_id,
             'title' => $this->title,
             'condition' => $this->condition,
+            'shop_id' => $this->shop_id,
+            'shop_name' => optional($this->shop)->name,
+            'distance_km' => $catalog->shopDistances()->get($this->shop_id),
+            // True when the shop is farther than its own delivery radius — still
+            // shown while browsing, but checkout will block it.
+            'out_of_range' => in_array((int) $this->shop_id, $catalog->outOfRangeShopIds(), true),
             // 'attributes' => AttributeLightResource::collection($this->whenLoaded('attributeValues')),
             'has_offer' => $this->hasOffer(),
             'raw_price' => get_formated_value($this->current_sale_price()),

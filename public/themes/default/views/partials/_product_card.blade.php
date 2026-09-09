@@ -4,9 +4,16 @@
      ratings/pricing partials) so existing cart/quick-view JS keeps working unmodified.
      The image box is a fixed-ratio frame (object-fit: cover) so a tall, wide, or tiny
      source image never changes the card's size — every card in a row lines up the same.
-     Pass an optional $distance (km) to show it next to the store name. --}}
-<div class="product product-grid-view sc-product-item sf-product-card">
+     Pass an optional $distance (km) to show it next to the store name, and
+     $outOfRange (bool) when the shop is farther than its own delivery radius —
+     browsing never hides it, but checkout will block it, so the card should warn. --}}
+<div class="product product-grid-view sc-product-item sf-product-card {{ ! empty($outOfRange) ? 'sf-product-card--out-of-range' : '' }}">
   <ul class="product-info-labels">
+    @if (! empty($outOfRange))
+      <li class="sf-badge-out-of-range">
+        <i class="fal fa-map-marker-alt"></i> {{ trans('theme.out_of_delivery_range') }}
+      </li>
+    @endif
     @foreach ($item->getLabels() as $label)
       <li>{!! $label !!}</li>
     @endforeach
@@ -50,10 +57,12 @@
     <a href="{{ storefront_product_url($item) }}" class="product-info-title" data-name="product_name" aria-label="{{ $item->title }}">{{ $item->title }}</a>
 
     @if ($item->shop)
-      <a href="{{ route('show.store', $item->shop->slug) }}" class="sf-product-card__shop">
-        <i class="fal fa-store"></i>
+      <a href="{{ route('show.store', $item->shop->slug) }}" class="sf-product-card__shop {{ ! empty($outOfRange) ? 'sf-product-card__shop--out-of-range' : '' }}">
+        <i class="fal {{ ! empty($outOfRange) ? 'fa-exclamation-triangle' : 'fa-store' }}"></i>
         <span class="sf-product-card__shop-name">{{ $item->shop->name }}</span>
-        @if (! empty($distance))
+        @if (! empty($outOfRange))
+          <span class="sf-product-card__distance">&middot; {{ trans('theme.out_of_delivery_range') }}</span>
+        @elseif (! empty($distance))
           <span class="sf-product-card__distance">&middot; {{ format_distance_km($distance) }}</span>
         @endif
       </a>

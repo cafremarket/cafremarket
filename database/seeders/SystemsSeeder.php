@@ -35,7 +35,7 @@ class SystemsSeeder extends BaseSeeder
             'valume_unit' => 'liter',
             // 'currency_format' => 'x,xxx.xx',
             'show_currency_symbol' => 1,
-            'show_space_after_symbol' => 0,
+            'show_space_after_symbol' => 1,
             'google_analytic_report' => 0,
             'allow_guest_checkout' => 1,
             'active_theme' => 'default',

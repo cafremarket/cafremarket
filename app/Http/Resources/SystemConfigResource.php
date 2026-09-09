@@ -18,6 +18,14 @@ class SystemConfigResource extends JsonResource
      */
     public function toArray($request)
     {
+        $settings = is_array($this->resource)
+            ? $this->resource
+            : (array) $this->resource;
+
+        $attr = function (string $key, $default = null) use ($settings) {
+            return array_key_exists($key, $settings) ? $settings[$key] : $default;
+        };
+
         // declaring it outside the if block to avoid undefined error. Need to consider conditional merging in return statement
         $selectedCurrencyDetails = null;
 
@@ -41,56 +49,61 @@ class SystemConfigResource extends JsonResource
             $compatibility = System::$api_compatibility['vendor'];
         }
 
+        $currency = $attr('currency');
+        $currencyArr = is_array($currency)
+            ? $currency
+            : (is_object($currency) ? (array) $currency : null);
+
         return [
-            'maintenance_mode' => (bool) $this->maintenance_mode,
+            'maintenance_mode' => (bool) $attr('maintenance_mode'),
             // "install_verion" => System::VERSION, // Need to fix the spelling in app end also, will be removed soon
             'install_version' => System::VERSION,
             'compatible_app_version' => $this->when(isset($compatibility), $compatibility),
-            'name' => $this->name,
-            'slogan' => $this->slogan,
-            'legal_name' => $this->legal_name,
+            'name' => $attr('name'),
+            'slogan' => $attr('slogan'),
+            'legal_name' => $attr('legal_name'),
             'platform_logo' => get_logo_url('system', 'full'),
-            'email' => $this->email,
-            'worldwide_business_area' => (bool) $this->worldwide_business_area,
-            'timezone_id' => $this->timezone_id,
-            'currency_id' => $this->currency_id,
-            'default_language' => $this->default_language,
-            'ask_customer_for_email_subscription' => (bool) $this->ask_customer_for_email_subscription,
-            'can_cancel_order_within' => $this->can_cancel_order_within,
-            'support_phone' => $this->support_phone,
-            'support_phone_toll_free' => $this->support_phone_toll_free,
-            'support_email' => $this->support_email,
-            'facebook_link' => $this->facebook_link,
-            'google_plus_link' => $this->google_plus_link,
-            'twitter_link' => $this->twitter_link,
-            'pinterest_link' => $this->pinterest_link,
-            'instagram_link' => $this->instagram_link,
-            'youtube_link' => $this->youtube_link,
-            'length_unit' => $this->length_unit,
-            'weight_unit' => $this->weight_unit,
-            'valume_unit' => $this->valume_unit,
-            'decimals' => $this->decimals,
-            'show_currency_symbol' => (bool) $this->show_currency_symbol,
-            'show_space_after_symbol' => (bool) $this->show_space_after_symbol,
-            'max_img_size_limit_kb' => $this->max_img_size_limit_kb,
-            'show_item_conditions' => (bool) $this->show_item_conditions,
-            'address_default_country' => $this->address_default_country,
-            'address_default_state' => $this->address_default_state,
-            'show_address_title' => (bool) $this->show_address_title,
-            'address_show_country' => (bool) $this->address_show_country,
-            'address_show_map' => (bool) $this->address_show_map,
-            'allow_guest_checkout' => (bool) $this->allow_guest_checkout,
+            'email' => $attr('email'),
+            'worldwide_business_area' => (bool) $attr('worldwide_business_area'),
+            'timezone_id' => $attr('timezone_id'),
+            'currency_id' => $attr('currency_id'),
+            'default_language' => $attr('default_language'),
+            'ask_customer_for_email_subscription' => (bool) $attr('ask_customer_for_email_subscription'),
+            'can_cancel_order_within' => $attr('can_cancel_order_within'),
+            'support_phone' => $attr('support_phone'),
+            'support_phone_toll_free' => $attr('support_phone_toll_free'),
+            'support_email' => $attr('support_email'),
+            'facebook_link' => $attr('facebook_link'),
+            'google_plus_link' => $attr('google_plus_link'),
+            'twitter_link' => $attr('twitter_link'),
+            'pinterest_link' => $attr('pinterest_link'),
+            'instagram_link' => $attr('instagram_link'),
+            'youtube_link' => $attr('youtube_link'),
+            'length_unit' => $attr('length_unit'),
+            'weight_unit' => $attr('weight_unit'),
+            'valume_unit' => $attr('valume_unit'),
+            'decimals' => $attr('decimals'),
+            'show_currency_symbol' => (bool) $attr('show_currency_symbol'),
+            'show_space_after_symbol' => (bool) $attr('show_space_after_symbol'),
+            'max_img_size_limit_kb' => $attr('max_img_size_limit_kb'),
+            'show_item_conditions' => (bool) $attr('show_item_conditions'),
+            'address_default_country' => $attr('address_default_country'),
+            'address_default_state' => $attr('address_default_state'),
+            'show_address_title' => (bool) $attr('show_address_title'),
+            'address_show_country' => (bool) $attr('address_show_country'),
+            'address_show_map' => (bool) $attr('address_show_map'),
+            'allow_guest_checkout' => (bool) $attr('allow_guest_checkout'),
             'enable_chat' => true,
             'vendor_get_paid' => (bool) vendor_get_paid_directly(),
-            'currency' => [
-                'name' => $this->currency['name'],
-                'iso_code' => $this->currency['iso_code'],
-                'symbol' => $this->currency['symbol'],
-                'symbol_first' => (bool) $this->currency['symbol_first'],
-                'subunit' => $this->currency['subunit'],
-                'decimal_mark' => $this->currency['decimal_mark'],
-                'thousands_separator' => $this->currency['thousands_separator'],
-            ],
+            'currency' => $currencyArr ? [
+                'name' => $currencyArr['name'] ?? null,
+                'iso_code' => $currencyArr['iso_code'] ?? null,
+                'symbol' => $currencyArr['symbol'] ?? null,
+                'symbol_first' => (bool) ($currencyArr['symbol_first'] ?? false),
+                'subunit' => $currencyArr['subunit'] ?? null,
+                'decimal_mark' => $currencyArr['decimal_mark'] ?? null,
+                'thousands_separator' => $currencyArr['thousands_separator'] ?? null,
+            ] : null,
             'selected_currency' => $selectedCurrencyDetails ? [
                 'name' => $selectedCurrencyDetails->name,
                 'iso_code' => $selectedCurrencyDetails->iso_code,
@@ -103,22 +116,18 @@ class SystemConfigResource extends JsonResource
             'active_languages' => ListHelper::availableLocales()->pluck('language', 'code')->toArray(),
 
             'smart_form_id_for_registration' => $request->is('api/vendor/*')
-                ? (property_exists($this->resource, 'smart_form_id_for_vendor_additional_info') ? $this->resource->smart_form_id_for_vendor_additional_info : null)
-                : (property_exists($this->resource, 'smart_form_id_for_customer_registration_form') ? $this->resource->smart_form_id_for_customer_registration_form : null),
+                ? $attr('smart_form_id_for_vendor_additional_info')
+                : $attr('smart_form_id_for_customer_registration_form'),
 
             'show_terms_and_conditions_on_registration' => $request->is('api/vendor/*')
-                ? (bool) (property_exists($this->resource, 'show_vendor_terms_and_conditions') ? $this->resource->show_vendor_terms_and_conditions : false)
-                : (bool) (property_exists($this->resource, 'show_customer_terms_and_conditions') ? $this->resource->show_customer_terms_and_conditions : false),
-
-            // "smart_form_id_for_vendor_additional_info" => $this->when($request->is('api/vendor/*'), $this->smart_form_id_for_vendor_additional_info),
-
-            // 'smart_form_id_for_selling_page' => $this->when($request->is('api/vendor/*'), $this->smart_form_id_for_selling_page),
+                ? (bool) $attr('show_vendor_terms_and_conditions', false)
+                : (bool) $attr('show_customer_terms_and_conditions', false),
 
             'smart_form_id_for_contact_us_page' => $request->is('api/vendor/*')
-                ? (property_exists($this->resource, 'smart_form_id_for_selling_page') ? $this->resource->smart_form_id_for_selling_page : null)
-                : (property_exists($this->resource, 'smart_form_id_for_contact_us_page') ? $this->resource->smart_form_id_for_contact_us_page : null),
+                ? $attr('smart_form_id_for_selling_page')
+                : $attr('smart_form_id_for_contact_us_page'),
 
-            'publicly_show_affiliate_commission' => (bool) $this->publicly_show_affiliate_commission,
+            'publicly_show_affiliate_commission' => (bool) $attr('publicly_show_affiliate_commission', false),
 
             'disable_other_gender' => config('system.disable_other_gender'),
         ];

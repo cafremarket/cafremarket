@@ -305,13 +305,14 @@ class HomeController extends Controller
         $activePaymentMethods = PaymentMethod::active()->get();
         $activePaymentCodes = $activePaymentMethods->pluck('code')->toArray();
 
-        $activePaymentMethods = $shop->paymentMethods;
-
-        // $shop_config = null;
-        // if (vendor_get_paid_directly()) {
-        //     $activePaymentMethods = $shop->paymentMethods;
-        //     $shop_config = $shop;
-        // }
+        // Match CheckoutController: only force shop-scoped methods when vendors
+        // are paid directly. Otherwise platform-configured gateways (M-Pesa,
+        // eMola, Cafrepay) must still appear even if shop_payment_methods is empty.
+        $shopConfig = null;
+        if (vendor_get_paid_directly()) {
+            $activePaymentMethods = $shop->paymentMethods;
+            $shopConfig = $shop;
+        }
 
         $results = collect([]);
         foreach ($activePaymentMethods as $payment) {
@@ -322,7 +323,7 @@ class HomeController extends Controller
 
             if (
                 ! in_array($payment->code, $activePaymentCodes) ||
-                ! get_payment_config_info($payment->code, $shop)
+                ! get_payment_config_info($payment->code, $shopConfig)
             ) {
                 continue;
             }

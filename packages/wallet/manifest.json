@@ -10,7 +10,7 @@
   "uri": "https://incevio.com",
   "license": "Copyright reserved to the Incevio",
   "dependency": "",
-  "active": false,
+  "active": true,
   "warning": "",
   "provider": "Wallet\\WalletServiceProvider",
   "compatible": "2.20.0",

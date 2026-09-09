@@ -6211,3 +6211,31 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
     padding: 20px;
   }
 }
+
+/* ── Out-of-delivery-range flag on product cards ─────────────────────
+   Browsing shows every product (no radius cutoff) but a shop farther
+   than its own delivery radius will still be blocked at checkout —
+   flag it on the card itself so buyers know before they try. ──────── */
+.sf-badge-out-of-range {
+  display: flex !important;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  background: #feaf20 !important;
+}
+
+.sf-product-card--out-of-range .sf-product-card__media {
+  opacity: 0.85;
+}
+
+.sf-product-card__shop--out-of-range {
+  color: #feaf20;
+}
+
+.sf-product-card__shop--out-of-range:hover {
+  color: #d9930a;
+}
+
+.sf-product-card__shop--out-of-range .sf-product-card__distance {
+  font-weight: 600;
+}

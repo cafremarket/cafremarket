@@ -10,7 +10,9 @@
   </div>
 @else
   @php
-    $sf_search_distances = app(\App\Services\Hyperlocal\HyperlocalCatalogService::class)->shopDistances();
+    $sf_search_catalog = app(\App\Services\Hyperlocal\HyperlocalCatalogService::class);
+    $sf_search_distances = $sf_search_catalog->shopDistances();
+    $sf_search_out_of_range = $sf_search_catalog->outOfRangeShopIds();
   @endphp
 
   <div class="row sf-search-grid">
@@ -19,6 +21,7 @@
         @include('theme::partials._product_card', [
           'item' => $item,
           'distance' => $sf_search_distances->get($item->shop_id),
+          'outOfRange' => in_array($item->shop_id, $sf_search_out_of_range),
         ])
       </div>
     @endforeach
