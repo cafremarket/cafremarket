@@ -93,8 +93,42 @@ class CheckoutController extends Controller
             'package' => [
                 'wallet_loaded' => (bool) is_incevio_package_loaded('wallet'),
             ],
+            'db_payment_methods' => DB::table('payment_methods')
+                ->whereIn('code', ['mpesa', 'emola', 'zcart-wallet'])
+                ->select('id', 'code', 'name', 'enabled', 'order')
+                ->get(),
             'payment_methods' => $methods,
             'wallet_method' => $methods->firstWhere('code', 'zcart-wallet'),
+            'diagnosis' => $this->walletVisibilityDiagnosis($methods, $customer, $walletRow),
+        ];
+    }
+
+    private function walletVisibilityDiagnosis($methods, $customer, $walletRow): array
+    {
+        $issues = [];
+
+        if (! DB::table('payment_methods')->where('code', 'zcart-wallet')->where('enabled', 1)->exists()) {
+            $issues[] = 'MISSING_OR_DISABLED: payment_methods row for zcart-wallet — run php artisan migrate --force';
+        }
+
+        if (! $customer) {
+            $issues[] = 'NOT_LOGGED_IN: Cafrepay only shows in the app when the buyer is logged in (accessAllowed)';
+        } elseif (! $walletRow) {
+            $issues[] = 'NO_WALLET_ROW: customer has no default wallet — run migration 2026_09_09_000004 or ensure_customer_wallet()';
+        }
+
+        if (! (bool) get_from_option_table('wallet_checkout')) {
+            $issues[] = 'wallet_checkout option is off';
+        }
+
+        $walletMethod = $methods->firstWhere('code', 'zcart-wallet');
+        if ($walletMethod && ! ($walletMethod['would_show'] ?? false)) {
+            $issues[] = 'zcart-wallet filtered out by get_payment_config_info()';
+        }
+
+        return [
+            'ok' => empty($issues),
+            'issues' => $issues,
         ];
     }
 
