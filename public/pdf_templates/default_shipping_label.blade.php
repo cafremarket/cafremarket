@@ -100,7 +100,7 @@
       @endif
     </td>
     <td style="border:none; width:50%; vertical-align:top;">
-      <u>{{ trans('app.ship_to') ?: 'Ship to' }}</u><br />
+      <u>{{ trans('app.ship_to') }}</u><br />
       <b>{{ optional($order->customer)->getName() ?: optional($order->customer)->name }}</b><br />
       @if ($order->shipping_address)
         {!! nl2br(e(strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $order->shipping_address)))) !!}<br />
@@ -112,13 +112,14 @@
   </tr>
 </table>
 
-<div class="section">{{ trans('app.product') }} / {{ trans('app.pricing') ?: 'Pricing' }}</div>
+<div class="section">{{ trans('app.product') }} / {{ trans('app.pricing') }}</div>
 
 <table>
   <thead>
     <tr>
       <th>{{ trans('app.product') }}</th>
       <th class="c">{{ trans('app.quantity') }}</th>
+      <th class="c">{{ trans('app.dimensions') }}</th>
       <th class="r">{{ trans('app.price') }}</th>
       <th class="r">{{ trans('app.total') }}</th>
     </tr>
@@ -127,10 +128,22 @@
     @foreach ($order->inventories as $item)
       @php
         $lineTotal = (float) $item->pivot->unit_price * (int) $item->pivot->quantity;
+        $unit = $item->distance_unit ?: 'cm';
+        $hasDims = ((float) $item->length > 0) || ((float) $item->width > 0) || ((float) $item->height > 0);
+        $fmtDim = static function ($value) {
+            $formatted = number_format((float) $value, 2, '.', '');
+            $formatted = rtrim(rtrim($formatted, '0'), '.');
+
+            return $formatted === '' ? '0' : $formatted;
+        };
+        $dimsLabel = $hasDims
+            ? $fmtDim($item->length).' × '.$fmtDim($item->width).' × '.$fmtDim($item->height).' '.$unit
+            : '—';
       @endphp
       <tr>
         <td>{{ $item->pivot->item_description ?? $item->title }}</td>
         <td class="c">{{ $item->pivot->quantity }}</td>
+        <td class="c">{{ $dimsLabel }}</td>
         <td class="r">{{ get_formated_currency($item->pivot->unit_price, 2, $order->currency_id) }}</td>
         <td class="r">{{ get_formated_currency($lineTotal, 2, $order->currency_id) }}</td>
       </tr>
@@ -140,7 +153,7 @@
 
 <table class="totals" style="width:45%; margin-left:auto; margin-top:12px;">
   <tr>
-    <td>{{ trans('app.subtotal') ?: trans('app.total') }}</td>
+    <td>{{ trans('app.subtotal') }}</td>
     <td class="r">{{ get_formated_currency($subtotal, 2, $order->currency_id) }}</td>
   </tr>
   @if ((float) $order->discount > 0)
