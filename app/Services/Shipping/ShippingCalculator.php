@@ -12,7 +12,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Location-based shipping: free | fixed | km.
- * Cart charge = max(per-item calculated charges) for the same shop cart.
+ * Cart charge = sum of each product's calculated shipping charge.
  */
 class ShippingCalculator
 {
@@ -48,7 +48,7 @@ class ShippingCalculator
     }
 
     /**
-     * @return array{amount: float, distance_km: float|null, items: array, label: string}
+     * @return array{amount: float, distance_km: float|null, items: array<int, array>, label: string}
      */
     public function calculateForCart(Cart $cart, ?float $destLat = null, ?float $destLng = null): array
     {
@@ -60,27 +60,84 @@ class ShippingCalculator
         $distanceKm = $this->distanceFromShop($shop, $destLat, $destLng);
 
         $itemAmounts = [];
-        $max = 0.0;
+        $sum = 0.0;
 
         foreach ($cart->inventories as $item) {
-            $charge = $this->calculateForItem($item, $config, $distanceKm);
-            $itemAmounts[$item->id] = $charge;
-            if ($charge > $max) {
-                $max = $charge;
-            }
+            $unitCharge = $this->calculateForItem($item, $config, $distanceKm);
+            $qty = max(1, (int) ($item->pivot->quantity ?? 1));
+            // Charge once per cart line (product), not multiplied by qty —
+            // matches prior per-item rate semantics while summing every line.
+            $charge = round($unitCharge, 6);
+            $sum += $charge;
+
+            $title = $item->pivot->item_description
+                ?? $item->title
+                ?? ('#'.$item->id);
+
+            $itemAmounts[] = [
+                'inventory_id' => (int) $item->id,
+                'title' => strip_tags((string) $title),
+                'quantity' => $qty,
+                'unit_amount' => $unitCharge,
+                'amount' => $charge,
+                'shop_id' => $shop?->id,
+                'shop_name' => $shop?->name,
+            ];
         }
 
-        // Empty cart edge case
         if ($cart->inventories->isEmpty()) {
-            $max = 0.0;
+            $sum = 0.0;
+            $itemAmounts = [];
         }
 
         return [
-            'amount' => round($max, 6),
+            'amount' => round($sum, 6),
             'distance_km' => $distanceKm,
             'items' => $itemAmounts,
-            'label' => $this->labelForAmount($max, $distanceKm),
+            'label' => $this->labelForAmount($sum, $distanceKm),
         ];
+    }
+
+    /**
+     * API / UI friendly breakdown rows for a cart (products + handling).
+     *
+     * @return array<int, array{inventory_id: ?int, title: string, quantity: int, amount: string, amount_raw: string, shop_name: ?string}>
+     */
+    public function breakdownForCart(Cart $cart, ?float $destLat = null, ?float $destLng = null): array
+    {
+        if ($cart->is_digital || $cart->isPickup()) {
+            return [];
+        }
+
+        $decimal = config('system_settings.decimals', 2);
+        $result = $this->calculateForCart($cart, $destLat, $destLng);
+        $lines = [];
+
+        foreach ($result['items'] as $row) {
+            $amount = (float) ($row['amount'] ?? 0);
+            $lines[] = [
+                'inventory_id' => $row['inventory_id'] ?? null,
+                'title' => $row['title'] ?? '',
+                'quantity' => (int) ($row['quantity'] ?? 1),
+                'amount' => get_formated_currency($amount, $decimal),
+                'amount_raw' => strval(round($amount, 2)),
+                'shop_name' => $row['shop_name'] ?? null,
+            ];
+        }
+
+        $handling = (float) ($cart->handling ?? 0);
+        if ($handling > 0) {
+            $lines[] = [
+                'inventory_id' => null,
+                'title' => trans('theme.handling') ?: 'Handling',
+                'quantity' => 1,
+                'amount' => get_formated_currency($handling, $decimal),
+                'amount_raw' => strval(round($handling, 2)),
+                'shop_name' => optional($cart->shop)->name,
+            ];
+        }
+
+        return $lines;
     }
 
     /**
@@ -219,10 +276,9 @@ class ShippingCalculator
             'carrier_id' => null,
             'carrier_name' => trans('app.shipping') ?? 'Shipping',
             'rate' => $result['amount'],
-            'delivery_takes' => $result['distance_km'] !== null
-                ? round($result['distance_km'], 1).' km'
-                : null,
+            'delivery_takes' => null,
             'distance_km' => $result['distance_km'],
+            'items' => $result['items'],
         ]]);
     }
 
@@ -239,10 +295,6 @@ class ShippingCalculator
     {
         if ($amount <= 0) {
             return trans('theme.free_shipping') ?: 'Free shipping';
-        }
-
-        if ($distanceKm !== null) {
-            return (trans('app.shipping') ?: 'Shipping').' ('.round($distanceKm, 1).' km)';
         }
 
         return trans('app.shipping') ?: 'Shipping';

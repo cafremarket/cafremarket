@@ -19,11 +19,11 @@
     @endcan
   @endunless
 
-  <a href="{{ route('admin.order.order.show', $order->id) }}">
+  <a href="{{ panel_route('admin.order.order.show', $order->id) }}">
     <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.open') }}" class="fa fa-expand"></i>
   </a>&nbsp;
 
-  <a href="{{ route('admin.order.order.invoice', $order->id) }}">
+  <a href="{{ panel_route('admin.order.order.invoice', $order) }}">
     <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.download_invoice') }}" class="fa fa-download"></i>
   </a>&nbsp;
 

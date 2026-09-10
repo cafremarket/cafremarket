@@ -1900,7 +1900,6 @@ return [
     'pickup_enabled' => 'Pickup enabled',
     'payment_verified' => 'Payment verified',
     'bank_name' => 'Bank name',
-    'credit_back_percentage' => 'Credit back percentage',
     'total_item_sold' => 'Total item sold',
     'total_sold_amount' => 'Total sold amount',
     'now' => 'Now',

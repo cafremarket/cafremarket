@@ -14,5 +14,5 @@
       <td class="text-right"><strong id="checkout-fee-total">—</strong></td>
     </tr>
   </table>
-  <p class="small text-muted mb-0">{{ trans('packages.wallet.checkout_platform_fee_help_customer') }}</p>
+  <p class="small text-muted mb-0 checkout-fee-help">{{ trans('packages.wallet.checkout_platform_fee_help_customer') }}</p>
 </div>

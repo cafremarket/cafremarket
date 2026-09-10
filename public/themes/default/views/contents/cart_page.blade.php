@@ -168,12 +168,128 @@
           <div class="side-widget sf-checkout__card" id="cart-summary-combined">
             <h3 class="cart-summary-title"><span>{{ trans('theme.order_info') }}</span></h3>
             <ul class="shopping-cart-summary">
-              @foreach ($carts as $sumCart)
+              @php
+                $combinedSubtotal = 0;
+                $combinedShipping = 0;
+                $combinedHandling = 0;
+                $combinedPackaging = 0;
+                $combinedTaxes = 0;
+                $combinedDiscount = 0;
+                $hasPhysical = false;
+                foreach ($carts as $sumCart) {
+                    $combinedSubtotal += (float) ($sumCart->total ?? 0);
+                    $combinedTaxes += (float) ($sumCart->taxes ?? 0);
+                    $combinedDiscount += (float) ($sumCart->discount ?? 0);
+                    if (! $sumCart->is_digital) {
+                        $hasPhysical = true;
+                        $combinedShipping += (float) ($sumCart->shipping ?? 0);
+                        $combinedHandling += (float) ($sumCart->handling ?? 0);
+                        $combinedPackaging += (float) ($sumCart->packaging ?? 0);
+                    }
+                }
+                $combinedShippingTotal = $combinedShipping + $combinedHandling;
+              @endphp
+              <li>
+                <span>{{ trans('theme.subtotal') }}</span>
+                <span>
+                  {{ get_currency_prefix() }}
+                  <span id="summary-subtotal-combined" data-value="{{ get_formated_value($combinedSubtotal) }}">{{ get_formated_decimal(get_formated_value($combinedSubtotal), false, $dec) }}</span>
+                  {{ get_currency_suffix() }}
+                </span>
+              </li>
+              @if ($hasPhysical)
+                @php
+                  $shippingBreakdownLines = [];
+                  $shippingCalculator = app(\App\Services\Shipping\ShippingCalculator::class);
+                  foreach ($carts as $sumCart) {
+                      if ($sumCart->is_digital) {
+                          continue;
+                      }
+                      foreach ($shippingCalculator->breakdownForCart($sumCart) as $line) {
+                          $shippingBreakdownLines[] = $line;
+                      }
+                  }
+                @endphp
                 <li>
-                  <span>{{ optional($sumCart->shop)->name ?? ('Store #'.$sumCart->shop_id) }}</span>
-                  <span>{{ get_formated_currency($sumCart->grand_total, 2) }}</span>
+                  <span>
+                    {{ trans('theme.shipping') }}
+                    @if (!empty($shippingBreakdownLines))
+                      <a href="javascript:void(0);"
+                         class="shipping-breakdown-info"
+                         tabindex="0"
+                         role="button"
+                         data-toggle="popover"
+                         data-trigger="hover focus click"
+                         data-html="true"
+                         data-placement="left"
+                         title="{{ trans('theme.shipping') }}"
+                         data-content="@foreach($shippingBreakdownLines as $line){{ e(($line['shop_name'] ? $line['shop_name'].': ' : '').$line['title'].' — '.$line['amount']) }}<br>@endforeach">
+                        <i class="fal fa-info-circle"></i>
+                      </a>
+                    @endif
+                  </span>
+                  <span>
+                    {{ get_currency_prefix() }}
+                    <span id="summary-shipping-combined" data-value="{{ get_formated_value($combinedShippingTotal) }}">{{ get_formated_decimal(get_formated_value($combinedShippingTotal), false, $dec) }}</span>
+                    {{ get_currency_suffix() }}
+                  </span>
                 </li>
-              @endforeach
+                @if ($combinedPackaging > 0)
+                  <li>
+                    <span>{{ trans('theme.packaging') }}</span>
+                    <span>
+                      {{ get_currency_prefix() }}
+                      <span id="summary-packaging-combined" data-value="{{ get_formated_value($combinedPackaging) }}">{{ get_formated_decimal(get_formated_value($combinedPackaging), false, $dec) }}</span>
+                      {{ get_currency_suffix() }}
+                    </span>
+                  </li>
+                @endif
+              @endif
+              @if ($combinedTaxes > 0)
+                @php
+                  $taxBreakdownLines = [];
+                  $taxCalculator = app(\App\Services\Tax\ProductTaxCalculator::class);
+                  foreach ($carts as $sumCart) {
+                      foreach ($taxCalculator->breakdownForCart($sumCart) as $line) {
+                          $taxBreakdownLines[] = $line;
+                      }
+                  }
+                @endphp
+                <li>
+                  <span>
+                    {{ trans('theme.taxes') }}
+                    @if (!empty($taxBreakdownLines))
+                      <a href="javascript:void(0);"
+                         class="tax-breakdown-info"
+                         tabindex="0"
+                         role="button"
+                         data-toggle="popover"
+                         data-trigger="hover focus click"
+                         data-html="true"
+                         data-placement="left"
+                         title="{{ trans('theme.taxes') }}"
+                         data-content="@foreach($taxBreakdownLines as $line){{ e(($line['shop_name'] ? $line['shop_name'].': ' : '').($line['title'] ?? '').' — '.($line['tax_name'] ?? '').' — '.$line['amount']) }}<br>@endforeach">
+                        <i class="fal fa-info-circle"></i>
+                      </a>
+                    @endif
+                  </span>
+                  <span>
+                    {{ get_currency_prefix() }}
+                    <span id="summary-taxes-combined" data-value="{{ get_formated_value($combinedTaxes) }}">{{ get_formated_decimal(get_formated_value($combinedTaxes), false, $dec) }}</span>
+                    {{ get_currency_suffix() }}
+                  </span>
+                </li>
+              @endif
+              @if ($combinedDiscount > 0)
+                <li>
+                  <span>{{ trans('theme.discount') }}</span>
+                  <span>
+                    -{{ get_currency_prefix() }}
+                    <span id="summary-discount-combined" data-value="{{ get_formated_value($combinedDiscount) }}">{{ get_formated_decimal(get_formated_value($combinedDiscount), false, $dec) }}</span>
+                    {{ get_currency_suffix() }}
+                  </span>
+                </li>
+              @endif
               <li>
                 <span><strong>{{ trans('theme.total') }}</strong></span>
                 <span>
@@ -183,6 +299,20 @@
                     {{ get_currency_suffix() }}
                   </strong>
                 </span>
+              </li>
+              {{-- Hidden per-store grands kept for CartPricing JS updates --}}
+              @foreach ($carts as $sumCart)
+                <li class="hidden" aria-hidden="true">
+                  <span id="summary-store-grand{{ $sumCart->id }}" data-value="{{ get_formated_value($sumCart->grand_total) }}">{{ get_formated_decimal(get_formated_value($sumCart->grand_total), false, $dec) }}</span>
+                </li>
+              @endforeach
+              <li id="checkout-summary-customer-fee-li-combined" style="display: none;">
+                <span>{{ trans('packages.wallet.checkout_customer_platform_fee') }}</span>
+                <span id="checkout-summary-customer-fee-combined">—</span>
+              </li>
+              <li id="checkout-summary-pay-total-li-combined" style="display: none;">
+                <span><strong>{{ trans('packages.wallet.checkout_you_will_pay') }}</strong></span>
+                <span><strong id="checkout-summary-pay-total-combined">—</strong></span>
               </li>
             </ul>
           </div>

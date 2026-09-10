@@ -79,10 +79,6 @@ class Kernel extends ConsoleKernel
         // Wallet order payment scrow time and release payment.
         if (is_incevio_package_loaded('wallet')) {
             $schedule->command('wallet:release-payment')->daily();
-
-            if (is_wallet_credit_reward_enabled()) {
-                $schedule->command('wallet:release-rewards')->daily();
-            }
         }
 
         if (is_incevio_package_loaded('affiliate')) {

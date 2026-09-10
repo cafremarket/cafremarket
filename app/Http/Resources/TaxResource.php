@@ -17,7 +17,9 @@ class TaxResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'type' => $this->type ?: \App\Models\Tax::TYPE_PERCENT,
             'taxrate' => $this->taxrate,
+            'label' => $this->label,
             'country' => new CountryResource($this->country),
             'state' => new StateResource($this->state),
             'active' => (bool) $this->active,

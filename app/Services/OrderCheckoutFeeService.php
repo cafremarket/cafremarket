@@ -56,6 +56,89 @@ final class OrderCheckoutFeeService
         return self::customerTransactionFee($method, $order->grand_total, $order->shop);
     }
 
+    /**
+     * Combine per-shop checkout fees (flat and/or percent plans) into one customer total.
+     *
+     * @param  array<int, array{shop_id?: int|string|null, amount?: float|int|string}>  $cartParts
+     * @return array{
+     *   base: float,
+     *   subscription_fee: float,
+     *   fee: float,
+     *   total: float,
+     *   enabled: bool,
+     *   parts: array<int, array{shop_id: int, base: float, fee: float, total: float}>
+     * }
+     */
+    public static function customerTransactionFeeForCartParts(string $paymentMethod, array $cartParts): array
+    {
+        $baseSum = 0.0;
+        $feeSum = 0.0;
+        $subscriptionFeeSum = 0.0;
+        $enabled = false;
+        $parts = [];
+
+        foreach ($cartParts as $part) {
+            if (! is_array($part)) {
+                continue;
+            }
+
+            $shopId = isset($part['shop_id']) ? (int) $part['shop_id'] : 0;
+            $amount = round((float) ($part['amount'] ?? 0), 2);
+
+            if ($shopId <= 0 || $amount <= 0) {
+                continue;
+            }
+
+            $fee = self::customerTransactionFee($paymentMethod, $amount, $shopId);
+            $baseSum += $fee['base'];
+            $feeSum += $fee['fee'];
+            $subscriptionFeeSum += $fee['subscription_fee'];
+            $enabled = $enabled || (bool) $fee['enabled'];
+
+            $parts[] = [
+                'shop_id' => $shopId,
+                'base' => $fee['base'],
+                'fee' => $fee['fee'],
+                'total' => $fee['total'],
+            ];
+        }
+
+        return [
+            'base' => round($baseSum, 2),
+            'subscription_fee' => round($subscriptionFeeSum, 2),
+            'fee' => round($feeSum, 2),
+            'total' => round($baseSum + $feeSum, 2),
+            'enabled' => $enabled || $feeSum > 0,
+            'parts' => $parts,
+        ];
+    }
+
+    /**
+     * Sum customer charge totals for orders (mpesa/emola = base+fee; else grand_total).
+     *
+     * @param  iterable<int, Order>  $orders
+     */
+    public static function customerChargeTotalForOrders(iterable $orders, string $paymentMethod): float
+    {
+        $method = strtolower(trim($paymentMethod));
+        $chargeAmount = 0.0;
+
+        foreach ($orders as $order) {
+            if (! $order instanceof Order) {
+                continue;
+            }
+
+            if (in_array($method, self::MOBILE_PAYMENT_METHODS, true)) {
+                $feeBreakdown = self::customerTransactionFeeForOrder($order, $method);
+                $chargeAmount += (float) $feeBreakdown['total'];
+            } else {
+                $chargeAmount += (float) $order->grand_total;
+            }
+        }
+
+        return round($chargeAmount, 2);
+    }
+
     public static function subscriptionTransactionFeeForShop(Shop|int|null $shop, float|int|string $saleBase = 0): float
     {
         if (! is_subscription_enabled()) {

@@ -41,6 +41,34 @@ if (! function_exists('get_customer_transaction_fee_for_order')) {
     }
 }
 
+if (! function_exists('get_customer_transaction_fee_for_cart_parts')) {
+    /**
+     * @param  array<int, array{shop_id?: int|string|null, amount?: float|int|string}>  $cartParts
+     * @return array{
+     *   base: float,
+     *   subscription_fee: float,
+     *   fee: float,
+     *   total: float,
+     *   enabled: bool,
+     *   parts: array<int, array{shop_id: int, base: float, fee: float, total: float}>
+     * }
+     */
+    function get_customer_transaction_fee_for_cart_parts(string $paymentMethod, array $cartParts): array
+    {
+        return OrderCheckoutFeeService::customerTransactionFeeForCartParts($paymentMethod, $cartParts);
+    }
+}
+
+if (! function_exists('get_customer_charge_total_for_orders')) {
+    /**
+     * @param  iterable<int, Order>  $orders
+     */
+    function get_customer_charge_total_for_orders(iterable $orders, string $paymentMethod): float
+    {
+        return OrderCheckoutFeeService::customerChargeTotalForOrders($orders, $paymentMethod);
+    }
+}
+
 if (! function_exists('get_platform_payout_fee')) {
     function get_platform_payout_fee(float|int|string $withdrawalAmount): float
     {
@@ -85,6 +113,9 @@ if (! function_exists('shop_can_accept_sales')) {
 }
 
 if (! function_exists('persist_order_checkout_fees')) {
+    /**
+     * Persist customer transaction fees on the order (admin-visible only).
+     */
     function persist_order_checkout_fees(Order $order, string $paymentMethod): void
     {
         if (! in_array($paymentMethod, ['mpesa', 'emola'], true)) {
@@ -92,8 +123,9 @@ if (! function_exists('persist_order_checkout_fees')) {
         }
 
         $fees = get_customer_transaction_fee_for_order($order, $paymentMethod);
+        // Checkout customer fee is the subscription plan transaction fee.
         $order->platform_payment_fee = 0;
-        $order->subscription_transaction_fee = $fees['subscription_fee'];
+        $order->subscription_transaction_fee = round((float) $fees['fee'], 2);
         $order->save();
     }
 }

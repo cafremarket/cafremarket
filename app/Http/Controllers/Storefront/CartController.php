@@ -38,6 +38,7 @@ class CartController extends Controller
                 }
             },
             'inventories.images:path,imageable_id,imageable_type',
+            'inventories.product.taxes',
             'shippingZone',
             'shippingAddress',
             'state:id,name',

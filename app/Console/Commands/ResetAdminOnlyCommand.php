@@ -95,7 +95,6 @@ class ResetAdminOnlyCommand extends Command
             'tickets',
             'transactions',
             'transfers',
-            'wallet_credit_rewards',
             'wallets',
             'translation_inventories',
             'translation_products',

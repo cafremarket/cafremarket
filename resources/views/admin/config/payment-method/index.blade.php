@@ -19,6 +19,23 @@
 
       <div class="row">
         <div class="col-sm-12">
+          <div class="alert alert-info">
+            <strong>{{ trans('packages.wallet.payment_method_fee_admin_title') }}</strong>
+            @php
+              $subscriptionPlansUrl = \Illuminate\Support\Facades\Route::has('admin.subscriptionPlan.index')
+                  ? route('admin.subscriptionPlan.index')
+                  : url('admin/subscriptionPlan');
+              $walletSettingsUrl = \Illuminate\Support\Facades\Route::has('admin.wallet.settings')
+                  ? route('admin.wallet.settings')
+                  : (\Illuminate\Support\Facades\Route::has('admin.admin.wallet.settings')
+                      ? route('admin.admin.wallet.settings')
+                      : url('admin/setting/wallet'));
+            @endphp
+            <ul class="mb-0 mt-2">
+              <li>{!! trans('packages.wallet.payment_method_fee_admin_checkout', ['url' => $subscriptionPlansUrl]) !!}</li>
+              <li>{!! trans('packages.wallet.payment_method_fee_admin_topup', ['url' => $walletSettingsUrl]) !!}</li>
+            </ul>
+          </div>
           @foreach ($payment_method_types as $type_id => $type)
             @php
               $payment_providers = $payment_methods->where('type', $type_id);

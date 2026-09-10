@@ -72,6 +72,9 @@
             <li>
               <a href="#wc_tab_inventory" data-toggle="tab"><i class="fa fa-archive"></i> {{ trans('app.inventory') }}</a>
             </li>
+            <li>
+              <a href="#wc_tab_tax" data-toggle="tab"><i class="fa fa-percent"></i> {{ trans('app.taxes') }}</a>
+            </li>
             <li class="wc-tab-shipping">
               <a href="#wc_tab_shipping" data-toggle="tab"><i class="fa fa-truck"></i> {{ trans('app.shipping') }}</a>
             </li>
@@ -187,6 +190,95 @@
               </div>
             </div>
 
+            {{-- TAXES --}}
+            <div class="tab-pane" id="wc_tab_tax">
+              <div class="wc-option-group">
+                <p class="wc-hint">{{ trans('help.product_taxes') }}</p>
+
+                @php
+                  $productTaxRows = isset($product) ? $product->taxes : collect();
+                  $currencySymbol = get_currency_symbol();
+                @endphp
+
+                <div class="table-responsive" style="margin-bottom:16px;">
+                  <table class="table table-bordered table-striped" id="product-tax-table" style="margin-bottom:0;">
+                    <thead>
+                      <tr>
+                        <th>{{ trans('app.form.name') }} (Label)</th>
+                        <th>{{ trans('app.form.type') }}</th>
+                        <th>{{ trans('app.form.taxrate') }} (Amount)</th>
+                        <th style="width:90px;">{{ trans('app.action') ?: 'Action' }}</th>
+                      </tr>
+                    </thead>
+                    <tbody id="product-tax-rows">
+                      @forelse ($productTaxRows as $index => $taxRow)
+                        @php
+                          $taxType = $taxRow->type ?: 'percent';
+                          $amountLabel = $taxType === 'fixed'
+                            ? ($currencySymbol.' '.rtrim(rtrim(number_format((float) $taxRow->taxrate, 4, '.', ''), '0'), '.'))
+                            : (rtrim(rtrim(number_format((float) $taxRow->taxrate, 4, '.', ''), '0'), '.').'%');
+                        @endphp
+                        <tr class="product-tax-row" data-index="{{ $index }}">
+                          <td>
+                            {{ $taxRow->name }}
+                            <input type="hidden" name="tax_rows[{{ $index }}][id]" value="{{ $taxRow->id }}">
+                            <input type="hidden" name="tax_rows[{{ $index }}][name]" value="{{ $taxRow->name }}">
+                          </td>
+                          <td>
+                            {{ $taxType === 'fixed' ? 'Fixed' : 'Percentage' }}
+                            <input type="hidden" name="tax_rows[{{ $index }}][type]" value="{{ $taxType }}">
+                          </td>
+                          <td>
+                            {{ $amountLabel }}
+                            <input type="hidden" name="tax_rows[{{ $index }}][taxrate]" value="{{ $taxRow->taxrate }}">
+                          </td>
+                          <td>
+                            <button type="button" class="btn btn-danger btn-xs product-tax-remove" title="{{ trans('app.remove') }}">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      @empty
+                        <tr class="product-tax-empty-msg">
+                          <td colspan="4" class="text-muted text-center">{{ trans('help.product_taxes_empty') }}</td>
+                        </tr>
+                      @endforelse
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="product-tax-composer" style="border:1px dashed #ccd; padding:12px;">
+                  <div class="form-group">
+                    <label for="new_tax_name">{{ trans('app.form.name') }} (Label)</label>
+                    <input type="text" id="new_tax_name" class="form-control" placeholder="{{ trans('app.placeholder.name') }}">
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label for="new_tax_type">{{ trans('app.form.type') }}</label>
+                        <select id="new_tax_type" class="form-control">
+                          <option value="percent">Percentage</option>
+                          <option value="fixed">Fixed</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="form-group">
+                        <label for="new_tax_amount">{{ trans('app.form.taxrate') }} (Amount)</label>
+                        <div class="input-group">
+                          <input type="number" id="new_tax_amount" class="form-control" step="any" min="0" placeholder="0">
+                          <span class="input-group-addon" id="new_tax_addon">%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-primary" id="product-tax-add-btn">
+                    <i class="fa fa-plus"></i> {{ trans('app.add_tax') }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {{-- SHIPPING --}}
             <div class="tab-pane" id="wc_tab_shipping">
               <div class="wc-option-group">
@@ -267,19 +359,19 @@
                     <div class="col-sm-4">
                       <div class="form-group">
                         {!! Form::label('length', trans('app.form.length')) !!}
-                        {!! Form::text('length', null, ['class' => 'form-control']) !!}
+                        {!! Form::text('length', isset($inventory) ? $inventory->length : null, ['class' => 'form-control', 'placeholder' => '0']) !!}
                       </div>
                     </div>
                     <div class="col-sm-4">
                       <div class="form-group">
                         {!! Form::label('width', trans('app.form.width')) !!}
-                        {!! Form::text('width', null, ['class' => 'form-control']) !!}
+                        {!! Form::text('width', isset($inventory) ? $inventory->width : null, ['class' => 'form-control', 'placeholder' => '0']) !!}
                       </div>
                     </div>
                     <div class="col-sm-4">
                       <div class="form-group">
                         {!! Form::label('height', trans('app.form.height')) !!}
-                        {!! Form::text('height', null, ['class' => 'form-control']) !!}
+                        {!! Form::text('height', isset($inventory) ? $inventory->height : null, ['class' => 'form-control', 'placeholder' => '0']) !!}
                       </div>
                     </div>
                   </div>
@@ -554,3 +646,122 @@
     </div>
   </div>
 </div>
+
+<script>
+(function () {
+  var currencySymbol = @json(get_currency_symbol());
+  var nextIndex = {{ isset($product) ? max($product->taxes->count(), 0) : 0 }};
+  var $tbody = document.getElementById('product-tax-rows');
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function formatAmount(type, amount) {
+    var n = parseFloat(amount);
+    if (!isFinite(n)) n = 0;
+    var text = String(n);
+    return type === 'fixed' ? (currencySymbol + ' ' + text) : (text + '%');
+  }
+
+  function syncAddon(selectEl) {
+    var addon = document.getElementById('new_tax_addon');
+    if (!selectEl || !addon) return;
+    addon.textContent = selectEl.value === 'fixed' ? currencySymbol : '%';
+  }
+
+  function rowHtml(index, data) {
+    data = data || {};
+    var name = data.name || '';
+    var type = data.type || 'percent';
+    var amount = data.taxrate != null ? data.taxrate : '';
+    var id = data.id || '';
+    var typeLabel = type === 'fixed' ? 'Fixed' : 'Percentage';
+
+    return '' +
+      '<tr class="product-tax-row" data-index="' + index + '">' +
+        '<td>' + escapeHtml(name) +
+          (id ? '<input type="hidden" name="tax_rows[' + index + '][id]" value="' + escapeHtml(id) + '">' : '') +
+          '<input type="hidden" name="tax_rows[' + index + '][name]" value="' + escapeHtml(name) + '">' +
+        '</td>' +
+        '<td>' + typeLabel +
+          '<input type="hidden" name="tax_rows[' + index + '][type]" value="' + escapeHtml(type) + '">' +
+        '</td>' +
+        '<td>' + escapeHtml(formatAmount(type, amount)) +
+          '<input type="hidden" name="tax_rows[' + index + '][taxrate]" value="' + escapeHtml(amount) + '">' +
+        '</td>' +
+        '<td><button type="button" class="btn btn-danger btn-xs product-tax-remove"><i class="fa fa-trash"></i></button></td>' +
+      '</tr>';
+  }
+
+  function hideEmptyMsg() {
+    if (!$tbody) return;
+    var empty = $tbody.querySelector('.product-tax-empty-msg');
+    if (empty) empty.parentNode.removeChild(empty);
+  }
+
+  function showEmptyMsgIfNeeded() {
+    if (!$tbody) return;
+    if ($tbody.querySelectorAll('.product-tax-row').length === 0) {
+      $tbody.innerHTML = '<tr class="product-tax-empty-msg"><td colspan="4" class="text-muted text-center">{{ trans('help.product_taxes_empty') }}</td></tr>';
+    }
+  }
+
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.id === 'new_tax_type') {
+      syncAddon(e.target);
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    var removeBtn = e.target.closest('.product-tax-remove');
+    if (removeBtn) {
+      var row = removeBtn.closest('.product-tax-row');
+      if (row) row.parentNode.removeChild(row);
+      showEmptyMsgIfNeeded();
+      return;
+    }
+
+    if (e.target.closest('#product-tax-add-btn')) {
+      e.preventDefault();
+      var nameEl = document.getElementById('new_tax_name');
+      var typeEl = document.getElementById('new_tax_type');
+      var amountEl = document.getElementById('new_tax_amount');
+      if (!nameEl || !typeEl || !amountEl || !$tbody) return;
+
+      var name = (nameEl.value || '').trim();
+      var type = typeEl.value || 'percent';
+      var amount = amountEl.value;
+
+      if (!name) {
+        nameEl.focus();
+        return;
+      }
+      if (amount === '' || isNaN(parseFloat(amount)) || parseFloat(amount) < 0) {
+        amountEl.focus();
+        return;
+      }
+
+      hideEmptyMsg();
+      $tbody.insertAdjacentHTML('beforeend', rowHtml(nextIndex++, {
+        name: name,
+        type: type,
+        taxrate: amount
+      }));
+
+      nameEl.value = '';
+      amountEl.value = '';
+      typeEl.value = 'percent';
+      syncAddon(typeEl);
+      nameEl.focus();
+    }
+  });
+
+  var newType = document.getElementById('new_tax_type');
+  if (newType) syncAddon(newType);
+})();
+</script>

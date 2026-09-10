@@ -80,6 +80,8 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
             $product->syncTags($product, $request->input('tag_list'));
         }
 
+        $product->syncTaxesFromRows($request->input('tax_rows', []));
+
         $this->syncProductVideo($request, $product);
 
         return $product;
@@ -94,6 +96,8 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
         $product->categories()->sync($request->input('category_list', []));
 
         $product->syncTags($product, $request->input('tag_list', []));
+
+        $product->syncTaxesFromRows($request->input('tax_rows', []));
 
         $this->syncProductVideo($request, $product);
 

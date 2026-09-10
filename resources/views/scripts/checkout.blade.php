@@ -150,6 +150,78 @@
 
     var checkoutFeePreviewUrl = $('#checkout-platform-fee-box').attr('data-fee-url') || '{{ url('wallet/checkout/platform-fee') }}';
 
+    function collectCheckoutCartFeeParts() {
+      var parts = [];
+      $('input[id^="shop-id"]').each(function() {
+        var idAttr = $(this).attr('id') || '';
+        var cartId = idAttr.replace(/^shop-id/, '');
+        var shopId = parseInt($(this).val(), 10);
+        if (!shopId) {
+          return;
+        }
+
+        var amount = null;
+        var storeEl = $('#summary-store-grand' + cartId);
+        if (storeEl.length) {
+          amount = parseFloat(storeEl.attr('data-value') || storeEl.text().replace(/[^\d.-]/g, ''));
+        } else {
+          var grandEl = $('#summary-grand-total' + cartId);
+          amount = parseFloat(grandEl.attr('data-value') || grandEl.text().replace(/[^\d.-]/g, ''));
+        }
+
+        if (amount && amount > 0 && !isNaN(amount)) {
+          parts.push({ shop_id: shopId, amount: amount, cart_id: cartId });
+        }
+      });
+      return parts;
+    }
+
+    function hideCheckoutFeeUi(cartId) {
+      var box = $('#checkout-platform-fee-box');
+      box.hide();
+      $('#checkout-summary-customer-fee-li-combined').hide();
+      $('#checkout-summary-pay-total-li-combined').hide();
+      if (cartId) {
+        $('#checkout-summary-customer-fee-li' + cartId).hide();
+        $('#checkout-summary-pay-total-li' + cartId).hide();
+      } else {
+        $('[id^="checkout-summary-customer-fee-li"]').hide();
+        $('[id^="checkout-summary-pay-total-li"]').not('#checkout-summary-pay-total-li-combined').hide();
+      }
+    }
+
+    function applyCheckoutFeePreview(data, cartId) {
+      var box = $('#checkout-platform-fee-box');
+      if (!data || !data.formatted) {
+        hideCheckoutFeeUi(cartId);
+        return;
+      }
+
+      $('#checkout-fee-base').text(data.formatted.base);
+      $('#checkout-fee-amount').text(data.formatted.fee);
+      $('#checkout-fee-total').text(data.formatted.total);
+
+      if (data.fee > 0) {
+        $('#checkout-fee-row').show();
+      } else {
+        $('#checkout-fee-row').hide();
+      }
+
+      box.show();
+
+      $('#checkout-summary-customer-fee-combined').text(data.formatted.fee);
+      $('#checkout-summary-pay-total-combined').text(data.formatted.total);
+      $('#checkout-summary-customer-fee-li-combined').show();
+      $('#checkout-summary-pay-total-li-combined').show();
+
+      if (cartId) {
+        $('#checkout-summary-customer-fee' + cartId).text(data.formatted.fee);
+        $('#checkout-summary-pay-total' + cartId).text(data.formatted.total);
+        $('#checkout-summary-customer-fee-li' + cartId).show();
+        $('#checkout-summary-pay-total-li' + cartId).show();
+      }
+    }
+
     function refreshCheckoutPlatformFeePreview(cartId, grandAmount) {
       var box = $('#checkout-platform-fee-box');
       if (!box.length) {
@@ -161,62 +233,73 @@
       var method = selected.data('code') || selected.val();
 
       if (!method || (method !== 'mpesa' && method !== 'emola')) {
-        box.hide();
-        $('#checkout-summary-customer-fee-li' + cartId).hide();
-        $('#checkout-summary-pay-total-li' + cartId).hide();
+        hideCheckoutFeeUi(cartId);
+        return;
+      }
+
+      var parts = collectCheckoutCartFeeParts();
+
+      // Multi-vendor: calculate each shop fee (flat/percent) then combine.
+      if (parts.length > 1) {
+        var previewParams = { payment_method: method };
+        $.each(parts, function(i, part) {
+          previewParams['carts[' + i + '][shop_id]'] = part.shop_id;
+          previewParams['carts[' + i + '][amount]'] = part.amount;
+        });
+
+        $.getJSON(checkoutFeePreviewUrl, previewParams, function(data) {
+          applyCheckoutFeePreview(data, null);
+        }).fail(function() {
+          hideCheckoutFeeUi(null);
+        });
         return;
       }
 
       var amount = grandAmount;
-      if (amount === undefined || amount === null) {
-        var raw = $('#summary-grand-total' + cartId).text().replace(/[^\d.-]/g, '');
-        amount = parseFloat(raw);
+      var shopId = null;
+
+      if (parts.length === 1) {
+        amount = parts[0].amount;
+        shopId = parts[0].shop_id;
+        cartId = parts[0].cart_id || cartId;
+      } else {
+        if (amount === undefined || amount === null) {
+          var raw = $('#summary-grand-total' + cartId).text().replace(/[^\d.-]/g, '');
+          var combined = $('#summary-grand-total-combined');
+          if ((!raw || isNaN(parseFloat(raw))) && combined.length) {
+            amount = parseFloat(combined.attr('data-value') || combined.text().replace(/[^\d.-]/g, ''));
+          } else {
+            amount = parseFloat(raw);
+          }
+        }
+        shopId = $('#shop-id' + cartId).val();
       }
 
       if (!amount || amount <= 0 || isNaN(amount)) {
-        box.hide();
-        $('#checkout-summary-customer-fee-li' + cartId).hide();
-        $('#checkout-summary-pay-total-li' + cartId).hide();
+        hideCheckoutFeeUi(cartId);
         return;
       }
 
-      var shopId = $('#shop-id' + cartId).val();
       var previewParams = { payment_method: method, amount: amount };
       if (shopId) {
         previewParams.shop_id = shopId;
       }
 
+      // Without shop_id this endpoint returns wallet top-up fees — skip for checkout.
+      if (!shopId) {
+        hideCheckoutFeeUi(cartId);
+        return;
+      }
+
       $.getJSON(checkoutFeePreviewUrl, previewParams, function(data) {
-        if (!data) {
-          box.hide();
-          $('#checkout-summary-customer-fee-li' + cartId).hide();
-          $('#checkout-summary-pay-total-li' + cartId).hide();
-          return;
-        }
-
-        $('#checkout-fee-base').text(data.formatted.base);
-        $('#checkout-fee-amount').text(data.formatted.fee);
-        $('#checkout-fee-total').text(data.formatted.total);
-
-        if (data.fee > 0) {
-          $('#checkout-fee-row').show();
-        } else {
-          $('#checkout-fee-row').hide();
-        }
-
-        box.show();
-        $('#checkout-summary-customer-fee' + cartId).text(data.formatted.fee);
-        $('#checkout-summary-pay-total' + cartId).text(data.formatted.total);
-        $('#checkout-summary-customer-fee-li' + cartId).show();
-        $('#checkout-summary-pay-total-li' + cartId).show();
+        applyCheckoutFeePreview(data, cartId);
       }).fail(function() {
-        box.hide();
-        $('#checkout-summary-customer-fee-li' + cartId).hide();
-        $('#checkout-summary-pay-total-li' + cartId).hide();
+        hideCheckoutFeeUi(cartId);
       });
     }
 
     window.refreshCheckoutPlatformFeePreview = refreshCheckoutPlatformFeePreview;
+    window.collectCheckoutCartFeeParts = collectCheckoutCartFeeParts;
 
     function showWireTransferProof() {
       $('#wire-transfer-proof-wrap').removeClass('hide');

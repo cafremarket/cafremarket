@@ -23,6 +23,17 @@ class Cart extends BaseModel
     protected $withCount = ['inventories'];
 
     /**
+     * Runtime-only delivery-range flags set by CartDeliveryRangeService.
+     * These are NOT database columns on `carts`.
+     */
+    public const DELIVERY_RANGE_RUNTIME_ATTRIBUTES = [
+        'out_of_range',
+        'needs_delivery_location',
+        'delivery_distance_km',
+        'service_radius_km',
+    ];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -70,6 +81,18 @@ class Cart extends BaseModel
     protected $casts = [
         'is_digital' => 'boolean',
     ];
+
+    /**
+     * Keep delivery-range annotations readable on the model without persisting
+     * them (they are not columns on `carts`).
+     */
+    public function getDirty()
+    {
+        return \Illuminate\Support\Arr::except(
+            parent::getDirty(),
+            self::DELIVERY_RANGE_RUNTIME_ATTRIBUTES
+        );
+    }
 
     /**
      * For checking fulfillment type. Used for managing shipping rates.
@@ -317,22 +340,6 @@ class Cart extends BaseModel
     }
 
     /**
-     * Check if the cart eligible for wallet rewards
-     *
-     * @return bool
-     */
-    public function has_credit_rewards()
-    {
-        foreach ($this->inventories as $item) {
-            if ($item->reward_percentage) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Get the item types of the cart.
      *
      * @return array
@@ -344,6 +351,15 @@ class Cart extends BaseModel
 
     public function get_tax_amount()
     {
+        $this->loadMissing(['inventories.product.taxes']);
+
+        $calculator = app(\App\Services\Tax\ProductTaxCalculator::class);
+        if ($calculator->cartUsesProductTaxes($this)) {
+            $result = $calculator->calculateForCart($this);
+
+            return round((float) $result['amount'], config('system_settings.decimals', 2));
+        }
+
         if ($this->taxrate && $this->taxrate > 0) {
             return $this->total * ($this->taxrate / 100);
         }

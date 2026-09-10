@@ -30,7 +30,9 @@ class OrderItemResource extends JsonResource
             'download_limit' => $this->download_limit,
             'download' => $this->pivot->download,
             'unit_price' => get_formated_currency($this->pivot->unit_price, config('system_settings.decimals', 2), $this->currency_id),
+            'unit_price_raw' => strval(round((float) $this->pivot->unit_price, 2)),
             'total' => get_formated_currency($this->pivot->unit_price * $this->pivot->quantity, config('system_settings.decimals', 2), $this->currency_id),
+            'total_raw' => strval(round((float) $this->pivot->unit_price * (int) $this->pivot->quantity, 2)),
             'image' => get_inventory_img_src($this, 'small'),
             'attachments' => AttachmentResource::collection($this->attachments),
             'feedback' => $this->when($request->is('api/order/*'), function () {

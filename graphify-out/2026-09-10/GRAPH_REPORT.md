@@ -1,12 +1,12 @@
 # Graph Report - Cafrepay  (2026-09-10)
 
 ## Corpus Check
-- 4118 files · ~7,772,800 words
+- 4145 files · ~7,774,522 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 14518 nodes · 30242 edges · 1925 communities (387 shown, 680 thin omitted)
-- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 2775 edges (avg confidence: 0.85)
+- 14577 nodes · 30305 edges · 1929 communities (387 shown, 668 thin omitted)
+- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 2776 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
@@ -17,26 +17,26 @@
 ## Community Hubs (Navigation)
 - public/js/app.js
 - e
-- System
+- ViewComposerServiceProvider
 - TestCase
 - ListHelper
 - .apply
 - safe_notify
 - .trigger
 - Carbon\Carbon
-- Illuminate\Foundation\Events\Dispatchable
+- Illuminate\Queue\SerializesModels
 - Order
 - Inventory
-- Attribute
-- DistanceService
-- Illuminate\Database\Eloquent\Model
+- AttributeController
+- BuyerLocationService
+- Transfer
 - .response
 - Shop
 - Illuminate\Database\Eloquent\Factories\Factory
 - FCMService
-- Illuminate\Support\Facades\Auth
+- ChatConversation
 - User
-- Illuminate\Database\Eloquent\SoftDeletes
+- Illuminate\Database\Eloquent\Builder
 - Api/HomeController.php
 - Controller
 - Request
@@ -53,7 +53,7 @@
 - EmolaSpec
 - Closure
 - MessageController
-- Config
+- clearShopConfigCache
 - SystemController
 - Illuminate\Foundation\Http\FormRequest
 - CategoryController
@@ -61,40 +61,40 @@
 - _fnCallbackFire
 - HyperlocalCatalogService
 - .handle
-- Product
+- Cart
 - get_sender_email
 - themes/default/assets/js/app.js
-- ChatSocketPublisher
+- SystemConfig
 - get_storage_file_url
-- SaveChatConversationRequest
+- Config
 - Owl
 - OrderCreated
 - is_incevio_package_loaded
 - Illuminate\Console\Command
 - EloquentSalesReportsRepository
-- WalletService
+- DbService
 - Product
 - require
 - Banner
 - ProductController
 - SubscriptionPlan
-- wallet/routes/all.php
+- .handle
 - B
 - EmailTemplate
 - Carrier
-- OrderDetailRequest
-- get_from_option_table
+- static
+- PlatformFeeHelper.php
 - ProductController
-- UpdateDeliveryBoyRequest
+- ShopController
 - Manufacturer
-- InventoryStock
+- Illuminate\Database\Eloquent\Model
 - f
-- Mathable
-- Attachable
-- InventoryController
+- WalletService
+- Illuminate\Database\Eloquent\SoftDeletes
+- get_from_option_table
 - Ticket
-- Vendor.php
-- PaymentServiceContract
+- Illuminate\Support\Facades\Log
+- Feedbackable
 - d
 - HttpRequest
 - wallet/composer.json
@@ -105,7 +105,7 @@
 - Address
 - ShopLightResource
 - e
-- PaymentService
+- MPesaPaymentService
 - chartjs.js
 - Illuminate\Contracts\Queue\ShouldQueue
 - EloquentCustomer
@@ -118,7 +118,7 @@
 - CreateTaxRequest
 - Tax
 - .config
-- BCMath
+- Mathable
 - CustomerUploadController
 - Illuminate\Database\Eloquent\Factories\HasFactory
 - .attr
@@ -126,68 +126,67 @@
 - ConfirmTest
 - Country
 - PromotionAccessRequest
-- CategorySubGroupController
+- Page
 - OrderController
-- HasWallet
+- Wallet
 - Message
 - CommonService
-- DepositController
+- .register
 - Illuminate\Support\ServiceProvider
 - GuestCustomerApiTest
 - BaseSeeder
-- Merchant
-- RouteServiceProvider
+- HasWallet
+- ResetPasswordController
 - CategorySubGroup
 - LockService
 - PageController
 - TranslationAuditService
 - g
 - l
-- Visitor
+- EloquentCoupon
 - Refund
-- AddressController
+- CustomerController
 - Slider
 - Period
-- static
+- ChartHelper
 - BaseModel
-- TranslationModel
 - Subscription
-- affiliate/routes/web.php
+- CatalogProductController
 - Imageable
 - EloquentRepository
 - FaqTopic
-- EloquentTicket
+- TicketController
 - EnvManager
 - Coupon
 - ShopSlugChangeRequest
 - SalesReportController
-- PerformanceIndicatorsController
+- PerformanceIndicatorsRepository
 - Currency
-- HomeController
+- .response
 - Operation
 - EloquentShop
 - Registered
-- DownForMaintainace
+- ShopDownForMaintainace
 - should_seed_demo_images
-- .report
+- ConfigController
 - InventoryImportRequest
-- .response
-- AdminOnlyAccessRequest
+- AttributeValueController
+- PaymentMethod
 - CategoryGroup
 - JwtAuthService
-- ImageController
+- .saveProductVideo
 - Faq
 - Warehouse
 - Illuminate\Database\Eloquent\Relations\BelongsTo
 - themes/default/views/layouts/main.blade.php
 - AddressResource
 - EventServiceProvider.php
-- StripeWebPaymentService
+- PaypalPaymentService
 - Illuminate\Http\Request
-- Addressable
-- Language
-- liveChat/src/Helpers/functions.php
-- WalletBulkDepositController
+- ReleasesUniqueIdentifiers
+- get_formated_decimal
+- ConfigMPesa
+- Attribute
 - PushCampaign
 - UpdateShippingRateRequest
 - Bring
@@ -197,13 +196,13 @@
 - Re
 - TransactionResource
 - EloquentCategory
-- ChatConversation
-- CreateCategoryGroupRequest
+- CreateCustomerFromMerchant
+- CategoryGroupController
 - ShopAddressChangeRequest
 - GiftCard
-- Illuminate\Bus\Queueable
+- ProcessInventoryCsvBulkUpload
 - ji
-- ProductLightResource
+- ImageResource
 - currency/index.blade.php
 - TestCase
 - AffiliateLink
@@ -228,23 +227,23 @@
 - .off
 - Blog
 - WarehouseController
-- SupplierController
+- Supplier
 - EloquentInventory
-- EloquentAddress
+- ShippingRate
 - EloquentProduct
 - admin/inventory/_form.blade.php
 - admin/sidebar.blade.php
-- LoginController
+- get_min_withdrawal_limit
 - EloquentMerchant
-- EloquentPayoutsRepository
+- WalletServiceProvider.php
 - CreateInventoryWithVariantRequest
 - RefundController
 - admin/layouts/master.blade.php
 - alert
 - Incevio
 - PageLoadingTest
-- PackagesController
-- ConfigUpdated
+- AdminOnlyAccessRequest
+- ShopConfigUpdated
 - contents/product_page.blade.php
 - InventoryTranslationController
 - .register
@@ -255,21 +254,21 @@
 - 2014_12_31_000004_create_addresses_table.php
 - ConfigPaypalExpress
 - 2015_01_11_135657_create_shops_table.php
-- AffiliateCommission
+- StockOut
 - ProductPolicy
 - CreateShippingRateRequest
 - nice-select2.js
 - 2016_01_11_135660_create_attribute_table.php
 - 2016_04_22_162519_create_email_templates_table.php
 - MessageRepository
-- Dispute
+- System
 - 2018_05_27_135039_create_visitors_table.php
 - CatalogProductTranslationController
 - AllowMultipleDealOfTheDayProducts
 - 2020_11_20_195815_create_package_table.php
 - 2021_02_01_054507_add_device_id_fields_to_orders_table.php
-- RefundController
-- Billable.php
+- pdf_compatible_local_image_path
+- Billable
 - select2.js
 - app_banner/_create.blade.php
 - 2022_11_11_095200_add_fcm_token_to_users_table.php
@@ -282,7 +281,7 @@
 - app_banner/index.blade.php
 - product/inventory/index.blade.php
 - SitemapCrawlProfile
-- Permission
+- PaymentMethodController
 - VendorAdminPanelPageLoadTest
 - Role
 - SystemHelper.php
@@ -305,17 +304,17 @@
 - ProductUploadController
 - 2024_03_21_080453_add_approval_status_to_customers_table.php
 - 2024_03_21_100724_add_customer_needs_approval_to_systems_table.php
-- 2026_08_13_011900_create_push_campaigns_table.php
+- SubscriptionController
 - VerifyCsrfToken
 - Category
 - 2026_09_08_160000_create_deal_of_the_day_table.php
 - 2023_11_20_195811_add_fb_page_id_column_to_shops_table.php
 - 2021_03_07_142449_add_custom_subsription_fee_to_shops_table.php
 - 2024_05_27_074829_change_enums_at_tranfers_table.php
-- SystemConfigResource
+- get_logo_url
 - ContactUsRequest
 - TransferRequest
-- 2023_11_21_144404_add_parent_id_field_to_inventories_table.php
+- TaxController
 - M-Pesa Mozambique – Node.js (mpesa-mz-nodejs-lib)
 - ee
 - K
@@ -330,9 +329,9 @@
 - currency/_create.blade.php
 - gn
 - currency/_edit.blade.php
-- CategoryPolicy
+- .boot
 - KeepQueueWorkerRunning
-- StripePaymentService
+- CreateAttributeRequest
 - default/views/auth/register.blade.php
 - config
 - backup.php
@@ -357,13 +356,13 @@
 - ticket/index.blade.php
 - order/show.blade.php
 - admin/config/index.blade.php
-- 2024_05_28_084422_create_affiliate_commissions_table.php
+- SendProfileUpdateNotification.php
 - HomePage
 - CreateCouponRequest
 - GiftCardController
-- Supplier
-- SupportMessagesController
-- SubscriptionCancelled
+- MerchantPolicy
+- EloquentAttribute
+- SendsInvoiceNotifications
 - _product_card.blade.php
 - contents/cart_page.blade.php
 - _product_info.blade.php
@@ -407,27 +406,27 @@
 - backend/dashboard/index.blade.php
 - AttributeValue
 - SendAnnouncementCreatedNotification
-- RefundRepository
-- RoleController
+- CustomerJwtService
+- ShopDeleted
 - .redirect
 - Transaction
 - CreateAttributeValueRequest
-- MerchantController
+- Controllers/Auth/RegisterController.php
 - FreshAdminOnlySeeder
 - CreateBlogRequest
-- CouponPolicy
-- CreateCartRequest
+- get_activity_str
+- NotificationController
 - ConfigPaypalController
 - State
-- CustomerPolicy
-- InventoryPolicy
-- RefundToWallet
+- AttributePolicy
+- BlogPolicy
+- CategoryGroupPolicy
 - OrderItem
-- InitiateRefundRequest
+- CategorySubGroupPolicy
 - config/general.blade.php
 - payment_options.blade.php
 - resources/views/order_complete.blade.php
-- UpdatePhotoRequest
+- EloquentAttributeValue
 - 2014_10_12_000000_create_users_table.php
 - auth/layout.blade.php
 - views/checkout.blade.php
@@ -439,7 +438,7 @@
 - account/verify.blade.php
 - entities.blade.php
 - subGroup_parentCategories.blade.php
-- CreateRoleRequest
+- .schedule
 - dispute/show.blade.php
 - gift-card/index.blade.php
 - message/_create.blade.php
@@ -454,108 +453,108 @@
 - ReCaptcha.php
 - Authenticate
 - TrustHosts
-- CookieConsentMiddleware
+- AttributeRepository
 - ProductFeedbackCreateRequest
-- InvoiceRepository
+- AttributeValueRepository
 - 2018_04_11_202451_create_jobs_table.php
 - ShippingMethod
 - contents/dashboard.blade.php
 - logging.php
-- .handle
+- LowInventory
 - 2018_07_19_191545_create_feedbacks_table.php
-- TicketPolicy
-- get_cent_from_dollar
+- UpdateBasicConfigRequest
+- ProcessInventoryCsvBulkUpdate
 - 2022_01_04_065320_create_delivery_boys_table.php
-- .store
-- CreateAppBannerRequest
+- .handle
+- PasswordReset
 - 2024_02_15_110800_change_warehouse_id_type_to_string.php
-- UpdateAttributeRequest
+- AttributeController
 - UpdateAttributeValueRequest
 - CreateShippingZoneRequest
-- UpdateShippingZoneRequest
+- UpdateCarrierRequest
 - CreateBannerRequest
-- CreateCarrierRequest
+- CreateMessageRequest
 - UpdateCouponRequest
 - 2015_12_31_000004_create_blogs_table.php
 - CreateGiftCardRequest
 - UpdateGiftCardRequest
-- 2025_01_01_042623_create_pdf_templates_table.php
-- ConversationController
+- CreateInventoryRequest
+- .register
 - MerchantImportRequest
 - 2024_06_27_102130_create_translation_shops_table.php
 - 2016_04_22_162555_create_config_stripe_table.php
-- CreateSliderRequest
+- get_avatar_src
 - featured_products.blade.php
-- UpdateSliderRequest
+- UpdatePasswordRequest
 - UpdateTaxRequest
-- CreateWebBannerRequest
+- MyDeliveryRequest
 - featured_products/index.blade.php
-- CreateCustomerRequest
+- CustomerImportRequest
 - CreateAddressRequest
-- SelfAddressUpdateRequest
-- DeletePhotoRequest
-- UpdateBlogRequest
-- UpdateCategoryGroupRequest
-- ResetDeliveryBoyPasswordRequest
-- CreateEmailTemplateRequest
+- NotifyUserPasswordUpdated
+- OrderShipped
+- 2026_09_03_000003_seed_attribute_types_and_presets.php
+- admin/config/page.blade.php
+- system/config/page.blade.php
+- general/page.blade.php
 - UpdateEmailTemplateRequest
 - UpdateActivityLogTable
 - Attachment
-- CreateFaqRequest
+- .getLocalUser
 - inventory/_attributes_tab.blade.php
-- CartController
-- UpdateLanguageRequest
-- CreatePageRequest
-- UpdatePageRequest
+- 2014_10_11_000000_create_modules_table.php
+- 2014_10_11_000020_create_images_table.php
+- 2015_12_31_000002_create_tags_table.php
+- 2017_09_17_202406_create_gift_cards_table.php
 - 2014_10_12_000003_create_systems_table.php
-- ExportCategoryRequest
-- UpdateTrialPeriodRequest
-- UpdateUserRequest
+- 2017_11_27_144538_create_tickets_table.php
+- 2020_06_30_154819_create_cancellation_table.php
+- 2021_03_03_054507_add_pay_in_person_and_pay_online_fields_to_configs_table.php
 - VendorWalletTransferRequest
 - DraftSendRequest
-- InventoryUploadRequest
-- MerchantUploadRequest
-- ProductImportRequest
-- ProductUploadRequest
-- SaveEnvFileRequest
+- 2021_06_07_200450_create_avg_feedback_table.php
+- 2021_12_04_083515_add_payment_ref_id_to_orders_table.php
+- 2023_11_09_062412_add_catalog_system_enable_to_systems_table.php
+- 2024_01_12_084254_add_dimensions_to_inventories_and_products.php
+- 2024_06_25_043454_create_translation_manufacturers_table.php
 - 2016_03_11_182034_create_warehouse_table.php
 - 2014_10_12_000001_create_password_resets_table.php
-- SelfAvatarUpdateRequest
+- 2024_06_25_044609_create_translation_attributes_table.php
 - 2014_10_12_000003_create_dashboard_configs_table.php
-- SpcialLoginRequest
+- merchant/config/page.blade.php
 - 2014_10_11_000010_create_roles_table.php
 - 2014_10_11_000011_create_permissions_table.php
 - UpdateAddressRequest
-- 2014_10_11_000020_create_attachments_table.php
-- 2016_04_22_162555_create_config_paypal_express_table.php
-- UpdateAppBannerRequest
+- 2021_11_16_195811_create_config_mpesa_table.php
+- 2018_11_07_192923_create_transfers_table.php
+- 2024_05_28_153006_add_order_id_to_transactions_table.php
 - 2016_04_24_151506_create_cart_table.php
 - 2014_10_12_000000_create_subscription_items_table.php
 - UpdateBasicSystemConfigRequest
 - 2014_10_12_000004_create_customers_table.php
 - 2014_12_31_000001_create_countries_table.php
 - 2017_11_27_144538_create_disputes_table.php
-- UpdateWebBannerRequest
+- system/config/index.blade.php
 - 2015_05_12_151257_create_invoices_table.php
 - SendVerificationEmail
 - calendar.blade.php
 - 2016_01_11_135655_create_manufacturers_table.php
 - 2021_03_03_054507_add_fulfilment_type_fields_to_orders_table.php
 - 2016_03_25_192206_create_taxes_table.php
-- AdminWalletTopupRequest
+- general/index.blade.php
 - PayoutRequest
 - 2016_03_11_190111_create_inventory_table.php
 - 2018_10_04_162859_create_options_table.php
 - 2018_12_25_163942_create_config_cybersource_table.php
 - 2016_03_26_091903_create_shipping_zones_table.php
 - product_picker_modal.blade.php
-- CreateCurrencyRequest
-- 2024_01_04_062059_add_source_column_to_carriers_table.php
+- RegisterController
+- admin/config/_sections/order.blade.php
 - 2016_03_26_091903_create_carriers_table.php
 - 2020_10_22_195815_add_stripe_status_to_subscriptions_table.php
 - 2016_04_22_162552_create_payment_methods_table.php
 - 2016_04_22_162559_create_order_table.php
-- UpdateCurrencyRequest
+- merchant/config/_sections/order.blade.php
 - 2017_11_27_144538_create_contact_us_table.php
 - OrderInvoiceTest
 - 2017_11_27_144538_create_messages_table.php
@@ -566,26 +565,26 @@
 - CreateLanguageRequest
 - 2020_01_09_054507_add_payment_instruction_fields_to_order_table.php
 - 2021_03_04_051130_add_effect_to_banners_table.php
-- 2021_06_02_062412_add_show_item_conditions_to_systems_table.php
-- 2021_10_24_161811_add_split_money_to_payment_methods_table.php
+- affiliate::admin._shop_config_default_commission_field
+- CategoriesSeeder
 - optimize-speed.sh
-- system/general.blade.php
+- dynamic-currency::admin._configs
 - dynamicPopup/resources/views/index.blade.php
 - merchant/config/index.blade.php
 - verify/index.blade.php
 - index.js
 - 2020_07_01_103906_add_cancellation_config_to_systems_table.php
-- CreateTicketRequest
+- CurrenciesSeeder
 - admin/index.blade.php
 - links.blade.php
-- CustomerSearchRequest
+- FaqsSeeder
 - 2017_11_27_144538_create_refunds_table.php
-- RefundRequest
+- ModulesSeeder
 - 2017_11_27_144548_create_replies_table.php
-- RegisterCustomerRequest
+- PermissionSeeder
 - Uninstaller
 - 2021_02_01_054507_add_amount_fields_to_shop_table.php
-- ToggleMaintenanceModeRequest
+- admin/config/_sections/websocket.blade.php
 - 2018_04_28_201222_create_faqs_table.php
 - Illuminate\Support\Facades\Schema
 - 2018_07_16_015501_create_wishlists_table.php
@@ -638,7 +637,7 @@
 - message/_reply.blade.php
 - _cart_list.blade.php
 - _filter.blade.php
-- UpdateProfileRequest
+- system/config/_sections/websocket.blade.php
 - RatingFactory.php
 - product/_form.blade.php
 - product/import_failed.blade.php
@@ -653,7 +652,7 @@
 - shop/_translation_bulk_upload_review.blade.php
 - shop/_translation_import_failed.blade.php
 - slider/index.blade.php
-- system/config.blade.php
+- merchant/config/_sections/notifications.blade.php
 - ticket/show.blade.php
 - web_banner/index.blade.php
 - auth/master.blade.php
@@ -986,15 +985,13 @@
 - 2022_08_05_063657_add_api_key_to_users_table.php
 - 2023_01_25_112227_update_email_in_customers_table.php
 - 2023_03_28_080939_update_default_language_length_in_systems_table.php
-- 2024_02_16_113142_add_warehouse_id_to_orders_table.php
+- storefront.blade.php
 - 2021_02_01_054507_add_description_fields_to_sliders_table.php
 - admin.partials._qty_stepper
 - 2021_02_17_112139_add_type_field_to_images_table.php
 - _combinations.blade.php
 - product/inventory/_variants.blade.php
-- 2022_12_06_052602_add_vendor_bank_detail_to_configs_table.php
 - 2023_08_17_113230_update_decimal_column_precision_in_subscription_plans_table.php
-- 2023_08_28_054507_add_pay_to_fields_to_shop_table.php
 - 2019_12_27_092414_add_notify_chat_to_configs_table.php
 - 2023_11_30_061859_add_otp_and_delivery_boy_feedback_id_to_orders_table.php
 - 2023_12_28_041244_create_shipping_methods_table.php
@@ -1011,14 +1008,11 @@
 - 2024_10_30_092938_add_show_customer_terms_and_conditions_column_to_systems_table.php
 - 2021_02_01_054507_add_social_auth_fields_to_systems_table.php
 - 2024_05_21_040455_create_affiliates_table.php
-- 2024_06_26_052024_create_translation_category_groups_table.php
 - 2024_05_21_042302_create_affiliate_link_table.php
 - 2021_03_03_054507_add_active_ecommerce_fields_to_configs_table.php
 - 2019_12_06_063720_create_chat_tables.php
-- 2020_07_01_103906_add_nullable_on_subscriptions_table.php
 - 2024_11_05_121536_add_show_vendor_terms_and_conditions_column_to_sytems_table.php
 - 2023_07_18_144404_add_download_limit_field_to_inventories_table.php
-- 2024_02_08_173634_create_translation_products_table.php
 - 2018_11_05_124230_create_wallets_table.php
 - 2024_05_29_055112_enable_affiliate_and_configs.php
 - 2018_11_06_222923_create_transactions_table.php
@@ -1072,14 +1066,8 @@
 - ProductFactory
 - ShopFactory
 - UserFactory
-- AttributeSeeder
 - CategorySubGroupsSeeder
-- CountriesSeeder
-- EmailTemplateSeeder
-- LanguagesSeeder
-- RolesSeeder
 - SubscriptionPlansSeeder
-- SystemsSeeder
 - UsersSeeder
 - _reset_password.blade.php
 
@@ -1087,7 +1075,7 @@
 1. `User` - 449 edges
 2. `Controller` - 447 edges
 3. `Request` - 366 edges
-4. `Order` - 360 edges
+4. `Order` - 363 edges
 5. `Shop` - 330 edges
 6. `ListHelper` - 286 edges
 7. `Inventory` - 276 edges
@@ -1110,7 +1098,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (1925 total, 680 thin omitted)
+## Communities (1929 total, 668 thin omitted)
 
 ### Community 0 - "public/js/app.js"
 Cohesion: 0.01
@@ -1120,17 +1108,9 @@ Nodes (288): RFC-2822, absCeil(), absFloor(), absRound(), add$1(), _addNumericSo
 Cohesion: 0.08
 Nodes (147): a(), aa(), al(), ao(), B(), ba(), bl(), bn() (+139 more)
 
-### Community 2 - "System"
-Cohesion: 0.05
-Nodes (11): DownForMaintainace, SystemInfoUpdated, SystemIsLive, NotifyAdminDisputeCreated, NotifyAdminSystemIsDown, NotifyAdminSystemIsLive, NotifyAdminSystemUpdated, System (+3 more)
-
 ### Community 3 - "TestCase"
 Cohesion: 0.02
-Nodes (25): Illuminate\Database\Eloquent\ModelNotFoundException, Orchestra\Testbench\TestCase, TransferStatuses, MinimalTaxable, Taxable, CastsTest, DiscountTaxTest, DiscountTest (+17 more)
-
-### Community 4 - "ListHelper"
-Cohesion: 0.03
-Nodes (4): ListHelper, FormDataController, RegisterController, ViewComposerServiceProvider
+Nodes (26): Orchestra\Testbench\TestCase, TransferStatuses, Discount, MinimalTaxable, Taxable, CartTest, CastsTest, DiscountTaxTest (+18 more)
 
 ### Community 5 - ".apply"
 Cohesion: 0.03
@@ -1138,139 +1118,135 @@ Nodes (47): addFormatToken(), addWeekYearFormatToken(), AjaxAdapter(), alias(), 
 
 ### Community 6 - "safe_notify"
 Cohesion: 0.03
-Nodes (36): generateUniqueNumber(), email_logs_ready(), is_mail_transport_error(), log_email_event(), notify_super_admin_mail_failure(), Throwable, safe_mail_route_notify(), safe_notify() (+28 more)
+Nodes (37): email_logs_ready(), is_mail_transport_error(), log_email_event(), notify_super_admin_mail_failure(), Throwable, safe_mail_route_notify(), safe_notify(), setSystemConfig() (+29 more)
 
 ### Community 7 - ".trigger"
 Cohesion: 0.03
 Nodes (17): AllowClear(), BaseSelection(), clearMenus(), CloseOnSelect(), Dropdown(), EventRelay(), getParent(), _init() (+9 more)
 
 ### Community 8 - "Carbon\Carbon"
-Cohesion: 0.02
-Nodes (46): SystemConfigUpdated, requires_stripe_card_for_subscription(), PackageSeeder, PaymentMethodController, SystemConfigController, ThemeController, UpdateSystemConfigRequest, CreateShopForMerchant (+38 more)
-
-### Community 9 - "Illuminate\Foundation\Events\Dispatchable"
 Cohesion: 0.03
-Nodes (33): CustomerCreated, CustomerProfileUpdated, PasswordUpdated, InventoryLow, StockOut, NewMessage, OrderCancellationRequestApproved, OrderCancellationRequestCreated (+25 more)
+Nodes (21): ApiAuthTokens, HasHumanAttributes, PackageSeeder, SalesReportsRepository, Carbon\Carbon, CouponsSeeder, Factory, Illuminate\Database\Seeder (+13 more)
+
+### Community 9 - "Illuminate\Queue\SerializesModels"
+Cohesion: 0.02
+Nodes (50): CustomerCreated, CustomerProfileUpdated, PasswordUpdated, InventoryLow, MessageReplied, NewMessage, OrderCancellationRequestApproved, OrderCancellationRequestCreated (+42 more)
 
 ### Community 10 - "Order"
 Cohesion: 0.02
-Nodes (10): format_price_for_paypal(), get_vendor_settlement_for_order(), can_set_cancellation_fee(), FeedbackController, CreateMessageRequest, Order, PaymentController, get_credit_amount_for_order() (+2 more)
+Nodes (15): get_vendor_settlement_for_order(), cancellation_require_admin_approval(), OrderCancellationController, OrderController, OrderFulfillmentController, FeedbackController, OrderCancelController, OrderCancellationRequest (+7 more)
 
 ### Community 11 - "Inventory"
 Cohesion: 0.03
-Nodes (12): customerHasGroupPricing(), get_percentage_of(), is_serialized(), Inventory, InventoryObserver, migrateLegacyStock(), resolveWarehouseIds(), up() (+4 more)
+Nodes (8): customerHasGroupPricing(), get_percentage_of(), InventoryController, Inventory, InventoryObserver, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Database\Eloquent\Relations\HasOne, TranslationsTest
 
-### Community 12 - "Attribute"
-Cohesion: 0.03
-Nodes (12): ensure_shop_attribute_presets(), resolve_attribute_type_id(), AttributeController, AttributeController, AttributeValueController, CreateAttributeRequest, AttributeValueLightResource, Attribute (+4 more)
+### Community 13 - "BuyerLocationService"
+Cohesion: 0.08
+Nodes (10): getGeocode(), CustomerLocationController, DealController, NearbyShopDiagnosticController, ItemLightResource, ItemResource, GeocodeService, BuyerLocationService (+2 more)
 
-### Community 13 - "DistanceService"
-Cohesion: 0.13
-Nodes (3): DistanceService, ShippingCalculator, NearbyShopDiagnosticService
-
-### Community 14 - "Illuminate\Database\Eloquent\Model"
+### Community 14 - "Transfer"
 Cohesion: 0.04
-Nodes (20): AvgFeedback, Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Relations\MorphTo, Illuminate\Database\Eloquent\Relations\Relation, Exchangeable, self, Wallet, WalletFloat (+12 more)
+Nodes (14): Illuminate\Database\Eloquent\Relations\MorphTo, Exchangeable, Product, self, Wallet, WalletFloat, Transfer, CanExchange (+6 more)
 
 ### Community 15 - ".response"
-Cohesion: 0.04
-Nodes (22): getTaxRate(), AccountController, AuthController, BlogController, CartController, Cart, CustomerLocationController, EmolaGatewayController (+14 more)
+Cohesion: 0.03
+Nodes (24): AccountController, AuthController, AuthSocialController, BlogController, CartController, Cart, EmolaGatewayController, FeedbackController (+16 more)
 
 ### Community 16 - "Shop"
-Cohesion: 0.02
-Nodes (9): ReleaseTrashedMerchantIdentifiers, Product, RepairProductShopIds, get_verified_badge(), DashboardController, Shop, ShopWallet, App\Notifications\ShopCreated (+1 more)
+Cohesion: 0.03
+Nodes (6): ReleaseTrashedMerchantIdentifiers, Product, RepairProductShopIds, get_verified_badge(), DashboardController, Shop
 
 ### Community 17 - "Illuminate\Database\Eloquent\Factories\Factory"
 Cohesion: 0.21
 Nodes (5): BlogFactory, CategorySubGroupFactory, FeedbackFactory, MessageFactory, Illuminate\Database\Eloquent\Factories\Factory
 
 ### Community 18 - "FCMService"
-Cohesion: 0.04
-Nodes (13): MessageReplied, NotifyCustomerDisputeUpdated, NotifyAssociatedUsersMessagetReplied, Reply, NewMessage, Updated, Replied, OrderCreated (+5 more)
+Cohesion: 0.07
+Nodes (7): NotifyAssociatedUsers, NotifyAssociatedUsersMessagetReplied, SendNewMessageNotificationToReceiver, NewMessage, OrderCreated, FcmHttpV1Service, FCMService
 
-### Community 19 - "Illuminate\Support\Facades\Auth"
-Cohesion: 0.03
-Nodes (21): getGeocode(), NotificationController, ConversationController, AccountController, OrderConversationController, LocationController, SelfPasswordUpdateRequest, ConversationResource (+13 more)
+### Community 19 - "ChatConversation"
+Cohesion: 0.05
+Nodes (26): NewMessageEvent, create_file_from_base64(), get_chat_room_name(), get_private_chat_room_id(), get_vendor_chat_room_id(), ConversationController, OrderConversationController, ConversationResource (+18 more)
 
 ### Community 20 - "User"
 Cohesion: 0.03
-Nodes (8): User, BlogPolicy, CategorySubGroupPolicy, CountryPolicy, LanguagePolicy, MerchantPolicy, RefundPolicy, ChatConversationPolicy
+Nodes (8): User, CountryPolicy, CurrencyPolicy, LanguagePolicy, RefundPolicy, ShopPolicy, UserPolicy, ChatConversationPolicy
 
-### Community 21 - "Illuminate\Database\Eloquent\SoftDeletes"
-Cohesion: 0.06
-Nodes (12): CascadeSoftDeletes, Translatable, BlogComment, Invoice, ActiveScope, MineScope, RoleScope, Illuminate\Database\Eloquent\Builder (+4 more)
+### Community 21 - "Illuminate\Database\Eloquent\Builder"
+Cohesion: 0.07
+Nodes (11): CascadeSoftDeletes, Translatable, ActiveScope, MineScope, RoleScope, EloquentFilter\Filterable, Illuminate\Database\Eloquent\Builder, Illuminate\Database\Eloquent\Relations\BelongsToMany (+3 more)
 
 ### Community 22 - "Api/HomeController.php"
 Cohesion: 0.05
-Nodes (12): HomeController, TaxController, ShippingOptionRequest, BannerResource, CountryResource, CurrencyResource, ManufacturerLightResource, PageResource (+4 more)
+Nodes (12): HomeController, ShippingOptionRequest, BannerResource, CountryResource, CurrencyResource, ManufacturerLightResource, PageResource, PaymentMethodResource (+4 more)
 
 ### Community 23 - "Controller"
 Cohesion: 0.02
-Nodes (30): Authorizable, InventoryHelper, CustomCssController, ProductPickerController, ShopPerformanceIndicatorsController, ShippingRateController, CustomerController, DeliveryBoyController (+22 more)
+Nodes (40): Authorizable, InventoryHelper, CustomCssController, ShopPerformanceIndicatorsController, ShippingRateController, ThemeController, CustomerController, DeliveryBoyController (+32 more)
 
 ### Community 24 - "Request"
-Cohesion: 0.03
-Nodes (20): Request, AdminCustomerUpdatePasswordRequest, AdminUpdateMerchantPasswordRequest, AdminUserUpdatePasswordRequest, ApiUpdateCartRequest, CreateAnnouncementRequest, CreateMerchantRequest, DeleteAttachmentRequest (+12 more)
+Cohesion: 0.02
+Nodes (35): Request, AdminUserUpdatePasswordRequest, ApiUpdateCartRequest, ArchiveMessageRequest, ConfirmGoodsReceivedRequest, CreateAnnouncementRequest, CreateCartRequest, CreateCustomerRequest (+27 more)
 
 ### Community 25 - "app/Helpers/Functions.php"
-Cohesion: 0.02
-Nodes (74): allow_checkout(), buyer_has_location(), cart_item_count(), customer_needs_delivery_address(), file_upload_max_size(), format_bytes(), generate_unique_shop_slug(), generateCouponCode() (+66 more)
+Cohesion: 0.03
+Nodes (36): file_upload_max_size(), format_bytes(), generateCouponCode(), generatePinCode(), generateSerialNumber(), generateUniqueSrt(), get_category_url(), get_chat_status_name() (+28 more)
 
 ### Community 26 - "Illuminate\Database\Migrations\Migration"
 Cohesion: 0.02
-Nodes (29): CreateActivityLogTable, CreateImagesTable, CreateSubscriptionsTable, CreateTagsTable, CreateProductsTable, CreateConfigManualPaymentsTable, CreateGiftCardsTable, CreateTicketsTable (+21 more)
+Nodes (28): CreateActivityLogTable, CreateAttachmentsTable, CreateSubscriptionsTable, CreateProductsTable, CreateConfigManualPaymentsTable, CreateConfigPaypalExpressTable, AddEmailPhoneFieldsToMessagesTable, AddShowItemConditionsToSystemsTable (+20 more)
 
 ### Community 27 - "Illuminate\Http\Resources\Json\JsonResource"
-Cohesion: 0.03
-Nodes (29): get_product_video_url(), AttachmentResource, AttributeDryResource, AttributeLightResource, AttributeResource, AttributeValueResource, CancelationResource, CategoryGroupLightResource (+21 more)
+Cohesion: 0.04
+Nodes (18): AttributeColorResource, AttributeDryResource, AttributeLightResource, AttributeValueResource, CancelationResource, CouponResource, DashboardResource, DisputeLightResource (+10 more)
 
 ### Community 28 - "Image"
-Cohesion: 0.12
-Nodes (4): image_cache_path(), Image, PopupTypes, get_popup_data()
+Cohesion: 0.03
+Nodes (20): image_cache_path(), temp_storage_dir(), InventoryController, ImageController, EncryptCookies, Image, InventoryRepository, Illuminate\Contracts\Filesystem\Filesystem (+12 more)
 
 ### Community 29 - "Transaction"
 Cohesion: 0.04
-Nodes (10): multi_tag_explode(), DepositRequestController, Transaction, PayoutController, Transaction, Transaction, WithdrawalRequestController, WalletController (+2 more)
+Nodes (10): get_platform_address(), multi_tag_explode(), DepositRequestController, Transaction, Transaction, WithdrawalRequestController, WalletController, WithdrawalActionsRequest (+2 more)
 
 ### Community 30 - "Authorize"
 Cohesion: 0.04
-Nodes (12): Authorize, AttributePolicy, CartPolicy, CategoryGroupPolicy, GiftCardPolicy, OrderPolicy, PagePolicy, PaymentMethodPolicy (+4 more)
+Nodes (12): Authorize, CarrierPolicy, CartPolicy, CustomerPolicy, InventoryPolicy, MessagePolicy, OrderPolicy, SliderPolicy (+4 more)
 
 ### Community 31 - "ou"
 Cohesion: 0.04
 Nodes (81): ar(), at(), au(), br(), bu(), ca(), cr(), dl() (+73 more)
 
 ### Community 32 - "Customer"
-Cohesion: 0.03
-Nodes (21): get_deal_of_the_day(), get_formated_customer_str(), App\Http\Controllers\Admin, MerchantSwitchToCustomer, AuthSocialController, DealController, LocaleController, Customer (+13 more)
+Cohesion: 0.05
+Nodes (3): AdminCustomerUpdatePasswordRequest, Customer, self
 
 ### Community 33 - "Cart"
-Cohesion: 0.06
-Nodes (5): get_payment_config_info(), get_visitor_IP(), CheckoutController, ApiPaymentCredentialRequest, Cart
+Cohesion: 0.05
+Nodes (6): get_payment_config_info(), get_visitor_IP(), CheckoutController, ApiPaymentCredentialRequest, Cart, ShippingCalculator
 
 ### Community 34 - ".cache"
-Cohesion: 0.05
-Nodes (10): get_platform_address_string(), Product, CategoryGroupController, CategorySubGroupController, CreateCategorySubGroupRequest, down(), up(), down() (+2 more)
+Cohesion: 0.03
+Nodes (18): Product, CategoryGroupController, CategorySubGroupController, LanguageController, Language, CreateCategoryGroupRequest, UpdateCategoryGroupRequest, UpdateLanguageRequest (+10 more)
 
 ### Community 35 - "EmolaSpec"
-Cohesion: 0.05
-Nodes (6): PaymentFailedException, EmolaDailyLimit, EmolaOrderPaymentService, EmolaSpec, EmolaWalletDepositService, EmolaPaymentService
+Cohesion: 0.04
+Nodes (10): CanCreateStripeCustomer, PaymentFailedException, EmolaDailyLimit, EmolaOrderPaymentService, EmolaSpec, EmolaWalletDepositService, EmolaPaymentService, Illuminate\Contracts\Validation\Validator (+2 more)
 
 ### Community 36 - "Closure"
-Cohesion: 0.05
-Nodes (20): setDashboardConfig(), AllowOnlyAjaxRequests, ApiInit, BlockMerchantFromAdmin, CheckCustomerCanRegister, CheckForGuestCheckoutMode, CheckIfBillingInfoRequired, ConfigurePublicUrlSession (+12 more)
+Cohesion: 0.04
+Nodes (24): ConfirmPasswordController, VerificationController, AllowOnlyAjaxRequests, ApiInit, BlockMerchantFromAdmin, CheckCustomerCanRegister, ConfigurePublicUrlSession, CustomerAppMiddleware (+16 more)
 
-### Community 38 - "Config"
-Cohesion: 0.03
-Nodes (10): clearShopConfigCache(), ConfigController, ConfigController, VerificationController, MerchantVerifyRequest, UpdateBasicConfigRequest, UpdateConfigRequest, ShopSettingResource (+2 more)
+### Community 38 - "clearShopConfigCache"
+Cohesion: 0.08
+Nodes (7): ConfigUpdated, clearShopConfigCache(), ConfigController, VerificationController, MerchantVerifyRequest, UpdateConfigRequest, VendorShopConfigResource
 
 ### Community 39 - "SystemController"
-Cohesion: 0.11
-Nodes (4): SystemController, ResetDatabaseRequest, UpdateSystemRequest, ResetDbAndImportDemoData
+Cohesion: 0.08
+Nodes (5): SystemController, ResetDatabaseRequest, SaveEnvFileRequest, UpdateSystemRequest, ResetDbAndImportDemoData
 
 ### Community 40 - "Illuminate\Foundation\Http\FormRequest"
-Cohesion: 0.05
-Nodes (10): ConfirmDeliveryRequest, DeliveryBoyFeedbackCreateRequest, LoginRequest, MarkReachedRequest, MyDeliveryRequest, OrderStatusRequest, UpdatePasswordRequest, UpdateProfileRequest (+2 more)
+Cohesion: 0.07
+Nodes (8): ConfirmDeliveryRequest, DeliveryBoyFeedbackCreateRequest, LoginRequest, MarkReachedRequest, OrderStatusRequest, UpdateProfileRequest, CustomCssRequest, Illuminate\Foundation\Http\FormRequest
 
 ### Community 41 - "CategoryController"
 Cohesion: 0.07
@@ -1281,120 +1257,112 @@ Cohesion: 0.06
 Nodes (66): fn(), _fnAddData(), _fnAddOptionsHtml(), _fnAddTr(), _fnAdjustColumnSizing(), _fnAjaxDataSrc(), _fnAjaxUpdate(), _fnAjaxUpdateDraw() (+58 more)
 
 ### Community 44 - "HyperlocalCatalogService"
-Cohesion: 0.13
-Nodes (6): GtinTypes, get_nearby_featured_items(), HyperlocalCatalogService, NearbyShopService, Illuminate\Pagination\LengthAwarePaginator, Illuminate\Support\Collection
+Cohesion: 0.08
+Nodes (9): GtinTypes, get_nearby_featured_items(), CartDeliveryRangeService, DistanceService, HyperlocalCatalogService, NearbyShopDiagnosticService, NearbyShopService, Illuminate\Pagination\LengthAwarePaginator (+1 more)
 
-### Community 46 - "Product"
-Cohesion: 0.06
-Nodes (11): Countable, LogicException, ProductEnded, Customer, Discount, Product, Cart, self (+3 more)
+### Community 46 - "Cart"
+Cohesion: 0.08
+Nodes (14): Handler, Countable, Illuminate\Auth\Access\AuthorizationException, Illuminate\Auth\AuthenticationException, Illuminate\Database\Eloquent\ModelNotFoundException, Illuminate\Foundation\Exceptions\Handler, LogicException, ProductEnded (+6 more)
 
 ### Community 47 - "get_sender_email"
-Cohesion: 0.06
-Nodes (10): get_formated_currency(), get_page_url(), get_platform_address(), get_platform_title(), get_sender_email(), get_sender_name(), get_shop_url(), get_shortcode_replaced() (+2 more)
+Cohesion: 0.05
+Nodes (11): get_formated_currency(), get_page_url(), get_platform_title(), get_sender_email(), get_sender_name(), get_shop_url(), get_shortcode_replaced(), OrderCanceled (+3 more)
 
 ### Community 48 - "themes/default/assets/js/app.js"
 Cohesion: 0.04
 Nodes (52): el(), ae(), b(), bannerCol, cateScroll, ct(), decreaseCartItem(), Ee() (+44 more)
 
-### Community 49 - "ChatSocketPublisher"
-Cohesion: 0.23
-Nodes (10): create_file_from_base64(), get_chat_room_name(), get_private_chat_room_id(), get_vendor_chat_room_id(), ChatSocketPublisher, livechat_format_message_time(), livechat_message_for_attachment_only(), livechat_socket_attachments_payload() (+2 more)
+### Community 49 - "SystemConfig"
+Cohesion: 0.08
+Nodes (6): DiagnoseSubscription, SystemConfigUpdated, SystemConfigController, UpdateSystemConfigRequest, SystemConfig, SubscriptionPaymentCompletionService
 
 ### Community 50 - "get_storage_file_url"
-Cohesion: 0.06
-Nodes (16): default_brand_icon_url(), default_brand_logo_url(), default_shop_logo_url(), get_cover_img_src(), get_formated_gender(), get_icon_url(), get_logo_url(), get_placeholder_img() (+8 more)
+Cohesion: 0.09
+Nodes (10): default_brand_icon_url(), get_cover_img_src(), get_formated_gender(), get_icon_url(), get_placeholder_img(), get_storage_file_url(), BlogCommentResource, CategoryDetailResource (+2 more)
 
 ### Community 53 - "OrderCreated"
-Cohesion: 0.09
-Nodes (13): OrderCreated, safe_dispatch_order_event(), get_customer_transaction_fee_for_order(), persist_order_checkout_fees(), shop_can_accept_sales(), crosscheckAndUpdateOldCartInfo(), crosscheckCartOwnership(), vendor_get_paid_directly() (+5 more)
+Cohesion: 0.14
+Nodes (14): OrderCreated, allow_checkout(), is_panel_user_on_storefront(), safe_dispatch_order_event(), get_customer_transaction_fee_for_order(), persist_order_checkout_fees(), shop_can_accept_sales(), crosscheckAndUpdateOldCartInfo() (+6 more)
 
 ### Community 54 - "is_incevio_package_loaded"
-Cohesion: 0.04
-Nodes (14): Kernel, get_formated_decimal(), get_formated_price_value(), is_social_login_configured(), getHandelingCostOf(), getShopConfig(), is_incevio_package_loaded(), InventoryController (+6 more)
+Cohesion: 0.06
+Nodes (10): get_formated_price_value(), is_social_login_configured(), getHandelingCostOf(), getShopConfig(), is_incevio_package_loaded(), Product, AddInventoryRequest, QuickInventoryUpdateRequest (+2 more)
 
 ### Community 55 - "Illuminate\Console\Command"
 Cohesion: 0.04
-Nodes (28): BoostPerformance, CheckMissingTranslationsCommand, CleanCartTable, ClearImgCache, DeduplicatePortugueseLanguageCommand, DiagnoseProducts, DiagnoseSubscription, DumpAutoload (+20 more)
+Nodes (27): BoostPerformance, CheckMissingTranslationsCommand, CleanCartTable, ClearImgCache, DeduplicatePortugueseLanguageCommand, DiagnoseProducts, DumpAutoload, evaluateFeedbacks (+19 more)
 
 ### Community 56 - "EloquentSalesReportsRepository"
 Cohesion: 0.07
 Nodes (4): EloquentSalesReportsRepository, Carbon, Expression, ReflectionClass
 
-### Community 57 - "WalletService"
-Cohesion: 0.06
-Nodes (12): InvalidArgumentException, AmountInvalid, ConfirmedInvalid, WalletOwnerInvalid, Confirmable, WalletPaymentService, WalletService, CanConfirm (+4 more)
-
-### Community 58 - "Product"
-Cohesion: 0.06
-Nodes (3): mp_url(), CatalogProductController, Product
+### Community 57 - "DbService"
+Cohesion: 0.08
+Nodes (11): DbService, Illuminate\Database\ConnectionInterface, Illuminate\Database\Query\Expression, InvalidArgumentException, RefreshBalance, ConfirmedInvalid, WalletOwnerInvalid, WalletBulkDepositController (+3 more)
 
 ### Community 59 - "require"
 Cohesion: 0.04
 Nodes (57): require, algolia/algoliasearch-client-php, aws/aws-sdk-php, barryvdh/laravel-dompdf, blutekic/emola-sdk, brick/math, consoletvs/charts, doctrine/annotations (+49 more)
 
 ### Community 60 - "Banner"
-Cohesion: 0.06
-Nodes (8): AppBannerController, BannerController, WebBannerController, UpdateBannerRequest, Banner, BannerGroup, BannerRepository, EloquentBanner
+Cohesion: 0.04
+Nodes (12): AppBannerController, BannerController, WebBannerController, CreateAppBannerRequest, CreateWebBannerRequest, UpdateAppBannerRequest, UpdateBannerRequest, UpdateWebBannerRequest (+4 more)
 
 ### Community 61 - "ProductController"
 Cohesion: 0.06
 Nodes (8): generate_unique_listing_slug(), ProductController, CreateCatalogProductRequest, CreateProductRequest, UpdateCatalogProductRequest, UpdateProductRequest, ProductVideoFile, Illuminate\Contracts\Validation\ValidationRule
 
 ### Community 62 - "SubscriptionPlan"
-Cohesion: 0.05
-Nodes (9): StorePerformanceIndicatorsCommand, PerformanceIndicatorsRepository, format_subscription_plan_fee(), SubscriptionPlanController, CreateSubscriptionPlanRequest, SubscriptionPlan, PerformanceIndicatorsRepository, Carbon (+1 more)
-
-### Community 63 - "wallet/routes/all.php"
 Cohesion: 0.07
-Nodes (7): Illuminate\Support\Facades\Gate, Laravel\Passport\Passport, AdminWalletController, PayoutReportController, WalletSettingsController, TransferController, HasTransaction
+Nodes (8): format_subscription_plan_fee(), SubscriptionPlanController, SellingApiController, CreateSubscriptionPlanRequest, SubscriptionPlan, PerformanceIndicatorsRepository, Carbon, Illuminate\Database\Query\Builder
+
+### Community 63 - ".handle"
+Cohesion: 0.12
+Nodes (13): buyer_has_location(), cart_item_count(), customer_needs_delivery_address(), get_address_str_from_request_data(), get_default_geoip_country_iso(), get_id_of_model(), get_item_location_shipping_options(), get_shipping_zone_of() (+5 more)
 
 ### Community 66 - "Carrier"
-Cohesion: 0.09
-Nodes (5): CarrierController, UpdateCarrierRequest, CarrirResource, Carrier, CarrierPolicy
-
-### Community 67 - "OrderDetailRequest"
-Cohesion: 0.08
-Nodes (7): cancellation_require_admin_approval(), OrderCancellationController, OrderController, OrderCancelController, OrderCancellationRequest, OrderDetailRequest, CancellationReason
-
-### Community 68 - "get_from_option_table"
 Cohesion: 0.07
-Nodes (11): get_custom_css(), get_featured_items(), get_from_option_table(), get_subscription_payment_methods(), get_payout_commission_preview(), get_platform_payout_fee(), PlatformGatewayFeeService, get_min_withdrawal_limit() (+3 more)
+Nodes (6): CarrierController, CreateCarrierRequest, CarrirResource, Carrier, CarrierRepository, EloquentCarrier
+
+### Community 67 - "static"
+Cohesion: 0.11
+Nodes (3): hyperlocal_location_cache_suffix(), scope_inventory_for_buyer(), static
+
+### Community 68 - "PlatformFeeHelper.php"
+Cohesion: 0.10
+Nodes (7): get_customer_transaction_fee(), get_payout_commission_preview(), get_platform_payment_fee(), get_platform_payout_fee(), get_wallet_deposit_payment_methods(), self, PlatformGatewayFeeService
 
 ### Community 69 - "ProductController"
-Cohesion: 0.16
-Nodes (3): generate_combinations(), Product, ProductController
+Cohesion: 0.12
+Nodes (5): mp_route(), sync_product_category_attributes(), generate_combinations(), Product, ProductController
 
 ### Community 71 - "Manufacturer"
 Cohesion: 0.03
 Nodes (10): Product, ManufacturerController, ManufacturerTranslationController, ManufacturerController, CreateManufacturerRequest, UpdateManufacturerRequest, ManufacturerResource, Manufacturer (+2 more)
 
-### Community 72 - "InventoryStock"
-Cohesion: 0.15
-Nodes (3): StockManagementController, InventoryStock, StockService
-
-### Community 74 - "Mathable"
-Cohesion: 0.05
-Nodes (13): Illuminate\Foundation\Testing\RefreshDatabase, ReleasePayments, Mathable, self, Rateable, Storable, ExchangeService, Rate (+5 more)
-
-### Community 75 - "Attachable"
+### Community 72 - "Illuminate\Database\Eloquent\Model"
 Cohesion: 0.09
-Nodes (5): Attachable, Repliable, ClearStorage, attachment_storage_dir(), Feedback
+Nodes (6): StockManagementController, InventoryStock, StockMovement, StockTransfer, StockService, Illuminate\Database\Eloquent\Model
 
-### Community 76 - "InventoryController"
-Cohesion: 0.09
-Nodes (3): InventoryController, Product, AddInventoryRequest
+### Community 74 - "WalletService"
+Cohesion: 0.07
+Nodes (10): Illuminate\Foundation\Testing\RefreshDatabase, AmountInvalid, Storable, WalletPaymentService, WalletService, Store, Transfer, Wallet (+2 more)
+
+### Community 75 - "Illuminate\Database\Eloquent\SoftDeletes"
+Cohesion: 0.07
+Nodes (6): Attachable, Repliable, attachment_storage_dir(), BlogComment, Invoice, Illuminate\Database\Eloquent\SoftDeletes
+
+### Community 76 - "get_from_option_table"
+Cohesion: 0.10
+Nodes (10): forget_option_table_cache(), get_custom_css(), get_from_option_table(), get_subscription_payment_methods(), is_billing_info_required(), requires_stripe_card_for_subscription(), update_option_table_record(), update_or_create_option_table_record() (+2 more)
 
 ### Community 77 - "Ticket"
 Cohesion: 0.03
-Nodes (18): TicketAssigned, TicketCreated, TicketReplied, TicketUpdated, AccountController, TicketController, App\Http\Controllers\CommentsController, ReplyTicketRequest (+10 more)
+Nodes (11): AccountController, SupportMessagesController, CreateTicketRequest, UpdatePasswordRequest, UpdatePhotoRequest, SendAcknowledgementNotification, Ticket, TicketCreated (+3 more)
 
-### Community 78 - "Vendor.php"
-Cohesion: 0.04
-Nodes (19): format_payout_instruction_text(), AffiliateController, ResolvesVendorShop, NotificationController, PackageController, ReportController, SubscriptionController, WalletController (+11 more)
-
-### Community 79 - "PaymentServiceContract"
-Cohesion: 0.10
-Nodes (6): CanCreateStripeCustomer, PaymentServiceContract, get_platform_payment_fee(), VendorWalletDepositRequest, Illuminate\Contracts\Validation\Validator, DepositRequest
+### Community 78 - "Illuminate\Support\Facades\Log"
+Cohesion: 0.02
+Nodes (34): PaymentServiceContract, format_payout_instruction_text(), AffiliateController, ResolvesVendorShop, PackageController, ReportController, SubscriptionController, WalletDepositController (+26 more)
 
 ### Community 80 - "d"
 Cohesion: 0.07
@@ -1405,36 +1373,28 @@ Cohesion: 0.04
 Nodes (44): authors, autoload, autoload-dev, psr-4, psr-4, dev-develop, config, process-timeout (+36 more)
 
 ### Community 83 - ".count"
-Cohesion: 0.05
-Nodes (11): clear_encoding_str(), get_csv_import_limit(), get_formated_file_size(), shorten(), CustomerUploadRequest, InventoryUpdateRequest, UpdateCategorySubGroupRequest, UpdateCustomerRequest (+3 more)
+Cohesion: 0.03
+Nodes (16): clear_encoding_str(), get_csv_import_limit(), get_formated_file_size(), shorten(), CustomerUploadRequest, InventoryUpdateRequest, InventoryUploadRequest, MerchantUploadRequest (+8 more)
 
 ### Community 84 - "EmolaClient"
 Cohesion: 0.10
 Nodes (6): EmolaTestConnection, EmolaClient, EmolaResponse, Illuminate\Support\Facades\Config, SoapClient, SoapFault
 
 ### Community 85 - "PdfTemplate"
-Cohesion: 0.08
-Nodes (7): get_customer_invoice_templates_list(), get_shipping_label_templates_list(), PdfTemplateController, PdfTemplateCreateRequest, PdfTemplateUpateRequest, PdfTemplate, PdfGenerator
+Cohesion: 0.07
+Nodes (8): get_customer_invoice_templates_list(), get_shipping_label_templates_list(), PdfTemplateController, PdfTemplateCreateRequest, PdfTemplateUpateRequest, PdfTemplate, PdfGenerator, PdfTemplateSeeder
 
 ### Community 86 - "devDependencies"
 Cohesion: 0.05
 Nodes (42): axios, browserslist, @erbelion/vite-plugin-laravel-purgecss, font-awesome, laravel-echo, laravel-vite-plugin, lightningcss, lodash (+34 more)
 
-### Community 87 - "Address"
-Cohesion: 0.11
-Nodes (3): AddressController, Address, CartDeliveryRangeService
-
 ### Community 88 - "ShopLightResource"
-Cohesion: 0.11
-Nodes (8): get_formated_shipping_range_of(), get_formated_value(), get_formated_weight(), AttributeColorResource, DeliveryBoyLightResource, DisputeLightResource, OrderItemResource, ShopLightResource
+Cohesion: 0.09
+Nodes (8): get_formated_value(), AttachmentResource, CustomerLightResource, DeliveryBoyLightResource, OrderItemResource, ReplyResource, ShopLightResource, UserResource
 
 ### Community 89 - "e"
 Cohesion: 0.24
 Nodes (38): a(), b(), f(), g(), p(), v(), x(), be() (+30 more)
-
-### Community 90 - "PaymentService"
-Cohesion: 0.07
-Nodes (5): CodPaymentService, PaymentService, PaypalPaymentService, WirePaymentService, MPesaPaymentService
 
 ### Community 91 - "chartjs.js"
 Cohesion: 0.05
@@ -1442,202 +1402,186 @@ Nodes (8): at(), bt(), Pe(), qn(), rt(), se(), vt(), Yn()
 
 ### Community 92 - "Illuminate\Contracts\Queue\ShouldQueue"
 Cohesion: 0.02
-Nodes (53): SmsChannel, NotifyCustomerDisputeSolved, LowInventoryCheck, NotifyCustomerOrderCancellationDeclined, NotifyCustomerOrderCancellationRequest, NotifyCustomerPaymentFailed, NotifyMerchantNewOrderPlaced, CustomerResetPasswordNotification (+45 more)
+Nodes (63): SmsChannel, AdjustQttForCanceledOrder, AfterOrderCancellationJob, ChargeCustomerForOrder, ClearConfigCache, SendContactFromMessageToAdmin, SendPushCampaignJob, UpdateInventorySoldQuantityJob (+55 more)
 
 ### Community 93 - "EloquentCustomer"
 Cohesion: 0.11
 Nodes (3): CustomerRepository, EloquentCustomer, Customer
 
 ### Community 94 - "Affiliate"
-Cohesion: 0.14
-Nodes (3): AccountController, AffiliateController, Affiliate
+Cohesion: 0.08
+Nodes (8): Illuminate\Foundation\Auth\AuthenticatesUsers, Illuminate\Foundation\Auth\RegistersUsers, AccountController, AffiliateController, FrontController, LoginController, RegisterController, Affiliate
 
 ### Community 95 - "Illuminate\Auth\Access\HandlesAuthorization"
-Cohesion: 0.05
-Nodes (10): AttachmentPolicy, BannerPolicy, ConfigPolicy, DisputePolicy, MessagePolicy, ShippingRatePolicy, SystemConfigPolicy, SystemPolicy (+2 more)
+Cohesion: 0.07
+Nodes (8): AttachmentPolicy, BannerPolicy, ConfigPolicy, DisputePolicy, SystemConfigPolicy, SystemPolicy, Illuminate\Auth\Access\HandlesAuthorization, WalletPolicy
 
 ### Community 96 - "is_subscription_enabled"
-Cohesion: 0.10
-Nodes (5): is_billing_info_required(), is_subscription_enabled(), get_customer_transaction_fee(), OrderCheckoutFeeService, self
+Cohesion: 0.08
+Nodes (6): generate_unique_shop_slug(), is_base64(), is_subscription_enabled(), IsSubscriptionEnabled, VerifyUserIsSubscribed, OrderCheckoutFeeService
+
+### Community 97 - "Statistics"
+Cohesion: 0.03
+Nodes (7): Carbon, Statistics, VisitorController, VisitorController, AdminUpdateMerchantPasswordRequest, Merchant, Visitor
 
 ### Community 98 - "fileinput.js"
 Cohesion: 0.11
 Nodes (29): a(), c(), d(), e(), f(), g(), i(), l() (+21 more)
 
 ### Community 102 - ".config"
-Cohesion: 0.05
-Nodes (10): ShopUpdated, get_currency_symbol(), get_inventory_img_src(), prepareFilteredListings(), ShopController, ListingController, UpdateRoleRequest, InventoryLightResource (+2 more)
+Cohesion: 0.09
+Nodes (9): get_currency_symbol(), get_inventory_img_src(), prepareFilteredListings(), ListingController, AccountController, DemoRestrictionCheck, UpdateRoleRequest, ListingResource (+1 more)
 
-### Community 103 - "BCMath"
-Cohesion: 0.05
-Nodes (6): Brick\Math\BigDecimal, Brick\Math\RoundingMode, BCMath, BrickMath, Math, MathTest
-
-### Community 104 - "CustomerUploadController"
-Cohesion: 0.16
-Nodes (3): verifyRequiredDataForBulkUpload(), CustomerUploadController, CustomerImportRequest
+### Community 103 - "Mathable"
+Cohesion: 0.04
+Nodes (8): Brick\Math\BigDecimal, Brick\Math\RoundingMode, Mathable, BCMath, BrickMath, Math, MathTest, Ramsey\Uuid\Uuid
 
 ### Community 105 - "Illuminate\Database\Eloquent\Factories\HasFactory"
-Cohesion: 0.05
-Nodes (12): getShippingRates(), AttributeCategory, CategoryGroupTranslation, ChatSocketEvent, Dashboard, InventoryTranslation, ProductTranslation, ShippingRate (+4 more)
+Cohesion: 0.04
+Nodes (18): Taggable, AttributeCategory, AttributeTranslation, AvgFeedback, CategoryGroupTranslation, CategorySubGroupTranslation, CategoryTranslation, ChatSocketEvent (+10 more)
 
 ### Community 108 - "ConfirmTest"
-Cohesion: 0.06
-Nodes (10): Illuminate\Database\SQLiteConnection, Illuminate\Foundation\Application, BalanceLockTest, BalanceTest, CartLockTest, ConfirmLockTest, ConfirmTest, RaceCondition (+2 more)
+Cohesion: 0.09
+Nodes (6): Illuminate\Foundation\Application, BalanceLockTest, CartLockTest, ConfirmLockTest, ConfirmTest, RaceCondition
 
 ### Community 109 - "Country"
 Cohesion: 0.07
 Nodes (5): get_countries_in_shipping_zone(), CountryController, CreateCountryRequest, UpdateCountryRequest, Country
 
 ### Community 110 - "PromotionAccessRequest"
-Cohesion: 0.10
-Nodes (9): forget_option_table_cache(), update_option_table_record(), update_or_create_option_table_record(), updateOptionTable(), DealOfTheDayController, FeaturedProductsController, RegisterController, PromotionAccessRequest (+1 more)
-
-### Community 111 - "CategorySubGroupController"
-Cohesion: 0.12
-Nodes (3): CategorySubGroupController, CategorySubGroupLightResource, CategorySubGroupResource
+Cohesion: 0.14
+Nodes (4): DealOfTheDayController, ProductPickerController, PromotionAccessRequest, DealOfTheDay
 
 ### Community 112 - "OrderController"
 Cohesion: 0.06
-Nodes (5): OrderController, OrderFulfillmentController, FulfillOrderRequest, DeliveryDispatchService, ZipArchive
+Nodes (4): OrderController, FulfillOrderRequest, DeliveryDispatchService, ZipArchive
 
-### Community 113 - "HasWallet"
-Cohesion: 0.05
-Nodes (14): DbService, Illuminate\Database\ConnectionInterface, Illuminate\Database\Eloquent\Relations\MorphMany, Illuminate\Database\PostgresConnection, Illuminate\Database\Query\Expression, Illuminate\Database\QueryException, Laravel\Cashier\Billable, RefreshBalance (+6 more)
+### Community 113 - "Wallet"
+Cohesion: 0.04
+Nodes (13): Illuminate\Database\PostgresConnection, Illuminate\Database\QueryException, Illuminate\Database\SQLiteConnection, Laravel\Cashier\Billable, Wallet, HasWallets, WalletModel, BalanceTest (+5 more)
 
 ### Community 115 - "CommonService"
 Cohesion: 0.11
 Nodes (5): BalanceIsEmpty, InsufficientFunds, CommonService, Transaction, WalletTest
 
+### Community 116 - ".register"
+Cohesion: 0.16
+Nodes (4): AuthController, User, MerchantRegistrationResource, MerchantResource
+
 ### Community 117 - "Illuminate\Support\ServiceProvider"
-Cohesion: 0.05
-Nodes (23): remove_url_parameter(), EncryptCookies, AppServiceProvider, BroadcastServiceProvider, GoogleDriveServiceProvider, HelperServiceProvider, MysqlScoutServiceProvider, RepositoryServiceProvider (+15 more)
+Cohesion: 0.09
+Nodes (12): BroadcastServiceProvider, GoogleDriveServiceProvider, HelperServiceProvider, MysqlScoutServiceProvider, RepositoryServiceProvider, ValidationServiceProvider, Google_Client, Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter (+4 more)
 
 ### Community 119 - "BaseSeeder"
+Cohesion: 0.08
+Nodes (12): AttributeSeeder, BaseSeeder, CountriesSeeder, EmailTemplateSeeder, LanguagesSeeder, PagesSeeder, PaymentMethodsSeeder, RolesSeeder (+4 more)
+
+### Community 120 - "HasWallet"
 Cohesion: 0.09
-Nodes (11): BaseSeeder, CategoriesSeeder, CurrenciesSeeder, FaqsSeeder, ModulesSeeder, PagesSeeder, PaymentMethodsSeeder, PermissionSeeder (+3 more)
+Nodes (9): CustomerWallet, ShopWallet, Illuminate\Database\Eloquent\Relations\MorphMany, Illuminate\Foundation\Auth\User, HasWallet, Transaction, MorphOneWallet, User (+1 more)
 
-### Community 120 - "Merchant"
-Cohesion: 0.10
-Nodes (3): CustomerWallet, Merchant, Illuminate\Foundation\Auth\User
-
-### Community 121 - "RouteServiceProvider"
-Cohesion: 0.06
-Nodes (16): ConfirmPasswordController, ForgotPasswordController, ResetPasswordController, VerificationController, ForgotPasswordController, ResetPasswordController, RedirectIfAuthenticated, RouteServiceProvider (+8 more)
+### Community 121 - "ResetPasswordController"
+Cohesion: 0.12
+Nodes (7): ForgotPasswordController, ResetPasswordController, ForgotPasswordController, ResetPasswordController, Illuminate\Foundation\Auth\ResetsPasswords, Illuminate\Foundation\Auth\SendsPasswordResetEmails, Illuminate\Support\Facades\Password
 
 ### Community 122 - "CategorySubGroup"
-Cohesion: 0.12
-Nodes (3): ensure_default_category_sub_group_id(), CategorySubGroupTranslationController, CategorySubGroup
+Cohesion: 0.05
+Nodes (11): ensure_default_category_sub_group_id(), CategorySubGroupTranslationController, CategoryController, CategorySubGroupController, CreateCategorySubGroupRequest, CategoryGroupResource, CategoryResource, CategorySubGroupLightResource (+3 more)
 
 ### Community 123 - "LockService"
 Cohesion: 0.12
 Nodes (7): Illuminate\Contracts\Cache\Lock, Illuminate\Contracts\Cache\LockProvider, Illuminate\Contracts\Cache\Store, EmptyLock, LockService, Closure, EmptyLockTest
 
 ### Community 124 - "PageController"
-Cohesion: 0.12
-Nodes (4): PageController, Page, FlatformUserAccessRequest, PageRepository
+Cohesion: 0.08
+Nodes (6): PageController, Page, FlatformUserAccessRequest, CreatePageRequest, UpdatePageRequest, PageRepository
+
+### Community 128 - "EloquentCoupon"
+Cohesion: 0.15
+Nodes (3): get_formated_customer_str(), CouponRepository, EloquentCoupon
 
 ### Community 129 - "Refund"
-Cohesion: 0.05
-Nodes (10): RefundApproved, RefundDeclined, RefundInitiated, NotifyCustomerRefundApproved, NotifyCustomerRefundDeclined, NotifyCustomerRefundInitiated, Refund, Approved (+2 more)
+Cohesion: 0.06
+Nodes (5): Refund, Approved, Declined, Initiated, EloquentRefund
 
 ### Community 131 - "Slider"
-Cohesion: 0.09
-Nodes (5): SliderController, Slider, SliderPolicy, EloquentSlider, SliderRepository
+Cohesion: 0.07
+Nodes (6): SliderController, CreateSliderRequest, UpdateSliderRequest, Slider, EloquentSlider, SliderRepository
 
 ### Community 132 - "Period"
 Cohesion: 0.29
 Nodes (4): InvalidPeriod, Period, self, DateTime
 
-### Community 133 - "static"
-Cohesion: 0.06
-Nodes (10): LatestSales, SalesByPeriod, Subscribers, VisitorsOfMonths, ChartHelper, hyperlocal_location_cache_suffix(), scope_inventory_for_buyer(), self (+2 more)
+### Community 133 - "ChartHelper"
+Cohesion: 0.12
+Nodes (6): LatestSales, SalesByPeriod, Subscribers, VisitorsOfMonths, ChartHelper, ConsoleTVs\Charts\Classes\Highcharts\Chart
 
 ### Community 134 - "BaseModel"
-Cohesion: 0.06
-Nodes (8): AttributeType, BaseModel, ContactUs, Page, TicketCategory, Timezone, ConfigMPesaController, ConfigMPesa
-
-### Community 135 - "TranslationModel"
-Cohesion: 0.11
-Nodes (6): AttributeTranslation, CategorySubGroupTranslation, CategoryTranslation, ManufacturerTranslation, ShopTranslation, TranslationModel
+Cohesion: 0.08
+Nodes (7): AttributeType, BaseModel, ContactUs, Permission, TicketCategory, Timezone, PermissionPolicy
 
 ### Community 136 - "Subscription"
-Cohesion: 0.15
+Cohesion: 0.14
 Nodes (5): subscription_charges_immediately(), Subscription, Carbon, WalletSubscriptionService, Laravel\Cashier\Subscription
 
-### Community 137 - "affiliate/routes/web.php"
-Cohesion: 0.13
-Nodes (4): ChartDataController, DashboardController, FrontController, LoginController
-
 ### Community 138 - "Imageable"
-Cohesion: 0.17
-Nodes (4): Imageable, convert_img_to(), image_storage_dir(), Illuminate\Database\Eloquent\Relations\MorphOne
+Cohesion: 0.14
+Nodes (5): Imageable, convert_img_to(), image_storage_dir(), image_storage_path(), Illuminate\Database\Eloquent\Relations\MorphOne
 
 ### Community 139 - "EloquentRepository"
-Cohesion: 0.01
-Nodes (26): get_states_of(), Module, EloquentAccount, BaseRepository, BlogRepository, EloquentBlog, EloquentCarrier, EloquentCategoryGroup (+18 more)
+Cohesion: 0.02
+Nodes (22): Module, EloquentAddress, BaseRepository, BlogRepository, EloquentBlog, EloquentCategoryGroup, EloquentCategorySubGroup, ScopesMerchantShop (+14 more)
 
 ### Community 140 - "FaqTopic"
-Cohesion: 0.09
-Nodes (5): FaqTopicController, SellingApiController, CreateFaqTopicRequest, UpdateFaqTopicRequest, FaqTopic
+Cohesion: 0.06
+Nodes (7): FaqController, FaqTopicController, CreateFaqRequest, CreateFaqTopicRequest, UpdateFaqRequest, UpdateFaqTopicRequest, FaqTopic
+
+### Community 141 - "TicketController"
+Cohesion: 0.07
+Nodes (4): TicketController, App\Http\Controllers\CommentsController, UpdateTicketRequest, TicketRepository
 
 ### Community 144 - "ShopSlugChangeRequest"
 Cohesion: 0.15
 Nodes (4): ShopSlugChangeRequestController, ShopSlugChangeRequest, ShopSlugChangeService, Illuminate\Validation\ValidationException
 
-### Community 147 - "Currency"
+### Community 146 - "PerformanceIndicatorsRepository"
 Cohesion: 0.11
-Nodes (4): get_active_currencies(), Currency, CurrencyPolicy, CurrencyController
+Nodes (3): StorePerformanceIndicatorsCommand, PerformanceIndicatorsRepository, PerformanceIndicatorsController
 
-### Community 148 - "HomeController"
-Cohesion: 0.14
-Nodes (5): hyperlocal_browse_gate_view(), prepareFilteredListingsNew(), SellingController, HomeController, BrowseProductRequest
+### Community 147 - "Currency"
+Cohesion: 0.10
+Nodes (5): get_active_currencies(), Currency, CreateCurrencyRequest, CurrencyController, UpdateCurrencyRequest
 
-### Community 150 - "EloquentShop"
-Cohesion: 0.09
-Nodes (4): ShopDeleted, NotifyMerchantShopDeleted, EloquentShop, ShopRepository
+### Community 148 - ".response"
+Cohesion: 0.08
+Nodes (7): hyperlocal_browse_gate_view(), prepareFilteredListingsNew(), SellingController, LoginController, HomeController, LocationController, BrowseProductRequest
 
 ### Community 151 - "Registered"
-Cohesion: 0.12
-Nodes (6): Registered, EnsureCustomerWallet, RegisterNewsletter, SendWelcomeEmail, VerifyCustomerAccount, Spatie\Newsletter\Facades\Newsletter
-
-### Community 152 - "DownForMaintainace"
-Cohesion: 0.14
-Nodes (5): DownForMaintainace, ShopIsLive, NotifyMerchantShopDownForMaintainace, NotifyMerchantShopIsLive, ShopDownForMaintainace
+Cohesion: 0.13
+Nodes (6): Registered, ensure_customer_wallet(), EnsureCustomerWallet, RegisterNewsletter, VerifyCustomerAccount, Spatie\Newsletter\Facades\Newsletter
 
 ### Community 153 - "should_seed_demo_images"
-Cohesion: 0.12
-Nodes (9): should_seed_demo_images(), BannersSeeder, BlogSeeder, CategoryGroupsSeeder, InventoriesSeeder, PostDemoSeeder, ProductsSeeder, ShopsSeeder (+1 more)
-
-### Community 154 - ".report"
-Cohesion: 0.18
-Nodes (3): NewMessageEvent, NotifyAssociatedUsers, OrderChatSyncService
+Cohesion: 0.10
+Nodes (10): ClearStorage, should_seed_demo_images(), BannersSeeder, BlogSeeder, CategoryGroupsSeeder, InventoriesSeeder, PostDemoSeeder, ProductsSeeder (+2 more)
 
 ### Community 155 - "InventoryImportRequest"
 Cohesion: 0.13
 Nodes (3): InventoryBulkUpdateController, InventoryUploadController, InventoryImportRequest
 
-### Community 157 - "AdminOnlyAccessRequest"
-Cohesion: 0.18
-Nodes (3): LanguageController, Language, AdminOnlyAccessRequest
-
-### Community 158 - "CategoryGroup"
-Cohesion: 0.07
-Nodes (6): CategoryGroupTranslationController, CategoryController, CategoryGroupController, CategoryGroupResource, CategoryResource, CategoryGroup
+### Community 156 - "AttributeValueController"
+Cohesion: 0.13
+Nodes (3): AttributeValueController, AttributeResource, AttributeValueLightResource
 
 ### Community 159 - "JwtAuthService"
-Cohesion: 0.21
-Nodes (5): JwtAuthService, Firebase\JWT\JWT, Firebase\JWT\Key, Illuminate\Contracts\Auth\Authenticatable, Symfony\Component\HttpFoundation\Cookie
+Cohesion: 0.28
+Nodes (4): JwtAuthService, Firebase\JWT\JWT, Firebase\JWT\Key, Illuminate\Contracts\Auth\Authenticatable
 
-### Community 160 - "ImageController"
-Cohesion: 0.17
-Nodes (5): product_video_storage_dir(), temp_storage_dir(), ImageController, UploadedFile, League\Glide\Server
-
-### Community 161 - "Faq"
-Cohesion: 0.17
-Nodes (3): FaqController, Faq, FaqPolicy
+### Community 162 - "Warehouse"
+Cohesion: 0.07
+Nodes (6): Addressable, is_serialized(), Warehouse, migrateLegacyStock(), resolveWarehouseIds(), up()
 
 ### Community 163 - "Illuminate\Database\Eloquent\Relations\BelongsTo"
-Cohesion: 0.09
+Cohesion: 0.10
 Nodes (4): Illuminate\Database\Eloquent\Relations\BelongsTo, ReleaseCreditRewards, CreditRewardController, CreditReward
 
 ### Community 164 - "themes/default/views/layouts/main.blade.php"
@@ -1645,24 +1589,24 @@ Cohesion: 0.10
 Nodes (20): announcement::announcement, announcement::script, comparison::script, meta, otp-login::scripts, scripts.demo_restrict, scripts.google_place, theme::scripts.password_toggle (+12 more)
 
 ### Community 165 - "AddressResource"
-Cohesion: 0.20
+Cohesion: 0.17
 Nodes (3): AddressController, SelfAddressDeleteRequest, AddressResource
 
 ### Community 166 - "EventServiceProvider.php"
-Cohesion: 0.13
-Nodes (11): OrderObserver, RefundObserver, EventServiceProvider, Illuminate\Auth\Events\Verified, Illuminate\Auth\Listeners\SendEmailVerificationNotification, Illuminate\Foundation\Support\Providers\EventServiceProvider, Illuminate\Queue\Events\JobFailed, Illuminate\Queue\Events\JobProcessed (+3 more)
+Cohesion: 0.11
+Nodes (12): App\Notifications\ShopCreated, OrderObserver, ShopObserver, EventServiceProvider, Illuminate\Auth\Events\Verified, Illuminate\Auth\Listeners\SendEmailVerificationNotification, Illuminate\Foundation\Support\Providers\EventServiceProvider, Illuminate\Queue\Events\JobFailed (+4 more)
+
+### Community 167 - "PaypalPaymentService"
+Cohesion: 0.09
+Nodes (8): format_price_for_paypal(), get_cent_from_dollar(), get_currency_code(), get_system_currency(), is_non_decimal_currency(), PaypalPaymentService, StripePaymentService, StripeWebPaymentService
 
 ### Community 168 - "Illuminate\Http\Request"
 Cohesion: 0.01
-Nodes (32): PaymentMethodContract, AjaxController, AttributeValueController, BlogController, CarrierController, CartController, CouponController, CustomerController (+24 more)
+Nodes (33): PaymentMethodContract, get_states_of(), AjaxController, AttributeValueController, BlogController, CarrierController, CartController, CouponController (+25 more)
 
-### Community 169 - "Addressable"
-Cohesion: 0.06
-Nodes (11): Addressable, ApiAuthTokens, Billable, HasHumanAttributes, Loggable, LogOptions, ReleasesUniqueIdentifiers, LogOptions (+3 more)
-
-### Community 171 - "liveChat/src/Helpers/functions.php"
-Cohesion: 0.24
-Nodes (5): livechat_build_order_share_message(), livechat_build_order_share_payload(), livechat_is_merchant_panel(), livechat_support_route(), livechat_support_route_name()
+### Community 170 - "get_formated_decimal"
+Cohesion: 0.18
+Nodes (8): get_currency_prefix(), get_currency_suffix(), get_formated_currency_symbol(), get_formated_decimal(), get_formated_price_array(), get_formated_shipping_range_of(), get_formated_weight(), getTaxRate()
 
 ### Community 175 - "Bring"
 Cohesion: 0.18
@@ -1684,21 +1628,25 @@ Nodes (12): be(), hl(), Ie(), Re(), sl(), su(), ve(), xe() (+4 more)
 Cohesion: 0.17
 Nodes (3): WalletController, TransactionResource, WalletResource
 
+### Community 182 - "CreateCustomerFromMerchant"
+Cohesion: 0.18
+Nodes (4): customer_can_register(), App\Http\Controllers\Admin, MerchantSwitchToCustomer, CreateCustomerFromMerchant
+
 ### Community 184 - "ShopAddressChangeRequest"
-Cohesion: 0.19
+Cohesion: 0.20
 Nodes (3): ShopAddressChangeRequestController, ShopAddressChangeRequest, ShopAddressChangeService
 
-### Community 186 - "Illuminate\Bus\Queueable"
-Cohesion: 0.06
-Nodes (24): ShopCreated, AdjustQttForCanceledOrder, AfterOrderCancellationJob, ChargeCustomerForOrder, ClearConfigCache, ProcessInventoryCsvBulkUpdate, ProcessInventoryCsvBulkUpload, User (+16 more)
+### Community 185 - "GiftCard"
+Cohesion: 0.09
+Nodes (3): GiftCardController, GiftCard, GiftCardPolicy
 
 ### Community 187 - "ji"
 Cohesion: 0.18
 Nodes (11): ae(), ct(), fe(), ji(), ka(), ms(), ni(), qr() (+3 more)
 
-### Community 188 - "ProductLightResource"
-Cohesion: 0.18
-Nodes (4): get_catalog_featured_img_src(), Product, OfferResource, ProductLightResource
+### Community 188 - "ImageResource"
+Cohesion: 0.08
+Nodes (8): get_catalog_featured_img_src(), get_product_video_url(), Product, ImageResource, InventoryResource, OfferResource, ProductLightResource, ProductResource
 
 ### Community 189 - "currency/index.blade.php"
 Cohesion: 0.40
@@ -1709,28 +1657,28 @@ Cohesion: 0.18
 Nodes (5): Illuminate\Foundation\Testing\TestCase, CustomerDashboardTest, GuestCheckoutTest, ProductPageDisplayTest, TestCase
 
 ### Community 191 - "AffiliateLink"
-Cohesion: 0.16
-Nodes (4): affiliate_link_exists(), current_affiliates_link_for_item(), AffiliateLinkController, AffiliateLink
+Cohesion: 0.08
+Nodes (6): affiliate_link_exists(), current_affiliates_link_for_item(), AffiliateLinkController, CommissionController, AffiliateCommission, AffiliateLink
 
 ### Community 192 - "DeliveryBoy"
 Cohesion: 0.07
-Nodes (4): Feedbackable, DeliveryBoyController, CreateDeliveryBoyRequest, DeliveryBoy
+Nodes (5): DeliveryBoyController, CreateDeliveryBoyRequest, ResetDeliveryBoyPasswordRequest, UpdateDeliveryBoyRequest, DeliveryBoy
 
 ### Community 193 - "ShoppingCart"
-Cohesion: 0.23
-Nodes (4): Cart, ShoppingCart, cart_ids_from_cookie(), get_formated_order_number()
+Cohesion: 0.17
+Nodes (6): Cart, ShoppingCart, cart_ids_from_cookie(), get_formated_order_number(), CartController, Cart
 
 ### Community 194 - "DashboardController"
 Cohesion: 0.18
 Nodes (4): User, userLevelCompare(), DashboardController, SecretLoginRequest
 
 ### Community 195 - "ThemeHelpers.php"
-Cohesion: 0.19
-Nodes (13): active_selling_theme(), active_theme(), selling_theme_asset_url(), selling_theme_assets_path(), selling_theme_path(), selling_theme_views_path(), theme_asset_url(), theme_assets_path() (+5 more)
+Cohesion: 0.14
+Nodes (14): active_selling_theme(), active_theme(), selling_theme_asset_url(), selling_theme_assets_path(), selling_theme_path(), selling_theme_views_path(), theme_asset_url(), theme_assets_path() (+6 more)
 
 ### Community 196 - "Illuminate\Http\Response"
-Cohesion: 0.12
-Nodes (5): WellKnownController, VerifyUserType, CategorySubGroupRepository, ResponseManipulation, Illuminate\Http\Response
+Cohesion: 0.18
+Nodes (5): WellKnownController, CookieConsentMiddleware, ResponseManipulation, Illuminate\Http\Response, Illuminate\Support\Facades\Cookie
 
 ### Community 199 - "composer.json"
 Cohesion: 0.12
@@ -1765,8 +1713,8 @@ Cohesion: 0.12
 Nodes (16): active, author, compatible, dependency, description, dir, email, icon (+8 more)
 
 ### Community 207 - "DeliveryBoy/OrderController.php"
-Cohesion: 0.06
-Nodes (10): ApiAlert, AccountController, OrderController, DashboardController, DeliveryBoyController, DeliveryBoyResource, OrderLightResource, OrderResource (+2 more)
+Cohesion: 0.05
+Nodes (12): ApiAlert, AccountController, AuthController, OrderController, DashboardController, DeliveryBoyController, DeliveryBoyResource, InventoryLightResource (+4 more)
 
 ### Community 208 - "EloquentOrder"
 Cohesion: 0.07
@@ -1776,17 +1724,17 @@ Nodes (4): setAdditionalCartInfo(), EloquentCart, EloquentOrder, OrderRepository
 Cohesion: 0.12
 Nodes (3): de(), initSlickSliders(), scrollRow()
 
-### Community 211 - "Blog"
-Cohesion: 0.08
-Nodes (4): Taggable, BlogController, Blog, Tag
-
 ### Community 212 - "WarehouseController"
 Cohesion: 0.07
 Nodes (6): WarehouseController, CreateWarehouseRequest, UpdateWarehouseRequest, WarehouseLightResource, WarehouseResource, WarehouseRepository
 
-### Community 213 - "SupplierController"
-Cohesion: 0.07
-Nodes (6): SupplierController, CreateSupplierRequest, UpdateSupplierRequest, SupplierLightResource, SupplierResource, SupplierRepository
+### Community 213 - "Supplier"
+Cohesion: 0.05
+Nodes (8): SupplierController, CreateSupplierRequest, UpdateSupplierRequest, SupplierLightResource, SupplierResource, Supplier, EloquentSupplier, SupplierRepository
+
+### Community 215 - "ShippingRate"
+Cohesion: 0.22
+Nodes (3): getShippingRates(), ShippingRate, ShippingRatePolicy
 
 ### Community 216 - "EloquentProduct"
 Cohesion: 0.16
@@ -1800,9 +1748,17 @@ Nodes (15): admin.inventory.partials.warehouse_stock_matrix, admin.inventory._va
 Cohesion: 0.13
 Nodes (14): affiliate::admin._sidebar_nav, aiAssistant::_sidebar_nav, auction::admin._sidebar_nav_inventory, auction::admin._sidebar_nav_product, buyerGroup::_sidebar_admin_nav, pos::_sidebar_option, partials._addon_badge, shopify::_sidebar_admin_nav (+6 more)
 
-### Community 221 - "EloquentPayoutsRepository"
-Cohesion: 0.15
-Nodes (3): EloquentPayoutsRepository, Carbon, PayoutsRepository
+### Community 219 - "get_min_withdrawal_limit"
+Cohesion: 0.18
+Nodes (3): VendorWalletWithdrawRequest, get_min_withdrawal_limit(), WithdrawalRequest
+
+### Community 221 - "WalletServiceProvider.php"
+Cohesion: 0.07
+Nodes (9): ReleasePayments, self, Rateable, EloquentPayoutsRepository, Carbon, PayoutsRepository, ExchangeService, Rate (+1 more)
+
+### Community 223 - "RefundController"
+Cohesion: 0.06
+Nodes (7): get_system_currency_value(), RefundController, RefundController, InitiateRefundRequest, RefundResource, RefundRepository, RefundToWallet
 
 ### Community 224 - "admin/layouts/master.blade.php"
 Cohesion: 0.14
@@ -1812,13 +1768,9 @@ Nodes (13): admin.footer_js, admin.header, admin.partials.page_header, admin.par
 Cohesion: 0.18
 Nodes (11): alert(), alert_hide(), alert_show(), confirm(), confirm_hide(), confirm_show(), input(), input_hide() (+3 more)
 
-### Community 228 - "PackagesController"
-Cohesion: 0.17
-Nodes (4): get_exception_message(), PackagesController, Package, PackageInstaller
-
-### Community 229 - "ConfigUpdated"
-Cohesion: 0.24
-Nodes (3): ConfigUpdated, NotifyMerchantConfigUpdated, ShopConfigUpdated
+### Community 228 - "AdminOnlyAccessRequest"
+Cohesion: 0.11
+Nodes (7): get_exception_message(), updateOptionTable(), PackagesController, AdminOnlyAccessRequest, PackageInstallationRequest, Package, PackageInstaller
 
 ### Community 230 - "contents/product_page.blade.php"
 Cohesion: 0.15
@@ -1832,6 +1784,10 @@ Nodes (10): auction::frontend.script, liveChat::livechat, theme::modals.contact_
 Cohesion: 0.15
 Nodes (12): dotenv, mpesa-mz-nodejs-lib, dependencies, dotenv, mpesa-mz-nodejs-lib, description, main, name (+4 more)
 
+### Community 240 - "StockOut"
+Cohesion: 0.24
+Nodes (4): StockOut, NotifyMerchantStockOut, Illuminate\Broadcasting\InteractsWithSockets, Illuminate\Broadcasting\PrivateChannel
+
 ### Community 241 - "ProductPolicy"
 Cohesion: 0.22
 Nodes (3): can_use_own_catalog_only(), is_catalog_enabled(), ProductPolicy
@@ -1840,13 +1796,17 @@ Nodes (3): can_use_own_catalog_only(), is_catalog_enabled(), ProductPolicy
 Cohesion: 0.23
 Nodes (6): c(), f(), h(), l(), r(), u()
 
-### Community 247 - "Dispute"
-Cohesion: 0.04
-Nodes (18): DisputeCreated, DisputeSolved, DisputeUpdated, DisputeController, DisputeController, DisputeController, DisputeController, DisputeController (+10 more)
+### Community 247 - "System"
+Cohesion: 0.03
+Nodes (31): Loggable, LogOptions, ShowVersion, DisputeCreated, DisputeSolved, DisputeUpdated, get_platform_address_string(), system_has_custom_logo() (+23 more)
 
-### Community 254 - "Billable.php"
-Cohesion: 0.18
-Nodes (3): LocalInvoice, Laravel\Cashier\SubscriptionBuilder, SubscriptionBuilder
+### Community 253 - "pdf_compatible_local_image_path"
+Cohesion: 0.27
+Nodes (9): pdf_compatible_local_image_path(), pdf_dompdf_storage_image_src(), pdf_dompdf_transparent_pixel_data_uri(), pdf_gd_load_image(), pdf_invoice_qr_data_uri(), pdf_invoice_qr_image_src(), pdf_invoice_qr_png_binary(), pdf_platform_logo_path() (+1 more)
+
+### Community 254 - "Billable"
+Cohesion: 0.14
+Nodes (4): Billable, LocalInvoice, Laravel\Cashier\SubscriptionBuilder, SubscriptionBuilder
 
 ### Community 255 - "select2.js"
 Cohesion: 0.27
@@ -1854,7 +1814,7 @@ Nodes (8): a(), b(), c(), e(), i(), n(), s(), x()
 
 ### Community 259 - "PackageConfig"
 Cohesion: 0.09
-Nodes (10): PackageConfig, AuthServiceProvider, Illuminate\Foundation\Support\Providers\AuthServiceProvider, AffiliateServiceProvider, DynamicPopupServiceProvider, LiveChatServiceProvider, MPesaServiceProvider, ChargeSubscriptionFee (+2 more)
+Nodes (9): PackageConfig, AuthServiceProvider, Illuminate\Foundation\Support\Providers\AuthServiceProvider, AffiliateServiceProvider, DynamicPopupServiceProvider, LiveChatServiceProvider, MPesaServiceProvider, SubscriptionServiceProvider (+1 more)
 
 ### Community 261 - "psr-4"
 Cohesion: 0.20
@@ -1877,8 +1837,8 @@ Cohesion: 0.09
 Nodes (3): SystemUsers, Role, RolePolicy
 
 ### Community 270 - "SystemHelper.php"
-Cohesion: 0.11
-Nodes (11): SeedFromSQLDump, get_marketplace_commission_for_order(), customer_has_wallet(), ensure_customer_wallet(), get_sales_commission_for_order(), getMysqliConnection(), getPlatformFeeForOrder(), is_wallet_configured_for() (+3 more)
+Cohesion: 0.09
+Nodes (13): SeedFromSQLDump, get_marketplace_commission_for_order(), can_set_cancellation_fee(), customer_has_wallet(), get_sales_commission_for_order(), getMysqliConnection(), getPlatformFeeForOrder(), is_wallet_configured_for() (+5 more)
 
 ### Community 274 - "require-dev"
 Cohesion: 0.22
@@ -1932,13 +1892,13 @@ Nodes (7): admin.inventory._table_head_digital, admin.inventory._add, admin.part
 Cohesion: 0.32
 Nodes (4): Closure, VerifyCsrfToken, Illuminate\Foundation\Http\Middleware\VerifyCsrfToken, Illuminate\Session\TokenMismatchException
 
-### Community 297 - "SystemConfigResource"
-Cohesion: 0.28
-Nodes (3): HomeController, HomeController, SystemConfigResource
+### Community 292 - "Category"
+Cohesion: 0.07
+Nodes (3): CategoryTranslationController, Category, CategoryPolicy
 
-### Community 299 - "TransferRequest"
-Cohesion: 0.17
-Nodes (3): customer_can_register(), UpdatePasswordRequest, TransferRequest
+### Community 297 - "get_logo_url"
+Cohesion: 0.09
+Nodes (9): default_brand_logo_url(), default_shop_logo_url(), get_logo_url(), shop_has_custom_logo(), HomeController, HomeController, CategoryGroupLightResource, ShopListingResource (+1 more)
 
 ### Community 301 - "M-Pesa Mozambique – Node.js (mpesa-mz-nodejs-lib)"
 Cohesion: 0.25
@@ -1971,6 +1931,10 @@ Nodes (6): affiliate::backend._nav_header, affiliate::backend._sidebar, affiliat
 ### Community 309 - "meta.blade.php"
 Cohesion: 0.29
 Nodes (6): analytics::scripts.google_tag_manager, scripts.facebook_pixel, scripts.linkedin_pixel, scripts.pinterest_pixel, scripts.tiktok_pixel, scripts.twitter_pixel
+
+### Community 316 - ".boot"
+Cohesion: 0.31
+Nodes (4): remove_url_parameter(), AppServiceProvider, ErrorException, LengthAwarePaginator
 
 ### Community 320 - "default/views/auth/register.blade.php"
 Cohesion: 0.29
@@ -2057,16 +2021,20 @@ Cohesion: 0.33
 Nodes (5): affiliate::admin._order_page_commission_table, admin.partials._activity_logs, admin.partials.ui.card_end, admin.partials.ui.card_start, wallet::admin._order_page_credit_rewards
 
 ### Community 343 - "admin/config/index.blade.php"
-Cohesion: 0.29
-Nodes (6): affiliate::admin._shop_config_default_commission_field, admin.config._websocket_status, admin.partials.ui.card_tabbed_end, admin.partials.ui.card_tabbed_start, merchant.config.partials._shipping_settings, wallet::admin._shop_config_credit_field
+Cohesion: 0.50
+Nodes (3): admin.partials.settings._hub, admin.partials.settings._shell_end, admin.partials.settings._shell_start
+
+### Community 344 - "SendProfileUpdateNotification.php"
+Cohesion: 0.22
+Nodes (3): SendProfileUpdateNotification, NotifyUserProfileUpdated, ProfileUpdated
 
 ### Community 345 - "HomePage"
 Cohesion: 0.25
 Nodes (4): Laravel\Dusk\Browser, Laravel\Dusk\Page, HomePage, Page
 
-### Community 348 - "Supplier"
-Cohesion: 0.14
-Nodes (3): Supplier, SupplierPolicy, EloquentSupplier
+### Community 350 - "SendsInvoiceNotifications"
+Cohesion: 0.10
+Nodes (7): InvoiceRepository, SubscriptionCancelled, WebhookController, UpdateActiveSubscription, SendsInvoiceNotifications, InvoiceRepository, Laravel\Cashier\Http\Controllers\WebhookController
 
 ### Community 351 - "_product_card.blade.php"
 Cohesion: 0.40
@@ -2228,21 +2196,25 @@ Nodes (4): admin.product.inventory._attribute_dropdown, admin.partials.ui.card_e
 Cohesion: 0.40
 Nodes (4): affiliate::backend.dashboard._chart, affiliate::backend.dashboard._ranking_lists, affiliate::backend.dashboard._top_cards, plugins.ionic
 
+### Community 392 - "AttributeValue"
+Cohesion: 0.17
+Nodes (3): AttributeValue, AttributeValuePolicy, demoCatalogSeeder
+
 ### Community 396 - ".redirect"
-Cohesion: 0.10
-Nodes (5): Handler, AccountController, Customer, Illuminate\Auth\AuthenticationException, Illuminate\Foundation\Exceptions\Handler
+Cohesion: 0.04
+Nodes (10): ConfigStripeController, LoginController, LoginController, AccountController, Customer, CheckoutController, OrderController, DirectCheckoutRequest (+2 more)
 
-### Community 399 - "MerchantController"
-Cohesion: 0.06
-Nodes (6): UserCreated, MerchantController, MerchantUploadController, UserController, CreateUserRequest, UserRepository
+### Community 399 - "Controllers/Auth/RegisterController.php"
+Cohesion: 0.05
+Nodes (10): ShopCreated, UserCreated, MerchantController, MerchantUploadController, UserController, CreateUserRequest, UpdateUserRequest, CreateShopForMerchant (+2 more)
 
-### Community 404 - "ConfigPaypalController"
-Cohesion: 0.18
-Nodes (4): ConfigPaypalController, ConfigStripeController, ConfigPaypal, ConfigStripe
+### Community 402 - "get_activity_str"
+Cohesion: 0.25
+Nodes (5): get_dispute_status_name(), get_order_status_name(), get_payment_status_name(), subscription_plan_label(), get_activity_str()
 
 ### Community 405 - "State"
-Cohesion: 0.08
-Nodes (10): InventorySearch, get_business_area_of(), get_price_ranges_from_listings(), shop_ships_to_country(), shop_ships_to_state(), StateController, CreateStateRequest, ProductSearchRequest (+2 more)
+Cohesion: 0.10
+Nodes (8): InventorySearch, get_business_area_of(), get_price_ranges_from_listings(), shop_ships_to_country(), shop_ships_to_state(), StateController, ProductSearchRequest, State
 
 ### Community 411 - "config/general.blade.php"
 Cohesion: 0.40
@@ -2292,6 +2264,10 @@ Nodes (4): admin.partials.ui.card_end, admin.partials.ui.card_start, admin.parti
 Cohesion: 0.40
 Nodes (4): admin.partials.ui.card_end, admin.partials.ui.card_start, admin.partials.ui.mass_checkbox_header, admin.partials.ui.trash_start
 
+### Community 426 - ".schedule"
+Cohesion: 0.43
+Nodes (3): Kernel, Illuminate\Console\Scheduling\Schedule, Illuminate\Foundation\Console\Kernel
+
 ### Community 427 - "dispute/show.blade.php"
 Cohesion: 0.40
 Nodes (4): admin.partials._activity_logs, admin.partials._reply_conversations, admin.partials.ui.card_end, admin.partials.ui.card_start
@@ -2336,41 +2312,57 @@ Nodes (3): auction::frontend._dashboard_bid_table, buyerGroup::charts.customerCh
 Cohesion: 0.50
 Nodes (3): Monolog\Handler\NullHandler, Monolog\Handler\StreamHandler, Monolog\Handler\SyslogUdpHandler
 
-### Community 448 - ".handle"
-Cohesion: 0.40
-Nodes (3): system_cache_remember_for(), EnsureMerchantPanelAccess, InitSettings
-
-### Community 467 - "ConversationController"
-Cohesion: 0.09
-Nodes (5): ConversationController, ArchiveMessageRequest, ContactSellerRequest, OrderConversationRequest, ReplyMyMessageRequest
+### Community 448 - "LowInventory"
+Cohesion: 0.10
+Nodes (8): system_cache_remember_for(), setShopConfig(), EnsureMerchantPanelAccess, InitSettings, NotifyMerchantDisputeCreated, LowInventoryCheck, NotifyMerchantNewOrderPlaced, LowInventory
 
 ### Community 477 - "featured_products/index.blade.php"
 Cohesion: 0.50
 Nodes (3): admin.partials.product_picker_modal, admin.partials.ui.card_end, admin.partials.ui.card_start
 
-### Community 488 - "Attachment"
-Cohesion: 0.10
-Nodes (6): AttachmentController, AttachmentController, Attachment, Barryvdh\DomPDF\Facade\Pdf, OrderFactory, Illuminate\Support\Facades\Storage
+### Community 482 - "2026_09_03_000003_seed_attribute_types_and_presets.php"
+Cohesion: 0.50
+Nodes (3): Carbon, seedShopPresets(), up()
 
-### Community 491 - "CartController"
-Cohesion: 0.16
-Nodes (4): CartController, Cart, CheckoutController, DirectCheckoutRequest
+### Community 483 - "admin/config/page.blade.php"
+Cohesion: 0.50
+Nodes (3): admin.config._sections., admin.partials.settings._shell_end, admin.partials.settings._shell_start
+
+### Community 484 - "system/config/page.blade.php"
+Cohesion: 0.50
+Nodes (3): admin.system.config._sections., admin.partials.settings._shell_end, admin.partials.settings._shell_start
+
+### Community 485 - "general/page.blade.php"
+Cohesion: 0.50
+Nodes (3): admin.system.general._sections., admin.partials.settings._shell_end, admin.partials.settings._shell_start
+
+### Community 488 - "Attachment"
+Cohesion: 0.06
+Nodes (11): get_qualified_model(), AddressController, AttachmentController, WalletController, AttachmentController, Attachment, AddressRepository, Barryvdh\DomPDF\Facade\Pdf (+3 more)
+
+### Community 512 - "merchant/config/page.blade.php"
+Cohesion: 0.50
+Nodes (3): merchant.config._sections., admin.partials.settings._shell_end, admin.partials.settings._shell_start
+
+### Community 529 - "system/config/index.blade.php"
+Cohesion: 0.50
+Nodes (3): admin.partials.settings._hub, admin.partials.settings._shell_end, admin.partials.settings._shell_start
+
+### Community 536 - "general/index.blade.php"
+Cohesion: 0.50
+Nodes (3): admin.partials.settings._hub, admin.partials.settings._shell_end, admin.partials.settings._shell_start
 
 ### Community 562 - "optimize-speed.sh"
 Cohesion: 0.83
 Nodes (3): pct(), optimize-speed.sh script, spinner_while()
-
-### Community 563 - "system/general.blade.php"
-Cohesion: 0.50
-Nodes (3): dynamic-currency::admin._configs, admin.partials.ui.card_tabbed_end, admin.partials.ui.card_tabbed_start
 
 ### Community 564 - "dynamicPopup/resources/views/index.blade.php"
 Cohesion: 0.50
 Nodes (3): DynamicPopup::popup_modal, admin.partials.ui.card_end, admin.partials.ui.card_start
 
 ### Community 565 - "merchant/config/index.blade.php"
-Cohesion: 0.40
-Nodes (4): merchant.config.partials._toggle_row, admin.partials.ui.card_end, admin.partials.ui.card_tabbed_start, merchant.config.partials._shipping_settings
+Cohesion: 0.50
+Nodes (3): admin.partials.settings._hub, admin.partials.settings._shell_end, admin.partials.settings._shell_start
 
 ### Community 566 - "verify/index.blade.php"
 Cohesion: 0.50
@@ -2390,7 +2382,7 @@ Nodes (3): admin.partials.ui.card_end, admin.partials.ui.card_start, admin.parti
 
 ### Community 581 - "Illuminate\Support\Facades\Schema"
 Cohesion: 0.03
-Nodes (4): ResetDemoApp, CreateModulesTable, up(), Illuminate\Support\Facades\Schema
+Nodes (4): ResetDemoApp, up(), up(), Illuminate\Support\Facades\Schema
 
 ### Community 583 - "deposits/payouts.blade.php"
 Cohesion: 0.50
@@ -2624,10 +2616,6 @@ Nodes (3): admin.partials.ui.card_end, admin.partials.ui.card_start, admin.parti
 Cohesion: 0.50
 Nodes (3): admin.partials.ui.card_end, admin.partials.ui.card_start, admin.partials.ui.mass_checkbox_header
 
-### Community 647 - "system/config.blade.php"
-Cohesion: 0.50
-Nodes (3): admin.config._websocket_status, admin.partials.ui.card_tabbed_end, admin.partials.ui.card_tabbed_start
-
 ### Community 648 - "ticket/show.blade.php"
 Cohesion: 0.50
 Nodes (3): admin.partials._reply_conversations, admin.partials.ui.card_end, admin.partials.ui.card_start
@@ -2661,23 +2649,23 @@ Cohesion: 0.50
 Nodes (3): admin.partials._activity_logs, admin.partials.ui.card_end, admin.partials.ui.card_start
 
 ## Knowledge Gaps
-- **1453 isolated node(s):** `admin.currency._form`, `admin.currency._form`, `dynamic-currency::admin._form`, `admin.partials.ui.card_start`, `admin.partials.ui.mass_checkbox_header` (+1448 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 5790 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **680 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **1471 isolated node(s):** `admin.currency._form`, `admin.currency._form`, `dynamic-currency::admin._form`, `admin.partials.ui.card_start`, `admin.partials.ui.mass_checkbox_header` (+1466 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 5829 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **668 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Controller` connect `Controller` to `ListHelper`, `safe_notify`, `Carbon\Carbon`, `Illuminate\Foundation\Events\Dispatchable`, `Order`, `Attribute`, `.response`, `Illuminate\Support\Facades\Auth`, `Api/HomeController.php`, `Transaction`, `Customer`, `Cart`, `.cache`, `MessageController`, `Config`, `SystemController`, `CategoryController`, `ChatSocketPublisher`, `SaveChatConversationRequest`, `OrderCreated`, `is_incevio_package_loaded`, `Illuminate\Console\Command`, `Product`, `Banner`, `ProductController`, `SubscriptionPlan`, `wallet/routes/all.php`, `Carrier`, `OrderDetailRequest`, `ProductController`, `Manufacturer`, `InventoryStock`, `InventoryController`, `Ticket`, `Vendor.php`, `PdfTemplate`, `Address`, `Illuminate\Contracts\Queue\ShouldQueue`, `Affiliate`, `.config`, `CustomerUploadController`, `Country`, `PromotionAccessRequest`, `CategorySubGroupController`, `OrderController`, `DepositController`, `RouteServiceProvider`, `CategorySubGroup`, `PageController`, `Visitor`, `AddressController`, `Slider`, `BaseModel`, `affiliate/routes/web.php`, `EloquentRepository`, `FaqTopic`, `ShopSlugChangeRequest`, `SalesReportController`, `PerformanceIndicatorsController`, `Currency`, `HomeController`, `InventoryImportRequest`, `.response`, `AdminOnlyAccessRequest`, `CategoryGroup`, `ImageController`, `Faq`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `AddressResource`, `Illuminate\Http\Request`, `WalletBulkDepositController`, `PushCampaign`, `TransactionResource`, `ShopAddressChangeRequest`, `GiftCard`, `AffiliateLink`, `DeliveryBoy`, `DashboardController`, `Illuminate\Http\Response`, `DeliveryBoy/OrderController.php`, `Blog`, `WarehouseController`, `SupplierController`, `LoginController`, `RefundController`, `Incevio`, `PackagesController`, `InventoryTranslationController`, `.register`, `ConfigPaypalExpress`, `AffiliateCommission`, `Dispute`, `CatalogProductTranslationController`, `RefundController`, `ShopTranslationController`, `ProductUploadController`, `Category`, `SystemConfigResource`, `ContactUsRequest`, `GiftCardController`, `SupportMessagesController`, `RoleController`, `.redirect`, `MerchantController`, `ConfigPaypalController`, `State`, `NewsletterSubscribeRequest`, `ConversationController`, `Attachment`, `CartController`?**
-  _High betweenness centrality (0.066) - this node is a cross-community bridge._
-- **Why does `Request` connect `Request` to `SpcialLoginRequest`, `UpdateAddressRequest`, `UpdateAppBannerRequest`, `Carbon\Carbon`, `Order`, `Attribute`, `UpdateBasicSystemConfigRequest`, `.response`, `UpdateWebBannerRequest`, `Illuminate\Support\Facades\Auth`, `Api/HomeController.php`, `AdminWalletTopupRequest`, `app/Helpers/Functions.php`, `PayoutRequest`, `Transaction`, `CreateCurrencyRequest`, `Customer`, `Cart`, `.cache`, `UpdateCurrencyRequest`, `Config`, `SystemController`, `Illuminate\Foundation\Http\FormRequest`, `CategoryController`, `HyperlocalCatalogService`, `CreateLanguageRequest`, `SaveChatConversationRequest`, `OrderCreated`, `is_incevio_package_loaded`, `CreateTicketRequest`, `CustomerSearchRequest`, `ProductController`, `SubscriptionPlan`, `RefundRequest`, `RegisterCustomerRequest`, `Banner`, `Carrier`, `OrderDetailRequest`, `ToggleMaintenanceModeRequest`, `UpdateDeliveryBoyRequest`, `Manufacturer`, `InventoryController`, `Ticket`, `PaymentServiceContract`, `.count`, `PdfTemplate`, `CreateTaxRequest`, `.config`, `CustomerUploadController`, `Country`, `CategorySubGroupController`, `OrderController`, `Illuminate\Support\ServiceProvider`, `UpdateProfileRequest`, `AddressController`, `BaseModel`, `FaqTopic`, `HomeController`, `InventoryImportRequest`, `.response`, `CategoryGroup`, `AddressResource`, `liveChat/src/Helpers/functions.php`, `WalletBulkDepositController`, `UpdateShippingRateRequest`, `CreateCategoryGroupRequest`, `DashboardController`, `WarehouseController`, `SupplierController`, `CreateInventoryWithVariantRequest`, `.register`, `CreateShippingRateRequest`, `Dispute`, `PackageConfig`, `ContactUsRequest`, `TransferRequest`, `CreateCouponRequest`, `SupportMessagesController`, `.redirect`, `CreateAttributeValueRequest`, `MerchantController`, `CreateBlogRequest`, `CreateCartRequest`, `State`, `InitiateRefundRequest`, `UpdatePhotoRequest`, `CreateRoleRequest`, `NewsletterSubscribeRequest`, `ReplyMessageRequest`, `ProductFeedbackCreateRequest`, `CreateAppBannerRequest`, `UpdateAttributeRequest`, `UpdateAttributeValueRequest`, `CreateShippingZoneRequest`, `UpdateShippingZoneRequest`, `CreateBannerRequest`, `CreateCarrierRequest`, `UpdateCouponRequest`, `CreateGiftCardRequest`, `UpdateGiftCardRequest`, `ConversationController`, `MerchantImportRequest`, `CreateSliderRequest`, `UpdateSliderRequest`, `UpdateTaxRequest`, `CreateWebBannerRequest`, `CreateCustomerRequest`, `CreateAddressRequest`, `SelfAddressUpdateRequest`, `DeletePhotoRequest`, `UpdateBlogRequest`, `UpdateCategoryGroupRequest`, `ResetDeliveryBoyPasswordRequest`, `CreateEmailTemplateRequest`, `UpdateEmailTemplateRequest`, `CreateFaqRequest`, `CartController`, `UpdateLanguageRequest`, `CreatePageRequest`, `UpdatePageRequest`, `ExportCategoryRequest`, `UpdateTrialPeriodRequest`, `UpdateUserRequest`, `VendorWalletTransferRequest`, `DraftSendRequest`, `InventoryUploadRequest`, `MerchantUploadRequest`, `ProductImportRequest`, `ProductUploadRequest`, `SaveEnvFileRequest`, `SelfAvatarUpdateRequest`?**
-  _High betweenness centrality (0.044) - this node is a cross-community bridge._
-- **Why does `User` connect `User` to `Visitor`, `Slider`, `ListHelper`, `safe_notify`, `Subscription`, `Illuminate\Foundation\Events\Dispatchable`, `Carbon\Carbon`, `EloquentRepository`, `Imageable`, `Role`, `AttributeValue`, `Permission`, `Shop`, `ShopSlugChangeRequest`, `FCMService`, `Illuminate\Support\Facades\Auth`, `CouponPolicy`, `Illuminate\Database\Eloquent\SoftDeletes`, `EloquentShop`, `Controller`, `Request`, `app/Helpers/Functions.php`, `.report`, `Currency`, `CustomerPolicy`, `InventoryPolicy`, `Authorize`, `Faq`, `Category`, `Illuminate\Http\Request`, `Addressable`, `PushCampaign`, `Illuminate\Console\Command`, `ShopAddressChangeRequest`, `Product`, `Illuminate\Bus\Queueable`, `CategoryPolicy`, `EmailTemplate`, `Carrier`, `TicketPolicy`, `ManufacturerPolicy`, `ShippingZone`, `Attachable`, `.count`, `Address`, `LoginController`, `Illuminate\Contracts\Queue\ShouldQueue`, `Supplier`, `EloquentMerchant`, `Illuminate\Auth\Access\HandlesAuthorization`, `Statistics`, `ConfigUpdated`, `Tax`, `.register`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `ProductPolicy`, `Merchant`?**
-  _High betweenness centrality (0.041) - this node is a cross-community bridge._
+- **Why does `Controller` connect `Controller` to `ListHelper`, `safe_notify`, `Carbon\Carbon`, `Illuminate\Queue\SerializesModels`, `Order`, `Inventory`, `AttributeController`, `BuyerLocationService`, `.response`, `ChatConversation`, `Api/HomeController.php`, `Image`, `Transaction`, `Cart`, `.cache`, `EmolaSpec`, `Closure`, `MessageController`, `clearShopConfigCache`, `SystemController`, `CategoryController`, `get_sender_email`, `SystemConfig`, `Illuminate\Console\Command`, `DbService`, `Banner`, `ProductController`, `SubscriptionPlan`, `Carrier`, `ProductController`, `ShopController`, `Manufacturer`, `Illuminate\Database\Eloquent\Model`, `get_from_option_table`, `Ticket`, `Illuminate\Support\Facades\Log`, `PdfTemplate`, `Address`, `MPesaPaymentService`, `Affiliate`, `Statistics`, `.config`, `CustomerUploadController`, `Country`, `PromotionAccessRequest`, `OrderController`, `.register`, `ResetPasswordController`, `CategorySubGroup`, `PageController`, `CustomerController`, `Slider`, `CatalogProductController`, `EloquentRepository`, `FaqTopic`, `TicketController`, `ShopSlugChangeRequest`, `SalesReportController`, `PerformanceIndicatorsRepository`, `Currency`, `.response`, `ConfigController`, `InventoryImportRequest`, `AttributeValueController`, `CategoryGroup`, `Illuminate\Database\Eloquent\Relations\BelongsTo`, `AddressResource`, `Illuminate\Http\Request`, `ConfigMPesa`, `PushCampaign`, `TransactionResource`, `CreateCustomerFromMerchant`, `CategoryGroupController`, `ShopAddressChangeRequest`, `GiftCard`, `AffiliateLink`, `DeliveryBoy`, `ShoppingCart`, `DashboardController`, `Illuminate\Http\Response`, `DeliveryBoy/OrderController.php`, `Blog`, `WarehouseController`, `Supplier`, `RefundController`, `Incevio`, `AdminOnlyAccessRequest`, `InventoryTranslationController`, `.register`, `ConfigPaypalExpress`, `System`, `CatalogProductTranslationController`, `ShopTranslationController`, `PaymentMethodController`, `ProductUploadController`, `SubscriptionController`, `Category`, `get_logo_url`, `ContactUsRequest`, `TransferRequest`, `TaxController`, `GiftCardController`, `.redirect`, `Controllers/Auth/RegisterController.php`, `NotificationController`, `ConfigPaypalController`, `State`, `NewsletterSubscribeRequest`, `AttributeController`, `.register`, `Attachment`?**
+  _High betweenness centrality (0.076) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `ListHelper`, `BaseModel`, `Subscription`, `Illuminate\Queue\SerializesModels`, `Carbon\Carbon`, `ShopDeleted`, `.redirect`, `Role`, `Imageable`, `.response`, `Shop`, `Controllers/Auth/RegisterController.php`, `FCMService`, `Coupon`, `EloquentRepository`, `BuyerLocationService`, `AttributePolicy`, `Controller`, `Request`, `app/Helpers/Functions.php`, `BlogPolicy`, `CategoryGroupPolicy`, `CategorySubGroupPolicy`, `PaymentMethod`, `Authorize`, `EloquentShop`, `Faq`, `SubscriptionController`, `Warehouse`, `Category`, `AddressResource`, `clearShopConfigCache`, `EventServiceProvider.php`, `Illuminate\Http\Request`, `ReleasesUniqueIdentifiers`, `PushCampaign`, `SystemConfig`, `AttributeValue`, `Illuminate\Console\Command`, `ShopAddressChangeRequest`, `GiftCard`, `Product`, `ProcessInventoryCsvBulkUpload`, `EmailTemplate`, `ProcessInventoryCsvBulkUpdate`, `.handle`, `ManufacturerPolicy`, `ShippingZone`, `Illuminate\Database\Eloquent\SoftDeletes`, `Illuminate\Support\Facades\Log`, `.count`, `ShopSlugChangeRequest`, `ShippingRate`, `Illuminate\Contracts\Queue\ShouldQueue`, `MerchantPolicy`, `EloquentMerchant`, `Illuminate\Auth\Access\HandlesAuthorization`, `ChatConversation`, `Statistics`, `ShopConfigUpdated`, `.config`, `Tax`, `.register`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `Page`, `ProductPolicy`, `.register`, `HasWallet`?**
+  _High betweenness centrality (0.045) - this node is a cross-community bridge._
+- **Why does `Request` connect `Request` to `UpdateAddressRequest`, `Illuminate\Queue\SerializesModels`, `Order`, `Inventory`, `UpdateBasicSystemConfigRequest`, `.response`, `ChatConversation`, `Api/HomeController.php`, `Controller`, `app/Helpers/Functions.php`, `PayoutRequest`, `Transaction`, `Customer`, `Cart`, `.cache`, `EmolaSpec`, `clearShopConfigCache`, `SystemController`, `Illuminate\Foundation\Http\FormRequest`, `CategoryController`, `HyperlocalCatalogService`, `CreateLanguageRequest`, `Cart`, `SystemConfig`, `OrderCreated`, `is_incevio_package_loaded`, `Banner`, `ProductController`, `SubscriptionPlan`, `.handle`, `Carrier`, `Manufacturer`, `Ticket`, `Illuminate\Support\Facades\Log`, `.count`, `PdfTemplate`, `Statistics`, `CreateTaxRequest`, `.config`, `Country`, `OrderController`, `CategorySubGroup`, `PageController`, `Slider`, `.customer`, `FaqTopic`, `TicketController`, `Currency`, `.response`, `InventoryImportRequest`, `AddressResource`, `ConfigMPesa`, `UpdateShippingRateRequest`, `CreateCustomerFromMerchant`, `CategoryGroupController`, `DeliveryBoy`, `DashboardController`, `ThemeHelpers.php`, `WarehouseController`, `Supplier`, `get_min_withdrawal_limit`, `CreateInventoryWithVariantRequest`, `RefundController`, `AdminOnlyAccessRequest`, `.register`, `CreateShippingRateRequest`, `System`, `PackageConfig`, `ContactUsRequest`, `TransferRequest`, `.boot`, `CreateAttributeRequest`, `CreateCouponRequest`, `.redirect`, `CreateAttributeValueRequest`, `Controllers/Auth/RegisterController.php`, `CreateBlogRequest`, `State`, `NewsletterSubscribeRequest`, `ReplyMessageRequest`, `ProductFeedbackCreateRequest`, `UpdateBasicConfigRequest`, `AttributeController`, `UpdateAttributeValueRequest`, `CreateShippingZoneRequest`, `UpdateCarrierRequest`, `CreateBannerRequest`, `CreateMessageRequest`, `UpdateCouponRequest`, `CreateGiftCardRequest`, `UpdateGiftCardRequest`, `CreateInventoryRequest`, `MerchantImportRequest`, `UpdateTaxRequest`, `CustomerImportRequest`, `CreateAddressRequest`, `UpdateEmailTemplateRequest`, `Attachment`, `.getLocalUser`, `VendorWalletTransferRequest`, `DraftSendRequest`?**
+  _High betweenness centrality (0.037) - this node is a cross-community bridge._
 - **Are the 26 inferred relationships involving `Request` (e.g. with `mp_is()` and `panel_route_name()`) actually correct?**
   _`Request` has 26 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `admin.currency._form`, `admin.currency._form`, `dynamic-currency::admin._form` to the rest of the system?**
-  _1453 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1471 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `public/js/app.js` be split into smaller, more focused modules?**
   _Cohesion score 0.012197548246889395 - nodes in this community are weakly interconnected._
 - **Should `e` be split into smaller, more focused modules?**

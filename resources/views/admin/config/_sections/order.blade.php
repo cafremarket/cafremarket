@@ -104,10 +104,6 @@
 
               @include('merchant.config.partials._shipping_settings')
 
-              @if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled())
-                @include('wallet::admin._shop_config_credit_field')
-              @endif
-
               <div class="row">
                 <div class="col-sm-4 text-right">
                   <div class="form-group">

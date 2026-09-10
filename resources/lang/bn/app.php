@@ -1769,7 +1769,6 @@ return [
   'pickup_enabled' => 'পিকআপ সক্ষম',
   'payment_verified' => 'পেমেন্ট যাচাই করা হয়েছে',
   'bank_name' => 'ব্যাংকের নাম',
-  'credit_back_percentage' => 'ক্রেডিট ব্যাক শতাংশ',
   'total_item_sold' => 'মোট আইটেম বিক্রি',
   'total_sold_amount' => 'মোট বিক্রয় পরিমাণ',
   'now' => 'এখন',

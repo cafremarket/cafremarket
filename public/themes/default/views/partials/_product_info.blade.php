@@ -37,12 +37,6 @@
         @include('theme::layouts.ratings', ['ratings' => $item->ratings, 'count' => $item->ratings_count])
       @endif
     </div> <!-- /.col-* -->
-
-    <div class="col-12 col-sm-6 text-right">
-      @if (is_incevio_package_loaded('wallet'))
-        @include('wallet::_credit_back_percentage_badge', ['rw_percentage' => $item->reward_percentage])
-      @endif
-    </div> <!-- /.col-* -->
   </div> <!-- /.row -->
 
   <div class="row">

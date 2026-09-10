@@ -77,12 +77,6 @@
                     <i class="fa fa-external-link" aria-hidden="true"></i>
                   </a>
 
-                  @if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled())
-                    @if ($item->pivot->credit_back_amount)
-                      @include('wallet::_credit_back_amount_badge', ['amount' => get_formated_currency($item->pivot->credit_back_amount)])
-                    @endif
-                  @endif
-
                   @if ($order->cancellation && $order->cancellation->isItemInRequest($item->id))
                     <span class="label label-danger">
                       {{ trans('theme.' . $order->cancellation->request_type . '_requested') }}

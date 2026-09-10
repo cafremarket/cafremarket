@@ -159,6 +159,83 @@ class Product extends Inspectable
     }
 
     /**
+     * Product-level taxes (fixed and/or percent); inventories inherit these.
+     */
+    public function taxes()
+    {
+        return $this->belongsToMany(Tax::class, 'product_tax')->withTimestamps();
+    }
+
+    /**
+     * Create/update shop taxes from product form rows and sync the pivot.
+     *
+     * @param  array<int, array{id?:mixed,name?:mixed,type?:mixed,taxrate?:mixed}>  $rows
+     */
+    public function syncTaxesFromRows(array $rows): void
+    {
+        $shopId = $this->shop_id ?: (auth()->check() ? auth()->user()->merchantId() : null);
+        $countryId = config('system_settings.address_default_country');
+        $ids = [];
+
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $name = trim((string) ($row['name'] ?? ''));
+            $type = strtolower((string) ($row['type'] ?? Tax::TYPE_PERCENT)) === Tax::TYPE_FIXED
+                ? Tax::TYPE_FIXED
+                : Tax::TYPE_PERCENT;
+            $rate = (float) ($row['taxrate'] ?? 0);
+
+            if ($name === '' || $rate < 0) {
+                continue;
+            }
+
+            $existingId = isset($row['id']) ? (int) $row['id'] : 0;
+            $tax = null;
+
+            if ($existingId > 0) {
+                $tax = Tax::query()
+                    ->where('id', $existingId)
+                    ->when($shopId, function ($q) use ($shopId) {
+                        $q->where(function ($inner) use ($shopId) {
+                            $inner->where('shop_id', $shopId)->orWhere('public', 1);
+                        });
+                    })
+                    ->first();
+            }
+
+            if ($tax && $shopId && (int) $tax->shop_id === (int) $shopId) {
+                $tax->update([
+                    'name' => $name,
+                    'type' => $type,
+                    'taxrate' => $rate,
+                    'active' => Tax::ACTIVE,
+                ]);
+            } elseif ($tax && (int) $tax->public === 1) {
+                // Keep public/platform tax as-is; only attach.
+            } else {
+                $tax = Tax::create([
+                    'shop_id' => $shopId,
+                    'name' => $name,
+                    'type' => $type,
+                    'taxrate' => $rate,
+                    'country_id' => $countryId,
+                    'public' => 0,
+                    'active' => Tax::ACTIVE,
+                ]);
+            }
+
+            if ($tax) {
+                $ids[] = (int) $tax->id;
+            }
+        }
+
+        $this->taxes()->sync(array_values(array_unique($ids)));
+    }
+
+    /**
      * Get the inventories for the product.
      */
     public function inventories()

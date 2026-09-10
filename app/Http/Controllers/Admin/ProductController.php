@@ -161,6 +161,8 @@ class ProductController extends Controller
             $storedProduct->syncTags($storedProduct, $request->input('tag_list'));
         }
 
+        $storedProduct->syncTaxesFromRows($request->input('tax_rows', []));
+
         $inventoryData = [
             'title' => $request->name,
             'warehouse_id' => $request->warehouse_id,
@@ -176,7 +178,15 @@ class ProductController extends Controller
             'available_form' => $request->available_form,
             'offer_price' => $request->offer_price,
             'shipping_weight' => $request->shipping_weight,
+            'length' => $request->filled('length') ? $request->input('length') : null,
+            'width' => $request->filled('width') ? $request->input('width') : null,
+            'height' => $request->filled('height') ? $request->input('height') : null,
+            'distance_unit' => $request->input('distance_unit', 'cm'),
             'free_shipping' => $request->free_shipping,
+            'shipping_type' => $request->input('shipping_type'),
+            'shipping_fixed_rate' => $request->input('shipping_fixed_rate'),
+            'shipping_per_km_rate' => $request->input('shipping_per_km_rate'),
+            'shipping_base_fee' => $request->input('shipping_base_fee'),
             'available_from' => $request->available_from,
             'expiry_date' => $request->expiry_date,
             'min_order_quantity' => $request->min_order_quantity,
@@ -224,7 +234,15 @@ class ProductController extends Controller
                 'supplier_id' => $request->input('supplier_id'),
                 'purchase_price' => $request->input('purchase_price'),
                 'shipping_weight' => $request->input('shipping_weight'),
+                'length' => $request->filled('length') ? $request->input('length') : null,
+                'width' => $request->filled('width') ? $request->input('width') : null,
+                'height' => $request->filled('height') ? $request->input('height') : null,
+                'distance_unit' => $request->input('distance_unit', 'cm'),
                 'free_shipping' => $request->input('free_shipping'),
+                'shipping_type' => $request->input('shipping_type'),
+                'shipping_fixed_rate' => $request->input('shipping_fixed_rate'),
+                'shipping_per_km_rate' => $request->input('shipping_per_km_rate'),
+                'shipping_base_fee' => $request->input('shipping_base_fee'),
                 'available_from' => $request->input('available_from'),
                 'active' => $request->input('active'),
                 'tax_id' => $request->input('tax_id'),
@@ -354,6 +372,7 @@ class ProductController extends Controller
             'inventories.attributeValues',
             'inventories.attributes',
             'inventories.image',
+            'taxes',
         ])->find($id);
 
         $this->authorize('update', $product); // Check permission
@@ -424,6 +443,8 @@ class ProductController extends Controller
             $product->saveProductVideo($request->file('video'));
         }
 
+        $product->syncTaxesFromRows($request->input('tax_rows', []));
+
         $inventoryId = Inventory::where('product_id', $id)->whereNull('parent_id')->pluck('id')->first();
 
         $product = $this->inventory->update($request, $inventoryId);
@@ -439,7 +460,15 @@ class ProductController extends Controller
             'purchase_price' => $request->purchase_price,
             'available_form' => $request->available_form,
             'shipping_weight' => $request->shipping_weight,
+            'length' => $request->filled('length') ? $request->input('length') : null,
+            'width' => $request->filled('width') ? $request->input('width') : null,
+            'height' => $request->filled('height') ? $request->input('height') : null,
+            'distance_unit' => $request->input('distance_unit', 'cm'),
             'free_shipping' => $request->free_shipping,
+            'shipping_type' => $request->input('shipping_type'),
+            'shipping_fixed_rate' => $request->input('shipping_fixed_rate'),
+            'shipping_per_km_rate' => $request->input('shipping_per_km_rate'),
+            'shipping_base_fee' => $request->input('shipping_base_fee'),
             'available_from' => $request->available_from,
             'expiry_date' => $request->expiry_date,
             'min_order_quantity' => $request->min_order_quantity,

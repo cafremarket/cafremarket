@@ -21,7 +21,6 @@
       <div class="sf-store__identity-main">
         <div class="sf-store__title-row">
           <h1 class="sf-store__name">{!! $shop->getQualifiedName() !!}</h1>
-          {!! $shop->reward_badge !!}
         </div>
 
         @if ($shop->feedbacks->count())

@@ -354,6 +354,16 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
 
     public function update(Request $request, $id)
     {
+        foreach (['length', 'width', 'height'] as $dimension) {
+            if ($request->exists($dimension) && ! $request->filled($dimension)) {
+                $request->merge([$dimension => null]);
+            }
+        }
+
+        if ($request->exists('distance_unit') && ! $request->filled('distance_unit')) {
+            $request->merge(['distance_unit' => 'cm']);
+        }
+
         $inventory = parent::update($request, $id);
 
         $this->setAttributes($inventory, $request->input('variants'));

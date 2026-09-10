@@ -214,14 +214,6 @@ class Customer extends CustomerWallet
     }
 
     /**
-     * Get credit rewards associated with the customer.
-     */
-    public function creditRewards()
-    {
-        return $this->hasMany(\Incevio\Package\Wallet\Models\CreditReward::class);
-    }
-
-    /**
      * Get the user latest_orders.
      */
     public function latest_orders()

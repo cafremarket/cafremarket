@@ -11,6 +11,10 @@ class Tax extends BaseModel
 
     const DEFAULT_TAX_ID = 1;
 
+    public const TYPE_PERCENT = 'percent';
+
+    public const TYPE_FIXED = 'fixed';
+
     /**
      * The database table used by the model.
      *
@@ -26,7 +30,7 @@ class Tax extends BaseModel
     protected $guarded = ['id', 'deleted_at'];
 
     /**
-     * Get the Country associated with the blog post.
+     * Get the Country associated with the tax.
      */
     public function country()
     {
@@ -34,7 +38,7 @@ class Tax extends BaseModel
     }
 
     /**
-     * Get the State associated with the blog post.
+     * Get the State associated with the tax.
      */
     public function state()
     {
@@ -42,23 +46,23 @@ class Tax extends BaseModel
     }
 
     /**
-     * Get the Shop associated with the blog post.
+     * Get the Shop associated with the tax.
      */
     public function shop()
     {
         return $this->belongsTo(Shop::class);
     }
 
-    // /**
-    //  * Get the inventories for the supplier.
-    //  */
-    // public function inventories()
-    // {
-    //     return $this->hasMany(Inventory::class);
-    // }
+    /**
+     * Catalog products that use this tax.
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'product_tax')->withTimestamps();
+    }
 
     /**
-     * Get the carts for the supplier.
+     * Get the carts for the tax.
      */
     public function carts()
     {
@@ -66,11 +70,21 @@ class Tax extends BaseModel
     }
 
     /**
-     * Get the orders for the supplier.
+     * Get the orders for the tax.
      */
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function isFixed(): bool
+    {
+        return strtolower((string) ($this->type ?? self::TYPE_PERCENT)) === self::TYPE_FIXED;
+    }
+
+    public function isPercent(): bool
+    {
+        return ! $this->isFixed();
     }
 
     /**
@@ -80,6 +94,10 @@ class Tax extends BaseModel
      */
     public function getLabelAttribute()
     {
+        if ($this->isFixed()) {
+            return get_formated_currency($this->taxrate, config('system_settings.decimals', 2));
+        }
+
         return get_formated_decimal($this->taxrate, true, 2).'%';
     }
 

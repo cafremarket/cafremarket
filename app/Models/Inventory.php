@@ -111,6 +111,7 @@ class Inventory extends Inspectable
         'length',
         'width',
         'height',
+        'distance_unit',
         'free_shipping',
         'shipping_type',
         'shipping_fixed_rate',
@@ -131,7 +132,6 @@ class Inventory extends Inspectable
         'auction_end',
         'bid_accept_action',
         'affiliate_commission_percentage',
-        'credit_back_percentage',
         'shopify_id',
     ];
 
@@ -261,6 +261,25 @@ class Inventory extends Inspectable
     public function product()
     {
         return $this->belongsTo(Product::class)->withDefault();
+    }
+
+    /**
+     * Resolve active product taxes for calculation (prefer eager-loaded relation).
+     */
+    public function resolvedProductTaxes()
+    {
+        $product = $this->relationLoaded('product') ? $this->product : $this->product()->first();
+        if (! $product || ! $product->id) {
+            return collect();
+        }
+
+        if ($product->relationLoaded('taxes')) {
+            return $product->taxes
+                ->filter(static fn ($tax) => (int) ($tax->active ?? 0) === 1)
+                ->values();
+        }
+
+        return $product->taxes()->where('active', 1)->get();
     }
 
     /**
@@ -625,44 +644,6 @@ class Inventory extends Inspectable
         }
 
         return get_formated_currency($value, 2)." ({$percentage}%)";
-    }
-
-    /**
-     * Return the reward percentage value
-     *
-     * @return float|int
-     */
-    public function getRewardPercentageAttribute()
-    {
-        $value = 0;
-        if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled()) {
-            if ($this->credit_back_percentage !== null) {
-                $value = $this->credit_back_percentage;
-            } else {
-                $value = getShopConfig($this->shop_id, 'credit_back_percentage');
-            }
-        }
-
-        return get_formated_decimal($value, true, 2);
-    }
-
-    /**
-     * Return the reward amount value
-     *
-     * @return float|int
-     */
-    public function getRewardAmountAttribute()
-    {
-        $value = 0;
-        if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled()) {
-            if ($this->credit_back_percentage !== null) {
-                $value = $this->credit_back_percentage;
-            } else {
-                $value = getShopConfig($this->shop_id, 'credit_back_percentage');
-            }
-        }
-
-        return get_formated_decimal($value, true, 2);
     }
 
     /**

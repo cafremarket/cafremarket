@@ -258,10 +258,6 @@
         @if (is_incevio_package_loaded('auction'))
           @include('auction::admin._inventory_fields')
         @endif
-
-        @if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled())
-          @include('wallet::admin._inventory_fields')
-        @endif
     @include('admin.partials.ui.card_end')
 
     @if (is_incevio_package_loaded('wholesale'))

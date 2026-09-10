@@ -55,7 +55,7 @@
 
                     @if (\Auth::user()->isMerchant())
                       <td class="pull-right">
-                        @if (optional($current_plan)->type == $plan->name)
+                        @if (optional($current_plan)->stripe_price == $plan->plan_id)
                           @if (Auth::user()->isOnGracePeriod())
                             <a href="{{ route('admin.account.subscription.resume') }}" class="confirm btn btn-lg btn-primary">
                               <i class="fa fa-play"></i> {{ trans('app.resume_subscription') }}

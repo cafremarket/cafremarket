@@ -3009,10 +3009,7 @@ if (! function_exists('get_item_location_shipping_options')) {
                 ? (trans('theme.free_shipping') ?: 'Free shipping')
                 : (trans('app.shipping') ?: 'Shipping'));
 
-        if (! $outOfRange && $distanceKm !== null && $total > 0) {
-            $label .= ' ('.round($distanceKm, 1).' km)';
-        }
-
+        // Only surface range errors as delivery_takes — never distance labels.
         $distanceLabel = null;
         if ($outOfRange) {
             $distanceLabel = trans('theme.notify.product_out_of_delivery_range', [
@@ -3020,12 +3017,6 @@ if (! function_exists('get_item_location_shipping_options')) {
                 'distance' => round($distanceKm, 1),
                 'radius' => round($shopRadius, 1),
             ]);
-        } elseif ($distanceKm !== null) {
-            $distanceLabel = round($distanceKm, 1).' km';
-        } elseif (! $lat || ! $lng) {
-            $distanceLabel = trans('theme.notify.shipping_select_location') ?: 'Select your delivery location';
-        } else {
-            $distanceLabel = trans('theme.notify.shipping_based_on_location') ?: 'Based on delivery distance';
         }
 
         return collect([(object) [
@@ -3035,7 +3026,8 @@ if (! function_exists('get_item_location_shipping_options')) {
             'carrier_id' => null,
             'carrier' => (object) ['name' => ' '],
             'carrier_name' => trans('app.shipping') ?? 'Shipping',
-            'rate' => $outOfRange ? null : round($amount, 6),
+            // Include handling so PDP / shipping option UIs show the full delivery charge.
+            'rate' => $outOfRange ? null : round($total, 6),
             'based_on' => 'location',
             'minimum' => 0,
             'maximum' => $shopRadius,

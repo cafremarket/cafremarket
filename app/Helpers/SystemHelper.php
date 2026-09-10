@@ -619,6 +619,7 @@ if (! function_exists('crosscheckAndUpdateOldCartInfo')) {
         $total = 0;
         $quantity = 0;
         $shipping_weight = 0;
+        $pivotDirty = false;
 
         // Qtt and Total
         foreach ($cart->inventories as $item) {
@@ -637,11 +638,19 @@ if (! function_exists('crosscheckAndUpdateOldCartInfo')) {
             $quantity += $temp_qtt;
             $total += $temp_total;
 
-            // Update the cart item pivot table
+            // Skip DB pivot write when nothing changed (checkout hot path).
+            if ((int) $item->pivot->quantity === (int) $temp_qtt
+                && (float) $item->pivot->unit_price == (float) $unit_price) {
+                continue;
+            }
+
             $cart->inventories()->updateExistingPivot($item->id, ['quantity' => $temp_qtt, 'unit_price' => $unit_price]);
+            $pivotDirty = true;
         }
 
-        $cart->refresh(); // Refresh the cart to save the updated pivot values
+        if ($pivotDirty) {
+            $cart->refresh(); // Refresh only when pivot rows actually changed
+        }
 
         // Set qtt and total
         $cart->shipping_weight = $shipping_weight;
@@ -659,18 +668,19 @@ if (! function_exists('crosscheckAndUpdateOldCartInfo')) {
             $cart->taxrate = getTaxRate($request->tax_id);
         }
 
-        // Location-based shipping (free / fixed / km) — max of item charges
-        if (! $cart->is_digital) {
-            $destLat = $request->input('latitude') ?? $request->input('lat');
-            $destLng = $request->input('longitude') ?? $request->input('lng');
+        // Location-based shipping — recalculate for physical carts so amounts stay current.
+        $destLat = $request->input('latitude') ?? $request->input('lat');
+        $destLng = $request->input('longitude') ?? $request->input('lng');
+
+        if ($cart->is_digital) {
+            $cart->shipping = 0;
+            $cart->shipping_rate_id = null;
+        } else {
             app(\App\Services\Shipping\ShippingCalculator::class)->applyToCart(
                 $cart,
                 is_numeric($destLat) ? (float) $destLat : null,
                 is_numeric($destLng) ? (float) $destLng : null
             );
-        } else {
-            $cart->shipping = 0;
-            $cart->shipping_rate_id = null;
         }
 
         // Packaging
@@ -707,7 +717,10 @@ if (! function_exists('crosscheckAndUpdateOldCartInfo')) {
         $cart->taxes = $cart->get_tax_amount();
         $cart->discount = $cart->get_discounted_amount();
         $cart->grand_total = $cart->calculate_grand_total();
-        $cart->save();
+        // Avoid a pointless UPDATE when checkout payload matches cart totals.
+        if ($cart->isDirty()) {
+            $cart->save();
+        }
 
         return $cart;
     }

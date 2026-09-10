@@ -121,7 +121,6 @@ class Shop extends ShopWallet
         'primary_address_id',
         'total_item_sold',
         'total_sold_amount',
-        'total_reward_given',
         'pay_to',
         'fb_page_id',
         'extra_info',
@@ -408,14 +407,6 @@ class Shop extends ShopWallet
         return $this->hasMany(Dispute::class);
     }
 
-    /**
-     * Get credit rewards associated with the shop.
-     */
-    public function creditRewards()
-    {
-        return $this->hasMany(\Incevio\Package\Wallet\Models\CreditReward::class);
-    }
-
     public function smsGateways()
     {
         return $this->hasMany(\Incevio\Package\smsGateways\Models\SmsGateway::class);
@@ -433,34 +424,6 @@ class Shop extends ShopWallet
         }
 
         return get_formated_currency($amount, 2, config('system_settings.currency.id'));
-    }
-
-    /**
-     * Return the reward percentage value
-     *
-     * @return float|int
-     */
-    public function getRewardPercentageAttribute()
-    {
-        if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled() && $this->config->credit_back_percentage) {
-            return get_formated_decimal($this->config->credit_back_percentage, true, 2);
-        }
-
-        return 0;
-    }
-
-    /**
-     * Return a nice styled label badge of reward value
-     *
-     * @return string
-     */
-    public function getRewardBadgeAttribute()
-    {
-        if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled() && $this->config->credit_back_percentage && $this->config->credit_back_percentage > 0) {
-            return '<span class="label label-primary ml-1" data-toggle="tooltip" data-placement="top" title="'.trans('packages.wallet.credit_back_rewards').'"><i class="fa fa-star"></i> '.get_formated_decimal($this->config->credit_back_percentage, true, 2).'%</span>';
-        }
-
-        return '';
     }
 
     public function getNameAttribute($value)

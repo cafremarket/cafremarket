@@ -2478,12 +2478,37 @@ body.login-page .login-box:has(.admin-auth-card) {
   gap: 10px;
   border-radius: var(--admin-radius-sm) !important;
   margin-bottom: 4px;
+  cursor: pointer;
+  text-decoration: none !important;
+  color: inherit;
+}
+
+.admin-activity-log__item:hover,
+.admin-activity-log__item:focus {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+.admin-activity-log__title {
+  flex: 1;
+  min-width: 0;
 }
 
 .admin-activity-log__time {
   margin-left: auto;
   color: #94a3b8;
   font-size: 12px;
+  white-space: nowrap;
+}
+
+.admin-activity-log__caret {
+  color: #94a3b8;
+  font-size: 11px;
+  transition: transform 0.15s ease;
+}
+
+a.admin-activity-log__item[aria-expanded="true"] .admin-activity-log__caret {
+  transform: rotate(180deg);
 }
 
 .admin-activity-log__change {

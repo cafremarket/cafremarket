@@ -27,7 +27,8 @@ class CreateTaxRequest extends Request
 
         return [
             'name' => 'required',
-            'taxrate' => 'required|numeric',
+            'type' => 'required|in:percent,fixed',
+            'taxrate' => 'required|numeric|min:0',
             'country_id' => 'required',
         ];
     }

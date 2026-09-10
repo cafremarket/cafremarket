@@ -6,9 +6,6 @@
       <h4 class="mb-1 mt-2">{!! $shop->owner->getName() !!}</h4>
     @else
       <h4 class="mb-1 mt-2">{!! $shop->getQualifiedName(10) !!}</h4>
-      @if (!empty($shop->reward_badge))
-        <div class="sf-shop-card__badge mb-1">{!! $shop->reward_badge !!}</div>
-      @endif
     @endif
   </a>
 

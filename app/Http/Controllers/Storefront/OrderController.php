@@ -239,6 +239,7 @@ class OrderController extends Controller
         }
 
         app(\App\Services\Cart\CartDeliveryRangeService::class)->annotate($carts);
+        $request->merge(['delivery_validated' => true]);
 
         foreach ($carts as $cart) {
             if (! crosscheckCartOwnership($request, $cart)) {
@@ -297,9 +298,13 @@ class OrderController extends Controller
             foreach ($orders as $order) {
                 if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
                     persist_order_checkout_fees($order, $paymentMethod);
-                    $feeBreakdown = get_customer_transaction_fee_for_order($order, $paymentMethod);
-                    $chargeAmount += (float) $feeBreakdown['total'];
-                } else {
+                }
+            }
+
+            if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                $chargeAmount = get_customer_charge_total_for_orders($orders, $paymentMethod);
+            } else {
+                foreach ($orders as $order) {
                     $chargeAmount += (float) $order->grand_total;
                 }
             }
@@ -378,9 +383,7 @@ class OrderController extends Controller
             }
         }
 
-        foreach ($carts as $cart) {
-            $cart->forceDelete();
-        }
+        // Carts already force-deleted inside saveOrderFromCart.
 
         $primary = $orders[0];
         session(['confirmed_order_ids' => collect($orders)->pluck('id')->all()]);

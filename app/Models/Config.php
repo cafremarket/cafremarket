@@ -87,7 +87,6 @@ class Config extends BaseModel
         'shipping_fixed_rate',
         'shipping_per_km_rate',
         'shipping_base_fee',
-        'credit_back_percentage',
         'auto_archive_order',
         'default_payment_method_id',
         'bank_name',

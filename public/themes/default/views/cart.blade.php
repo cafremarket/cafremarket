@@ -14,6 +14,7 @@
     @include('wholesale::scripts.cart_page_script')
   @endif
 
+  @include('theme::scripts.cart_pricing')
   @include('theme::scripts.dynamic_checkout')
 
   @if (($activeCart ?? null) || (isset($carts) && $carts->count() > 0))
@@ -27,6 +28,15 @@
         var target = $(this).data('target');
         $(target).slideToggle(180);
       });
+
+      // Shipping / tax breakdown info (hover / click)
+      if ($.fn.popover) {
+        $('.shipping-breakdown-info, .tax-breakdown-info').popover({
+          container: 'body',
+          html: true,
+          trigger: 'hover focus click'
+        });
+      }
     }(window.jQuery));
   </script>
 @endsection

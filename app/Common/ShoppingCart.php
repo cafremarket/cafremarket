@@ -317,13 +317,18 @@ trait ShoppingCart
         $customerLat = $request->customer_latitude ?? $request->latitude ?? $buyerLocation->latitude();
         $customerLng = $request->customer_longitude ?? $request->longitude ?? $buyerLocation->longitude();
 
-        if (($request->fulfilment_type ?? Order::FULFILMENT_TYPE_DELIVER) != Order::FULFILMENT_TYPE_PICKUP
+        // Skip when checkout already annotated delivery range for this cart.
+        $skipDeliveryRecheck = (bool) $request->boolean('delivery_validated')
+            || (isset($cart->out_of_range) && $cart->out_of_range === false);
+
+        if (! $skipDeliveryRecheck
+            && ($request->fulfilment_type ?? Order::FULFILMENT_TYPE_DELIVER) != Order::FULFILMENT_TYPE_PICKUP
             && $catalog->isEnabled()) {
             if (! $customerLat || ! $customerLng) {
                 throw new \Exception(trans('theme.set_location_to_shop'));
             }
 
-            $shop = Shop::find($cart->shop_id);
+            $shop = $cart->relationLoaded('shop') ? $cart->shop : Shop::find($cart->shop_id);
 
             if ($shop && ! app(\App\Services\Shop\NearbyShopService::class)->isShopDeliverableTo($shop, (float) $customerLat, (float) $customerLng)) {
                 throw new \Exception(trans('app.shop_outside_delivery_radius'));
@@ -415,11 +420,6 @@ trait ShoppingCart
                 'updated_at' => $item->pivot->updated_at,
             ];
 
-            // Add credit reward amount
-            if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled()) {
-                $order_items[$t_item_id]['credit_back_amount'] = ($item->reward_percentage / 100) * $item->pivot->unit_price;
-            }
-
             if (is_incevio_package_loaded('affiliate') && Session::has('affiliate_marketer_id')) {
                 $affiliate_link = $item->affiliateLinks()
                     ->where('affiliate_id', Session::get('affiliate_marketer_id'))
@@ -450,7 +450,9 @@ trait ShoppingCart
 
         // Reduce the coupon in use
         if ($order->coupon_id) {
-            $coupon = Coupon::find($order->coupon_id);
+            $coupon = ($cart->relationLoaded('coupon') && optional($cart->coupon)->id === $order->coupon_id)
+                ? $cart->coupon
+                : Coupon::find($order->coupon_id);
 
             if ($coupon) {
                 $coupon->decrement('quantity');

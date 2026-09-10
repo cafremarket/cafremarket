@@ -153,6 +153,8 @@ class CatalogProductController extends Controller
             $product->syncTags($product, $request->input('tag_list'));
         }
 
+        $product->syncTaxesFromRows($request->input('tax_rows', []));
+
         $request->session()->flash('success', trans('messages.created', ['model' => $this->model]));
 
         return response()->json($this->getJsonParams($product));
@@ -185,6 +187,7 @@ class CatalogProductController extends Controller
             'categories.attrsList',
             'inventories.attributeValues',
             'inventories.image',
+            'taxes',
         ])->find($id);
 
         $this->authorize('update', $product); // Check permission
@@ -233,6 +236,8 @@ class CatalogProductController extends Controller
         if ($request->has('tag_list')) {
             $product->syncTags($product, $request->input('tag_list'));
         }
+
+        $product->syncTaxesFromRows($request->input('tax_rows', []));
 
         if ($request->input('delete_image')) {
             if (is_array($request->delete_image)) {

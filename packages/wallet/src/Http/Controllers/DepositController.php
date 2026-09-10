@@ -385,18 +385,71 @@ class DepositController extends Controller
 
     /**
      * Preview transaction fee (checkout) or gateway fee (wallet top-up) for M-Pesa / eMola.
+     * Multi-vendor checkout: pass carts[] with shop_id + amount to combine flat/percent fees.
      */
     public function platformFeePreview(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:0.01',
             'payment_method' => 'required|in:mpesa,emola',
+            'amount' => 'nullable|numeric|min:0.01',
             'shop_id' => 'nullable|integer|exists:shops,id',
+            'carts' => 'nullable|array|min:1',
+            'carts.*.shop_id' => 'required_with:carts|integer|exists:shops,id',
+            'carts.*.amount' => 'required_with:carts|numeric|min:0.01',
         ]);
 
         $method = (string) $request->input('payment_method');
+        $cartParts = $request->input('carts');
+
+        if (is_array($cartParts) && count($cartParts) > 0) {
+            $customer = get_customer_transaction_fee_for_cart_parts($method, $cartParts);
+
+            if ($customer['base'] <= 0) {
+                return response()->json([
+                    'message' => 'Invalid cart parts',
+                ], 422);
+            }
+
+            $partsFormatted = [];
+            foreach ($customer['parts'] as $part) {
+                $partsFormatted[] = [
+                    'shop_id' => $part['shop_id'],
+                    'base' => $part['base'],
+                    'fee' => $part['fee'],
+                    'total' => $part['total'],
+                    'formatted' => [
+                        'base' => get_formated_currency($part['base']),
+                        'fee' => get_formated_currency($part['fee']),
+                        'total' => get_formated_currency($part['total']),
+                    ],
+                ];
+            }
+
+            return response()->json([
+                'base' => $customer['base'],
+                'fee' => $customer['fee'],
+                'subscription_fee' => $customer['subscription_fee'],
+                'total' => $customer['total'],
+                'enabled' => (bool) $customer['enabled'],
+                'multi_vendor' => count($customer['parts']) > 1,
+                'parts' => $partsFormatted,
+                'formatted' => [
+                    'base' => get_formated_currency($customer['base']),
+                    'fee' => get_formated_currency($customer['fee']),
+                    'subscription_fee' => get_formated_currency($customer['subscription_fee']),
+                    'total' => get_formated_currency($customer['total']),
+                ],
+            ]);
+        }
+
         $amount = $request->input('amount');
         $shopId = $request->input('shop_id');
+
+        if ($amount === null || (float) $amount <= 0) {
+            return response()->json([
+                'message' => 'The amount field is required when carts are not provided.',
+            ], 422);
+        }
 
         if ($shopId) {
             $customer = get_customer_transaction_fee($method, $amount, (int) $shopId);
@@ -416,6 +469,7 @@ class DepositController extends Controller
                 'marketplace_commission' => $marketplaceCommission,
                 'vendor_net' => $vendorNet,
                 'enabled' => true,
+                'multi_vendor' => false,
                 'formatted' => [
                     'base' => get_formated_currency($customer['base']),
                     'fee' => get_formated_currency($customer['fee']),

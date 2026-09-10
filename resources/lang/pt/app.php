@@ -1835,7 +1835,6 @@ return [
     'pickup_enabled' => 'Levantamento habilitado',
     'payment_verified' => 'Pagamento verificado',
     'bank_name' => 'Nome do banco',
-    'credit_back_percentage' => 'Porcentagem de crédito de volta',
     'total_item_sold' => 'Total de itens vendidos',
     'total_sold_amount' => 'Total vendido',
     'now' => 'Novidades da Agora',

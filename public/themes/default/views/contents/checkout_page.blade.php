@@ -45,7 +45,16 @@
     </div>
 
     {!! Form::open(['route' => ['order.create', $cart], 'id' => 'formId' . $cart->id, 'name' => 'checkoutForm', 'files' => true, 'data-toggle' => 'validator', 'autocomplete' => 'off', 'novalidate']) !!}
-    <div class="row justify-content-center shopping-cart-wrapper radius mb-4" id="cartId{{ $cart->id }}" data-cart="{{ $cart->id }}" data-cart-type="{{ $cart->is_digital ? 'digital' : 'physical' }}">
+    @php
+      $usesProductTaxes = app(\App\Services\Tax\ProductTaxCalculator::class)->cartUsesProductTaxes($cart);
+    @endphp
+    <div class="row justify-content-center shopping-cart-wrapper radius mb-4"
+         id="cartId{{ $cart->id }}"
+         data-cart="{{ $cart->id }}"
+         data-cart-type="{{ $cart->is_digital ? 'digital' : 'physical' }}"
+         data-tax-mode="{{ $usesProductTaxes ? 'product' : 'zone' }}"
+         data-taxes="{{ get_formated_value((float) ($cart->taxes ?? 0)) }}"
+         data-taxrate="{{ (float) ($cart->taxrate ?? 0) }}">
       <div class="col-lg-4 bg-light">
         <div class="seller-info my-3">
           <div class="text-muted small mb-3">
@@ -59,10 +68,6 @@
               <img>
               {!! $shop->getQualifiedName() !!}
             </a>
-
-            <div>
-              {!! $shop->reward_badge !!}
-            </div>
           </div> <!-- /.logo-wrapper -->
         </div><!-- /.seller-info -->
 
@@ -120,11 +125,28 @@
           </li>
 
           @unless ($cart->is_digital)
+            @php
+              $checkoutShippingBreakdown = app(\App\Services\Shipping\ShippingCalculator::class)->breakdownForCart($cart);
+            @endphp
             <li>
               <span>
                 <a class="dynamic-shipping-rates" data-toggle="popover" data-cart="{{ $cart->id }}" data-options="{{ $shipping_options[$cart->id] }}" id="shipping-options{{ $cart->id }}" title="{{ trans('theme.shipping') }}">
                   <u>{{ trans('theme.shipping') }}</u>
                 </a>
+                @if (!empty($checkoutShippingBreakdown))
+                  <a href="javascript:void(0);"
+                     class="shipping-breakdown-info"
+                     tabindex="0"
+                     role="button"
+                     data-toggle="popover"
+                     data-trigger="hover focus click"
+                     data-html="true"
+                     data-placement="left"
+                     title="{{ trans('theme.shipping') }}"
+                     data-content="@foreach($checkoutShippingBreakdown as $line){{ e(($line['shop_name'] ? $line['shop_name'].': ' : '').$line['title'].' — '.$line['amount']) }}<br>@endforeach">
+                    <i class="fal fa-info-circle"></i>
+                  </a>
+                @endif
                 <em id="summary-shipping-name{{ $cart->id }}" class="small text-muted"></em>
               </span>
 
@@ -167,7 +189,26 @@
           </li>
 
           <li id="tax-section-li{{ $cart->id }}" style="display: {{ $cart->taxes > 0 ? 'block' : 'none' }};">
-            <span>{{ trans('theme.taxes') }}</span>
+            @php
+              $checkoutTaxBreakdown = app(\App\Services\Tax\ProductTaxCalculator::class)->breakdownForCart($cart);
+            @endphp
+            <span>
+              {{ trans('theme.taxes') }}
+              @if (!empty($checkoutTaxBreakdown))
+                <a href="javascript:void(0);"
+                   class="tax-breakdown-info"
+                   tabindex="0"
+                   role="button"
+                   data-toggle="popover"
+                   data-trigger="hover focus click"
+                   data-html="true"
+                   data-placement="left"
+                   title="{{ trans('theme.taxes') }}"
+                   data-content="@foreach($checkoutTaxBreakdown as $line){{ e(($line['shop_name'] ? $line['shop_name'].': ' : '').($line['title'] ?? '').' — '.($line['tax_name'] ?? '').' — '.$line['amount']) }}<br>@endforeach">
+                  <i class="fal fa-info-circle"></i>
+                </a>
+              @endif
+            </span>
 
             <span>{{ get_currency_prefix() }}
               <span id="summary-taxes{{ $cart->id }}" data-value="{{ $cart->taxes }}">{{ get_formated_decimal($cart->taxes, false, $dec) }}</span>{{ get_currency_suffix() }}
@@ -281,13 +322,6 @@
           <div class="checkout-shiping-address">
             @include('theme::partials.checkout_shiping_address')
           </div>
-
-          @if ($cart->has_credit_rewards())
-            <span class="text-dark">
-              <i class="fa fa-warning"></i>
-              {{ trans('packages.wallet.create_an_account_to_get_reward') }}
-            </span>
-          @endif
         @endif
 
         <hr class="dotted" />

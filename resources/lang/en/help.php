@@ -157,6 +157,8 @@ return [
     'catalog_max_price' => 'Set a maximum price for the product. Vendors can add inventory within this price limits.',
     'requires_shipping' => 'This item requires shipping.',
     'requires_shipping_with_inventory' => 'Requires shipping (Downloads should be disabled when requires shipping is enabled to show the shipping section)',
+    'product_taxes' => 'Add taxes for this product. Fixed taxes apply per unit × quantity; percentage taxes apply to the line subtotal. All inventories of this product inherit these taxes.',
+    'product_taxes_empty' => 'No taxes added yet. Enter a label, type, and amount, then click Add tax.',
     'downloadable' => 'This item is a digital content and buyers can download the item.',
     'manufacturer_url' => 'The official website link of the manufacturer.',
     'manufacturer_email' => 'The system will use this email address to communicate with the manufacturer.',

@@ -24,9 +24,10 @@
   $shipping_options = get_item_location_shipping_options($item);
   $pdp_shipping = $shipping_options instanceof \Illuminate\Support\Collection ? $shipping_options->first() : null;
   $pdp_out_of_range = (bool) optional($pdp_shipping)->out_of_range;
-  $pdp_ship_rate = $pdp_shipping ? (float) ($pdp_shipping->rate ?? 0) : 0;
-  $pdp_handling = (float) (getHandelingCostOf($item->shop_id) ?: 0);
-  $pdp_ship_value = ($pdp_out_of_range || $item->free_shipping || $pdp_ship_rate <= 0) ? 0 : ($pdp_ship_rate + $pdp_handling);
+  // rate already includes handling from get_item_location_shipping_options()
+  $pdp_ship_value = ($pdp_out_of_range || $item->free_shipping)
+      ? 0
+      : (float) (optional($pdp_shipping)->rate ?? 0);
   $pdp_ship_label = $pdp_out_of_range
       ? (trans('theme.out_of_delivery_range') ?: 'Out of delivery range')
       : ($pdp_ship_value <= 0
@@ -92,7 +93,7 @@
                         </div>
                       @endif
                       @unless ($pdp_out_of_range)
-                        <small id="delivery-time" class="text-muted">{{ $pdp_shipping->delivery_takes ?? '' }}</small>
+                        <small id="delivery-time" class="text-muted hidden"></small>
                       @endunless
                     </div>
                   </div>

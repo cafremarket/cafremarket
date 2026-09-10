@@ -63,7 +63,6 @@
                 @if ($shop->isDown())
                   <span class="label label-default">{{ trans('app.maintenance_mode') }}</span>
                 @endif
-                {!! $shop->reward_badge !!}
               </div>
               @can('update', $shop)
                 <a href="javascript:void(0)" data-link="{{ route('admin.vendor.shop.toggle', $shop) }}" data-doafter="reload" class="toggle-widget toggle-confirm admin-table__toggle">

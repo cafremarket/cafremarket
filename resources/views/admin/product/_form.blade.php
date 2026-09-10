@@ -142,6 +142,68 @@
             </div>
           </div>
 
+          <div class="form-group">
+            <p class="help-block">{{ trans('help.product_taxes') }}</p>
+            @php
+              $productTaxRows = isset($product) ? $product->taxes : collect();
+              $currencySymbol = get_currency_symbol();
+            @endphp
+            <div class="table-responsive" style="margin-bottom:12px;">
+              <table class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse ($productTaxRows as $index => $taxRow)
+                    @php $taxType = $taxRow->type ?: 'percent'; @endphp
+                    <tr>
+                      <td>
+                        {{ $taxRow->name }}
+                        <input type="hidden" name="tax_rows[{{ $index }}][id]" value="{{ $taxRow->id }}">
+                        <input type="hidden" name="tax_rows[{{ $index }}][name]" value="{{ $taxRow->name }}">
+                      </td>
+                      <td>
+                        {{ $taxType === 'fixed' ? 'Fixed' : 'Percentage' }}
+                        <input type="hidden" name="tax_rows[{{ $index }}][type]" value="{{ $taxType }}">
+                      </td>
+                      <td>
+                        {{ $taxType === 'fixed' ? $currencySymbol.' '.$taxRow->taxrate : $taxRow->taxrate.'%' }}
+                        <input type="hidden" name="tax_rows[{{ $index }}][taxrate]" value="{{ $taxRow->taxrate }}">
+                      </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="3" class="text-muted text-center">{{ trans('help.product_taxes_empty') }}</td>
+                    </tr>
+                  @endforelse
+                </tbody>
+              </table>
+            </div>
+            @php $newTaxIndex = isset($product) ? $product->taxes->count() : 0; @endphp
+            <div class="form-group">
+              {!! Form::label('tax_rows_new_name', 'Name (Label)') !!}
+              {!! Form::text('tax_rows['.$newTaxIndex.'][name]', null, ['class' => 'form-control', 'placeholder' => 'e.g. GST']) !!}
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  {!! Form::label('tax_rows_new_type', 'Type') !!}
+                  {!! Form::select('tax_rows['.$newTaxIndex.'][type]', ['percent' => 'Percentage', 'fixed' => 'Fixed'], 'percent', ['class' => 'form-control']) !!}
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  {!! Form::label('tax_rows_new_amount', 'Amount') !!}
+                  {!! Form::number('tax_rows['.$newTaxIndex.'][taxrate]', null, ['class' => 'form-control', 'step' => 'any', 'min' => 0, 'placeholder' => '0']) !!}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <fieldset class="admin-catalog-rules">
             <legend>{{ trans('app.catalog_rules') }}</legend>
 

@@ -44,13 +44,18 @@ class CartResource extends JsonResource
             'total_raw' => strval(round($this->total, 2)),
             'shipping' => get_formated_currency($this->shipping, $decimal),
             'shipping_raw' => strval(round($this->shipping, 2)),
+            'shipping_breakdown' => $this->is_digital
+                ? []
+                : app(\App\Services\Shipping\ShippingCalculator::class)->breakdownForCart($this->resource),
             'packaging' => get_formated_currency($this->packaging, $decimal),
             'packaging_raw' => strval(round($this->packaging, 2)),
             'handling' => get_formated_currency($this->handling, $decimal),
             'handling_raw' => strval(round($this->handling, 2)),
             'taxrate' => get_formated_decimal($this->taxrate, true, $decimal).'%',
+            'taxrate_raw' => strval(round((float) $this->taxrate, 4)),
             'taxes' => get_formated_currency($this->taxes, $decimal),
             'taxes_raw' => strval(round($this->taxes, 2)),
+            'tax_breakdown' => app(\App\Services\Tax\ProductTaxCalculator::class)->breakdownForCart($this->resource),
             'discount' => get_formated_currency($this->discount, $decimal),
             'discount_raw' => strval(round($this->discount, 2)),
             'grand_total' => get_formated_currency($this->grand_total, $decimal),

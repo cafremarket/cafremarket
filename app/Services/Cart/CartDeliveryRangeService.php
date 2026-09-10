@@ -69,6 +69,15 @@ class CartDeliveryRangeService
             $cart->delivery_distance_km = round($distance, 1);
             $cart->out_of_range = $distance > $radius;
         }
+
+        // Annotations are for API/UI checks only — never persist to carts table.
+        foreach ($carts as $cart) {
+            foreach (\App\Models\Cart::DELIVERY_RANGE_RUNTIME_ATTRIBUTES as $attribute) {
+                if (array_key_exists($attribute, $cart->getAttributes())) {
+                    $cart->syncOriginalAttribute($attribute);
+                }
+            }
+        }
     }
 
     /**

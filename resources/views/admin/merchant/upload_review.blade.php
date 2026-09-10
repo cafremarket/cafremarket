@@ -92,10 +92,6 @@
                     <dt>{{ trans('app.order_handling_cost') }}: </dt>
                     <dd>{{ $row['order_handling_cost'] }}</dd>
                   @endif
-                  @if ($row['credit_back_percentage'])
-                    <dt>{{ trans('app.credit_back_percentage') }}: </dt>
-                    <dd>{{ $row['credit_back_percentage'] }}</dd>
-                  @endif
                   @if ($row['alert_quantity'])
                     <dt>{{ trans('app.alert_quantity') }}: </dt>
                     <dd>{{ $row['alert_quantity'] }}</dd>

@@ -47,8 +47,6 @@
                 $payment_instructions = get_from_option_table('wallet_payment_instructions_' . $order->paymentMethod->code);
             }
         }
-        $orderTransactionFee = (float) ($order->subscription_transaction_fee ?? 0) + (float) ($order->platform_payment_fee ?? 0);
-        $orderTotalPaid = round((float) $order->grand_total + $orderTransactionFee, 2);
       @endphp
 
       <div class="sf-order-confirm__store-block" style="{{ $isMultiStore ? 'margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,.08);' : '' }}">
@@ -80,7 +78,7 @@
           </div>
           <div class="sf-order-confirm__meta-item">
             <span>@lang('theme.order_amount')</span>
-            <strong>{{ get_formated_currency($orderTransactionFee > 0 ? $orderTotalPaid : $order->grand_total, 2, $order->currency_id) }}</strong>
+            <strong>{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</strong>
           </div>
           @if (! $isMultiStore && $order->shop)
             <div class="sf-order-confirm__meta-item">

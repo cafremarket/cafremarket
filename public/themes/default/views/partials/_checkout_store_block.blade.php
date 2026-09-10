@@ -4,13 +4,22 @@
   $shop = $cart->shop;
   $cart_total = 0;
   $cartBlocked = !empty($cart->out_of_range) || !empty($cart->needs_delivery_location);
+  $usesProductTaxes = app(\App\Services\Tax\ProductTaxCalculator::class)->cartUsesProductTaxes($cart);
 @endphp
 
 <div class="sf-checkout__store-block shopping-cart-wrapper {{ $cartBlocked ? 'is-oor' : '' }}"
      id="cartId{{ $cart->id }}"
      data-cart="{{ $cart->id }}"
      data-cart-type="{{ $cart->is_digital ? 'digital' : 'physical' }}"
-     data-out-of-range="{{ !empty($cart->out_of_range) ? '1' : '0' }}">
+     data-out-of-range="{{ !empty($cart->out_of_range) ? '1' : '0' }}"
+     data-shipping="{{ get_formated_value((float) ($cart->shipping ?? 0)) }}"
+     data-handling="{{ get_formated_value((float) ($cart->handling ?? 0)) }}"
+     data-packaging="{{ get_formated_value((float) ($cart->packaging ?? 0)) }}"
+     data-discount="{{ get_formated_value((float) ($cart->discount ?? 0)) }}"
+     data-taxrate="{{ (float) ($cart->taxrate ?? 0) }}"
+     data-tax-mode="{{ $usesProductTaxes ? 'product' : 'zone' }}"
+     data-taxes="{{ get_formated_value((float) ($cart->taxes ?? 0)) }}"
+     data-grand="{{ get_formated_value((float) $cart->grand_total) }}">
 
   {{ Form::hidden('cart_ids[]', $cart->id) }}
   {{ Form::hidden('cart_weight_'.$cart->id, $cart->shipping_weight, ['id' => 'cartWeight' . $cart->id]) }}
@@ -109,9 +118,6 @@
             <td class="hidden-sm hidden-xs">
               <a href="{{ storefront_product_url($item) }}" class="product-info-title">
                 {{ $item->pivot->item_description }}
-                @if (is_incevio_package_loaded('wallet'))
-                  @include('wallet::_credit_back_percentage_badge', ['rw_percentage' => $item->reward_percentage])
-                @endif
                 @if ($item->isOutOfStock())
                   <span class="label label-danger text-right ml-3">{{ trans('mobile.out_of_stock') }}</span>
                 @endif
@@ -120,7 +126,7 @@
             @unless ($cart->is_digital)
               <td class="shopping-cart-item-price">
                 <span>
-                  {{ get_currency_prefix() }}<span id="item-price{{ $cart->id . '-' . $item->id }}" data-value="{{ $unit_price }}">{{ get_formated_decimal(get_formated_price_value($unit_price), false, $dec) }}</span>{{ get_currency_suffix() }}
+                  {{ get_currency_prefix() }}<span id="item-price{{ $cart->id . '-' . $item->id }}" data-value="{{ $unit_price }}">{{ get_formated_decimal($unit_price, false, $dec) }}</span>{{ get_currency_suffix() }}
                 </span>
               </td>
               <td>
@@ -133,7 +139,7 @@
             @endunless
             <td>
               <span>
-                {{ get_currency_prefix() }}<span id="item-total{{ $cart->id . '-' . $item->id }}" class="item-total{{ $cart->id }}" data-value="{{ get_formated_price_value($item_total) }}">{{ get_formated_decimal(get_formated_price_value($item_total), false, $dec) }}</span>{{ get_currency_suffix() }}
+                {{ get_currency_prefix() }}<span id="item-total{{ $cart->id . '-' . $item->id }}" class="item-total{{ $cart->id }}" data-value="{{ $item_total }}">{{ get_formated_decimal($item_total, false, $dec) }}</span>{{ get_currency_suffix() }}
               </span>
             </td>
             <td>

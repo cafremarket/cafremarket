@@ -12,6 +12,12 @@
 @endsection
 
 @section('content')
+  @php
+    $fulfilmentLabel = trans('app.fulfilment_type.' . ($order->fulfilment_type ?: 'deliver'));
+    $adminOrderTransactionFee = (float) ($order->subscription_transaction_fee ?? 0) + (float) ($order->platform_payment_fee ?? 0);
+    $adminOrderTotalPaid = round((float) $order->grand_total + $adminOrderTransactionFee, 2);
+  @endphp
+
   <div class="row admin-order-detail">
     <div class="col-md-8">
       @include('admin.partials.ui.card_start', [
@@ -23,12 +29,53 @@
       ])
         <div class="admin-order-payment-bar">
           <span class="admin-order-payment-bar__method">
-            {{ trans('app.payment') . ': ' . $order->paymentMethod->name }}
+            {{ trans('app.payment') . ': ' . optional($order->paymentMethod)->name }}
           </span>
           <span class="admin-order-payment-bar__status">
             {!! $order->paymentStatusName() !!}
           </span>
         </div>
+
+        <dl class="admin-order-sidebar-panel__meta" style="margin:12px 0 20px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 16px;">
+          <div>
+            <dt>{{ trans('app.order_date') }}</dt>
+            <dd>{{ optional($order->created_at)->toDayDateTimeString() ?: '—' }}</dd>
+          </div>
+          <div>
+            <dt>{{ trans('app.form.fulfilment_type') }}</dt>
+            <dd>{{ $fulfilmentLabel }}</dd>
+          </div>
+          @if ($order->shipping_date)
+            <div>
+              <dt>{{ trans('app.shipping_date') }}</dt>
+              <dd>{{ $order->shipping_date->toFormattedDateString() }}</dd>
+            </div>
+          @endif
+          @if ($order->delivery_date)
+            <div>
+              <dt>{{ trans('app.delivery_date') }}</dt>
+              <dd>{{ $order->delivery_date->toFormattedDateString() }}</dd>
+            </div>
+          @endif
+          @if ($order->payment_ref_id)
+            <div>
+              <dt>{{ trans('app.payment') }} Ref</dt>
+              <dd>{{ $order->payment_ref_id }}</dd>
+            </div>
+          @endif
+          @if ($order->coupon)
+            <div>
+              <dt>{{ trans('app.coupon') }}</dt>
+              <dd>{{ $order->coupon->code ?? $order->coupon->name }}</dd>
+            </div>
+          @endif
+          @if ($order->goods_received)
+            <div>
+              <dt>{{ trans('app.statuses.delivered') }}</dt>
+              <dd><span class="label label-success">{{ trans('app.yes') }}</span></dd>
+            </div>
+          @endif
+        </dl>
 
         <div class="row">
           <div class="col-md-12">
@@ -49,6 +96,7 @@
                       </td>
                       <td class="nopadding-right" width="55%">
                         {{ $item->pivot->item_description }}
+                        <a href="{{ storefront_product_url($item) }}" target="_blank" class="indent5 small"><i class="fa fa-external-link"></i></a>
                       </td>
                       <td class="nopadding-right text-right" width="15%">
                         {{ get_formated_currency($item->pivot->unit_price, 2, $order->currency_id) }}
@@ -88,6 +136,12 @@
               <blockquote>{!! $order->admin_note !!}</blockquote>
             @endif
 
+            @if ($order->message_to_customer)
+              <div class="spacer10"></div>
+              {{ trans('app.message_to_customer') }}:
+              <blockquote>{{ $order->message_to_customer }}</blockquote>
+            @endif
+
             @if ($order->cancellation)
               <div class="spacer10"></div>
               {{ trans('app.' . $order->cancellation->request_type . '_request') }}:
@@ -98,6 +152,23 @@
                   <br><strong>{{ trans('app.detail') }}:</strong> {{ $order->cancellation->description }}
                 @endif
               </blockquote>
+
+              @if ($order->cancellation->isPartial() && is_array($order->cancellation->items))
+                <table class="table table-striped admin-table">
+                  <tbody>
+                    @foreach ($order->inventories as $item)
+                      @if (in_array($item->id, $order->cancellation->items))
+                        <tr>
+                          <td>{{ $item->pivot->item_description }}</td>
+                          <td class="text-right">{{ $item->pivot->quantity }} &times; {{ get_formated_currency($item->pivot->unit_price, 2, $order->currency_id) }}</td>
+                        </tr>
+                      @endif
+                    @endforeach
+                  </tbody>
+                </table>
+              @else
+                <p class="text-muted">{{ trans('app.all_items') }}</p>
+              @endif
             @endif
           </div>
           <div class="col-md-6">
@@ -127,6 +198,15 @@
                 </td>
                 <td class="text-right" width="40%">{{ get_formated_currency($order->shipping, 2, $order->currency_id) }}</td>
               </tr>
+              @if (is_incevio_package_loaded('packaging') && $order->shippingPackage)
+                <tr>
+                  <td class="text-right">
+                    {{ trans('app.packaging') }}<br>
+                    <em class="small">{{ optional($order->shippingPackage)->name }}</em>
+                  </td>
+                  <td class="text-right" width="40%">{{ get_formated_currency($order->packaging, 2, $order->currency_id) }}</td>
+                </tr>
+              @endif
               @if ($order->handling)
                 <tr>
                   <td class="text-right">{{ trans('app.handling') }}</td>
@@ -136,14 +216,17 @@
               <tr>
                 <td class="text-right">
                   {{ trans('app.taxes') }}<br>
-                  <em class="small">{{ get_formated_decimal($order->taxrate, true, 2) }}%</em>
+                  <em class="small">
+                    @if ($order->shippingZone)
+                      {{ optional($order->shippingZone)->name }}
+                    @elseif ($order->shippingRate)
+                      {{ optional($order->shippingRate->shippingZone)->name }}
+                    @endif
+                    {{ get_formated_decimal($order->taxrate, true, 2) }}%
+                  </em>
                 </td>
                 <td class="text-right" width="40%">{{ get_formated_currency($order->taxes, 2, $order->currency_id) }}</td>
               </tr>
-              @php
-                $adminOrderTransactionFee = (float) ($order->subscription_transaction_fee ?? 0) + (float) ($order->platform_payment_fee ?? 0);
-                $adminOrderTotalPaid = round((float) $order->grand_total + $adminOrderTransactionFee, 2);
-              @endphp
               <tr class="lead">
                 <td class="text-right">{{ trans('app.grand_total') }}</td>
                 <td class="text-right" width="40%">{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</td>
@@ -156,6 +239,11 @@
                 <tr class="lead">
                   <td class="text-right">{{ trans('app.total_paid') }}</td>
                   <td class="text-right" width="40%">{{ get_formated_currency($adminOrderTotalPaid, 2, $order->currency_id) }}</td>
+                </tr>
+              @elseif ((float) ($order->subscription_transaction_fee ?? 0) == 0 && in_array(optional($order->paymentMethod)->code, ['mpesa', 'emola'], true))
+                <tr>
+                  <td class="text-right text-muted">{{ trans('app.transaction_fee') }}</td>
+                  <td class="text-right text-muted" width="40%">{{ get_formated_currency(0, 2, $order->currency_id) }}</td>
                 </tr>
               @endif
             </table>
@@ -201,10 +289,10 @@
         'bodyClass' => 'admin-order-sidebar-panel',
       ])
         <div class="admin-order-sidebar-panel__shop">
-          <img src="{{ get_storage_file_url(optional($order->shop->image)->path, 'mini') }}" class="admin-order-sidebar-panel__logo" alt="">
+          <img src="{{ get_storage_file_url(optional(optional($order->shop)->image)->path, 'mini') }}" class="admin-order-sidebar-panel__logo" alt="">
           <div>
-            <strong>{{ $order->shop->name }}</strong>
-            @if ($order->shop->id)
+            <strong>{{ optional($order->shop)->name }}</strong>
+            @if (optional($order->shop)->id)
               <br><a href="{{ route('show.store', $order->shop->slug) }}" target="_blank" class="small"><i class="fa fa-external-link"></i> {{ trans('app.store_front') }}</a>
             @endif
           </div>
@@ -258,10 +346,10 @@
         <div class="admin-order-sidebar-panel__user">
           <img src="{{ get_avatar_src($order->customer, 'tiny') }}" class="img-circle img-sm" alt="">
           <div>
-            <strong>{{ $order->customer->getName() }}</strong>
+            <strong>{{ optional($order->customer)->getName() }}</strong>
             @if ($order->email)
               <br><small class="text-muted">{{ $order->email }}</small>
-            @elseif ($order->customer->email)
+            @elseif (optional($order->customer)->email)
               <br><small class="text-muted">{{ $order->customer->email }}</small>
             @endif
             @if ($order->customer_phone_number)
@@ -270,9 +358,16 @@
           </div>
         </div>
 
+        <div class="admin-order-sidebar-panel__actions btn-group btn-group-justified" style="margin-top:12px;">
+          @if ($order->conversation)
+            <a href="{{ route('admin.support.message.show', $order->conversation) }}" class="btn btn-sm btn-info btn-flat">{{ trans('app.view_conversations') }}</a>
+          @endif
+          <a href="{{ panel_route('admin.order.order.invoice', $order) }}" class="btn btn-sm btn-default btn-flat">{{ trans('app.invoice') }}</a>
+        </div>
+
         @if ($order->dispute)
           <div class="spacer10"></div>
-          <span class="label label-danger">{{ trans('app.view_dispute') }}</span>
+          <a href="{{ route('admin.support.dispute.show', $order->dispute) }}" class="btn btn-sm btn-danger btn-flat">{{ trans('app.view_dispute') }}</a>
         @endif
 
         @if (optional($order->paymentMethod)->code === 'wire' && count($order->attachments))
@@ -293,19 +388,50 @@
             <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} - Bank Transfer Proof</legend>
           </fieldset>
           <span><i class="fa fa-file"></i> {{ $order->wire_transfer_proof_name ?: basename($order->wire_transfer_proof_path) }}</span>
+          @php
+            $dbProofExt = strtolower(pathinfo((string) $order->wire_transfer_proof_name, PATHINFO_EXTENSION));
+            $dbProofIsImage = in_array($dbProofExt, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+          @endphp
+          @if ($dbProofIsImage)
+            <a href="{{ \Illuminate\Support\Facades\Storage::url($order->wire_transfer_proof_path) }}" target="_blank" class="btn btn-xs btn-default wire-proof-preview"
+              data-src="{{ \Illuminate\Support\Facades\Storage::url($order->wire_transfer_proof_path) }}"
+              data-name="{{ $order->wire_transfer_proof_name ?: basename($order->wire_transfer_proof_path) }}">
+              {{ trans('app.preview') }}
+            </a>
+          @endif
+        @endif
+
+        @if (is_incevio_package_loaded('pharmacy') && count($order->attachments))
+          <fieldset>
+            <legend><i class="far fa-stethoscope"></i> {{ trans('packages.pharmacy.prescription') }}</legend>
+          </fieldset>
+          @foreach ($order->attachments as $attachment)
+            <a href="{{ route('attachment.download', $attachment) }}">
+              <i class="fa fa-file"></i> {{ $attachment->name }}
+            </a><br>
+          @endforeach
         @endif
 
         @if ($order->pickup())
           <fieldset><legend>{{ strtoupper(trans('app.pick_up_address')) }}</legend></fieldset>
           @if ($order->warehouse)
             <strong>{{ $order->warehouse->name }}</strong><br>
-            {!! $order->warehouse->address->toHtml() !!}
+            {!! optional($order->warehouse->address)->toHtml() !!}
+            @if (is_array($order->warehouse->business_days))
+              <em class="fa fa-calendar"></em> {{ trans('app.form.business_days') }} : {{ implode(', ', $order->warehouse->business_days) }} <br>
+            @endif
+            @if ($order->warehouse->opening_time || $order->warehouse->close_time)
+              <em class="fa fa-clock-o"></em> {{ trans('app.form.business_hours') }} : {{ $order->warehouse->opening_time }} - {{ $order->warehouse->close_time }}
+            @endif
           @else
             <p><i class="fa fa-warning"></i> {{ trans('app.info_not_found') }}</p>
           @endif
         @elseif ($order->deliver())
           <fieldset><legend>{{ strtoupper(trans('app.shipping_address')) }}</legend></fieldset>
           {!! address_str_to_html($order->shipping_address) !!}
+          @if ($order->shipping_address)
+            <iframe width="100%" height="150" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q={{ urlencode(address_str_to_geocode_str($order->shipping_address)) }}&output=embed"></iframe>
+          @endif
 
           <fieldset><legend>{{ strtoupper(trans('app.billing_address')) }}</legend></fieldset>
           @if ($order->shipping_address == $order->billing_address)
@@ -321,12 +447,18 @@
           'title' => trans('app.shipping'),
           'icon' => 'fa-truck',
           'bodyClass' => 'admin-order-sidebar-panel',
-          'actions' => '<a href="' . route('admin.order.order.invoice', $order->id) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-download"></i> ' . e(trans('app.invoice')) . '</a>'
+          'actions' => '<a href="' . panel_route('admin.order.order.invoice', $order) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-download"></i> ' . e(trans('app.invoice')) . '</a>'
             . ' <a href="' . panel_route('admin.order.shipping_label', $order) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-file"></i> ' . e(trans('app.download_shipping_label')) . '</a>',
         ])
           <dl class="admin-order-sidebar-panel__meta">
+            <dt>{{ trans('app.customer_name') }}</dt>
+            <dd><strong>{{ optional($order->customer)->getName() }}</strong></dd>
+            <dt>{{ trans('app.phone_number') }}</dt>
+            <dd>{{ $order->customer_phone_number ?: '—' }}</dd>
             <dt>{{ trans('app.tracking_id') }}</dt>
             <dd>{{ $order->tracking_id ?: '—' }}</dd>
+            <dt>{{ trans('app.shipping_address') }}</dt>
+            <dd>{!! address_str_to_html($order->shipping_address) !!}</dd>
           </dl>
         @include('admin.partials.ui.card_end')
       @endif
@@ -366,6 +498,15 @@
           window.jQuery('#wireProofPreviewModal').modal('show');
         }
       });
+
+      // Keep History caret / aria-expanded in sync with Bootstrap collapse
+      if (window.jQuery) {
+        window.jQuery(document).on('show.bs.collapse hide.bs.collapse', '.admin-activity-log__details', function(e) {
+          var id = this.id;
+          var trigger = window.jQuery('a[data-target="#' + id + '"]');
+          trigger.attr('aria-expanded', e.type === 'show' ? 'true' : 'false');
+        });
+      }
     })();
   </script>
 @endsection

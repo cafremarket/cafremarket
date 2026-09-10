@@ -10,7 +10,6 @@ use App\Models\Cart;
 use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\Inventory;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -37,10 +36,12 @@ class CartController extends Controller
                 $q->with('config');
             },
             'inventories.image',
+            'inventories.product.taxes',
             'coupon:id,shop_id,name,code,value,type',
             'shippingAddress',
         ])->get();
 
+        $this->refreshLocationShipping($carts);
         app(\App\Services\Cart\CartDeliveryRangeService::class)->annotate($carts);
 
         return CartResource::collection($carts);
@@ -55,7 +56,8 @@ class CartController extends Controller
     public function show(Request $request, Cart $cart)
     {
         if (crosscheckCartOwnership($request, $cart)) {
-            $cart->loadMissing(['shop.config', 'inventories.image', 'coupon', 'shippingAddress']);
+            $cart->loadMissing(['shop.config', 'inventories.image', 'inventories.product.taxes', 'coupon', 'shippingAddress']);
+            $this->refreshLocationShipping(collect([$cart]));
             app(\App\Services\Cart\CartDeliveryRangeService::class)->annotate(collect([$cart]));
 
             return new CartResource($cart);
@@ -157,22 +159,10 @@ class CartController extends Controller
             $cart->ship_to = $request->ship_to;
         }
 
-        // Reset if the old cart exist, because shipping rate will change after adding new item
-        if ($old_cart) {
-            $cart->shipping_zone_id = null;
-            $cart->shipping_rate_id = null;
-            $cart->shipping = null;
-        } else {
-            $cart->shipping_zone_id = $request->shipping_zone_id;
-
-            $cart->shipping_rate_id = $request->shipping_option_id == 'Null' ?
-                null : $request->shipping_option_id;
-
-            $cart->shipping = $request->shipping_option_id == 'Null' ?
-                null : optional($cart->shippingRate)->rate;
-        }
-
-        $cart->handling = $cart->get_handling_cost();
+        // Location shipping is recalculated after items are attached.
+        $cart->shipping_zone_id = $old_cart ? $old_cart->shipping_zone_id : ($request->shipping_zone_id ?: null);
+        $cart->shipping_rate_id = null;
+        $cart->shipping = $old_cart ? $old_cart->shipping : null;
 
         $cart->total = $old_cart ?
             ($old_cart->total + ($qtt * $unit_price)) : ($qtt * $unit_price);
@@ -187,8 +177,6 @@ class CartController extends Controller
             $cart->taxrate = optional($cart->shippingZone->tax)->taxrate;
             $cart->taxes = $cart->get_tax_amount();
         }
-
-        $cart->grand_total = $cart->calculate_grand_total();
 
         // All items need to have shipping_weight to calculate shipping
         // If any one the item missing shipping_weight set null to cart shipping_weight
@@ -206,6 +194,8 @@ class CartController extends Controller
             $cart->ship_to_state_id = $request->ship_to_state_id;
         }
 
+        $cart->handling = $cart->get_handling_cost();
+        $cart->grand_total = $cart->calculate_grand_total();
         $cart->save();
 
         // Makes item_description field
@@ -223,6 +213,22 @@ class CartController extends Controller
         // Save cart items into pivot
         if (! empty($cart_item_pivot_data)) {
             $cart->inventories()->syncWithoutDetaching($cart_item_pivot_data);
+        }
+
+        // Recalculate location-based shipping now that inventories are attached
+        $cart->load('inventories');
+        if (! $cart->is_digital) {
+            $destLat = $request->input('latitude') ?? $request->input('lat');
+            $destLng = $request->input('longitude') ?? $request->input('lng');
+            app(\App\Services\Shipping\ShippingCalculator::class)->applyToCart(
+                $cart,
+                is_numeric($destLat) ? (float) $destLat : null,
+                is_numeric($destLng) ? (float) $destLng : null
+            );
+            $cart->handling = $cart->get_handling_cost();
+            $cart->taxes = $cart->get_tax_amount();
+            $cart->grand_total = $cart->calculate_grand_total();
+            $cart->save();
         }
 
         return response()->json(['message' => trans('api.item_added_to_cart')], 200);
@@ -302,9 +308,9 @@ class CartController extends Controller
             $cart->taxes = $cart->get_tax_amount();
         }
 
-        if ($request->shipping_option_id) {
-            $cart->shipping_rate_id = $request->shipping_option_id;
-            $cart->shipping = optional($cart->shippingRate)->rate;
+        // Location-based shipping ignores legacy shipping_rate rows.
+        if ($request->shipping_option_id && is_numeric($request->shipping_option_id)) {
+            $cart->shipping_rate_id = (int) $request->shipping_option_id;
         }
 
         if (is_incevio_package_loaded('packaging')) {
@@ -314,11 +320,25 @@ class CartController extends Controller
             }
         }
 
-        // Update some filed only if the cart is older than 24hrs (only to increase performance)
-        if ($cart->updated_at < Carbon::now()->subHour(24)) {
-            $cart->handling = getShopConfig($cart->shop_id, 'order_handling_cost');
+        $cart->loadMissing(['inventories', 'shop.config', 'shippingAddress']);
+
+        if ($cart->is_digital) {
+            $cart->shipping = 0;
+            $cart->shipping_rate_id = null;
+            $cart->handling = 0;
+        } else {
+            $destLat = $request->input('latitude') ?? $request->input('lat');
+            $destLng = $request->input('longitude') ?? $request->input('lng');
+            app(\App\Services\Shipping\ShippingCalculator::class)->applyToCart(
+                $cart,
+                is_numeric($destLat) ? (float) $destLat : null,
+                is_numeric($destLng) ? (float) $destLng : null
+            );
+            $cart->handling = $cart->get_handling_cost();
         }
 
+        $cart->taxes = $cart->get_tax_amount();
+        $cart->discount = $cart->get_discounted_amount();
         $cart->grand_total = $cart->calculate_grand_total();
         $cart->save();
 
@@ -456,11 +476,43 @@ class CartController extends Controller
         $calculator = app(\App\Services\Shipping\ShippingCalculator::class);
         $calculator->applyToCart($cart, $destLat, $destLng);
         $cart->handling = $cart->get_handling_cost();
+        $cart->taxes = $cart->get_tax_amount();
         $cart->grand_total = $cart->calculate_grand_total();
         $cart->save();
 
         return ShippingOptionResource::collection(
             $calculator->shippingOptionsPayload($cart, $destLat, $destLng)
         );
+    }
+
+    /**
+     * Ensure carts carry current location-based shipping before API responses.
+     *
+     * @param  \Illuminate\Support\Collection|iterable  $carts
+     */
+    private function refreshLocationShipping($carts): void
+    {
+        $calculator = app(\App\Services\Shipping\ShippingCalculator::class);
+
+        foreach ($carts as $cart) {
+            $cart->loadMissing(['inventories.product.taxes', 'inventories', 'shop.config', 'shippingAddress']);
+
+            if ($cart->is_digital) {
+                $cart->shipping = 0;
+                $cart->shipping_rate_id = null;
+                $cart->handling = 0;
+            } else {
+                $calculator->applyToCart($cart);
+                $cart->handling = $cart->get_handling_cost();
+            }
+
+            $cart->taxes = $cart->get_tax_amount();
+            $cart->discount = $cart->get_discounted_amount();
+            $cart->grand_total = $cart->calculate_grand_total();
+
+            if ($cart->isDirty()) {
+                $cart->save();
+            }
+        }
     }
 }

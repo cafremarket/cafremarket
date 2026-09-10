@@ -101,10 +101,6 @@
         @include('admin.partials.ui.card_end')
       @endif
 
-      @if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled())
-        @include('wallet::admin._order_page_credit_rewards', ['order' => $order])
-      @endif
-
       @if (is_incevio_package_loaded('affiliate') && isset($commissions))
         @include('affiliate::admin._order_page_commission_table', ['commissions' => $commissions, 'order' => $order])
       @endif
@@ -296,32 +292,12 @@
                   </td>
                 </tr>
 
-                @php
-                  $adminOrderTransactionFee = (float) ($order->subscription_transaction_fee ?? 0) + (float) ($order->platform_payment_fee ?? 0);
-                  $adminOrderTotalPaid = round((float) $order->grand_total + $adminOrderTransactionFee, 2);
-                @endphp
-
                 <tr class="lead">
                   <td class="text-right">{{ trans('app.grand_total') }}</td>
                   <td class="text-right" width="40%">
                     {{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}
                   </td>
                 </tr>
-
-                @if ($adminOrderTransactionFee > 0)
-                  <tr>
-                    <td class="text-right">{{ trans('app.transaction_fee') }}</td>
-                    <td class="text-right" width="40%">
-                      {{ get_formated_currency($adminOrderTransactionFee, 2, $order->currency_id) }}
-                    </td>
-                  </tr>
-                  <tr class="lead">
-                    <td class="text-right">{{ trans('app.total_paid') }}</td>
-                    <td class="text-right" width="40%">
-                      {{ get_formated_currency($adminOrderTotalPaid, 2, $order->currency_id) }}
-                    </td>
-                  </tr>
-                @endif
               </table>
             </div>
           </div><!-- /.row -->
@@ -522,7 +498,7 @@
               @else
                 <a href="javascript:void(0)" data-link="{{ route('admin.support.orderConversation.create', $order->id) }}" class="ajax-modal-btn btn btn-new btn-sm">{{ trans('app.send_message') }}</a>
               @endif
-              <a href="{{ route('admin.order.order.invoice', $order->id) }}" class="btn btn-sm btn-default btn-flat">{{ trans('app.invoice') }}</a>
+              <a href="{{ panel_route('admin.order.order.invoice', $order) }}" class="btn btn-sm btn-default btn-flat">{{ trans('app.invoice') }}</a>
             </div>
             @if ($order->dispute)
               <a href="{{ route('admin.support.dispute.show', $order->dispute) }}" class="btn btn-sm btn-danger btn-flat">{{ trans('app.view_dispute') }}</a>
@@ -653,7 +629,8 @@
           'title' => trans('app.shipping'),
           'icon' => 'fa-truck',
           'bodyClass' => 'admin-order-sidebar-panel',
-          'actions' => '<a href="' . panel_route('admin.order.shipping_label', $order) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-file"></i> ' . e(trans('app.download_shipping_label')) . '</a>',
+          'actions' => '<a href="' . panel_route('admin.order.order.invoice', $order) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-download"></i> ' . e(trans('app.download_invoice') ?: trans('app.invoice')) . '</a>'
+            . ' <a href="' . panel_route('admin.order.shipping_label', $order) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-file"></i> ' . e(trans('app.download_shipping_label')) . '</a>',
         ])
           <dl class="admin-order-sidebar-panel__meta">
             <dt>{{ trans('app.customer_name') }}</dt>

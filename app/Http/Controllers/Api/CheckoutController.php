@@ -9,6 +9,7 @@ use App\Exceptions\PaymentFailedException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CheckoutCartRequest;
 use App\Http\Resources\CartResource;
+use App\Http\Resources\OrderLightResource;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\PaymentMethodResource;
 use App\Models\Cart;
@@ -155,6 +156,7 @@ class CheckoutController extends Controller
 
         $deliveryRange = app(\App\Services\Cart\CartDeliveryRangeService::class);
         $deliveryRange->annotate(collect([$cart]));
+        $request->merge(['delivery_validated' => true]);
         if (! empty($cart->needs_delivery_location)) {
             return response()->json([
                 'message' => trans('theme.notify.set_location_for_delivery'),
@@ -168,6 +170,14 @@ class CheckoutController extends Controller
                     'radius' => $cart->service_radius_km ?? '—',
                 ]),
             ], 422);
+        }
+
+        $paymentMethod = (string) $request->input('payment_method', '');
+        if ($paymentMethod === 'zcart-wallet') {
+            $walletCheck = $this->assertCustomerWalletCanPay((float) $cart->grand_total);
+            if ($walletCheck !== null) {
+                return $walletCheck;
+            }
         }
 
         DB::beginTransaction();
@@ -262,8 +272,7 @@ class CheckoutController extends Controller
         // Everything is fine. Now commit the transaction
         DB::commit();
 
-        // Delete the cart
-        $cart->forceDelete();
+        // Cart already force-deleted inside saveOrderFromCart.
 
         // eMola: defer order-placed notifications until Movitel callback confirms payment.
         if (! $this->shouldDeferEmolaConfirmation($order, $response)) {
@@ -295,7 +304,13 @@ class CheckoutController extends Controller
      */
     public function checkoutAll(CheckoutCartRequest $request, PaymentGateway $payment)
     {
-        $carts = $this->getShoppingCarts(true)->loadMissing(['shop', 'shippingAddress', 'inventories']);
+        $carts = $this->getShoppingCarts(true)->loadMissing([
+            'shop',
+            'shippingAddress',
+            'inventories',
+            'shippingRate.carrier',
+            'coupon',
+        ]);
 
         if ($carts->isEmpty()) {
             return response()->json([
@@ -305,6 +320,8 @@ class CheckoutController extends Controller
 
         $deliveryRange = app(\App\Services\Cart\CartDeliveryRangeService::class);
         $deliveryRange->annotate($carts);
+        // Tell saveOrderFromCart to skip a second hyperlocal radius check.
+        $request->merge(['delivery_validated' => true]);
 
         foreach ($carts as $cart) {
             if (! crosscheckCartOwnership($request, $cart)) {
@@ -342,6 +359,18 @@ class CheckoutController extends Controller
             ], 422);
         }
 
+        $paymentMethod = (string) $request->input('payment_method', '');
+
+        // Fail fast for wallet: do not create orders when balance is too low.
+        if ($paymentMethod === 'zcart-wallet') {
+            $walletCheck = $this->assertCustomerWalletCanPay(
+                $carts->sum(fn (Cart $cart) => (float) $cart->grand_total)
+            );
+            if ($walletCheck !== null) {
+                return $walletCheck;
+            }
+        }
+
         $customerId = Auth::guard('api')->id() ?: $request->input('customer_id');
         if ($customerId) {
             Cart::whereIn('id', $carts->pluck('id'))->update(['customer_id' => $customerId]);
@@ -374,16 +403,29 @@ class CheckoutController extends Controller
             if ($request->input('payment_status') == 'paid' && $request->has('payment_meta')) {
                 $response = $payment->setOrderInfo($orders)->verifyPaidPayment();
             } else {
-                $paymentMethod = (string) $request->input('payment_method', '');
                 $chargeAmount = 0.0;
 
                 foreach ($orders as $order) {
                     if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
                         persist_order_checkout_fees($order, $paymentMethod);
-                        $feeBreakdown = get_customer_transaction_fee_for_order($order, $paymentMethod);
-                        $chargeAmount += (float) $feeBreakdown['total'];
-                    } else {
+                    }
+                }
+
+                if (in_array($paymentMethod, ['mpesa', 'emola'], true)) {
+                    $chargeAmount = get_customer_charge_total_for_orders($orders, $paymentMethod);
+                } else {
+                    foreach ($orders as $order) {
                         $chargeAmount += (float) $order->grand_total;
+                    }
+                }
+
+                // Re-check wallet against final charge (after shipping/tax updates).
+                if ($paymentMethod === 'zcart-wallet') {
+                    $walletCheck = $this->assertCustomerWalletCanPay($chargeAmount);
+                    if ($walletCheck !== null) {
+                        DB::rollback();
+
+                        return $walletCheck;
                     }
                 }
 
@@ -460,9 +502,7 @@ class CheckoutController extends Controller
 
         DB::commit();
 
-        foreach ($carts as $cart) {
-            $cart->forceDelete();
-        }
+        // Carts are already force-deleted inside saveOrderFromCart.
 
         foreach ($orders as $order) {
             if (! $this->shouldDeferEmolaConfirmation($order, $response)) {
@@ -482,16 +522,23 @@ class CheckoutController extends Controller
             $message = trans('app.waiting_for_payment');
         }
 
-        // Eager-load for resources
-        foreach ($orders as $order) {
-            $order->loadMissing(['shop', 'paymentMethod', 'inventories.image', 'customer']);
-        }
+        // Light payload for speed — load only what the app needs for confirmation.
+        $primary->loadMissing(['shop', 'paymentMethod', 'inventories.image', 'customer']);
 
         return response()->json([
             'message' => $message,
             'payment_notice' => $response->paymentNotice ?? null,
             'order' => new OrderResource($primary),
-            'orders' => collect($orders)->map(fn (Order $order) => (new OrderResource($order))->resolve())->values(),
+            'orders' => collect($orders)->map(function (Order $order) use ($primary) {
+                if ($order->id === $primary->id) {
+                    return (new OrderResource($order))->resolve();
+                }
+
+                // Secondary orders: light resource (avoid N full OrderResource graphs).
+                $order->loadMissing(['shop', 'paymentMethod']);
+
+                return (new OrderLightResource($order))->resolve();
+            })->values(),
         ], 200);
     }
 
@@ -548,6 +595,44 @@ class CheckoutController extends Controller
     public function paymentOptionsDebug(Cart $cart)
     {
         return response()->json($this->walletVisibilityDebugData($cart));
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse|null Null when the customer can pay.
+     */
+    private function assertCustomerWalletCanPay(float $amount)
+    {
+        $customer = Auth::guard('api')->user();
+        if (! $customer) {
+            return response()->json([
+                'message' => trans('api.auth_required'),
+                'error' => trans('api.auth_required'),
+            ], 401);
+        }
+
+        if (! isset($customer->wallet)) {
+            return response()->json([
+                'message' => trans('packages.wallet.wallet_empty'),
+                'error' => trans('packages.wallet.wallet_empty'),
+            ], 422);
+        }
+
+        $amount = round(max(0, $amount), 2);
+        if ($amount <= 0) {
+            return null;
+        }
+
+        try {
+            (new \Incevio\Package\Wallet\Services\CommonService)
+                ->verifyWithdraw($customer->wallet, $amount);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage() ?: trans('packages.wallet.insufficient_funds'),
+                'error' => $e->getMessage() ?: trans('packages.wallet.insufficient_funds'),
+            ], 422);
+        }
+
+        return null;
     }
 
     /**

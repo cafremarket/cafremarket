@@ -286,27 +286,13 @@ class Order extends BaseModel
     }
 
     /**
-     * Get credit rewards associated with the order.
-     */
-    public function creditRewards()
-    {
-        return $this->hasMany(\Incevio\Package\Wallet\Models\CreditReward::class);
-    }
-
-    /**
      * Get the inventories for the order.
      */
     public function inventories()
     {
-        $query = $this->belongsToMany(Inventory::class, 'order_items');
-        $pivots = ['item_description', 'quantity', 'unit_price', 'feedback_id', 'download'];
-
-        // Add credit_back_amount pivot value when exist
-        if (is_incevio_package_loaded('wallet') && is_wallet_credit_reward_enabled()) {
-            $pivots = array_merge($pivots, ['credit_back_amount']);
-        }
-
-        return $query->withPivot($pivots)->withTimestamps();
+        return $this->belongsToMany(Inventory::class, 'order_items')
+            ->withPivot(['item_description', 'quantity', 'unit_price', 'feedback_id', 'download'])
+            ->withTimestamps();
     }
 
     /**
@@ -752,10 +738,6 @@ class Order extends BaseModel
         if (! $alreadyDelivered && $this->isPaid() && is_incevio_package_loaded('wallet')) {
             if (! vendor_get_paid_directly()) {
                 (new \Incevio\Package\Wallet\Services\OrderWalletService)->payVendor($this, true);
-            }
-
-            if ($this->customer_id && is_wallet_credit_reward_enabled()) {
-                (new \Incevio\Package\Wallet\Services\OrderWalletService)->initiateReward($this);
             }
         }
 

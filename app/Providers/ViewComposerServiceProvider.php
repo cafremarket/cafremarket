@@ -356,6 +356,8 @@ class ViewComposerServiceProvider extends ServiceProvider
 
                 $view->with('tags', ListHelper::tags());
 
+                $view->with('taxes', ListHelper::taxes());
+
                 if (is_incevio_package_loaded('packaging')) {
                     $view->with('packagings', ListHelper::packagings());
                 }

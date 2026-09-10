@@ -496,15 +496,12 @@ foreach ($variants as &$value) {
       let rate = Number(shipping.rate || 0);
       if (free_shipping == 1 || rate <= 0) {
         $('#summary-shipping-cost').attr('data-value', 0).html(shipping.name || '{{ trans('theme.free_shipping') }}');
-        $('#delivery-time').text(shipping.delivery_takes || '{{ trans('theme.std_delivery_time') }}');
+        $('#delivery-time').text('').addClass('hidden');
         $('#shipping-rate-id').val('location');
       } else {
-        let value = rate + Number(handlingCost || 0);
-        $('#summary-shipping-cost').attr('data-value', value).html(getFormatedPrice(value));
-        let delivery_takes = shipping.delivery_takes
-          ? shipping.delivery_takes
-          : '{{ trans('theme.notify.shipping_based_on_location') }}';
-        $('#delivery-time').text(delivery_takes);
+        // rate already includes shop handling from get_item_location_shipping_options()
+        $('#summary-shipping-cost').attr('data-value', rate).html(getFormatedPrice(rate));
+        $('#delivery-time').text('').addClass('hidden');
         $('#shipping-rate-id').val(shipping.id || 'location');
       }
 
