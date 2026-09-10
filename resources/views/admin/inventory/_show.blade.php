@@ -212,6 +212,35 @@
                     <td style="width: 75%;"> {{ $inventory->warehouse->name }} </td>
                   </tr>
                 @endif
+
+                @php $stockRows = $inventory->stocks()->with('warehouse')->get(); @endphp
+                @if ($stockRows->isNotEmpty())
+                  <tr>
+                    <th class="text-right">{{ trans('app.warehouse_stock_levels') }}:</th>
+                    <td style="width: 75%;">
+                      <table class="table table-condensed" style="margin:0;">
+                        <thead>
+                          <tr>
+                            <th>{{ trans('app.warehouse') }}</th>
+                            <th>{{ trans('app.on_hand') }}</th>
+                            <th>{{ trans('app.reserved') }}</th>
+                            <th>{{ trans('app.available') }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @foreach ($stockRows as $stock)
+                            <tr>
+                              <td>{{ optional($stock->warehouse)->name }}</td>
+                              <td>{{ $stock->quantity }}</td>
+                              <td>{{ $stock->reserved_quantity }}</td>
+                              <td>{{ $stock->availableQuantity() }}</td>
+                            </tr>
+                          @endforeach
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                @endif
               </table>
             @endif
           </div>

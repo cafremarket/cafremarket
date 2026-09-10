@@ -1,5 +1,5 @@
 @if (Auth::user()->isAdmin())
-  <li class="treeview {{ Request::is('admin/payouts*') || Request::is('admin/payout*') || Request::is('admin/rewards*') || Request::is('admin/wallets*') || Request::is('admin/wallet/topup*') || Request::is('admin/wallet/transactions*') || Request::is('admin/wallet/bulkupload*') || Request::is('admin/affiliate/commissions*') ? 'active' : '' }}">
+  <li class="treeview {{ Request::is('admin/payouts*') || Request::is('admin/payout*') || Request::is('admin/wallets*') || Request::is('admin/wallet/topup*') || Request::is('admin/wallet/transactions*') || Request::is('admin/wallet/bulkupload*') || Request::is('admin/affiliate/commissions*') ? 'active' : '' }}">
     <a href="javascript:void(0)">
       <i class="fa fa-money"></i>
       <span>{{ trans('packages.wallet.wallet') }}</span>
@@ -24,12 +24,6 @@
           </a>
         </li>
         @endif
-
-        <li class="{{ Request::is('admin/rewards*') ? 'active' : '' }}">
-          <a href="{{ url('admin/rewards') }}">
-          <i class="fa fa-angle-double-right"></i> {{ trans('packages.wallet.credit_rewards') }}
-          </a>
-        </li>
       @endcan
 
       @if (is_incevio_package_loaded('affiliate'))

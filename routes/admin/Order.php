@@ -52,9 +52,13 @@ Route::get('{order}/deliveryboys', [OrderController::class, 'deliveryBoys'])->na
 
 Route::post('{order}/deliveryboy/assign', [OrderController::class, 'assignDeliveryBoy'])->name('deliveryboy.assign');
 
+Route::put('{order}/deliveryboy/confirmOtp', [OrderController::class, 'confirmDeliveryBoyOtp'])->name('deliveryboy.confirmOtp');
+
 // Courier routes
 Route::get('{order}/courier', [OrderController::class, 'courierForm'])->name('courier.form');
 
 Route::post('{order}/courier/assign', [OrderController::class, 'assignCourier'])->name('courier.assign');
+
+Route::put('{order}/courier/confirmOtp', [OrderController::class, 'confirmCourierOtp'])->name('courier.confirmOtp');
 
 Route::resource('order', OrderController::class)->except(['update', 'edit']); // order resource routes

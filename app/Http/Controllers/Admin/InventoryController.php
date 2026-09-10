@@ -42,6 +42,12 @@ class InventoryController extends Controller
      */
     public function index($type = null)
     {
+        // Physical stock overview is the dedicated warehouse-aware dashboard
+        // (avoids the legacy DataTables "Processing…" hang).
+        if ($type === null || $type === 'physical') {
+            return redirect()->route('admin.stock.overview', request()->only(['q', 'status', 'warehouse_id', 'tab']));
+        }
+
         $trashes = Inventory::withCount('variants')
             ->onlyTrashed()
             ->where('parent_id', null)
@@ -111,12 +117,14 @@ class InventoryController extends Controller
 
         // Separate products by type when catalog mode is enabled
         $inventory = $inventory->filter(function ($item) use ($type) {
+            $downloadable = optional($item->product)->downloadable;
+
             if ($type === 'digital') {
-                return $item->product->downloadable;      // Include only digital products
+                return (bool) $downloadable;
             }
 
             if ($type === 'physical') {
-                return ! $item->product->downloadable;      // Include only physical products
+                return ! $downloadable;
             }
 
             return true;

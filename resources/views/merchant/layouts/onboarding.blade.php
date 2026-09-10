@@ -26,8 +26,12 @@
       @include('merchant.partials.language_switcher')
       {{ Auth::user()->getName() }}
       &middot;
-      <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('mp-logout').submit();">{{ trans('app.log_out') ?? trans('app.logout') }}</a>
-      <form id="mp-logout" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
+      @if (Request::session()->has('impersonated'))
+        <a href="{{ route('admin.secretLogout') }}">{{ trans('app.log_out') ?? trans('app.logout') }}</a>
+      @else
+        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('mp-logout').submit();">{{ trans('app.log_out') ?? trans('app.logout') }}</a>
+        <form id="mp-logout" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
+      @endif
     </div>
   </header>
 

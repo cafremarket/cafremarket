@@ -37,14 +37,87 @@ class SystemController extends Controller
         $this->model_name = trans('app.model.config');
     }
 
+    private const PAGES = [
+        'marketplace' => [
+            'label' => 'app.general_settings',
+            'icon' => 'fa-cubes',
+        ],
+        'environment' => [
+            'label' => 'app.environment_config',
+            'icon' => 'fa-cog',
+        ],
+    ];
+
     /**
-     * Display the resource.
+     * System settings hub.
      *
      * @return \Illuminate\Http\Response
      */
     public function view()
     {
-        return view('admin.system.general');
+        return view('admin.system.general.index', [
+            'cards' => $this->hubCards(),
+            'navItems' => $this->navItems(),
+            'active' => 'hub',
+        ]);
+    }
+
+    /**
+     * System settings subpage.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function page(string $page)
+    {
+        if (! isset(self::PAGES[$page])) {
+            abort(404);
+        }
+
+        return view('admin.system.general.page', [
+            'page' => $page,
+            'pageMeta' => self::PAGES[$page],
+            'navItems' => $this->navItems(),
+            'active' => $page,
+        ]);
+    }
+
+    private function navItems(): array
+    {
+        $items = [
+            [
+                'key' => 'hub',
+                'label' => 'Overview',
+                'icon' => 'fa-th-large',
+                'url' => route('admin.setting.system.general'),
+            ],
+        ];
+
+        foreach (self::PAGES as $key => $meta) {
+            $items[] = [
+                'key' => $key,
+                'label' => trans($meta['label']),
+                'icon' => $meta['icon'],
+                'url' => route('admin.setting.system.general.page', $key),
+            ];
+        }
+
+        return $items;
+    }
+
+    private function hubCards(): array
+    {
+        $cards = [];
+
+        foreach (self::PAGES as $key => $meta) {
+            $cards[] = [
+                'url' => route('admin.setting.system.general.page', $key),
+                'icon' => $meta['icon'],
+                'title' => trans($meta['label']),
+                'desc' => trans($meta['label']),
+            ];
+        }
+
+        return $cards;
     }
 
     /**

@@ -128,6 +128,35 @@ if (! function_exists('format_payout_instruction_text')) {
     }
 }
 
+if (! function_exists('get_wallet_deposit_payment_methods')) {
+    /**
+     * Payment methods offered for customer/vendor wallet top-up (M-Pesa + eMola only).
+     * Never includes zcart-wallet (cannot top up a wallet with itself).
+     *
+     * @return \Illuminate\Support\Collection<int, \App\Models\PaymentMethod>
+     */
+    function get_wallet_deposit_payment_methods()
+    {
+        $allowed = ['mpesa', 'emola'];
+        $ids = get_from_option_table('wallet_payment_methods', []);
+
+        $query = \App\Models\PaymentMethod::query()
+            ->whereIn('code', $allowed)
+            ->where('enabled', 1);
+
+        if (is_array($ids) && count($ids) > 0) {
+            $methods = (clone $query)->whereIn('id', $ids)->get();
+            if ($methods->isNotEmpty()) {
+                return $methods->sortBy(fn ($m) => array_search($m->code, $allowed, true))->values();
+            }
+        }
+
+        return $query->get()
+            ->sortBy(fn ($m) => array_search($m->code, $allowed, true))
+            ->values();
+    }
+}
+
 if (! function_exists('resolve_platform_payout_fee')) {
     function resolve_platform_payout_fee(float|int|string $withdrawalAmount, float|int|string|null $requestedFee = null): float
     {

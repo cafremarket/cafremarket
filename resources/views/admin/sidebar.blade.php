@@ -103,9 +103,9 @@
           <ul class="treeview-menu">
             @if (is_catalog_enabled())
               @can('index', \App\Models\Inventory::class)
-                <li class="{{ (Request::is('admin/stock/inventory/physical') && !(Request::is('admin/stock/inventory/digital*') || Request::is('admin/stock/inventory/auction*'))) || (isset($inventory) && isset($product) && !$product->downloadable && !$inventory->auctionable) ? 'active' : '' }}">
-                  <a href="{{ route('admin.stock.inventory.index', ['type' => 'physical']) }}">
-                    <i class="fa fa-angle-double-right"></i> {{ trans('nav.physical_products') }}
+                <li class="{{ Request::is('admin/stock/overview*') || (Request::is('admin/stock/inventory/physical*') || (Request::is('admin/stock/inventory') && ! Request::is('admin/stock/inventory/digital*') && ! Request::is('admin/stock/inventory/auction*'))) ? 'active' : '' }}">
+                  <a href="{{ route('admin.stock.overview') }}">
+                    <i class="fa fa-angle-double-right"></i> {{ trans('nav.stock_overview') }}
                   </a>
                 </li>
 
@@ -145,6 +145,24 @@
               <li class="{{ Request::is('admin/stock/warehouse*') ? 'active' : '' }}">
                 <a href="{{ url('admin/stock/warehouse') }}">
                   <i class="fa fa-angle-double-right"></i> {{ trans('nav.warehouses') }}
+                </a>
+              </li>
+            @endcan
+
+            @can('index', \App\Models\Inventory::class)
+              <li class="{{ Request::is('admin/stock/low-stock*') ? 'active' : '' }}">
+                <a href="{{ route('admin.stock.low') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.low_stock') }}
+                </a>
+              </li>
+              <li class="{{ Request::is('admin/stock/movements*') ? 'active' : '' }}">
+                <a href="{{ route('admin.stock.movements') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.stock_movements') }}
+                </a>
+              </li>
+              <li class="{{ Request::is('admin/stock/transfer*') ? 'active' : '' }}">
+                <a href="{{ route('admin.stock.transfers') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.stock_transfers') }}
                 </a>
               </li>
             @endcan
@@ -452,11 +470,8 @@
       @endif
 
       {{-- ===== CONTENT & DESIGN ===== --}}
-      @if ((new \App\Helpers\Authorize(Auth::user(), 'customize_appearance'))->check())
-        <li class="nav-section"><span class="nav-section-label">{{ trans('nav.appearance') ?? 'Content' }}</span></li>
-      @endif
-
       @if (Auth::user()->isAdmin() && (new \App\Helpers\Authorize(Auth::user(), 'customize_appearance'))->check())
+        <li class="nav-section"><span class="nav-section-label">{{ trans('nav.banners') ?? 'Banners' }}</span></li>
         <li class="{{ Request::is('admin/web-banners*') ? 'active' : '' }}">
           <a href="{{ route('admin.web_banner.index') }}">
             <i class="fa fa-images"></i>
@@ -468,55 +483,6 @@
             <i class="fa fa-mobile"></i>
             <span>{{ trans('nav.app_banners') }}</span>
           </a>
-        </li>
-      @endif
-
-      @if ((new \App\Helpers\Authorize(Auth::user(), 'customize_appearance'))->check())
-        <li class="treeview {{ Request::is('admin/appearance*') ? 'active' : '' }}">
-          <a href="javascript:void(0)">
-            <i class="fa fa-paint-brush"></i>
-            <span>{{ trans('nav.appearance') }}</span>
-            <i class="fa fa-angle-left pull-right"></i>
-          </a>
-          <ul class="treeview-menu">
-            @unless (Auth::user()->isMerchant())
-              <li class="{{ Request::is('admin/appearance/theme') ? 'active' : '' }}">
-                <a href="{{ url('admin/appearance/theme') }}">
-                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.themes') }}
-                </a>
-              </li>
-
-              @if (is_incevio_package_loaded('dynamic-popup'))
-                <li class="{{ Request::is('admin/appearance/popup*') ? 'active' : '' }}">
-                  <a href="{{ route('admin.appearance.popup') }}">
-                    <i class="fa fa-angle-double-right"></i> {{ trans('DynamicPopup::lang.dynamic_popups') }}
-                  </a>
-                </li>
-              @endif
-            @endunless
-
-            @if (Auth::user()->isMerchant())
-            <li class="{{ Request::is('admin/appearance/banner*') ? 'active' : '' }}">
-              <a href="{{ url('admin/appearance/banner') }}">
-                <i class="fa fa-angle-double-right"></i> {{ trans('nav.banners') }}
-              </a>
-            </li>
-            @endif
-
-            <li class="{{ Request::is('admin/appearance/slider*') ? 'active' : '' }}">
-              <a href="{{ url('admin/appearance/slider') }}">
-                <i class="fa fa-angle-double-right"></i> {{ trans('nav.sliders') }}
-              </a>
-            </li>
-
-            @unless (Auth::user()->isMerchant())
-            <li class="{{ Request::is('admin/appearance/custom_css*') ? 'active' : '' }}">
-              <a href="{{ route('admin.appearance.custom_css') }}">
-                <i class="fa fa-angle-double-right"></i> {{ trans('nav.custom_css') }}
-              </a>
-            </li>
-            @endunless
-          </ul>
         </li>
       @endif
 

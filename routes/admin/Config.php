@@ -27,3 +27,7 @@ Route::get('config/updateBankInfo/{config}', [ConfigController::class, 'editBank
 
 Route::put('config/updateBankInfo/{config}', [ConfigController::class, 'updateBankInfo'])
     ->name('bankInfo.update');
+
+Route::get('config/{page}', [ConfigController::class, 'page'])
+    ->where('page', 'inventory|order|views|support|websocket|notifications|storefront')
+    ->name('config.page');

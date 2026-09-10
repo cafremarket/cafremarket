@@ -28,15 +28,7 @@ class DeliveryBoyController extends Controller
      */
     public function index(Request $request)
     {
-        $filter = $request->get('filter');
-
-        if ($filter == 'trash') {
-            $delivery_boy = $this->delivery_boy->trashOnly();
-        } else {
-            $delivery_boy = $this->delivery_boy->all('name');
-        }
-
-        return DeliveryBoyResource::collection($delivery_boy);
+        return DeliveryBoyResource::collection($this->delivery_boy->all());
     }
 
     /**
@@ -92,31 +84,19 @@ class DeliveryBoyController extends Controller
     }
 
     /**
-     * trashed delivery boy
+     * Delete a delivery boy — no trash/restore state, this is immediate and
+     * permanent. Kept under the "trash" name/route for API compatibility with
+     * existing app builds that still call it.
      */
     public function trash($id)
     {
         try {
-            $this->delivery_boy->trash($id);
+            $this->delivery_boy->destroy($id);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
 
-        return response()->json(['message' => trans('api.delivery_boy_trashed_successfully')], 200);
-    }
-
-    /**
-     * restore delivery boy
-     */
-    public function restore($id)
-    {
-        try {
-            $this->delivery_boy->restore($id);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
-        }
-
-        return response()->json(['message' => trans('api.delivery_boy_restored_successfully')], 200);
+        return response()->json(['message' => trans('api.delivery_boy_deleted_successfully')], 200);
     }
 
     /**

@@ -49,10 +49,6 @@
       </a>
 
       @if (Auth::user()->isAdmin())
-        <a href="{{ url('admin/appearance/theme') }}">
-          <i class="fa fa-fw fa-paint-brush"></i> {{ trans('nav.appearance') }}
-        </a>
-
         <a href="{{ route('admin.kpi') }}">
           <i class="fa fa-fw fa-bar-chart"></i> {{ trans('nav.reports') }}
         </a>

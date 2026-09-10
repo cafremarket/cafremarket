@@ -1,0 +1,250 @@
+/* ---- Admin settings hub + subpages ---- */
+.as-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.as-hero {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse 55% 90% at 100% 0%, rgba(255, 102, 0, 0.12), transparent 55%),
+    linear-gradient(135deg, #ffffff 0%, #fff7ed 100%);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+}
+
+.as-hero__eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ff6600;
+}
+
+.as-hero__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.as-hero__sub {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  max-width: 52ch;
+}
+
+.as-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.as-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.as-btn--primary {
+  background: #ff6600;
+  color: #fff;
+}
+
+.as-btn--primary:hover {
+  background: #e65c00;
+  color: #fff;
+}
+
+.as-btn--ghost {
+  background: #fff;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+
+.as-btn--ghost:hover {
+  border-color: #fdba74;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.as-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+
+.as-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: none;
+  transition: 0.15s ease;
+}
+
+.as-nav__link i {
+  color: #94a3b8;
+}
+
+.as-nav__link:hover {
+  background: #fff7ed;
+  color: #9a3412;
+  text-decoration: none;
+}
+
+.as-nav__link:hover i {
+  color: #ff6600;
+}
+
+.as-nav__link.is-active {
+  background: #ff6600;
+  color: #fff;
+}
+
+.as-nav__link.is-active i {
+  color: #fff;
+}
+
+.as-hub {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.as-hub-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: 0.15s ease;
+  min-height: 140px;
+}
+
+.as-hub-card:hover {
+  border-color: #fdba74;
+  box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
+  text-decoration: none;
+  color: inherit;
+  transform: translateY(-1px);
+}
+
+.as-hub-card__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff7ed;
+  color: #ff6600;
+  font-size: 18px;
+}
+
+.as-hub-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.as-hub-card__desc {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.as-hub-card__cta {
+  margin-top: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ff6600;
+}
+
+.as-panel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 22px 24px 28px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.as-panel fieldset {
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 16px 18px 8px;
+  margin: 0 0 18px;
+}
+
+.as-panel legend {
+  width: auto;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.as-panel .form-group {
+  margin-bottom: 16px;
+}
+
+.as-panel .handle.horizontal {
+  margin-top: 4px;
+}
+
+@media (max-width: 1100px) {
+  .as-hub {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .as-hub {
+    grid-template-columns: 1fr;
+  }
+
+  .as-hero {
+    padding: 18px;
+  }
+
+  .as-panel {
+    padding: 16px;
+  }
+}

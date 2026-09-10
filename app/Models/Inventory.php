@@ -222,11 +222,37 @@ class Inventory extends Inspectable
     }
 
     /**
-     * Get the Warehouse associated with the inventory.
+     * Get the primary Warehouse associated with the inventory.
      */
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class);
+    }
+
+    /**
+     * Per-warehouse stock rows for this listing.
+     */
+    public function stocks()
+    {
+        return $this->hasMany(InventoryStock::class);
+    }
+
+    /**
+     * Warehouses that hold stock for this listing.
+     */
+    public function warehouses()
+    {
+        return $this->belongsToMany(Warehouse::class, 'inventory_stocks')
+            ->withPivot(['quantity', 'reserved_quantity', 'damaged_quantity', 'reorder_level'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Stock movement ledger for this listing.
+     */
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
     }
 
     /**
@@ -235,6 +261,21 @@ class Inventory extends Inspectable
     public function product()
     {
         return $this->belongsTo(Product::class)->withDefault();
+    }
+
+    /**
+     * Available sellable quantity across warehouses (on hand minus reserved).
+     */
+    public function availableStockQuantity(): int
+    {
+        if ($this->relationLoaded('stocks')) {
+            return (int) $this->stocks->sum(fn (InventoryStock $stock) => $stock->availableQuantity());
+        }
+
+        return (int) InventoryStock::query()
+            ->where('inventory_id', $this->id)
+            ->selectRaw('COALESCE(SUM(quantity - reserved_quantity), 0) as available')
+            ->value('available');
     }
 
     /**
@@ -639,13 +680,36 @@ class Inventory extends Inspectable
 
     public function setWarehouseIdAttribute($value)
     {
-        $this->attributes['warehouse_id'] = $value > 0 ? serialize($value) : null;
+        // Primary warehouse only — multi-warehouse qty lives in inventory_stocks.
+        if (is_array($value)) {
+            $value = reset($value);
+        }
+
+        if (is_string($value) && function_exists('is_serialized') && is_serialized($value)) {
+            $decoded = @unserialize($value);
+            $value = is_array($decoded) ? reset($decoded) : $decoded;
+        }
+
+        $this->attributes['warehouse_id'] = ($value !== null && $value !== '' && (int) $value > 0)
+            ? (string) (int) $value
+            : null;
     }
 
     public function getWarehouseIdAttribute($value)
     {
-        // To ensure compatibility with previous versions that didn't store warehouse_id as serialized
-        return is_serialized($value) ? unserialize($value) : $value;
+        // Legacy rows may still hold a serialized multi-id payload.
+        if (is_string($value) && function_exists('is_serialized') && is_serialized($value)) {
+            $decoded = @unserialize($value);
+            if (is_array($decoded)) {
+                $first = reset($decoded);
+
+                return $first ? (int) $first : null;
+            }
+
+            return is_numeric($decoded) ? (int) $decoded : null;
+        }
+
+        return $value !== null && $value !== '' ? (int) $value : null;
     }
 
     public function setSupplierIdAttribute($value)

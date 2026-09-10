@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Incevio\Package\Wallet\Http\Controllers\Admin\AdminWalletController;
-use Incevio\Package\Wallet\Http\Controllers\Admin\CreditRewardController;
 use Incevio\Package\Wallet\Http\Controllers\Admin\DepositRequestController;
 use Incevio\Package\Wallet\Http\Controllers\Admin\PayoutController;
 use Incevio\Package\Wallet\Http\Controllers\Admin\PayoutReportController;
@@ -49,19 +48,6 @@ Route::middleware(['web'])->group(function () {
             Route::post('wallet/payout', [
                 PayoutController::class, 'payout',
             ])->name('wallet.payout.submit');
-
-            // Credit Rewards
-            Route::get('rewards', [
-                CreditRewardController::class, 'index',
-            ])->name('wallet.rewards');
-
-            Route::post('reward/{creditReward}/release', [
-                CreditRewardController::class, 'release',
-            ])->name('wallet.reward.release');
-
-            Route::delete('reward/{creditReward}/delete', [
-                CreditRewardController::class, 'delete',
-            ])->name('wallet.reward.delete');
 
             // Deposit
             // Route::get('deposit/requests', [

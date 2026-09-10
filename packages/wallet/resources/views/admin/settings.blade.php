@@ -105,44 +105,6 @@
 
           <div class="form-group">
             <div class="col-sm-5 text-right">
-              {!! Form::label('wallet_credit_reward_system', trans('packages.wallet.wallet_credit_reward_system') . ':', ['class' => 'with-help control-label']) !!}
-              <small class="text-info d-block">
-                {{ trans('packages.wallet.help_wallet_credit_reward_system') }}
-              </small>
-            </div>
-
-            <div class="col-sm-7 nopadding-left">
-              @php
-                $wallet_credit_reward_system = get_from_option_table('wallet_credit_reward_system');
-              @endphp
-
-              <div class="handle horizontal">
-                <a href="javascript:void(0)" data-link="{{ route('admin.package.config.toggle', ['option' => 'wallet_credit_reward_system']) }}" type="button" class="btn btn-md btn-secondary btn-toggle {{ $wallet_credit_reward_system == 1 ? 'active' : '' }}" data-toggle="button" aria-pressed="{{ $wallet_credit_reward_system == 1 ? 'true' : 'false' }}" autocomplete="off">
-                  <div class="btn-handle"></div>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="col-sm-5 text-right">
-              {!! Form::label('wallet_release_credit_rewards_in_days', trans('packages.wallet.wallet_release_credit_rewards_in_days') . ': ', ['class' => 'with-help control-label']) !!}
-              <small class="text-info d-block">
-                {!! trans('packages.wallet.help_release_credit_rewards_in') !!}
-              </small>
-            </div>
-
-            <div class="col-sm-7 nopadding-left">
-              <div class="input-group">
-                {!! Form::number('wallet_release_credit_rewards_in_days', get_from_option_table('wallet_release_credit_rewards_in_days'), ['min' => 0, 'class' => 'form-control', 'placeholder' => trans('packages.wallet.placeholder_release_credit_rewards_in'), 'disabled' => !is_wallet_credit_reward_enabled()]) !!}
-                <span class="input-group-addon">{{ trans('packages.wallet.days') }}</span>
-              </div>
-              <div class="help-block with-errors"></div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="col-sm-5 text-right">
               {!! Form::label('wallet_payment_info_cod', trans('packages.wallet.manual_payment_info_cod') . ':*', ['class' => 'with-help text-right control-label']) !!}
               <small class="text-info d-block">
                 {!! trans('help.config_additional_details') !!}

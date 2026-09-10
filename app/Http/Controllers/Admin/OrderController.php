@@ -346,6 +346,10 @@ class OrderController extends Controller
     {
         $order = $this->order->find($id);
 
+        if ($order->isDelivered()) {
+            return back()->with('error', trans('app.order_already_delivered'));
+        }
+
         if ($request->filled('delivery_boy_id')) {
             $rider = DeliveryBoy::findOrFail($request->delivery_boy_id);
             $dispatchService->assignShopRider($order, $rider);
@@ -375,26 +379,130 @@ class OrderController extends Controller
      */
     public function assignCourier(Request $request, $id)
     {
-        $order = $this->order->find($id);
-
         if (! $request->filled('courier_name') || ! $request->filled('courier_phone')) {
             return back()->with('error', trans('app.courier_details_required'));
         }
 
-        $order->fulfillment_method = Order::FULFILLMENT_METHOD_COURIER;
-        $order->courier_name = $request->input('courier_name');
-        $order->courier_phone = $request->input('courier_phone');
-        $order->courier_tracking_number = $request->input('courier_tracking_number');
-        $order->courier_added_at = now();
-        $order->otp = $order->otp ?? Order::generateDeliveryOtp();
+        try {
+            \DB::transaction(function () use ($request, $id) {
+                // Locked re-read: an in-flight "assign" that started before a
+                // concurrent delivery confirmation must not be allowed to save
+                // over it — see DeliveryDispatchService::assignShopRider for
+                // the full race explanation.
+                $order = Order::whereKey($id)->lockForUpdate()->firstOrFail();
 
-        if ((int) $order->order_status_id < Order::STATUS_AWAITING_DELIVERY) {
-            $order->order_status_id = Order::STATUS_AWAITING_DELIVERY;
+                if ($order->isDelivered()) {
+                    throw new \RuntimeException(trans('app.order_already_delivered'));
+                }
+
+                $order->fulfillment_method = Order::FULFILLMENT_METHOD_COURIER;
+                $order->courier_name = $request->input('courier_name');
+                $order->courier_phone = $request->input('courier_phone');
+                $order->courier_tracking_number = $request->input('courier_tracking_number');
+                $order->courier_added_at = now();
+
+                // NOTE: `otp` is a non-nullable string column, so pre-existing rows
+                // hold '' rather than null. `?? ` only falls back on null, so it was
+                // silently keeping the empty string forever — use empty() instead.
+                if (empty($order->otp)) {
+                    $order->otp = Order::generateDeliveryOtp();
+                }
+
+                \Log::debug('assignCourier: otp state', [
+                    'order_id' => $order->id,
+                    'otp_after_assign' => $order->otp,
+                ]);
+
+                if ((int) $order->order_status_id < Order::STATUS_AWAITING_DELIVERY) {
+                    $order->order_status_id = Order::STATUS_AWAITING_DELIVERY;
+                }
+
+                $order->save();
+            });
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
         }
 
-        $order->save();
-
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
+    }
+
+    /**
+     * Vendor-side alternative to the customer's "Confirm Received" tap: the
+     * vendor reads the OTP back from the customer over a call/in person and
+     * enters it here. Verified server-side against the same OTP shown on the
+     * customer's order page, so it can't be used to bypass confirmation
+     * without the code. Mirrors Api\Vendor\OrderFulfillmentController::confirm_courier_otp.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function confirmCourierOtp(Request $request, $id)
+    {
+        $request->validate([
+            'otp' => 'required|string|size:6',
+        ]);
+
+        try {
+            \DB::transaction(function () use ($request, $id) {
+                $order = Order::whereKey($id)->lockForUpdate()->firstOrFail();
+
+                if ($order->isDelivered()) {
+                    throw new \RuntimeException(trans('app.order_already_delivered'));
+                }
+
+                if (! $order->hasCourier()) {
+                    throw new \RuntimeException(trans('app.courier_details_required'));
+                }
+
+                if (empty($order->otp) || ! hash_equals((string) $order->otp, (string) $request->input('otp'))) {
+                    throw new \RuntimeException(trans('app.invalid_otp'));
+                }
+
+                $order->mark_as_goods_received();
+            });
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+    }
+
+    /**
+     * Web-panel alternative to the delivery boy app's OTP confirmation, for
+     * shop-owned riders (not couriers). Mirrors Api\DeliveryBoy\OrderController::confirmDelivery.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function confirmDeliveryBoyOtp(Request $request, $id)
+    {
+        $request->validate([
+            'otp' => 'required|string|size:6',
+        ]);
+
+        try {
+            \DB::transaction(function () use ($request, $id) {
+                $order = Order::whereKey($id)->lockForUpdate()->firstOrFail();
+
+                if ($order->isDelivered()) {
+                    throw new \RuntimeException(trans('app.order_already_delivered'));
+                }
+
+                if (! $order->reached_at) {
+                    throw new \RuntimeException(trans('app.not_reached_yet'));
+                }
+
+                if (empty($order->otp) || ! hash_equals((string) $order->otp, (string) $request->input('otp'))) {
+                    throw new \RuntimeException(trans('app.invalid_otp'));
+                }
+
+                $order->mark_as_goods_received();
+            });
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
     }
 
     /**
@@ -408,6 +516,10 @@ class OrderController extends Controller
         $order = $this->order->find($id);
 
         $this->authorize('fulfill', $order); // Check permission
+
+        if ($order->isDelivered()) {
+            return back()->with('error', trans('app.order_already_delivered'));
+        }
 
         $this->order->fulfill($request, $order);
 
@@ -435,6 +547,10 @@ class OrderController extends Controller
         $order = $this->order->find($id);
 
         $this->authorize('fulfill', $order);
+
+        if ($order->isDelivered()) {
+            return back()->with('error', trans('app.order_already_delivered'));
+        }
 
         abort_unless($order->pickup(), 400, trans('app.order_not_pickup'));
 

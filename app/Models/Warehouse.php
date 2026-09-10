@@ -85,11 +85,29 @@ class Warehouse extends BaseModel
     }
 
     /**
-     * Get the Inventories for the warehouse.
+     * Listings that still point at this warehouse as primary.
      */
     public function inventories()
     {
         return $this->hasMany(Inventory::class);
+    }
+
+    /**
+     * Per-SKU stock rows stored in this warehouse.
+     */
+    public function stocks()
+    {
+        return $this->hasMany(InventoryStock::class);
+    }
+
+    /**
+     * Inventories that have stock in this warehouse (via stock table).
+     */
+    public function stockedInventories()
+    {
+        return $this->belongsToMany(Inventory::class, 'inventory_stocks')
+            ->withPivot(['quantity', 'reserved_quantity', 'damaged_quantity', 'reorder_level'])
+            ->withTimestamps();
     }
 
     /**
@@ -98,6 +116,16 @@ class Warehouse extends BaseModel
     public function products()
     {
         return $this->hasManyThrough(Product::class, Inventory::class);
+    }
+
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
+    }
+
+    public function totalOnHandQuantity(): int
+    {
+        return (int) $this->stocks()->sum('quantity');
     }
 
     /**

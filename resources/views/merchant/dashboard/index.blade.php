@@ -59,7 +59,7 @@
         <span class="mp-stat-card__label">{{ trans('app.stock_outs') }}</span>
         <span class="mp-stat-card__value">
           {{ $stock_out_count }}
-          <a href="{{ url('merchant/stock/inventory') }}" class="mp-stat-card__link" title="{{ trans('app.detail') }}">
+          <a href="{{ url('merchant/stock/overview') }}" class="mp-stat-card__link" title="{{ trans('app.detail') }}">
             <i class="icon ion-md-send"></i>
           </a>
         </span>

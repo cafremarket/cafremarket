@@ -200,6 +200,11 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
+        // Impersonation (secret login): leave vendor account and return to admin.
+        if ($request->session()->has('impersonated')) {
+            return redirect()->route('admin.secretLogout');
+        }
+
         // Clear permissions cache for user
         $user = Auth::guard('web')->user();
         if ($user) {

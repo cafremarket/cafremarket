@@ -10,6 +10,7 @@ return [
     'sent' => ':model foi enviado com sucesso!',
     'updated' => ':model foi atualizado com sucesso!',
     'trashed' => ':model foi movido para a lixeira!',
+    'password_reset' => ':model password has been reset successfully!',
     'restored' => ':model foi restaurado com sucesso!',
     'deleted' => ':model foi excluído permanentemente!',
     'mail_send_failed_soft' => 'A ação foi guardada, mas o e-mail não pôde ser enviado. Consulte os Registos de e-mail para detalhes.',

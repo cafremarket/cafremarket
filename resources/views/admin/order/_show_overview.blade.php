@@ -239,6 +239,14 @@
           @else
             <p class="text-muted">{{ trans('app.delivery_boy_not_assigned') }}</p>
           @endif
+
+          @if (! empty($order->otp) && ! $order->isDelivered() && Auth::user()->isAdmin())
+            <div class="admin-order-sidebar-panel__otp" style="margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+              <small class="text-muted">{{ trans('app.delivery_otp') }}</small>
+              <div style="font-size:20px; font-weight:700; letter-spacing:3px;">{{ $order->otp }}</div>
+              <small class="text-muted">{{ trans('app.delivery_otp_help') }}</small>
+            </div>
+          @endif
         @include('admin.partials.ui.card_end')
       @endif
 

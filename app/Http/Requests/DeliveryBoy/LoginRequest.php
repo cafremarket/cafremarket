@@ -26,6 +26,9 @@ class LoginRequest extends FormRequest
         return [
             'email' => 'required|email',
             'password' => 'required',
+            // Only needed when the same email is used by riders in more than one
+            // store — the app sends this back after the user picks a store.
+            'shop_id' => 'nullable|integer',
         ];
     }
 }

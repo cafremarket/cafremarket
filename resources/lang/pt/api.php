@@ -3,6 +3,7 @@
 return [
     'access_token_required' => 'A valid access token is required.',
     'auth_failed' => 'These credentials do not match our records.',
+    'multiple_stores_found' => 'This email is used for more than one store. Please choose which store to sign in to.',
     'account_inactive' => 'Your account is inactive. Please contact support.',
     'auth_out' => 'Logged out successfully!',
     'cart_updated' => 'Your cart has been updated successfully.',

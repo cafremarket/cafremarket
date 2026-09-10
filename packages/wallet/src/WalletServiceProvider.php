@@ -6,7 +6,6 @@ use App\Common\PackageConfig;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Incevio\Package\Wallet\Commands\PeriodicPayout;
 use Incevio\Package\Wallet\Commands\RefreshBalance;
-use Incevio\Package\Wallet\Console\Commands\ReleaseCreditRewards;
 use Incevio\Package\Wallet\Console\Commands\ReleasePayments;
 use Incevio\Package\Wallet\Interfaces\Mathable;
 use Incevio\Package\Wallet\Interfaces\Rateable;
@@ -53,7 +52,6 @@ class WalletServiceProvider extends ServiceProvider
             RefreshBalance::class,
             PeriodicPayout::class,
             ReleasePayments::class,
-            ReleaseCreditRewards::class,
         ]);
     }
 

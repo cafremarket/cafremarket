@@ -39,7 +39,7 @@ class WalletOptionsSeeder extends Seeder
                 'overwrite' => true,
             ], [
                 'option_name' => 'platform_fee_mpesa_enabled',
-                'option_value' => 0,
+                'option_value' => 1,
                 'autoload' => true,
                 'overwrite' => false,
             ], [
@@ -54,7 +54,7 @@ class WalletOptionsSeeder extends Seeder
                 'overwrite' => false,
             ], [
                 'option_name' => 'platform_fee_emola_enabled',
-                'option_value' => 0,
+                'option_value' => 1,
                 'autoload' => true,
                 'overwrite' => false,
             ], [

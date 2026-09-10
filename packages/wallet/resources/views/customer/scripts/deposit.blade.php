@@ -1,5 +1,3 @@
-<script src="https://js.stripe.com/v2/"></script>
-
 <script type="text/javascript">
   "use strict";;
   (function($, window, document) {
@@ -13,45 +11,15 @@
         var code = $(this).data('code');
         $("#payment-instructions.text-danger").removeClass('text-danger').addClass('text-info small');
         $('#payment-instructions').children('span').html($(this).data('info'));
-
-        if ('stripe' == code && $(this).val() != 'saved_card') {
-          showStripeCardForm();
-        } else {
-          hideStripeCardForm();
-        }
-
-        if ('paypal' == code) {
-          $('#paypal-express-btn').removeClass('hide');
-          $('#pay-now-btn').addClass('hide');
-        } else {
-          $('#paypal-express-btn').addClass('hide');
-          $('#pay-now-btn').removeClass('hide');
-        }
-
         toggleWalletMobileFields(code);
         refreshWalletTopupFeePreview();
-      });
-
-      $("a#paypal-express-btn").on('click', function(e) {
-        e.preventDefault();
-        $("form#depositForm").submit();
       });
 
       var paymentOptionSelected = $('input[name="payment_method"]:checked');
 
       if (paymentOptionSelected.length > 0) {
-        var code = paymentOptionSelected.data('code');
-
-        if (code == 'stripe' && paymentOptionSelected.val() != 'saved_card') {
-          showStripeCardForm();
-        } else if ('paypal' == code) {
-          $('#pay-now-btn').addClass('hide');
-          $('#paypal-express-btn').removeClass('hide');
-        }
-        toggleWalletMobileFields(code);
+        toggleWalletMobileFields(paymentOptionSelected.data('code'));
       }
-
-      Stripe.setPublishableKey("{{ config('services.stripe.key') }}");
 
       $("form#depositForm").on('submit', function(e) {
         e.preventDefault();
@@ -67,25 +35,7 @@
           return;
         }
 
-        var payment_method = $('input[name=payment_method]:checked').val();
-
-        if (payment_method == 'stripe') {
-          if (!$("input[data-stripe='number']").val() || !$("input[data-stripe='cvc']").val()) {
-            return;
-          }
-
-          Stripe.card.createToken(form, function(status, response) {
-            if (response.error) {
-              form.find('.stripe-errors').text(response.error.message).removeClass('hide');
-              remove_busy_filter('body');
-            } else {
-              form.append($('<input type="hidden" name="cc_token">').val(response.id));
-              form.get(0).submit();
-            }
-          });
-        } else {
-          form.get(0).submit();
-        }
+        form.get(0).submit();
       });
 
       $('#amount').on('input change', refreshWalletTopupFeePreview);
@@ -136,14 +86,6 @@
         $('#pay-now-btn').prop('disabled', false);
         box.hide();
       });
-    }
-
-    function showStripeCardForm() {
-      $('#cc-form').show().find('input:text, select').attr('required', 'required');
-    }
-
-    function hideStripeCardForm() {
-      $('#cc-form').hide().find('input, select').removeAttr('required');
     }
 
     function toggleWalletMobileFields(code) {

@@ -5,7 +5,7 @@
       {{ trans('app.courier_details') }}
     </div>
     <div class="modal-body">
-      {!! Form::open(['route' => ['admin.order.courier.assign', $order], 'method' => 'post']) !!}
+      {!! Form::open(['url' => panel_route('admin.order.courier.assign', $order, false), 'method' => 'post']) !!}
         <div class="form-group">
           <label>{{ trans('app.courier_name') }}</label>
           {!! Form::text('courier_name', $order->courier_name, ['class' => 'form-control', 'required']) !!}

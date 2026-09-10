@@ -8,8 +8,17 @@ include 'admin/Auth.php';
 
 // Admin Routes
 Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('admin')->group(function () {
-    // Addon package manager removed — custom features are built in-house.
-    // include 'admin/Package.php';
+    // Addon package manager removed — keep only package option update/toggle
+    // used by wallet (and similar) settings pages.
+    Route::post('package/{package}/update', [
+        Admin\PackagesController::class,
+        'updateConfig',
+    ])->name('package.config.update');
+
+    Route::put('package/toggle/{option}', [
+        Admin\PackagesController::class,
+        'toggleConfig',
+    ])->name('package.config.toggle')->middleware('ajax');
 
     // Deal of the Day calendar
     include 'admin/DealOfTheDay.php';
@@ -106,6 +115,7 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/Warehouse.php';
             include 'admin/InventoryProduct.php';
             include 'admin/Supplier.php';
+            include 'admin/Stock.php';
         });
 
         // Shipping Routes for Admin/Merchant
@@ -147,15 +157,6 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/State.php';
             include 'admin/Language.php';
             include 'admin/Verification.php';
-        });
-
-        // Appearances Routes for Admin
-        Route::name('appearance.')->prefix('appearance')->group(function () {
-            include 'admin/Theme.php';
-            include 'admin/Banner.php';
-            include 'admin/Slider.php';
-            include 'admin/CustomCSS.php';
-            // include 'admin/CustomInvoice.php';
         });
 
         // Web + App homepage banners (platform admin only)

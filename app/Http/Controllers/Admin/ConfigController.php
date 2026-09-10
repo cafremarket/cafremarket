@@ -20,6 +20,7 @@ use App\Services\Shop\ShopAddressChangeService;
 use App\Services\Shop\ShopSlugChangeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class ConfigController extends Controller
@@ -76,8 +77,24 @@ class ConfigController extends Controller
         return view('admin.config.general', $viewData);
     }
 
+    private const ADMIN_PAGES = [
+        'inventory' => ['label' => 'app.inventory', 'icon' => 'fa-cubes'],
+        'order' => ['label' => 'app.order', 'icon' => 'fa-shopping-cart'],
+        'views' => ['label' => 'app.views', 'icon' => 'fa-laptop'],
+        'support' => ['label' => 'app.support', 'icon' => 'fa-phone'],
+        'websocket' => ['label' => 'app.websocket', 'icon' => 'fa-plug'],
+        'notifications' => ['label' => 'app.notifications', 'icon' => 'fa-bell-o'],
+    ];
+
+    private const MERCHANT_PAGES = [
+        'order' => ['label' => 'app.order', 'icon' => 'fa-shopping-cart'],
+        'storefront' => ['label' => 'app.store_front', 'icon' => 'fa-laptop'],
+        'support' => ['label' => 'app.support', 'icon' => 'fa-phone'],
+        'notifications' => ['label' => 'app.notifications', 'icon' => 'fa-bell-o'],
+    ];
+
     /**
-     * Display the resource.
+     * Shop config hub.
      *
      * @return \Illuminate\View\View
      */
@@ -85,17 +102,98 @@ class ConfigController extends Controller
     {
         $config = Config::findOrFail(Auth::user()->merchantId());
 
-        $this->authorize('view', $config); // Check permission
+        $this->authorize('view', $config);
 
-        $order_invoice_pdf_templates = PdfTemplate::active()->where('type', PdfTemplate::TYPE_ORDER_INVOICE)->get()->pluck('name', 'id');
+        $isMerchant = Auth::user()->isFromMerchant();
+        $pages = $isMerchant ? self::MERCHANT_PAGES : self::ADMIN_PAGES;
 
-        $shipping_label_pdf_templates = PdfTemplate::active()->where('type', PdfTemplate::TYPE_SHIPPING_LABEL)->get()->pluck('name', 'id');
+        return view($isMerchant ? 'merchant.config.index' : 'admin.config.index', [
+            'config' => $config,
+            'cards' => $this->hubCards($pages),
+            'navItems' => $this->navItems($pages),
+            'active' => 'hub',
+            'order_invoice_pdf_templates' => $this->orderInvoiceTemplates(),
+            'shipping_label_pdf_templates' => $this->shippingLabelTemplates(),
+        ]);
+    }
 
-        $view = Auth::user()->isFromMerchant()
-            ? 'merchant.config.index'
-            : 'admin.config.index';
+    /**
+     * Shop config subpage.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function page(string $page)
+    {
+        $config = Config::findOrFail(Auth::user()->merchantId());
 
-        return view($view, compact('config', 'order_invoice_pdf_templates', 'shipping_label_pdf_templates'));
+        $this->authorize('view', $config);
+
+        $isMerchant = Auth::user()->isFromMerchant();
+        $pages = $isMerchant ? self::MERCHANT_PAGES : self::ADMIN_PAGES;
+
+        if (! isset($pages[$page])) {
+            abort(404);
+        }
+
+        return view($isMerchant ? 'merchant.config.page' : 'admin.config.page', [
+            'config' => $config,
+            'page' => $page,
+            'pageMeta' => $pages[$page],
+            'navItems' => $this->navItems($pages),
+            'active' => $page,
+            'can_update' => Gate::allows('update', $config),
+            'order_invoice_pdf_templates' => $this->orderInvoiceTemplates(),
+            'shipping_label_pdf_templates' => $this->shippingLabelTemplates(),
+        ]);
+    }
+
+    private function orderInvoiceTemplates()
+    {
+        return PdfTemplate::active()->where('type', PdfTemplate::TYPE_ORDER_INVOICE)->get()->pluck('name', 'id');
+    }
+
+    private function shippingLabelTemplates()
+    {
+        return PdfTemplate::active()->where('type', PdfTemplate::TYPE_SHIPPING_LABEL)->get()->pluck('name', 'id');
+    }
+
+    private function navItems(array $pages): array
+    {
+        $items = [
+            [
+                'key' => 'hub',
+                'label' => 'Overview',
+                'icon' => 'fa-th-large',
+                'url' => route('admin.setting.config.view'),
+            ],
+        ];
+
+        foreach ($pages as $key => $meta) {
+            $items[] = [
+                'key' => $key,
+                'label' => trans($meta['label']),
+                'icon' => $meta['icon'],
+                'url' => route('admin.setting.config.page', $key),
+            ];
+        }
+
+        return $items;
+    }
+
+    private function hubCards(array $pages): array
+    {
+        $cards = [];
+
+        foreach ($pages as $key => $meta) {
+            $cards[] = [
+                'url' => route('admin.setting.config.page', $key),
+                'icon' => $meta['icon'],
+                'title' => trans($meta['label']),
+                'desc' => trans($meta['label']),
+            ];
+        }
+
+        return $cards;
     }
 
     /**

@@ -15,6 +15,11 @@ Route::name('system.')->prefix('system')->group(function () {
         'view',
     ])->name('general');
 
+    Route::get('general/{page}', [
+        SystemController::class,
+        'page',
+    ])->where('page', 'marketplace|environment')->name('general.page');
+
     Route::put('updateBasicSystem', [
         SystemController::class,
         'update',

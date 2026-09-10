@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateDeliveryBoyRequest;
+use App\Http\Requests\Validations\ResetDeliveryBoyPasswordRequest;
 use App\Http\Requests\Validations\UpdateDeliveryBoyRequest;
 use App\Models\DeliveryBoy;
 use App\Repositories\DeliveryBoy\DeliveryBoyRepository;
@@ -35,9 +36,7 @@ class DeliveryBoyController extends Controller
     {
         $deliveryBoys = $this->deliveryBoy->all();
 
-        $trashes = $this->deliveryBoy->trashOnly();
-
-        return view('admin.deliveryboy.index', compact('deliveryBoys', 'trashes'));
+        return view('admin.deliveryboy.index', compact('deliveryBoys'));
     }
 
     /**
@@ -48,6 +47,20 @@ class DeliveryBoyController extends Controller
     public function create()
     {
         return view('admin.deliveryboy._create');
+    }
+
+    /**
+     * Whether a delivery boy account already exists for this email (in any
+     * store) — used by the create form to hide the password field and reuse
+     * that rider's existing password instead of asking for a new one.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkEmail(Request $request)
+    {
+        $exists = DeliveryBoy::where('email', $request->get('email'))->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 
     /**
@@ -106,72 +119,49 @@ class DeliveryBoyController extends Controller
     }
 
     /**
-     * Permanently Remove the specified resource from storage.
+     * Show the reset-password form for a delivery boy.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function resetPasswordForm(DeliveryBoy $deliveryboy)
+    {
+        return view('admin.deliveryboy._reset_password', compact('deliveryboy'));
+    }
+
+    /**
+     * Set a new password for a delivery boy (admin/vendor-initiated reset —
+     * doesn't require knowing the old password).
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function resetPassword(ResetDeliveryBoyPasswordRequest $request, DeliveryBoy $deliveryboy)
+    {
+        $deliveryboy->password = $request->password;
+        $deliveryboy->save();
+
+        return back()->with('success', trans('messages.password_reset', ['model' => $this->model_name]));
+    }
+
+    /**
+     * Permanently remove the specified resource from storage — there is no
+     * trash/restore step for delivery boys, this deletes it outright.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, $id)
     {
+        if (config('app.demo') == true && $id <= config('system.demo.delivery_boys')) {
+            return response()->json(['message' => trans('messages.demo_restriction')], 400);
+        }
+
         $this->deliveryBoy->destroy($id);
 
         return back()->with('success', trans('messages.deleted', ['model' => $this->model_name]));
     }
 
     /**
-     * Move items from storage to trash
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function trash(Request $request, $id)
-    {
-        if (config('app.demo') == true && $id <= config('system.demo.delivery_boys')) {
-            return response()->json(['message' => trans('messages.demo_restriction')], 400);
-        }
-
-        $this->deliveryBoy->trash($id);
-
-        return back()->with('success', trans('messages.trashed', ['model' => $this->model_name]));
-    }
-
-    /**
-     * Restore the specified resource from soft delete.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function restore(Request $request, $id)
-    {
-        $this->deliveryBoy->restore($id);
-
-        return back()->with('success', trans('messages.restored', ['model' => $this->model_name]));
-    }
-
-    /**
-     * Trash the mass resources.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function massTrash(Request $request)
-    {
-        if (config('app.demo') == true) {
-            return back()->with('warning', trans('messages.demo_restriction'));
-        }
-
-        $this->deliveryBoy->massTrash($request->ids);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => trans('messages.trashed', ['model' => $this->model_name]),
-            ]);
-        }
-
-        return back()->with('success', trans('messages.trashed', ['model' => $this->model_name]));
-    }
-
-    /**
-     * Destroy the mass resources.
+     * Destroy the mass resources — no trash/restore step, deletes outright.
      *
      * @return \Illuminate\Http\Response
      */
@@ -182,28 +172,6 @@ class DeliveryBoyController extends Controller
         }
 
         $this->deliveryBoy->massDestroy($request->ids);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => trans('messages.deleted', ['model' => $this->model_name]),
-            ]);
-        }
-
-        return back()->with('success', trans('messages.deleted', ['model' => $this->model_name]));
-    }
-
-    /**
-     * Destroy the mass trash resources.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function emptyTrash(Request $request)
-    {
-        if (config('app.demo') == true) {
-            return back()->with('warning', trans('messages.demo_restriction'));
-        }
-
-        $this->deliveryBoy->emptyTrash($request->ids);
 
         if ($request->ajax()) {
             return response()->json([

@@ -38,7 +38,6 @@ return [
     'default' => [
         'min_withdrawal_limit' => 100, // amount
         'order_amount_escrow_holding_duration' => 15, // Days
-        'credit_back_reward_release_in' => 3, // Days
     ],
 
     /**

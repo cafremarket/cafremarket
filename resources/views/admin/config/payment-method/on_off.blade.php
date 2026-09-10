@@ -35,8 +35,8 @@ $active_payment_methods = $config->paymentMethods->pluck('id')->toArray();
 
                 <div class="col-sm-7">
                   @foreach ($payment_providers as $payment_provider)
-                    <!-- Skip the wallet because wallet setting has option to activatte -->
-                    @continue($payment_provider->code == 'zcart-wallet')
+                    <!-- Skip removed gateways and wallet -->
+                    @continue(in_array($payment_provider->code, ['zcart-wallet', 'stripe'], true))
 
                     @php
                       $logo_path = sys_image_path('payment-methods') . "{$payment_provider->code}.png";
@@ -44,12 +44,11 @@ $active_payment_methods = $config->paymentMethods->pluck('id')->toArray();
                     <ul class="list-group">
                       <li class="list-group-item">
                         @if (File::exists($logo_path))
-                          <img src="{{ asset($logo_path) }}" class="open-img-md" alt="{{ $type }}">
-                        @else
-                          <p class="list-group-item-heading inline lead">
-                            {{ $payment_provider->name }}
-                          </p>
+                          <img src="{{ asset($logo_path) }}" class="open-img-md" alt="{{ $payment_provider->name }}">
                         @endif
+                        <p class="list-group-item-heading inline lead" style="{{ File::exists($logo_path) ? 'margin-left: 8px;' : '' }}">
+                          {{ $payment_provider->name }}
+                        </p>
 
                         <span class="spacer10"></span>
 

@@ -43,8 +43,8 @@
 
 {{-- Inventory (warehouses / stock tools only — products live under Catalog) --}}
 @if (Gate::allows('index', \App\Models\Warehouse::class) || Gate::allows('index', \App\Models\Inventory::class))
-  <div class="mp-nav-group {{ mp_is_any(['merchant/stock/warehouse*', 'merchant/stock/inventory*']) ? 'is-open' : '' }}">
-    <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is_any(['merchant/stock/warehouse*', 'merchant/stock/inventory*']) ? 'true' : 'false' }}">
+  <div class="mp-nav-group {{ mp_is_any(['merchant/stock/warehouse*', 'merchant/stock/inventory*', 'merchant/stock/overview*', 'merchant/stock/movements*', 'merchant/stock/transfer*', 'merchant/stock/low-stock*']) ? 'is-open' : '' }}">
+    <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is_any(['merchant/stock/warehouse*', 'merchant/stock/inventory*', 'merchant/stock/overview*', 'merchant/stock/movements*', 'merchant/stock/transfer*', 'merchant/stock/low-stock*']) ? 'true' : 'false' }}">
       <i class="fa fa-cubes"></i>
       <span>{{ trans('nav.stock') ?? 'Inventory' }}</span>
       <i class="fa fa-chevron-down mp-nav-group__chevron"></i>
@@ -52,7 +52,7 @@
     <div class="mp-nav-group__items">
       <div class="mp-nav-group__items-inner">
         @can('index', \App\Models\Inventory::class)
-          <a href="{{ mp_route('admin.stock.inventory.index', ['type' => 'physical']) }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/stock/inventory*') ? 'is-active' : '' }}">
+          <a href="{{ route('admin.stock.overview') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/stock/overview*') || (mp_is('merchant/stock/inventory*') && ! mp_is('merchant/stock/inventory/digital*')) ? 'is-active' : '' }}">
             <i class="fa fa-list"></i>
             <span>{{ trans('nav.stock_overview') ?? 'Stock overview' }}</span>
           </a>
@@ -225,8 +225,8 @@
 
 {{-- Store management --}}
 @can('view', \App\Models\Config::class)
-  <div class="mp-nav-group {{ mp_is_any(['merchant/setting/general*', 'merchant/appearance/banner*']) ? 'is-open' : '' }}">
-    <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is_any(['merchant/setting/general*', 'merchant/appearance/banner*']) ? 'true' : 'false' }}">
+  <div class="mp-nav-group {{ mp_is('merchant/setting/general*') ? 'is-open' : '' }}">
+    <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is('merchant/setting/general*') ? 'true' : 'false' }}">
       <i class="fa fa-shopping-bag"></i>
       <span>{{ trans('nav.store_management') ?? 'Store' }}</span>
       <i class="fa fa-chevron-down mp-nav-group__chevron"></i>
@@ -237,12 +237,6 @@
           <i class="fa fa-cog"></i>
           <span>{{ trans('nav.shop_settings') }}</span>
         </a>
-        @if ((new \App\Helpers\Authorize(Auth::user(), 'customize_appearance'))->check())
-          <a href="{{ mp_url('merchant/appearance/banner') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/appearance/banner*') ? 'is-active' : '' }}">
-            <i class="fa fa-image"></i>
-            <span>{{ trans('nav.banners') }}</span>
-          </a>
-        @endif
       </div>
     </div>
   </div>

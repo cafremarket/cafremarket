@@ -64,11 +64,14 @@ class DashboardController extends Controller
     public function secretLogout()
     {
         $secret_url = Request::session()->get('secretUrl');
+        $impersonated_id = Request::session()->get('impersonated');
 
-        Request::session()->forget('impersonated', 'secretUrl');
+        Request::session()->forget(['impersonated', 'secretUrl']);
 
         // Flush permissions for impersonated user
-        Cache::forget('permissions_'.session('impersonated'));
+        if ($impersonated_id) {
+            Cache::forget('permissions_'.$impersonated_id);
+        }
 
         return $secret_url ?
             redirect()->to($secret_url)->with('success', trans('messages.secret_logged_out')) :

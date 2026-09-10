@@ -38,7 +38,7 @@
   <div class="col-md-6 nopadding-right">
     <div class="form-group">
       {!! Form::label('email', trans('app.form.email_address') . '*') !!}
-      {!! Form::email('email', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.valid_email'), 'required']) !!}
+      {!! Form::email('email', null, ['class' => 'form-control', 'id' => 'deliveryboy-email', 'placeholder' => trans('app.placeholder.valid_email'), 'required']) !!}
       <div class="help-block with-errors"></div>
     </div>
   </div>
@@ -52,7 +52,11 @@
 </div>
 
 @if (!isset($deliveryboy))
-  <div class="form-group">
+  <div class="alert alert-info" id="deliveryboy-email-exists-msg" style="display: none;">
+    {{ trans('app.delivery_boy_email_exists') }}
+  </div>
+
+  <div class="form-group" id="deliveryboy-password-fields">
     {!! Form::label('password', trans('app.form.password') . '*') !!}
     <div class="row">
       <div class="col-md-6 nopadding-right">
@@ -65,6 +69,56 @@
       </div>
     </div>
   </div>
+
+  <script>
+    (function() {
+      var emailInput = document.getElementById('deliveryboy-email');
+      var passwordFields = document.getElementById('deliveryboy-password-fields');
+      var existsMsg = document.getElementById('deliveryboy-email-exists-msg');
+      if (!emailInput || !passwordFields || !existsMsg) {
+        return;
+      }
+
+      var passwordInput = passwordFields.querySelector('#password');
+      var confirmInput = passwordFields.querySelector('input[name="password_confirmation"]');
+      var checkUrl = "{{ route('admin.admin.deliveryboy.checkEmail') }}";
+      if (typeof window.toPanelUrl === 'function') {
+        checkUrl = window.toPanelUrl(checkUrl);
+      }
+
+      function setPasswordRequired(required) {
+        if (required) {
+          passwordFields.style.display = '';
+          existsMsg.style.display = 'none';
+          passwordInput.setAttribute('required', 'required');
+          confirmInput.setAttribute('required', 'required');
+        } else {
+          passwordFields.style.display = 'none';
+          existsMsg.style.display = '';
+          passwordInput.removeAttribute('required');
+          confirmInput.removeAttribute('required');
+          passwordInput.value = '';
+          confirmInput.value = '';
+        }
+      }
+
+      emailInput.addEventListener('blur', function() {
+        var email = emailInput.value.trim();
+        if (!email) {
+          setPasswordRequired(true);
+          return;
+        }
+
+        if (typeof jQuery === 'undefined') {
+          return;
+        }
+
+        jQuery.get(checkUrl, {email: email}, function(response) {
+          setPasswordRequired(! (response && response.exists));
+        });
+      });
+    })();
+  </script>
 @endif
 
 <div class="row">

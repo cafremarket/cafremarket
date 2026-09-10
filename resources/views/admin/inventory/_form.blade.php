@@ -362,11 +362,7 @@
         'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
       ])
           @unless ($product->downloadable)
-            <div class="form-group">
-              {!! Form::label('warehouse_id[]', trans('app.form.warehouse'), ['class' => 'with-help']) !!}
-              <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.select_warehouse') }}"></i>
-              {!! Form::select('warehouse_id[]', $warehouses, isset($inventory) ? null : config('shop_settings.default_warehouse_id'), ['class' => 'form-control select2-normal', 'multiple' => 'multiple']) !!}
-            </div>
+            @include('admin.inventory.partials.warehouse_stock_matrix')
 
             <div class="form-group">
               {!! Form::label('shipping_weight', trans('app.form.shipping_weight'), ['class' => 'with-help']) !!}

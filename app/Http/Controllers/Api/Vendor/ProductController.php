@@ -154,7 +154,6 @@ class ProductController extends Controller
                     'description' => $request->description,
                     'condition' => $request->input('condition', $inventory->condition),
                     'condition_note' => $request->condition_note,
-                    'stock_quantity' => $request->input('stock_quantity', $inventory->stock_quantity),
                     'min_order_quantity' => $request->input('min_order_quantity', $inventory->min_order_quantity),
                     'sale_price' => $request->sale_price,
                     'offer_price' => $request->offer_price,
@@ -165,6 +164,24 @@ class ProductController extends Controller
                     'purchase_price' => $request->input('purchase_price', $inventory->purchase_price),
                     'key_features' => $request->input('key_features', $inventory->key_features),
                 ])->save();
+
+                if ($request->filled('warehouse_id')) {
+                    $inventory->warehouse_id = $request->warehouse_id;
+                    $inventory->saveQuietly();
+                }
+
+                if ($request->has('stock_quantity')) {
+                    try {
+                        app(\App\Services\Inventory\StockService::class)->ensurePrimaryStock(
+                            $inventory,
+                            $request->filled('warehouse_id') ? (int) $request->warehouse_id : null,
+                            (int) $request->input('stock_quantity')
+                        );
+                    } catch (\InvalidArgumentException $e) {
+                        $inventory->stock_quantity = (int) $request->input('stock_quantity');
+                        $inventory->saveQuietly();
+                    }
+                }
             }
 
             // Delete images for app

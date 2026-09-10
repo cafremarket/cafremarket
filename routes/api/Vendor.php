@@ -233,6 +233,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('order/{order}/delivery_boys', [OrderFulfillmentController::class, 'delivery_boys']);
         Route::post('order/{order}/assign_delivery_boy', [OrderFulfillmentController::class, 'assign_delivery_boy']);
         Route::post('order/{order}/courier', [OrderFulfillmentController::class, 'assign_courier']);
+        Route::put('order/{order}/courier/confirm', [OrderFulfillmentController::class, 'confirm_courier_otp']);
 
         // Order conversations
 
@@ -273,8 +274,8 @@ Route::prefix('vendor')->group(function () {
         Route::post('delivery-boy/create', [DeliveryBoyController::class, 'store']);
         Route::get('delivery-boy/{delivery_boy}', [DeliveryBoyController::class, 'show']);
         Route::put('delivery-boy/{delivery_boy}/update', [DeliveryBoyController::class, 'update']);
+        // No trash/restore step for delivery boys — both routes delete permanently.
         Route::delete('delivery-boy/{delivery_boy}/trash', [DeliveryBoyController::class, 'trash']);
-        Route::put('delivery-boy/{delivery_boy_id}/restore', [DeliveryBoyController::class, 'restore']);
         Route::delete('delivery-boy/{delivery_boy_id}/delete', [DeliveryBoyController::class, 'destroy']);
 
         // Roles and Permissions

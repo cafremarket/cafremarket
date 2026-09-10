@@ -8,7 +8,6 @@ use App\Exceptions\PaymentFailedException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\VendorWalletDepositRequest;
 use App\Http\Resources\PaymentMethodResource;
-use App\Models\PaymentMethod;
 use App\Models\Shop;
 use App\Services\Emola\EmolaWalletDepositService;
 use App\Services\Payments\PaymentService;
@@ -27,9 +26,7 @@ class WalletDepositController extends Controller
 
     public function getPaymentMethods()
     {
-        $paymentMethods = PaymentMethod::find(get_from_option_table('wallet_payment_methods', []));
-
-        return PaymentMethodResource::collection($paymentMethods);
+        return PaymentMethodResource::collection(get_wallet_deposit_payment_methods());
     }
 
     public function platformFeePreview(Request $request)

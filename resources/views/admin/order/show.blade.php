@@ -441,6 +441,21 @@
                 @endif
               </div>
             </div>
+
+            @if ($order->isReached())
+              <div class="admin-order-sidebar-panel__otp-confirm" style="margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+                {!! Form::open(['url' => panel_route('admin.order.deliveryboy.confirmOtp', $order, false), 'method' => 'put']) !!}
+                  <label class="control-label" style="font-weight:600;">{{ trans('app.confirm_courier_otp') }}</label>
+                  <p class="text-muted" style="margin-bottom:8px;">{{ trans('app.confirm_courier_otp_help') }}</p>
+                  <div class="input-group">
+                    {!! Form::text('otp', null, ['class' => 'form-control', 'maxlength' => 6, 'pattern' => '[0-9]{6}', 'placeholder' => trans('app.delivery_otp'), 'required']) !!}
+                    <span class="input-group-btn">
+                      <button type="submit" class="btn btn-new">{{ trans('app.confirm') }}</button>
+                    </span>
+                  </div>
+                {!! Form::close() !!}
+              </div>
+            @endif
           @elseif ($order->hasCourier())
             <div class="admin-order-sidebar-panel__user">
               <strong>{{ $order->courier_name }}</strong>
@@ -451,6 +466,29 @@
             </div>
           @else
             <p class="text-muted">{{ trans('app.delivery_boy_not_assigned') }}</p>
+          @endif
+
+          @if (! empty($order->otp) && ! $order->isDelivered() && Auth::user()->isAdmin())
+            <div class="admin-order-sidebar-panel__otp" style="margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+              <small class="text-muted">{{ trans('app.delivery_otp') }}</small>
+              <div style="font-size:20px; font-weight:700; letter-spacing:3px;">{{ $order->otp }}</div>
+              <small class="text-muted">{{ trans('app.delivery_otp_help') }}</small>
+            </div>
+          @endif
+
+          @if ($order->hasCourier() && ! $order->isDelivered())
+            <div class="admin-order-sidebar-panel__otp-confirm" style="margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+              {!! Form::open(['url' => panel_route('admin.order.courier.confirmOtp', $order, false), 'method' => 'put']) !!}
+                <label class="control-label" style="font-weight:600;">{{ trans('app.confirm_courier_otp') }}</label>
+                <p class="text-muted" style="margin-bottom:8px;">{{ trans('app.confirm_courier_otp_help') }}</p>
+                <div class="input-group">
+                  {!! Form::text('otp', null, ['class' => 'form-control', 'maxlength' => 6, 'pattern' => '[0-9]{6}', 'placeholder' => trans('app.delivery_otp'), 'required']) !!}
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn btn-new">{{ trans('app.confirm') }}</button>
+                  </span>
+                </div>
+              {!! Form::close() !!}
+            </div>
           @endif
         @include('admin.partials.ui.card_end')
       @endif

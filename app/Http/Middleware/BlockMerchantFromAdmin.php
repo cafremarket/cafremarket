@@ -25,6 +25,11 @@ class BlockMerchantFromAdmin
 
         $path = trim($request->path(), '/');
 
+        // Impersonation exit must stay on /admin so the admin session is restored.
+        if ($path === 'admin/secretLogout' && $request->session()->has('impersonated')) {
+            return $next($request);
+        }
+
         if (isset($this->pathMap[$path])) {
             return redirect()->to('/'.$this->pathMap[$path]);
         }

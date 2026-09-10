@@ -275,6 +275,16 @@ class ProcessInventoryCsvBulkUpload implements ShouldQueue
             $this->setAttributes($inventory, $attributes); // Sync the attributes with the inventory
         }
 
+        try {
+            app(\App\Services\Inventory\StockService::class)->ensurePrimaryStock(
+                $inventory,
+                is_numeric($data['warehouse_id'] ?? null) ? (int) $data['warehouse_id'] : null,
+                (int) ($data['stock_quantity'] ?? 0)
+            );
+        } catch (\InvalidArgumentException $e) {
+            // Shop may not have a warehouse yet.
+        }
+
         // Upload images
         if ($data['image_links']) {
             $image_links = explode(',', $data['image_links']);

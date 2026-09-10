@@ -771,7 +771,11 @@ class ViewComposerServiceProvider extends ServiceProvider
         View::composer(
             [
                 'admin.config.index',
+                'admin.config.page',
+                'admin.config._sections.*',
                 'merchant.config.index',
+                'merchant.config.page',
+                'merchant.config._sections.*',
             ],
 
             function ($view) {
@@ -1145,7 +1149,9 @@ class ViewComposerServiceProvider extends ServiceProvider
 
             function ($view) {
                 $view->with('payment_method_types', ListHelper::payment_method_types());
-                $view->with('payment_methods', PaymentMethod::where('enabled', 1)->get());
+                $view->with('payment_methods', PaymentMethod::where('enabled', 1)
+                    ->where('code', '!=', 'stripe')
+                    ->get());
                 $view->with('config', Config::findOrFail(Auth::user()->merchantId()));
             }
         );
@@ -1176,14 +1182,17 @@ class ViewComposerServiceProvider extends ServiceProvider
     private function composeSystemConfigPage()
     {
         View::composer(
-
-            'admin.system.config',
+            [
+                'admin.system.config.index',
+                'admin.system.config.page',
+                'admin.system.config._sections.*',
+            ],
 
             function ($view) {
                 $view->with('countries', ListHelper::countries());
                 $view->with('states', ListHelper::states());
                 $view->with('payment_method_types', ListHelper::payment_method_types());
-                $view->with('payment_methods', PaymentMethod::all());
+                $view->with('payment_methods', PaymentMethod::where('code', '!=', 'stripe')->get());
                 $view->with('shipping_method_types', ListHelper::shipping_method_types());
                 $view->with('shipping_methods', ShippingMethod::all());
             }
@@ -1211,8 +1220,11 @@ class ViewComposerServiceProvider extends ServiceProvider
     private function composeSystemGeneralPage()
     {
         View::composer(
-
-            'admin.system.general',
+            [
+                'admin.system.general.index',
+                'admin.system.general.page',
+                'admin.system.general._sections.*',
+            ],
 
             function ($view) {
                 $view->with('system', System::orderBy('id', 'asc')->first());

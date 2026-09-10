@@ -15,6 +15,7 @@ use App\Services\Delivery\DeliveryDispatchService;
 use App\Services\FCMService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -95,6 +96,11 @@ class OrderController extends Controller
     {
         try {
             $order = Order::findOrFail($orderID);
+
+            if ($order->isDelivered()) {
+                return response()->json(['message' => trans('app.order_already_delivered')], 422);
+            }
+
             $rider = Auth::guard('delivery_boy-api')->user();
 
             $dispatchService->assignShopRider($order, $rider);
@@ -120,9 +126,23 @@ class OrderController extends Controller
      */
     public function reached(MarkReachedRequest $request, Order $order)
     {
-        $order->reached_at = now();
-        $order->otp = Order::generateDeliveryOtp();
-        $order->save();
+        try {
+            $order = DB::transaction(function () use ($order) {
+                $locked = Order::whereKey($order->getKey())->lockForUpdate()->firstOrFail();
+
+                if ($locked->isDelivered()) {
+                    throw new \RuntimeException(trans('app.order_already_delivered'));
+                }
+
+                $locked->reached_at = now();
+                $locked->otp = Order::generateDeliveryOtp();
+                $locked->save();
+
+                return $locked;
+            });
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         $customer_token = optional($order->customer)->fcm_token;
 
@@ -142,15 +162,27 @@ class OrderController extends Controller
      */
     public function confirmDelivery(ConfirmDeliveryRequest $request, Order $order)
     {
-        if (! $order->reached_at) {
-            return response()->json(['message' => trans('app.not_reached_yet')], 422);
-        }
+        try {
+            DB::transaction(function () use ($order, $request) {
+                $locked = Order::whereKey($order->getKey())->lockForUpdate()->firstOrFail();
 
-        if (! hash_equals((string) $order->otp, (string) $request->otp)) {
-            return response()->json(['message' => trans('app.invalid_otp')], 422);
-        }
+                if ($locked->isDelivered()) {
+                    throw new \RuntimeException(trans('app.order_already_delivered'));
+                }
 
-        $order->mark_as_goods_received();
+                if (! $locked->reached_at) {
+                    throw new \RuntimeException(trans('app.not_reached_yet'));
+                }
+
+                if (! hash_equals((string) $locked->otp, (string) $request->otp)) {
+                    throw new \RuntimeException(trans('app.invalid_otp'));
+                }
+
+                $locked->mark_as_goods_received();
+            });
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         return response()->json(['message' => trans('api.order_status_updated')], 200);
     }

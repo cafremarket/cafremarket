@@ -18,7 +18,12 @@ class WalletSettingsController extends Controller
     {
         Gate::authorize('setting', Wallet::class);
 
-        $paymentMethods = PaymentMethod::online()->active()->pluck('name', 'id')->toArray();
+        // Deposit top-up: M-Pesa and eMola only (not Cafrepay wallet).
+        $paymentMethods = PaymentMethod::online()
+            ->active()
+            ->whereIn('code', ['mpesa', 'emola'])
+            ->pluck('name', 'id')
+            ->toArray();
 
         return view('wallet::admin.settings', compact('paymentMethods'));
     }

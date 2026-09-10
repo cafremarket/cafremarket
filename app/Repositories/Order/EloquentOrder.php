@@ -8,6 +8,7 @@ use App\Models\Inventory;
 use App\Models\Order;
 use App\Repositories\BaseRepository;
 use App\Repositories\EloquentRepository;
+use App\Services\Inventory\StockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -133,13 +134,21 @@ class EloquentOrder extends EloquentRepository implements BaseRepository, OrderR
      */
     public function syncInventory($order, array $items)
     {
+        $stockService = app(StockService::class);
+        $preferredWarehouse = $order->warehouse_id ? (int) $order->warehouse_id : null;
+
         // Increase stock if any item removed from the order
         if ($order->inventories->count() > 0) {
             $newItems = array_column($items, 'inventory_id');
 
             foreach ($order->inventories as $inventory) {
                 if (! in_array($inventory->id, $newItems)) {
-                    Inventory::find($inventory->id)->increment('stock_quantity', $inventory->pivot->quantity);
+                    $stockService->restock(
+                        $inventory,
+                        (int) $inventory->pivot->quantity,
+                        $preferredWarehouse,
+                        $order
+                    );
                 }
             }
         }
@@ -163,12 +172,27 @@ class EloquentOrder extends EloquentRepository implements BaseRepository, OrderR
                 $old_qtt = $old->pivot->quantity;
 
                 if ($old_qtt > $item->quantity) {
-                    Inventory::find($id)->increment('stock_quantity', $old_qtt - $item->quantity);
+                    $stockService->restock(
+                        Inventory::find($id),
+                        (int) ($old_qtt - $item->quantity),
+                        $preferredWarehouse,
+                        $order
+                    );
                 } elseif ($old_qtt < $item->quantity) {
-                    Inventory::find($id)->decrement('stock_quantity', $item->quantity - $old_qtt);
+                    $stockService->sell(
+                        Inventory::find($id),
+                        (int) ($item->quantity - $old_qtt),
+                        $preferredWarehouse,
+                        $order
+                    );
                 }
             } else {
-                Inventory::find($id)->decrement('stock_quantity', $item->quantity);
+                $stockService->sell(
+                    Inventory::find($id),
+                    (int) $item->quantity,
+                    $preferredWarehouse,
+                    $order
+                );
             }
         }
 

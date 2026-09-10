@@ -688,6 +688,11 @@ class OrderController extends Controller
      */
     public function goods_received(ConfirmGoodsReceivedRequest $request, Order $order)
     {
+        if ($order->isDelivered()) {
+            return redirect()->route('order.feedback', $order)
+                ->with('error', trans('app.order_already_delivered'));
+        }
+
         $order->mark_as_goods_received();
 
         return redirect()->route('order.feedback', $order)

@@ -90,9 +90,21 @@ class ProcessInventoryCsvBulkUpdate implements ShouldQueue
             if ($inventory) {
                 $inventory->update([
                     'title' => $data['title'] ?? $inventory->title,
-                    'stock_quantity' => $data['stock_quantity'] ?? $inventory->quantity,
                     'sale_price' => $data['sale_price'] ?? $inventory->price,
                 ]);
+
+                if (isset($data['stock_quantity']) && $data['stock_quantity'] !== '') {
+                    try {
+                        app(\App\Services\Inventory\StockService::class)->ensurePrimaryStock(
+                            $inventory,
+                            null,
+                            (int) $data['stock_quantity']
+                        );
+                    } catch (\InvalidArgumentException $e) {
+                        $inventory->stock_quantity = (int) $data['stock_quantity'];
+                        $inventory->saveQuietly();
+                    }
+                }
 
                 $this->success_counter++; // Increase the counter for successful import
             } else {

@@ -145,6 +145,10 @@ class OrderController extends Controller
      */
     public function goods_received(ConfirmGoodsReceivedRequest $request, Order $order)
     {
+        if ($order->isDelivered()) {
+            return response()->json(['message' => trans('app.order_already_delivered')], 422);
+        }
+
         $order->mark_as_goods_received();
 
         return new OrderResource($order);

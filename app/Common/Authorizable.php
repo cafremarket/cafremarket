@@ -71,6 +71,7 @@ trait Authorizable
         'dashboard' => 'view',
         'deliveryboys' => 'fulfill',
         'shipping_label' => 'view',
+        'confirmOtp' => 'fulfill',
     ];
 
     /**
@@ -181,6 +182,10 @@ trait Authorizable
             $slug = 'fulfill_order';
         } elseif ($slug == 'initiate_courier' || $slug == 'assign_courier') {
             // Courier assignment is part of order fulfillment, same as assign_deliveryboy above.
+            $slug = 'fulfill_order';
+        } elseif ($slug == 'fulfill_courier' || $slug == 'fulfill_deliveryboy') {
+            // OTP confirmation (courier.confirmOtp / deliveryboy.confirmOtp) is part of
+            // order fulfillment too, same bucket as assign_courier/assign_deliveryboy above.
             $slug = 'fulfill_order';
         } elseif ($slug == 'addVariant' || $slug == 'saveVariant') {
             $slug = 'edit_product';

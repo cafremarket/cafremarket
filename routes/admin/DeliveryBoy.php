@@ -4,25 +4,22 @@ use App\Http\Controllers\Admin\DeliveryBoyController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('deliveryboy.')->group(function () {
-    Route::post('deliveryboy/massTrash', [
-        DeliveryBoyController::class, 'massTrash',
-    ])->name('massTrash')->middleware('demoCheck');
+    Route::get('deliveryboy/checkEmail', [
+        DeliveryBoyController::class, 'checkEmail',
+    ])->name('checkEmail');
 
+    // No trash/restore step for delivery boys — delete is immediate and permanent.
     Route::post('deliveryboy/massDestroy', [
         DeliveryBoyController::class, 'massDestroy',
     ])->name('massDestroy')->middleware('demoCheck');
 
-    Route::delete('deliveryboy/emptyTrash', [
-        DeliveryBoyController::class, 'emptyTrash',
-    ])->name('emptyTrash');
+    Route::get('deliveryboy/{deliveryboy}/resetPassword', [
+        DeliveryBoyController::class, 'resetPasswordForm',
+    ])->name('resetPasswordForm');
 
-    Route::delete('deliveryboy/{deliveryboy}/trash', [
-        DeliveryBoyController::class, 'trash',
-    ])->name('trash');
-
-    Route::get('deliveryboy/{deliveryboy}/restore', [
-        DeliveryBoyController::class, 'restore',
-    ])->name('restore');
+    Route::put('deliveryboy/{deliveryboy}/resetPassword', [
+        DeliveryBoyController::class, 'resetPassword',
+    ])->name('resetPassword');
 });
 
 Route::resource('deliveryboy', DeliveryBoyController::class);

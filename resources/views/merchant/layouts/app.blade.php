@@ -25,8 +25,12 @@
           @include('merchant.partials.language_switcher')
           <a href="{{ get_shop_url() }}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i> {{ trans('app.store_front') ?? 'My store' }}</a>
           <span>{{ Auth::user()->getName() }}</span>
-          <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('mp-logout').submit();">{{ trans('app.log_out') ?? trans('app.logout') }}</a>
-          <form id="mp-logout" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
+          @if (Request::session()->has('impersonated'))
+            <a href="{{ route('admin.secretLogout') }}">{{ trans('app.log_out') ?? trans('app.logout') }}</a>
+          @else
+            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('mp-logout').submit();">{{ trans('app.log_out') ?? trans('app.logout') }}</a>
+            <form id="mp-logout" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
+          @endif
         </div>
       </header>
 

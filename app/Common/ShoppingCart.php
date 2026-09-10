@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Shop;
 use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\Hyperlocal\HyperlocalCatalogService;
+use App\Services\Inventory\StockService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -438,7 +439,12 @@ trait ShoppingCart
 
             // Sync up the inventory. Decrease the stock of the order items from the listing
             if (! $cart->is_digital) {
-                $item->decrement('stock_quantity', $item->pivot->quantity);
+                app(StockService::class)->sell(
+                    $item,
+                    (int) $item->pivot->quantity,
+                    $order->warehouse_id ? (int) $order->warehouse_id : null,
+                    $order
+                );
             }
         }
 
@@ -550,7 +556,12 @@ trait ShoppingCart
 
             // Sync up the inventory. Increase the stock of the order items from the listing
             if ($revert) {
-                $item->increment('stock_quantity', $item->pivot->quantity);
+                app(StockService::class)->restock(
+                    $item,
+                    (int) $item->pivot->quantity,
+                    $order->warehouse_id ? (int) $order->warehouse_id : null,
+                    $order
+                );
             }
         }
 

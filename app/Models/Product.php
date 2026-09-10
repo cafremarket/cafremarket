@@ -167,6 +167,22 @@ class Product extends Inspectable
     }
 
     /**
+     * Warehouse stock rows across all listings of this product.
+     */
+    public function inventoryStocks()
+    {
+        return $this->hasManyThrough(InventoryStock::class, Inventory::class);
+    }
+
+    /**
+     * Total on-hand quantity across all listings.
+     */
+    public function totalStockQuantity(): int
+    {
+        return (int) $this->inventories()->sum('stock_quantity');
+    }
+
+    /**
      * Get the product's translations
      */
     public function translations()

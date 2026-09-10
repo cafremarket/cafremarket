@@ -4,7 +4,6 @@ namespace Incevio\Package\Wallet\Http\Controllers;
 
 use App\Contracts\PaymentServiceContract;
 use App\Http\Controllers\Controller;
-use App\Models\PaymentMethod;
 use App\Services\Payments\PaymentService;
 use App\Services\Payments\PaypalPaymentService;
 use Illuminate\Http\RedirectResponse;
@@ -35,7 +34,7 @@ class DepositController extends Controller
      */
     public function show_form(Request $request)
     {
-        $paymentMethods = PaymentMethod::find(get_from_option_table('wallet_payment_methods', []));
+        $paymentMethods = get_wallet_deposit_payment_methods();
 
         // When the redirected from payment gateway with error
         if (Session::has('error')) {

@@ -170,7 +170,7 @@ class Shop extends ShopWallet
      */
     public function deliveryBoys()
     {
-        return $this->hasMany(DeliveryBoy::class)->withTrashed();
+        return $this->hasMany(DeliveryBoy::class);
     }
 
     /**

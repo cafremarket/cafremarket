@@ -7,9 +7,9 @@
     // When admin get paid but still give option to vendors on/off a active payment method.
     $active_payment_methods = isset($shop) && !vendor_get_paid_directly() && vendor_can_on_off_payment_method() ? $shop->paymentMethods->pluck('id')->toArray() : [];
 
-    // Prepaid only — hide Cash on Delivery
+    // Prepaid only — hide Cash on Delivery and removed Stripe gateway
     $paymentMethods = $paymentMethods->reject(function ($paymentMethod) {
-        return $paymentMethod->code === 'cod';
+        return in_array($paymentMethod->code, ['cod', 'stripe'], true);
     });
 
     // Don't show manual payment options for downloadables
@@ -38,32 +38,17 @@
     {{-- Skip the payment option if not confirured --}}
     @continue(!$config || !is_array($config) || !$config['config'])
 
-    {{-- @if ($paymentMethod->code !== 'pip' && $shop->config->pay_online) --}}
-    @if ($customer && $paymentMethod->code == 'stripe' && $customer->hasBillingToken())
-      <div class="form-group">
-        <label>
-          <input name="payment_method" value="saved_card" class="i-radio-blue payment-option" type="radio" data-info="{{ $config['msg'] }}" data-type="{{ $paymentMethod->type }}" required="required" {{ old('payment_method') ? '' : 'checked' }} /> @lang('theme.card'): <i class="fab fa-cc-{{ strtolower($customer->pm_type) }}"></i> ************{{ $customer->pm_last_four }}
-        </label>
-      </div>
-      {{-- @endif --}}
-    @endif
-
-    {{-- @if ($paymentMethod->code == 'pip' && $shop->config->pay_in_person) --}}
     <div class="form-group">
       <label>
         <input name="payment_method" value="{{ $paymentMethod->code }}" data-code="{{ $paymentMethod->code }}" class="i-radio-blue payment-option" type="radio" data-info="{{ $config['msg'] }}" data-type="{{ $paymentMethod->type }}" required="required" {{ old('payment_method') == $paymentMethod->code ? 'checked' : '' }} />
 
         <span>
-          {{ $paymentMethod->code == 'stripe' ? trans('theme.credit_card') : $paymentMethod->name . $suffix }}
+          {{ $paymentMethod->name . $suffix }}
         </span>
       </label>
     </div>
-    {{-- @endif --}}
   @endforeach
 </div>
-
-{{-- Stripe --}}
-@include('partials.stripe_card_form')
 
 {{-- M-Pesa Payment --}}
 @if (is_incevio_package_loaded('mpesa'))

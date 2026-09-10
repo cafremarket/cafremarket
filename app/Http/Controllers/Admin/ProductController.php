@@ -276,6 +276,16 @@ class ProductController extends Controller
                     $inventory->saveImage($images[$key]);
                 }
 
+                try {
+                    app(\App\Services\Inventory\StockService::class)->ensurePrimaryStock(
+                        $inventory,
+                        is_numeric($commonInfo['warehouse_id'] ?? null) ? (int) $commonInfo['warehouse_id'] : null,
+                        (int) ($data['stock_quantity'] ?? 0)
+                    );
+                } catch (\InvalidArgumentException $e) {
+                    // No warehouse configured yet.
+                }
+
                 return $inventory;
             };
 

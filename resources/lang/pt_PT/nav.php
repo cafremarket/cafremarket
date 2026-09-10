@@ -105,4 +105,8 @@ return [
     // Version 2.17.0
     'pdf_template' => 'Modelos de PDF',
 
+    'low_stock' => 'Stock baixo',
+    'stock_movements' => 'Movimentos de stock',
+    'stock_transfers' => 'Transferências de stock',
+
 ];

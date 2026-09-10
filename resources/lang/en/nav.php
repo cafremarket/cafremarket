@@ -90,4 +90,7 @@ return [
     'store_management' => 'Store Management',
     'staff' => 'Staff',
     'delivery' => 'Delivery',
+    'low_stock' => 'Low stock',
+    'stock_movements' => 'Stock movements',
+    'stock_transfers' => 'Stock transfers',
 ];

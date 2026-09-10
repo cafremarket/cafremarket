@@ -31,21 +31,26 @@ class EloquentDeliveryBoy extends EloquentRepository implements BaseRepository, 
         return $result->orderBy('id', 'desc')->get();
     }
 
-    public function trashOnly()
-    {
-        if (Auth::user()->isFromPlatform()) {
-            return $this->model->with('shop:id,name')->onlyTrashed()->get();
-        }
-
-        return $this->model->with('avatarImage')->mine()->onlyTrashed()->get();
-    }
-
     public function store($request)
     {
         if (! Auth::user()->isFromPlatform()) {
             $request->merge([
                 'shop_id' => Auth::user()->merchantId(),
             ]);
+        }
+
+        // This email already has a rider account in another store — reuse that
+        // password (a straight copy, not a reference) so this new row keeps
+        // working under its own password even if the other store's account is
+        // later deleted, and the rider can log into both with one password.
+        if (! $request->filled('password')) {
+            $existing = DeliveryBoy::where('email', $request->email)
+                ->whereNotNull('password')
+                ->first();
+
+            if ($existing) {
+                $request->merge(['password' => $existing->password]);
+            }
         }
 
         $deliveryBoy = parent::store($request);
@@ -74,52 +79,30 @@ class EloquentDeliveryBoy extends EloquentRepository implements BaseRepository, 
         return $deliveryBoy;
     }
 
+    /**
+     * Delete a delivery boy outright — there's no trash/restore state for
+     * this model, so this is a real, immediate, permanent delete.
+     */
     public function destroy($id)
     {
-        $deliveryBoy = parent::findTrash($id);
-
-        // $deliveryBoy->flushAddresses();
+        $deliveryBoy = $this->model->findOrFail($id);
 
         $deliveryBoy->flushImages();
 
-        return $deliveryBoy->forceDelete();
+        return $deliveryBoy->delete();
     }
 
-    public function massTrash($ids)
-    {
-        $deliveryBoys = $this->model->withTrashed()->whereIn('id', $ids)->get();
-
-        // foreach ($deliveryBoys as $deliveryBoy) {
-        //     //$deliveryBoy->flushAddresses();
-        //     $deliveryBoy->flushImages();
-        // }
-
-        // massTrash
-        return parent::massTrash($ids);
-    }
-
+    /**
+     * Same as destroy(), for multiple ids at once — no trash/restore state.
+     */
     public function massDestroy($ids)
     {
-        $deliveryBoys = $this->model->withTrashed()->whereIn('id', $ids)->get();
+        $deliveryBoys = $this->model->whereIn('id', $ids)->get();
 
         foreach ($deliveryBoys as $deliveryBoy) {
-            // $deliveryBoy->flushAddresses();
             $deliveryBoy->flushImages();
         }
 
-        // massDestroy
-        return parent::massDestroy($ids);
-    }
-
-    public function emptyTrash()
-    {
-        $deliveryBoys = $this->model->onlyTrashed()->get();
-
-        // foreach ($deliveryBoys as $deliveryBoy) {
-        //     //$deliveryBoy->flushAddresses();
-        //     $deliveryBoy->flushImages();
-        // }
-
-        return parent::emptyTrash();
+        return $this->model->whereIn('id', $ids)->delete();
     }
 }

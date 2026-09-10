@@ -85,4 +85,7 @@ return [
     'pdf_template' => 'Modelos de PDF',
     'address_change_requests' => 'Pedidos de alteração de endereço',
     'delivery' => 'Entrega',
+    'low_stock' => 'Stock baixo',
+    'stock_movements' => 'Movimentos de stock',
+    'stock_transfers' => 'Transferências de stock',
 ];

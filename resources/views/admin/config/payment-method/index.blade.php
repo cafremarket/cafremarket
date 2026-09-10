@@ -41,7 +41,7 @@
                 <div class="col-sm-7">
                   @foreach ($payment_providers as $payment_provider)
                     {{-- Skip the wallet because wallet setting has option to activate --}}
-                    @continue($payment_provider->code == 'zcart-wallet')
+                    @continue(in_array($payment_provider->code, ['zcart-wallet', 'stripe'], true))
 
                     @php
                       $has_config = false;
@@ -50,12 +50,11 @@
                     <ul class="list-group">
                       <li class="list-group-item">
                         @if (File::exists($logo_path))
-                          <img src="{{ asset($logo_path) }}" class="open-img-md" alt="{{ $type }}">
-                        @else
-                          <p class="list-group-item-heading inline lead">
-                            {{ $payment_provider->name }}
-                          </p>
+                          <img src="{{ asset($logo_path) }}" class="open-img-md" alt="{{ $payment_provider->name }}">
                         @endif
+                        <p class="list-group-item-heading inline lead" style="{{ File::exists($logo_path) ? 'margin-left: 8px;' : '' }}">
+                          {{ $payment_provider->name }}
+                        </p>
 
                         <span class="spacer10"></span>
 
@@ -68,20 +67,16 @@
                         @if (in_array($payment_provider->id, $active_payment_methods))
                           @if ($can_update)
                             @php
-                              $has_config = $payment_provider->code === 'emola'
-                                  ? \App\Models\SystemConfig::isPaymentConfigured('emola')
-                                  : (!empty($config->{$payment_provider->code}) && in_array($payment_provider->code, (array) $config));
+                              $has_config = in_array($payment_provider->code, ['mpesa', 'emola'], true)
+                                  ? \App\Models\SystemConfig::isPaymentConfigured($payment_provider->code)
+                                  : (! empty($config->{$payment_provider->code}) && in_array($payment_provider->code, (array) $config));
                             @endphp
 
                             @unless ($has_config)
                               <div class="alert alert-danger">@lang('app.payment_method_configuration_issue')</div>
                             @endunless
 
-                            @if ($payment_provider->code == 'stripe')
-                              <a href="{{ route('admin.setting.paymentMethod.activate', $payment_provider->id) }}" class="btn btn-info">{{ trans('app.update') }}</a>
-                            @else
-                              <a href="javascript:void(0)" data-link="{{ route('admin.setting.paymentMethod.activate', $payment_provider->id) }}" class="btn ajax-modal-btn btn-info">{{ trans('app.update') }}</a>
-                            @endif
+                            <a href="javascript:void(0)" data-link="{{ route('admin.setting.paymentMethod.activate', $payment_provider->id) }}" class="btn ajax-modal-btn btn-info">{{ trans('app.update') }}</a>
 
                             <a href="{{ route('admin.setting.paymentMethod.deactivate', $payment_provider->id) }}" class="btn btn-default ajax-silent confirm"> {{ trans('app.deactivate') }}</a>
                           @else
@@ -89,11 +84,7 @@
                           @endif
                         @else
                           @if ($can_update)
-                            @if ($payment_provider->code == 'stripe')
-                              <a href="{{ route('admin.setting.paymentMethod.activate', $payment_provider->id) }}" class="btn btn-primary">{{ $has_config ? trans('app.reactivate') : trans('app.activate') }}</a>
-                            @else
-                              <a href="javascript:void(0)" data-link="{{ route('admin.setting.paymentMethod.activate', $payment_provider->id) }}" class="btn ajax-modal-btn btn-primary">{{ $has_config ? trans('app.reactivate') : trans('app.activate') }}</a>
-                            @endif
+                            <a href="javascript:void(0)" data-link="{{ route('admin.setting.paymentMethod.activate', $payment_provider->id) }}" class="btn ajax-modal-btn btn-primary">{{ $has_config ? trans('app.reactivate') : trans('app.activate') }}</a>
                           @else
                             <span class="label label-default">{{ trans('app.inactive') }}</span>
                           @endif

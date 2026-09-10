@@ -10,6 +10,7 @@ return [
     'sent' => ':model has been sent successfully!',
     'updated' => ':model has been updated successfully!',
     'trashed' => ':model has been moved to trash!',
+    'password_reset' => ':model password has been reset successfully!',
     'restored' => ':model has been restored successfully!',
     'deleted' => ':model has been deleted permanently!',
     'mail_send_failed_soft' => 'The action was saved, but the email could not be delivered. Check Email logs for details.',

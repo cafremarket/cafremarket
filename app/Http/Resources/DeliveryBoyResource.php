@@ -29,6 +29,8 @@ class DeliveryBoyResource extends JsonResource
             'active' => $this->status,
             'member_since' => optional($this->created_at)->diffForHumans(),
             'avatar' => get_storage_file_url(optional($this->avatarImage)->path, 'small'),
+            'shop_id' => $this->shop_id,
+            'shop_name' => optional($this->shop)->name,
             'api_token' => $this->jwt_access_token ?? null,
             'access_token' => $this->jwt_access_token ?? null,
             'avg_rating' => $this->when($this->feedbacks, $this->feedbacks->avg('rating')),

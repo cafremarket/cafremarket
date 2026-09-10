@@ -6,7 +6,7 @@
     </div>
     <div class="modal-body">
       @if (($shopRidersAvailable ?? 0) > 0)
-        {!! Form::open(['route' => ['admin.order.deliveryboy.assign', $order], 'method' => 'post']) !!}
+        {!! Form::open(['url' => panel_route('admin.order.deliveryboy.assign', $order, false), 'method' => 'post']) !!}
           <div class="form-group">
             <label>{{ trans('app.shop_riders') }}</label>
             {!! Form::select('delivery_boy_id', $deliveryboys, $order->delivery_boy_id, ['class' => 'form-control select2', 'placeholder' => trans('app.placeholder.select'), 'required']) !!}

@@ -9,7 +9,6 @@ use App\Common\HasHumanAttributes;
 use App\Common\Imageable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +16,10 @@ use Illuminate\Support\Facades\Hash;
 
 class DeliveryBoy extends Authenticatable
 {
-    use Addressable, ApiAuthTokens, Feedbackable, HasFactory, HasHumanAttributes, Imageable, Notifiable, SoftDeletes;
+    // Deliberately no SoftDeletes: a deleted delivery boy is just gone —
+    // no trash/restore state, so removing a rider can't leave a stale row
+    // that email-uniqueness/password-copy checks would need to account for.
+    use Addressable, ApiAuthTokens, Feedbackable, HasFactory, HasHumanAttributes, Imageable, Notifiable;
 
     protected $fillable = [
         'shop_id',
@@ -59,6 +61,20 @@ class DeliveryBoy extends Authenticatable
     public function shop(): BelongsTo
     {
         return $this->belongsTo(Shop::class, 'shop_id');
+    }
+
+    /**
+     * Every rider account (one per store) that shares this email, matched by
+     * password — a rider who works for more than one store has a separate
+     * row per store (email is only unique within a store, not system-wide).
+     */
+    public static function matchingAccounts(string $email, string $password)
+    {
+        return static::where('email', $email)
+            ->with('shop:id,name')
+            ->get()
+            ->filter(fn (self $account) => Hash::check($password, $account->password))
+            ->values();
     }
 
     public function setPasswordAttribute($password)

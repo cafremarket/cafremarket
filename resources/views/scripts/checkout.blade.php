@@ -1,4 +1,3 @@
-<script src="https://js.stripe.com/v2/"></script>
 <script type="text/javascript">
   "use strict";;
   (function($, window, document) {
@@ -90,9 +89,6 @@
         refreshCheckoutPlatformFeePreview();
       }, 400);
 
-      // Stripe code, create a token
-      Stripe.setPublishableKey("{{ config('services.stripe.key') }}");
-
       $("form[name='checkoutForm']").on('submit', function(e) {
         e.preventDefault();
 
@@ -125,14 +121,7 @@
         }
 
         apply_busy_filter('body');
-
-        var payment_method = $('input[name=payment_method]:checked').data('code');
-
-        if (payment_method == 'stripe') {
-          form.get(0).submit();
-        } else {
-          form.get(0).submit();
-        }
+        form.get(0).submit();
       });
 
       $("#submit-btn-block").show(); // Show the submit buttons after loading the doms

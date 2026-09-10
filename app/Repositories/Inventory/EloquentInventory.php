@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Repositories\BaseRepository;
 use App\Repositories\Concerns\ScopesMerchantShop;
 use App\Repositories\EloquentRepository;
+use App\Services\Inventory\StockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -109,6 +110,8 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
         $this->syncProductShopId($inventory);
 
         $this->syncImagesFromProductIfEmpty($inventory);
+
+        $this->syncStockFromRequest($inventory, $request);
 
         return $inventory;
     }
@@ -295,6 +298,8 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
             if (isset($images[$key])) {
                 $inventory->saveImage($images[$key]);
             }
+
+            $this->syncStockFromRequest($inventory, $request, (int) ($stock_quantities[$key] ?? 0));
         }
 
         return true;
@@ -303,6 +308,44 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
     public function updateQtt(Request $request, $id)
     {
         $inventory = parent::find($id);
+        $stockService = app(StockService::class);
+
+        if ($request->filled('warehouse_stocks') && is_array($request->input('warehouse_stocks'))) {
+            $stockService->syncWarehouseStocks(
+                $inventory,
+                $request->input('warehouse_stocks', []),
+                $request->input('reorder_levels', []),
+                $request->input('damaged_quantities', []),
+                $request->input('notes')
+            );
+
+            return true;
+        }
+
+        if ($request->filled('warehouse_id') && $request->has('stock_quantity')) {
+            $stockService->setStock(
+                $inventory,
+                (int) $request->input('warehouse_id'),
+                (int) $request->input('stock_quantity'),
+                \App\Models\StockMovement::TYPE_ADJUST,
+                $request->input('notes') ?? 'Quick stock update'
+            );
+
+            return true;
+        }
+
+        $warehouseId = $stockService->resolvePrimaryWarehouseId($inventory);
+        if ($warehouseId) {
+            $stockService->setStock(
+                $inventory,
+                $warehouseId,
+                (int) $request->input('stock_quantity', 0),
+                \App\Models\StockMovement::TYPE_ADJUST,
+                $request->input('notes') ?? 'Quick stock update'
+            );
+
+            return true;
+        }
 
         $inventory->stock_quantity = $request->input('stock_quantity');
 
@@ -349,7 +392,61 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
             }
         }
 
+        $this->syncStockFromRequest($inventory, $request);
+
         return $inventory;
+    }
+
+    /**
+     * Persist warehouse stock matrix / legacy flat qty into inventory_stocks.
+     */
+    protected function syncStockFromRequest(Inventory $inventory, Request $request, ?int $fallbackQty = null): void
+    {
+        $stockService = app(StockService::class);
+        $warehouseStocks = $request->input('warehouse_stocks');
+
+        if (is_array($warehouseStocks) && count($warehouseStocks)) {
+            $stockService->syncWarehouseStocks(
+                $inventory,
+                $warehouseStocks,
+                $request->input('reorder_levels', []),
+                $request->input('damaged_quantities', []),
+                'Inventory form sync'
+            );
+
+            return;
+        }
+
+        $warehouseIds = $request->input('warehouse_id');
+        if (! is_array($warehouseIds)) {
+            $warehouseIds = $warehouseIds ? [$warehouseIds] : [];
+        }
+        $warehouseIds = array_values(array_filter(array_map('intval', $warehouseIds)));
+
+        $qty = $fallbackQty;
+        if ($qty === null) {
+            $qty = $request->has('stock_quantity')
+                ? (int) $request->input('stock_quantity')
+                : (int) $inventory->stock_quantity;
+        }
+
+        if (! empty($warehouseIds)) {
+            $map = [];
+            foreach ($warehouseIds as $index => $warehouseId) {
+                $map[$warehouseId] = $index === 0 ? $qty : 0;
+            }
+            $stockService->syncWarehouseStocks($inventory, $map, [], [], 'Inventory warehouse sync');
+
+            return;
+        }
+
+        try {
+            $stockService->ensurePrimaryStock($inventory, null, $qty);
+        } catch (\InvalidArgumentException $e) {
+            // Digital / shops without warehouses — keep flat stock_quantity only.
+            $inventory->stock_quantity = $qty;
+            $inventory->saveQuietly();
+        }
     }
 
     public function destroy($inventory)

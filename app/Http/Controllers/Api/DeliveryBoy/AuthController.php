@@ -29,25 +29,93 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $credentials = [
-            'email' => $request->email,
-            'password' => $request->password,
-        ];
+        // A rider who works for more than one store has one account row per
+        // store (email is only unique within a store) — find every row this
+        // email+password combination matches.
+        $matches = DeliveryBoy::matchingAccounts($request->email, $request->password);
 
-        $deliveryBoy = DeliveryBoy::where('email', $credentials['email'])->first();
-
-        if ($deliveryBoy && Hash::check($credentials['password'], $deliveryBoy->password)) {
-            $deliveryBoy->generateToken('delivery_boy');
-
-            if ($request->filled('fcm_token')) {
-                $deliveryBoy->fcm_token = FCMService::normalizeToken($request->fcm_token) ?: null;
-                $deliveryBoy->save();
-            }
-
-            return new DeliveryBoyResource($deliveryBoy);
+        if ($matches->isEmpty()) {
+            return response()->json(['message' => trans('api.auth_failed')], 401);
         }
 
-        return response()->json(['message' => trans('api.auth_failed')], 401);
+        if ($request->filled('shop_id')) {
+            $deliveryBoy = $matches->firstWhere('shop_id', (int) $request->shop_id);
+
+            if (! $deliveryBoy) {
+                return response()->json(['message' => trans('api.auth_failed')], 401);
+            }
+        } elseif ($matches->count() > 1) {
+            return response()->json([
+                'choose_store' => true,
+                'message' => trans('api.multiple_stores_found'),
+                'stores' => $matches->map(fn ($account) => [
+                    'shop_id' => $account->shop_id,
+                    'shop_name' => optional($account->shop)->name,
+                    'shop_logo' => get_storage_file_url(optional(optional($account->shop)->image)->path, 'mini'),
+                ])->values(),
+            ], 200);
+        } else {
+            $deliveryBoy = $matches->first();
+        }
+
+        $deliveryBoy->generateToken('delivery_boy');
+
+        if ($request->filled('fcm_token')) {
+            $deliveryBoy->fcm_token = FCMService::normalizeToken($request->fcm_token) ?: null;
+            $deliveryBoy->save();
+        }
+
+        return new DeliveryBoyResource($deliveryBoy);
+    }
+
+    /**
+     * List every store the currently logged-in rider's email is registered
+     * under, so the app can offer a "Switch Store" option.
+     */
+    public function myStores(Request $request)
+    {
+        $current = Auth::guard('delivery_boy-api')->user();
+
+        $accounts = DeliveryBoy::where('email', $current->email)
+            ->with('shop:id,name')
+            ->get();
+
+        return response()->json([
+            'stores' => $accounts->map(fn ($account) => [
+                'shop_id' => $account->shop_id,
+                'shop_name' => optional($account->shop)->name,
+                'shop_logo' => get_storage_file_url(optional(optional($account->shop)->image)->path, 'mini'),
+                'is_current' => $account->id === $current->id,
+            ])->values(),
+        ]);
+    }
+
+    /**
+     * Switch to a different store's rider account for this same email.
+     * No password re-entry — the caller is already authenticated as a rider
+     * with this email (via a valid bearer token for one of these accounts),
+     * so hopping to another store account under that same email doesn't
+     * need re-proving identity.
+     */
+    public function switchStore(Request $request)
+    {
+        $request->validate([
+            'shop_id' => 'required|integer',
+        ]);
+
+        $current = Auth::guard('delivery_boy-api')->user();
+
+        $deliveryBoy = DeliveryBoy::where('email', $current->email)
+            ->where('shop_id', $request->shop_id)
+            ->first();
+
+        if (! $deliveryBoy) {
+            return response()->json(['message' => trans('api.auth_failed')], 401);
+        }
+
+        $deliveryBoy->generateToken('delivery_boy');
+
+        return new DeliveryBoyResource($deliveryBoy);
     }
 
     /**

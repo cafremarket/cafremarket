@@ -27,6 +27,8 @@ Route::prefix('deliveryboy')->namespace('DeliveryBoy')->group(function () {
         Route::get('vendor', [AccountController::class, 'vendor']);
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('password/update', [AuthController::class, 'updatePassword']);
+        Route::get('my-stores', [AuthController::class, 'myStores']);
+        Route::post('switch-store', [AuthController::class, 'switchStore']);
         Route::get('feedbacks', [OrderController::class, 'showDeliveryBoyFeedbacks']);
 
         // Orders

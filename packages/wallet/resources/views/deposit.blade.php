@@ -40,24 +40,18 @@
 
             @foreach ($paymentMethods as $paymentMethod)
               @php
+                if (! in_array($paymentMethod->code, ['mpesa', 'emola'], true)) {
+                  continue;
+                }
                 $config = get_payment_config_info($paymentMethod->code);
               @endphp
 
-              {{-- Skip the payment option if not confirured --}}
+              {{-- Skip the payment option if not configured --}}
               @continue(!$config)
-
-              @if ($paymentMethod->code == 'stripe' && $merchant->hasBillingToken())
-                <div class="form-group">
-                  <label>
-                    <input name="payment_method" value="saved_card" class="icheck payment-option" id="saved-card" type="radio" data-code="{{ $paymentMethod->code }}" data-info="{{ $config['msg'] }}" data-type="{{ $paymentMethod->type }}" required="required" {{ old('payment_method') ? '' : 'checked' }} />
-                    @lang('app.saved_card'): <i class="fa fa-cc-{{ strtolower($merchant->pm_type) }}"></i> ************{{ $merchant->pm_last_four }}
-                  </label>
-                </div>
-              @endif
 
               <div class="form-group">
                 <label>
-                  <input name="payment_method" value="{{ $paymentMethod->code }}" class="icheck payment-option" type="radio" data-code="{{ $paymentMethod->code }}" data-info="{{ $config['msg'] }}" data-type="{{ $paymentMethod->type }}" required="required" {{ old('payment_method') == $paymentMethod->code ? 'checked' : '' }} /> {{ $paymentMethod->code == 'stripe' ? trans('app.credit_card') : $paymentMethod->name }}
+                  <input name="payment_method" value="{{ $paymentMethod->code }}" class="icheck payment-option" type="radio" data-code="{{ $paymentMethod->code }}" data-info="{{ $config['msg'] }}" data-type="{{ $paymentMethod->type }}" required="required" {{ old('payment_method') == $paymentMethod->code ? 'checked' : '' }} /> {{ $paymentMethod->name }}
                 </label>
               </div>
             @endforeach
@@ -90,10 +84,6 @@
       <div class="col-md-4 nopadding">
         <div class="panel panel-default">
           <div class="panel-body">
-            {{-- authorize-net --}}
-            {{-- Stripe --}}
-            @include('partials.stripe_card_form')
-
             <p id="payment-instructions" class="text-info small space30">
               <i class="fa fa-info-circle"></i>
               <span>@lang('app.select_payment_option')</span>
@@ -103,10 +93,6 @@
               <button id="pay-now-btn" class="btn btn-primary btn-lg btn-block" type="submit">
                 <small><i class="fa fa-shield"></i> <span id="pay-now-btn-txt">@lang('packages.wallet.pay_now')</span></small>
               </button>
-
-              <a href="javascript:void(0)" id="paypal-express-btn" class="hide" type="submit">
-                <img src="{{ asset(sys_image_path('payment-methods') . 'paypal-express.png') }}" width="70%" alt="paypal express checkout" title="paypal-express" />
-              </a>
             </div>
           </div> <!-- /.panel-body -->
         </div> <!-- /.panel -->

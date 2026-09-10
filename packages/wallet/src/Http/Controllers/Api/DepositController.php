@@ -5,7 +5,6 @@ namespace Incevio\Package\Wallet\Http\Controllers\Api;
 use App\Contracts\PaymentServiceContract;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PaymentMethodResource;
-use App\Models\PaymentMethod;
 use App\Services\Payments\PaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -157,8 +156,6 @@ class DepositController extends Controller
      */
     public function getPaymentMethods()
     {
-        $paymentMethods = PaymentMethod::find(get_from_option_table('wallet_payment_methods', []));
-
-        return PaymentMethodResource::collection($paymentMethods);
+        return PaymentMethodResource::collection(get_wallet_deposit_payment_methods());
     }
 }

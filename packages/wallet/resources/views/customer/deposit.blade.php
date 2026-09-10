@@ -40,23 +40,18 @@
 
         @foreach ($paymentMethods as $paymentMethod)
           @php
+            // Top-up only supports mobile money gateways.
+            if (! in_array($paymentMethod->code, ['mpesa', 'emola'], true)) {
+              continue;
+            }
             $config = get_payment_config_info($paymentMethod->code);
           @endphp
 
           @continue(!$config)
 
-          @if ($customer && $paymentMethod->code == 'stripe' && $customer->hasBillingToken())
-            <div class="sf-form-group">
-              <label>
-                <input name="payment_method" value="saved_card" class="icheck payment-option" id="saved-card" type="radio" data-code="{{ $paymentMethod->code }}" data-info="{{ $config['msg'] }}" data-type="{{ $paymentMethod->type }}" required="required" {{ old('payment_method') ? '' : 'checked' }} />
-                @lang('app.saved_card'): <i class="fa fa-cc-{{ strtolower($customer->pm_type) }}"></i> ************{{ $customer->pm_last_four }}
-              </label>
-            </div>
-          @endif
-
           <div class="sf-form-group">
             <label>
-              <input name="payment_method" value="{{ $paymentMethod->code }}" class="icheck payment-option" type="radio" data-code="{{ $paymentMethod->code }}" data-info="{{ $config['msg'] }}" data-type="{{ $paymentMethod->type }}" required="required" {{ old('payment_method') == $paymentMethod->code ? 'checked' : '' }} /> {{ $paymentMethod->code == 'stripe' ? trans('app.credit_card') : $paymentMethod->name }}
+              <input name="payment_method" value="{{ $paymentMethod->code }}" class="icheck payment-option" type="radio" data-code="{{ $paymentMethod->code }}" data-info="{{ $config['msg'] }}" data-type="{{ $paymentMethod->type }}" required="required" {{ old('payment_method') == $paymentMethod->code ? 'checked' : '' }} /> {{ $paymentMethod->name }}
             </label>
           </div>
         @endforeach
@@ -87,8 +82,6 @@
       </div>
 
       <div class="sf-wallet-deposit__panel">
-        @include('partials.stripe_card_form')
-
         <p id="payment-instructions" class="text-info small">
           <i class="fas fa-info-circle" aria-hidden="true"></i>
           <span>@lang('app.select_payment_option')</span>
@@ -99,10 +92,6 @@
             <i class="fas fa-shield-alt" aria-hidden="true"></i>
             <span id="pay-now-btn-txt">@lang('packages.wallet.pay_now')</span>
           </button>
-
-          <a href="javascript:void(0)" id="paypal-express-btn" class="hide" type="submit">
-            <img src="{{ asset(sys_image_path('payment-methods') . 'paypal-express.png') }}" width="70%" alt="paypal express checkout" title="paypal-express" />
-          </a>
         </div>
       </div>
     </div>

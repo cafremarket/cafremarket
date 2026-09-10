@@ -64,6 +64,7 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
             include 'admin/Inventory.php';
             include 'admin/Warehouse.php';
             include 'admin/InventoryProduct.php';
+            include 'admin/Stock.php';
         });
 
         // Order Routes for Merchant panel (mirrors admin.order.*)
@@ -86,10 +87,6 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
                 ->name('config.general');
 
             include 'admin/PaymentConfig.php';
-        });
-
-        Route::name('appearance.')->prefix('appearance')->group(function () {
-            include 'admin/Banner.php';
         });
 
         Route::name('support.')->prefix('support')->group(function () {
