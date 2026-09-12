@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ShopLightResource;
+use App\Http\Controllers\Api\Concerns\CachesApiResponses;
+use App\Services\Cache\CatalogCache;
 use App\Services\Shop\NearbyShopService;
 use Illuminate\Http\Request;
 
 class NearbyShopController extends Controller
 {
+    use CachesApiResponses;
+
     public function index(Request $request, NearbyShopService $nearbyShopService)
     {
         $request->validate([
@@ -16,26 +20,28 @@ class NearbyShopController extends Controller
             'lng' => 'required|numeric|between:-180,180',
         ]);
 
-        $results = $nearbyShopService->find(
-            (float) $request->lat,
-            (float) $request->lng
-        );
+        $lat = (float) $request->lat;
+        $lng = (float) $request->lng;
 
-        return response()->json([
-            'data' => $results->map(function ($row) use ($request) {
-                $address = $row['shop']->storeAddress();
+        return $this->rememberApi('nearby:'.CatalogCache::geoKey($lat, $lng), function () use ($nearbyShopService, $request, $lat, $lng) {
+            $results = $nearbyShopService->find($lat, $lng);
 
-                return array_merge(
-                    (new ShopLightResource($row['shop']))->toArray($request),
-                    [
-                        'distance_km' => $row['distance_km'],
-                        'deliverable' => $row['deliverable'],
-                        'latitude' => $address?->latitude ? (float) $address->latitude : null,
-                        'longitude' => $address?->longitude ? (float) $address->longitude : null,
-                    ]
-                );
-            })->values(),
-        ]);
+            return [
+                'data' => $results->map(function ($row) use ($request) {
+                    $address = $row['shop']->storeAddress();
+
+                    return array_merge(
+                        (new ShopLightResource($row['shop']))->toArray($request),
+                        [
+                            'distance_km' => $row['distance_km'],
+                            'deliverable' => $row['deliverable'],
+                            'latitude' => $address?->latitude ? (float) $address->latitude : null,
+                            'longitude' => $address?->longitude ? (float) $address->longitude : null,
+                        ]
+                    );
+                })->values(),
+            ];
+        }, null, 'geo');
     }
 
     public function map(Request $request, NearbyShopService $nearbyShopService)

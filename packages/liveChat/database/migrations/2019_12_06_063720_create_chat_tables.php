@@ -13,6 +13,10 @@ class CreateChatTables extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('chat_conversations')) {
+            return;
+        }
+
         Schema::create('chat_conversations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('shop_id')->unsigned()->nullable();
@@ -24,8 +28,12 @@ class CreateChatTables extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            $table->foreign('shop_id')->references('id')->on('shops')->onDelete('set null');
-            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('set null');
+            if (Schema::hasTable('shops')) {
+                $table->foreign('shop_id')->references('id')->on('shops')->onDelete('set null');
+            }
+            if (Schema::hasTable('customers')) {
+                $table->foreign('customer_id')->references('id')->on('customers')->onDelete('set null');
+            }
         });
     }
 

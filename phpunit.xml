@@ -31,6 +31,7 @@
         <server name="MAIL_MAILER" value="array"/>
         <server name="QUEUE_CONNECTION" value="sync"/>
         <server name="SESSION_DRIVER" value="array"/>
+        <env name="API_CACHE_ENABLED" value="false"/>
         <!--Added later for server configuration for testing-->
         <server name="REMOTE_ADDR" value="127113.21.228.209"/>
       

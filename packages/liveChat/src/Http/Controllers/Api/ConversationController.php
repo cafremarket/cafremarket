@@ -37,7 +37,7 @@ class ConversationController extends Controller
      */
     public function conversations(Request $request)
     {
-        if (is_incevio_package_loaded('livechat')) {
+        if (is_incevio_package_loaded('livechat') && Schema::hasTable('chat_conversations')) {
             $conversations = ChatConversation::query()
                 ->where('customer_id', Auth::guard('api')->id())
                 ->with(['customer', 'shop', 'lastReply'])
@@ -70,7 +70,7 @@ class ConversationController extends Controller
      */
     public function conversation(ChatConversationRequest $request, Shop $shop)
     {
-        if (is_incevio_package_loaded('livechat')) {
+        if (is_incevio_package_loaded('livechat') && Schema::hasTable('chat_conversations')) {
             $conversation = ChatConversation::where([
                 'customer_id' => Auth::guard('api')->id(),
                 'shop_id' => $shop->id,
@@ -108,7 +108,7 @@ class ConversationController extends Controller
      */
     public function save_conversation(SaveChatConversationRequest $request, Shop $shop)
     {
-        if (is_incevio_package_loaded('livechat')) {
+        if (is_incevio_package_loaded('livechat') && Schema::hasTable('chat_conversations')) {
             $msg_object = null;
             $replyText = trim((string) ($request->input('message') ?? ''));
             if ($replyText === '' && ($request->hasFile('photo') || $request->filled('photo'))) {
@@ -247,7 +247,7 @@ class ConversationController extends Controller
         $user = Auth::guard('vendor_api')->user() ?? Auth::user();
         $shopId = $user ? (int) $user->merchantId() : 0;
 
-        if (! $shopId) {
+        if (! $shopId || ! Schema::hasTable('chat_conversations')) {
             return ConversationResource::collection(collect());
         }
 

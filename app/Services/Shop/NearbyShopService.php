@@ -3,6 +3,8 @@
 namespace App\Services\Shop;
 
 use App\Models\Shop;
+use App\Services\Cache\AppCache;
+use App\Services\Cache\CatalogCache;
 use App\Services\Geo\DistanceService;
 use Illuminate\Support\Collection;
 
@@ -17,14 +19,32 @@ class NearbyShopService
      */
     public function approvedShops(): Collection
     {
+        $version = AppCache::version(CatalogCache::VERSION_SHOPS);
+        $requireInventory = (bool) config('hyperlocal.require_inventory_for_nearby', false);
+
+        $ids = AppCache::remember(
+            'shops:approved:ids:v'.$version.':inv'.(int) $requireInventory,
+            (int) config('performance.ttl.shops', 180),
+            function () use ($requireInventory) {
+                return Shop::query()
+                    ->approved()
+                    ->active()
+                    ->when($requireInventory, function ($query) {
+                        $query->whereHas('inventories', function ($q) {
+                            $q->where('active', 1);
+                        });
+                    })
+                    ->pluck('id')
+                    ->all();
+            }
+        );
+
+        if ($ids === []) {
+            return collect();
+        }
+
         return Shop::query()
-            ->approved()
-            ->active()
-            ->when(config('hyperlocal.require_inventory_for_nearby', false), function ($query) {
-                $query->whereHas('inventories', function ($q) {
-                    $q->where('active', 1);
-                });
-            })
+            ->whereIn('id', $ids)
             ->withCount([
                 'inventories as active_inventories_count' => function ($q) {
                     $q->where('active', 1);

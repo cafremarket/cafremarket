@@ -1,12 +1,13 @@
 <?php
 
-namespace Incevio\Package\LiveChat\Http\Controllers;;
+namespace Incevio\Package\LiveChat\Http\Controllers;
 
 use App\Models\Shop;
 use App\Events\Chat\NewMessageEvent;
 use App\Services\ChatSocketPublisher;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Incevio\Package\LiveChat\Http\Requests\ChatConversationRequest;
 use Incevio\Package\LiveChat\Http\Requests\SaveChatConversationRequest;
 use Incevio\Package\LiveChat\Models\ChatConversation;
@@ -26,6 +27,10 @@ class ChatController extends Controller
      */
     public function conversation(ChatConversationRequest $request, Shop $shop)
     {
+        if (! Schema::hasTable('chat_conversations')) {
+            return response()->json(null);
+        }
+
         $conversation = ChatConversation::where([
             'customer_id' => Auth::guard('customer')->id(),
             'shop_id' => $shop->id,
@@ -61,6 +66,10 @@ class ChatController extends Controller
 
         if ($replyText === '' && ! $request->hasFile('photo') && ! $request->filled('photo')) {
             return response()->json(['message' => trans('validation.required', ['attribute' => 'message'])], 422);
+        }
+
+        if (! Schema::hasTable('chat_conversations')) {
+            return response()->json(['message' => trans('api.something_went_wrong')], 503);
         }
 
         $conversation = ChatConversation::where([

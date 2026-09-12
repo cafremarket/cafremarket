@@ -25,6 +25,8 @@ class LiveChatServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
 
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'liveChat');
+
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
     }
 
     /**

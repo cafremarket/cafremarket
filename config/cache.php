@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_DRIVER', 'file'),
+    'default' => env('CACHE_DRIVER', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -118,9 +118,9 @@ return [
     */
     'remember' => [
         'categories' => 86400,
-        'latest_items' => 86400,
-        'random_items' => 86400,
-        'daily_popular' => 86400,
+        'latest_items' => 300,
+        'random_items' => 180,
+        'daily_popular' => 300,
         'trending_category_items' => 86400,
         'deals' => 86400,
 

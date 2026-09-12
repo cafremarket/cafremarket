@@ -9,10 +9,12 @@ use App\Http\Resources\CategorySubGroupResource;
 use App\Models\Category;
 use App\Models\CategoryGroup;
 use App\Models\CategorySubGroup;
+use App\Http\Controllers\Api\Concerns\CachesApiResponses;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    use CachesApiResponses;
     /**
      * Display a listing of the resource.
      *
@@ -20,16 +22,18 @@ class CategoryController extends Controller
      */
     public function index(Request $request, $sub_group = null)
     {
-        $categories = Category::active();
+        return $this->rememberApi('categories:'.($sub_group ?: 'all'), function () use ($sub_group) {
+            $categories = Category::active();
 
-        if ($sub_group) {
-            $categories = $categories->where('category_sub_group_id', $sub_group);
-        }
+            if ($sub_group) {
+                $categories = $categories->where('category_sub_group_id', $sub_group);
+            }
 
-        $categories = $categories->with(['coverImage', 'featureImage'])
-            ->orderBy('order', 'asc')->get();
+            $categories = $categories->with(['coverImage', 'featureImage'])
+                ->orderBy('order', 'asc')->get();
 
-        return CategoryResource::collection($categories);
+            return CategoryResource::collection($categories);
+        });
     }
 
     /**
@@ -39,11 +43,13 @@ class CategoryController extends Controller
      */
     public function categoryGroup()
     {
-        $categories = CategoryGroup::with(['coverImage', 'logoImage'])
-            ->orderBy('order', 'asc')
-            ->active()->get();
+        return $this->rememberApi('category-groups', function () {
+            $categories = CategoryGroup::with(['coverImage', 'logoImage'])
+                ->orderBy('order', 'asc')
+                ->active()->get();
 
-        return CategoryGroupResource::collection($categories);
+            return CategoryGroupResource::collection($categories);
+        });
     }
 
     /**
@@ -53,17 +59,19 @@ class CategoryController extends Controller
      */
     public function categorySubGroup(Request $request, $group = null)
     {
-        $categories = CategorySubGroup::active();
+        return $this->rememberApi('category-subgroups:'.($group ?: 'all'), function () use ($group) {
+            $categories = CategorySubGroup::active();
 
-        if ($group) {
-            $categories = $categories->where('category_group_id', $group);
-        }
+            if ($group) {
+                $categories = $categories->where('category_group_id', $group);
+            }
 
-        $categories = $categories->with(['coverImage'])
-            ->orderBy('order', 'asc')
-            ->get();
+            $categories = $categories->with(['coverImage'])
+                ->orderBy('order', 'asc')
+                ->get();
 
-        return CategorySubGroupResource::collection($categories);
+            return CategorySubGroupResource::collection($categories);
+        });
     }
 
     public function featuredCategories()
@@ -76,17 +84,19 @@ class CategoryController extends Controller
      */
     public function categoriesOfGroup($group)
     {
-        $subGroupIds = CategorySubGroup::query()
-            ->where('category_group_id', $group)
-            ->pluck('id');
+        return $this->rememberApi('categories-of-group:'.$group, function () use ($group) {
+            $subGroupIds = CategorySubGroup::query()
+                ->where('category_group_id', $group)
+                ->pluck('id');
 
-        $categories = Category::active()
-            ->whereIn('category_sub_group_id', $subGroupIds)
-            ->with(['coverImage', 'featureImage'])
-            ->orderBy('order', 'asc')
-            ->get();
+            $categories = Category::active()
+                ->whereIn('category_sub_group_id', $subGroupIds)
+                ->with(['coverImage', 'featureImage'])
+                ->orderBy('order', 'asc')
+                ->get();
 
-        return CategoryResource::collection($categories);
+            return CategoryResource::collection($categories);
+        });
     }
 
     public function trendingCategories()

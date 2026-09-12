@@ -20,11 +20,13 @@ use App\Models\Shop;
 use App\Models\State;
 use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\Hyperlocal\HyperlocalCatalogService;
+use App\Http\Controllers\Api\Concerns\CachesApiResponses;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ListingController extends Controller
 {
+    use CachesApiResponses;
     /**
      * Display a listing of the resource.
      *
@@ -44,71 +46,65 @@ class ListingController extends Controller
             ], 422);
         }
 
-        $shop_id = null;
+        $shop_id = $request->get('shop_id');
+        $slug = $request->get('shop_slug');
+        $cacheKey = 'list:'.$list.':'.($shop_id ?: $slug ?: 'all');
 
-        if ($request->has('shop_id')) {
-            $shop_id = $request->get('shop_id');
-        }
+        return $this->rememberApi($cacheKey, function () use ($list, $catalog, $shop_id, $slug) {
+            switch ($list) {
+                case 'trending':
+                    $listings = ListHelper::popular_items(
+                        config('mobile_app.popular.period.trending', 2),
+                        config('mobile_app.popular.take.trending', 8),
+                        $shop_id
+                    );
+                    break;
 
-        if ($request->has('shop_slug')) {
-            $slug = $request->get('shop_slug');
-        }
+                case 'popular':
+                    $listings = ListHelper::popular_items(config('mobile_app.popular.period.weekly', 7), config('mobile_app.popular.take.weekly', 8), $shop_id);
+                    break;
 
-        switch ($list) {
-            case 'trending':
-                // Must pass shop_id (same as popular/latest) so vendor storefront shows this shop only.
-                $listings = ListHelper::popular_items(
-                    config('mobile_app.popular.period.trending', 2),
-                    config('mobile_app.popular.take.trending', 8),
-                    $shop_id
-                );
-                break;
+                case 'random':
+                    $listings = ListHelper::random_items(null);
+                    break;
 
-            case 'popular':
-                $listings = ListHelper::popular_items(config('mobile_app.popular.period.weekly', 7), config('mobile_app.popular.take.weekly', 8), $shop_id);
-                break;
+                case 'featured':
+                    $listings = get_featured_items($shop_id);
+                    break;
 
-            case 'random':
-                $listings = ListHelper::random_items(null);
-                break;
+                case 'nearby-featured':
+                    $listings = $catalog->nearbyFeaturedItems(
+                        (int) config('mobile_app.popular.take.trending', 8)
+                    );
+                    break;
 
-            case 'featured':
-                $listings = get_featured_items($shop_id);
-                break;
+                case 'top_selling_shop_items':
+                    $shop = Shop::where('slug', $slug)->approved()
+                        ->withCount([
+                            'inventories' => function ($q) {
+                                $q->where('active', 1);
+                            },
+                        ])
+                        ->firstOrFail();
+                    $listings = ListHelper::top_selling_shop_items($shop, 10);
+                    break;
 
-            case 'nearby-featured':
-                $listings = $catalog->nearbyFeaturedItems(
-                    (int) config('mobile_app.popular.take.trending', 8)
-                );
-                break;
-
-            case 'top_selling_shop_items':
-                $shop = Shop::where('slug', $slug)->approved()
-                    ->withCount([
-                        'inventories' => function ($q) {
-                            $q->where('active', 1);
-                        },
-                    ])
-                    ->firstOrFail();
-                $listings = ListHelper::top_selling_shop_items($shop, 10);
-                break;
-
-            case 'latest':
-            default:
-                $listings = ListHelper::latest_available_items(8, $shop_id);
-                break;
-        }
-
-        if ($catalog->isEnabled() && ! $shop_id) {
-            $listings = $catalog->filterInventories(collect($listings))->values();
-
-            // Featured products: nearest store's products first, farthest store's products last.
-            if ($list === 'featured') {
-                $listings = $catalog->sortByShopDistance($listings);
+                case 'latest':
+                default:
+                    $listings = ListHelper::latest_available_items(8, $shop_id);
+                    break;
             }
-        }
 
-        return ListingResource::collection($listings);
+            if ($catalog->isEnabled() && ! $shop_id) {
+                $listings = $catalog->filterInventories(collect($listings))->values();
+
+                if ($list === 'featured') {
+                    $listings = $catalog->sortByShopDistance($listings);
+                }
+            }
+
+            return ListingResource::collection($listings);
+        }, null, 'listing');
     }
 
     /**
@@ -118,6 +114,13 @@ class ListingController extends Controller
      * @return ItemResource
      */
     public function item(Request $request, $slug)
+    {
+        return $this->rememberApi('item:'.$slug, function () use ($request, $slug) {
+            return $this->buildItemPayload($request, $slug);
+        }, null, 'item');
+    }
+
+    protected function buildItemPayload(Request $request, $slug)
     {
         $item = Inventory::where('slug', $slug)
             ->where('active', 1)

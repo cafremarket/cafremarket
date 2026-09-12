@@ -9,6 +9,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Incevio\Package\LiveChat\Http\Requests\SaveChatConversationRequest;
 use Incevio\Package\LiveChat\Http\Requests\ViewChatConversationRequest;
 use Incevio\Package\LiveChat\Models\ChatConversation;
@@ -22,10 +23,12 @@ class AdminChatController extends Controller
     {
         Gate::authorize('index', ChatConversation::class);
 
-        $chats = ChatConversation::mine()
-            ->with('customer')
-            ->latest('updated_at')
-            ->get();
+        $chats = Schema::hasTable('chat_conversations')
+            ? ChatConversation::mine()
+                ->with('customer')
+                ->latest('updated_at')
+                ->get()
+            : collect();
 
         if (livechat_is_merchant_panel()) {
             return view('liveChat::merchant.index', compact('chats'));

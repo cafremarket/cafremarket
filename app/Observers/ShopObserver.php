@@ -22,11 +22,13 @@ class ShopObserver
      */
     public function created(Shop $shop)
     {
-        // $user = User::find($shop->owner_id);
-        // $user->shop_id = $shop->id;
-        // $user->save();
+        \App\Services\Cache\CatalogCache::bumpShops();
+    }
 
-        // $user->notify(new ShopCreated($shop));
+    public function updated(Shop $shop)
+    {
+        \App\Services\Cache\CatalogCache::bumpShops();
+        \App\Services\Cache\CatalogCache::bumpVendor((int) $shop->id);
     }
 
     /**
@@ -36,6 +38,7 @@ class ShopObserver
      */
     public function deleting(Shop $shop)
     {
+        \App\Services\Cache\CatalogCache::bumpShops();
         $shop->owner()->delete();
         $shop->staffs()->delete();
     }

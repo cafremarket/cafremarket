@@ -10,10 +10,12 @@ use App\Http\Resources\ListingResource;
 use App\Models\Inventory;
 use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\Hyperlocal\HyperlocalCatalogService;
+use App\Http\Controllers\Api\Concerns\CachesApiResponses;
 use Illuminate\Http\Request;
 
 class DealController extends Controller
 {
+    use CachesApiResponses;
     /**
      * Today's Deal of the Day (calendar-based, multiple products).
      *
@@ -22,24 +24,27 @@ class DealController extends Controller
     public function dealOfTheDay(HyperlocalCatalogService $catalog, BuyerLocationService $buyerLocation)
     {
         $buyerLocation->syncFromCustomer();
-        $items = get_deal_of_the_day();
 
-        if ($items->isEmpty()) {
-            return response()->json(['data' => []]);
-        }
+        return $this->rememberApi('deal-of-the-day:'.now()->toDateString(), function () use ($catalog) {
+            $items = get_deal_of_the_day();
 
-        if ($catalog->isEnabled()) {
-            $items = $catalog->filterInventories($items)->values();
-        }
+            if ($items->isEmpty()) {
+                return response()->json(['data' => []]);
+            }
 
-        return response()->json([
-            'data' => ListingResource::collection($items),
-            'meta' => [
-                'deal_date' => now()->toDateString(),
-                'deal_title' => trans('app.deal_of_the_day'),
-                'count' => $items->count(),
-            ],
-        ]);
+            if ($catalog->isEnabled()) {
+                $items = $catalog->filterInventories($items)->values();
+            }
+
+            return response()->json([
+                'data' => ListingResource::collection($items),
+                'meta' => [
+                    'deal_date' => now()->toDateString(),
+                    'deal_title' => trans('app.deal_of_the_day'),
+                    'count' => $items->count(),
+                ],
+            ]);
+        });
     }
 
     /**

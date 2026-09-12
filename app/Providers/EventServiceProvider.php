@@ -3,10 +3,16 @@
 namespace App\Providers;
 
 use App\Listeners\Customer\VerifyCustomerAccount;
+use App\Models\Banner;
+use App\Models\Category;
+use App\Models\CategoryGroup;
+use App\Models\CategorySubGroup;
 use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\Refund;
 use App\Models\Shop;
+use App\Models\Slider;
+use App\Observers\CatalogCacheObserver;
 use App\Observers\InventoryObserver;
 use App\Observers\OrderObserver;
 use App\Observers\RefundObserver;
@@ -252,6 +258,11 @@ class EventServiceProvider extends ServiceProvider
         Order::observe(OrderObserver::class);
         Refund::observe(RefundObserver::class);
         Inventory::observe(InventoryObserver::class);
+        Banner::observe(CatalogCacheObserver::class);
+        Slider::observe(CatalogCacheObserver::class);
+        Category::observe(CatalogCacheObserver::class);
+        CategoryGroup::observe(CatalogCacheObserver::class);
+        CategorySubGroup::observe(CatalogCacheObserver::class);
 
         Queue::failing(function (JobFailed $event) {
             Log::channel('joblog')->error('Job Failed!', [

@@ -995,35 +995,38 @@ class ListHelper
      */
     public static function popular_items($days = 7, $limit = 15, $shop_id = null)
     {
-        $items = Inventory::query()
-            ->select(static::common_select_attr('inventory'))
-            ->where('active', 1)
-            ->whereNull('parent_id')
-            ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                'image:path,imageable_id,imageable_type',
-            ]);
+        $cacheKey = 'popular_items_'.$days.'_'.$limit.'_'.($shop_id ?: 'all').hyperlocal_location_cache_suffix();
 
-        if ($shop_id) {
-            $items = $items->where('shop_id', $shop_id);
-        } else {
-            $items = scope_inventory_for_buyer($items);
-        }
+        return Cache::remember($cacheKey, (int) config('performance.ttl.popular', 300), function () use ($days, $limit, $shop_id) {
+            $items = Inventory::query()
+                ->select(static::common_select_attr('inventory'))
+                ->where('active', 1)
+                ->whereNull('parent_id')
+                ->with([
+                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'image:path,imageable_id,imageable_type',
+                ]);
 
-        // It's a trick for the demo only to get different items
-        if (config('app.demo') == true) {
-            return $items->limit(99)->get()->random(5);
-        }
+            if ($shop_id) {
+                $items = $items->where('shop_id', $shop_id);
+            } else {
+                $items = scope_inventory_for_buyer($items);
+            }
 
-        $from = Carbon::today()->subDays($days)->startOfDay();
+            if (config('app.demo') == true) {
+                return $items->limit(99)->get()->random(5);
+            }
 
-        return $items->withCount([
-            'orders' => function ($q) use ($from) {
-                $q->withArchived()->where('orders.created_at', '>', $from);
-            },
-        ])
-            ->orderBy('orders_count', 'desc')
-            ->limit($limit)->get();
+            $from = Carbon::today()->subDays($days)->startOfDay();
+
+            return $items->withCount([
+                'orders' => function ($q) use ($from) {
+                    $q->withArchived()->where('orders.created_at', '>', $from);
+                },
+            ])
+                ->orderBy('orders_count', 'desc')
+                ->limit($limit)->get();
+        });
     }
 
     /**

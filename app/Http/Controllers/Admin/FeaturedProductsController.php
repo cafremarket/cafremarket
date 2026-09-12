@@ -62,6 +62,7 @@ class FeaturedProductsController extends Controller
         update_or_create_option_table_record('featured_items', $ids);
         forget_option_table_cache('featured_items');
         Cache::forget('featured_items');
+        \App\Services\Cache\CatalogCache::bumpCatalog();
 
         return back()->with('success', trans('messages.updated', ['model' => trans('app.featured_items')]));
     }

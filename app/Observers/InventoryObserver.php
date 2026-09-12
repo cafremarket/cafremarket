@@ -83,5 +83,6 @@ class InventoryObserver
             : $inventory->shop()->value('slug');
 
         ListHelper::clearLatestItemsCache($inventory->shop_id, $shopSlug);
+        \App\Services\Cache\CatalogCache::bumpCatalog($inventory->shop_id);
     }
 }

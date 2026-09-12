@@ -4075,30 +4075,31 @@ if (! function_exists('get_featured_items')) {
             return collect([]);
         }
 
-        // Active curated listings (radius filtering happens at the request layer).
-        $items = Inventory::query()
-            ->whereIn('inventories.id', $ids)
-            ->where('inventories.active', 1)
-            ->whereNull('inventories.deleted_at')
-            ->whereHas('shop', function ($q) {
-                $q->approved();
-            })
-            
-            ->when($shop_id, function ($q) use ($shop_id) {
-                $q->where('shop_id', $shop_id);
-            })
-            ->select(ListHelper::common_select_attr('inventory'))
-            ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                'image:path,imageable_id,imageable_type',
-            ])
-            ->get()
-            ->keyBy('id');
+        $cacheKey = 'featured_items_'.($shop_id ?: 'all').'_'.md5(implode(',', $ids)).hyperlocal_location_cache_suffix();
 
-        // Preserve admin selection order
-        return collect($ids)->map(function ($id) use ($items) {
-            return $items->get($id);
-        })->filter()->values();
+        return Cache::remember($cacheKey, (int) config('performance.ttl.listing', 180), function () use ($ids, $shop_id) {
+            $items = Inventory::query()
+                ->whereIn('inventories.id', $ids)
+                ->where('inventories.active', 1)
+                ->whereNull('inventories.deleted_at')
+                ->whereHas('shop', function ($q) {
+                    $q->approved();
+                })
+                ->when($shop_id, function ($q) use ($shop_id) {
+                    $q->where('shop_id', $shop_id);
+                })
+                ->select(ListHelper::common_select_attr('inventory'))
+                ->with([
+                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'image:path,imageable_id,imageable_type',
+                ])
+                ->get()
+                ->keyBy('id');
+
+            return collect($ids)->map(function ($id) use ($items) {
+                return $items->get($id);
+            })->filter()->values();
+        });
     }
 }
 

@@ -169,5 +169,6 @@ class DealOfTheDayController extends Controller
         Cache::forget('deal_of_the_day_items_'.$date);
         Cache::forget('deal_of_the_day_'.now()->toDateString());
         Cache::forget('deal_of_the_day_items_'.now()->toDateString());
+        \App\Services\Cache\CatalogCache::bumpCatalog();
     }
 }

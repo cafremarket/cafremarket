@@ -28,11 +28,15 @@ use App\Models\PaymentMethod;
 use App\Models\Shop;
 use App\Models\Slider;
 use App\Models\State;
+use App\Http\Controllers\Api\Concerns\CachesApiResponses;
+use App\Services\Cache\CatalogCache;
 use App\Services\Shop\NearbyShopService;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+    use CachesApiResponses;
+
     use InventorySearch;
 
     protected function setUp(): void
@@ -61,19 +65,17 @@ class HomeController extends Controller
      */
     public function sliders(Request $request)
     {
-        $shop_id = null;
+        $shop_id = $request->get('shop_id');
 
-        if ($request->has('shop_id')) {
-            $shop_id = $request->get('shop_id');
-        }
+        return $this->rememberApi('sliders:'.($shop_id ?: 'platform'), function () use ($shop_id) {
+            $sliders = Slider::whereHas('mobileImage')
+                ->with('mobileImage')
+                ->where('shop_id', $shop_id)
+                ->orderBy('order', 'asc')
+                ->get();
 
-        $sliders = Slider::whereHas('mobileImage')
-            ->with('mobileImage')
-            ->where('shop_id', $shop_id)
-            ->orderBy('order', 'asc')
-            ->get();
-
-        return SliderResource::collection($sliders);
+            return SliderResource::collection($sliders);
+        });
     }
 
     /**
@@ -83,19 +85,17 @@ class HomeController extends Controller
      */
     public function banners(Request $request)
     {
-        $shop_id = null;
+        $shop_id = $request->get('shop_id');
 
-        if ($request->has('shop_id')) {
-            $shop_id = $request->get('shop_id');
-        }
+        return $this->rememberApi('banners:'.($shop_id ?: 'platform'), function () use ($shop_id) {
+            $banners = Banner::with(['featureImage'])
+                ->where('shop_id', $shop_id)
+                ->when($shop_id === null, fn ($q) => $q->forApp())
+                ->orderBy('order', 'asc')
+                ->get();
 
-        $banners = Banner::with(['featureImage'])
-            ->where('shop_id', $shop_id)
-            ->when($shop_id === null, fn ($q) => $q->forApp())
-            ->orderBy('order', 'asc')
-            ->get();
-
-        return BannerResource::collection($banners);
+            return BannerResource::collection($banners);
+        });
     }
 
     /**
@@ -106,49 +106,48 @@ class HomeController extends Controller
     public function allShops(Request $request, NearbyShopService $nearbyShopService)
     {
         if ($request->filled('lat') && $request->filled('lng')) {
-            $results = $nearbyShopService->find(
-                (float) $request->lat,
-                (float) $request->lng
-            );
+            $lat = (float) $request->lat;
+            $lng = (float) $request->lng;
 
-            return response()->json([
-                'data' => $results->map(function ($row) use ($request) {
-                    $address = $row['shop']->storeAddress();
+            return $this->rememberApi('shops:nearby:'.CatalogCache::geoKey($lat, $lng), function () use ($nearbyShopService, $request, $lat, $lng) {
+                $results = $nearbyShopService->find($lat, $lng);
 
-                    return array_merge(
-                        (new ShopLightResource($row['shop']))->toArray($request),
-                        [
-                            'distance_km' => $row['distance_km'],
-                            'deliverable' => $row['deliverable'],
-                            'latitude' => $address?->latitude ? (float) $address->latitude : null,
-                            'longitude' => $address?->longitude ? (float) $address->longitude : null,
-                        ]
-                    );
-                })->values(),
-            ]);
+                return [
+                    'data' => $results->map(function ($row) use ($request) {
+                        $address = $row['shop']->storeAddress();
+
+                        return array_merge(
+                            (new ShopLightResource($row['shop']))->toArray($request),
+                            [
+                                'distance_km' => $row['distance_km'],
+                                'deliverable' => $row['deliverable'],
+                                'latitude' => $address?->latitude ? (float) $address->latitude : null,
+                                'longitude' => $address?->longitude ? (float) $address->longitude : null,
+                            ]
+                        );
+                    })->values(),
+                ];
+            }, null, 'geo');
         }
 
-        $shops = Shop::with([
-            'logoImage:path,imageable_id,imageable_type',
-            'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-        ])
-            ->withCount([
-                'inventories' => function ($q) {
-                    // Keep count aligned with storefront: listing is active and already available.
-                    // Do not apply Inventory::available() here because it also applies shop->active()
-                    // and zipcode filters, which hides valid approved shops in app vendor list.
-                    // Count parent products only (skip variant child SKUs).
-                    $q->where('active', 1)
-                        ->whereNull('parent_id');
-                },
+        return $this->rememberApi('shops:all', function () {
+            $shops = Shop::with([
+                'logoImage:path,imageable_id,imageable_type',
+                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
             ])
-            // Keep mobile vendor list behavior aligned with storefront shops page.
-            ->approved()
-            ->whereHas('inventories')
-            ->orderBy('name')
-            ->get();
+                ->withCount([
+                    'inventories' => function ($q) {
+                        $q->where('active', 1)
+                            ->whereNull('parent_id');
+                    },
+                ])
+                ->approved()
+                ->whereHas('inventories')
+                ->orderBy('name')
+                ->get();
 
-        return ShopLightResource::collection($shops);
+            return ShopLightResource::collection($shops);
+        }, null, 'shops');
     }
 
     /**
@@ -159,26 +158,27 @@ class HomeController extends Controller
      */
     public function shop($slug)
     {
-        $shop = Shop::where('slug', $slug)->approved()
-            ->with([
-                'latestFeedbacks' => function ($q) {
-                    $q->with('customer:id,nice_name,name')->take(3);
-                },
-            ])
-            ->withCount([
-                'inventories' => function ($q) {
-                    $q->where('active', 1)
-                        ->whereNull('parent_id');
-                },
-            ])
-            ->firstOrFail();
+        return $this->rememberApi('shop:'.$slug, function () use ($slug) {
+            $shop = Shop::where('slug', $slug)->approved()
+                ->with([
+                    'latestFeedbacks' => function ($q) {
+                        $q->with('customer:id,nice_name,name')->take(3);
+                    },
+                ])
+                ->withCount([
+                    'inventories' => function ($q) {
+                        $q->where('active', 1)
+                            ->whereNull('parent_id');
+                    },
+                ])
+                ->firstOrFail();
 
-        // Check shop maintenance_mode
-        if ($shop->isDown()) {
-            return response()->json(['message' => trans('app.marketplace_down')], 404);
-        }
+            if ($shop->isDown()) {
+                return response()->json(['message' => trans('app.marketplace_down')], 404);
+            }
 
-        return new ShopResource($shop);
+            return new ShopResource($shop);
+        }, null, 'shops');
     }
 
     /**
@@ -207,12 +207,13 @@ class HomeController extends Controller
      */
     public function allBrands()
     {
-        $brands = Manufacturer::select('id', 'name', 'slug', 'description', 'country_id')
-            // ->with('country:id,name')
-            ->with('logoImage:path,imageable_id,imageable_type')
-            ->active()->get();
+        return $this->rememberApi('brands:all', function () {
+            $brands = Manufacturer::select('id', 'name', 'slug', 'description', 'country_id')
+                ->with('logoImage:path,imageable_id,imageable_type')
+                ->active()->get();
 
-        return ManufacturerLightResource::collection($brands);
+            return ManufacturerLightResource::collection($brands);
+        });
     }
 
     /**
@@ -233,9 +234,11 @@ class HomeController extends Controller
      */
     public function brand($slug)
     {
-        $brand = Manufacturer::where('slug', $slug)->firstOrFail();
+        return $this->rememberApi('brand:'.$slug, function () use ($slug) {
+            $brand = Manufacturer::where('slug', $slug)->firstOrFail();
 
-        return new ManufacturerResource($brand);
+            return new ManufacturerResource($brand);
+        });
     }
 
     /**
@@ -336,9 +339,11 @@ class HomeController extends Controller
      */
     public function currencies()
     {
-        $currencies = Currency::active()->orderBy('priority', 'asc')->get();
+        return $this->rememberApi('currencies', function () {
+            $currencies = Currency::active()->orderBy('priority', 'asc')->get();
 
-        return CurrencyResource::collection($currencies);
+            return CurrencyResource::collection($currencies);
+        }, null, 'config');
     }
 
     /**
@@ -348,15 +353,17 @@ class HomeController extends Controller
      */
     public function countries()
     {
-        $isos = config('system.marketplace_country_isos', ['IN', 'MZ']);
+        return $this->rememberApi('countries', function () {
+            $isos = config('system.marketplace_country_isos', ['IN', 'MZ']);
 
-        $countries = Country::select('id', 'name', 'iso_code')
-            ->active()
-            ->whereIn('iso_code', $isos)
-            ->orderBy('name')
-            ->get();
+            $countries = Country::select('id', 'name', 'iso_code')
+                ->active()
+                ->whereIn('iso_code', $isos)
+                ->orderBy('name')
+                ->get();
 
-        return CountryResource::collection($countries);
+            return CountryResource::collection($countries);
+        }, null, 'config');
     }
 
     /**
@@ -367,11 +374,13 @@ class HomeController extends Controller
      */
     public function states($country)
     {
-        $states = State::select('id', 'name', 'iso_code')
-            ->where('country_id', $country)
-            ->get();
+        return $this->rememberApi('states:'.$country, function () use ($country) {
+            $states = State::select('id', 'name', 'iso_code')
+                ->where('country_id', $country)
+                ->get();
 
-        return StateResource::collection($states);
+            return StateResource::collection($states);
+        }, null, 'config');
     }
 
     /**
@@ -382,8 +391,10 @@ class HomeController extends Controller
      */
     public function page($slug)
     {
-        $page = Page::where('slug', $slug)->firstOrFail();
+        return $this->rememberApi('page:'.$slug, function () use ($slug) {
+            $page = Page::where('slug', $slug)->firstOrFail();
 
-        return new PageResource($page);
+            return new PageResource($page);
+        }, null, 'config');
     }
 }

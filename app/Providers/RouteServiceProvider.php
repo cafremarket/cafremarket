@@ -100,12 +100,70 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Configure the rate limiters for the application.
      *
+     * Mobile apps burst many parallel calls on home/dashboard. Auth middleware
+     * runs after this limiter, so `$request->user()` is almost always null and
+     * a 60/min IP bucket is shared across every guest + logged-in device on
+     * the same NAT (typical on mobile carriers). That surfaces in the apps as
+     * Laravel's "Too Many Attempts." 429.
+     *
      * @return void
      */
     protected function configureRateLimiting()
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by(optional($request->user())->id ?? $request->ip());
+            if ($this->isPaymentWebhookRequest($request)) {
+                return Limit::none();
+            }
+
+            if ($this->isAuthAttemptRequest($request)) {
+                $identity = strtolower((string) (
+                    $request->input('email')
+                    ?: $request->input('phone')
+                    ?: $request->ip()
+                ));
+
+                return Limit::perMinute(20)->by('auth:'.$request->ip().'|'.$identity);
+            }
+
+            $token = $request->bearerToken()
+                ?: $request->header('X-Auth-Token')
+                ?: $request->input('api_token')
+                ?: $request->query('api_token');
+
+            if (is_string($token) && $token !== '') {
+                return Limit::perMinute(600)->by('token:'.sha1($token));
+            }
+
+            return Limit::perMinute(300)->by('ip:'.$request->ip());
         });
+    }
+
+    protected function isPaymentWebhookRequest(Request $request): bool
+    {
+        return $request->is('api/emola/callback');
+    }
+
+    protected function isAuthAttemptRequest(Request $request): bool
+    {
+        if ($request->isMethod('GET')) {
+            return false;
+        }
+
+        return $request->is(
+            'api/auth/login',
+            'api/auth/register',
+            'api/auth/forgot',
+            'api/auth/reset',
+            'api/auth/social/*',
+            'api/auth/customer/phone/verify',
+            'api/vendor/auth/login',
+            'api/vendor/auth/register',
+            'api/vendor/auth/forgot',
+            'api/vendor/auth/reset',
+            'api/vendor/auth/user/phone/verify',
+            'api/deliveryboy/login',
+            'api/deliveryboy/forgot',
+            'api/deliveryboy/reset'
+        );
     }
 }

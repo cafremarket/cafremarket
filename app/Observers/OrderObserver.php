@@ -19,16 +19,17 @@ class OrderObserver
      * @param  \App\order  $order
      * @return void
      */
-    // public function created(Order $order)
-    // {
-    //     activity()
-    //        ->log('edited');
-    // }
+    public function created(Order $order)
+    {
+        if ($order->shop_id) {
+            \App\Services\Cache\CatalogCache::bumpVendor((int) $order->shop_id);
+        }
+    }
 
-    // public function updated(Order $order)
-    // {
-    //     activity()
-    //        ->withProperties(['key' => 'value'])
-    //        ->log('edited');
-    // }
+    public function updated(Order $order)
+    {
+        if ($order->shop_id) {
+            \App\Services\Cache\CatalogCache::bumpVendor((int) $order->shop_id);
+        }
+    }
 }
