@@ -19,6 +19,10 @@ class AppCache
         }
 
         try {
+            if (config('cache.default') === 'redis' && config('performance.redis_available') === false) {
+                return $callback();
+            }
+
             return Cache::remember($key, $ttl, $callback);
         } catch (Throwable $e) {
             Log::warning('AppCache remember failed', [

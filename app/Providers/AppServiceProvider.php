@@ -106,6 +106,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        \App\Services\Cache\RedisAvailability::ensure();
+
         // Need for cashier
         // Cashier::ignoreMigrations();
         Cashier::useCustomerModel('App\\Models\\Shop');

@@ -14,6 +14,14 @@ return [
 
     'api_cache' => env('API_CACHE_ENABLED', true),
 
+    /*
+    | When true (default), a missing Redis server does not take the app down.
+    | Cache falls back to file, sessions to file, and Redis queues to sync.
+    */
+    'redis_optional' => env('REDIS_OPTIONAL', true),
+
+    'redis_available' => false,
+
     'ttl' => [
         'catalog' => (int) env('API_CACHE_TTL_CATALOG', 300),
         'listing' => (int) env('API_CACHE_TTL_LISTING', 180),
