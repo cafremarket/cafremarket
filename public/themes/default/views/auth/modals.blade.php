@@ -1,4 +1,4 @@
-<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true">
   <div class="modal-dialog auth-modal modal-sm modal-dialog-centered" role="document">
     @if (is_incevio_package_loaded('otp-login'))
       @include('otp-login::modal')
@@ -9,7 +9,7 @@
             @include('theme::partials._site_logo', ['wrapLink' => false, 'class' => 'sf-auth-modal-logo__img', 'height' => 56])
           </div>
 
-          <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close" style="display:none;">
+          <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -92,14 +92,14 @@
 
 <div class="modal fade" id="guestContinueModal" tabindex="-1" role="dialog" aria-hidden="true" style="display:none;"></div>
 
-<div class="modal fade auth-modal" id="createAccountModal" tabindex="-1" role="dialog" aria-labelledby="createAccountModal" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade auth-modal" id="createAccountModal" tabindex="-1" role="dialog" aria-labelledby="createAccountModal" aria-hidden="true">
   <div class="modal-dialog auth-modal modal-md modal-dialog-centered" role="document">
     <div class="modal-content px-3">
       <div class="modal-header p-3">
         <div class="modal-icon sf-auth-modal-logo">
           @include('theme::partials._site_logo', ['wrapLink' => false, 'class' => 'sf-auth-modal-logo__img', 'height' => 56])
         </div>
-        <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close" style="display:none;">
+        <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -180,14 +180,14 @@
   </div>
 </div> <!-- /#createAccountModal -->
 
-<div class="modal fade" id="passwordResetModal" tabindex="-1" role="dialog" aria-labelledby="passwordResetModal" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="passwordResetModal" tabindex="-1" role="dialog" aria-labelledby="passwordResetModal" aria-hidden="true">
   <div class="modal-dialog auth-modal modal-sm modal-dialog-centered" role="document">
     <div class="modal-content px-2">
       <div class="modal-header p-3">
         <div class="modal-icon sf-auth-modal-logo">
           @include('theme::partials._site_logo', ['wrapLink' => false, 'class' => 'sf-auth-modal-logo__img', 'height' => 56])
         </div>
-        <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close" style="display:none;">
+        <button type="button" class="close allow-dismiss" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>

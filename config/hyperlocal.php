@@ -2,7 +2,7 @@
 
 return [
     'enabled' => env('HYPERLOCAL_ENABLED', true),
-    'require_location_for_browse' => env('HYPERLOCAL_REQUIRE_LOCATION', true),
+    'require_location_for_browse' => env('HYPERLOCAL_REQUIRE_LOCATION', false),
     'ignore_shipping_zones' => env('HYPERLOCAL_IGNORE_SHIPPING_ZONES', true),
     'default_shop_service_radius_km' => (float) env('HYPERLOCAL_DEFAULT_SHOP_RADIUS_KM', 5),
     'google_maps_api_key' => env('GOOGLE_PLACE_KEY'),

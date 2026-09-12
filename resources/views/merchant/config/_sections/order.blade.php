@@ -58,13 +58,6 @@
               @include('merchant.config.partials._shipping_settings')
 
               @include('merchant.config.partials._toggle_row', [
-                'field' => 'auto_archive_order',
-                'label' => trans('app.auto_archive_order'),
-                'help' => trans('help.config_auto_archive_order'),
-                'active' => $config->auto_archive_order == 1,
-              ])
-
-              @include('merchant.config.partials._toggle_row', [
                 'field' => 'pay_online',
                 'label' => trans('app.pay_online'),
                 'help' => trans('help.pay_online'),

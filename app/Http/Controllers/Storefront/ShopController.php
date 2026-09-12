@@ -33,7 +33,7 @@ class ShopController extends Controller
             return redirect()->route('shops', $request->except(['lat', 'lng', 'address_text']));
         }
 
-        if (! $customer?->preferred_address_id && $request->filled('lat') && $request->filled('lng')) {
+        if ($customer && ! $customer->preferred_address_id && $request->filled('lat') && $request->filled('lng')) {
             $buyerLocation->save(
                 (float) $request->get('lat'),
                 (float) $request->get('lng'),

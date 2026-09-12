@@ -150,12 +150,24 @@ class VerificationController extends Controller
     {
         $config = $this->merchantConfig();
 
-        if (! $attachment->attachable instanceof Config) {
-            abort(403);
-        }
+        $ownsAttachment = $config->attachments()
+            ->where('attachments.id', $attachment->id)
+            ->exists();
 
-        if ((int) $attachment->attachable_id !== (int) $config->id) {
-            abort(403);
+        $isConfigMorph = in_array($attachment->attachable_type, [
+            Config::class,
+            'App\\Models\\Config',
+            'App\\Config',
+            'config',
+        ], true) && (int) $attachment->attachable_id === (int) $config->getKey();
+
+        $isRegistered = in_array((int) $attachment->id, array_merge(
+            $config->personVerificationAttachmentIds(),
+            $config->storeVerificationAttachmentIds()
+        ), true);
+
+        if (! $ownsAttachment && ! $isConfigMorph && ! $isRegistered) {
+            abort(403, trans('responses.unauthorized'));
         }
 
         if (! $config->canSubmitVerificationRequest()) {

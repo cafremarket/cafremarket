@@ -1,4 +1,4 @@
-@isset($recent)
+@if (isset($recent) && count($recent))
   <section>
     <div class="neckbands">
       <div class="container md-100">
@@ -34,4 +34,4 @@
       </div> <!-- /.container -->
     </div> <!-- /.neckbands -->
   </section>
-@endisset
+@endif

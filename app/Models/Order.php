@@ -502,17 +502,43 @@ class Order extends BaseModel
      */
     public function scopeUnfulfilled($query)
     {
-        return $query->where('order_status_id', '<', static::STATUS_FULFILLED);
+        // Past STATUS_FULFILLED, or already assigned courier / rider, leave this list.
+        return $query->where('order_status_id', '<', static::STATUS_FULFILLED)
+            ->whereNull('delivery_boy_id')
+            ->where(function ($q) {
+                $q->whereNull('fulfillment_method')
+                    ->orWhere('fulfillment_method', '!=', self::FULFILLMENT_METHOD_COURIER);
+            });
     }
 
     /**
      * Scope a query to only include fulfilled orders.
+     * Vendor apps treat "fulfilled" as completed delivery; in-transit
+     * awaiting-delivery orders use {@see scopeToDeliver} / awaiting_delivery filter.
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeFulfilled($query)
     {
         return $query->where('order_status_id', '>=', static::STATUS_FULFILLED);
+    }
+
+    /**
+     * Orders that have been fulfilled/assigned and are waiting to be delivered.
+     * (STATUS_FULFILLED and STATUS_AWAITING_DELIVERY — not yet delivered.)
+     */
+    public function scopeAwaitingDelivery($query)
+    {
+        return $query->where('order_status_id', '>=', static::STATUS_FULFILLED)
+            ->where('order_status_id', '<', static::STATUS_DELIVERED);
+    }
+
+    /**
+     * Completed deliveries only (for vendor "Fulfilled" tab).
+     */
+    public function scopeDeliveredOnly($query)
+    {
+        return $query->where('order_status_id', static::STATUS_DELIVERED);
     }
 
     /**

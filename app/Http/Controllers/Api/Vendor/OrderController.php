@@ -85,10 +85,10 @@ class OrderController extends Controller
         // When the orders need to filter
         $orders = match ($filter) {
             'unfulfilled' => $orders->unfulfilled(),
-            'fulfilled' => $orders->fulfilled(),
+            'awaiting_delivery' => $orders->awaitingDelivery(),
+            'fulfilled' => $orders->deliveredOnly(),
             'unpaid' => $orders->unpaid(),
             'paid' => $orders->paid(),
-            'archived' => $orders->archived(),
             default => $orders,
         };
 
@@ -199,39 +199,6 @@ class OrderController extends Controller
         try {
             $order->admin_note = $request->input('admin_note');
             $order->save();
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
-        }
-
-        return response()->json(['message' => trans('api.order_updated_successfully')], 200);
-    }
-
-    /**
-     * Archive order
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function archive(OrderDetailRequest $request, Order $order)
-    {
-        try {
-            $order->delete();
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
-        }
-
-        return response()->json(['message' => trans('api.order_updated_successfully')], 200);
-    }
-
-    /**
-     * Restore the order from archive
-     *
-     * @param  Order  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function unarchive(Request $request, $id)
-    {
-        try {
-            Order::onlyTrashed()->findOrFail($id)->restore();
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }

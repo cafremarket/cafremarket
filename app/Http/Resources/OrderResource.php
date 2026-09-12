@@ -77,6 +77,7 @@ class OrderResource extends JsonResource
             // The rider must never see the OTP the customer is meant to read out to them.
             'otp' => $deliveryBoyGuard ? null : ($this->otp ?? null),
             'fulfillment_method' => $this->fulfillment_method,
+            'has_courier' => $this->hasCourier(),
             'reached_at' => optional($this->reached_at)->toIso8601String(),
             'delivery_status_label' => $this->deliveryStatusLabel(),
             'courier' => $this->when($this->hasCourier(), function () {

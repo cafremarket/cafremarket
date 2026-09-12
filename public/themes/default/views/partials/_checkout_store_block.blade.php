@@ -3,7 +3,7 @@
   $dec = $dec ?? (is_non_decimal_currency() ? 0 : config('system_settings.decimals', 2));
   $shop = $cart->shop;
   $cart_total = 0;
-  $cartBlocked = !empty($cart->out_of_range) || !empty($cart->needs_delivery_location);
+  $cartBlocked = false;
   $usesProductTaxes = app(\App\Services\Tax\ProductTaxCalculator::class)->cartUsesProductTaxes($cart);
 @endphp
 

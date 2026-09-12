@@ -2464,6 +2464,24 @@ body.login-page .login-box:has(.admin-auth-card) {
   flex-wrap: wrap;
   gap: 8px;
   margin-left: auto;
+  align-items: center;
+}
+
+.admin-order-fulfill-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-order-fulfill-options__label {
+  font-weight: 600;
+  color: #334155;
+  margin-right: 4px;
+}
+
+.admin-order-fulfill-options .btn {
+  margin: 0;
 }
 
 .admin-activity-log__panel {
@@ -4770,6 +4788,38 @@ body.admin-modern .btn-toggle.btn-lg.active > .btn-handle {
 
   .wb-row__header {
     flex-direction: column;
+  }
+}
+
+/* Address create/edit modal — keep it narrower on large screens and make the
+   body scroll internally so the header (with the close button) and footer
+   (with the save button) always stay on screen instead of scrolling away
+   when the form + map content is taller than the viewport. */
+.modal-dialog.address-modal {
+  width: 100%;
+  max-width: 640px;
+}
+
+.modal-dialog.address-modal .modal-content {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-dialog.address-modal .modal-header,
+.modal-dialog.address-modal .modal-footer {
+  flex: 0 0 auto;
+}
+
+.modal-dialog.address-modal .modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+@media (max-width: 680px) {
+  .modal-dialog.address-modal {
+    max-width: calc(100% - 20px);
+    margin: 10px auto;
   }
 }
 

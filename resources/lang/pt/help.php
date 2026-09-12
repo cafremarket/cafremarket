@@ -43,7 +43,7 @@ return [
     'brand_featured_image' => 'Esta imagem será exibida na secção de Marcas em Destaque na página inicial.',
     'slug' => 'O slug é geralmente uma URL amigável para motores de busca.',
     'shop_slug' => 'Este será usado como URL da sua loja. Não poderá alterá-lo mais tarde. Seja criativo ao escolher o slug da sua loja.',
-    'shop_url' => 'O caminho completo para a página de destino da loja. Não deve alterar o slug da loja, pois isso pode prejudicar o seu SEO.',
+    'shop_url' => '',
     'shop_timezone' => 'O fuso horário não afetará a loja nem o marketplace. Serve apenas para conhecer melhor a sua loja.',
     'url' => 'Web address',
     'optional' => '(optional)',

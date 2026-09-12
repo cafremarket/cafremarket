@@ -24,6 +24,9 @@ class DashboardController extends Controller
         $currency = config('system_settings.currency.id');
 
         $last_sale = Statistics::last_sale();
+        $last_sale_breakdown = Statistics::sale_breakdown_from_order($last_sale);
+        $todays_sale_breakdown = Statistics::sale_breakdown_for_date(\Carbon\Carbon::today());
+        $yesterdays_sale_breakdown = Statistics::sale_breakdown_for_date(\Carbon\Carbon::yesterday());
 
         $statistics['data'] = [
             'latest_order_count' => Statistics::latest_order_count($days),
@@ -35,6 +38,9 @@ class DashboardController extends Controller
             'todays_sale_amount' => get_formated_currency(Statistics::todays_sale_amount(), $decimal, $currency),
             'yesterdays_sale_amount' => get_formated_currency(Statistics::yesterdays_sale_amount(), $decimal, $currency),
             'latest_refund_amount' => get_formated_currency(Statistics::latest_refund_total($days), $decimal, $currency),
+            'last_sale_breakdown' => Statistics::format_sale_breakdown($last_sale_breakdown, $currency, $decimal),
+            'todays_sale_breakdown' => Statistics::format_sale_breakdown($todays_sale_breakdown, $currency, $decimal),
+            'yesterdays_sale_breakdown' => Statistics::format_sale_breakdown($yesterdays_sale_breakdown, $currency, $decimal),
         ];
 
         return response()->json($statistics, 200);

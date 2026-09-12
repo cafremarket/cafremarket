@@ -110,15 +110,6 @@
           ? '<span class="label label-danger">' . e(trans('app.statuses.disputed')) . '</span>'
           : '';
         $orderHeaderActions = $order->orderStatus();
-        // Allow assigning/changing the delivery boy or courier any time before the
-        // order is delivered. The current assignment is also shown in the delivery
-        // boy panel below; these buttons let the vendor change it if needed.
-        if (Gate::allows('fulfill', $order) && ! $order->isDelivered()) {
-          $deliveryBoyLabel = $order->delivery_boy_id ? trans('app.change_deliveryboy') : trans('app.assign_deliveryboy');
-          $courierLabel = $order->hasCourier() ? trans('app.change_courier') : trans('app.courier_details');
-          $orderHeaderActions .= ' <a data-link="' . route('admin.order.deliveryboys', $order->id) . '" class="ajax-modal-btn btn btn-default btn-xs btn-flat"><i class="fa fa-user"></i> ' . e($deliveryBoyLabel) . '</a>';
-          $orderHeaderActions .= ' <a data-link="' . route('admin.order.courier.form', $order->id) . '" class="ajax-modal-btn btn btn-default btn-xs btn-flat"><i class="fa fa-truck"></i> ' . e($courierLabel) . '</a>';
-        }
       @endphp
 
       @include('admin.partials.ui.card_start', [
@@ -333,15 +324,7 @@
             @endif
 
             <div class="admin-order-actions__primary">
-              @if ($order->isFulfilled())
-                @unless ($order->isArchived())
-                  @can('archive', $order)
-                    {!! Form::open(['route' => ['admin.order.order.archive', $order->id], 'method' => 'delete', 'class' => 'inline']) !!}
-                    <button type="submit" class="confirm ajax-silent btn btn-lg btn-default"><i class="fa fa-archive text-muted"></i> {{ trans('app.order_archive') }}</button>
-                    {!! Form::close() !!}
-                  @endcan
-                @endunless
-              @else
+              @if (! $order->isFulfilled())
                 @unless ($order->isCanceled() || $order->cancellation)
                   @if (!$order->cancellationFeeApplicable())
                     @if (Auth::user()->isFromPlatform())
@@ -360,7 +343,30 @@
                   @endif
                 @endunless
 
-                @if ($order->deliver())
+                @if ($order->deliver() && ! $order->isDelivered())
+                  @if ($order->hasCourier())
+                    {{-- Courier already assigned: OTP confirmation is the next step (same as sidebar). --}}
+                    <span class="admin-order-fulfill-options__label">{{ trans('app.confirm_courier_otp') }}:</span>
+                    {!! Form::open(['url' => panel_route('admin.order.courier.confirmOtp', $order, false), 'method' => 'put', 'class' => 'form-inline admin-order-otp-inline']) !!}
+                      {!! Form::text('otp', null, ['class' => 'form-control input-lg', 'maxlength' => 6, 'pattern' => '[0-9]{6}', 'placeholder' => trans('app.delivery_otp'), 'required', 'style' => 'width:140px; display:inline-block;']) !!}
+                      <button type="submit" class="btn btn-flat btn-lg btn-primary">{{ trans('app.confirm') }}</button>
+                    {!! Form::close() !!}
+                    <a href="javascript:void(0)" data-link="{{ route('admin.order.deliveryboys', $order->id) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-default">
+                      <i class="fa fa-truck"></i>
+                      {{ trans('app.change_courier') }}
+                    </a>
+                  @elseif ($order->delivery_boy_id)
+                    <a href="javascript:void(0)" data-link="{{ route('admin.order.deliveryboys', $order->id) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-default">
+                      <i class="fa fa-motorcycle"></i>
+                      {{ trans('app.change_deliveryboy') }}
+                    </a>
+                  @else
+                    <a href="javascript:void(0)" data-link="{{ route('admin.order.deliveryboys', $order->id) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-primary">
+                      <i class="fa fa-truck"></i>
+                      {{ trans('app.assign_deliveryboy') }}
+                    </a>
+                  @endif
+                @elseif ($order->deliver())
                   <a href="javascript:void(0)" data-link="{{ route('admin.order.order.fulfillment', $order) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-primary">
                     {{ trans('app.fulfill_order') }}
                   </a>

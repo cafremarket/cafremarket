@@ -1,4 +1,4 @@
-{{-- Compulsory login + post-login address setup (no location picker on load) --}}
+{{-- Optional login + post-login address setup. Guests can browse without signing in. --}}
 <script>
   (function($) {
     if (typeof $ === 'undefined') {
@@ -19,8 +19,8 @@
 
       cleanupModalOverlay();
       $login.modal({
-        backdrop: 'static',
-        keyboard: false,
+        backdrop: true,
+        keyboard: true,
         show: true
       });
     }
@@ -34,8 +34,8 @@
       var $open = $('.modal.in');
       if (!$open.length) {
         $target.modal({
-          backdrop: 'static',
-          keyboard: false,
+          backdrop: true,
+          keyboard: true,
           show: true
         });
         return;
@@ -49,8 +49,8 @@
       $open.one('hidden.bs.modal', function() {
         cleanupModalOverlay();
         $target.modal({
-          backdrop: 'static',
-          keyboard: false,
+          backdrop: true,
+          keyboard: true,
           show: true
         });
       });
@@ -72,7 +72,7 @@
         $modal.attr('data-onboarding', isOnboarding ? '1' : '0');
         $modal.attr('data-modal-type', 'address-select');
         $modal.html(data).modal({
-          backdrop: isOnboarding ? 'static' : true,
+          backdrop: true,
           keyboard: true,
           show: true
         });
@@ -176,8 +176,17 @@
         }
       });
 
+      $(document).on('click', '.js-open-login', function(e) {
+        e.preventDefault();
+        openLoginModal();
+      });
+
       $(document).on('click', '.js-open-address-setup', function(e) {
         e.preventDefault();
+        if (isGuest) {
+          openLoginModal();
+          return;
+        }
         openAddressSetupModal({ onboarding: false });
       });
 
@@ -224,20 +233,21 @@
 
       if (isGuest) {
         $('#loginModal, #createAccountModal, #passwordResetModal').on('shown.bs.modal', function() {
-          $(this).find('.close').hide();
+          $(this).find('.close').show();
           if ($(this).is('#loginModal')) {
             hideLoginModalError();
             $(this).find('#email').trigger('focus');
           }
         });
 
-        openLoginModal();
+        if (forceLogin) {
+          openLoginModal();
+        }
         return;
       }
 
-      if (needsAddress && !hasLocation) {
-        openAddressSetupModal({ onboarding: true });
-      }
+      // Logged-in customers can add an address from the header chip.
+      // Distance is shown only after an address exists on their account.
     });
   })(window.jQuery);
 </script>

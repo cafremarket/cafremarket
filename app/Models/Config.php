@@ -184,8 +184,8 @@ class Config extends BaseModel
         }
 
         // Legacy uploads were treated as person/identity documents.
-        if (empty($meta['store_attachment_ids']) && $this->relationLoaded('attachments')) {
-            return $this->attachments->pluck('id')->map(fn ($id) => (int) $id)->all();
+        if (empty($meta['store_attachment_ids'])) {
+            return $this->attachments()->pluck('id')->map(fn ($id) => (int) $id)->all();
         }
 
         return [];
@@ -204,14 +204,22 @@ class Config extends BaseModel
     {
         $ids = $this->personVerificationAttachmentIds();
 
-        return $this->attachments->whereIn('id', $ids)->values();
+        if ($ids === []) {
+            return collect();
+        }
+
+        return $this->attachments()->whereIn('id', $ids)->get();
     }
 
     public function storeVerificationAttachments()
     {
         $ids = $this->storeVerificationAttachmentIds();
 
-        return $this->attachments->whereIn('id', $ids)->values();
+        if ($ids === []) {
+            return collect();
+        }
+
+        return $this->attachments()->whereIn('id', $ids)->get();
     }
 
     public function hasPersonVerificationDocuments(): bool

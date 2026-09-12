@@ -9,9 +9,6 @@
       $anyBlocked = false;
       foreach ($carts as $c) {
           $combinedGrand += (float) $c->grand_total;
-          if (!empty($c->out_of_range) || !empty($c->needs_delivery_location)) {
-              $anyBlocked = true;
-          }
       }
       // Payment methods: platform list when multi-store (single combined charge).
       $checkoutShop = $primaryCart ? $primaryCart->shop : null;
@@ -146,8 +143,16 @@
                   </a>
                 </div>
               @else
-                <div class="checkout-shiping-address">
-                  @include('theme::partials.checkout_shiping_address')
+                <div class="sf-checkout__login-required alert alert-info">
+                  <p class="mb-2">{{ trans('theme.login_required_to_shop') }}</p>
+                  <div class="d-flex flex-wrap" style="gap:10px;">
+                    <a href="javascript:void(0);" class="js-open-login btn btn-primary">
+                      {{ trans('theme.button.login') }}
+                    </a>
+                    <a href="javascript:void(0);" class="js-auth-switch btn btn-default" data-target="#createAccountModal">
+                      {{ trans('theme.create_account') }}
+                    </a>
+                  </div>
                 </div>
               @endif
 
@@ -352,12 +357,24 @@
     @else
       <div class="row">
         <div class="col-12">
-          <p class="lead text-center my-5">
-            {{ trans('theme.empty_cart') }}<br /><br />
-            <a href="{{ url('/') }}" class="btn btn-primary">
-              <i class="fas fa-shopping-cart no-fill"></i> @lang('theme.button.shop_now')
-            </a>
-          </p>
+          @guest('customer')
+            <div id="guest-cart-panel" style="display:none;"></div>
+            <div id="guest-cart-empty">
+              <p class="lead text-center my-5">
+                {{ trans('theme.empty_cart') }}<br /><br />
+                <a href="{{ url('/') }}" class="btn btn-primary">
+                  <i class="fas fa-shopping-cart no-fill"></i> @lang('theme.button.shop_now')
+                </a>
+              </p>
+            </div>
+          @else
+            <p class="lead text-center my-5">
+              {{ trans('theme.empty_cart') }}<br /><br />
+              <a href="{{ url('/') }}" class="btn btn-primary">
+                <i class="fas fa-shopping-cart no-fill"></i> @lang('theme.button.shop_now')
+              </a>
+            </p>
+          @endguest
         </div>
       </div>
     @endif

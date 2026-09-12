@@ -104,27 +104,6 @@
 
               @include('merchant.config.partials._shipping_settings')
 
-              <div class="row">
-                <div class="col-sm-4 text-right">
-                  <div class="form-group">
-                    {!! Form::label('auto_archive_order', trans('app.auto_archive_order') . ':', ['class' => 'with-help control-label']) !!}
-                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.config_auto_archive_order') }}"></i>
-                  </div>
-                </div>
-
-                <div class="col-sm-7">
-                  @if ($can_update)
-                    <div class="handle horizontal">
-                      <a href="javascript:void(0)" data-link="{{ route('admin.setting.config.notification.toggle', 'auto_archive_order') }}" type="button" class="btn btn-md btn-secondary btn-toggle {{ $config->auto_archive_order == 1 ? 'active' : '' }}" data-toggle="button" aria-pressed="{{ $config->auto_archive_order == 1 ? 'true' : 'false' }}" autocomplete="off">
-                        <div class="btn-handle"></div>
-                      </a>
-                    </div>
-                  @else
-                    <span>{{ $config->auto_archive_order == 1 ? trans('app.on') : trans('app.off') }}</span>
-                  @endif
-                </div>
-              </div> <!-- /.row -->
-
               {{-- Checkout Config --}}
               <div class="row">
                 <div class="col-sm-4 text-right">

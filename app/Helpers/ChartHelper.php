@@ -75,7 +75,7 @@ class ChartHelper
 
         $dateRange = static::Days($days, 'M-d', $start);
 
-        $sales = Order::select('total', 'created_at')
+        $sales = Order::select('grand_total', 'created_at')
             ->mine()->withTrashed() // Include the archived orders also
             ->whereDate('created_at', '>=', $start->subDays($days))
             ->orderBy('created_at', 'DESC')->get()
@@ -83,7 +83,7 @@ class ChartHelper
                 return $item->created_at->format('M-d');
             })
             ->map(function ($item) {
-                return $item->sum('total');
+                return $item->sum('grand_total');
             })
             ->toArray();
 
@@ -117,7 +117,7 @@ class ChartHelper
             return $item->created_at->format($grp_by);
         })
             ->map(function ($item) {
-                return $item->sum('total');
+                return $item->sum('grand_total');
             })
             ->toArray();
 

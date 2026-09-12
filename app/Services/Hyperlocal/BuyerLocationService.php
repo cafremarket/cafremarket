@@ -15,6 +15,29 @@ class BuyerLocationService
         return $this->latitude() !== null && $this->longitude() !== null;
     }
 
+    /**
+     * True when the logged-in customer has coordinates on their account
+     * (preferred location or a saved address). Guests never qualify.
+     */
+    public function hasAccountCoordinates(?Customer $customer = null): bool
+    {
+        $customer = $customer ?? $this->customer();
+
+        if (! $customer) {
+            return false;
+        }
+
+        if ($customer->preferred_latitude && $customer->preferred_longitude) {
+            return true;
+        }
+
+        $address = $this->defaultDeliveryAddress($customer);
+
+        return $address
+            && $address->latitude
+            && $address->longitude;
+    }
+
     public function activeAddressId(?Customer $customer = null): ?int
     {
         $customer = $customer ?? $this->customer();

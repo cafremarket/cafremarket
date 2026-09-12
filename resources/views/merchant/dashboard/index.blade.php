@@ -25,7 +25,7 @@
       <div class="mp-stat-card__body">
         <span class="mp-stat-card__label">{{ trans('app.unfulfilled_orders') }}</span>
         <span class="mp-stat-card__value">
-          {{ $unfulfilled_order_count }}
+          <span class="mp-stat-card__value-text">{{ $unfulfilled_order_count }}</span>
           <a href="{{ url('merchant/order/order?tab=unfulfilled') }}" class="mp-stat-card__link" title="{{ trans('app.detail') }}">
             <i class="icon ion-md-send"></i>
           </a>
@@ -36,9 +36,14 @@
     <div class="mp-stat-card mp-stat-card--blue">
       <div class="mp-stat-card__icon"><i class="icon ion-md-cart"></i></div>
       <div class="mp-stat-card__body">
-        <span class="mp-stat-card__label">{{ trans('app.last_sale') }}</span>
+        <span class="mp-stat-card__label">
+          {{ trans('app.last_sale') }}
+          @include('merchant.dashboard.partials._sale_breakdown_info', ['breakdown' => $last_sale_breakdown ?? []])
+        </span>
         <span class="mp-stat-card__value">
-          {{ get_formated_currency($last_sale ? $last_sale->total : 0, 2, config('system_settings.currency.id')) }}
+          <span class="mp-stat-card__value-text">
+            {{ get_formated_currency($last_sale ? $last_sale->grand_total : 0, 2, config('system_settings.currency.id')) }}
+          </span>
         </span>
       </div>
     </div>
@@ -46,9 +51,14 @@
     <div class="mp-stat-card mp-stat-card--green">
       <div class="mp-stat-card__icon"><i class="icon ion-md-cash"></i></div>
       <div class="mp-stat-card__body">
-        <span class="mp-stat-card__label">{{ trans('app.todays_sale') }}</span>
+        <span class="mp-stat-card__label">
+          {{ trans('app.todays_sale') }}
+          @include('merchant.dashboard.partials._sale_breakdown_info', ['breakdown' => $todays_sale_breakdown ?? []])
+        </span>
         <span class="mp-stat-card__value">
-          {{ get_formated_currency($todays_sale_amount, 2, config('system_settings.currency.id')) }}
+          <span class="mp-stat-card__value-text">
+            {{ get_formated_currency($todays_sale_amount, 2, config('system_settings.currency.id')) }}
+          </span>
         </span>
       </div>
     </div>
@@ -58,7 +68,7 @@
       <div class="mp-stat-card__body">
         <span class="mp-stat-card__label">{{ trans('app.stock_outs') }}</span>
         <span class="mp-stat-card__value">
-          {{ $stock_out_count }}
+          <span class="mp-stat-card__value-text">{{ $stock_out_count }}</span>
           <a href="{{ url('merchant/stock/overview') }}" class="mp-stat-card__link" title="{{ trans('app.detail') }}">
             <i class="icon ion-md-send"></i>
           </a>
@@ -110,4 +120,37 @@
       </table>
     </div>
   </div>
+@endsection
+
+@section('scripts')
+<script>
+(function () {
+  function closeAll(except) {
+    document.querySelectorAll('.mp-stat-info.is-open').forEach(function (el) {
+      if (el !== except) {
+        el.classList.remove('is-open');
+        var btn = el.querySelector('.mp-stat-info__btn');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  document.querySelectorAll('.mp-stat-info__btn').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var wrap = btn.closest('.mp-stat-info');
+      if (!wrap) return;
+      var open = !wrap.classList.contains('is-open');
+      closeAll(wrap);
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  document.addEventListener('click', function () {
+    closeAll(null);
+  });
+})();
+</script>
 @endsection

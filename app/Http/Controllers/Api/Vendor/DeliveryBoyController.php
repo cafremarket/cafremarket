@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Vendor;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateDeliveryBoyRequest;
 use App\Http\Resources\DeliveryBoyResource;
+use App\Models\DeliveryBoy;
 use App\Repositories\DeliveryBoy\DeliveryBoyRepository;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,20 @@ class DeliveryBoyController extends Controller
     public function index(Request $request)
     {
         return DeliveryBoyResource::collection($this->delivery_boy->all());
+    }
+
+    /**
+     * Whether this email already has a delivery boy account (any store).
+     * App/web create forms hide password fields when true and reuse that password.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkEmail(Request $request)
+    {
+        $email = trim((string) $request->get('email', ''));
+        $exists = $email !== '' && DeliveryBoy::where('email', $email)->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 
     /**
@@ -81,6 +96,34 @@ class DeliveryBoyController extends Controller
         }
 
         return response()->json(['message' => trans('api.delivery_boy_updated_successfully')], 200);
+    }
+
+    /**
+     * Vendor-initiated password reset (same behaviour as admin panel).
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function resetPassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $deliveryBoy = DeliveryBoy::mine()->findOrFail($id);
+
+        if (config('app.demo') == true && $deliveryBoy->id <= config('system.demo.delivery_boys', 0)) {
+            return response()->json(['message' => trans('messages.demo_restriction')], 400);
+        }
+
+        $deliveryBoy->password = $request->password;
+        $deliveryBoy->save();
+
+        return response()->json([
+            'message' => trans('messages.password_reset', [
+                'model' => trans('app.model.delivery_boy'),
+            ]),
+        ], 200);
     }
 
     /**

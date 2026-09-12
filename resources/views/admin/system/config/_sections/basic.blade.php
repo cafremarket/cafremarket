@@ -94,12 +94,6 @@
         </div>
       </div>
       @include('admin.system.config._sections._toggle', [
-        'field' => 'allow_guest_checkout',
-        'label' => trans('app.allow_guest_checkout'),
-        'help' => trans('help.allow_guest_checkout'),
-        'active' => (bool) $system->allow_guest_checkout,
-      ])
-      @include('admin.system.config._sections._toggle', [
         'field' => 'customer_needs_approval',
         'label' => trans('app.customer_needs_approval'),
         'help' => trans('help.customer_needs_approval'),

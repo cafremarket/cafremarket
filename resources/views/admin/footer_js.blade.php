@@ -548,10 +548,6 @@
           'data': 'order_date',
           'name': 'order_date'
         },
-        {
-          'data': 'delivery_boy',
-          'name': 'delivery_boy'
-        },
         @if (Auth::user()->isFromPlatform())
           {
             'data': 'shop',

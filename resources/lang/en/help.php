@@ -43,7 +43,7 @@ return [
     'brand_featured_image' => 'This image will show in Featured Brands section on homepage',
     'slug' => 'Slug are usually a search engine friendly URL',
     'shop_slug' => 'This will be used as your shop URL, You can not change it later. Be creative to choose the slug for your shop',
-    'shop_url' => 'The complete path to the shop\'s landing page. You should not change the shop slug. Because it may damage your SEO.',
+    'shop_url' => '',
     'shop_timezone' => 'The timezone will not effect the shop or marketplace. Its for just to know more about your shop',
     'url' => 'Web address',
     'optional' => '(optional)',

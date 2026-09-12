@@ -90,23 +90,125 @@ class Statistics
         return Order::mine()->withTrashed()->orderBy('created_at', 'desc')->first();
     }
 
+    /**
+     * Raw money breakdown for dashboard sale cards (products + fees − discount).
+     *
+     * @param  \App\Models\Order|null  $order
+     * @return array{products: float, taxes: float, shipping: float, handling: float, packaging: float, discount: float, grand_total: float, order_count: int, order_number: string|null}
+     */
+    public static function sale_breakdown_from_order($order): array
+    {
+        if (! $order) {
+            return static::empty_sale_breakdown();
+        }
+
+        return [
+            'products' => (float) $order->total,
+            'taxes' => (float) $order->taxes,
+            'shipping' => (float) $order->shipping,
+            'handling' => (float) $order->handling,
+            'packaging' => (float) $order->packaging,
+            'discount' => (float) $order->discount,
+            'grand_total' => (float) $order->grand_total,
+            'order_count' => 1,
+            'order_number' => $order->order_number,
+        ];
+    }
+
+    /**
+     * Aggregated sale breakdown for orders created on a calendar day.
+     *
+     * @return array{products: float, taxes: float, shipping: float, handling: float, packaging: float, discount: float, grand_total: float, order_count: int, order_number: string|null}
+     */
+    public static function sale_breakdown_for_date(Carbon $day): array
+    {
+        $query = Auth::user()->isFromPlatform()
+            ? Order::withTrashed()
+            : Order::mine()->withTrashed();
+
+        $row = $query->whereDate('created_at', $day)
+            ->selectRaw('
+                COALESCE(SUM(total), 0) as products,
+                COALESCE(SUM(taxes), 0) as taxes,
+                COALESCE(SUM(shipping), 0) as shipping,
+                COALESCE(SUM(handling), 0) as handling,
+                COALESCE(SUM(packaging), 0) as packaging,
+                COALESCE(SUM(discount), 0) as discount,
+                COALESCE(SUM(grand_total), 0) as grand_total,
+                COUNT(*) as order_count
+            ')
+            ->first();
+
+        if (! $row || (int) $row->order_count === 0) {
+            return static::empty_sale_breakdown();
+        }
+
+        return [
+            'products' => (float) $row->products,
+            'taxes' => (float) $row->taxes,
+            'shipping' => (float) $row->shipping,
+            'handling' => (float) $row->handling,
+            'packaging' => (float) $row->packaging,
+            'discount' => (float) $row->discount,
+            'grand_total' => (float) $row->grand_total,
+            'order_count' => (int) $row->order_count,
+            'order_number' => null,
+        ];
+    }
+
+    public static function empty_sale_breakdown(): array
+    {
+        return [
+            'products' => 0.0,
+            'taxes' => 0.0,
+            'shipping' => 0.0,
+            'handling' => 0.0,
+            'packaging' => 0.0,
+            'discount' => 0.0,
+            'grand_total' => 0.0,
+            'order_count' => 0,
+            'order_number' => null,
+        ];
+    }
+
+    /**
+     * Format a sale breakdown for API / UI display.
+     */
+    public static function format_sale_breakdown(array $breakdown, $currency = null, $decimal = null): array
+    {
+        $currency = $currency ?? config('system_settings.currency.id');
+        $decimal = $decimal ?? config('system_settings.decimals', 2);
+
+        return [
+            'products' => get_formated_currency($breakdown['products'], $decimal, $currency),
+            'taxes' => get_formated_currency($breakdown['taxes'], $decimal, $currency),
+            'shipping' => get_formated_currency($breakdown['shipping'], $decimal, $currency),
+            'handling' => get_formated_currency($breakdown['handling'], $decimal, $currency),
+            'packaging' => get_formated_currency($breakdown['packaging'], $decimal, $currency),
+            'discount' => get_formated_currency($breakdown['discount'], $decimal, $currency),
+            'grand_total' => get_formated_currency($breakdown['grand_total'], $decimal, $currency),
+            'order_count' => (int) ($breakdown['order_count'] ?? 0),
+            'order_number' => $breakdown['order_number'] ?? null,
+        ];
+    }
+
     public static function todays_sale_amount()
     {
         if (Auth::user()->isFromPlatform()) {
-            return Order::withTrashed()->whereDate('created_at', Carbon::today())->sum('total');
+            return Order::withTrashed()->whereDate('created_at', Carbon::today())->sum('grand_total');
         }
 
-        return Order::mine()->withTrashed()->whereDate('created_at', Carbon::today())->sum('total');
+        return Order::mine()->withTrashed()->whereDate('created_at', Carbon::today())->sum('grand_total');
     }
 
     public static function yesterdays_sale_amount()
     {
         if (Auth::user()->isFromPlatform()) {
-            return Order::withTrashed()->whereDate('created_at', Carbon::yesterday())->sum('total');
+            return Order::withTrashed()->whereDate('created_at', Carbon::yesterday())->sum('grand_total');
         }
 
         return Order::mine()->withTrashed()
-            ->whereDate('created_at', Carbon::yesterday())->sum('total');
+            ->whereDate('created_at', Carbon::yesterday())->sum('grand_total');
     }
 
     public static function sales_data_by_period(Carbon $startTime, Carbon $endTime)

@@ -163,6 +163,8 @@
   <!-- AppJS -->
   @include('theme::scripts.appjs')
 
+  @include('theme::scripts.guest_cart')
+
   {{-- Announcement script --}}
   @if (is_incevio_package_loaded('announcement'))
     @include('announcement::script')

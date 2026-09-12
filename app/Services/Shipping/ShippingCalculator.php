@@ -11,7 +11,9 @@ use App\Services\Geo\DistanceService;
 use Illuminate\Support\Collection;
 
 /**
- * Location-based shipping: free | fixed | km.
+ * Shipping: free | fixed. Per-kilometre (distance-based) shipping has been
+ * removed system-wide — TYPE_KM is kept only so legacy stored data doesn't
+ * error out; it is never resolved to or charged.
  * Cart charge = sum of each product's calculated shipping charge.
  */
 class ShippingCalculator
@@ -149,17 +151,17 @@ class ShippingCalculator
 
         return match ($resolved['type']) {
             self::TYPE_FREE => 0.0,
-            self::TYPE_FIXED => max(0.0, (float) ($resolved['fixed_rate'] ?? 0)),
-            self::TYPE_KM => $this->kmCharge(
-                $distanceKm,
-                (float) ($resolved['per_km_rate'] ?? 0),
-                (float) ($resolved['base_fee'] ?? 0)
-            ),
             default => max(0.0, (float) ($resolved['fixed_rate'] ?? 0)),
         };
     }
 
     /**
+     * Per-kilometre shipping has been removed system-wide — shipping is
+     * always either free or a flat fixed rate. Any product/shop still
+     * carrying a legacy 'km' type falls back to its fixed rate (or its old
+     * per-km base fee, if that's all it had configured), never a
+     * distance-multiplied charge.
+     *
      * @return array{type: string, fixed_rate: ?float, per_km_rate: ?float, base_fee: ?float}
      */
     public function resolveItemSettings(Inventory $item, ?Config $shopConfig): array
@@ -179,9 +181,9 @@ class ShippingCalculator
 
             return [
                 'type' => $this->normalizeShopType($shopConfig?->shipping_type),
-                'fixed_rate' => $shopConfig?->shipping_fixed_rate,
-                'per_km_rate' => $shopConfig?->shipping_per_km_rate,
-                'base_fee' => $shopConfig?->shipping_base_fee ?? 0,
+                'fixed_rate' => $shopConfig?->shipping_fixed_rate ?? $shopConfig?->shipping_base_fee ?? 0,
+                'per_km_rate' => 0,
+                'base_fee' => 0,
             ];
         }
 
@@ -195,23 +197,15 @@ class ShippingCalculator
         }
 
         return [
-            'type' => in_array($type, [self::TYPE_FIXED, self::TYPE_KM], true) ? $type : self::TYPE_FIXED,
-            'fixed_rate' => $item->shipping_fixed_rate ?? $shopConfig?->shipping_fixed_rate,
-            'per_km_rate' => $item->shipping_per_km_rate ?? $shopConfig?->shipping_per_km_rate,
-            'base_fee' => $item->shipping_base_fee ?? $shopConfig?->shipping_base_fee ?? 0,
+            'type' => self::TYPE_FIXED,
+            'fixed_rate' => $item->shipping_fixed_rate
+                ?? $item->shipping_base_fee
+                ?? $shopConfig?->shipping_fixed_rate
+                ?? $shopConfig?->shipping_base_fee
+                ?? 0,
+            'per_km_rate' => 0,
+            'base_fee' => 0,
         ];
-    }
-
-    public function kmCharge(?float $distanceKm, float $perKm, float $baseFee = 0): float
-    {
-        if ($distanceKm === null) {
-            // No destination/shop coords yet — charge base only (or 0).
-            return max(0.0, $baseFee);
-        }
-
-        $km = max(0.0, $distanceKm);
-
-        return max(0.0, $baseFee + ($km * max(0.0, $perKm)));
     }
 
     public function distanceFromShop(?Shop $shop, ?float $destLat, ?float $destLng): ?float
@@ -286,9 +280,7 @@ class ShippingCalculator
     {
         $type = strtolower(trim((string) $type));
 
-        return in_array($type, [self::TYPE_FREE, self::TYPE_FIXED, self::TYPE_KM], true)
-            ? $type
-            : self::TYPE_FIXED;
+        return $type === self::TYPE_FREE ? self::TYPE_FREE : self::TYPE_FIXED;
     }
 
     protected function labelForAmount(float $amount, ?float $distanceKm): string

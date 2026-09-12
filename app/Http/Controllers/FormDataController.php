@@ -208,6 +208,11 @@ class FormDataController extends Controller
      */
     public function attributes(Request $request)
     {
+        // Mirror web product form: ensure Colour/Size/Material presets for this shop.
+        if (Auth::check() && Auth::user()->isFromMerchant()) {
+            ensure_shop_attribute_presets(Auth::user()->merchantId());
+        }
+
         $filter = $request->get('filter');
 
         if ($filter == 'all') {
@@ -238,9 +243,24 @@ class FormDataController extends Controller
     /**
      * This is return all countries
      */
-    public function countries()
+    public function countries(Request $request)
     {
+        // ?all=1 → full world list (product origin, manufacturer country).
+        // Default stays marketplace service countries (shipping/verification).
+        if ($request->boolean('all') || $request->get('scope') === 'all') {
+            return ListHelper::allCountries();
+        }
+
         return ListHelper::countries();
+    }
+
+    /**
+     * Full world country list (not limited to marketplace service countries).
+     * Used for manufacturer country and product country of origin.
+     */
+    public function allCountries()
+    {
+        return ListHelper::allCountries();
     }
 
     /**

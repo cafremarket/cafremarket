@@ -305,8 +305,16 @@ class ConfigController extends Controller
     public function verify(MerchantVerifyRequest $request)
     {
         $config = Config::findOrFail(Auth::user()->merchantId());
+        $storeAddress = $config->shop->storeAddress();
 
-        return view('admin.account.verify', compact('config'));
+        return view('admin.account.verify', [
+            'config' => $config,
+            'storeAddress' => $storeAddress,
+            'countries' => ListHelper::countries(),
+            'states' => $storeAddress && $storeAddress->country_id
+                ? ListHelper::states($storeAddress->country_id)
+                : ListHelper::states(config('system_settings.address_default_country')),
+        ]);
     }
 
     /**

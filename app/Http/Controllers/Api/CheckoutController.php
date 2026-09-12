@@ -156,21 +156,6 @@ class CheckoutController extends Controller
 
         $deliveryRange = app(\App\Services\Cart\CartDeliveryRangeService::class);
         $deliveryRange->annotate(collect([$cart]));
-        $request->merge(['delivery_validated' => true]);
-        if (! empty($cart->needs_delivery_location)) {
-            return response()->json([
-                'message' => trans('theme.notify.set_location_for_delivery'),
-            ], 422);
-        }
-        if (! empty($cart->out_of_range)) {
-            return response()->json([
-                'message' => trans('theme.notify.product_out_of_delivery_range', [
-                    'store' => optional($cart->shop)->name ?? 'This store',
-                    'distance' => $cart->delivery_distance_km ?? '—',
-                    'radius' => $cart->service_radius_km ?? '—',
-                ]),
-            ], 422);
-        }
 
         $paymentMethod = (string) $request->input('payment_method', '');
         if ($paymentMethod === 'zcart-wallet') {
@@ -331,22 +316,6 @@ class CheckoutController extends Controller
             if (! shop_can_accept_sales($cart->shop)) {
                 return response()->json([
                     'message' => trans('packages.wallet.vendor_sales_require_subscription'),
-                ], 422);
-            }
-
-            if (! empty($cart->needs_delivery_location)) {
-                return response()->json([
-                    'message' => trans('theme.notify.set_location_for_delivery'),
-                ], 422);
-            }
-
-            if (! empty($cart->out_of_range)) {
-                return response()->json([
-                    'message' => trans('theme.notify.product_out_of_delivery_range', [
-                        'store' => optional($cart->shop)->name ?? 'This store',
-                        'distance' => $cart->delivery_distance_km ?? '—',
-                        'radius' => $cart->service_radius_km ?? '—',
-                    ]),
                 ], 422);
             }
         }

@@ -29,10 +29,14 @@ class UpdateAddressRequest extends Request
             'address_type' => 'bail|required|composite_unique:addresses,addressable_id,addressable_type,'.$id,
             'address_line_1' => 'required|string',
             'address_line_2' => 'nullable|string',
+            'landmark' => 'nullable|string|max:255',
             'city' => 'required|string',
+            'state_id' => 'nullable|integer|exists:states,id',
             'zip_code' => 'nullable|string',
             'country_id' => 'required',
             'phone' => 'nullable|string',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ];
     }
 

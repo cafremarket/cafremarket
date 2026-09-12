@@ -45,11 +45,23 @@ class CreateProductRequest extends Request
             'sku' => (string) $this->input('sku', ''),
         ]);
 
-        $desiredSlug = trim((string) ($this->input('slug') ?: $this->input('name') ?: 'product'));
+        $name = trim((string) $this->input('name', ''));
+        $plainDescription = trim(preg_replace(
+            '/\s+/',
+            ' ',
+            strip_tags((string) $this->input('description', ''))
+        ) ?? '');
+        $metaDescLimit = (int) config('seo.meta.description_character_limit', 160);
+
+        // Slug + SEO meta are derived from name/description (no customer input).
         $this->merge([
             'shop_id' => $shop?->id,
             'user_id' => $user->id,
-            'slug' => generate_unique_listing_slug($desiredSlug),
+            'slug' => generate_unique_listing_slug($name !== '' ? $name : 'product'),
+            'meta_title' => $name !== '' ? $name : null,
+            'meta_description' => $plainDescription !== ''
+                ? \Illuminate\Support\Str::limit($plainDescription, $metaDescLimit, '')
+                : null,
         ]);
     }
 

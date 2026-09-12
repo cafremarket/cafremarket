@@ -8,6 +8,14 @@ Route::post('addToCart/{slug}', [
     CartController::class, 'addToCart',
 ])->name('cart.addItem')->middleware(['ajax']);
 
+Route::post('cart/guest-preview', [
+    CartController::class, 'guestPreview',
+])->name('cart.guestPreview')->middleware(['ajax']);
+
+Route::post('cart/merge-guest', [
+    CartController::class, 'mergeGuest',
+])->name('cart.mergeGuest')->middleware(['auth:customer', 'ajax']);
+
 Route::post('coupon/validate', [
     CartController::class, 'validateCoupon',
 ])->name('validate.coupon')->middleware(['auth:customer', 'ajax']);

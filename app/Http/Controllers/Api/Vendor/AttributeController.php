@@ -36,6 +36,11 @@ class AttributeController extends Controller
     {
         $filter = $request->get('filter');
 
+        // Same as web merchant catalog: Colour, Size, Material, Style, Gender, Storage.
+        if ($filter !== 'trash') {
+            ensure_shop_attribute_presets(optional($request->user())->merchantId());
+        }
+
         if ($filter == 'trash') {
             $attributes = $this->attribute->trashonly();
         } else {

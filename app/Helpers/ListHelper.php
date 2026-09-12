@@ -1093,20 +1093,30 @@ class ListHelper
      */
     public static function clearLatestItemsCache(?int $shopId = null, ?string $shopSlug = null): void
     {
-        $limits = [10, 20];
+        $limits = [8, 10, 20];
 
         if ($shopSlug) {
             Cache::forget('latest_items_'.$shopSlug);
+            Cache::forget('latest_items_v3_'.$shopSlug);
+            Cache::forget('latest_items_v4_'.$shopSlug);
+            Cache::forget('top_selling_items_v3_'.$shopSlug);
+            Cache::forget('top_selling_items_v4_'.$shopSlug);
         }
 
         if ($shopId) {
             foreach ($limits as $limit) {
                 Cache::forget('latest_available_items_'.$shopId.'_'.$limit);
+                Cache::forget('latest_available_items_v2_'.$shopId.'_'.$limit);
+                // Legacy keys that incorrectly appended buyer location for a shop feed.
+                Cache::forget('latest_available_items_'.$shopId.'_'.$limit.hyperlocal_location_cache_suffix());
             }
         }
 
         foreach ($limits as $limit) {
             Cache::forget('latest_available_items_all_'.$limit);
+            Cache::forget('latest_available_items_v2_all_'.$limit);
+            Cache::forget('latest_available_items_all_'.$limit.hyperlocal_location_cache_suffix());
+            Cache::forget('latest_available_items_v2_all_'.$limit.hyperlocal_location_cache_suffix());
         }
     }
 
@@ -1117,15 +1127,19 @@ class ListHelper
      */
     public static function latest_available_items($limit = 10, $shop_id = null)
     {
-        // Cache key must include shop_id; a single "latest_items" key returned marketplace-wide rows for every shop.
-        $cacheKey = 'latest_available_items_'.($shop_id ?? 'all').'_'.$limit.hyperlocal_location_cache_suffix();
+        // Shop feeds are shop-scoped — do not append buyer-location suffix (it prevented cache clears).
+        // Marketplace-wide feeds keep location suffix when hyperlocal is on.
+        $cacheKey = 'latest_available_items_v2_'.($shop_id ?? 'all').'_'.$limit
+            .($shop_id ? '' : hyperlocal_location_cache_suffix());
 
         return Cache::remember($cacheKey, config('cache.remember.latest_items', 0), function () use ($shop_id, $limit) {
             $items = Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('active', 1)
-                
                 ->whereNull('parent_id')
+                ->whereHas('shop', function ($query) {
+                    $query->approved();
+                })
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                     'image:path,imageable_id,imageable_type',
@@ -1133,6 +1147,10 @@ class ListHelper
                     'product.image:path,imageable_id,imageable_type',
                     'product.images:path,imageable_id,imageable_type,order',
                 ]);
+
+            if (config('system_settings.hide_out_of_stock_items')) {
+                $items = $items->where('stock_quantity', '>', 0);
+            }
 
             if ($shop_id) {
                 $items = $items->where('shop_id', $shop_id);
@@ -1183,21 +1201,8 @@ class ListHelper
      */
     public static function latest_shop_items(Shop $shop, $limit = 10)
     {
-        return Cache::remember('latest_items_v3_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
-            return Inventory::query()
-                ->select(static::common_select_attr('inventory'))
-                ->where('shop_id', $shop->id)
-                ->where('active', 1)
-                ->whereNull('parent_id')
-                ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                    'image:path,imageable_id,imageable_type',
-                    'product.featureImage:path,imageable_id,imageable_type,type',
-                    'product.image:path,imageable_id,imageable_type',
-                    'product.images:path,imageable_id,imageable_type,order',
-                ])
-                ->latest()->limit($limit)->get();
-        });
+        // Same source as mobile API latest?shop_id= so web store + app stay in sync.
+        return static::latest_available_items($limit, $shop->id);
     }
 
     /**
@@ -1207,17 +1212,28 @@ class ListHelper
      */
     public static function top_selling_shop_items(Shop $shop, $limit = 10)
     {
-        return Cache::remember('top_selling_items_v3_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
-            return Inventory::query()
+        return Cache::remember('top_selling_items_v4_'.$shop->slug, config('cache.remember.latest_items', 0), function () use ($limit, $shop) {
+            $items = Inventory::query()
                 ->select(static::common_select_attr('inventory'))
                 ->where('shop_id', $shop->id)
                 ->where('active', 1)
                 ->whereNull('parent_id')
+                ->whereHas('shop', function ($query) {
+                    $query->approved();
+                })
                 ->with([
                     'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
                     'image:path,imageable_id,imageable_type',
-                ])
-                ->orderBy('sold_quantity', 'desc')->limit($limit)->get();
+                    'product.featureImage:path,imageable_id,imageable_type,type',
+                    'product.image:path,imageable_id,imageable_type',
+                    'product.images:path,imageable_id,imageable_type,order',
+                ]);
+
+            if (config('system_settings.hide_out_of_stock_items')) {
+                $items = $items->where('stock_quantity', '>', 0);
+            }
+
+            return $items->orderBy('sold_quantity', 'desc')->limit($limit)->get();
         });
     }
 

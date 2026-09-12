@@ -44,9 +44,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $archives = $this->order->trashOnly();
-
-        return view('admin.order.index', compact('archives'));
+        return view('admin.order.index');
     }
 
     /**
@@ -171,9 +169,6 @@ class OrderController extends Controller
             ->addColumn('order_date', function ($order) {
                 return view('admin.partials.actions.order.order_date', compact('order'));
             })
-            ->editColumn('delivery_boy', function ($order) {
-                return view('admin.partials.actions.order.delivery_boy', compact('order'));
-            })
             ->editColumn('shop', function ($order) {
                 return view('admin.partials.actions.order.shop', compact('order'));
             })
@@ -194,7 +189,7 @@ class OrderController extends Controller
             ->editColumn('option', function ($order) {
                 return view('admin.partials.actions.order.option', compact('order'));
             })
-            ->rawColumns(['checkbox', 'order', 'order_date', 'delivery_boy', 'shop', 'customer_name', 'grand_total', 'payment_status', 'option'])
+            ->rawColumns(['checkbox', 'order', 'order_date', 'shop', 'customer_name', 'grand_total', 'payment_status', 'option'])
             ->make(true);
     }
 
@@ -333,7 +328,7 @@ class OrderController extends Controller
         });
         $shopRidersAvailable = $shopRiders->count();
 
-        return view('admin.order._assign_delivery_boy', compact('deliveryboys', 'order', 'shopRidersAvailable'));
+        return view('admin.order._assign_fulfillment', compact('deliveryboys', 'order', 'shopRidersAvailable'));
     }
 
     /**
@@ -364,11 +359,9 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\View\View
      */
-    public function courierForm($id)
+    public function courierForm($id, DeliveryDispatchService $dispatchService)
     {
-        $order = $this->order->find($id);
-
-        return view('admin.order._assign_courier', compact('order'));
+        return $this->deliveryBoys($id, $dispatchService);
     }
 
     /**
@@ -396,6 +389,7 @@ class OrderController extends Controller
                 }
 
                 $order->fulfillment_method = Order::FULFILLMENT_METHOD_COURIER;
+                $order->delivery_boy_id = null;
                 $order->courier_name = $request->input('courier_name');
                 $order->courier_phone = $request->input('courier_phone');
                 $order->courier_tracking_number = $request->input('courier_tracking_number');
@@ -524,13 +518,6 @@ class OrderController extends Controller
         $this->order->fulfill($request, $order);
 
         event(new OrderFulfilled($order, $request->filled('notify_customer')));
-
-        if (config('shop_settings.auto_archive_order') && $order->isPaid()) {
-            $this->order->trash($id);
-
-            return redirect()->route('admin.order.order.index')
-                ->with('success', trans('messages.fulfilled_and_archived'));
-        }
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
     }

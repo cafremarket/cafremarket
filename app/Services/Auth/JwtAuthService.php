@@ -79,7 +79,10 @@ class JwtAuthService
 
     public function resolveFromRequest(Request $request, string $guard): ?Authenticatable
     {
-        $token = $request->bearerToken();
+        $token = $request->bearerToken()
+            ?: $request->header('X-Auth-Token')
+            ?: $request->input('api_token')
+            ?: $request->query('api_token');
 
         if (! $token) {
             $cookie = $this->guardConfig($guard)['cookie'] ?? null;

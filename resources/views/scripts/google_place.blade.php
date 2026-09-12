@@ -95,10 +95,8 @@
       setFieldValue(findInForm(form, ['[name="latitude"]', '#latitude']), data.latitude);
       setFieldValue(findInForm(form, ['[name="longitude"]', '#longitude']), data.longitude);
 
-      if (window.marker && window.map && typeof google !== 'undefined') {
-        var pos = { lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) };
-        window.marker.setPosition(pos);
-        window.map.setCenter(pos);
+      if (typeof window.updateAdminMapFromCoords === 'function') {
+        window.updateAdminMapFromCoords(data.latitude, data.longitude, true);
       }
     }
   }

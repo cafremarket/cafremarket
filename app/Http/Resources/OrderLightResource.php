@@ -42,6 +42,14 @@ class OrderLightResource extends JsonResource
             'tracking_id' => $this->tracking_id,
             'tracking_url' => $this->getTrackingUrl(),
             'fulfillment_method' => $this->fulfillment_method,
+            'has_courier' => $this->hasCourier(),
+            'courier' => $this->when($this->hasCourier(), function () {
+                return [
+                    'name' => $this->courier_name,
+                    'phone' => $this->courier_phone,
+                    'tracking_number' => $this->courier_tracking_number,
+                ];
+            }),
             'delivery_status_label' => $this->deliveryStatusLabel(),
             'item_count' => $this->when($vendor, $this->inventories_count),
             'delivery_boy' => new DeliveryBoyLightResource($this->deliveryBoy),

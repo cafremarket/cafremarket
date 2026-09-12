@@ -1,5 +1,5 @@
 @php
-  $title_classes = isset($product) ? 'form-control wc-product-title' : 'form-control wc-product-title makeSlug';
+  $title_classes = 'form-control wc-product-title';
   $hasVariants = isset($product) && $product->inventories->whereNotNull('parent_id')->count() > 0;
   $productType = $hasVariants ? 'variable' : 'simple';
 @endphp
@@ -23,14 +23,6 @@
         'autocomplete' => 'off',
       ]) !!}
       <div class="help-block with-errors"></div>
-    </div>
-    <div class="wc-permalink">
-      <span class="text-muted">{{ rtrim(get_shop_url(Auth::user()->shop ?? optional($product ?? null)->shop), '/') }}/</span>
-      {!! Form::text('slug', isset($inventory) ? $inventory->slug : null, [
-        'class' => 'form-control input-sm slug wc-permalink__input',
-        'placeholder' => trans('app.placeholder.slug'),
-        'required',
-      ]) !!}
     </div>
   </div>
 
@@ -300,23 +292,12 @@
                       'inherit' => 'Use shop default',
                       'free' => trans('theme.free_shipping') ?: 'Free shipping',
                       'fixed' => 'Fixed charge',
-                      'km' => 'Per kilometre',
                     ], isset($inventory) ? ($inventory->shipping_type ?: 'inherit') : 'inherit', ['class' => 'form-control', 'id' => 'item_shipping_type']) !!}
                   </div>
 
                   <div class="form-group item-ship-fixed">
                     {!! Form::label('shipping_fixed_rate', 'Fixed rate') !!}
                     {!! Form::number('shipping_fixed_rate', isset($inventory) ? $inventory->shipping_fixed_rate : null, ['class' => 'form-control', 'step' => 'any', 'min' => 0]) !!}
-                  </div>
-
-                  <div class="form-group item-ship-km">
-                    {!! Form::label('shipping_base_fee', 'KM base fee') !!}
-                    {!! Form::number('shipping_base_fee', isset($inventory) ? $inventory->shipping_base_fee : null, ['class' => 'form-control', 'step' => 'any', 'min' => 0]) !!}
-                  </div>
-
-                  <div class="form-group item-ship-km">
-                    {!! Form::label('shipping_per_km_rate', 'Rate per KM') !!}
-                    {!! Form::number('shipping_per_km_rate', isset($inventory) ? $inventory->shipping_per_km_rate : null, ['class' => 'form-control', 'step' => 'any', 'min' => 0]) !!}
                   </div>
 
                   {{ Form::hidden('free_shipping', 0) }}
@@ -330,9 +311,6 @@
                         document.querySelectorAll('.item-ship-fixed').forEach(function (el) {
                           el.style.display = v === 'fixed' ? '' : 'none';
                         });
-                        document.querySelectorAll('.item-ship-km').forEach(function (el) {
-                          el.style.display = v === 'km' ? '' : 'none';
-                        });
                         var free = document.getElementById('free_shipping');
                         if (free) free.checked = v === 'free';
                       }
@@ -344,7 +322,7 @@
                   </script>
 
                   <div class="form-group">
-                    {!! Form::label('shipping_weight', trans('app.form.shipping_weight')) !!}
+                    {!! Form::label('shipping_weight', trans('app.form.shipping_weight') . trans('app.form.optional')) !!}
                     <div class="input-group">
                       {!! Form::number('shipping_weight', isset($inventory) ? $inventory->shipping_weight : null, [
                         'class' => 'form-control',
@@ -358,19 +336,19 @@
                   <div class="row">
                     <div class="col-sm-4">
                       <div class="form-group">
-                        {!! Form::label('length', trans('app.form.length')) !!}
+                        {!! Form::label('length', trans('app.form.length') . trans('app.form.optional')) !!}
                         {!! Form::text('length', isset($inventory) ? $inventory->length : null, ['class' => 'form-control', 'placeholder' => '0']) !!}
                       </div>
                     </div>
                     <div class="col-sm-4">
                       <div class="form-group">
-                        {!! Form::label('width', trans('app.form.width')) !!}
+                        {!! Form::label('width', trans('app.form.width') . trans('app.form.optional')) !!}
                         {!! Form::text('width', isset($inventory) ? $inventory->width : null, ['class' => 'form-control', 'placeholder' => '0']) !!}
                       </div>
                     </div>
                     <div class="col-sm-4">
                       <div class="form-group">
-                        {!! Form::label('height', trans('app.form.height')) !!}
+                        {!! Form::label('height', trans('app.form.height') . trans('app.form.optional')) !!}
                         {!! Form::text('height', isset($inventory) ? $inventory->height : null, ['class' => 'form-control', 'placeholder' => '0']) !!}
                       </div>
                     </div>
@@ -506,18 +484,6 @@
                   {!! Form::select('supplier_id', $suppliers, isset($inventory) ? null : config('shop_settings.default_supplier_id'), [
                     'class' => 'form-control select2',
                     'placeholder' => trans('app.placeholder.select'),
-                  ]) !!}
-                </div>
-
-                <div class="form-group">
-                  {!! Form::label('meta_title', trans('app.form.meta_title')) !!}
-                  {!! Form::text('meta_title', isset($inventory) ? $inventory->meta_title : null, ['class' => 'form-control']) !!}
-                </div>
-                <div class="form-group">
-                  {!! Form::label('meta_description', trans('app.form.meta_description')) !!}
-                  {!! Form::text('meta_description', isset($inventory) ? $inventory->meta_description : null, [
-                    'class' => 'form-control',
-                    'maxlength' => config('seo.meta.description_character_limit', '160'),
                   ]) !!}
                 </div>
 

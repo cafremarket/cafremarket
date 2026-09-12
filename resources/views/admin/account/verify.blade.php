@@ -95,39 +95,16 @@
             <div class="alert alert-warning"><i class="fa fa-exclamation-triangle"></i> {{ trans('app.store_location_required') }}</div>
           @endif
 
-          {!! Form::open(['route' => 'admin.setting.verify.location', 'id' => 'store-location-form', 'data-toggle' => 'validator']) !!}
-            <div class="row">
-              <div class="col-md-8">
-                <div class="form-group">
-                  {!! Form::label('address_line_1', trans('app.form.address_line_1')) !!}
-                  {!! Form::text('address_line_1', old('address_line_1', optional($storeAddress)->address_line_1), ['class' => 'form-control', 'placeholder' => trans('app.placeholder.address_line_1')]) !!}
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="form-group">
-                  {!! Form::label('city', trans('app.form.city')) !!}
-                  {!! Form::text('city', old('city', optional($storeAddress)->city), ['class' => 'form-control', 'placeholder' => trans('app.placeholder.city')]) !!}
-                </div>
-              </div>
-            </div>
-
-            @if (config('services.google.place_api_key'))
-              @include('partials.map_pin_picker', [
-                'latitude' => old('latitude', optional($storeAddress)->latitude),
-                'longitude' => old('longitude', optional($storeAddress)->longitude),
-              ])
-            @else
-              <div class="alert alert-info">
-                <i class="fa fa-info-circle"></i> {{ trans('messages.seller_onboarding_map_unavailable') }}
-                @if ($storeAddress)
-                  <a href="javascript:void(0)" data-link="{{ route('address.edit', $storeAddress->id) }}" class="ajax-modal-btn">{{ trans('app.set_store_location') }}</a>
-                @else
-                  <a href="javascript:void(0)" data-link="{{ route('address.create', ['addressable_type' => 'App\\Models\\Shop', 'addressable_id' => $config->shop->id]) }}" class="ajax-modal-btn">{{ trans('app.set_store_location') }}</a>
-                @endif
-              </div>
-            @endif
-
-            {!! Form::submit(trans('app.save_store_location'), ['class' => 'btn btn-flat btn-new']) !!}
+          {!! Form::open(['route' => 'admin.setting.verify.location', 'id' => 'store-location-form', 'class' => 'mp-address-wizard-form']) !!}
+            @include('merchant.verify.partials.address_wizard', [
+              'wizardId' => 'seller-onboarding-address-wizard',
+              'address' => $storeAddress,
+              'countries' => $countries ?? [],
+              'states' => $states ?? [],
+              'defaultAddressTitle' => $config->shop->name,
+              'defaultPhone' => optional($config->shop->config)->support_phone ?? Auth::user()->phone,
+              'submitLabel' => trans('app.save_store_location'),
+            ])
           {!! Form::close() !!}
         @include('admin.partials.ui.card_end')
 

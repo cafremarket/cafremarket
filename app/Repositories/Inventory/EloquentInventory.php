@@ -356,7 +356,7 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
     {
         foreach (['length', 'width', 'height'] as $dimension) {
             if ($request->exists($dimension) && ! $request->filled($dimension)) {
-                $request->merge([$dimension => null]);
+                $request->merge([$dimension => 0]);
             }
         }
 

@@ -251,20 +251,6 @@ class OrderController extends Controller
                 return redirect()->route('cart.index')
                     ->with('error', trans('packages.wallet.vendor_sales_require_subscription'));
             }
-
-            if (! empty($cart->needs_delivery_location)) {
-                return redirect()->route('cart.index')
-                    ->with('error', trans('theme.notify.set_location_for_delivery'));
-            }
-
-            if (! empty($cart->out_of_range)) {
-                return redirect()->route('cart.index')
-                    ->with('error', trans('theme.notify.product_out_of_delivery_range', [
-                        'store' => optional($cart->shop)->name ?? 'This store',
-                        'distance' => $cart->delivery_distance_km ?? '—',
-                        'radius' => $cart->service_radius_km ?? '—',
-                    ]));
-            }
         }
 
         DB::beginTransaction();

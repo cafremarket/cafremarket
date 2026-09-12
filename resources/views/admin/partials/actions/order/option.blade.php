@@ -1,12 +1,13 @@
 <td class="row-options">
-  {{-- Platform admins get read-only access to orders — no fulfill/archive shortcuts.
+  {{-- Platform admins get read-only access to orders — no fulfill shortcuts.
        Those actions belong to the merchant on their own panel. --}}
   @unless (Auth::user()->isFromPlatform())
     @can('fulfill', $order)
       @unless ($order->isFulfilled())
         @if ($order->deliver())
-          <a href="javascript:void(0)" data-link="{{ route('admin.order.order.fulfillment', $order) }}" class="ajax-modal-btn">
-            <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.fulfill_order_delivery') }}" class="fa fa-truck"></i>
+          {{-- One modal: Delivery Boy OR Courier (exclusive) --}}
+          <a href="javascript:void(0)" data-link="{{ route('admin.order.deliveryboys', $order->id) }}" class="ajax-modal-btn">
+            <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.fulfill_order') }}" class="fa fa-truck"></i>
           </a>&nbsp;
         @elseif ($order->pickup())
           {!! Form::open(['route' => ['admin.order.order.markAsPickedUp', $order->id], 'method' => 'put', 'class' => 'inline']) !!}
@@ -30,24 +31,4 @@
   <a href="{{ panel_route('admin.order.shipping_label', $order) }}">
     <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.download_shipping_label') }}" class="fa fa-file"></i>
   </a>&nbsp;
-
-  @unless (Auth::user()->isFromPlatform())
-    @can('archive', $order)
-      {!! Form::open([
-          'route' => ['admin.order.order.archive', $order->id],
-          'method' => 'delete',
-          'class' => 'data-form',
-      ]) !!}
-
-      {!! Form::button('<i class="fa fa-archive text-muted"></i>', [
-          'type' => 'submit',
-          'class' => 'confirm ajax-silent',
-          'title' => trans('app.order_archive'),
-          'data-toggle' => 'tooltip',
-          'data-placement' => 'top',
-      ]) !!}
-
-      {!! Form::close() !!}
-    @endcan
-  @endunless
 </td>

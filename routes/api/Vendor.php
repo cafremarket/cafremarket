@@ -49,6 +49,13 @@ Route::prefix('vendor')->group(function () {
     // Public APIs
     Route::get('data/subscription_plans', [FormDataController::class, 'subscriptionPlans']);
 
+    // Location search / reverse-geocode for the store-location map picker —
+    // backed by the same GeocodeService the web uses, so it automatically
+    // uses whichever Google Maps key (or the free OSM fallback) is configured
+    // in the web .env, with no key ever hardcoded in the app.
+    Route::get('location/search', [AddressController::class, 'searchLocation']);
+    Route::post('location/reverse-geocode', [AddressController::class, 'reverseGeocode']);
+
     // Authentication
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
@@ -220,8 +227,6 @@ Route::prefix('vendor')->group(function () {
         Route::put('order/{order}/mark_as_paid', [OrderController::class, 'mark_as_paid']);
         Route::put('order/{order}/mark_as_unpaid', [OrderController::class, 'mark_as_unpaid']);
         Route::put('order/{order}/mark_as_fulfilled', [OrderController::class, 'mark_as_fulfilled']); // Where and why we need this route?
-        Route::delete('order/{order}/archive', [OrderController::class, 'archive']);
-        Route::put('order/{order_id}/unarchive', [OrderController::class, 'unarchive']);
         Route::post('order/{order}/add_note', [OrderController::class, 'add_note']);
         Route::delete('order/{order}', [OrderController::class, 'delete']);
         Route::get('order/{order}/invoice', [OrderController::class, 'invoice']);
@@ -271,9 +276,11 @@ Route::prefix('vendor')->group(function () {
 
         // Delivery Boys
         Route::get('delivery-boys', [DeliveryBoyController::class, 'index']);
+        Route::get('delivery-boy/check-email', [DeliveryBoyController::class, 'checkEmail']);
         Route::post('delivery-boy/create', [DeliveryBoyController::class, 'store']);
         Route::get('delivery-boy/{delivery_boy}', [DeliveryBoyController::class, 'show']);
         Route::put('delivery-boy/{delivery_boy}/update', [DeliveryBoyController::class, 'update']);
+        Route::put('delivery-boy/{delivery_boy}/reset-password', [DeliveryBoyController::class, 'resetPassword']);
         // No trash/restore step for delivery boys — both routes delete permanently.
         Route::delete('delivery-boy/{delivery_boy}/trash', [DeliveryBoyController::class, 'trash']);
         Route::delete('delivery-boy/{delivery_boy_id}/delete', [DeliveryBoyController::class, 'destroy']);
@@ -298,6 +305,12 @@ Route::prefix('vendor')->group(function () {
         Route::put('settings/{shop}/toggle', [ConfigController::class, 'toggleShopActive']);
         Route::get('shop/verification', [ConfigController::class, 'verificationStatus']);
         Route::post('shop/verification', [ConfigController::class, 'submitVerification']);
+        Route::post('shop/verification/contact', [ConfigController::class, 'saveVerificationContact']);
+        Route::post('shop/verification/location', [ConfigController::class, 'saveVerificationLocation']);
+        Route::post('shop/verification/documents', [ConfigController::class, 'uploadVerificationDocuments']);
+        Route::post('shop/verification/documents/{attachment}', [ConfigController::class, 'replaceVerificationDocument']);
+        Route::post('shop/verification/documents/{attachment}/delete', [ConfigController::class, 'deleteVerificationDocument']);
+        Route::delete('shop/verification/documents/{attachment}', [ConfigController::class, 'deleteVerificationDocument']);
         Route::get('attachment/{attachment}/download', [ConfigController::class, 'downloadVerificationAttachment']);
 
         // Taxes
@@ -386,6 +399,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('data/attributes', [FormDataController::class, 'attributes']);
         Route::get('data/manufacturers', [FormDataController::class, 'manufacturers']);
         Route::get('data/countries', [FormDataController::class, 'countries']);
+        Route::get('data/all_countries', [FormDataController::class, 'allCountries']);
         Route::get('data/roles', [FormDataController::class, 'roles']);
         Route::get('data/business_days', [FormDataController::class, 'business_days']);
         Route::get('data/states/{country_id}', [FormDataController::class, 'states']);

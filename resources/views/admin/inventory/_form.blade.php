@@ -385,23 +385,12 @@
                 'inherit' => 'Use shop default',
                 'free' => trans('theme.free_shipping') ?: 'Free shipping',
                 'fixed' => 'Fixed charge',
-                'km' => 'Per kilometre',
               ], isset($inventory) ? ($inventory->shipping_type ?: 'inherit') : 'inherit', ['class' => 'form-control', 'id' => 'item_shipping_type']) !!}
             </div>
 
             <div class="form-group item-ship-fixed">
               {!! Form::label('shipping_fixed_rate', 'Fixed rate', ['class' => 'with-help']) !!}
               {!! Form::number('shipping_fixed_rate', isset($inventory) ? $inventory->shipping_fixed_rate : null, ['class' => 'form-control', 'step' => 'any', 'min' => 0, 'placeholder' => '0.00']) !!}
-            </div>
-
-            <div class="form-group item-ship-km">
-              {!! Form::label('shipping_base_fee', 'KM base fee', ['class' => 'with-help']) !!}
-              {!! Form::number('shipping_base_fee', isset($inventory) ? $inventory->shipping_base_fee : null, ['class' => 'form-control', 'step' => 'any', 'min' => 0, 'placeholder' => '0.00']) !!}
-            </div>
-
-            <div class="form-group item-ship-km">
-              {!! Form::label('shipping_per_km_rate', 'Rate per KM', ['class' => 'with-help']) !!}
-              {!! Form::number('shipping_per_km_rate', isset($inventory) ? $inventory->shipping_per_km_rate : null, ['class' => 'form-control', 'step' => 'any', 'min' => 0, 'placeholder' => '0.00']) !!}
             </div>
 
             {{ Form::hidden('free_shipping', 0) }}
@@ -413,9 +402,6 @@
                   var v = t.value;
                   document.querySelectorAll('.item-ship-fixed').forEach(function (el) {
                     el.style.display = v === 'fixed' ? '' : 'none';
-                  });
-                  document.querySelectorAll('.item-ship-km').forEach(function (el) {
-                    el.style.display = v === 'km' ? '' : 'none';
                   });
                   var free = document.getElementById('free_shipping');
                   if (free) {

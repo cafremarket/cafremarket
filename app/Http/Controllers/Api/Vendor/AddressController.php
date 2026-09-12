@@ -7,12 +7,57 @@ use App\Http\Requests\Validations\CreateAddressRequest;
 use App\Http\Resources\AddressResource;
 use App\Models\Address;
 use App\Models\User;
+use App\Services\Geo\GeocodeService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AddressController extends Controller
 {
+    /**
+     * Search for an address/place by free-text query, for the store-location
+     * map picker's search box. Delegates to GeocodeService, which uses the
+     * Google Maps key configured in the web .env when present, falling back
+     * to free OpenStreetMap/Nominatim otherwise.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function searchLocation(Request $request, GeocodeService $geocoder)
+    {
+        $request->validate([
+            'query' => 'required|string|min:3|max:200',
+        ]);
+
+        return response()->json([
+            'results' => $geocoder->searchAddresses($request->query('query')),
+        ]);
+    }
+
+    /**
+     * Reverse-geocode a picked map coordinate into a human-readable address
+     * (and structured components) for the store-location map picker.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function reverseGeocode(Request $request, GeocodeService $geocoder)
+    {
+        $request->validate([
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ]);
+
+        return response()->json([
+            'address_text' => $geocoder->reverseGeocode(
+                (float) $request->latitude,
+                (float) $request->longitude
+            ),
+            'details' => $geocoder->reverseGeocodeDetails(
+                (float) $request->latitude,
+                (float) $request->longitude
+            ),
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      *

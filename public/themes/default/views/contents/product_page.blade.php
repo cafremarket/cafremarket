@@ -136,18 +136,12 @@
 
             <div class="sf-pdp__cta flex-between-center flex-wrap sp-btns">
               @unless ($item->auctionable)
-                @if (!empty($pdp_out_of_range))
-                  <button type="button" class="btn btn-danger btn-lg" disabled>
-                    <i class="fal fa-map-marker-alt"></i> {{ trans('theme.out_of_delivery_range') }}
-                  </button>
-                @else
                   <a href="{{ route('direct.checkout', $item->slug) }}" class="btn btn-primary btn-lg{{ $item->stock_quantity < 1 ? ' disabled' : '' }}" id="buy-now-btn"{{ $item->stock_quantity < 1 ? ' aria-disabled=true' : '' }}>
                     <i class="fal fa-rocket-launch"></i> @lang('theme.button.buy_now')
                   </a>
                   <a data-link="{{ route('cart.addItem', $item->slug) }}" class="btn btn-lg add-to-card-now-btn sc-add-to-cart{{ $item->stock_quantity < 1 ? ' disabled' : '' }}">
                     <i class="fal fa-shopping-cart"></i> @lang('theme.button.add_to_cart')
                   </a>
-                @endif
               @endunless
 
               @if (is_incevio_package_loaded('comparison'))

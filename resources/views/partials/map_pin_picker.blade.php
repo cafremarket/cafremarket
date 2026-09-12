@@ -1,5 +1,9 @@
-{{-- Google Maps pin picker — requires latitude/longitude hidden inputs and GOOGLE_PLACE_KEY --}}
-@if (config('services.google.place_api_key'))
+{{-- Address pin picker — draggable/click-to-pin map with a "use current location" button.
+     Uses Google Maps when a key is configured, otherwise falls back to a free
+     OpenStreetMap/Leaflet map so the picker always renders, key or no key. --}}
+@php
+  $googleMapsKey = config('services.google.place_api_key');
+@endphp
 <style>
   .map-picker-toolbar {
     display: flex;
@@ -58,16 +62,35 @@
   <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $longitude ?? '') }}">
 </div>
 
+@if (! $googleMapsKey)
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+@endif
+
 <script>
 (function() {
+  var hasGoogleMaps = {{ $googleMapsKey ? 'true' : 'false' }};
   var defaultLat = parseFloat(document.getElementById('latitude').value) || -25.9655;
   var defaultLng = parseFloat(document.getElementById('longitude').value) || 32.5832;
+  var hasExistingCoords = !!(document.getElementById('latitude').value && document.getElementById('longitude').value);
   var reverseUrl = @json(route('address.reverse'));
+
+  // Always guarantee a coordinate value up front, synchronously, regardless of
+  // whether the map library below ever finishes loading. Coordinates are a
+  // required field on the address form, and when this partial is injected
+  // into the admin ajax modal (jQuery .html()), a dynamically-inserted
+  // <script src> for Leaflet loads asynchronously — the map/marker may not
+  // exist yet by the time this script runs, but the hidden inputs must never
+  // be left empty or the form silently fails server-side validation.
+  if (!document.getElementById('latitude').value) {
+    document.getElementById('latitude').value = defaultLat;
+    document.getElementById('longitude').value = defaultLng;
+  }
   var csrfToken = @json(csrf_token());
   var fetchingLabel = @json(trans('theme.fetching_address'));
   var useLocationLabel = @json(trans('theme.use_current_location'));
   var geoUnsupportedLabel = @json(trans('theme.geolocation_not_supported'));
   var geoDeniedLabel = @json(trans('theme.geolocation_denied'));
+  var statesUrl = @json(route('ajax.getCountryStates'));
 
   function setCoords(lat, lng) {
     document.getElementById('latitude').value = lat;
@@ -79,28 +102,66 @@
     return wrap ? wrap.closest('form') : document.querySelector('form');
   }
 
-  function fillAddressFields(addressText) {
-    if (!addressText) return;
+  function setSelectByText(select, text) {
+    if (!select || !text) return false;
+    var matched = false;
+    Array.prototype.forEach.call(select.options, function(opt) {
+      if (matched || !opt.value) return;
+      if (opt.text.trim().toLowerCase() === String(text).trim().toLowerCase()) {
+        select.value = opt.value;
+        matched = true;
+      }
+    });
+    if (matched && typeof jQuery !== 'undefined') {
+      jQuery(select).trigger('change');
+    }
+    return matched;
+  }
 
+  function fillAddressFields(details) {
     var form = findAddressForm();
-    if (!form) return;
+    if (!form || !details) return;
 
     var line1 = form.querySelector('[name="address_line_1"]');
     var city = form.querySelector('[name="city"]');
+    var zip = form.querySelector('[name="zip_code"]');
+    var country = form.querySelector('[name="country_id"]');
+    var state = form.querySelector('[name="state_id"]');
 
-    if (line1) {
-      line1.value = addressText;
+    if (line1 && !line1.value && details.address_line_1) {
+      line1.value = details.address_line_1;
+    }
+    if (city && !city.value && details.city) {
+      city.value = details.city;
+    }
+    if (zip && !zip.value && details.zip_code) {
+      zip.value = details.zip_code;
     }
 
-    if (city && !city.value) {
-      var parts = addressText.split(',').map(function(p) { return p.trim(); }).filter(Boolean);
-      if (parts.length >= 2) {
-        city.value = parts[parts.length - 2] || parts[1] || '';
+    var countryMatched = country && details.country ? setSelectByText(country, details.country) : false;
+
+    if (state && details.state) {
+      if (countryMatched && country) {
+        fetch(statesUrl + '?id=' + encodeURIComponent(country.value), {
+          headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        })
+          .then(function(r) { return r.ok ? r.json() : {}; })
+          .then(function(states) {
+            var html = state.options[0] ? state.options[0].outerHTML : '';
+            Object.keys(states || {}).forEach(function(id) {
+              html += '<option value="' + id + '">' + states[id] + '</option>';
+            });
+            state.innerHTML = html;
+            setSelectByText(state, details.state);
+          })
+          .catch(function() {});
+      } else {
+        setSelectByText(state, details.state);
       }
     }
   }
 
-  function reverseGeocodeAndFill(lat, lng) {
+  function reverseGeocodeAndFill(lat, lng, pan) {
     return fetch(reverseUrl, {
       method: 'POST',
       headers: {
@@ -116,23 +177,37 @@
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      if (data.address_text) {
-        fillAddressFields(data.address_text);
+      if (data && data.details) {
+        fillAddressFields(data.details);
+      } else if (data && data.address_text) {
+        fillAddressFields({ address_line_1: data.address_text });
       }
     })
     .catch(function() {});
   }
 
+  var leafletMap = null;
+  var leafletMarker = null;
+
   window.updateAdminMapFromCoords = function(lat, lng, pan) {
     setCoords(lat, lng);
 
-    if (window.marker && window.map) {
+    if (hasGoogleMaps && window.marker && window.map) {
       var pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
       window.marker.setPosition(pos);
 
       if (pan) {
         window.map.setCenter(pos);
         window.map.setZoom(16);
+      }
+      return;
+    }
+
+    if (leafletMap && leafletMarker) {
+      leafletMarker.setLatLng([lat, lng]);
+
+      if (pan) {
+        leafletMap.setView([lat, lng], 16);
       }
     }
   };
@@ -155,17 +230,50 @@
     window.marker.addListener('dragend', function() {
       var pos = window.marker.getPosition();
       setCoords(pos.lat(), pos.lng());
+      reverseGeocodeAndFill(pos.lat(), pos.lng());
     });
 
     window.map.addListener('click', function(e) {
       window.marker.setPosition(e.latLng);
       setCoords(e.latLng.lat(), e.latLng.lng());
+      reverseGeocodeAndFill(e.latLng.lat(), e.latLng.lng());
     });
 
     if (!document.getElementById('latitude').value) {
       setCoords(defaultLat, defaultLng);
     }
   };
+
+  function initLeafletPicker() {
+    var el = document.getElementById('admin-map-canvas');
+    if (!el || typeof L === 'undefined' || leafletMap) return;
+
+    leafletMap = L.map(el).setView([defaultLat, defaultLng], hasExistingCoords ? 16 : 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap',
+    }).addTo(leafletMap);
+
+    leafletMarker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(leafletMap);
+
+    leafletMarker.on('dragend', function() {
+      var pos = leafletMarker.getLatLng();
+      setCoords(pos.lat, pos.lng);
+      reverseGeocodeAndFill(pos.lat, pos.lng);
+    });
+
+    leafletMap.on('click', function(e) {
+      leafletMarker.setLatLng(e.latlng);
+      setCoords(e.latlng.lat, e.latlng.lng);
+      reverseGeocodeAndFill(e.latlng.lat, e.latlng.lng);
+    });
+
+    if (!document.getElementById('latitude').value) {
+      setCoords(defaultLat, defaultLng);
+    }
+
+    setTimeout(function() { leafletMap.invalidateSize(); }, 150);
+  }
 
   function setCurrentLocationLoading(loading) {
     var btn = document.getElementById('map-use-current-location');
@@ -217,9 +325,35 @@
   }
 
   window.useAdminMapCurrentLocation = useCurrentLocation;
+
+  if (hasGoogleMaps) {
+    if (typeof google !== 'undefined' && google.maps) {
+      window.initAdminMapPicker();
+    }
+    // else: waits for the Google Maps script `callback=initAdminMapPicker` to fire.
+  } else if (typeof L !== 'undefined') {
+    // Leaflet is already loaded on the page (e.g. a wizard rendered earlier
+    // in this same page already pulled it in) — safe to init immediately.
+    initLeafletPicker();
+  } else {
+    // Load Leaflet ourselves and only touch the map once it has actually
+    // finished loading — this partial is frequently injected into the admin
+    // ajax modal via jQuery's `.html()`, which loads a dynamically-inserted
+    // <script src> asynchronously, so we can't rely on script order/readyState.
+    var existing = document.querySelector('script[data-leaflet-loader]');
+    if (existing) {
+      existing.addEventListener('load', initLeafletPicker);
+    } else {
+      var leafletScript = document.createElement('script');
+      leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      leafletScript.crossOrigin = '';
+      leafletScript.setAttribute('data-leaflet-loader', '1');
+      leafletScript.onload = initLeafletPicker;
+      document.head.appendChild(leafletScript);
+    }
+  }
 })();
 </script>
-@if (empty($skipMapsScript))
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.place_api_key') }}&callback=initAdminMapPicker"></script>
-@endif
+@if ($googleMapsKey && empty($skipMapsScript))
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $googleMapsKey }}&callback=initAdminMapPicker"></script>
 @endif

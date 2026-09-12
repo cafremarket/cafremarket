@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-lg">
+<div class="modal-dialog modal-lg address-modal">
   <div class="modal-content">
     {!! Form::open(['route' => 'address.store', 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
     <div class="modal-header">

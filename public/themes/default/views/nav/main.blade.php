@@ -3,16 +3,22 @@
     <div class="container">
       <div class="top-nav-inner">
         <div class="top-nav-left">
-          @if (buyer_delivery_address_label())
-            <a href="javascript:void(0);" class="delivery-location-chip js-open-address-setup">
-              <i class="fal fa-map-marker-alt"></i>
-              {{ trans('theme.deliver_to') }} <strong>{{ Str::limit(buyer_delivery_address_label(), 28) }}</strong>
-            </a>
+          @auth('customer')
+            @if (buyer_delivery_address_label())
+              <a href="javascript:void(0);" class="delivery-location-chip js-open-address-setup">
+                <i class="fal fa-map-marker-alt"></i>
+                {{ trans('theme.deliver_to') }} <strong>{{ Str::limit(buyer_delivery_address_label(), 28) }}</strong>
+              </a>
+            @else
+              <a href="javascript:void(0);" class="delivery-location-chip delivery-location-chip--empty js-open-address-setup">
+                <i class="fal fa-map-marker-alt"></i> {{ trans('theme.set_delivery_location') }}
+              </a>
+            @endif
           @else
-            <a href="javascript:void(0);" class="delivery-location-chip delivery-location-chip--empty js-open-address-setup">
-              <i class="fal fa-map-marker-alt"></i> {{ trans('theme.set_delivery_location') }}
+            <a href="javascript:void(0);" class="delivery-location-chip delivery-location-chip--empty js-open-login">
+              <i class="fal fa-map-marker-alt"></i> {{ trans('theme.login_to_see_distance') }}
             </a>
-          @endif
+          @endauth
         </div> <!-- /.top-nav-left -->
 
         <div class="top-nav-right">

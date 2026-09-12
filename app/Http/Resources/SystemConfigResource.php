@@ -92,7 +92,6 @@ class SystemConfigResource extends JsonResource
             'show_address_title' => (bool) $attr('show_address_title'),
             'address_show_country' => (bool) $attr('address_show_country'),
             'address_show_map' => (bool) $attr('address_show_map'),
-            'allow_guest_checkout' => (bool) $attr('allow_guest_checkout'),
             'enable_chat' => true,
             'vendor_get_paid' => (bool) vendor_get_paid_directly(),
             'currency' => $currencyArr ? [

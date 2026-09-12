@@ -322,13 +322,6 @@
           <fieldset>
             <legend>{{ trans('app.seo') }}</legend>
             <div class="form-group">
-              {!! Form::label('slug', trans('app.form.slug') . '*', ['class' => 'with-help']) !!}
-              <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.product_slug') }}"></i>
-              {!! Form::text('slug', null, ['class' => 'form-control slug', 'placeholder' => trans('app.placeholder.slug'), isset($product) ? 'disabled' : 'required']) !!}
-              <div class="help-block with-errors"></div>
-            </div>
-
-            <div class="form-group">
               {!! Form::label('tag_list[]', trans('app.form.tags'), ['class' => 'with-help']) !!}
               {!! Form::select('tag_list[]', $tags, null, ['class' => 'form-control select2-tag', 'multiple' => 'multiple']) !!}
             </div>

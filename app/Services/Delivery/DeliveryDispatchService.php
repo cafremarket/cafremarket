@@ -55,6 +55,10 @@ class DeliveryDispatchService
     {
         $order->delivery_boy_id = $rider->id;
         $order->fulfillment_method = Order::FULFILLMENT_METHOD_DELIVERY_BOY;
+        $order->courier_name = null;
+        $order->courier_phone = null;
+        $order->courier_tracking_number = null;
+        $order->courier_added_at = null;
         $order->order_status_id = Order::STATUS_AWAITING_DELIVERY;
 
         // (Re)assigning starts the delivery leg fresh: a previous rider's "reached"

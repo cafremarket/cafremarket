@@ -481,7 +481,8 @@ class ViewComposerServiceProvider extends ServiceProvider
             'admin.manufacturer._form',
 
             function ($view) {
-                $view->with('countries', ListHelper::countries());
+                // Country of origin is informational — show the full world list.
+                $view->with('countries', ListHelper::allCountries());
             }
         );
     }
@@ -1094,6 +1095,7 @@ class ViewComposerServiceProvider extends ServiceProvider
                 $dispute_count = Statistics::dispute_count(Auth::user()->merchantId());
                 $refund_request_count = Statistics::open_refund_request_count();
                 $current_plan = Auth::user()->shop->plan;
+                $last_sale = Statistics::last_sale();
 
                 $view->with([
                     'chart' => $chart,
@@ -1108,7 +1110,9 @@ class ViewComposerServiceProvider extends ServiceProvider
                     'stock_count' => Statistics::shop_inventories_count(),
                     'todays_sale_amount' => Statistics::todays_sale_amount(),
                     'yesterdays_sale_amount' => Statistics::yesterdays_sale_amount(),
-                    'last_sale' => Statistics::last_sale(),
+                    'last_sale' => $last_sale,
+                    'last_sale_breakdown' => Statistics::sale_breakdown_from_order($last_sale),
+                    'todays_sale_breakdown' => Statistics::sale_breakdown_for_date(\Carbon\Carbon::today()),
                     'latest_refund_total' => Statistics::latest_refund_total($days),
                     'latest_sale_total' => array_sum($salesData),
                     'dispute_count' => $dispute_count,

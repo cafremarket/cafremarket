@@ -40,6 +40,8 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
             'categories',
             'images',
             'tags',
+            'taxes',
+            'origin',
         ]);
 
         if (! Auth::user()->isFromPlatform()) {

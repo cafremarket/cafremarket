@@ -33,7 +33,7 @@ class ShopSettingResource extends JsonResource
             'verification_status' => $this->getVerificationStatus(),
             'verification_request_status' => optional($this->config)->verificationRequestStatus(),
             'verification_rejection_reason' => optional($this->config)->verification_rejection_reason,
-            'pickup_enabled' => false,
+            'pickup_enabled' => (bool) optional($this->config)->pickup_enabled,
             'member_since' => $this->created_at,
             'updated_at' => $this->updated_at,
             'logo' => $this->logoImage ? get_storage_file_url($this->logoImage->path) : null,

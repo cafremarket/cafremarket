@@ -116,6 +116,7 @@ class OrderFulfillmentController extends Controller
                 }
 
                 $locked->fulfillment_method = Order::FULFILLMENT_METHOD_COURIER;
+                $locked->delivery_boy_id = null;
                 $locked->courier_name = $request->input('courier_name');
                 $locked->courier_phone = $request->input('courier_phone');
                 $locked->courier_tracking_number = $request->input('courier_tracking_number');
@@ -125,6 +126,7 @@ class OrderFulfillmentController extends Controller
                     $locked->otp = Order::generateDeliveryOtp();
                 }
 
+                // Courier assignment moves the order out of "unfulfilled" into awaiting delivery.
                 if ($locked->order_status_id < Order::STATUS_AWAITING_DELIVERY) {
                     $locked->order_status_id = Order::STATUS_AWAITING_DELIVERY;
                 }

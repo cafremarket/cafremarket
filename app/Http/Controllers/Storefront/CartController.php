@@ -8,6 +8,7 @@ use App\Helpers\ListHelper;
 use App\Models\Cart;
 use App\Models\Country;
 use App\Models\Coupon;
+use App\Models\Inventory;
 use App\Models\PaymentMethod;
 use App\Models\State;
 use Illuminate\Http\Request;
@@ -297,5 +298,80 @@ class CartController extends Controller
 
             setcookie('cart_ids', $cookieValue, time() + (60 * 24 * 7), '/');
         }
+    }
+
+    /**
+     * Resolve guest local-cart slugs into display data.
+     */
+    public function guestPreview(Request $request)
+    {
+        $rows = collect($request->input('items', []))
+            ->filter(fn ($row) => is_array($row) && ! empty($row['slug']))
+            ->values();
+
+        if ($rows->isEmpty()) {
+            return response()->json(['data' => []]);
+        }
+
+        $inventories = Inventory::query()
+            ->whereIn('slug', $rows->pluck('slug')->unique()->all())
+            ->with(['image:path,imageable_id,imageable_type', 'shop:id,name,slug'])
+            ->get()
+            ->keyBy('slug');
+
+        $data = [];
+
+        foreach ($rows as $row) {
+            $item = $inventories->get($row['slug']);
+
+            if (! $item) {
+                continue;
+            }
+
+            $quantity = max(1, (int) ($row['quantity'] ?? 1));
+            $unit = $item->current_sale_price();
+
+            $data[] = [
+                'slug' => $item->slug,
+                'title' => $item->title,
+                'quantity' => $quantity,
+                'price' => $unit,
+                'line_total' => $unit * $quantity,
+                'price_formatted' => get_formated_currency($unit),
+                'line_total_formatted' => get_formated_currency($unit * $quantity),
+                'image' => get_product_img_src($item, 'tiny'),
+                'url' => storefront_product_url($item),
+                'shop' => optional($item->shop)->name,
+            ];
+        }
+
+        return response()->json(['data' => $data]);
+    }
+
+    /**
+     * Push guest local-cart items into the logged-in customer's server cart.
+     */
+    public function mergeGuest(Request $request)
+    {
+        $rows = collect($request->input('items', []))
+            ->filter(fn ($row) => is_array($row) && ! empty($row['slug']))
+            ->values();
+
+        $merged = 0;
+
+        foreach ($rows as $row) {
+            $request->merge(['quantity' => max(1, (int) ($row['quantity'] ?? 1))]);
+            $response = $this->addToCart($request, $row['slug']);
+            $status = method_exists($response, 'getStatusCode') ? $response->getStatusCode() : 200;
+
+            if (in_array($status, [200, 444], true)) {
+                $merged++;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'merged' => $merged,
+        ]);
     }
 }

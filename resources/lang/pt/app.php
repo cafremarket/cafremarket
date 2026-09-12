@@ -294,6 +294,8 @@ return [
     'with_message' => 'Com mensagem',
     'last_sale' => 'Última venda',
     'todays_sale' => 'Total de hoje',
+    'sale_breakdown' => 'Detalhe da venda',
+    'sale_order_count' => '{0} Sem pedidos|{1} :count pedido|[2,*] :count pedidos',
     'visitors_today' => 'Visitantes hoje',
     'stock' => 'Estoque',
     'stock_outs' => 'Falta de estoque',

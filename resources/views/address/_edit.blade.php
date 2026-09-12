@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-lg">
+<div class="modal-dialog modal-lg address-modal">
   <div class="modal-content">
     {!! Form::model($address, ['method' => 'PUT', 'route' => ['address.update', $address->id], 'id' => 'form', 'data-toggle' => 'validator']) !!}
     <div class="modal-header">

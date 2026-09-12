@@ -134,7 +134,11 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         \App\Http\Controllers\Storefront\NearbyShopDiagnosticController::class, 'index',
     ])->name('test.nearby_stores');
 
-    // Customer-only actions (account, cart, checkout, messages)
+    // Cart: guests can view; add-to-cart is stored locally until login.
+    // Checkout/order remain login-restricted.
+    include 'storefront/Cart.php';
+
+    // Customer-only actions (account, checkout, messages)
     Route::middleware(['auth:customer'])->group(function () {
         Route::post('customer/location', [
             LocationController::class, 'store',
@@ -149,7 +153,6 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         ])->name('customer.location.search');
 
         include 'storefront/Chat.php';
-        include 'storefront/Cart.php';
         include 'storefront/Order.php';
         include 'storefront/GiftCard.php';
         include 'storefront/Account.php';

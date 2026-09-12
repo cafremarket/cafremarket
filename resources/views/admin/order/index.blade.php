@@ -36,7 +36,6 @@
         </th>
         <th>{{ trans('app.order_number') }}</th>
         <th>{{ trans('app.order_date') }}</th>
-        <th>{{ trans('app.model.delivery_boy') }}</th>
         @if (Auth::user()->isFromPlatform())
           <th>{{ trans('app.shop') }}</th>
         @endif
@@ -48,54 +47,6 @@
       </tr>
     </thead>
     <tbody id="massSelectArea"></tbody>
-  </table>
-
-  @include('admin.partials.ui.card_end')
-
-  @include('admin.partials.ui.trash_start', ['title' => trans('app.archived_orders')])
-
-  <table class="table table-hover admin-table table-no-sort">
-    <thead>
-      <tr>
-        <th>{{ trans('app.order_number') }}</th>
-        <th>{{ trans('app.order_date') }}</th>
-        <th>{{ trans('app.grand_total') }}</th>
-        <th>{{ trans('app.payment') }}</th>
-        <th>{{ trans('app.status') }}</th>
-        <th>{{ trans('app.archived_at') }}</th>
-        <th class="admin-table__actions-col">{{ trans('app.option') }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach ($archives as $archive)
-        <tr>
-          <td>
-            @can('view', $archive)
-              <a href="{{ route('admin.order.order.show', $archive->id) }}">{{ $archive->order_number }}</a>
-            @else
-              {{ $archive->order_number }}
-            @endcan
-          </td>
-          <td>{{ $archive->created_at->toDayDateTimeString() }}</td>
-          <td>{{ get_formated_currency($archive->grand_total, 2, $archive->currency_id) }}</td>
-          <td>{!! $archive->paymentStatusName() !!}</td>
-          <td>{!! $archive->orderStatus() !!}</td>
-          <td>{{ $archive->deleted_at->diffForHumans() }}</td>
-          <td class="row-options admin-row-actions">
-            @can('archive', $archive)
-              @include('admin.partials.ui.action_btn', ['href' => route('admin.order.order.restore', $archive->id), 'icon' => 'fa-database', 'title' => trans('app.restore')])
-            @endcan
-            @can('delete', $archive)
-              {!! Form::open(['route' => ['admin.order.order.destroy', $archive->id], 'method' => 'delete', 'class' => 'data-form admin-inline-form']) !!}
-              <button type="submit" class="admin-action-btn confirm ajax-silent" title="{{ trans('app.delete_permanently') }}" data-toggle="tooltip">
-                <i class="fa fa-trash-o"></i>
-              </button>
-              {!! Form::close() !!}
-            @endcan
-          </td>
-        </tr>
-      @endforeach
-    </tbody>
   </table>
 
   @include('admin.partials.ui.card_end')

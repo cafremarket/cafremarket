@@ -268,24 +268,19 @@ class HomeController extends Controller
         $type = strtolower((string) ($config->shipping_type ?? 'fixed'));
         $amount = match ($type) {
             'free' => 0.0,
-            'km' => $calculator->kmCharge(
-                $distanceKm,
-                (float) ($config->shipping_per_km_rate ?? 0),
-                (float) ($config->shipping_base_fee ?? 0)
-            ),
-            default => max(0.0, (float) ($config->shipping_fixed_rate ?? 0)),
+            default => max(0.0, (float) ($config->shipping_fixed_rate ?? $config->shipping_base_fee ?? 0)),
         };
 
         return ShippingOptionResource::collection(collect([(object) [
             'id' => 'location',
             'name' => $amount <= 0
                 ? (trans('theme.free_shipping') ?: 'Free shipping')
-                : ((trans('app.shipping') ?: 'Shipping').($distanceKm !== null ? ' ('.round($distanceKm, 1).' km)' : '')),
+                : (trans('app.shipping') ?: 'Shipping'),
             'shipping_zone_id' => null,
             'carrier_id' => null,
             'carrier_name' => trans('app.shipping') ?? 'Shipping',
             'rate' => $amount,
-            'delivery_takes' => $distanceKm !== null ? round($distanceKm, 1).' km' : null,
+            'delivery_takes' => null,
             'distance_km' => $distanceKm,
         ]]));
     }

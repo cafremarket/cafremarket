@@ -34,6 +34,11 @@
   </div>
 </div>
 
+<div class="form-group">
+  {!! Form::label('landmark', trans('theme.placeholder.landmark')) !!}
+  {!! Form::text('landmark', null, ['class' => 'form-control', 'placeholder' => trans('theme.placeholder.landmark')]) !!}
+</div>
+
 <div class="row">
   <div class="col-md-4 nopadding-right">
     <div class="form-group">

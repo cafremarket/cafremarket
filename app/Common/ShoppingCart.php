@@ -9,7 +9,6 @@ use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\Shop;
 use App\Services\Hyperlocal\BuyerLocationService;
-use App\Services\Hyperlocal\HyperlocalCatalogService;
 use App\Services\Inventory\StockService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -74,30 +73,20 @@ trait ShoppingCart
 
         $customer_id = $this->getCartOwnerId($request);
 
+        if (! $customer_id && ! $request->routeIs('direct.checkout')) {
+            return response()->json([
+                'message' => trans('theme.notify.please_login_to_checkout'),
+                'guest' => true,
+            ], 401);
+        }
+
         $items = Inventory::whereIn('slug', $slugsArray)->get();
 
         if ($items->count() == 0) {
             return response()->json(trans('theme.item_not_available'), 404);
         }
 
-        $catalog = app(HyperlocalCatalogService::class);
-        $buyerLocation = app(BuyerLocationService::class);
-        $isDirectCheckout = $request->routeIs('direct.checkout');
-
-        if (! $isDirectCheckout && $catalog->requiresLocationForBrowse() && ! $buyerLocation->hasLocation()) {
-            return response()->json([
-                'message' => trans('theme.set_location_to_shop'),
-                'require_location' => true,
-            ], 422);
-        }
-
         foreach ($items as $item) {
-            if (! $isDirectCheckout && $catalog->isEnabled() && ! $catalog->isShopDeliverable($item->shop_id)) {
-                return response()->json([
-                    'message' => trans('app.shop_outside_delivery_radius'),
-                ], 422);
-            }
-
             // Check if the item is a downloadable one
             $downloadable = $item->product->downloadable;
 
@@ -312,28 +301,9 @@ trait ShoppingCart
      */
     private function saveOrderFromCart(Request $request, Cart $cart)
     {
-        $catalog = app(HyperlocalCatalogService::class);
         $buyerLocation = app(BuyerLocationService::class);
         $customerLat = $request->customer_latitude ?? $request->latitude ?? $buyerLocation->latitude();
         $customerLng = $request->customer_longitude ?? $request->longitude ?? $buyerLocation->longitude();
-
-        // Skip when checkout already annotated delivery range for this cart.
-        $skipDeliveryRecheck = (bool) $request->boolean('delivery_validated')
-            || (isset($cart->out_of_range) && $cart->out_of_range === false);
-
-        if (! $skipDeliveryRecheck
-            && ($request->fulfilment_type ?? Order::FULFILMENT_TYPE_DELIVER) != Order::FULFILMENT_TYPE_PICKUP
-            && $catalog->isEnabled()) {
-            if (! $customerLat || ! $customerLng) {
-                throw new \Exception(trans('theme.set_location_to_shop'));
-            }
-
-            $shop = $cart->relationLoaded('shop') ? $cart->shop : Shop::find($cart->shop_id);
-
-            if ($shop && ! app(\App\Services\Shop\NearbyShopService::class)->isShopDeliverableTo($shop, (float) $customerLat, (float) $customerLng)) {
-                throw new \Exception(trans('app.shop_outside_delivery_radius'));
-            }
-        }
 
         // Save the order
         // Use getAttributes() — NOT toArray(). Loaded relations like shipTo() are

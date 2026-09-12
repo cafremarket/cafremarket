@@ -60,11 +60,9 @@
       @include('partials._field_error', ['field' => 'nuit'])
     </div>
 
-    <div class="sf-sell-form-group {{ $errors->has('slug') ? 'sf-sell-form-group--invalid' : '' }}">
+    <div class="sf-sell-form-group">
       {!! Form::label('slug', trans('app.slug')) !!}
-      {!! Form::text('slug', old('slug'), ['class' => 'sf-sell-form-control slug' . ($errors->has('slug') ? ' is-invalid' : ''), 'id' => 'shop_slug', 'placeholder' => trans('app.placeholder.slug'), 'pattern' => '[a-z0-9-]+', 'aria-invalid' => $errors->has('slug') ? 'true' : 'false', 'aria-describedby' => $errors->has('slug') ? 'error-slug' : null]) !!}
-      @include('partials._field_error', ['field' => 'slug'])
-      <p class="sf-sell-form-help">{{ trans('help.shop_url') }} — {{ url('/shop') }}/<span id="shop_slug_preview">{{ old('slug', 'your-store') }}</span></p>
+      <p class="sf-sell-form-help">{{ url('/shop') }}/<span id="shop_slug_preview">your-store</span></p>
     </div>
 
     <div class="sf-sell-form-row">
@@ -173,29 +171,16 @@
       }
 
       var shopName = document.getElementById('shop_name');
-      var slugInput = document.getElementById('shop_slug');
       var slugPreview = document.getElementById('shop_slug_preview');
-      var slugTouched = {{ old('slug') ? 'true' : 'false' }};
 
       function updatePreview() {
         if (slugPreview) {
-          slugPreview.textContent = slugInput && slugInput.value ? slugInput.value : 'your-store';
+          slugPreview.textContent = shopName && shopName.value ? slugify(shopName.value) : 'your-store';
         }
       }
 
-      if (shopName && slugInput) {
-        shopName.addEventListener('input', function() {
-          if (!slugTouched) {
-            slugInput.value = slugify(shopName.value);
-            updatePreview();
-          }
-        });
-
-        slugInput.addEventListener('input', function() {
-          slugTouched = true;
-          slugInput.value = slugify(slugInput.value);
-          updatePreview();
-        });
+      if (shopName) {
+        shopName.addEventListener('input', updatePreview);
       }
 
       updatePreview();

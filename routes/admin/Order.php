@@ -14,8 +14,6 @@ Route::get('order/{order}/adminNote', [OrderController::class, 'adminNote'])->na
 
 Route::put('order/{order}/adminNote', [OrderController::class, 'saveAdminNote'])->name('order.saveAdminNote');
 
-Route::delete('order/{order}/archive', [OrderController::class, 'archive'])->name('order.archive'); // order move to trash
-
 Route::get('/{order}/details', [OrderController::class, 'show'])->name('details'); // order Details
 
 // Bulk operations
@@ -34,8 +32,6 @@ Route::put('order/{order}/cancel', [OrderCancellationController::class, 'cancel'
 Route::get('cancellation', [OrderCancellationController::class, 'index'])->name('order.cancellation');
 
 Route::put('cancellation/{order}/{action}', [OrderCancellationController::class, 'handleCancellationRequest'])->name('cancellation.handle');
-
-Route::get('order/{order}/restore', [OrderController::class, 'restore'])->name('order.restore');
 
 Route::get('order/searchCustomer', [OrderController::class, 'searchCustomer'])->name('order.searchCustomer');
 

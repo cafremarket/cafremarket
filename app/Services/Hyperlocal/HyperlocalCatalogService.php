@@ -2,11 +2,12 @@
 
 namespace App\Services\Hyperlocal;
 
-use App\Models\Inventory;
+use App\Models\Customer;
 use App\Models\Shop;
 use App\Services\Shop\NearbyShopService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class HyperlocalCatalogService
 {
@@ -26,7 +27,28 @@ class HyperlocalCatalogService
 
     public function requiresLocationForBrowse(): bool
     {
-        return $this->isEnabled() && (bool) config('hyperlocal.require_location_for_browse', true);
+        // Guests and customers without a saved address can still browse.
+        // Distance is computed separately via canShowDistance().
+        return false;
+    }
+
+    /**
+     * Store distance is only shown when the customer is logged in
+     * and has a delivery address with coordinates on their account.
+     */
+    public function canShowDistance(): bool
+    {
+        if (! $this->isEnabled()) {
+            return false;
+        }
+
+        $customer = Auth::guard('customer')->user() ?? Auth::guard('api')->user();
+
+        if (! $customer instanceof Customer) {
+            return false;
+        }
+
+        return $this->buyerLocation->hasAccountCoordinates($customer);
     }
 
     /**
@@ -65,20 +87,8 @@ class HyperlocalCatalogService
 
     public function isShopDeliverable(int $shopId): bool
     {
-        if (! $this->isEnabled()) {
-            return true;
-        }
-
-        $lat = $this->buyerLocation->latitude();
-        $lng = $this->buyerLocation->longitude();
-
-        if (! $lat || ! $lng) {
-            return false;
-        }
-
-        $shop = Shop::find($shopId);
-
-        return $shop && $this->nearbyShops->isShopDeliverableTo($shop, $lat, $lng);
+        // Delivery radius is informational only — it must not block cart or checkout.
+        return true;
     }
 
     /**
@@ -86,7 +96,7 @@ class HyperlocalCatalogService
      */
     public function filterInventories(Collection $items): Collection
     {
-        if (! $this->isEnabled()) {
+        if (! $this->isEnabled() || ! $this->canShowDistance()) {
             return $items;
         }
 
@@ -104,7 +114,7 @@ class HyperlocalCatalogService
      */
     public function scopeInventoryQuery($query)
     {
-        if (! $this->isEnabled()) {
+        if (! $this->isEnabled() || ! $this->canShowDistance()) {
             return $query;
         }
 
@@ -139,19 +149,12 @@ class HyperlocalCatalogService
     }
 
     /**
-     * Shop ids that are outside their own delivery radius for the current buyer —
-     * still shown while browsing (no radius cutoff), but checkout will block them.
-     * Used to flag those products/shops on cards so buyers know before they try
-     * to check out.
+     * Delivery radius is informational only and must never block or warn —
+     * no shop is ever flagged "out of range" on product/listing cards.
      */
     public function outOfRangeShopIds(): array
     {
-        return $this->nearbyShopsWithDistance()
-            ->where('deliverable', false)
-            ->pluck('shop.id')
-            ->filter()
-            ->values()
-            ->all();
+        return [];
     }
 
     /**
@@ -161,6 +164,10 @@ class HyperlocalCatalogService
      */
     public function shopDistance(int $shopId): ?float
     {
+        if (! $this->canShowDistance()) {
+            return null;
+        }
+
         $lat = $this->buyerLocation->latitude();
         $lng = $this->buyerLocation->longitude();
 
@@ -226,11 +233,15 @@ class HyperlocalCatalogService
             return $this->cachedNearbyShops;
         }
 
+        if (! $this->canShowDistance()) {
+            return $this->cachedNearbyShops = $this->nearbyShops->allApproved();
+        }
+
         $lat = $this->buyerLocation->latitude();
         $lng = $this->buyerLocation->longitude();
 
         if (! $lat || ! $lng) {
-            return $this->cachedNearbyShops = collect();
+            return $this->cachedNearbyShops = $this->nearbyShops->allApproved();
         }
 
         return $this->cachedNearbyShops = $this->nearbyShops->find($lat, $lng);

@@ -13,12 +13,11 @@ class NearbyShopService
     }
 
     /**
-     * Find shops near a buyer location, sorted by distance (nearest first, farthest last).
-     * No radius cutoff — every shop with a resolvable location is included.
+     * Approved active shops used for browsing and nearby lists.
      */
-    public function find(float $latitude, float $longitude): Collection
+    public function approvedShops(): Collection
     {
-        $shops = Shop::query()
+        return Shop::query()
             ->approved()
             ->active()
             ->when(config('hyperlocal.require_inventory_for_nearby', false), function ($query) {
@@ -40,13 +39,40 @@ class NearbyShopService
                 'addresses',
             ])
             ->get();
+    }
 
-        return $shops
+    /**
+     * All approved shops without distance (guest / no-address browse).
+     */
+    public function allApproved(): Collection
+    {
+        return $this->approvedShops()
+            ->map(function ($shop) {
+                return [
+                    'shop' => $shop,
+                    'distance_km' => null,
+                    'deliverable' => true,
+                ];
+            })
+            ->values();
+    }
+
+    /**
+     * Find shops near a buyer location, sorted by distance (nearest first, farthest last).
+     * No radius cutoff — every shop with a resolvable location is included.
+     */
+    public function find(float $latitude, float $longitude): Collection
+    {
+        return $this->approvedShops()
             ->map(function ($shop) use ($latitude, $longitude) {
                 $address = $shop->storeAddress();
 
                 if (! $address || ! $address->latitude || ! $address->longitude) {
-                    return null;
+                    return [
+                        'shop' => $shop,
+                        'distance_km' => null,
+                        'deliverable' => true,
+                    ];
                 }
 
                 $distanceKm = $this->distance->distanceKm(
@@ -61,14 +87,12 @@ class NearbyShopService
                 return [
                     'shop' => $shop,
                     'distance_km' => $distanceKm,
-                    // Browsing has no cutoff (the shop still shows either way), but this
-                    // tells the UI whether it's actually within the shop's own delivery
-                    // radius — checkout blocks it otherwise, so cards should warn early.
                     'deliverable' => $distanceKm <= $shopRadius,
                 ];
             })
-            ->filter()
-            ->sortBy('distance_km')
+            ->sortBy(function ($row) {
+                return $row['distance_km'] === null ? PHP_FLOAT_MAX : $row['distance_km'];
+            })
             ->values();
     }
 

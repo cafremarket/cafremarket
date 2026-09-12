@@ -48,15 +48,10 @@ class CartDeliveryRangeService
             $radius = (float) ($shop->service_radius_km ?: config('hyperlocal.default_shop_service_radius_km', 5));
             $cart->service_radius_km = $radius;
 
-            if (! $lat || ! $lng) {
-                $cart->needs_delivery_location = true;
-
-                continue;
-            }
-
-            if (! $store || ! $store->latitude || ! $store->longitude) {
-                $cart->out_of_range = true;
-
+            // Delivery radius is informational only — it must never block cart
+            // or checkout, so out_of_range always stays false. Distance is
+            // still computed (when available) purely for display.
+            if (! $lat || ! $lng || ! $store || ! $store->latitude || ! $store->longitude) {
                 continue;
             }
 
@@ -67,7 +62,6 @@ class CartDeliveryRangeService
                 (float) $lng
             );
             $cart->delivery_distance_km = round($distance, 1);
-            $cart->out_of_range = $distance > $radius;
         }
 
         // Annotations are for API/UI checks only — never persist to carts table.
@@ -87,6 +81,7 @@ class CartDeliveryRangeService
     {
         $this->annotate(collect([$cart]));
 
-        return ! empty($cart->out_of_range) || ! empty($cart->needs_delivery_location);
+        // Radius is informational only and must not block checkout.
+        return false;
     }
 }

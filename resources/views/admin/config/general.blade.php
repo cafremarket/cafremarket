@@ -43,8 +43,7 @@
           <div class="form-group">
             <div class="row">
               <div class="col-sm-4 text-right">
-                {!! Form::label('slug', '*' . trans('app.slug') . ':', ['class' => 'with-help control-label']) !!}
-                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.shop_url') }}"></i>
+                {!! Form::label('slug', '*' . trans('app.slug') . ':', ['class' => 'control-label']) !!}
               </div>
               <div class="col-sm-8 nopadding-left">
                 @if ($can_update)

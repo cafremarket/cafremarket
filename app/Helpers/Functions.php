@@ -1020,7 +1020,7 @@ if (! function_exists('allow_checkout')) {
             return Auth::guard('customer')->user()->isApproved();
         }
 
-        return config('system_settings.allow_guest_checkout') || Auth::guard('customer')->check();
+        return Auth::guard('customer')->check();
     }
 }
 
@@ -1699,25 +1699,53 @@ if (! function_exists('verifyUniqueSlug')) {
 if (! function_exists('generate_unique_shop_slug')) {
     /**
      * Build a unique shop slug for the storefront URL (/shop/{slug}).
+     *
+     * Collisions are resolved by appending a fruit name (e.g. "shop-mango"),
+     * trying each fruit in order. In the astronomically unlikely case every
+     * fruit is also taken, an incrementing number is appended after the last
+     * fruit tried so this always terminates.
      */
     function generate_unique_shop_slug(string $name, ?int $exceptShopId = null): string
     {
-        $base = Str::slug($name) ?: 'shop';
-        $slug = $base;
-        $counter = 1;
+        static $fruits = [
+            'apple', 'mango', 'banana', 'papaya', 'orange', 'grape', 'melon',
+            'cherry', 'peach', 'plum', 'kiwi', 'guava', 'lemon', 'lime',
+            'coconut', 'pear', 'fig', 'date', 'olive', 'apricot', 'avocado',
+            'pineapple', 'watermelon', 'tangerine', 'nectarine', 'lychee',
+            'jackfruit', 'pomegranate', 'blueberry', 'raspberry', 'strawberry',
+            'cranberry', 'passionfruit', 'dragonfruit', 'cantaloupe',
+        ];
 
-        while (true) {
+        $base = Str::slug($name) ?: 'shop';
+
+        $isTaken = function (string $slug) use ($exceptShopId): bool {
             $query = DB::table('shops')->where('slug', $slug)->whereNull('deleted_at');
 
             if ($exceptShopId) {
                 $query->where('id', '!=', $exceptShopId);
             }
 
-            if (! $query->exists()) {
+            return $query->exists();
+        };
+
+        if (! $isTaken($base)) {
+            return $base;
+        }
+
+        foreach ($fruits as $fruit) {
+            $slug = $base.'-'.$fruit;
+            if (! $isTaken($slug)) {
                 return $slug;
             }
+        }
 
-            $slug = $base.'-'.$counter;
+        $counter = 2;
+        $lastFruit = end($fruits);
+        while (true) {
+            $slug = $base.'-'.$lastFruit.'-'.$counter;
+            if (! $isTaken($slug)) {
+                return $slug;
+            }
             $counter++;
         }
     }
@@ -2998,26 +3026,16 @@ if (! function_exists('get_item_location_shipping_options')) {
 
         $shopRadius = (float) (optional($item->shop)->service_radius_km
             ?: config('hyperlocal.default_shop_service_radius_km', 5));
-        $outOfRange = false;
-        if (hyperlocal_enabled() && $distanceKm !== null) {
-            $outOfRange = $distanceKm > $shopRadius;
+        $canShowDistance = app(\App\Services\Hyperlocal\HyperlocalCatalogService::class)->canShowDistance();
+        if (! $canShowDistance) {
+            $distanceKm = null;
         }
 
-        $label = $outOfRange
-            ? (trans('theme.out_of_delivery_range') ?: 'Out of delivery range')
-            : ($total <= 0
-                ? (trans('theme.free_shipping') ?: 'Free shipping')
-                : (trans('app.shipping') ?: 'Shipping'));
-
-        // Only surface range errors as delivery_takes — never distance labels.
-        $distanceLabel = null;
-        if ($outOfRange) {
-            $distanceLabel = trans('theme.notify.product_out_of_delivery_range', [
-                'store' => optional($item->shop)->name ?? 'Store',
-                'distance' => round($distanceKm, 1),
-                'radius' => round($shopRadius, 1),
-            ]);
-        }
+        // Delivery radius is informational only — it must never block or warn,
+        // so shipping is never marked "out of range" here.
+        $label = $total <= 0
+            ? (trans('theme.free_shipping') ?: 'Free shipping')
+            : (trans('app.shipping') ?: 'Shipping');
 
         return collect([(object) [
             'id' => 'location',
@@ -3027,13 +3045,13 @@ if (! function_exists('get_item_location_shipping_options')) {
             'carrier' => (object) ['name' => ' '],
             'carrier_name' => trans('app.shipping') ?? 'Shipping',
             // Include handling so PDP / shipping option UIs show the full delivery charge.
-            'rate' => $outOfRange ? null : round($total, 6),
+            'rate' => round($total, 6),
             'based_on' => 'location',
             'minimum' => 0,
             'maximum' => $shopRadius,
-            'delivery_takes' => $distanceLabel,
+            'delivery_takes' => null,
             'distance_km' => $distanceKm,
-            'out_of_range' => $outOfRange,
+            'out_of_range' => false,
             'service_radius_km' => $shopRadius,
         ]]);
     }
@@ -3742,12 +3760,26 @@ if (! function_exists('buyer_has_location')) {
     }
 }
 
+if (! function_exists('customer_can_see_store_distance')) {
+    /**
+     * Distance is shown only to logged-in customers with a saved address.
+     */
+    function customer_can_see_store_distance(): bool
+    {
+        return app(\App\Services\Hyperlocal\HyperlocalCatalogService::class)->canShowDistance();
+    }
+}
+
 if (! function_exists('buyer_delivery_address_label')) {
     /**
      * Unified delivery address label for header, homepage, and store pages.
      */
     function buyer_delivery_address_label(): ?string
     {
+        if (! customer_can_see_store_distance()) {
+            return null;
+        }
+
         $service = app(\App\Services\Hyperlocal\BuyerLocationService::class);
 
         if (! $service->hasLocation()) {

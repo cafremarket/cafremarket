@@ -43,19 +43,25 @@
         </div>
       </div>
 
-      @if (buyer_has_location())
+      @if (customer_can_see_store_distance())
         @include('theme::partials._no_stores_message', [
           'title' => trans('theme.no_store_found'),
           'message' => trans('theme.no_stores_nearby'),
           'showLocationButton' => true,
           'locationButtonText' => trans('theme.change_location'),
         ])
+      @elseif (Auth::guard('customer')->check())
+        @include('theme::partials._no_stores_message', [
+          'title' => trans('theme.no_store_found'),
+          'message' => trans('theme.add_delivery_address_help'),
+          'showLocationButton' => true,
+          'locationButtonText' => trans('theme.set_delivery_location'),
+        ])
       @else
         @include('theme::partials._no_stores_message', [
           'title' => trans('theme.no_store_found'),
-          'message' => trans('theme.set_location_to_see_products'),
-          'showLocationButton' => true,
-          'locationButtonText' => trans('theme.set_delivery_location'),
+          'message' => trans('theme.browse_all_stores'),
+          'showLocationButton' => false,
         ])
       @endif
     </div>
