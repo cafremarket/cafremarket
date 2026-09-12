@@ -2081,8 +2081,19 @@ if (! function_exists('get_formated_gender')) {
      */
     function get_formated_gender($sex, $show_icon = true)
     {
+        // trans(null) returns the Translator object, which JSON-encodes as {}.
+        // The mobile app then fails for customers who never set a gender.
+        if ($sex === null || $sex === '') {
+            return null;
+        }
+
+        $label = trans((string) $sex);
+        if (! is_string($label) || $label === '') {
+            $label = (string) $sex;
+        }
+
         if (! $show_icon) {
-            return trans($sex);
+            return $label;
         }
 
         $icon = '';
@@ -2092,7 +2103,7 @@ if (! function_exists('get_formated_gender')) {
             $icon = "<i class='fa fa-venus'></i> ";
         }
 
-        return $icon.trans($sex);
+        return $icon.$label;
     }
 }
 

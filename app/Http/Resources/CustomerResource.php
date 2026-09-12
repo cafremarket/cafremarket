@@ -20,7 +20,7 @@ class CustomerResource extends JsonResource
             'nice_name' => $this->nice_name,
             'dob' => $this->dob ? $this->dob : null,
             // 'dob' => $this->dob ? date('F j, Y', strtotime($this->dob)) : null,
-            'sex' => $this->sex ? trans($this->sex) : null,
+            'sex' => get_formated_gender($this->sex, false),
             'description' => $this->description,
             'active' => $this->active,
             'email' => $this->email,
@@ -33,11 +33,17 @@ class CustomerResource extends JsonResource
         ];
 
         if (is_incevio_package_loaded('buyerGroup')) {
+            $details = $this->buyer_group_application_details;
+            if (is_string($details) && $details !== '') {
+                $unserialized = @unserialize($details);
+                $details = $unserialized === false ? null : $unserialized;
+            }
+
             $customer_data = array_merge($customer_data, [
                 'buyer_group_id' => $this->buyer_group_id,
                 'buyer_group_requested_id' => $this->buyer_group_requested_id,
                 'buyer_group_application_status' => $this->buyer_group_application_status,
-                'buyer_group_application_details' => unserialize($this->buyer_group_application_details),
+                'buyer_group_application_details' => $details,
             ]);
         }
 

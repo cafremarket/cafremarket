@@ -117,7 +117,7 @@ class HomeController extends Controller
                         $address = $row['shop']->storeAddress();
 
                         return array_merge(
-                            (new ShopLightResource($row['shop']))->toArray($request),
+                            (new ShopLightResource($row['shop']))->resolve($request),
                             [
                                 'distance_km' => $row['distance_km'],
                                 'deliverable' => $row['deliverable'],

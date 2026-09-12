@@ -26,8 +26,8 @@ class DashboardResource extends JsonResource
             'orders_count' => $this->orders_count,
             'disputes_count' => $this->disputes_count,
             'coupons_count' => $this->coupons_count,
-            'member_since' => $this->created_at->diffForHumans(),
-            'updated_at' => $this->updated_at->diffForHumans(),
+            'member_since' => optional($this->created_at)->diffForHumans(),
+            'updated_at' => optional($this->updated_at)->diffForHumans(),
             'avatar' => get_storage_file_url(optional($this->avatarImage)->path, 'small'),
             // 'avatar' => (new ImageResource($this->image))->size('small'),
         ];

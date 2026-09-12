@@ -52,17 +52,19 @@ class ItemResource extends JsonResource
                 get_formated_currency($this->offer_price, config('system_settings.decimals', 2)) : null,
             'discount' => $this->hasOffer() ?
                 trans('theme.percent_off', ['value' => $this->discount_percentage()]) : null,
-            'offer_start' => $this->hasOffer() ? (string) $this->offer_start : null,
-            'offer_end' => $this->hasOffer() ? (string) $this->offer_end : null,
+            'offer_start' => $this->hasOffer() && $this->offer_start ? (string) $this->offer_start : null,
+            'offer_end' => $this->hasOffer() && $this->offer_end ? (string) $this->offer_end : null,
             'shipping_weight' => get_formated_weight($this->shipping_weight),
             'attributes' => AttributeColorResource::collection($this->whenLoaded('attributeValues')->unique('attribute_id')),
             'images' => ImageResource::collection($this->whenLoaded('images')),
             'image_id' => $this->when($this->whenLoaded('image'), optional($this->image)->id),
             'rating' => $this->rating(),
             'feedbacks_count' => $this->rating() ? $this->avgFeedback->count : 0,
-            'feedbacks' => FeedbackResource::collection($this->whenLoaded('latestFeedbacks')),
+            'feedbacks' => $this->relationLoaded('latestFeedbacks')
+                ? array_values(FeedbackResource::collection($this->latestFeedbacks ?? collect())->resolve())
+                : [],
             'shop' => array_merge(
-                (new ShopLightResource($this->shop))->toArray($request),
+                (new ShopLightResource($this->shop))->resolve($request),
                 ['distance_km' => app(\App\Services\Hyperlocal\HyperlocalCatalogService::class)->shopDistance($this->shop_id)]
             ),
             'product' => new ProductResource($this->product),

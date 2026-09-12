@@ -36,8 +36,8 @@ class ListingResource extends JsonResource
             'price' => get_formated_currency($this->sale_price, config('system_settings.decimals', 2)),
             'offer_price' => $this->hasOffer() ? get_formated_currency($this->offer_price, config('system_settings.decimals', 2)) : null,
             'discount' => $this->hasOffer() ? trans('theme.percent_off', ['value' => $this->discount_percentage()]) : null,
-            'offer_start' => $this->hasOffer() ? (string) $this->offer_start : null,
-            'offer_end' => $this->hasOffer() ? (string) $this->offer_end : null,
+            'offer_start' => $this->hasOffer() && $this->offer_start ? (string) $this->offer_start : null,
+            'offer_end' => $this->hasOffer() && $this->offer_end ? (string) $this->offer_end : null,
 
             $this->mergeWhen(is_incevio_package_loaded('auction'), [
                 'auctionable' => $this->auctionable ? true : false,
@@ -54,7 +54,7 @@ class ListingResource extends JsonResource
             'hot_item' => $this->orders_count >= config('system.popular.hot_item.sell_count', 3) ? true : false,
             'rating' => $this->rating(),
             'feedbacks_count' => $this->rating() ? $this->avgFeedback->count : 0,
-            'labels' => $this->getLabels(),
+            'labels' => array_values($this->getLabels() ?? []),
             'listed_at' => date('F j, Y', strtotime($this->available_from)),
             'image' => get_inventory_img_src($this, 'medium'),
         ];

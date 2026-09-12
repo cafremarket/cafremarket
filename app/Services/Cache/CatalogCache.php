@@ -67,7 +67,7 @@ class CatalogCache
             $suffix = hyperlocal_location_cache_suffix();
         }
 
-        return 'api:'.$bucket.':v'.$version.':'.$key.$suffix;
+        return 'api:v2:'.$bucket.':v'.$version.':'.$key.$suffix;
     }
 
     public static function geoKey(float $lat, float $lng): string

@@ -30,7 +30,9 @@ class ShopResource extends JsonResource
             'image' => get_logo_url($this, 'full'),
             'rating' => $this->rating(),
             'feedbacks_count' => $this->rating() ? $this->avgFeedback->count : 0,
-            'feedbacks' => FeedbackResource::collection($this->latestFeedbacks),
+            'feedbacks' => array_values(
+                FeedbackResource::collection($this->latestFeedbacks ?? collect())->resolve()
+            ),
         ];
     }
 }

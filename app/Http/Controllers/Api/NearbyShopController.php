@@ -30,8 +30,8 @@ class NearbyShopController extends Controller
                 'data' => $results->map(function ($row) use ($request) {
                     $address = $row['shop']->storeAddress();
 
-                    return array_merge(
-                        (new ShopLightResource($row['shop']))->toArray($request),
+                        return array_merge(
+                            (new ShopLightResource($row['shop']))->resolve($request),
                         [
                             'distance_km' => $row['distance_km'],
                             'deliverable' => $row['deliverable'],

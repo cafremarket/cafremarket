@@ -130,6 +130,13 @@ return [
             'path' => storage_path('logs/wallet.log'),
             'level' => 'debug',
         ],
+
+        'api' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/api.log'),
+            'level' => env('API_LOG_LEVEL', env('LOG_LEVEL', 'debug')),
+            'days' => 14,
+        ],
     ],
 
 ];
