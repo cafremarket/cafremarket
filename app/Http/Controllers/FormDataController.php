@@ -89,7 +89,7 @@ class FormDataController extends Controller
      */
     public function delivery_boys()
     {
-        return ListHelper::deliveryBoys();
+        return ListHelper::deliveryBoysDetailed();
     }
 
     /**

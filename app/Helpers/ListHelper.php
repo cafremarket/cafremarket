@@ -1779,6 +1779,36 @@ class ListHelper
     }
 
     /**
+     * Active shop riders with id, display name, and email for assign dropdowns.
+     */
+    public static function deliveryBoysDetailed($shop_id = null)
+    {
+        $shop_id = $shop_id ?? Auth::user()->merchantId();
+
+        return DB::table('delivery_boys')
+            ->where('shop_id', $shop_id)
+            ->where('status', BaseModel::ACTIVE)
+            ->orderBy('nice_name', 'asc')
+            ->get(['id', 'nice_name', 'first_name', 'last_name', 'email'])
+            ->map(function ($boy) {
+                $name = trim((string) $boy->nice_name);
+                if ($name === '') {
+                    $name = trim(implode(' ', array_filter([
+                        $boy->first_name,
+                        $boy->last_name,
+                    ])));
+                }
+
+                return [
+                    'id' => (int) $boy->id,
+                    'name' => $name !== '' ? $name : ('#'.$boy->id),
+                    'email' => (string) ($boy->email ?? ''),
+                ];
+            })
+            ->values();
+    }
+
+    /**
      * Return attribute list for the given product
      *
      * @return Collection
