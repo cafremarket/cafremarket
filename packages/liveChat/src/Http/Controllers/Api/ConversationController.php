@@ -58,7 +58,7 @@ class ConversationController extends Controller
             return ConversationResource::collection($conversations);
         }
 
-        return response()->json([]);
+        return ConversationResource::collection(collect());
     }
 
     /**
@@ -96,7 +96,9 @@ class ConversationController extends Controller
             ]);
         }
 
-        return response()->json([]);
+        return response()->json([
+            'message' => trans('api.welcome_chat'),
+        ]);
     }
 
     /**
