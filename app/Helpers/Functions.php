@@ -3680,6 +3680,70 @@ if (! function_exists('is_stripe_configured')) {
     }
 }
 
+if (! function_exists('chat_socket_client_url')) {
+    /**
+     * Public WebSocket URL for mobile/web clients.
+     * Built from CHAT_SOCKET_* env so it can change on the server without app releases.
+     */
+    function chat_socket_client_url(): string
+    {
+        $scheme = rtrim((string) config('chat_socket.scheme', 'ws'), ':');
+        $host = trim((string) config('chat_socket.client_host', '127.0.0.1'));
+        $port = (int) config('chat_socket.port', 6002);
+        $path = trim((string) config('chat_socket.client_path', ''));
+
+        if ($path !== '' && $path[0] !== '/') {
+            $path = '/'.$path;
+        }
+
+        if ($host === '') {
+            return '';
+        }
+
+        // With an explicit path (e.g. nginx location) omit port.
+        if ($path !== '') {
+            return $scheme.'://'.$host.$path;
+        }
+
+        // wss/https on default 443 — omit port (subdomain proxy).
+        if (in_array($scheme, ['wss', 'https'], true) && ($port === 443 || $port <= 0)) {
+            return $scheme.'://'.$host;
+        }
+
+        // ws/http on default 80 — omit port.
+        if (in_array($scheme, ['ws', 'http'], true) && ($port === 80 || $port <= 0)) {
+            return $scheme.'://'.$host;
+        }
+
+        if ($port > 0) {
+            return $scheme.'://'.$host.':'.$port;
+        }
+
+        return $scheme.'://'.$host;
+    }
+}
+
+if (! function_exists('chat_socket_client_config')) {
+    /**
+     * Structured chat socket client settings for API consumers.
+     */
+    function chat_socket_client_config(): array
+    {
+        $scheme = rtrim((string) config('chat_socket.scheme', 'ws'), ':');
+        $host = trim((string) config('chat_socket.client_host', '127.0.0.1'));
+        $port = (int) config('chat_socket.port', 6002);
+        $path = trim((string) config('chat_socket.client_path', ''));
+
+        return [
+            'url' => chat_socket_client_url(),
+            'scheme' => $scheme,
+            'host' => $host,
+            'port' => $port,
+            'path' => $path,
+        ];
+    }
+}
+
 if (! function_exists('get_chat_room_name')) {
     /**
      * Return marketplace chat room name

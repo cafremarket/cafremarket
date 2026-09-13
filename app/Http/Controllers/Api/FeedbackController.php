@@ -7,12 +7,13 @@ use App\Http\Requests\DeliveryBoy\DeliveryBoyFeedbackCreateRequest;
 use App\Http\Requests\Validations\ProductFeedbackCreateRequest;
 use App\Http\Requests\Validations\ShopFeedbackCreateRequest;
 use App\Http\Resources\FeedbackResource;
+use App\Http\Resources\ReviewResource;
 use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\Shop;
+use App\Services\Review\ReviewService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class FeedbackController extends Controller
 {
@@ -26,6 +27,14 @@ class FeedbackController extends Controller
     public function show_shop_feedbacks(Request $request, $slug)
     {
         $shop = Shop::where('slug', $slug)->firstOrFail();
+
+        // Prefer rebuilt reviews table; fall back to legacy feedbacks if empty.
+        $reviews = $shop->reviews()->with(['customer', 'attachments'])
+            ->paginate(config('mobile_app.view_listing_per_page', 8));
+
+        if ($reviews->total() > 0) {
+            return ReviewResource::collection($reviews);
+        }
 
         return FeedbackResource::collection($shop->feedbacks()->paginate());
     }
@@ -41,6 +50,13 @@ class FeedbackController extends Controller
     {
         $item = Inventory::where('slug', $slug)->firstOrFail();
 
+        $reviews = $item->reviews()->with(['customer', 'attachments'])
+            ->paginate(config('mobile_app.view_listing_per_page', 8));
+
+        if ($reviews->total() > 0) {
+            return ReviewResource::collection($reviews);
+        }
+
         return FeedbackResource::collection($item->feedbacks()->paginate());
     }
 
@@ -50,16 +66,13 @@ class FeedbackController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function save_shop_feedbacks(ShopFeedbackCreateRequest $request, Order $order)
+    public function save_shop_feedbacks(ShopFeedbackCreateRequest $request, Order $order, ReviewService $reviews)
     {
-        if ($order->feedback_id) {
-            return response()->json([
-                'message' => trans('api.you_already_gave_feedback'),
-            ], 200);
+        try {
+            $reviews->createStoreReview($order->customer, $order->shop, $request->all(), $order);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
-
-        $feedback = $order->shop->feedbacks()->create($request->all());
-        $order->feedback_given($feedback->id);
 
         return response()->json(['message' => trans('api.your_feedback_saved')], 200);
     }
@@ -91,25 +104,20 @@ class FeedbackController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function save_product_feedbacks(ProductFeedbackCreateRequest $request, Order $order)
+    public function save_product_feedbacks(ProductFeedbackCreateRequest $request, Order $order, ReviewService $reviews)
     {
         $inputs = $request->input('items');
-        $customer_id = Auth::guard('api')->user()->id; // Set customer_id
 
         foreach ($order->inventories as $inventory) {
-            // Skip the item that is not present or given feedback before
-            if (! isset($inputs[$inventory->id]) || $inventory->pivot->feedback_id) {
+            if (! isset($inputs[$inventory->id])) {
                 continue;
             }
 
-            $feedback_data = $inputs[$inventory->id];
-            $feedback_data['customer_id'] = $customer_id;
-
-            $feedback = $inventory->feedbacks()->create($feedback_data);
-
-            // Update feedback_id in order_items table
-            DB::table('order_items')->where('order_id', $inventory->pivot->order_id)
-                ->where('inventory_id', $inventory->id)->update(['feedback_id' => $feedback->id]);
+            try {
+                $reviews->createProductReview($order->customer, $inventory, $inputs[$inventory->id], $order);
+            } catch (ValidationException $e) {
+                continue;
+            }
         }
 
         return response()->json(['message' => trans('api.your_feedback_saved')], 200);

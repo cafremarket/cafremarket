@@ -94,6 +94,16 @@ class SystemConfigResource extends JsonResource
             'address_show_map' => (bool) $attr('address_show_map'),
             'enable_chat' => true,
             'vendor_get_paid' => (bool) vendor_get_paid_directly(),
+            // Live chat WebSocket — apps must use this (changeable via server .env).
+            'chat_socket' => function_exists('chat_socket_client_config')
+                ? chat_socket_client_config()
+                : [
+                    'url' => '',
+                    'scheme' => (string) config('chat_socket.scheme', 'ws'),
+                    'host' => (string) config('chat_socket.client_host', ''),
+                    'port' => (int) config('chat_socket.port', 6002),
+                    'path' => (string) config('chat_socket.client_path', ''),
+                ],
             'currency' => $currencyArr ? [
                 'name' => $currencyArr['name'] ?? null,
                 'iso_code' => $currencyArr['iso_code'] ?? null,
