@@ -11,6 +11,7 @@ use App\Http\Resources\CurrencyResource;
 use App\Http\Resources\ManufacturerLightResource;
 use App\Http\Resources\ManufacturerResource;
 use App\Http\Resources\PageResource;
+use App\Http\Resources\PopupResource;
 use App\Http\Resources\PaymentMethodResource;
 use App\Http\Resources\ShippingOptionResource;
 use App\Http\Resources\ShopLightResource;
@@ -24,6 +25,7 @@ use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Manufacturer;
 use App\Models\Page;
+use App\Models\Popup;
 use App\Models\PaymentMethod;
 use App\Models\Shop;
 use App\Models\Slider;
@@ -99,6 +101,31 @@ class HomeController extends Controller
     }
 
     /**
+     * Get the single highest-priority popup matching the requesting platform/page/viewer,
+     * per the admin's targeting rules. Returns an empty payload when nothing matches.
+     *
+     * @return \Illuminate\Http\Resources\Json\JsonResource
+     */
+    public function popups(Request $request)
+    {
+        $platform = $request->get('platform', Popup::PLATFORM_WEB);
+        $page = $request->get('page', Popup::PAGE_ALL);
+        $userType = $request->get('user_type', Popup::USER_TYPE_GUEST);
+
+        return $this->rememberApi("popup:{$platform}:{$page}:{$userType}", function () use ($platform, $page, $userType) {
+            $popup = Popup::with('featureImage')
+                ->scheduled()
+                ->forPlatform($platform)
+                ->forPage($page)
+                ->forUserType($userType)
+                ->orderBy('priority')
+                ->first();
+
+            return ['data' => $popup ? (new PopupResource($popup))->resolve() : null];
+        }, 60);
+    }
+
+    /**
      * Display Basic Details of all shops.
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection The collection of ShopLightResource
@@ -133,7 +160,7 @@ class HomeController extends Controller
         return $this->rememberApi('shops:all', function () {
             $shops = Shop::with([
                 'logoImage:path,imageable_id,imageable_type',
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
             ])
                 ->withCount([
                     'inventories' => function ($q) {
@@ -161,7 +188,7 @@ class HomeController extends Controller
         return $this->rememberApi('shop:'.$slug, function () use ($slug) {
             $shop = Shop::where('slug', $slug)->approved()
                 ->with([
-                    'latestFeedbacks' => function ($q) {
+                    'latestReviews' => function ($q) {
                         $q->with('customer:id,nice_name,name')->take(3);
                     },
                 ])

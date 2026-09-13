@@ -117,21 +117,24 @@
             </a>
 
             @unless ($order->isCanceled())
-              <a href="{{ route('order.invoice', $order) }}" class="btn btn-default btn-sm">
-                <i class="fa fa-file-pdf-o" aria-hidden="true"></i> @lang('theme.invoice')
-              </a>
+            <a href="{{ route('order.invoice', $order) }}" class="btn btn-default btn-sm">
+              <i class="fa fa-file-pdf-o" aria-hidden="true"></i> @lang('theme.invoice')
+            </a>
+          @endunless
 
-              @if ($order->dispute)
-                <a href="{{ route('dispute.open', $order) }}" class="btn btn-default btn-sm" data-confirm="@lang('theme.confirm_action.open_a_dispute')">
-                  <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
-                  @lang('theme.dispute_detail')
-                </a>
-              @else
-                <a href="{{ route('dispute.open', $order) }}" class="confirm btn btn-default btn-sm" data-confirm="@lang('theme.confirm_action.open_a_dispute')">
-                  <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
-                  @lang('theme.button.open_dispute')
-                </a>
-              @endif
+            @if ($order->dispute)
+              <a href="{{ route('dispute.open', $order) }}" class="btn btn-default btn-sm">
+                <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+                @lang('theme.dispute_detail')
+              </a>
+            @else
+              <a href="{{ route('dispute.open', $order) }}" class="confirm btn btn-default btn-sm" data-confirm="@lang('theme.confirm_action.open_a_dispute')">
+                <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+                @lang('theme.button.open_dispute')
+              </a>
+            @endif
+
+            @unless ($order->isCanceled())
 
               @if ($order->canBeCanceled())
                 {!! Form::model($order, ['method' => 'PUT', 'route' => ['order.cancel', $order]]) !!}

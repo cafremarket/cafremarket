@@ -26,11 +26,7 @@
 
           @include('theme::partials._reply')
 
-          <div class="form-group my-4">
-            <label>
-              {!! Form::checkbox('solved', null, null, ['class' => 'i-check']) !!} {{ trans('theme.mark_as_solved') }}
-            </label>
-          </div>
+          <p class="text-muted">{{ trans('theme.only_admin_can_close') }}</p>
 
           <button type="submit" class="btn btn-primary btn-block btn-lg btn-round mt-3">
             {{ trans('theme.button.submit') }}

@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\NearbyShopController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\PaymentCredentialController;
+use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Support\Facades\Route;
 use Incevio\Package\LiveChat\Http\Controllers\Api\ConversationController;
 use Incevio\Package\OtpLogin\Http\Controllers\Api\PhoneVerificationController;
@@ -33,6 +34,7 @@ Route::middleware('customerApp')->group(function () {
     // Homepage
     Route::get('sliders', [HomeController::class, 'sliders']);
     Route::get('banners', [HomeController::class, 'banners']);
+    Route::get('popups', [HomeController::class, 'popups']);
     Route::get('page/{slug}', [HomeController::class, 'page']);
     Route::get('currencies', [HomeController::class, 'currencies']);
     Route::get('system_configs', [HomeController::class, 'system_configs']);
@@ -59,6 +61,8 @@ Route::middleware('customerApp')->group(function () {
     Route::get('shop/{slug}/listings', [ListingController::class, 'shop']);
     Route::get('shop/{slug}/feedbacks', [FeedbackController::class, 'show_shop_feedbacks']);
     Route::post('shop/{order}/feedback', [FeedbackController::class, 'save_shop_feedbacks']);
+    Route::get('shop/{slug}/reviews', [ReviewController::class, 'show_shop_reviews']);
+    Route::post('shop/{order}/review', [ReviewController::class, 'save_shop_review']);
     Route::get('shop/{shop}/contact', [ConversationController::class, 'conversation']);
     Route::post('shop/{shop}/contact', [ConversationController::class, 'save_conversation']);
     Route::get('shop/{slug}/warehouses', [HomeController::class, 'showAllWarehousesOfShop']);
@@ -80,6 +84,7 @@ Route::middleware('customerApp')->group(function () {
     Route::get('listing/category-grp/{slug}', [ListingController::class, 'categoryGroup']);
     Route::post('listing/{item}/shipTo', [ListingController::class, 'shipTo']);
     Route::get('listing/{slug}/feedbacks', [FeedbackController::class, 'show_item_feedbacks']);
+    Route::get('listing/{slug}/reviews', [ReviewController::class, 'show_item_reviews']);
     Route::get('recently_viewed_items', [ListingController::class, 'recently_viewed']);
 
     // Location lookup (public — same geocode as web; save stays auth-only)
@@ -157,6 +162,13 @@ Route::middleware('customerApp')->group(function () {
         Route::post('order/{order}/conversation', [OrderController::class, 'save_conversation']);
         Route::get('order/{order}/track', [OrderController::class, 'track']);
         Route::post('order/{order}/feedback', [FeedbackController::class, 'save_product_feedbacks']);
+        Route::post('order/{order}/review', [ReviewController::class, 'save_product_review']);
+
+        // Reviews - eligibility + write-directly-from-product/shop-page
+        Route::get('shop/{slug}/reviews/eligibility', [ReviewController::class, 'shop_review_eligibility']);
+        Route::post('shop/{slug}/reviews', [ReviewController::class, 'store_shop_review']);
+        Route::get('listing/{slug}/reviews/eligibility', [ReviewController::class, 'product_review_eligibility']);
+        Route::post('listing/{slug}/reviews', [ReviewController::class, 'store_product_review']);
         Route::post('order/{order}/goodsReceived', [OrderController::class, 'goods_received']);
 
         // eMola order status + resend (mobile app polling)
@@ -175,6 +187,7 @@ Route::middleware('customerApp')->group(function () {
         Route::post('dispute/{dispute}/response', [DisputeController::class, 'response']);
         Route::post('dispute/{dispute}/appeal', [DisputeController::class, 'appeal']);
         Route::put('dispute/{dispute}/solved', [DisputeController::class, 'mark_as_solved']);
+        Route::post('dispute/{dispute}/request-close', [DisputeController::class, 'request_close']);
         Route::get('attachment/{attachment}/download', [AttachmentController::class, 'download']);
 
         Route::get('customer/location', [CustomerLocationController::class, 'show']);

@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Admin;
-use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\MerchantSwitchToCustomer;
 use App\Http\Controllers\Merchant\DashboardController as MerchantDashboardController;
@@ -20,14 +19,7 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
     ])->name('createCustomer');
 
     Route::name('account.')->prefix('account')->group(function () {
-        Route::get('profile', [AccountController::class, 'profile'])->name('profile');
-        Route::get('billing', [AccountController::class, 'profile'])->name('billing');
-        Route::put('update', [AccountController::class, 'update'])->name('update');
-        Route::get('changePasswordForm', [AccountController::class, 'ShowChangePasswordForm'])->name('showChangePasswordForm');
-        Route::post('updatePassword', [AccountController::class, 'updatePassword'])->name('updatePassword');
-        Route::post('updatePhoto', [AccountController::class, 'updatePhoto'])->name('updatePhoto');
-        Route::get('deletePhoto', [AccountController::class, 'deletePhoto'])->name('deletePhoto');
-
+        include 'admin/Account.php';
         include 'admin/Billing.php';
     });
 
@@ -132,6 +124,38 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
                 \App\Http\Controllers\Merchant\DisputeController::class,
                 'response',
             ])->name('dispute.response');
+
+            Route::post('dispute/{dispute}/resolved', [
+                \App\Http\Controllers\Merchant\DisputeController::class,
+                'markResolved',
+            ])->name('dispute.resolved');
+
+            Route::post('dispute/{dispute}/request-close', [
+                \App\Http\Controllers\Merchant\DisputeController::class,
+                'requestClose',
+            ])->name('dispute.requestClose');
+        });
+
+        Route::name('review.')->prefix('review')->group(function () {
+            Route::get('/', [
+                \App\Http\Controllers\Merchant\ReviewController::class,
+                'index',
+            ])->name('index');
+
+            Route::get('{review}', [
+                \App\Http\Controllers\Merchant\ReviewController::class,
+                'show',
+            ])->name('show');
+
+            Route::post('{review}/reply', [
+                \App\Http\Controllers\Merchant\ReviewController::class,
+                'reply',
+            ])->name('reply');
+
+            Route::post('{review}/request-delete', [
+                \App\Http\Controllers\Merchant\ReviewController::class,
+                'requestDelete',
+            ])->name('requestDelete');
         });
     });
 

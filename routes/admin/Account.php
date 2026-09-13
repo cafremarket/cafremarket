@@ -10,12 +10,12 @@ Route::get('profile', [
 
 Route::get('billing', [
     AccountController::class,
-    'profile',
+    'billing',
 ])->name('billing');
 
 Route::get('ticket', [
     AccountController::class,
-    'profile',
+    'ticket',
 ])->name('ticket');
 
 Route::put('update', [

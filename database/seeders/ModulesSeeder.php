@@ -72,6 +72,11 @@ class ModulesSeeder extends BaseSeeder
             'actions' => 'view,add,edit,delete',
         ],
 
+        'Delivery Boy' => [
+            'access' => 'Merchant',
+            'actions' => 'view,add,edit,delete',
+        ],
+
         'Dispute' => [
             'access' => 'Common',
             'actions' => 'view,response',
@@ -120,6 +125,11 @@ class ModulesSeeder extends BaseSeeder
         'Refund' => [
             'access' => 'Common',
             'actions' => 'view,initiate,update,approve',
+        ],
+
+        'Review' => [
+            'access' => 'Common',
+            'actions' => 'view,reply,request_delete',
         ],
 
         'Role' => [

@@ -38,8 +38,10 @@ class SubscriptionController extends Controller
      */
     public function subscribe(Request $request, $plan, $merchant = null)
     {
+        $this->authorizeMerchantBilling($merchant);
+
         if (config('app.demo') == true && $request->user()->merchantId() <= config('system.demo.shops', 1)) {
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with('warning', trans('messages.demo_restriction'));
         }
 
@@ -47,7 +49,7 @@ class SubscriptionController extends Controller
         $paymentMethod = (string) $request->input('payment_method', 'wallet');
 
         if (requires_stripe_card_for_subscription() && ! $merchant->hasBillingToken()) {
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with('error', trans('messages.no_card_added'));
         }
 
@@ -56,7 +58,7 @@ class SubscriptionController extends Controller
             $currentPlan = $merchant->getCurrentPlan();
 
             if ($currentPlan && ! $this->validateSubscriptionSwap($subscription)) {
-                return redirect()->route('admin.account.billing')->with(
+                return redirect()->to(mp_route('admin.account.billing'))->with(
                     'error',
                     trans('messages.using_more_resource', ['plan' => $subscription->name])
                 );
@@ -68,7 +70,7 @@ class SubscriptionController extends Controller
                 && subscription_charges_immediately($merchant, $subscription)
                 && (float) (optional($merchant->merchantShop())->balance ?? 0) < (float) $subscription->cost
             ) {
-                return redirect()->route('admin.account.billing')
+                return redirect()->to(mp_route('admin.account.billing'))
                     ->with('error', trans('packages.wallet.insufficient_funds'));
             }
 
@@ -87,12 +89,12 @@ class SubscriptionController extends Controller
                     return redirect()->to(url($path.'?ref='.urlencode($pending['ref'])));
                 }
 
-                return redirect()->route('admin.account.billing')
+                return redirect()->to(mp_route('admin.account.billing'))
                     ->with('error', trans('messages.subscription_payment_failed'));
             }
 
             if ($currentPlan && $currentPlan->stripe_price === $plan) {
-                return redirect()->route('admin.account.billing')
+                return redirect()->to(mp_route('admin.account.billing'))
                     ->with('success', trans('messages.subscribed'));
             }
 
@@ -127,11 +129,11 @@ class SubscriptionController extends Controller
                 ? trans('packages.wallet.insufficient_funds')
                 : ($e->getMessage() ?: trans('messages.subscription_error'));
 
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with('error', $message);
         }
 
-        return redirect()->route('admin.account.billing')
+        return redirect()->to(mp_route('admin.account.billing'))
             ->with('success', trans('messages.subscribed'));
     }
 
@@ -142,8 +144,10 @@ class SubscriptionController extends Controller
      */
     public function updateCardInfo(Request $request)
     {
+        $this->authorizeMerchantBilling();
+
         if (config('app.demo') == true && $request->user()->merchantId() <= config('system.demo.shops', 1)) {
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with('warning', trans('messages.demo_restriction'));
         }
 
@@ -159,11 +163,11 @@ class SubscriptionController extends Controller
 
             $request->user()->shop->forceFill(['card_holder_name' => $request->input('name')])->save();
 
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with('success', trans('messages.card_updated'));
         }
 
-        return redirect()->route('admin.account.billing')
+        return redirect()->to(mp_route('admin.account.billing'))
             ->with('error', trans('messages.trouble_validating_card'))->withInput();
     }
 
@@ -174,11 +178,13 @@ class SubscriptionController extends Controller
      */
     public function resumeSubscription(Request $request)
     {
+        $this->authorizeMerchantBilling();
+
         if (
             config('app.demo') == true &&
             $request->user()->merchantId() <= config('system.demo.shops', 1)
         ) {
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with('warning', trans('messages.demo_restriction'));
         }
 
@@ -187,11 +193,11 @@ class SubscriptionController extends Controller
         } catch (\Stripe\Error\Card $e) {
             $response = $e->getJsonBody();
 
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with('error', $response['error']['message']);
         }
 
-        return redirect()->route('admin.account.billing')
+        return redirect()->to(mp_route('admin.account.billing'))
             ->with('success', trans('messages.subscription_resumed'));
     }
 
@@ -202,8 +208,10 @@ class SubscriptionController extends Controller
      */
     public function cancelSubscription(Request $request)
     {
+        $this->authorizeMerchantBilling();
+
         if (config('app.demo') == true && $request->user()->merchantId() <= config('system.demo.shops', 1)) {
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with('warning', trans('messages.demo_restriction'));
         }
 
@@ -236,14 +244,14 @@ class SubscriptionController extends Controller
         } catch (\Stripe\Error\Card $e) {
             $response = $e->getJsonBody();
 
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with(['error' => $response['error']['message']]);
         } catch (\Exception $e) {
-            return redirect()->route('admin.account.billing')
+            return redirect()->to(mp_route('admin.account.billing'))
                 ->with(['error' => $e->getMessage()]);
         }
 
-        return redirect()->route('admin.account.billing')
+        return redirect()->to(mp_route('admin.account.billing'))
             ->with('success', $isWallet
                 ? trans('messages.subscription_removed')
                 : trans('messages.subscription_cancelled'));
@@ -315,10 +323,30 @@ class SubscriptionController extends Controller
 
     public function invoice(Request $request, $invoiceId)
     {
+        $this->authorizeMerchantBilling();
+
         return $request->user()->shop
             ->downloadInvoice($invoiceId, [
                 'vendor' => get_platform_title(),
                 'product' => trans('app.subscription_fee'),
             ]);
+    }
+
+    /**
+     * Billing is for shop owners, or platform admins acting for a merchant.
+     */
+    private function authorizeMerchantBilling($merchantId = null): void
+    {
+        $user = Auth::user();
+
+        if ($user->isFromPlatform()) {
+            return;
+        }
+
+        if ($merchantId && (int) $merchantId !== (int) $user->id) {
+            abort_unless($user->isFromPlatform(), 403);
+        }
+
+        abort_unless($user->isMerchant(), 403);
     }
 }

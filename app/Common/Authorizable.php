@@ -48,6 +48,7 @@ trait Authorizable
         'reply' => 'reply',
         'response' => 'response',
         'storeResponse' => 'response',
+        'close' => 'response',
         'edit' => 'edit',
         'update' => 'edit',
         'massUpdate' => 'edit',
@@ -67,6 +68,9 @@ trait Authorizable
         'emptyTrash' => 'delete',
         'secretLogin' => 'login',
         'assign' => 'assign',
+        'resetPassword' => 'edit',
+        'resetPasswordForm' => 'edit',
+        'requestDelete' => 'request_delete',
         'user' => 'view',
         'dashboard' => 'view',
         'deliveryboys' => 'fulfill',
@@ -204,6 +208,10 @@ trait Authorizable
         $temp1 = explode('.', Request::route()->getName());
         $module = $module ? $module : array_slice($temp1, -2, 1)[0];
         $action = $action ? $action : array_slice($temp1, -1, 1)[0];
+
+        if ($module === 'deliveryboy') {
+            $module = 'delivery_boy';
+        }
 
         if ($action === 'dashboard') {
             return 'dashboard';

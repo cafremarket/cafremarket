@@ -3500,10 +3500,10 @@ if (! function_exists('get_dispute_status_name')) {
                 return trans('app.statuses.appealed');
             case Dispute::STATUS_SOLVED:
                 return trans('app.statuses.solved');
+            case Dispute::STATUS_CLOSE_REQUESTED:
+                return trans('app.statuses.close_requested');
             case Dispute::STATUS_CLOSED:
                 return trans('app.statuses.closed');
-                // case Dispute::STATUS_REFUNDED:
-                //     return trans('app.statuses.refunded');
             default:
                 return '';
         }
@@ -3747,7 +3747,7 @@ if (! function_exists('get_nearby_featured_items')) {
             ->whereIn('shop_id', $shopIds)
             ->where('active', 1)
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'image:path,imageable_id,imageable_type',
                 'shop:id,name,slug',
             ])
@@ -4054,7 +4054,7 @@ if (! function_exists('get_deal_of_the_day')) {
                 
                 ->select(ListHelper::common_select_attr('inventory'))
                 ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'image:path,imageable_id,imageable_type',
                 ])
                 ->get()
@@ -4101,7 +4101,7 @@ if (! function_exists('get_featured_items')) {
                 })
                 ->select(ListHelper::common_select_attr('inventory'))
                 ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'image:path,imageable_id,imageable_type',
                 ])
                 ->get()
@@ -4374,5 +4374,46 @@ if (! function_exists('ensure_default_category_sub_group_id')) {
         }
 
         return (int) $subGroup->id;
+    }
+}
+
+if (! function_exists('current_popup_page_key')) {
+    /**
+     * Map the current storefront route to one of the Popup model's predefined
+     * page-targeting keys, so admin rules can match against it.
+     */
+    function current_popup_page_key(): string
+    {
+        $routeName = \Illuminate\Support\Facades\Route::currentRouteName();
+
+        return match (true) {
+            $routeName === 'homepage' => \App\Models\Popup::PAGE_HOME,
+            $routeName === 'show.product' => \App\Models\Popup::PAGE_PRODUCT,
+            in_array($routeName, ['category.browse', 'categories.browse', 'categoryGrp.browse', 'shop.category.browse'], true) => \App\Models\Popup::PAGE_CATEGORY,
+            $routeName === 'cart.index' => \App\Models\Popup::PAGE_CART,
+            in_array($routeName, ['cart.checkout', 'direct.checkout'], true) => \App\Models\Popup::PAGE_CHECKOUT,
+            default => \App\Models\Popup::PAGE_ALL,
+        };
+    }
+}
+
+if (! function_exists('get_matching_web_popup')) {
+    /**
+     * The single highest-priority popup (if any) targeted at the current
+     * storefront page for the current viewer.
+     */
+    function get_matching_web_popup(): ?\App\Models\Popup
+    {
+        $userType = \Illuminate\Support\Facades\Auth::guard('customer')->check()
+            ? \App\Models\Popup::USER_TYPE_CUSTOMER
+            : \App\Models\Popup::USER_TYPE_GUEST;
+
+        return \App\Models\Popup::with('featureImage')
+            ->scheduled()
+            ->forPlatform(\App\Models\Popup::PLATFORM_WEB)
+            ->forPage(current_popup_page_key())
+            ->forUserType($userType)
+            ->orderBy('priority')
+            ->first();
     }
 }

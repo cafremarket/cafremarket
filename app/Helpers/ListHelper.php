@@ -186,26 +186,35 @@ class ListHelper
      */
     public static function dispute_statuses()
     {
-        if (Auth::user() instanceof Customer) {
-            $statuses = [
+        $user = Auth::user() ?: Auth::guard('customer')->user() ?: Auth::guard('api')->user();
+
+        if ($user instanceof Customer) {
+            return [
                 Dispute::STATUS_OPEN => trans('app.statuses.open'),
+                Dispute::STATUS_WAITING => trans('app.statuses.waiting'),
                 Dispute::STATUS_SOLVED => trans('app.statuses.solved'),
             ];
-        } else {
-            $statuses = [
+        }
+
+        $isPlatform = $user && method_exists($user, 'isFromPlatform') && $user->isFromPlatform();
+
+        if ($isPlatform) {
+            return [
                 Dispute::STATUS_NEW => trans('app.statuses.new'),
                 Dispute::STATUS_OPEN => trans('app.statuses.open'),
                 Dispute::STATUS_WAITING => trans('app.statuses.waiting'),
                 Dispute::STATUS_SOLVED => trans('app.statuses.solved'),
+                Dispute::STATUS_CLOSE_REQUESTED => trans('app.statuses.close_requested'),
                 Dispute::STATUS_CLOSED => trans('app.statuses.closed'),
             ];
         }
 
-        if (! Auth::user() instanceof Customer && auth()->user()->isFromPlatform()) {
-            $statuses[Dispute::STATUS_APPEALED] = trans('app.statuses.appealed');
-        }
-
-        return $statuses;
+        return [
+            Dispute::STATUS_NEW => trans('app.statuses.new'),
+            Dispute::STATUS_OPEN => trans('app.statuses.open'),
+            Dispute::STATUS_WAITING => trans('app.statuses.waiting'),
+            Dispute::STATUS_SOLVED => trans('app.statuses.solved'),
+        ];
     }
 
     /**
@@ -585,6 +594,100 @@ class ListHelper
     public static function modulesWithPermissions()
     {
         return Module::active()->with('permissions')->orderBy('name', 'asc')->get();
+    }
+
+    /**
+     * Modules staff can be granted on the new merchant store panel.
+     */
+    public static function storePanelModuleNames(): array
+    {
+        return [
+            'Product',
+            'Category',
+            'Attribute',
+            'Manufacturer',
+            'Inventory',
+            'Warehouse',
+            'Order',
+            'Refund',
+            'Delivery Boy',
+            'User',
+            'Role',
+            'Config',
+            'Dispute',
+            'Chat Conversation',
+            'Review',
+        ];
+    }
+
+    /**
+     * Permission groups that match the store panel sidebar.
+     * Extra groups are used on platform/admin role forms.
+     */
+    public static function rolePermissionGroups(): array
+    {
+        return [
+            'catalog' => [
+                'label' => trans('nav.catalog') ?? 'Catalog',
+                'icon' => 'fa-tags',
+                'modules' => ['Product', 'Category', 'Attribute', 'Manufacturer'],
+            ],
+            'inventory' => [
+                'label' => trans('nav.stock') ?? 'Inventory',
+                'icon' => 'fa-cubes',
+                'modules' => ['Inventory', 'Warehouse'],
+            ],
+            'orders' => [
+                'label' => trans('nav.orders') ?? 'Orders',
+                'icon' => 'fa-shopping-cart',
+                'modules' => ['Order', 'Refund'],
+            ],
+            'delivery' => [
+                'label' => trans('nav.delivery') ?? 'Delivery',
+                'icon' => 'fa-truck',
+                'modules' => ['Delivery Boy'],
+            ],
+            'staff' => [
+                'label' => trans('nav.staff') ?? 'Staff',
+                'icon' => 'fa-users',
+                'modules' => ['User', 'Role'],
+            ],
+            'support' => [
+                'label' => trans('nav.support') ?? 'Support',
+                'icon' => 'fa-life-ring',
+                'modules' => ['Dispute', 'Chat Conversation', 'Ticket', 'Message'],
+            ],
+            'reviews' => [
+                'label' => trans('nav.reviews') ?? 'Reviews',
+                'icon' => 'fa-star',
+                'modules' => ['Review', 'Review Moderation'],
+            ],
+            'store' => [
+                'label' => trans('nav.store_management') ?? 'Store',
+                'icon' => 'fa-shopping-bag',
+                'modules' => ['Config', 'Appearance'],
+            ],
+            'customers' => [
+                'label' => trans('nav.customers') ?? 'Customers',
+                'icon' => 'fa-user',
+                'modules' => ['Customer', 'Cart'],
+            ],
+            'vendors' => [
+                'label' => trans('nav.vendors') ?? 'Vendors',
+                'icon' => 'fa-briefcase',
+                'modules' => ['Vendor'],
+            ],
+            'shipping' => [
+                'label' => trans('nav.shipping') ?? 'Shipping',
+                'icon' => 'fa-ship',
+                'modules' => ['Carrier', 'Shipping Zone', 'Shipping Rate', 'Tax', 'Supplier'],
+            ],
+            'platform' => [
+                'label' => trans('nav.settings') ?? 'Platform',
+                'icon' => 'fa-cogs',
+                'modules' => ['System Config', 'Utility', 'Category Group', 'Category Sub Group', 'Wallet'],
+            ],
+        ];
     }
 
     /**
@@ -1003,7 +1106,7 @@ class ListHelper
                 ->where('active', 1)
                 ->whereNull('parent_id')
                 ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'image:path,imageable_id,imageable_type',
                 ]);
 
@@ -1144,7 +1247,7 @@ class ListHelper
                     $query->approved();
                 })
                 ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'image:path,imageable_id,imageable_type',
                     'product.featureImage:path,imageable_id,imageable_type,type',
                     'product.image:path,imageable_id,imageable_type',
@@ -1181,7 +1284,7 @@ class ListHelper
                 
                 ->whereNull('parent_id')
                 ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'image:path,imageable_id,imageable_type',
                 ])->whereHas('product', function ($query) {
                     $query->where('downloadable', true);
@@ -1225,7 +1328,7 @@ class ListHelper
                     $query->approved();
                 })
                 ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'image:path,imageable_id,imageable_type',
                     'product.featureImage:path,imageable_id,imageable_type,type',
                     'product.image:path,imageable_id,imageable_type',
@@ -1303,7 +1406,7 @@ class ListHelper
             })
             ->select(static::common_select_attr('inventory'))
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'image:path,imageable_id,imageable_type',
             ])
             ->inRandomOrder()
@@ -1331,7 +1434,7 @@ class ListHelper
             })
             ->select(static::common_select_attr('inventory'))
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'image:path,imageable_id,imageable_type',
             ])
             ->where('parent_id', null)
@@ -1356,7 +1459,7 @@ class ListHelper
             })
             ->select(static::common_select_attr('inventory'))
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'image:path,imageable_id,imageable_type',
             ])
             ->inRandomOrder()
@@ -1377,7 +1480,7 @@ class ListHelper
                 Inventory::available()
                     ->select(static::common_select_attr('inventory'))
                     ->with([
-                        'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                        'reviewSummary:rating,count,reviewable_id,reviewable_type',
                         'image:path,imageable_id,imageable_type',
                     ])
                     ->where('parent_id', null)
@@ -1411,7 +1514,7 @@ class ListHelper
                 ->select(static::common_select_attr('inventory'))
                 ->whereNull('parent_id')
                 ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'image:path,imageable_id,imageable_type',
                 ])->orderByRaw('FIELD(id, '.implode(',', $products).')')  // To get data order by products id whatever has like [2,5,3,7]
                 ->get();

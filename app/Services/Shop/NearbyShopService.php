@@ -54,7 +54,7 @@ class NearbyShopService
                 'logoImage',
                 'config',
                 'owner:id,name',
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'primaryAddress',
                 'addresses',
             ])

@@ -29,9 +29,9 @@ class ShopResource extends JsonResource
             'pickup_enabled' => false,
             'image' => get_logo_url($this, 'full'),
             'rating' => $this->rating(),
-            'feedbacks_count' => $this->rating() ? $this->avgFeedback->count : 0,
+            'feedbacks_count' => $this->rating() ? $this->reviewSummary->count : 0,
             'feedbacks' => array_values(
-                FeedbackResource::collection($this->latestFeedbacks ?? collect())->resolve()
+                ReviewResource::collection($this->latestReviews ?? collect())->resolve()
             ),
         ];
     }

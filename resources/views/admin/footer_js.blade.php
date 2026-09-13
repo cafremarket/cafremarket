@@ -1219,17 +1219,17 @@
       checkboxClass: 'icheckbox_flat-pink',
       radioClass: 'iradio_flat-pink'
     });
-    //iCheck line checkbox and radio
+    //iCheck line checkbox and radio — switch chip (never a Bootstrap form-control)
     $('.icheckbox_line').each(function() {
       var self = $(this),
         label = self.next(),
-        label_text = label.text();
+        label_text = $.trim(label.text());
 
       label.remove();
       self.iCheck({
         checkboxClass: 'icheckbox_line-pink',
         radioClass: 'iradio_line-pink',
-        insert: '<div class="icheck_line-icon form-control"></div>' + label_text
+        insert: '<span class="icheck_line-icon" aria-hidden="true"></span><span class="icheck_line-text">' + $('<div>').text(label_text).html() + '</span>'
       });
     });
 
@@ -1273,31 +1273,51 @@
     //END shipping zone
 
     //User Role form
+    function syncRolePermissionGroups() {
+      $('.role-perm__group').each(function() {
+        var visible = $(this).find('.role-perm__row').filter(function() {
+          return !this.hasAttribute('hidden') && $(this).css('display') !== 'none';
+        }).length;
+        $(this).toggle(visible > 0);
+      });
+    }
+
     $("#user-role-status").change(function() {
       var temp = $("#user-role-status").select2('data')[0].text;
       var roleType = temp.toLowerCase();
-      var rows = $('table#tbl-permissions tr');
+      var rows = $('.role-perm__row');
       var platform = rows.filter('.platform-module');
       var merchant = rows.filter('.merchant-module');
+      var storePanel = rows.filter('.store-panel-module');
+      var notStore = rows.filter('.not-store-panel-module');
 
       switch (roleType) {
         case 'platform':
-          platform.show();
-          merchant.hide();
+          platform.removeAttr('hidden');
+          merchant.attr('hidden', true);
           merchant.find("input[type='checkbox']").iCheck('uncheck');
+          rows.filter('.common-module').removeAttr('hidden');
+          notStore.filter('.common-module, .platform-module').removeAttr('hidden');
           break;
         case 'merchant':
-          platform.hide();
-          merchant.show();
+          platform.attr('hidden', true);
           platform.find("input[type='checkbox']").iCheck('uncheck');
+          storePanel.filter('.merchant-module, .common-module').removeAttr('hidden');
+          notStore.attr('hidden', true);
+          notStore.find("input[type='checkbox']").iCheck('uncheck');
           break;
         default:
-          platform.hide();
-          merchant.hide();
+          platform.attr('hidden', true);
+          merchant.attr('hidden', true);
           merchant.find("input[type='checkbox']").iCheck('uncheck');
           platform.find("input[type='checkbox']").iCheck('uncheck');
       }
+      syncRolePermissionGroups();
     });
+
+    if ($('.role-perm').length) {
+      syncRolePermissionGroups();
+    }
 
     $('input.role-module').on('ifChecked', function() {
       var selfId = $(this).attr('id');

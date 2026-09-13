@@ -77,10 +77,6 @@
   {!! Form::textarea('description', null, ['class' => 'form-control summernote', 'rows' => '2', 'placeholder' => trans('app.placeholder.biography')]) !!}
 </div>
 
-@unless (isset($user))
-  @include('address._form')
-@endunless
-
 <div class="form-group">
   <label for="exampleInputFile">{{ trans('app.form.avatar') }}</label>
   @if (isset($user) && $user->avatarImage)

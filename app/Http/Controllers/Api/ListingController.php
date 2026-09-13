@@ -127,7 +127,7 @@ class ListingController extends Controller
             ->whereHas('shop', function ($q) {
                 $q->approved();
             })
-            ->with('avgFeedback:rating,count,feedbackable_id,feedbackable_type')
+            ->with('reviewSummary:rating,count,reviewable_id,reviewable_type')
             ->firstOrFail();
 
         // Auction listings
@@ -146,7 +146,7 @@ class ListingController extends Controller
                 $q->select('id', 'attribute_values.attribute_id', 'value', 'color', 'order')
                     ->with('attribute:id,name,attribute_type_id,order')->orderBy('order');
             },
-            'latestFeedbacks' => function ($q) {
+            'latestReviews' => function ($q) {
                 $q->with('customer:id,nice_name,name')->take(3);
             },
             'image:id,path,imageable_id,imageable_type',
@@ -281,7 +281,7 @@ class ListingController extends Controller
                 $q->available()->whereNull('parent_id');
             },
             // 'inventories.attributeValues.attribute',
-            'inventories.avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+            'inventories.reviewSummary:rating,count,reviewable_id,reviewable_type',
         ])->firstOrFail();
 
         return new OfferResource($product);
@@ -341,7 +341,7 @@ class ListingController extends Controller
         // Filter results
         $listings = $all_products->filter($request->all())
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'image:path,imageable_id,imageable_type',
             ])
             ->paginate(config('mobile_app.view_listing_per_page', 8))
@@ -375,7 +375,7 @@ class ListingController extends Controller
             // because it additionally enforces shop->active() + zipcode filtering.
             ->where('active', 1)
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'image:path,imageable_id,imageable_type',
             ])
             ->withCount([
@@ -408,7 +408,7 @@ class ListingController extends Controller
                 $q->select(['id', 'current_billing_plan', 'active'])->active();
             })
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'image:path,imageable_id,imageable_type',
             ])
             ->withCount([
@@ -433,7 +433,7 @@ class ListingController extends Controller
         $listings = Inventory::whereIn('id', $ids)->available()
             ->select(ListHelper::common_select_attr('inventory'))
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'image:path,imageable_id,imageable_type',
             ])
             ->where('parent_id', null)->get();
@@ -570,7 +570,7 @@ class ListingController extends Controller
         $products = $products->paginate(config('mobile_app.view_listing_per_page', 8));
 
         // Load avg rating
-        $products = $products->load('avgFeedback:rating,count,feedbackable_id');
+        $products = $products->load('reviewSummary:rating,count,reviewable_id');
 
         return ListingResource::collection($products);
     }

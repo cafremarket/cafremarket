@@ -1,6 +1,6 @@
 <div class="modal-dialog modal-md">
   <div class="modal-content">
-    {!! Form::model($ticket, ['method' => 'POST', 'route' => ['admin.account.ticket.storeReply', $ticket->id], 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
+    {!! Form::model($ticket, ['method' => 'POST', 'url' => mp_route('admin.account.ticket.storeReply', $ticket->id), 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       {{ trans('app.reply') }}

@@ -4,7 +4,6 @@ namespace App\Http\Requests\Validations;
 
 use App\Http\Requests\Request;
 use App\Models\Customer;
-use Illuminate\Validation\Rule;
 
 class CreateDisputeRequest extends Request
 {
@@ -33,7 +32,7 @@ class CreateDisputeRequest extends Request
 
         $this->merge(['refund_amount' => get_system_currency_value($this->input('refund_amount'), $order->currency_id)]);
 
-        $max = $order->exchange_rate ? $order->grand_total * $order->exchange_rate : $order->grand_total;
+        $max = $order->grand_total;
 
         Request::merge([
             'order_id' => $order->id,
@@ -48,7 +47,7 @@ class CreateDisputeRequest extends Request
             'dispute_type_id' => 'required',
             'order_received' => 'required',
             'description' => 'required',
-            'product_id' => Rule::requiredIf($this->order_received == 1),
+            'product_id' => 'nullable',
             'refund_amount' => 'required|numeric|max:'.$max,
         ];
     }

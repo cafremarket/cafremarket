@@ -18,9 +18,9 @@ class InventoryFilter extends ModelFilter
 
     public function rating($rating)
     {
-        return $this->whereHas('feedbacks', function ($query) use ($rating) {
+        return $this->whereHas('reviews', function ($query) use ($rating) {
             return $query->select('rating')
-                ->groupBy('feedbackable_id')->havingRaw('AVG(rating) >= ?', [$rating]);
+                ->groupBy('reviewable_id')->havingRaw('AVG(rating) >= ?', [$rating]);
         });
     }
 

@@ -32,6 +32,10 @@ class NotifyMerchantDisputeCreated implements ShouldQueue
      */
     public function handle(DisputeCreated $event)
     {
+        if ($event->dispute->raised_by === \App\Models\Dispute::RAISED_BY_VENDOR) {
+            return;
+        }
+
         if (! config('shop_settings')) {
             setShopConfig($event->dispute->shop_id);
         }

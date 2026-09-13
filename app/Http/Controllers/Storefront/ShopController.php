@@ -6,8 +6,8 @@ use App\Helpers\ListHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\BrowseProductRequest;
 use App\Models\Banner;
-use App\Models\Feedback;
 use App\Models\Inventory;
+use App\Models\Review;
 use App\Models\Shop;
 use App\Models\Slider;
 use App\Services\Hyperlocal\BuyerLocationService;
@@ -128,7 +128,7 @@ class ShopController extends Controller
         $all_products = Inventory::where('shop_id', $shop->id)
             ->whereNull('parent_id')
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'image:path,imageable_id,imageable_type',
             ])
             ->withCount(['orders' => function (\Illuminate\Database\Eloquent\Builder $q) use ($now) {
@@ -207,7 +207,7 @@ class ShopController extends Controller
 
         $products = $listingsBase
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'shop:id,slug,name,id_verified,phone_verified,address_verified',
                 'image:path,imageable_id,imageable_type',
             ])
@@ -239,12 +239,26 @@ class ShopController extends Controller
             return response()->view('theme::errors.503', [], 503);
         }
 
-        $reviews = Feedback::where([
-            ['feedbackable_id', '=', $shop->id],
-            ['feedbackable_type', '=', 'App\Models\Shop'],
+        $reviews = Review::where([
+            ['reviewable_id', '=', $shop->id],
+            ['reviewable_type', '=', Shop::class],
         ])->with('customer:id,nice_name,name')
             ->latest()->paginate(5);
 
-        return view('theme::shop', compact('shop', 'reviews'));
+        $canReviewStore = false;
+        $myStoreReview = null;
+
+        if (\Illuminate\Support\Facades\Auth::guard('customer')->check()) {
+            $customer = \Illuminate\Support\Facades\Auth::guard('customer')->user();
+            $myStoreReview = Review::where('customer_id', $customer->id)
+                ->where('reviewable_type', Shop::class)
+                ->where('reviewable_id', $shop->id)
+                ->first();
+
+            $canReviewStore = (bool) app(\App\Services\Review\ReviewEligibilityService::class)
+                ->canReviewStore($customer, $shop);
+        }
+
+        return view('theme::shop', compact('shop', 'reviews', 'canReviewStore', 'myStoreReview'));
     }
 }

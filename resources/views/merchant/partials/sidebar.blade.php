@@ -21,7 +21,7 @@
             <span>{{ trans('nav.dashboard') }}</span>
           </a>
 
-          @if (optional(Auth::user()->shop)->exists && ! Auth::user()->shop->isVerified())
+          @if (Auth::user()->isMerchant() && optional(Auth::user()->shop)->exists && ! Auth::user()->shop->isVerified())
             <a href="{{ route('merchant.verify') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/verify*') ? 'is-active' : '' }}">
               <i class="fa fa-shield"></i>
               <span>{{ trans('app.get_verified') }}</span>

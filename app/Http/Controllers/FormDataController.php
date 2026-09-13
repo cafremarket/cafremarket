@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ListHelper;
 use App\Models\Category;
+use App\Models\DisputeType;
 use App\Models\Product;
 use App\Models\Shop;
 use Illuminate\Http\Request;
@@ -319,6 +320,11 @@ class FormDataController extends Controller
     public function dispute_statuses()
     {
         return ListHelper::dispute_statuses();
+    }
+
+    public function dispute_types()
+    {
+        return DisputeType::orderBy('id')->pluck('detail', 'id');
     }
 
     /**

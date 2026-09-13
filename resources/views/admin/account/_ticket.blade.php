@@ -14,7 +14,7 @@
 				@foreach($tickets as $ticket )
 					<tr>
 						<td>
-							<a href="{{ route('admin.account.ticket.show', $ticket->id) }}">{{ $ticket->subject }}</a>
+							<a href="{{ mp_route('admin.account.ticket.show', $ticket->id) }}">{{ $ticket->subject }}</a>
 		                    <span class="indent5">
 								{!! $ticket->statusName() !!}
 							</span>
@@ -32,7 +32,7 @@
 		</table>
 	</div>
 	<div class="col-xs-12">
-		<a href="javascript:void(0)" data-link="{{ route('admin.account.ticket.create') }}" class="ajax-modal-btn btn btn-lg btn-new btn-flat">
+		<a href="javascript:void(0)" data-link="{{ mp_route('admin.account.ticket.create') }}" class="ajax-modal-btn btn btn-lg btn-new btn-flat">
 			<i class="fa fa-ticket"></i>
 			{{ trans('app.submit_a_ticket') }}
 		</a>

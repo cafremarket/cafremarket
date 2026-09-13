@@ -27,6 +27,8 @@ class WalletController extends Controller
             return view('theme::dashboard', compact('tab', 'content'));
         }
 
+        abort_unless(Auth::check() && Auth::user()->isMerchant(), 403);
+
         $wallet = Auth::user()->shop;
         $wallet->load('wallet');
         $transactions = $wallet->transactions()->get();

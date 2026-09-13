@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Common\CascadeSoftDeletes;
-use App\Common\Feedbackable;
 use App\Common\Imageable;
 use App\Common\Taggable;
 use App\Common\Translatable;
@@ -15,7 +14,7 @@ use Laravel\Scout\Searchable;
 
 class Product extends Inspectable
 {
-    use CascadeSoftDeletes, Feedbackable, HasFactory, Imageable, Searchable, SoftDeletes, Taggable, Translatable;
+    use CascadeSoftDeletes, HasFactory, Imageable, Searchable, SoftDeletes, Taggable, Translatable;
 
     /**
      * The database table used by the model.

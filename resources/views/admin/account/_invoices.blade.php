@@ -22,7 +22,7 @@
               <td>{{ trans('app.' . $invoice->status) }}</td>
               <td>{{ $invoice->total() }}</td>
               <td>
-                <a href="{{ route('admin.account.subscription.invoice', $invoice->id) }}"><i class="fa fa-cloud-download" data-toggle="tooltip" data-placement="top" title="{{ trans('app.download') }}"></i></a>
+                <a href="{{ mp_route('admin.account.subscription.invoice', $invoice->id) }}"><i class="fa fa-cloud-download" data-toggle="tooltip" data-placement="top" title="{{ trans('app.download') }}"></i></a>
               </td>
             </tr>
           @endforeach

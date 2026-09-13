@@ -22,6 +22,8 @@ return [
     '404_hint' => 'Verifique o URL ou use um dos links abaixo para continuar.',
     'go_to_homepage' => 'Ir para a Página Inicial',
     'go_to_dashboard' => 'Ir para o Painel',
+    'permission_denied_message' => 'Não tem permissão para aceder a esta página. Peça a um administrador se precisar de acesso.',
+    'permission_denied_hint' => 'Se isto parecer incorreto, contacte o administrador da conta ou tente outra secção.',
     'no_file_was_uploaded' => 'No file was uploaded.',
     'error_uploading_file' => 'Error uploading file',
     'model_not_defined' => 'The model is not defined!',

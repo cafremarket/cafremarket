@@ -45,8 +45,43 @@ class AccountController extends Controller
     public function profile()
     {
         $profile = $this->profile->profile();
+        $section = 'profile';
 
-        return view('admin.account.index', compact('profile'));
+        return view('admin.account.index', compact('profile', 'section'));
+    }
+
+    /**
+     * Show billing / subscription management (shop owner only).
+     *
+     * @return \Illuminate\View\View
+     */
+    public function billing()
+    {
+        abort_unless(Auth::user()->isMerchant(), 403);
+
+        $profile = $this->profile->profile();
+        $section = 'billing';
+
+        return view('admin.account.index', compact('profile', 'section'));
+    }
+
+    /**
+     * Show support tickets for the current user.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function ticket()
+    {
+        abort_unless(
+            Auth::user()->isMerchant()
+                || (new Authorize(Auth::user(), 'view_ticket'))->check(),
+            403
+        );
+
+        $profile = $this->profile->profile();
+        $section = 'ticket';
+
+        return view('admin.account.index', compact('profile', 'section'));
     }
 
     /**
@@ -57,9 +92,7 @@ class AccountController extends Controller
      */
     public function showTicket(Ticket $ticket)
     {
-        if (! (new Authorize(Auth::user(), 'view_ticket', $ticket))->check()) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorizeAccountTicketAccess($ticket);
 
         return view('admin.account.show_ticket', compact('ticket'));
     }
@@ -71,6 +104,8 @@ class AccountController extends Controller
      */
     public function createTicket()
     {
+        $this->authorizeAccountTicketList();
+
         return view('admin.account._create_ticket');
     }
 
@@ -82,6 +117,8 @@ class AccountController extends Controller
      */
     public function storeTicket(CreateTicketRequest $request)
     {
+        $this->authorizeAccountTicketList();
+
         $ticket = Ticket::create($request->all());
 
         if ($request->hasFile('attachments')) {
@@ -97,7 +134,7 @@ class AccountController extends Controller
 
         event(new TicketCreated($ticket));
 
-        return redirect()->route('admin.account.ticket')
+        return redirect()->to(mp_route('admin.account.ticket'))
             ->with('success', trans('messages.created', ['model' => trans('app.model.ticket')]));
     }
 
@@ -109,6 +146,8 @@ class AccountController extends Controller
      */
     public function replyTicket(Ticket $ticket)
     {
+        $this->authorizeAccountTicketAccess($ticket);
+
         return view('admin.account._reply_ticket', compact('ticket'));
     }
 
@@ -121,7 +160,10 @@ class AccountController extends Controller
      */
     public function storeTicketReply(ReplyTicketRequest $request, Ticket $ticket)
     {
-        if (! (new Authorize(Auth::user(), 'reply_ticket', $ticket))->check()) {
+        $this->authorizeAccountTicketAccess($ticket);
+
+        if (! (new Authorize(Auth::user(), 'reply_ticket', $ticket))->check()
+            && Auth::id() != $ticket->user_id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -135,7 +177,7 @@ class AccountController extends Controller
 
         event(new TicketReplied($reply));
 
-        return redirect()->route('admin.account.ticket')
+        return redirect()->to(mp_route('admin.account.ticket'))
             ->with('success', trans('messages.updated', ['model' => trans('app.model.ticket')]));
     }
 
@@ -153,7 +195,7 @@ class AccountController extends Controller
 
         $ticket->delete();
 
-        return redirect()->route('admin.account.ticket')
+        return redirect()->to(mp_route('admin.account.ticket'))
             ->with('success', trans('messages.deleted', ['model' => trans('app.model.ticket')]));
     }
 
@@ -190,7 +232,7 @@ class AccountController extends Controller
 
         event(new ProfileUpdated(Auth::user()));
 
-        return redirect()->route('admin.account.profile')->with('success', trans('messages.profile_updated'));
+        return redirect()->to(mp_route('admin.account.profile'))->with('success', trans('messages.profile_updated'));
     }
 
     /**
@@ -218,7 +260,7 @@ class AccountController extends Controller
 
         event(new PasswordUpdated(Auth::user()));
 
-        return redirect()->route('admin.account.profile')->with('success', trans('messages.password_updated'));
+        return redirect()->to(mp_route('admin.account.profile'))->with('success', trans('messages.password_updated'));
     }
 
     /**
@@ -231,7 +273,7 @@ class AccountController extends Controller
     {
         $this->profile->updatePhoto($request);
 
-        return redirect()->route('admin.account.profile')->with('success', trans('messages.profile_updated'));
+        return redirect()->to(mp_route('admin.account.profile'))->with('success', trans('messages.profile_updated'));
     }
 
     /**
@@ -244,7 +286,7 @@ class AccountController extends Controller
     {
         $this->profile->deletePhoto($request);
 
-        return redirect()->route('admin.account.profile')->with('success', trans('messages.profile_updated'));
+        return redirect()->to(mp_route('admin.account.profile'))->with('success', trans('messages.profile_updated'));
     }
 
     /**
@@ -252,6 +294,8 @@ class AccountController extends Controller
      */
     public function editPayoutInstruction()
     {
+        abort_unless(Auth::user()->isMerchant(), 403);
+
         $shop = Shop::where('owner_id', Auth::user()->id)->first();
 
         $payout_instruction = $shop->pay_to;
@@ -265,9 +309,37 @@ class AccountController extends Controller
      */
     public function updatePayoutInstruction(Request $request)
     {
+        abort_unless(Auth::user()->isMerchant(), 403);
+
         Shop::where('owner_id', Auth::user()->id)
             ->update(['pay_to' => $request->input('payout_instruction')]);
 
         return back()->with('success', trans('messages.profile_updated'));
+    }
+
+    /**
+     * Whether the user may open the account support-ticket list.
+     */
+    private function authorizeAccountTicketList(): void
+    {
+        abort_unless(
+            Auth::user()->isMerchant()
+                || (new Authorize(Auth::user(), 'view_ticket'))->check(),
+            403
+        );
+    }
+
+    /**
+     * Whether the user may open a specific account support ticket.
+     */
+    private function authorizeAccountTicketAccess(Ticket $ticket): void
+    {
+        if (Auth::id() == $ticket->user_id) {
+            $this->authorizeAccountTicketList();
+
+            return;
+        }
+
+        abort_unless((new Authorize(Auth::user(), 'view_ticket', $ticket))->check(), 403);
     }
 }

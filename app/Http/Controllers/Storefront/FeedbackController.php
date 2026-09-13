@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\OrderDetailRequest;
-use App\Http\Requests\Validations\ProductFeedbackCreateRequest;
-use App\Http\Requests\Validations\ShopFeedbackCreateRequest;
+use App\Http\Requests\Validations\ProductReviewCreateRequest;
+use App\Http\Requests\Validations\StoreReviewCreateRequest;
+use App\Models\Inventory;
 use App\Models\Order;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Models\Review;
+use App\Models\Shop;
+use App\Services\Review\ReviewService;
+use Illuminate\Validation\ValidationException;
 
 class FeedbackController extends Controller
 {
@@ -24,25 +27,33 @@ class FeedbackController extends Controller
         $order->load([
             'shop' => function ($q) {
                 return $q->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'image:path,imageable_id,imageable_type',
                 ]);
             },
             'inventories' => function ($q) {
                 return $q->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'image:path,imageable_id,imageable_type',
                 ]);
             },
         ]);
 
-        // $order->load([
-        //     'inventories.image',
-        //     'inventories.product.feedbacks:id,feedbackable_id'
-        // ]);
-        // ->loadCount('shop.feedbacks');
+        // Reviews are product/store based, not order based - look up whatever the
+        // customer has already written for this shop/these products (if anything) so
+        // the form can show it instead of a blank "write a review" box.
+        $storeReview = Review::where('customer_id', $order->customer_id)
+            ->where('reviewable_type', Shop::class)
+            ->where('reviewable_id', $order->shop_id)
+            ->first();
 
-        return view('theme::feedback_form', compact('order'));
+        $productReviews = Review::where('customer_id', $order->customer_id)
+            ->where('reviewable_type', Inventory::class)
+            ->whereIn('reviewable_id', $order->inventories->pluck('id'))
+            ->get()
+            ->keyBy('reviewable_id');
+
+        return view('theme::feedback_form', compact('order', 'storeReview', 'productReviews'));
     }
 
     /**
@@ -52,15 +63,13 @@ class FeedbackController extends Controller
      * @param  App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function save_shop_feedbacks(ShopFeedbackCreateRequest $request, Order $order)
+    public function save_shop_feedbacks(StoreReviewCreateRequest $request, Order $order, ReviewService $reviews)
     {
-        if ($order->feedback) {
-            return back()->with('warning', trans('theme.already_given_feedback'));
+        try {
+            $reviews->createStoreReview($order->customer, $order->shop, $request->all(), $order);
+        } catch (ValidationException $e) {
+            return back()->with('warning', $e->getMessage());
         }
-
-        $feedback = $order->shop->feedbacks()->create($request->all());
-
-        $order->feedback_given($feedback->id);
 
         return back()->with('success', trans('theme.notify.your_feedback_saved'));
     }
@@ -72,21 +81,20 @@ class FeedbackController extends Controller
      * @param  App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function save_product_feedbacks(ProductFeedbackCreateRequest $request, Order $order)
+    public function save_product_feedbacks(ProductReviewCreateRequest $request, Order $order, ReviewService $reviews)
     {
         $inputs = $request->input('items');
-        $customer_id = Auth::guard('customer')->user()->id; // Set customer_id
 
         foreach ($order->inventories as $inventory) {
-            $feedback_data = $inputs[$inventory->id] ?? '';
-            $feedback_data['customer_id'] = $customer_id;
+            if (! isset($inputs[$inventory->id])) {
+                continue;
+            }
 
-            $feedback = $inventory->feedbacks()->create($feedback_data);
-
-            // Update feedback_id in order_items table
-            DB::table('order_items')->where('order_id', $inventory->pivot->order_id)
-                ->where('inventory_id', $inventory->id)
-                ->update(['feedback_id' => $feedback->id]);
+            try {
+                $reviews->createProductReview($order->customer, $inventory, $inputs[$inventory->id], $order);
+            } catch (ValidationException $e) {
+                continue;
+            }
         }
 
         return back()->with('success', trans('theme.notify.your_feedback_saved'));

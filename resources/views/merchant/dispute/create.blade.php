@@ -1,19 +1,19 @@
 @extends('merchant.layouts.app')
 
-@section('page_title', 'Raise Dispute Ticket')
+@section('page_title', trans('app.raise_dispute'))
 
 @section('content')
   <div class="mp-panel">
     <div class="mp-panel__head">
-      <h2 style="margin:0;font-size:16px;">Raise Dispute Ticket</h2>
+      <div class="mp-panel__head-text">
+        <h2>{{ trans('app.raise_dispute') }}</h2>
+        <p>{{ trans('app.raise_dispute_help') }}</p>
+      </div>
+      <a href="{{ route('merchant.support.dispute.index') }}" class="mp-btn mp-btn--outline mp-btn--sm">{{ trans('app.back') }}</a>
     </div>
     <div class="mp-panel__body">
-      <p style="color:#666;margin-top:0;">
-        Disputes are handled as tickets. Admin manages resolution. This is not a live chat.
-      </p>
-
       @if ($orders->isEmpty())
-        <div class="mp-alert mp-alert--danger">No eligible orders without an open dispute ticket.</div>
+        <div class="mp-alert mp-alert--danger">{{ trans('app.no_eligible_orders_for_dispute') }}</div>
       @else
         @php
           $actionOrder = $selectedOrderId
@@ -25,12 +25,11 @@
           'route' => ['merchant.support.dispute.store', $actionOrder],
           'files' => true,
           'id' => 'merchant-dispute-form',
-          'data-toggle' => 'validator',
         ]) !!}
 
-        <div class="form-group">
-          {!! Form::label('order_select', 'Order *') !!}
-          <select id="order_select" class="form-control" required>
+        <div class="mp-form-group">
+          {!! Form::label('order_select', trans('app.order').' *') !!}
+          <select id="order_select" class="mp-form-control" required>
             @foreach ($orders as $order)
               <option value="{{ $order->id }}"
                       data-action="{{ route('merchant.support.dispute.store', $order) }}"
@@ -41,36 +40,38 @@
           </select>
         </div>
 
-        <div class="form-group">
-          {!! Form::label('dispute_type_id', trans('app.dispute_type') ?? 'Dispute type') !!} *
-          {!! Form::select('dispute_type_id', $types, null, ['class' => 'form-control', 'required', 'placeholder' => 'Select type']) !!}
+        <div class="mp-form-group">
+          {!! Form::label('dispute_type_id', trans('app.dispute_type').' *') !!}
+          {!! Form::select('dispute_type_id', $types, null, ['class' => 'mp-form-control', 'required', 'placeholder' => trans('app.select_type')]) !!}
         </div>
 
-        <div class="form-group">
-          {!! Form::label('order_received', 'Order received? *') !!}
-          <div>
-            <label style="margin-right:12px;">{!! Form::radio('order_received', 1, true) !!} Yes</label>
-            <label>{!! Form::radio('order_received', 0, false) !!} No</label>
+        <div class="mp-form-group">
+          {!! Form::label('order_received', trans('app.order_received').' *') !!}
+          <div class="mp-actions" style="margin-top:0;">
+            <label>{!! Form::radio('order_received', 1, true) !!} {{ trans('app.yes') }}</label>
+            <label>{!! Form::radio('order_received', 0, false) !!} {{ trans('app.no') }}</label>
           </div>
         </div>
 
-        <div class="form-group">
-          {!! Form::label('refund_amount', trans('app.refund_amount') ?? 'Refund amount') !!} *
-          {!! Form::number('refund_amount', null, ['class' => 'form-control', 'step' => '0.01', 'min' => 0, 'required']) !!}
+        <div class="mp-form-group">
+          {!! Form::label('refund_amount', trans('app.refund_amount').' *') !!}
+          {!! Form::number('refund_amount', null, ['class' => 'mp-form-control', 'step' => '0.01', 'min' => 0, 'required']) !!}
         </div>
 
-        <div class="form-group">
-          {!! Form::label('description', trans('app.description') ?? 'Description') !!} *
-          {!! Form::textarea('description', null, ['class' => 'form-control', 'rows' => 5, 'required', 'placeholder' => 'Describe the issue for the admin ticket…']) !!}
+        <div class="mp-form-group">
+          {!! Form::label('description', trans('app.description').' *') !!}
+          {!! Form::textarea('description', null, ['class' => 'mp-form-control', 'rows' => 5, 'required', 'placeholder' => trans('app.describe_dispute_issue')]) !!}
         </div>
 
-        <div class="form-group">
-          {!! Form::label('attachments', trans('app.attachments') ?? 'Attachments') !!}
-          {!! Form::file('attachments[]', ['multiple' => true, 'class' => 'form-control']) !!}
+        <div class="mp-form-group">
+          {!! Form::label('attachments', trans('app.attachments')) !!}
+          {!! Form::file('attachments[]', ['multiple' => true, 'class' => 'mp-form-control']) !!}
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit Ticket</button>
-        <a href="{{ route('merchant.support.dispute.index') }}" class="btn btn-default">Cancel</a>
+        <div class="mp-actions">
+          <button type="submit" class="mp-btn mp-btn--primary">{{ trans('app.submit_ticket') }}</button>
+          <a href="{{ route('merchant.support.dispute.index') }}" class="mp-btn mp-btn--outline">{{ trans('app.cancel') }}</a>
+        </div>
 
         {!! Form::close() !!}
       @endif

@@ -56,7 +56,7 @@ class DealController extends Controller
     public function item(Request $request, $slug)
     {
         $item = Inventory::where('slug', $slug)->available()
-            ->with('avgFeedback:rating,count,feedbackable_id,feedbackable_type')
+            ->with('reviewSummary:rating,count,reviewable_id,reviewable_type')
             // ->withCount('feedbacks')
             ->firstOrFail();
 
@@ -71,7 +71,7 @@ class DealController extends Controller
                 $q->select('id', 'attribute_values.attribute_id', 'value', 'color', 'order')
                     ->with('attribute:id,name,attribute_type_id,order')->orderBy('order');
             },
-            'latestFeedbacks' => function ($q) {
+            'latestReviews' => function ($q) {
                 $q->with('customer:id,nice_name,name');
             },
             // 'feedbacks.customer:id,nice_name,name',

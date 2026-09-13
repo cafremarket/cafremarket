@@ -65,18 +65,25 @@ class EloquentRole extends EloquentRepository implements BaseRepository, RoleRep
 
     public function syncPermissions($role, array $permissions)
     {
-        if (Auth::user()->isFromMerchant()) {        // Sanitise data
-            $rows = Permission::with('module:id,access,active')
+        if (Auth::user()->isFromMerchant()) {
+            $allowed = \App\Helpers\ListHelper::storePanelModuleNames();
+            $rows = Permission::with('module:id,name,access,active')
                 ->whereIn('id', $permissions)
                 ->get();
 
             $result = [];
             foreach ($rows as $t_perm) {
-                if ($t_perm->module->access == Module::ACCESS_MERCHANT || $t_perm->module->access == Module::ACCESS_COMMON) {
-                    $result[] = $t_perm->id; // Clean
+                if (
+                    $t_perm->module
+                    && in_array($t_perm->module->name, $allowed, true)
+                    && in_array($t_perm->module->access, [Module::ACCESS_MERCHANT, Module::ACCESS_COMMON], true)
+                ) {
+                    $result[] = $t_perm->id;
                 }
             }
             $role->permissions()->sync($result);
+
+            return;
         }
 
         $role->permissions()->sync($permissions);

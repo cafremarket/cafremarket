@@ -53,7 +53,7 @@ class ListingResource extends JsonResource
             'free_shipping' => $this->free_shipping,
             'hot_item' => $this->orders_count >= config('system.popular.hot_item.sell_count', 3) ? true : false,
             'rating' => $this->rating(),
-            'feedbacks_count' => $this->rating() ? $this->avgFeedback->count : 0,
+            'feedbacks_count' => $this->rating() ? $this->reviewSummary->count : 0,
             'labels' => array_values($this->getLabels() ?? []),
             'listed_at' => date('F j, Y', strtotime($this->available_from)),
             'image' => get_inventory_img_src($this, 'medium'),

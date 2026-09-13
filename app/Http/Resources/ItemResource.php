@@ -59,9 +59,9 @@ class ItemResource extends JsonResource
             'images' => ImageResource::collection($this->whenLoaded('images')),
             'image_id' => $this->when($this->whenLoaded('image'), optional($this->image)->id),
             'rating' => $this->rating(),
-            'feedbacks_count' => $this->rating() ? $this->avgFeedback->count : 0,
-            'feedbacks' => $this->relationLoaded('latestFeedbacks')
-                ? array_values(FeedbackResource::collection($this->latestFeedbacks ?? collect())->resolve())
+            'feedbacks_count' => $this->rating() ? $this->reviewSummary->count : 0,
+            'feedbacks' => $this->relationLoaded('latestReviews')
+                ? array_values(ReviewResource::collection($this->latestReviews ?? collect())->resolve())
                 : [],
             'shop' => array_merge(
                 (new ShopLightResource($this->shop))->resolve($request),

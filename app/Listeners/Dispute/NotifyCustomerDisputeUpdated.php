@@ -33,12 +33,17 @@ class NotifyCustomerDisputeUpdated implements ShouldQueue
      */
     public function handle(DisputeUpdated $event)
     {
-        $customer_token = optional($event->reply->repliable->customer)->fcm_token;
+        if ($event->reply->customer_id) {
+            return;
+        }
+
+        $repliable = $event->reply->repliable;
+        $customer_token = optional($repliable->customer)->fcm_token;
 
         if (! is_null($customer_token)) {
             FCMService::send($customer_token, [
-                'title' => trans('notifications.dispute_updated.subject', ['order_id' => $event->repliable->order->order_number]),
-                'body' => trans('notifications.dispute_updated.message', ['order_id' => $event->repliable->order->order_number]),
+                'title' => trans('notifications.dispute_updated.subject', ['order_id' => $repliable->order->order_number]),
+                'body' => trans('notifications.dispute_updated.message', ['order_id' => $repliable->order->order_number]),
             ]);
         }
 

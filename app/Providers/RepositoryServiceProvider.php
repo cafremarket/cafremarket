@@ -37,6 +37,10 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\Blog\EloquentBlog::class
         );
         $this->app->singleton(
+            \App\Repositories\Popup\PopupRepository::class,
+            \App\Repositories\Popup\EloquentPopup::class
+        );
+        $this->app->singleton(
             \App\Repositories\Carrier\CarrierRepository::class,
             \App\Repositories\Carrier\EloquentCarrier::class
         );

@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\Dispute\DisputeCreated;
-use App\Events\Dispute\DisputeSolved;
-use App\Events\Dispute\DisputeUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateDisputeRequest;
 use App\Http\Requests\Validations\DisputeDetailRequest;
@@ -15,18 +12,19 @@ use App\Http\Resources\DisputeLightResource;
 use App\Http\Resources\DisputeResource;
 use App\Models\Dispute;
 use App\Models\Order;
-use App\Models\System;
-use App\Notifications\SuperAdmin\DisputeAppealed as DisputeAppealedNotification;
+use App\Services\Dispute\DisputeTicketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DisputeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    private $tickets;
+
+    public function __construct(DisputeTicketService $tickets)
+    {
+        $this->tickets = $tickets;
+    }
+
     public function index(Request $request)
     {
         $disputes = Auth::guard('api')->user()->disputes()
@@ -36,56 +34,28 @@ class DisputeController extends Controller
         return DisputeLightResource::collection($disputes);
     }
 
-    /**
-     * show_dispute_form
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  App\Models\Order  $order
-     * @return \Illuminate\Http\Response
-     */
     public function create(OrderDetailRequest $request, Order $order)
     {
         return new DisputeFormResource($order);
     }
 
-    /**
-     * open_dispute
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  App\Models\Order  $order
-     * @return \Illuminate\Http\Response
-     */
     public function store(CreateDisputeRequest $request, Order $order)
     {
-        $payload = $request->all();
-        $payload['raised_by'] = Dispute::RAISED_BY_CUSTOMER;
-        $payload['status'] = Dispute::STATUS_NEW;
-
-        $dispute = $order->dispute()->create($payload);
-
-        event(new DisputeCreated($dispute));
+        $dispute = $this->tickets->createFromOrder(
+            $order,
+            $request->all(),
+            Dispute::RAISED_BY_CUSTOMER,
+            $request->file('attachments')
+        );
 
         return new DisputeResource($dispute);
     }
 
-    /**
-     * show dispute detail
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  App\Models\Dispute  $dispute
-     * @return \Illuminate\Http\Response
-     */
     public function show(DisputeDetailRequest $request, Dispute $dispute)
     {
         return new DisputeResource($dispute->load('shop:id,name,slug'));
     }
 
-    /**
-     * show response_form
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function response_form(DisputeDetailRequest $request, Dispute $dispute)
     {
         return [
@@ -94,70 +64,39 @@ class DisputeController extends Controller
         ];
     }
 
-    /**
-     * [response description]
-     *
-     * @param  ReplyDisputeRequest  $request  [description]
-     * @param  Dispute  $dispute  [description]
-     * @return [type]                       [description]
-     */
     public function response(ReplyDisputeRequest $request, Dispute $dispute)
     {
-        // Update status
-        if ($dispute->status != $request->status) {
-            $dispute->status = $request->status;
+        $this->tickets->reply($dispute, $request, Auth::guard('api')->user());
 
-            $dispute->save();
-        }
-
-        $response = $dispute->replies()->create($request->all());
-
-        if ($request->hasFile('attachments')) {
-            $response->saveAttachments($request->file('attachments'));
-        }
-
-        event(new DisputeUpdated($response));
-
-        return new DisputeResource($dispute->load('shop:id,name,slug'));
+        return new DisputeResource($dispute->fresh()->load('shop:id,name,slug'));
     }
 
     public function mark_as_solved(DisputeDetailRequest $request, Dispute $dispute)
     {
-        $dispute->status = Dispute::STATUS_SOLVED;
+        $this->tickets->markResolved($dispute, Dispute::RAISED_BY_CUSTOMER);
 
-        $dispute->save();
-
-        event(new DisputeSolved($dispute));
-
-        return response()->json(trans('theme.notify.dispute_updated'), 200);
+        return response()->json(trans('theme.notify.dispute_resolved') ?? trans('theme.notify.dispute_updated'), 200);
     }
 
-    /**
-     * [appeal description]
-     *
-     * @param  ReplyDisputeRequest  $request  [description]
-     * @param  Dispute  $dispute  [description]
-     * @return [type]                       [description]
-     */
+    public function request_close(DisputeDetailRequest $request, Dispute $dispute)
+    {
+        $this->tickets->requestClose($dispute, Dispute::RAISED_BY_CUSTOMER);
+
+        return response()->json(trans('theme.notify.dispute_close_requested') ?? trans('theme.notify.dispute_updated'), 200);
+    }
+
     public function appeal(ReplyDisputeRequest $request, Dispute $dispute)
     {
-        $dispute->status = Dispute::STATUS_APPEALED;
-        $dispute->save();
-
-        $response = $dispute->replies()->create($request->all());
-
-        if ($request->hasFile('attachments')) {
-            $response->saveAttachments($request->file('attachments'));
+        if (! $dispute->isResolved()) {
+            $this->tickets->markResolved($dispute, Dispute::RAISED_BY_CUSTOMER);
         }
 
-        // Send notification to Admin
-        if (config('system_settings.notify_when_dispute_appealed')) {
-            $system = System::orderBy('id', 'asc')->first();
-            safe_notify($system->superAdmin(), new DisputeAppealedNotification($response), 'api dispute appealed');
+        if ($request->filled('reply')) {
+            $this->tickets->reply($dispute->fresh(), $request, Auth::guard('api')->user());
         }
 
-        event(new DisputeUpdated($response));
+        $this->tickets->requestClose($dispute->fresh(), Dispute::RAISED_BY_CUSTOMER);
 
-        return new DisputeResource($dispute->load('shop:id,name,slug'));
+        return new DisputeResource($dispute->fresh()->load('shop:id,name,slug'));
     }
 }

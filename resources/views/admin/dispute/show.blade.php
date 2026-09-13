@@ -47,8 +47,11 @@
         if (!$dispute->order->refunds->count() && Gate::allows('initiate', \App\Models\Refund::class)) {
           $disputeActions .= '<a href="javascript:void(0)" data-link="' . route('admin.support.refund.form', $dispute->order->id) . '" class="ajax-modal-btn btn btn-new btn-flat btn-sm">' . e(trans('app.initiate_refund')) . '</a> ';
         }
-        if (Gate::allows('response', $dispute)) {
-          $disputeActions .= '<a href="javascript:void(0)" data-link="' . route('admin.support.dispute.response', $dispute) . '" class="ajax-modal-btn btn btn-info btn-flat btn-sm"><i class="fa fa-reply"></i> ' . e(trans('app.response')) . '</a>';
+        if (Gate::allows('response', $dispute) && $dispute->isOpen()) {
+          $disputeActions .= '<a href="javascript:void(0)" data-link="' . route('admin.support.dispute.response', $dispute) . '" class="ajax-modal-btn btn btn-info btn-flat btn-sm"><i class="fa fa-reply"></i> ' . e(trans('app.response')) . '</a> ';
+        }
+        if (Gate::allows('close', $dispute) && $dispute->isOpen()) {
+          $disputeActions .= '<form method="POST" action="' . route('admin.support.dispute.close', $dispute) . '" style="display:inline">' . csrf_field() . '<button type="submit" class="confirm btn btn-warning btn-flat btn-sm">' . e(trans('app.close_dispute')) . '</button></form>';
         }
       @endphp
 
@@ -71,7 +74,27 @@
           </span>
         </div>
 
-        <p class="admin-detail-view__title">{{ $dispute->dispute_type->detail }}</p>
+        <p class="admin-detail-view__title">{{ optional($dispute->dispute_type)->detail }}</p>
+        <p class="text-muted">{{ trans('app.ticket') }} {{ $dispute->ticketRef() }} · {{ trans('app.raised_by') }} {{ $dispute->raisedByLabel() }}</p>
+
+        @if ($dispute->isCloseRequested())
+          <div class="alert alert-warning">
+            {{ trans('app.close_requested_by', ['by' => ucfirst($dispute->close_requested_by)]) }}
+            @if ($dispute->close_requested_at)
+              ({{ $dispute->close_requested_at->diffForHumans() }})
+            @endif
+            . {{ trans('app.only_admin_can_close_ticket') }}
+          </div>
+        @endif
+
+        @if ($dispute->isClosed())
+          <div class="alert alert-success">
+            {{ trans('app.closed_by_admin') }}
+            @if ($dispute->closed_at)
+              ({{ $dispute->closed_at->diffForHumans() }})
+            @endif
+          </div>
+        @endif
 
         @if (count($dispute->attachments))
           <div class="admin-detail-view__attachments">
@@ -88,7 +111,7 @@
 
         @if ($dispute->replies->count() > 0)
           <div class="admin-detail-view__replies">
-            <strong>{{ trans('app.ticket_updates') ?? 'Ticket updates' }}</strong>
+            <strong>{{ trans('app.ticket_updates') }}</strong>
             @foreach ($dispute->replies as $reply)
               @include('admin.partials._reply_conversations')
             @endforeach

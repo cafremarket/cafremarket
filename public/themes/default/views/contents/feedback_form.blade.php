@@ -19,8 +19,8 @@
                 {{ $order->shop->name }}
               </a>
               <div class="mt-2">
-                @if (optional($order->shop->avgFeedback)->rating)
-                  @include('theme::layouts.ratings', ['ratings' => $order->shop->avgFeedback->rating, 'count' => $order->shop->avgFeedback->count])
+                @if (optional($order->shop->reviewSummary)->rating)
+                  @include('theme::layouts.ratings', ['ratings' => $order->shop->reviewSummary->rating, 'count' => $order->shop->reviewSummary->count])
                 @else
                   <span class="text-muted small">@lang('theme.no_reviews')</span>
                 @endif
@@ -31,10 +31,10 @@
           <p class="mb-2">@lang('theme.how_satisfied_you_are')</p>
 
           <div class="post-review-box">
-            @if ($order->feedback)
-              @include('theme::layouts.ratings', ['ratings' => $order->feedback->rating])
+            @if ($storeReview)
+              @include('theme::layouts.ratings', ['ratings' => $storeReview->rating])
               <p>
-                {{ $order->feedback->comment != '' ? $order->feedback->comment : trans('theme.no_comment') }}
+                {{ $storeReview->comment != '' ? $storeReview->comment : trans('theme.no_comment') }}
               </p>
             @else
               {!! Form::open(['route' => ['shop.feedback', $order], 'files' => true, 'class' => 'sf-form', 'data-toggle' => 'validator']) !!}
@@ -88,21 +88,21 @@
                   {{ $item->pivot->item_description }}
                 </a>
                 <div class="mt-1 mb-2">
-                  @if (optional($item->avgFeedback)->rating)
-                    @include('theme::layouts.ratings', ['ratings' => $item->avgFeedback->rating, 'count' => $item->avgFeedback->count])
+                  @if (optional($item->reviewSummary)->rating)
+                    @include('theme::layouts.ratings', ['ratings' => $item->reviewSummary->rating, 'count' => $item->reviewSummary->count])
                   @else
                     <span class="text-muted small">@lang('theme.no_reviews')</span>
                   @endif
                 </div>
 
-                @if ($item->pivot->feedback_id)
+                @if ($productReviews->has($item->id))
                   @php
-                    $feedback = \App\Models\Feedback::find($item->pivot->feedback_id);
+                    $productReview = $productReviews->get($item->id);
                   @endphp
 
-                  @include('theme::layouts.ratings', ['ratings' => $feedback->rating])
+                  @include('theme::layouts.ratings', ['ratings' => $productReview->rating])
                   <p class="mb-0">
-                    {{ $feedback->comment != '' ? $feedback->comment : trans('theme.no_comment') }}
+                    {{ $productReview->comment != '' ? $productReview->comment : trans('theme.no_comment') }}
                   </p>
                 @else
                   @php

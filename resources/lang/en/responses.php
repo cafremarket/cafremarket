@@ -22,6 +22,8 @@ return [
     '404_hint' => 'Check the URL, or use one of the links below to continue.',
     'go_to_homepage' => 'Go to Homepage',
     'go_to_dashboard' => 'Go to Dashboard',
+    'permission_denied_message' => 'You do not have permission to access this page. Ask an administrator if you need access.',
+    'permission_denied_hint' => 'If this looks wrong, contact your account admin or try another section.',
     'no_file_was_uploaded' => 'No file was uploaded.',
     'error_uploading_file' => 'Error uploading file',
     'model_not_defined' => 'The model is not defined!',

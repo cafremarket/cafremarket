@@ -17,67 +17,80 @@
     @endif
   </div>
 
-  @include('merchant.partials.subscription_notice')
+  @if (Auth::user()->isMerchant())
+    @include('merchant.partials.subscription_notice')
+  @endif
 
-  <div class="mp-stat-grid">
-    <div class="mp-stat-card mp-stat-card--yellow">
-      <div class="mp-stat-card__icon"><i class="icon ion-md-cube"></i></div>
-      <div class="mp-stat-card__body">
-        <span class="mp-stat-card__label">{{ trans('app.unfulfilled_orders') }}</span>
-        <span class="mp-stat-card__value">
-          <span class="mp-stat-card__value-text">{{ $unfulfilled_order_count }}</span>
-          <a href="{{ url('merchant/order/order?tab=unfulfilled') }}" class="mp-stat-card__link" title="{{ trans('app.detail') }}">
-            <i class="icon ion-md-send"></i>
-          </a>
-        </span>
-      </div>
+  @php
+    $canOrders = Auth::user()->isMerchant() || Gate::allows('index', \App\Models\Order::class);
+    $canInventory = Gate::allows('index', \App\Models\Inventory::class);
+  @endphp
+
+  @if ($canOrders || $canInventory)
+    <div class="mp-stat-grid">
+      @if ($canOrders)
+        <div class="mp-stat-card mp-stat-card--yellow">
+          <div class="mp-stat-card__icon"><i class="icon ion-md-cube"></i></div>
+          <div class="mp-stat-card__body">
+            <span class="mp-stat-card__label">{{ trans('app.unfulfilled_orders') }}</span>
+            <span class="mp-stat-card__value">
+              <span class="mp-stat-card__value-text">{{ $unfulfilled_order_count }}</span>
+              <a href="{{ url('merchant/order/order?tab=unfulfilled') }}" class="mp-stat-card__link" title="{{ trans('app.detail') }}">
+                <i class="icon ion-md-send"></i>
+              </a>
+            </span>
+          </div>
+        </div>
+
+        <div class="mp-stat-card mp-stat-card--blue">
+          <div class="mp-stat-card__icon"><i class="icon ion-md-cart"></i></div>
+          <div class="mp-stat-card__body">
+            <span class="mp-stat-card__label">
+              {{ trans('app.last_sale') }}
+              @include('merchant.dashboard.partials._sale_breakdown_info', ['breakdown' => $last_sale_breakdown ?? []])
+            </span>
+            <span class="mp-stat-card__value">
+              <span class="mp-stat-card__value-text">
+                {{ get_formated_currency($last_sale ? $last_sale->grand_total : 0, 2, config('system_settings.currency.id')) }}
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="mp-stat-card mp-stat-card--green">
+          <div class="mp-stat-card__icon"><i class="icon ion-md-cash"></i></div>
+          <div class="mp-stat-card__body">
+            <span class="mp-stat-card__label">
+              {{ trans('app.todays_sale') }}
+              @include('merchant.dashboard.partials._sale_breakdown_info', ['breakdown' => $todays_sale_breakdown ?? []])
+            </span>
+            <span class="mp-stat-card__value">
+              <span class="mp-stat-card__value-text">
+                {{ get_formated_currency($todays_sale_amount, 2, config('system_settings.currency.id')) }}
+              </span>
+            </span>
+          </div>
+        </div>
+      @endif
+
+      @if ($canInventory)
+        <div class="mp-stat-card mp-stat-card--red">
+          <div class="mp-stat-card__icon"><i class="icon ion-md-basket"></i></div>
+          <div class="mp-stat-card__body">
+            <span class="mp-stat-card__label">{{ trans('app.stock_outs') }}</span>
+            <span class="mp-stat-card__value">
+              <span class="mp-stat-card__value-text">{{ $stock_out_count }}</span>
+              <a href="{{ url('merchant/stock/overview') }}" class="mp-stat-card__link" title="{{ trans('app.detail') }}">
+                <i class="icon ion-md-send"></i>
+              </a>
+            </span>
+          </div>
+        </div>
+      @endif
     </div>
+  @endif
 
-    <div class="mp-stat-card mp-stat-card--blue">
-      <div class="mp-stat-card__icon"><i class="icon ion-md-cart"></i></div>
-      <div class="mp-stat-card__body">
-        <span class="mp-stat-card__label">
-          {{ trans('app.last_sale') }}
-          @include('merchant.dashboard.partials._sale_breakdown_info', ['breakdown' => $last_sale_breakdown ?? []])
-        </span>
-        <span class="mp-stat-card__value">
-          <span class="mp-stat-card__value-text">
-            {{ get_formated_currency($last_sale ? $last_sale->grand_total : 0, 2, config('system_settings.currency.id')) }}
-          </span>
-        </span>
-      </div>
-    </div>
-
-    <div class="mp-stat-card mp-stat-card--green">
-      <div class="mp-stat-card__icon"><i class="icon ion-md-cash"></i></div>
-      <div class="mp-stat-card__body">
-        <span class="mp-stat-card__label">
-          {{ trans('app.todays_sale') }}
-          @include('merchant.dashboard.partials._sale_breakdown_info', ['breakdown' => $todays_sale_breakdown ?? []])
-        </span>
-        <span class="mp-stat-card__value">
-          <span class="mp-stat-card__value-text">
-            {{ get_formated_currency($todays_sale_amount, 2, config('system_settings.currency.id')) }}
-          </span>
-        </span>
-      </div>
-    </div>
-
-    <div class="mp-stat-card mp-stat-card--red">
-      <div class="mp-stat-card__icon"><i class="icon ion-md-basket"></i></div>
-      <div class="mp-stat-card__body">
-        <span class="mp-stat-card__label">{{ trans('app.stock_outs') }}</span>
-        <span class="mp-stat-card__value">
-          <span class="mp-stat-card__value-text">{{ $stock_out_count }}</span>
-          <a href="{{ url('merchant/stock/overview') }}" class="mp-stat-card__link" title="{{ trans('app.detail') }}">
-            <i class="icon ion-md-send"></i>
-          </a>
-        </span>
-      </div>
-    </div>
-  </div>
-
-  @if (! Auth::user()->shop->isVerified() && ! Auth::user()->shop->config->pending_verification)
+  @if (Auth::user()->isMerchant() && ! Auth::user()->shop->isVerified() && ! Auth::user()->shop->config->pending_verification)
     <div class="mp-alert mp-alert--warning">
       <i class="fa fa-shield"></i>
       {{ trans('messages.complete_store_verification') }}
@@ -85,41 +98,43 @@
     </div>
   @endif
 
-  <div class="mp-panel">
-    <div class="mp-panel__head"><h2 style="margin:0;font-size:16px">{{ trans('app.latest_orders') }}</h2></div>
-    <div class="mp-panel__body mp-panel__body--flush">
-      <table class="mp-table">
-        <thead>
-          <tr>
-            <th>{{ trans('app.order_number') }}</th>
-            <th>{{ trans('app.order_date') }}</th>
-            <th>{{ trans('app.customer') }}</th>
-            <th>{{ trans('app.grand_total') }}</th>
-            <th>{{ trans('app.status') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @forelse($latest_orders ?? [] as $order)
+  @if ($canOrders)
+    <div class="mp-panel">
+      <div class="mp-panel__head"><h2 style="margin:0;font-size:16px">{{ trans('app.latest_orders') }}</h2></div>
+      <div class="mp-panel__body mp-panel__body--flush">
+        <table class="mp-table">
+          <thead>
             <tr>
-              <td>
-                @can('view', $order)
-                  <a href="{{ mp_route('admin.order.order.show', $order->id) }}">{{ $order->order_number }}</a>
-                @else
-                  {{ $order->order_number }}
-                @endcan
-              </td>
-              <td>{{ $order->created_at->diffForHumans() }}</td>
-              <td>{{ optional($order->customer)->name }}</td>
-              <td>{{ get_formated_currency($order->grand_total, 2, config('system_settings.currency.id')) }}</td>
-              <td>{!! $order->orderStatus() !!}</td>
+              <th>{{ trans('app.order_number') }}</th>
+              <th>{{ trans('app.order_date') }}</th>
+              <th>{{ trans('app.customer') }}</th>
+              <th>{{ trans('app.grand_total') }}</th>
+              <th>{{ trans('app.status') }}</th>
             </tr>
-          @empty
-            <tr><td colspan="5" class="mp-table__empty">{{ trans('messages.no_orders') }}</td></tr>
-          @endforelse
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @forelse($latest_orders ?? [] as $order)
+              <tr>
+                <td>
+                  @can('view', $order)
+                    <a href="{{ mp_route('admin.order.order.show', $order->id) }}">{{ $order->order_number }}</a>
+                  @else
+                    {{ $order->order_number }}
+                  @endcan
+                </td>
+                <td>{{ $order->created_at->diffForHumans() }}</td>
+                <td>{{ optional($order->customer)->name }}</td>
+                <td>{{ get_formated_currency($order->grand_total, 2, config('system_settings.currency.id')) }}</td>
+                <td>{!! $order->orderStatus() !!}</td>
+              </tr>
+            @empty
+              <tr><td colspan="5" class="mp-table__empty">{{ trans('messages.no_orders') }}</td></tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+  @endif
 @endsection
 
 @section('scripts')

@@ -270,14 +270,14 @@
           "priceCurrency": @json(get_system_currency()),
           "price": "{{ number_format((float) $item->current_sale_price(), 2, '.', '') }}"
         }
-        @if (($item->feedbacks_count ?? 0) > 0)
+        @if (($item->reviews_count ?? 0) > 0)
           ,
           "aggregateRating": {
             "@type": "AggregateRating",
-            "ratingValue": "{{ get_formated_decimal($item->feedbacks->avg('rating'), true, 1) }}",
+            "ratingValue": "{{ get_formated_decimal($item->reviews->avg('rating'), true, 1) }}",
             "bestRating": "5",
             "worstRating": "1",
-            "reviewCount": "{{ $item->feedbacks_count }}"
+            "reviewCount": "{{ $item->reviews_count }}"
           }
         @endif
       }

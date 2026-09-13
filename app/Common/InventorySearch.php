@@ -284,7 +284,7 @@ trait InventorySearch
         // For APIs
         if ($request->is('api/*') && $request->acceptsJson()) {
             // Load avg rating
-            $products = $products->load('avgFeedback:rating,count,feedbackable_id');
+            $products = $products->load('reviewSummary:rating,count,reviewable_id');
 
             return ListingResource::collection($products);
         }
@@ -301,7 +301,7 @@ trait InventorySearch
                     'categories.subGroup.group:id,name,slug',
                 ]);
             },
-            'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+            'reviewSummary:rating,count,reviewable_id,reviewable_type',
             'images:path,imageable_id,imageable_type',
             'image:path,imageable_id,imageable_type',
         ]);

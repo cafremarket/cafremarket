@@ -242,6 +242,11 @@ return [
     'please_select_conversation' => 'Please select a conversation from the left.',
 
     'session_expired' => 'Your session has been expired! Please login.',
+    'review_delete_request_pending' => 'Já existe um pedido de eliminação desta avaliação a aguardar revisão do admin.',
+    'review_delete_request_not_pending' => 'Este pedido de eliminação já não está pendente.',
+    'review_delete_request_approved' => 'A avaliação foi eliminada.',
+    'review_delete_request_rejected' => 'O pedido de eliminação foi rejeitado.',
+    'review_deleted' => 'A avaliação foi eliminada.',
 
     'no_address_for_invoice' => 'You have no business address set up yet. Please add address now.',
 

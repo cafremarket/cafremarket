@@ -6,8 +6,8 @@
 
 @section('content')
   @php
-    $ticketActions = '<a href="' . route('admin.account.ticket') . '" class="btn btn-default btn-flat btn-sm"><i class="fa fa-arrow-left"></i> ' . e(trans('app.back')) . '</a> '
-      . '<a href="javascript:void(0)" data-link="' . route('admin.account.ticket.reply', $ticket) . '" class="ajax-modal-btn btn btn-new btn-flat btn-sm"><i class="fa fa-reply"></i> ' . e(trans('app.reply')) . '</a>';
+    $ticketActions = '<a href="' . e(mp_route('admin.account.ticket')) . '" class="btn btn-default btn-flat btn-sm"><i class="fa fa-arrow-left"></i> ' . e(trans('app.back')) . '</a> '
+      . '<a href="javascript:void(0)" data-link="' . e(mp_route('admin.account.ticket.reply', $ticket)) . '" class="ajax-modal-btn btn btn-new btn-flat btn-sm"><i class="fa fa-reply"></i> ' . e(trans('app.reply')) . '</a>';
   @endphp
 
   @include('admin.partials.ui.card_start', [
@@ -61,8 +61,8 @@
 
           <hr />
           <span class="pull-right">
-            <a href="javascript:void(0)" data-link="{{ route('admin.account.ticket.reply', $ticket) }}" class="ajax-modal-btn btn btn-new btn-flat">{{ trans('app.reply') }}</a>
-            {!! Form::open(['route' => ['admin.account.ticket.archive', $ticket], 'method' => 'delete', 'class' => 'inline']) !!}
+            <a href="javascript:void(0)" data-link="{{ mp_route('admin.account.ticket.reply', $ticket) }}" class="ajax-modal-btn btn btn-new btn-flat">{{ trans('app.reply') }}</a>
+            {!! Form::open(['url' => mp_route('admin.account.ticket.archive', $ticket), 'method' => 'delete', 'class' => 'inline']) !!}
             <button class="confirm btn btn-danger" type="submit"><i class="fa fa-trash"></i> {{ trans('app.delete') }}</button>
             {!! Form::close() !!}
           </span>

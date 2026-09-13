@@ -448,7 +448,7 @@ class Statistics
             return $dispute->where('created_at', '>=', $date)->count();
         }
 
-        return $dispute->statusOf(Dispute::STATUS_APPEALED)->count();
+        return $dispute->statusOf(Dispute::STATUS_CLOSE_REQUESTED)->count();
     }
 
     public static function disputes_by_customer_count($customer, $period = null)
@@ -486,6 +486,13 @@ class Statistics
     {
         return \App\Models\ShopSlugChangeRequest::query()
             ->where('status', \App\Models\ShopSlugChangeRequest::STATUS_PENDING)
+            ->count();
+    }
+
+    public static function pending_review_delete_count()
+    {
+        return \App\Models\ReviewDeleteRequest::query()
+            ->where('status', \App\Models\ReviewDeleteRequest::STATUS_PENDING)
             ->count();
     }
 }

@@ -299,11 +299,13 @@
           </li>
         @endcan
 
-        <li class="{{ Request::is('admin/admin/deliveryboy*') ? 'active' : '' }}">
-          <a href="{{ route('admin.admin.deliveryboy.index') }}">
-            <i class="fa fa-motorcycle"></i> <span>{{ trans('nav.delivery_boys') }}</span>
-          </a>
-        </li>
+        @can('index', \App\Models\DeliveryBoy::class)
+          <li class="{{ Request::is('admin/admin/deliveryboy*') ? 'active' : '' }}">
+            <a href="{{ route('admin.admin.deliveryboy.index') }}">
+              <i class="fa fa-motorcycle"></i> <span>{{ trans('nav.delivery_boys') }}</span>
+            </a>
+          </li>
+        @endcan
       @endif
 
       @if (Auth::user()->isFromPlatform() && (Gate::allows('index', \App\Models\Merchant::class) || Gate::allows('index', \App\Models\Shop::class)))
@@ -465,6 +467,26 @@
                 </a>
               </li>
             @endcan
+
+            @can('index', \App\Models\Review::class)
+              <li class="{{ (Request::is('admin/support/review*') && !Request::is('admin/support/review/delete-requests*')) ? 'active' : '' }}">
+                <a href="{{ route('admin.support.review.index') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.reviews') ?? 'Reviews' }}
+                </a>
+              </li>
+            @endcan
+
+            @can('index', \App\Models\ReviewDeleteRequest::class)
+              <li class="{{ Request::is('admin/support/review/delete-requests*') ? 'active' : '' }}">
+                <a href="{{ route('admin.support.review.deleteRequests') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.review_delete_requests') ?? 'Review Delete Requests' }}
+                  @php($pendingReviewDeletes = \App\Helpers\Statistics::pending_review_delete_count())
+                  @if ($pendingReviewDeletes > 0)
+                    <span class="label label-warning pull-right">{{ $pendingReviewDeletes }}</span>
+                  @endif
+                </a>
+              </li>
+            @endcan
           </ul>
         </li>
       @endif
@@ -482,6 +504,12 @@
           <a href="{{ route('admin.app_banner.index') }}">
             <i class="fa fa-mobile"></i>
             <span>{{ trans('nav.app_banners') }}</span>
+          </a>
+        </li>
+        <li class="{{ Request::is('admin/popups*') ? 'active' : '' }}">
+          <a href="{{ route('admin.popup.index') }}">
+            <i class="fa fa-window-restore"></i>
+            <span>{{ trans('nav.popups') }}</span>
           </a>
         </li>
       @endif

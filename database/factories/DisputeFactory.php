@@ -31,7 +31,8 @@ class DisputeFactory extends Factory
             'description' => $this->faker->text(100),
             'return_goods' => $this->faker->boolean,
             'order_received' => $this->faker->boolean,
-            'status' => rand(1, 6),
+            'status' => rand(1, 7),
+            'raised_by' => 'customer',
             'created_at' => Carbon::Now()->subMonths(rand(0, 5)),
             'updated_at' => Carbon::Now()->subMonths(rand(0, 5)),
         ];

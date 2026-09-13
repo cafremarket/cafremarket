@@ -10,11 +10,11 @@
       @endif
 
       @if (Auth::user()->image)
-        <a class="btn btn-xs btn-default confirm ajax-silent" type="submit" href="{{ route('admin.account.deletePhoto') }}"><i class="fa fa-trash-o"></i> {{ trans('app.form.delete_avatar') }}</a>
+        <a class="btn btn-xs btn-default confirm ajax-silent" type="submit" href="{{ mp_route('admin.account.deletePhoto') }}"><i class="fa fa-trash-o"></i> {{ trans('app.form.delete_avatar') }}</a>
       @endif
     </div>
 
-    {!! Form::open(['route' => 'admin.account.updatePhoto', 'files' => true, 'data-toggle' => 'validator']) !!}
+    {!! Form::open(['url' => mp_route('admin.account.updatePhoto'), 'files' => true, 'data-toggle' => 'validator']) !!}
     <div class="form-group">
       <input type="file" name="image" required />
       <div class="help-block with-errors"></div>
@@ -26,7 +26,7 @@
     <div class="form-group mt-5">
       <label>{{ trans('app.security') }}</label>
       <div class="form-group">
-        <a class="ajax-modal-btn btn btn-new" href="javascript:void(0)" data-link="{{ route('admin.account.showChangePasswordForm') }}"><i class="fa fa-lock"></i> {{ trans('app.change_password') }}</a>
+        <a class="ajax-modal-btn btn btn-new" href="javascript:void(0)" data-link="{{ mp_route('admin.account.showChangePasswordForm') }}"><i class="fa fa-lock"></i> {{ trans('app.change_password') }}</a>
       </div>
     </div>
 
@@ -45,7 +45,7 @@
   </div>
 
   <div class="col-md-6">
-    {!! Form::model($profile, ['method' => 'PUT', 'route' => ['admin.account.update'], 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
+    {!! Form::model($profile, ['method' => 'PUT', 'url' => mp_route('admin.account.update'), 'files' => true, 'id' => 'form', 'data-toggle' => 'validator']) !!}
 
     <div class="form-group">
       {!! Form::label('name', trans('app.form.full_name') . '*') !!}
@@ -115,13 +115,13 @@
           <p class="mb-3">{{ $profile->shop->pay_to }}</p>
         @endif
 
-        <a class="ajax-modal-btn btn btn-default" href="javascript:void(0)" data-link="{{ route('admin.account.shop.editPayoutInstruction') }}">
+        <a class="ajax-modal-btn btn btn-default" href="javascript:void(0)" data-link="{{ mp_route('admin.account.shop.editPayoutInstruction') }}">
           <i class="fa fa-money"></i> {{ $profile->shop->pay_to ? trans('app.update_payout_instructions') : trans('app.add_payout_instructions') }}
         </a>
       </div>
     @endif
 
-    @if ($profile->isFromMerchant() && optional($profile->shop)->config)
+    @if ($profile->isMerchant() && optional($profile->shop)->config)
       <div class="form-group mb-5">
         <label>{{ trans('app.form.logo') }}</label>
         <img src="{{ get_storage_file_url(optional($profile->shop->image)->path, 'small') }}" class="thumbnail" alt="{{ trans('app.logo') }}">
@@ -151,7 +151,7 @@
             <i class="fa fa-check-circle"></i> {{ trans('messages.store_verification_approved_notice') }}
           </div>
         @else
-          <a href="{{ route('admin.setting.verify') }}" class="btn btn-block btn-flat btn-success">{{ trans('app.get_verified') }}</a>
+          <a href="{{ route('merchant.verify') }}" class="btn btn-block btn-flat btn-success">{{ trans('app.get_verified') }}</a>
         @endif
       </div>
     @endif

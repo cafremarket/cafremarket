@@ -52,6 +52,7 @@ class Kernel extends ConsoleKernel
 
         // Re-evaluate ratings for models
         $schedule->command('incevio:evaluate-ratings')->daily();
+        $schedule->command('incevio:evaluate-review-ratings')->daily();
 
         // remove cart table old data
         $schedule->command('incevio:clean-cart-table')->twiceDaily(1, 13);

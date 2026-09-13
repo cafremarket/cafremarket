@@ -45,13 +45,7 @@ class EloquentUser extends EloquentRepository implements BaseRepository, UserRep
 
     public function store(Request $request)
     {
-        $temp = $request['phone'];
-        unset($request['phone']);
         $user = parent::store($request);
-
-        $request->merge(['phone' => $temp]);
-
-        $this->saveAdrress($request->all(), $user);
 
         if ($request->hasFile('image')) {
             $user->saveImage($request->file('image'));

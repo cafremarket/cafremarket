@@ -33,6 +33,8 @@ return [
     'disputes' => 'Disputas',
     'support_tickets' => 'Chamados de suporte',
     'refunds' => 'Reembolsos',
+    'reviews' => 'Avaliações',
+    'review_delete_requests' => 'Pedidos de eliminação de avaliações',
     'user_roles' => 'Funções de utilizador',
     'taxes' => 'Impostos',
     'themes' => 'Temas',

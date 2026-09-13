@@ -141,7 +141,7 @@ class HomeController extends Controller
 
         $products = $listingsBase
             ->with([
-                'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
                 'shop:id,slug,name,id_verified,phone_verified,address_verified',
                 'image:path,imageable_id,imageable_type',
             ])
@@ -189,7 +189,7 @@ class HomeController extends Controller
                         },
                     ])
                         ->with([
-                            'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                            'reviewSummary:rating,count,reviewable_id,reviewable_type',
                             'shop:id,slug,name,id_verified,phone_verified,address_verified',
                             'image:path,imageable_id,imageable_type',
                         ])->get();
@@ -249,7 +249,7 @@ class HomeController extends Controller
                         $query->where('order_items.created_at', '>=', $now->subHours(config('system.popular.hot_item.period', 24)));
                     },
                 ])->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     'shop:id,slug,name,id_verified,phone_verified,address_verified',
                     'image:path,imageable_id,imageable_type',
                 ])->get();
@@ -288,14 +288,14 @@ class HomeController extends Controller
             ->whereHas('shop', function ($q) use ($shop) {
                 $q->where('slug', $shop);
             })
-            ->withCount('feedbacks')->available()->withTrashed()->first();
+            ->withCount('reviews')->available()->withTrashed()->first();
 
         if (! $item) {
             $item = Inventory::where('slug', $slug)
                 ->whereHas('shop', function ($q) use ($shop) {
                     $q->where('slug', $shop);
                 })
-                ->withCount('feedbacks')->withTrashed()->first();
+                ->withCount('reviews')->withTrashed()->first();
         }
 
         if (! $item) {
@@ -330,16 +330,16 @@ class HomeController extends Controller
                     },
                 ])
                     ->with([
-                        'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                        'latestFeedbacks' => function ($q) {
+                        'reviewSummary:rating,count,reviewable_id,reviewable_type',
+                        'latestReviews' => function ($q) {
                             $q->with('customer:id,nice_name,name');
                         },
                     ]);
             },
-            'latestFeedbacks' => function ($q) {
+            'latestReviews' => function ($q) {
                 $q->with('customer:id,nice_name,name');
             },
-            'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+            'reviewSummary:rating,count,reviewable_id,reviewable_type',
             'images:id,path,imageable_id,imageable_type',
             'tags:id,name',
         ]);
@@ -388,7 +388,21 @@ class HomeController extends Controller
             $item->wholesale_prices = get_wholesale_item_prices($item->id);
         }
 
-        return view('theme::product', compact('item', 'variants', 'attributes', 'item_attrs', 'related', 'linked_items', 'business_areas', 'alternative_items'));
+        $canReviewProduct = false;
+        $myProductReview = null;
+
+        if (\Illuminate\Support\Facades\Auth::guard('customer')->check()) {
+            $customer = \Illuminate\Support\Facades\Auth::guard('customer')->user();
+            $myProductReview = \App\Models\Review::where('customer_id', $customer->id)
+                ->where('reviewable_type', Inventory::class)
+                ->where('reviewable_id', $item->id)
+                ->first();
+
+            $canReviewProduct = (bool) app(\App\Services\Review\ReviewEligibilityService::class)
+                ->canReviewProduct($customer, $item);
+        }
+
+        return view('theme::product', compact('item', 'variants', 'attributes', 'item_attrs', 'related', 'linked_items', 'business_areas', 'alternative_items', 'canReviewProduct', 'myProductReview'));
     }
 
     /**
@@ -413,7 +427,7 @@ class HomeController extends Controller
                         }]);
                 },
             ])
-            ->withCount('feedbacks')->firstOrFail();
+            ->withCount('reviews')->firstOrFail();
 
         if (is_incevio_package_loaded('wholesale')) {
             $item->wholesale_prices = get_wholesale_item_prices($item->id);
@@ -464,8 +478,8 @@ class HomeController extends Controller
                     $q->available();
                 },
                 'inventories.attributeValues.attribute',
-                'inventories.avgFeedback:rating,count,feedbackable_id,feedbackable_type',
-                'inventories.shop.feedbacks:rating,feedbackable_id,feedbackable_type',
+                'inventories.reviewSummary:rating,count,reviewable_id,reviewable_type',
+                'inventories.shop.reviews:rating,reviewable_id,reviewable_type',
                 'inventories.shop.image:path,imageable_id,imageable_type',
             ])
             ->firstOrFail();

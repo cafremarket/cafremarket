@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>{{ trans('responses.page_not_found') }} — {{ config('app.name', 'Cafrepay') }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   @php
     $brandName = config('app.name', 'Cafrepay');
     try {
@@ -59,31 +62,27 @@
   @endphp
   <style>
     :root {
-      --bg-1: #0f1c18;
-      --bg-2: #1a332b;
-      --bg-3: #243f36;
-      --accent: #3dd68c;
-      --accent-soft: rgba(61, 214, 140, 0.16);
-      --text: #f4f7f5;
-      --muted: #a8b8b1;
-      --card: rgba(255, 255, 255, 0.06);
-      --border: rgba(255, 255, 255, 0.1);
-      --shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+      --primary: #ff6600;
+      --primary-dark: #cc5200;
+      --primary-soft: rgba(255, 102, 0, 0.12);
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e8edf2;
+      --card: #ffffff;
+      --shadow: 0 20px 50px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html, body {
-      min-height: 100%;
-    }
+    html, body { min-height: 100%; }
 
     body {
-      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      font-family: "Outfit", "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(ellipse 80% 60% at 15% 10%, rgba(61, 214, 140, 0.18), transparent 55%),
-        radial-gradient(ellipse 70% 50% at 90% 85%, rgba(56, 156, 120, 0.2), transparent 50%),
-        linear-gradient(160deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+        radial-gradient(ellipse 70% 55% at 12% 8%, rgba(255, 102, 0, 0.14), transparent 55%),
+        radial-gradient(ellipse 55% 45% at 92% 88%, rgba(255, 148, 77, 0.12), transparent 50%),
+        linear-gradient(165deg, #fffaf6 0%, #f8fafc 42%, #eef2f7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -93,9 +92,9 @@
 
     .nf {
       width: 100%;
-      max-width: 560px;
+      max-width: 540px;
       text-align: center;
-      animation: nf-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation: nf-rise 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .nf__brand {
@@ -103,32 +102,35 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      margin-bottom: 36px;
+      margin-bottom: 32px;
       text-decoration: none;
-      color: var(--text);
-      transition: opacity 0.2s ease;
+      color: var(--primary);
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
-    .nf__brand:hover { opacity: 0.85; }
+    .nf__brand:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
 
     .nf__logo {
-      max-height: 44px;
-      max-width: 160px;
+      max-height: 48px;
+      max-width: 180px;
       object-fit: contain;
     }
 
     .nf__brand-name {
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
     }
 
     .nf__card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 28px;
+      border-radius: 24px;
       padding: 48px 36px 40px;
-      backdrop-filter: blur(18px);
       box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
@@ -137,37 +139,33 @@
     .nf__card::before {
       content: "";
       position: absolute;
-      inset: -40% auto auto -20%;
-      width: 220px;
-      height: 220px;
+      top: -80px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
       border-radius: 50%;
-      background: var(--accent-soft);
-      filter: blur(24px);
-      animation: nf-glow 4.5s ease-in-out infinite alternate;
+      background: var(--primary-soft);
+      filter: blur(8px);
+      animation: nf-drift 5s ease-in-out infinite alternate;
       pointer-events: none;
     }
 
     .nf__code {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: clamp(4.5rem, 16vw, 7rem);
+      display: inline-block;
+      font-size: clamp(4.25rem, 15vw, 6.5rem);
       font-weight: 800;
-      letter-spacing: -0.06em;
+      letter-spacing: -0.07em;
       line-height: 1;
-      background: linear-gradient(180deg, #fff 10%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 12px;
+      color: var(--primary);
+      margin-bottom: 10px;
       position: relative;
-      animation: nf-pulse 3.2s ease-in-out infinite;
+      animation: nf-pop 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
     }
 
     .nf__title {
-      font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+      font-size: clamp(1.35rem, 3.5vw, 1.7rem);
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
       margin-bottom: 12px;
       position: relative;
     }
@@ -175,7 +173,7 @@
     .nf__message {
       color: var(--muted);
       font-size: 1rem;
-      line-height: 1.6;
+      line-height: 1.65;
       max-width: 36ch;
       margin: 0 auto 28px;
       position: relative;
@@ -186,8 +184,8 @@
       max-width: 100%;
       padding: 8px 14px;
       margin-bottom: 28px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.25);
+      border-radius: 10px;
+      background: #f8fafc;
       border: 1px solid var(--border);
       color: var(--muted);
       font-size: 0.8rem;
@@ -217,35 +215,36 @@
       font-size: 0.95rem;
       font-weight: 600;
       text-decoration: none;
-      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
 
     .nf__btn:hover { transform: translateY(-1px); }
 
     .nf__btn--primary {
-      background: var(--accent);
-      color: #0b1a14;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
       border: 1px solid transparent;
+      box-shadow: 0 8px 20px rgba(255, 102, 0, 0.28);
     }
 
     .nf__btn--primary:hover {
-      background: #55e09d;
+      box-shadow: 0 10px 24px rgba(255, 102, 0, 0.36);
     }
 
     .nf__btn--ghost {
-      background: transparent;
+      background: #fff;
       color: var(--text);
       border: 1px solid var(--border);
     }
 
     .nf__btn--ghost:hover {
-      border-color: rgba(255, 255, 255, 0.28);
-      background: rgba(255, 255, 255, 0.05);
+      border-color: #cbd5e1;
+      background: #f8fafc;
     }
 
     .nf__hint {
       margin-top: 28px;
-      color: rgba(168, 184, 177, 0.75);
+      color: #94a3b8;
       font-size: 0.85rem;
       position: relative;
     }
@@ -255,18 +254,18 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    @keyframes nf-glow {
-      from { transform: translate(0, 0); opacity: 0.55; }
-      to { transform: translate(40px, 30px); opacity: 1; }
+    @keyframes nf-drift {
+      from { transform: translate(0, 0); opacity: 0.7; }
+      to { transform: translate(-24px, 18px); opacity: 1; }
     }
 
-    @keyframes nf-pulse {
-      0%, 100% { filter: drop-shadow(0 0 0 transparent); }
-      50% { filter: drop-shadow(0 0 18px rgba(61, 214, 140, 0.35)); }
+    @keyframes nf-pop {
+      from { opacity: 0; transform: scale(0.86); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     @media (max-width: 480px) {
-      .nf__card { padding: 36px 22px 32px; border-radius: 22px; }
+      .nf__card { padding: 36px 22px 32px; border-radius: 20px; }
       .nf__actions { flex-direction: column; }
       .nf__btn { width: 100%; }
     }

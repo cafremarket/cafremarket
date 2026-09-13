@@ -61,9 +61,12 @@ class RoleController extends Controller
         $modules = Module::active()
             ->with('permissions')
             ->whereIn('access', [Module::ACCESS_COMMON, Module::ACCESS_MERCHANT])
-            // ->where('access', 'common')
-            // ->orWhere('access', 'merchant')
-            ->orderBy('name', 'asc')->get();
+            ->orderBy('name', 'asc')
+            ->get()
+            ->filter(function ($module) {
+                return in_array($module->name, \App\Helpers\ListHelper::storePanelModuleNames(), true);
+            })
+            ->values();
 
         return ModuleResource::collection($modules);
     }

@@ -7,7 +7,7 @@
         </div>
 
         <div class="product-info">
-          @include('theme::layouts.ratings', ['ratings' => $item->feedbacks->avg('rating')])
+          @include('theme::layouts.ratings', ['ratings' => $item->reviews->avg('rating')])
 
           <a href="{{ storefront_product_url($item) }}" class="product-info-title">
             {{ $item->title }}

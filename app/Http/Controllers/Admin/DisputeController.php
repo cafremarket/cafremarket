@@ -3,15 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Common\Authorizable;
-use App\Events\Dispute\DisputeUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\ResponseDisputeRequest;
-// use App\Events\Dispute\DisputeCreated;
 use App\Models\Dispute;
-use App\Models\System;
-use App\Notifications\SuperAdmin\AppealedDisputeReplied as AppealedDisputeRepliedNotification;
-use App\Notifications\SuperAdmin\DisputeAppealed as DisputeAppealedNotification;
-use App\Repositories\Dispute\DisputeRepository;
+use App\Services\Dispute\DisputeTicketService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DisputeController extends Controller
@@ -20,102 +16,73 @@ class DisputeController extends Controller
 
     private $model_name;
 
-    private $dispute;
+    private $tickets;
 
-    /**
-     * construct
-     */
-    public function __construct(DisputeRepository $dispute)
+    public function __construct(DisputeTicketService $tickets)
     {
         parent::__construct();
 
         $this->model_name = trans('app.model.dispute');
-
-        $this->dispute = $dispute;
+        $this->tickets = $tickets;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $query = Dispute::with('dispute_type', 'order', 'customer.avatarImage', 'shop')
-            ->withCount('replies')->orderBy('created_at', 'desc');
+            ->withCount('replies')
+            ->orderByDesc('updated_at');
 
-        if (Auth::user()->isFromPlatform()) {
-            // Admin manages the full dispute ticket queue (open + closed).
-            $disputes = (clone $query)->open()->get();
-            $closed = (clone $query)->closed()->get();
-        } else {
-            $disputes = $query->mine()->open()->get();
-            $closed = Dispute::with('dispute_type', 'order', 'customer.avatarImage', 'shop')
-                ->withCount('replies')
-                ->mine()
-                ->closed()
-                ->orderBy('created_at', 'desc')
-                ->get();
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
         }
 
-        return view('admin.dispute.index', compact('disputes', 'closed'));
+        $pendingClose = (clone $query)->closeRequested()->get();
+        $disputes = (clone $query)->open()->where('status', '!=', Dispute::STATUS_CLOSE_REQUESTED)->get();
+        $closed = (clone $query)->closed()->get();
+
+        return view('admin.dispute.index', compact('disputes', 'pendingClose', 'closed'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param int id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        $dispute = Dispute::with('activities.causer')->find($id);
+        $dispute = Dispute::with([
+            'activities.causer',
+            'dispute_type',
+            'order.refunds',
+            'customer',
+            'shop.owner',
+            'product.image',
+            'replies.attachments',
+            'replies.user',
+            'replies.customer',
+            'attachments',
+            'closedByUser',
+        ])->findOrFail($id);
 
         return view('admin.dispute.show', compact('dispute'));
     }
 
-    /**
-     * Display the response form.
-     *
-     * @param int id
-     * @return \Illuminate\Http\Response
-     */
     public function response($id)
     {
-        $dispute = $this->dispute->find($id);
+        $dispute = Dispute::findOrFail($id);
 
         return view('admin.dispute._response', compact('dispute'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param int id
-     * @return \Illuminate\Http\Response
-     */
     public function storeResponse(ResponseDisputeRequest $request, $id)
     {
-        $dispute = $this->dispute->find($id);
+        $dispute = Dispute::findOrFail($id);
 
-        $old_status = $dispute->status;
+        $this->tickets->reply($dispute, $request, Auth::user());
 
-        $response = $this->dispute->storeResponse($request, $dispute);
+        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+    }
 
-        $current_status = $response->repliable->status;
+    public function close(Request $request, Dispute $dispute)
+    {
+        $this->authorize('close', $dispute);
 
-        // Send notification to Admin
-        if (config('system_settings.notify_when_dispute_appealed') && ($current_status == Dispute::STATUS_APPEALED)) {
-            $system = System::orderBy('id', 'asc')->first();
-
-            if ($current_status != $old_status) {
-                safe_notify($system->superAdmin(), new DisputeAppealedNotification($response), 'admin dispute appealed');
-            } else {
-                safe_notify($system->superAdmin(), new AppealedDisputeRepliedNotification($response), 'admin dispute reply');
-            }
-        }
-
-        event(new DisputeUpdated($response));
+        $this->tickets->close($dispute, Auth::user());
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
     }

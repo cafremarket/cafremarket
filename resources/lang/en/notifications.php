@@ -375,9 +375,23 @@ return [
 
     // Version 1.2.6
     'dispute_solved' => [
-        'subject' => 'Dispute [Order ID: :order_id] has been marked as solved!',
+        'subject' => 'Dispute [Order ID: :order_id] has been marked as resolved!',
         'greeting' => 'Hello :customer!',
-        'message' => 'The dispute for Order ID: :order_id has been marked as solved. Thank you for being with us.',
+        'message' => 'The dispute for Order ID: :order_id has been marked as resolved. Admin can now close the ticket when you request it.',
+        'button_text' => 'View the dispute',
+    ],
+
+    'dispute_close_requested' => [
+        'subject' => 'Close requested for dispute ticket :ticket [Order ID: :order_id]',
+        'greeting' => 'Hello!',
+        'message' => 'Customer or seller requested to close dispute ticket :ticket for Order ID: :order_id. Please review and close it if the issue is resolved.',
+        'button_text' => 'Review ticket',
+    ],
+
+    'dispute_closed' => [
+        'subject' => 'Dispute ticket :ticket [Order ID: :order_id] has been closed',
+        'greeting' => 'Hello!',
+        'message' => 'Marketplace admin has closed dispute ticket :ticket for Order ID: :order_id.',
         'button_text' => 'View the dispute',
     ],
 

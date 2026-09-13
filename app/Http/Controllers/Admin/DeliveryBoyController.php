@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Common\Authorizable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateDeliveryBoyRequest;
 use App\Http\Requests\Validations\ResetDeliveryBoyPasswordRequest;
@@ -12,6 +13,8 @@ use Illuminate\Http\Request;
 
 class DeliveryBoyController extends Controller
 {
+    use Authorizable;
+
     private $model_name;
 
     private $deliveryBoy;

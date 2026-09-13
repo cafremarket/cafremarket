@@ -6,21 +6,23 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class DisputeResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
     public function toArray($request)
     {
         $vendor = $request->is('api/vendor/*');
 
         return [
             'id' => $this->id,
-            'reason' => $this->dispute_type->detail,
+            'ticket_number' => $this->ticketRef(),
+            'raised_by' => $this->raised_by,
+            'raised_by_label' => $this->raisedByLabel(),
+            'reason' => optional($this->dispute_type)->detail,
             'progress' => $this->progress(),
             'closed' => $this->isClosed(),
+            'resolved' => $this->isResolved(),
+            'close_requested' => $this->isCloseRequested(),
+            'can_reply' => $this->canReply(),
+            'can_resolve' => $this->canMarkResolved(),
+            'can_request_close' => $this->canRequestClose(),
             'description' => $this->description,
             'goods_received' => $this->order_received,
             'return_goods' => $this->return_goods,

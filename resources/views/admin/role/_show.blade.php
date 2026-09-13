@@ -37,40 +37,51 @@
       <div class="row">
         <div class="box-body">
           @if ($role_permissions)
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th width="40%" class="text-center">
-                    {{ strtoupper(trans('app.modules')) }}
-                  </th>
-                  <th>
-                    {{ strtoupper(trans('app.form.permissions')) }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach ($modules as $module)
-                  @if (in_array($module->id, $role_permissions))
-                    <tr>
-                      <td><button class="btn btn-primary btn-lg btn-block disabled" style="cursor: default;">{{ $module->name }}</button></td>
-                      <td>
-                        @foreach ($module->permissions as $permission)
-                          @if (array_key_exists($permission->slug, $role_permissions))
-                            <span class="label label-outline">
-                              <i class="fa fa-check"></i>
-                              {{ $permission->name }}</span>
-                          @else
-                            <span class="label label-danger">
-                              <i class="fa fa-times"></i>
-                              {{ $permission->name }}</span>
-                          @endif
-                        @endforeach
-                      </td>
-                    </tr>
-                  @endif
-                @endforeach
-              </tbody>
-            </table>
+            <div class="role-perm" id="tbl-permissions">
+              @php
+                $storePanelNames = \App\Helpers\ListHelper::storePanelModuleNames();
+                $permissionGroups = \App\Helpers\ListHelper::rolePermissionGroups();
+                $modulesByName = collect($modules)->keyBy('name');
+                $usedNames = [];
+              @endphp
+
+              @foreach ($permissionGroups as $group)
+                @php
+                  $groupModules = [];
+                  foreach ($group['modules'] as $moduleName) {
+                    $module = $modulesByName->get($moduleName);
+                    if ($module && in_array($module->id, $role_permissions)) {
+                      $groupModules[] = $module;
+                      $usedNames[] = $module->name;
+                    }
+                  }
+                @endphp
+                @if (count($groupModules))
+                  <section class="role-perm__group">
+                    <header class="role-perm__group-head">
+                      <i class="fa {{ $group['icon'] }}"></i>
+                      <span>{{ $group['label'] }}</span>
+                    </header>
+                    @foreach ($groupModules as $module)
+                      <div class="role-perm__row">
+                        <div class="role-perm__module">
+                          <strong>{{ $module->name }}</strong>
+                        </div>
+                        <div class="role-perm__actions">
+                          @foreach ($module->permissions as $permission)
+                            @if (array_key_exists($permission->slug, $role_permissions))
+                              <span class="label label-outline"><i class="fa fa-check"></i> {{ $permission->name }}</span>
+                            @else
+                              <span class="label label-danger"><i class="fa fa-times"></i> {{ $permission->name }}</span>
+                            @endif
+                          @endforeach
+                        </div>
+                      </div>
+                    @endforeach
+                  </section>
+                @endif
+              @endforeach
+            </div>
           @else
             <div class="alert alert-danger">{{ trans('app.no_permissions_set') }}</div>
           @endif

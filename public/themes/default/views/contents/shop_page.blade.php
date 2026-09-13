@@ -3,7 +3,7 @@
   $isStoreHome = $storeRoute === 'show.store';
   $isStoreProducts = $storeRoute === 'shop.products';
   $isStoreReviews = $storeRoute === 'shop.reviews';
-  $storeRating = $shop->feedbacks->count() ? $shop->feedbacks->avg('rating') : 0;
+  $storeRating = $shop->reviews->count() ? $shop->reviews->avg('rating') : 0;
 @endphp
 
 <div class="sf-store">
@@ -23,9 +23,9 @@
           <h1 class="sf-store__name">{!! $shop->getQualifiedName() !!}</h1>
         </div>
 
-        @if ($shop->feedbacks->count())
+        @if ($shop->reviews->count())
           <div class="sf-store__rating">
-            @include('theme::layouts.ratings', ['ratings' => $storeRating, 'count' => $shop->feedbacks->count(), 'shop' => true])
+            @include('theme::layouts.ratings', ['ratings' => $storeRating, 'count' => $shop->reviews->count(), 'shop' => true])
           </div>
         @endif
 
@@ -124,6 +124,28 @@
 
       <div id="reviews-tab" class="tab-pane {{ $isStoreReviews ? 'active' : '' }}">
         <div class="sf-store__reviews">
+          @if (Auth::guard('customer')->check() && ($canReviewStore ?? false))
+            <div class="sf-feedback-card mb-4" style="border:1px solid #eef2f7;border-radius:12px;padding:14px;">
+              <p class="mb-2"><strong>{{ isset($myStoreReview) && $myStoreReview ? trans('theme.update_your_review') ?? 'Update your review' : trans('theme.write_a_review') ?? 'Write a review' }}</strong></p>
+              {!! Form::open(['route' => ['shop.review.store', $shop->slug], 'class' => 'sf-form', 'data-toggle' => 'validator']) !!}
+              <div class="product-info-rating feedback-stars mb-3">
+                <span class="star rated" data-toggle="tooltip" data-title="@lang('theme.hate_it')" data-value="1"><i class="fas fa-star fa-fw"></i></span>
+                <span class="star rated" data-toggle="tooltip" data-title="@lang('theme.not_so_good')" data-value="2"><i class="fas fa-star fa-fw"></i></span>
+                <span class="star rated" data-toggle="tooltip" data-title="@lang('theme.its_ok')" data-value="3"><i class="fas fa-star fa-fw"></i></span>
+                <span class="star rated" data-toggle="tooltip" data-title="@lang('theme.like_it')" data-value="4"><i class="fas fa-star fa-fw"></i></span>
+                <span class="star rated" data-toggle="tooltip" data-title="@lang('theme.love_it')" data-value="5"><i class="fas fa-star fa-fw"></i></span>
+                <span class="response small text-primary">@lang('theme.love_it')</span>
+                {{ Form::hidden('rating', optional($myStoreReview ?? null)->rating ?: 5, ['class' => 'rating-value']) }}
+              </div>
+              <div class="sf-form-group">
+                {{ Form::textarea('comment', optional($myStoreReview ?? null)->comment, ['rows' => '2', 'class' => 'form-control sf-input', 'placeholder' => trans('theme.placeholder.write_your_feedback'), 'minlength' => '10', 'maxlength' => '250']) }}
+                <div class="help-block with-errors"></div>
+              </div>
+              <button class="confirm btn sf-btn-primary" data-confirm="@lang('theme.confirm_action.cant_undo')" type="submit">@lang('theme.button.save')</button>
+              {!! Form::close() !!}
+            </div>
+          @endif
+
           @isset($reviews)
             @forelse($reviews as $review)
               <article class="sf-store__review">
@@ -136,6 +158,12 @@
                 </header>
                 <p>{{ $review->comment }}</p>
                 @include('theme::layouts.ratings', ['ratings' => $review->rating])
+                @if ($review->hasReply())
+                  <div class="sf-store__review-reply" style="margin-top:8px;padding:10px 12px;background:#f7f7f8;border-left:3px solid #ccc;border-radius:4px;">
+                    <strong class="small">@lang('theme.seller_reply')</strong>
+                    <p class="mb-0 small">{{ $review->reply }}</p>
+                  </div>
+                @endif
               </article>
             @empty
               <p class="sf-store__empty">@lang('theme.no_reviews')</p>

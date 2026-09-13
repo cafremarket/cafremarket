@@ -31,7 +31,7 @@
                 <h5 class="description-header">&nbsp;</h5>
 
                 <span class="description-text small">
-                  @include('theme::layouts.ratings', ['ratings' => $shop->feedbacks->avg('rating'), 'count' => $shop->feedbacks->count()])
+                  @include('theme::layouts.ratings', ['ratings' => $shop->reviews->avg('rating'), 'count' => $shop->reviews->count()])
                 </span>
               </div>
             </div>
@@ -98,19 +98,26 @@
             </div> <!-- /.tab-pane -->
 
             <div class="tab-pane" id="shop_reviews_tab">
-              @forelse($shop->latestFeedbacks as $feedback)
+              @forelse($shop->latestReviews as $review)
                 <p>
-                  <b>{{ $feedback->customer->nice_name ?? $feedback->customer->name }}</b>
+                  <b>{{ $review->customer->nice_name ?? $review->customer->name }}</b>
 
                   <span class="pull-right small">
                     <b class="text-success">@lang('theme.verified_purchase')</b>
-                    <span class="text-muted"> | {{ $feedback->created_at->diffForHumans() }}</span>
+                    <span class="text-muted"> | {{ $review->created_at->diffForHumans() }}</span>
                   </span>
                 </p>
 
-                <p>{{ $feedback->comment }}</p>
+                <p>{{ $review->comment }}</p>
 
-                @include('theme::layouts.ratings', ['ratings' => $feedback->rating, 'count' => $feedback->ratings_count])
+                @include('theme::layouts.ratings', ['ratings' => $review->rating, 'count' => $review->ratings_count])
+
+                @if ($review->hasReply())
+                  <div class="small" style="margin-top:4px;padding:8px 10px;background:#f7f7f8;border-left:3px solid #ccc;border-radius:4px;">
+                    <strong>@lang('theme.seller_reply')</strong>
+                    <p class="mb-0">{{ $review->reply }}</p>
+                  </div>
+                @endif
 
                 @unless ($loop->last)
                   <hr />

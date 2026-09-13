@@ -21,9 +21,9 @@
           <div class="sf-panel__body" style="padding:18px;">
             @if ($order->dispute)
               <p class="mb-3">
-                <span class="label label-info">Ticket {{ $order->dispute->ticketRef() }}</span>
+                <span class="label label-info">{{ trans('theme.ticket') }} {{ $order->dispute->ticketRef() }}</span>
                 {!! $order->dispute->statusName() !!}
-                <span class="label label-default">Raised by {{ $order->dispute->raisedByLabel() }}</span>
+                <span class="label label-default">{{ trans('theme.raised_by') }} {{ $order->dispute->raisedByLabel() }}</span>
               </p>
             @endif
             <div class="step-wizard-wrapper">
@@ -154,13 +154,25 @@
 
                 <div class="text-center my-3">
                   @if ($order->dispute->isClosed())
-                    <a class="btn btn-danger" href="javascript:void(0);" data-toggle="modal" data-target="#disputeAppealModal">{!! trans('theme.button.appeal') !!}</a>
+                    <p class="text-muted">{{ trans('theme.only_admin_can_close') }}</p>
                   @else
-                    <a class="btn btn-default" href="javascript:void(0);" data-toggle="modal" data-target="#disputeResponseModal">{!! trans('theme.button.response') !!}</a>
+                    @if ($order->dispute->canReply())
+                      <a class="btn btn-default" href="javascript:void(0);" data-toggle="modal" data-target="#disputeResponseModal">{!! trans('theme.button.response') !!}</a>
+                    @endif
 
-                    {!! Form::open(['route' => ['dispute.markAsSolved', $order->dispute], 'class' => 'form-btn d-inline-block']) !!}
-                    {!! Form::button(trans('theme.mark_as_solved'), ['type' => 'submit', 'class' => 'confirm btn sf-btn-primary flat']) !!}
-                    {!! Form::close() !!}
+                    @if ($order->dispute->canMarkResolved())
+                      {!! Form::open(['route' => ['dispute.markAsSolved', $order->dispute], 'class' => 'form-btn d-inline-block']) !!}
+                      {!! Form::button(trans('theme.mark_as_solved'), ['type' => 'submit', 'class' => 'confirm btn sf-btn-primary flat']) !!}
+                      {!! Form::close() !!}
+                    @endif
+
+                    @if ($order->dispute->canRequestClose())
+                      {!! Form::open(['route' => ['dispute.requestClose', $order->dispute], 'class' => 'form-btn d-inline-block']) !!}
+                      {!! Form::button(trans('theme.request_close'), ['type' => 'submit', 'class' => 'confirm btn btn-warning flat']) !!}
+                      {!! Form::close() !!}
+                    @elseif ($order->dispute->isCloseRequested())
+                      <p class="text-muted mt-2">{{ trans('theme.close_requested_waiting') }}</p>
+                    @endif
                   @endif
                 </div>
               </div>

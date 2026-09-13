@@ -91,7 +91,7 @@ class SearchController extends Controller
         $products = $products->paginate(config('mobile_app.view_listing_per_page', 8));
 
         // Load avg rating
-        $products = $products->load('avgFeedback:rating,count,feedbackable_id');
+        $products = $products->load('reviewSummary:rating,count,reviewable_id');
 
         return ListingResource::collection($products);
     }

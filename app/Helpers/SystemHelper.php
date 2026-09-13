@@ -553,7 +553,7 @@ if (! function_exists('prepareFilteredListings')) {
                     },
                 ])
                 ->with([
-                    'avgFeedback:rating,count,feedbackable_id,feedbackable_type',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
                     // 'feedbacks:rating,feedbackable_id,feedbackable_type',
                     'images:path,imageable_id,imageable_type',
                 ])->get();

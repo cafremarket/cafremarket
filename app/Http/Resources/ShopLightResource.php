@@ -12,18 +12,25 @@ class ShopLightResource extends JsonResource
     private $feedback_id;
 
     /**
+     * @var int|null the order's customer, used to look up that customer's (product/store
+     *      based, not order based) review of this shop
+     */
+    private $customer_id;
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
      * @return void
      */
-    public function __construct($resource, $feedback_id = null)
+    public function __construct($resource, $feedback_id = null, $customer_id = null)
     {
         // Ensure you call the parent constructor
         parent::__construct($resource);
 
         $this->resource = $resource;
         $this->feedback_id = $feedback_id;
+        $this->customer_id = $customer_id;
     }
 
     /**
@@ -49,11 +56,19 @@ class ShopLightResource extends JsonResource
             'rating' => $this->rating(),
             'member_since' => date('F j, Y', strtotime($this->created_at)),
             'pickup_enabled' => false,
-            'feedbacks_count' => $this->rating() ? $this->avgFeedback->count : 0,
+            'feedbacks_count' => $this->rating() ? $this->reviewSummary->count : 0,
             'feedbacks' => $this->when($request->is('api/order/*'), function () {
                 $feedback = \App\Models\Feedback::find($this->feedback_id);
 
                 return $feedback ? new FeedbackResource($feedback) : null;
+            }),
+            'review' => $this->when($request->is('api/order/*') && $this->customer_id, function () {
+                $review = \App\Models\Review::where('customer_id', $this->customer_id)
+                    ->where('reviewable_type', \App\Models\Shop::class)
+                    ->where('reviewable_id', $this->id)
+                    ->first();
+
+                return $review ? new ReviewResource($review) : null;
             }),
 
             $this->mergeWhen($request->is('api/deliveryboy/*'), function () {

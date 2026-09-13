@@ -4,11 +4,11 @@ namespace App\Models;
 
 use App\Common\Addressable;
 use App\Common\Billable;
-use App\Common\Feedbackable;
 use App\Common\HasHumanAttributes;
 use App\Common\Imageable;
 use App\Common\Loggable;
 use App\Common\ReleasesUniqueIdentifiers;
+use App\Common\Reviewable;
 use App\Common\Translatable;
 use App\Helpers\Statistics;
 use Carbon\Carbon;
@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 
 class Shop extends ShopWallet
 {
-    use Addressable, Billable, Feedbackable, HasFactory, HasHumanAttributes, Imageable, Loggable, Notifiable, ReleasesUniqueIdentifiers, SoftDeletes, Translatable;
+    use Addressable, Billable, HasFactory, HasHumanAttributes, Imageable, Loggable, Notifiable, ReleasesUniqueIdentifiers, Reviewable, SoftDeletes, Translatable;
 
     public const SELLER_TYPE_INDIVIDUAL = 'individual';
 
@@ -453,7 +453,7 @@ class Shop extends ShopWallet
 
     public function openDisputes()
     {
-        return $this->disputes()->where('status', '<', Dispute::STATUS_SOLVED);
+        return $this->disputes()->where('status', '!=', Dispute::STATUS_CLOSED);
     }
 
     public function solvedDisputes()

@@ -2,10 +2,6 @@
 
 namespace App\Http\Controllers\Storefront;
 
-// use Illuminate\Support\Facades\Auth;
-use App\Events\Dispute\DisputeCreated;
-use App\Events\Dispute\DisputeSolved;
-use App\Events\Dispute\DisputeUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateDisputeRequest;
 use App\Http\Requests\Validations\OrderDetailRequest;
@@ -13,20 +9,18 @@ use App\Http\Requests\Validations\ReplyDisputeRequest;
 use App\Models\Dispute;
 use App\Models\DisputeType;
 use App\Models\Order;
-// use App\Http\Requests\Validations\RefundRequest;
-use App\Models\System;
-use App\Notifications\SuperAdmin\DisputeAppealed as DisputeAppealedNotification;
-use Illuminate\Http\Request;
+use App\Services\Dispute\DisputeTicketService;
+use Illuminate\Support\Facades\Auth;
 
 class DisputeController extends Controller
 {
-    /**
-     * show_dispute_form
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  App\Models\Order  $order
-     * @return \Illuminate\Http\Response
-     */
+    private $tickets;
+
+    public function __construct(DisputeTicketService $tickets)
+    {
+        $this->tickets = $tickets;
+    }
+
     public function show_dispute_form(OrderDetailRequest $request, Order $order)
     {
         $types = DisputeType::orderBy('id')->pluck('detail', 'id');
@@ -34,110 +28,50 @@ class DisputeController extends Controller
         return view('theme::dispute', compact('order', 'types'));
     }
 
-    /**
-     * refund_request
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  App\Models\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    // public function refund_request(RefundRequest $request, Order $order)
-    // {
-    //     $refund = $order->refunds()->create($request->all());
-
-    //     // event(new RefundCreated($refund));
-
-    //     return redirect()->route('order.detail', $order)->with('success', trans('theme.notify.refund_request_sent'));
-    // }
-
-    /**
-     * open_dispute
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  App\Models\Order  $order
-     * @return \Illuminate\Http\Response
-     */
     public function open_dispute(CreateDisputeRequest $request, Order $order)
     {
-        $payload = $request->all();
-        $payload['raised_by'] = Dispute::RAISED_BY_CUSTOMER;
-        $payload['status'] = Dispute::STATUS_NEW;
-
-        $dispute = $order->dispute()->create($payload);
-
-        event(new DisputeCreated($dispute));
+        $this->tickets->createFromOrder(
+            $order,
+            $request->all(),
+            Dispute::RAISED_BY_CUSTOMER,
+            $request->file('attachments')
+        );
 
         return redirect()->route('order.detail', $order)
             ->with('success', trans('theme.notify.dispute_created'));
     }
 
-    /**
-     * [response description]
-     *
-     * @param  ReplyDisputeRequest  $request  [description]
-     * @param  Dispute  $dispute  [description]
-     * @return [type]                       [description]
-     */
     public function response(ReplyDisputeRequest $request, Dispute $dispute)
     {
-        // Update status
-        // if ($dispute->status != $request->status) {
-        //     $dispute->status = $request->status;
-        //     $dispute->save();
-        // }
-
-        $response = $dispute->replies()->create($request->all());
-
-        if ($request->hasFile('attachments')) {
-            $response->saveAttachments($request->file('attachments'));
-        }
-
-        if ($request->get('solved')) {
-            $this->markAsSolved($request, $dispute);
-        } else {
-            event(new DisputeUpdated($response));
-        }
+        $this->tickets->reply($dispute, $request, Auth::guard('customer')->user() ?: Auth::user());
 
         return back()->with('success', trans('theme.notify.dispute_updated'));
     }
 
-    /**
-     * [appeal description]
-     *
-     * @param  ReplyDisputeRequest  $request  [description]
-     * @param  Dispute  $dispute  [description]
-     * @return [type]                       [description]
-     */
-    public function appeal(ReplyDisputeRequest $request, Dispute $dispute)
+    public function markAsSolved(Dispute $dispute)
     {
-        $dispute->status = Dispute::STATUS_APPEALED;
-        $dispute->save();
+        $this->assertCustomer($dispute);
 
-        $response = $dispute->replies()->create($request->all());
+        $this->tickets->markResolved($dispute, Dispute::RAISED_BY_CUSTOMER);
 
-        if ($request->hasFile('attachments')) {
-            $response->saveAttachments($request->file('attachments'));
-        }
-
-        // Send notification to Admin
-        if (config('system_settings.notify_when_dispute_appealed')) {
-            $system = System::orderBy('id', 'asc')->first();
-            safe_notify($system->superAdmin(), new DisputeAppealedNotification($response), 'storefront dispute appealed');
-        }
-
-        event(new DisputeUpdated($response));
-
-        return back()->with('success', trans('theme.notify.dispute_updated'));
+        return back()->with('success', trans('theme.notify.dispute_resolved') ?? trans('theme.notify.dispute_updated'));
     }
 
-    public function markAsSolved(Request $request, Dispute $dispute)
+    public function requestClose(Dispute $dispute)
     {
-        $dispute->status = Dispute::STATUS_SOLVED;
+        $this->assertCustomer($dispute);
 
-        $dispute->save();
+        $this->tickets->requestClose($dispute, Dispute::RAISED_BY_CUSTOMER);
 
-        event(new DisputeSolved($dispute));
+        return back()->with('success', trans('theme.notify.dispute_close_requested') ?? trans('theme.notify.dispute_updated'));
+    }
 
-        return back()->with('success', trans('theme.notify.dispute_updated'));
+    protected function assertCustomer(Dispute $dispute): void
+    {
+        $customer = Auth::guard('customer')->user() ?: Auth::user();
+
+        if (! $customer || (int) $dispute->customer_id !== (int) $customer->id) {
+            abort(403);
+        }
     }
 }

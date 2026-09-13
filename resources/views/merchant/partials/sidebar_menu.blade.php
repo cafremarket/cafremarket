@@ -93,7 +93,7 @@
 @endif
 
 {{-- Delivery --}}
-@if (Auth::user()->isMerchant())
+@if (Gate::allows('index', \App\Models\DeliveryBoy::class))
   <div class="mp-nav-group {{ mp_is_any(['merchant/admin/deliveryboy*']) ? 'is-open' : '' }}">
     <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is_any(['merchant/admin/deliveryboy*']) ? 'true' : 'false' }}">
       <i class="fa fa-truck"></i>
@@ -138,8 +138,15 @@
   </div>
 @endif
 
-{{-- Cafrepay / Wallet --}}
-@if (is_incevio_package_loaded('wallet') && (Route::has('merchant.wallet') || vendor_get_paid_directly() || vendor_can_on_off_payment_method()))
+{{-- Cafrepay / Wallet (shop owner wallet; payment methods need Config) --}}
+@php
+  $canSeeWallet = Auth::user()->isMerchant()
+      && is_incevio_package_loaded('wallet')
+      && Route::has('merchant.wallet');
+  $canSeePaymentMethods = (vendor_get_paid_directly() || vendor_can_on_off_payment_method())
+      && Gate::allows('view', \App\Models\Config::class);
+@endphp
+@if ($canSeeWallet || $canSeePaymentMethods)
   <div class="mp-nav-group {{ mp_is_any(['merchant/wallet*', 'merchant/setting/paymentMethod*']) ? 'is-open' : '' }}">
     <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is_any(['merchant/wallet*', 'merchant/setting/paymentMethod*']) ? 'true' : 'false' }}">
       <i class="fa fa-money"></i>
@@ -148,19 +155,17 @@
     </button>
     <div class="mp-nav-group__items">
       <div class="mp-nav-group__items-inner">
-        @if (Route::has('merchant.wallet'))
+        @if ($canSeeWallet)
           <a href="{{ route('merchant.wallet') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/wallet*') ? 'is-active' : '' }}">
             <i class="fa fa-money"></i>
             <span>{{ trans('packages.wallet.wallet') }}</span>
           </a>
         @endif
-        @if (vendor_get_paid_directly() || vendor_can_on_off_payment_method())
-          @can('view', \App\Models\Config::class)
-            <a href="{{ mp_url('merchant/setting/paymentMethod') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/setting/paymentMethod*') ? 'is-active' : '' }}">
-              <i class="fa fa-credit-card"></i>
-              <span>{{ trans('nav.payment_methods') }}</span>
-            </a>
-          @endcan
+        @if ($canSeePaymentMethods)
+          <a href="{{ mp_url('merchant/setting/paymentMethod') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/setting/paymentMethod*') ? 'is-active' : '' }}">
+            <i class="fa fa-credit-card"></i>
+            <span>{{ trans('nav.payment_methods') }}</span>
+          </a>
         @endif
       </div>
     </div>
@@ -176,10 +181,20 @@
 @endif
 
 {{-- Dispute Tickets --}}
-<a href="{{ route('merchant.support.dispute.index') }}" class="mp-sidebar__link {{ mp_is('merchant/support/dispute*') ? 'is-active' : '' }}">
-  <i class="fa fa-ticket"></i>
-  <span>{{ trans('nav.disputes') ?? 'Disputes' }}</span>
-</a>
+@can('index', \App\Models\Dispute::class)
+  <a href="{{ route('merchant.support.dispute.index') }}" class="mp-sidebar__link {{ mp_is('merchant/support/dispute*') ? 'is-active' : '' }}">
+    <i class="fa fa-ticket"></i>
+    <span>{{ trans('nav.disputes') ?? 'Disputes' }}</span>
+  </a>
+@endcan
+
+{{-- Reviews --}}
+@can('index', \App\Models\Review::class)
+  <a href="{{ route('merchant.review.index') }}" class="mp-sidebar__link {{ mp_is('merchant/review*') ? 'is-active' : '' }}">
+    <i class="fa fa-star"></i>
+    <span>{{ trans('nav.reviews') ?? 'Reviews' }}</span>
+  </a>
+@endcan
 
 {{-- Reports --}}
 @if (Auth::user()->isMerchant())
@@ -213,10 +228,16 @@
         <i class="fa fa-user"></i>
         <span>{{ trans('app.profile') ?? trans('app.account') }}</span>
       </a>
-      @if (Route::has('merchant.account.billing'))
+      @if (Auth::user()->isMerchant() && Route::has('merchant.account.billing'))
         <a href="{{ route('merchant.account.billing') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/account/billing*') ? 'is-active' : '' }}">
-          <i class="fa fa-file-text-o"></i>
+          <i class="fa fa-credit-card"></i>
           <span>{{ trans('app.billing') ?? 'Billing' }}</span>
+        </a>
+      @endif
+      @if (Auth::user()->isMerchant() || Gate::allows('index', \App\Models\Ticket::class))
+        <a href="{{ route('merchant.account.ticket') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/account/ticket*') ? 'is-active' : '' }}">
+          <i class="fa fa-ticket"></i>
+          <span>{{ trans('app.tickets') ?? 'Support tickets' }}</span>
         </a>
       @endif
     </div>

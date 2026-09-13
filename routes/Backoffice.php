@@ -163,6 +163,7 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
         Route::middleware(['userType:admin'])->group(function () {
             include 'admin/WebBanner.php';
             include 'admin/AppBanner.php';
+            include 'admin/Popup.php';
         });
 
         // Promotions Routes for Admin
@@ -179,6 +180,7 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/Ticket.php';
             include 'admin/Dispute.php';
             include 'admin/Refund.php';
+            include 'admin/Review.php';
         });
 
         // Others

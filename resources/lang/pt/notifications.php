@@ -377,7 +377,21 @@ return [
     'dispute_solved' => [
         'subject' => 'Disputa [Pedido ID: :order_id] foi marcada como resolvida!',
         'greeting' => 'Olá :customer!',
-        'message' => 'A disputa referente ao Pedido ID: :order_id foi marcada como resolvida. Obrigado por estar connosco.',
+        'message' => 'A disputa referente ao Pedido ID: :order_id foi marcada como resolvida. O admin pode agora fechar o ticket quando o pedir.',
+        'button_text' => 'Ver a disputa',
+    ],
+
+    'dispute_close_requested' => [
+        'subject' => 'Fecho pedido para o ticket de disputa :ticket [Pedido ID: :order_id]',
+        'greeting' => 'Olá!',
+        'message' => 'O cliente ou o vendedor pediu para fechar o ticket de disputa :ticket referente ao Pedido ID: :order_id. Reveja e feche-o se o problema estiver resolvido.',
+        'button_text' => 'Rever ticket',
+    ],
+
+    'dispute_closed' => [
+        'subject' => 'O ticket de disputa :ticket [Pedido ID: :order_id] foi fechado',
+        'greeting' => 'Olá!',
+        'message' => 'O administrador do marketplace fechou o ticket de disputa :ticket referente ao Pedido ID: :order_id.',
         'button_text' => 'Ver a disputa',
     ],
 

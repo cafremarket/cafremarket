@@ -71,7 +71,7 @@ class OrderResource extends JsonResource
             'tracking_url' => $this->getTrackingUrl(),
             'customer' => $this->customer_id ? new CustomerLightResource($this->customer) : null,
             'delivery_boy' => new DeliveryBoyLightResource($this->deliveryBoy),
-            'shop' => $this->when(! $vendor, new ShopLightResource($this->shop, $this->feedback_id)),
+            'shop' => $this->when(! $vendor, new ShopLightResource($this->shop, $this->feedback_id, $this->customer_id)),
             'items' => OrderItemResource::collection($this->inventories, $this->currency_id),
             'conversation' => $this->conversation,
             // The rider must never see the OTP the customer is meant to read out to them.

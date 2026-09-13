@@ -71,9 +71,13 @@
               {!! trans('theme.dispute_details') !!}
             </a>
 
-            @if ($dispute->isOpen())
+            @if ($dispute->canMarkResolved())
               {!! Form::open(['route' => ['dispute.markAsSolved', $dispute]]) !!}
               {!! Form::button(trans('theme.mark_as_solved'), ['type' => 'submit', 'class' => 'confirm btn sf-btn-primary btn-sm btn-block flat']) !!}
+              {!! Form::close() !!}
+            @elseif ($dispute->canRequestClose())
+              {!! Form::open(['route' => ['dispute.requestClose', $dispute]]) !!}
+              {!! Form::button(trans('theme.request_close'), ['type' => 'submit', 'class' => 'confirm btn btn-warning btn-sm btn-block flat']) !!}
               {!! Form::close() !!}
             @endif
           </div>

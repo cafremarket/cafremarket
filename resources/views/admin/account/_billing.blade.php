@@ -44,7 +44,7 @@
                     </td>
 
                     <td class="hidden-xs hidden-sm">
-                      <a href="javascript:void(0)" data-link="{{ route('admin.account.subscription.features', $plan->plan_id) }}" class="ajax-modal-btn btn btn-link">
+                      <a href="javascript:void(0)" data-link="{{ mp_route('admin.account.subscription.features', $plan->plan_id) }}" class="ajax-modal-btn btn btn-link">
                         <i class="fa fa-star-o"></i> {{ trans('app.features') }}
                       </a>
                     </td>
@@ -57,15 +57,15 @@
                       <td class="pull-right">
                         @if (optional($current_plan)->stripe_price == $plan->plan_id)
                           @if (Auth::user()->isOnGracePeriod())
-                            <a href="{{ route('admin.account.subscription.resume') }}" class="confirm btn btn-lg btn-primary">
+                            <a href="{{ mp_route('admin.account.subscription.resume') }}" class="confirm btn btn-lg btn-primary">
                               <i class="fa fa-play"></i> {{ trans('app.resume_subscription') }}
                             </a>
                           @elseif($current_plan->provider == 'stripe')
-                            {!! Form::open(['route' => 'admin.account.subscription.cancel', 'method' => 'delete', 'class' => 'inline']) !!}
+                            {!! Form::open(['url' => mp_route('admin.account.subscription.cancel'), 'method' => 'delete', 'class' => 'inline']) !!}
                             {!! Form::button('<i class="fa fa-times-circle-o"></i> '.trans('app.cancel'), ['type' => 'submit', 'class' => 'confirm ajax-silent btn btn-lg btn-danger']) !!}
                             {!! Form::close() !!}
                           @elseif($current_plan->valid())
-                            {!! Form::open(['route' => 'admin.account.subscription.cancel', 'method' => 'delete', 'class' => 'inline']) !!}
+                            {!! Form::open(['url' => mp_route('admin.account.subscription.cancel'), 'method' => 'delete', 'class' => 'inline']) !!}
                             {!! Form::button('<i class="fa fa-times-circle-o"></i> '.trans('app.remove_subscription'), ['type' => 'submit', 'class' => 'confirm ajax-silent btn btn-lg btn-danger']) !!}
                             {!! Form::close() !!}
                           @else

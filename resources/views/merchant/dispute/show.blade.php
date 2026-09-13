@@ -1,22 +1,30 @@
 @extends('merchant.layouts.app')
 
-@section('page_title', 'Dispute Ticket '.$dispute->ticketRef())
+@section('page_title', trans('app.dispute_ticket').' '.$dispute->ticketRef())
 
 @section('content')
-  <div class="mp-panel" style="margin-bottom:16px;">
-    <div class="mp-panel__head" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;">
-      <div>
-        <h2 style="margin:0;font-size:16px;">Ticket {{ $dispute->ticketRef() }}</h2>
-        <div style="margin-top:6px;">
+  <div class="mp-panel">
+    <div class="mp-panel__head">
+      <div class="mp-panel__head-text">
+        <h2>{{ trans('app.ticket') }} {{ $dispute->ticketRef() }}</h2>
+        <p>
           {!! $dispute->statusName() !!}
-          <span class="label label-default">Raised by {{ $dispute->raisedByLabel() }}</span>
-        </div>
+          <span class="label label-default">{{ trans('app.raised_by') }} {{ $dispute->raisedByLabel() }}</span>
+        </p>
       </div>
-      <a href="{{ route('merchant.support.dispute.index') }}" class="btn btn-default btn-sm">Back to tickets</a>
+      <a href="{{ route('merchant.support.dispute.index') }}" class="mp-btn mp-btn--outline mp-btn--sm">{{ trans('app.back_to_tickets') }}</a>
     </div>
     <div class="mp-panel__body">
-      <dl style="display:grid;grid-template-columns:140px 1fr;gap:8px 12px;margin:0;">
-        <dt>{{ trans('app.order') ?? 'Order' }}</dt>
+      @if ($dispute->isCloseRequested())
+        <div class="mp-alert mp-alert--warning">{{ trans('app.close_requested_waiting_admin') }}</div>
+      @elseif ($dispute->isResolved())
+        <div class="mp-alert mp-alert--success">{{ trans('app.ticket_resolved_request_close') }}</div>
+      @elseif ($dispute->isClosed())
+        <div class="mp-alert mp-alert--info">{{ trans('app.ticket_closed_admin_only') }}</div>
+      @endif
+
+      <dl class="mp-dl">
+        <dt>{{ trans('app.order') }}</dt>
         <dd>
           @if ($dispute->order)
             <a href="{{ url('merchant/order/order/'.$dispute->order->id) }}">#{{ $dispute->order->order_number }}</a>
@@ -24,93 +32,117 @@
             —
           @endif
         </dd>
-        <dt>{{ trans('app.customer') ?? 'Customer' }}</dt>
-        <dd>{{ optional($dispute->customer)->getName() }}</dd>
-        <dt>{{ trans('app.type') ?? 'Type' }}</dt>
-        <dd>{{ optional($dispute->dispute_type)->detail }}</dd>
-        <dt>{{ trans('app.refund_amount') ?? 'Refund' }}</dt>
+        <dt>{{ trans('app.customer') }}</dt>
+        <dd>{{ optional($dispute->customer)->getName() ?: '—' }}</dd>
+        <dt>{{ trans('app.type') }}</dt>
+        <dd>{{ optional($dispute->dispute_type)->detail ?: '—' }}</dd>
+        <dt>{{ trans('app.refund_amount') }}</dt>
         <dd>{{ get_formated_currency($dispute->refund_amount, 2, optional($dispute->order)->currency_id) }}</dd>
-        <dt>{{ trans('app.created_at') ?? 'Created' }}</dt>
+        <dt>{{ trans('app.created_at') }}</dt>
         <dd>{{ $dispute->created_at }}</dd>
       </dl>
 
       @if ($dispute->description)
-        <div style="margin-top:16px;padding:12px;background:#f7f7f8;border-radius:8px;">
-          <strong>Issue</strong>
+        <div class="mp-note">
+          <strong>{{ trans('app.issue') }}</strong>
           <div>{!! nl2br(e($dispute->description)) !!}</div>
         </div>
       @endif
 
       @if ($dispute->attachments->count())
-        <div style="margin-top:12px;">
-          <strong>{{ trans('app.attachments') ?? 'Attachments' }}:</strong>
+        <div class="mp-actions">
+          <strong>{{ trans('app.attachments') }}:</strong>
           @foreach ($dispute->attachments as $attachment)
-            <a href="{{ route('attachment.download', $attachment) }}" class="btn btn-xs btn-default"><i class="fa fa-file"></i></a>
+            <a href="{{ route('attachment.download', $attachment) }}" class="mp-btn mp-btn--outline mp-btn--sm"><i class="fa fa-file"></i> {{ trans('app.file') }}</a>
           @endforeach
+        </div>
+      @endif
+
+      @if ($dispute->isOpen())
+        <div class="mp-actions">
+          @if ($dispute->canMarkResolved())
+            {!! Form::open(['route' => ['merchant.support.dispute.resolved', $dispute]]) !!}
+            <button type="submit" class="mp-btn mp-btn--success mp-btn--sm">{{ trans('app.mark_as_resolved') }}</button>
+            {!! Form::close() !!}
+          @endif
+          @if ($dispute->canRequestClose())
+            {!! Form::open(['route' => ['merchant.support.dispute.requestClose', $dispute]]) !!}
+            <button type="submit" class="mp-btn mp-btn--warning mp-btn--sm">{{ trans('app.request_close_dispute') }}</button>
+            {!! Form::close() !!}
+          @endif
         </div>
       @endif
     </div>
   </div>
 
-  <div class="mp-panel" style="margin-bottom:16px;">
-    <div class="mp-panel__head"><h2 style="margin:0;font-size:16px;">Ticket updates</h2></div>
+  <div class="mp-panel">
+    <div class="mp-panel__head">
+      <div class="mp-panel__head-text">
+        <h2>{{ trans('app.ticket_updates') }}</h2>
+      </div>
+    </div>
     <div class="mp-panel__body">
-      @forelse ($dispute->replies->sortBy('created_at') as $reply)
-        <div style="padding:12px 0;border-bottom:1px solid #eee;">
-          <div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:6px;">
-            <strong>
-              @if ($reply->customer_id)
-                {{ optional($reply->customer)->getName() ?? 'Customer' }}
-              @elseif ($reply->user_id)
-                {{ optional($reply->user)->getName() ?? 'Staff' }}
-              @else
-                Support
-              @endif
-            </strong>
-            <span style="color:#888;font-size:12px;">{{ $reply->created_at->toDayDateTimeString() }}</span>
-          </div>
-          <div>{!! nl2br(e($reply->reply)) !!}</div>
-          @if ($reply->attachments && $reply->attachments->count())
-            <div style="margin-top:8px;">
-              @foreach ($reply->attachments as $attachment)
-                <a href="{{ route('attachment.download', $attachment) }}" class="btn btn-xs btn-default"><i class="fa fa-paperclip"></i></a>
-              @endforeach
+      <div class="mp-thread">
+        @forelse ($dispute->replies->sortBy('created_at') as $reply)
+          <div class="mp-thread__item">
+            <div class="mp-thread__meta">
+              <strong>
+                @if ($reply->customer_id)
+                  {{ optional($reply->customer)->getName() ?? trans('app.customer') }}
+                @elseif ($reply->user_id)
+                  {{ optional($reply->user)->getName() ?? trans('app.staff') }}
+                @else
+                  {{ trans('app.support') }}
+                @endif
+              </strong>
+              <span>{{ $reply->created_at->toDayDateTimeString() }}</span>
             </div>
-          @endif
-        </div>
-      @empty
-        <p style="color:#888;margin:0;">No updates yet. Add a response below.</p>
-      @endforelse
+            <div class="mp-thread__body">{!! nl2br(e($reply->reply)) !!}</div>
+            @if ($reply->attachments && $reply->attachments->count())
+              <div class="mp-actions">
+                @foreach ($reply->attachments as $attachment)
+                  <a href="{{ route('attachment.download', $attachment) }}" class="mp-btn mp-btn--outline mp-btn--sm"><i class="fa fa-paperclip"></i></a>
+                @endforeach
+              </div>
+            @endif
+          </div>
+        @empty
+          <p class="help-block" style="margin:0;">{{ trans('app.no_updates_yet') }}</p>
+        @endforelse
+      </div>
     </div>
   </div>
 
-  @if ($dispute->isOpen())
+  @if ($dispute->canReply())
     <div class="mp-panel">
-      <div class="mp-panel__head"><h2 style="margin:0;font-size:16px;">Add response</h2></div>
+      <div class="mp-panel__head">
+        <div class="mp-panel__head-text">
+          <h2>{{ trans('app.add_response') }}</h2>
+        </div>
+      </div>
       <div class="mp-panel__body">
         {!! Form::open([
           'route' => ['merchant.support.dispute.response', $dispute],
           'files' => true,
-          'data-toggle' => 'validator',
         ]) !!}
 
-        <div class="form-group">
-          {!! Form::label('status', trans('app.status') ?? 'Status') !!}
-          {!! Form::select('status', $statuses, $dispute->status, ['class' => 'form-control']) !!}
-          <p class="help-block">Use “Appealed” to escalate this ticket to Admin.</p>
+        <div class="mp-form-group">
+          {!! Form::label('status', trans('app.status')) !!}
+          {!! Form::select('status', $statuses, $dispute->status, ['class' => 'mp-form-control']) !!}
+          <p class="help-block">{{ trans('app.only_admin_can_set_closed') }}</p>
         </div>
 
-        <div class="form-group">
-          {!! Form::label('reply', 'Update *') !!}
-          {!! Form::textarea('reply', null, ['class' => 'form-control', 'rows' => 4, 'required', 'placeholder' => 'Write a ticket update…']) !!}
+        <div class="mp-form-group">
+          {!! Form::label('reply', trans('app.ticket_updates').' *') !!}
+          {!! Form::textarea('reply', null, ['class' => 'mp-form-control', 'rows' => 4, 'required', 'placeholder' => trans('app.write_ticket_update')]) !!}
         </div>
 
-        <div class="form-group">
-          {!! Form::label('attachments', trans('app.attachments') ?? 'Attachments') !!}
-          {!! Form::file('attachments[]', ['multiple' => true, 'class' => 'form-control']) !!}
+        <div class="mp-form-group">
+          {!! Form::label('attachments', trans('app.attachments')) !!}
+          {!! Form::file('attachments[]', ['multiple' => true, 'class' => 'mp-form-control']) !!}
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit update</button>
+        <button type="submit" class="mp-btn mp-btn--primary">{{ trans('app.submit_update') }}</button>
         {!! Form::close() !!}
       </div>
     </div>

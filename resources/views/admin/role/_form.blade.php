@@ -2,6 +2,11 @@
   $user = auth()->user();
   $merchant_user = $user->merchantId();
   $special_role = isset($role) && $role->isSpecial() ? true : false;
+  $role_permissions = isset($role) ? $role->permissions()->pluck('slug')->toArray() : [];
+  $storePanelNames = \App\Helpers\ListHelper::storePanelModuleNames();
+  $permissionGroups = \App\Helpers\ListHelper::rolePermissionGroups();
+  $modulesByName = collect($modules)->keyBy('name');
+  $usedNames = [];
 @endphp
 
 <div class="row">
@@ -47,65 +52,77 @@
   {!! Form::textarea('description', null, ['class' => 'form-control summernote-without-toolbar', 'placeholder' => trans('app.placeholder.description')]) !!}
 </div>
 
-<div class="form-group">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>
-          {!! Form::label('modules', trans('app.modules'), ['class' => 'with-help']) !!}
-          <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.permission_modules') }}"></i>
-        </th>
+<div class="form-group role-perm" id="tbl-permissions">
+  <div class="role-perm__intro">
+    <strong>{{ trans('app.modules') }}</strong>
+    <span>{{ trans('help.set_role_permissions') }}</span>
+  </div>
 
-        <th>
-          {!! Form::label('permissions', trans('app.form.permissions'), ['class' => 'with-help']) !!}
-          <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.set_role_permissions') }}"></i>
-        </th>
-      </tr>
-    </thead>
-  </table>
+  @foreach ($permissionGroups as $groupKey => $group)
+    @php
+      $groupModules = [];
+      foreach ($group['modules'] as $moduleName) {
+        $module = $modulesByName->get($moduleName);
+        if (! $module) {
+          continue;
+        }
 
-  <table class="table table-striped" id="tbl-permissions">
-    <tbody>
-      @php
-        $role_permissions = isset($role) ? $role->permissions()->pluck('slug')->toArray() : [];
-      @endphp
+        $access_level = Str::snake($module->access);
+        $inStorePanel = in_array($module->name, $storePanelNames, true);
 
-      @foreach ($modules as $module)
-        @php
-          $access_level = Str::snake($module->access);
-          $module_name = Str::snake($module->name);
-          $module_enabled = find_string_in_array($role_permissions, $module_name);
-        @endphp
+        if ($merchant_user && ! $inStorePanel) {
+          continue;
+        }
 
-        @if (!$merchant_user || ('common' == $access_level || 'merchant' == $access_level))
-          <tr class="{{ $access_level . '-module' }}" {{ 'common' == $access_level || ('merchant' == $access_level && $merchant_user) || (isset($role) && (($role->public == 1 && 'merchant' == $access_level) || ($role->id == \App\Models\Role::MERCHANT && 'merchant' == $access_level) || ($role->shop_id == null && $role->public != 1 && 'platform' == $access_level && $role->id != \App\Models\Role::MERCHANT))) ? 'show' : 'hidden' }}>
-            <td>
-              <div class="input-group">
-                {{ Form::hidden($module_name, 0) }}
-                <span class="input-group-addon" id="basic-addon1">
-                  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.module.name', ['module' => Str::plural($module->name)]) . ' ' . trans('help.module.access.' . $access_level, ['access' => $access_level]) }}"></i>
-                </span>
+        if ($merchant_user && ! in_array($access_level, ['common', 'merchant'], true)) {
+          continue;
+        }
 
-                {!! Form::checkbox($module_name, null, $module_enabled ? 1 : null, ['id' => $module_name, 'class' => 'icheckbox_line role-module']) !!}
+        $groupModules[] = $module;
+        $usedNames[] = $module->name;
+      }
+    @endphp
 
-                {!! Form::label($module_name, strtoupper($module->name)) !!}
-              </div>
-            </td>
+    @if (count($groupModules))
+      <section class="role-perm__group" data-group="{{ $groupKey }}">
+        <header class="role-perm__group-head">
+          <i class="fa {{ $group['icon'] }}"></i>
+          <span>{{ $group['label'] }}</span>
+        </header>
 
-            @foreach ($module->permissions as $permission)
-              <td>
-                <div class="checkbox">
-                  <label class="">
-                    {!! Form::checkbox('permissions[]', $permission->id, null, ['class' => $module_name . '-permission icheck', $module_enabled ? '' : 'disabled']) !!} {{ $permission->name }}
-                  </label>
-                </div>
-              </td>
-            @endforeach
-          </tr>
-        @endif
-      @endforeach
-    </tbody>
-  </table>
+        @foreach ($groupModules as $module)
+          @include('admin.role._module_row', ['module' => $module, 'role_permissions' => $role_permissions, 'merchant_user' => $merchant_user, 'storePanelNames' => $storePanelNames])
+        @endforeach
+      </section>
+    @endif
+  @endforeach
+
+  @unless ($merchant_user)
+    @php
+      $leftovers = collect($modules)->filter(function ($module) use ($usedNames, $merchant_user) {
+        if (in_array($module->name, $usedNames, true)) {
+          return false;
+        }
+        $access_level = Str::snake($module->access);
+        if ($merchant_user && ! in_array($access_level, ['common', 'merchant'], true)) {
+          return false;
+        }
+        return $access_level !== 'super_admin';
+      });
+    @endphp
+
+    @if ($leftovers->count())
+      <section class="role-perm__group" data-group="other">
+        <header class="role-perm__group-head">
+          <i class="fa fa-th"></i>
+          <span>{{ trans('app.others') ?? 'Other' }}</span>
+        </header>
+        @foreach ($leftovers as $module)
+          @include('admin.role._module_row', ['module' => $module, 'role_permissions' => $role_permissions, 'merchant_user' => $merchant_user, 'storePanelNames' => $storePanelNames])
+        @endforeach
+      </section>
+    @endif
+  @endunless
 </div>
 
 <p class="help-block">* {{ trans('app.form.required_fields') }}</p>

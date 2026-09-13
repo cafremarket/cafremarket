@@ -736,17 +736,17 @@
         checkboxClass: 'icheckbox_flat-pink',
         radioClass: 'iradio_flat-pink'
       });
-      //iCheck line checkbox and radio
+      //iCheck line checkbox and radio — switch chip (never a Bootstrap form-control)
       $('.icheckbox_line').each(function() {
         var self = $(this),
           label = self.next(),
-          label_text = label.text();
+          label_text = $.trim(label.text());
   
         label.remove();
         self.iCheck({
           checkboxClass: 'icheckbox_line-pink',
           radioClass: 'iradio_line-pink',
-          insert: '<div class="icheck_line-icon form-control"></div>' + label_text
+          insert: '<span class="icheck_line-icon" aria-hidden="true"></span><span class="icheck_line-text">' + $('<div>').text(label_text).html() + '</span>'
         });
       });
   

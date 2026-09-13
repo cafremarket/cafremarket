@@ -96,13 +96,13 @@ Route::middleware(['auth:customer', 'xssSanitizer'])->group(function () {
         DisputeController::class, 'response',
     ])->name('dispute.response');
 
-    Route::post('dispute/{dispute}/appeal', [
-        DisputeController::class, 'appeal',
-    ])->name('dispute.appeal');
-
     Route::post('dispute/{dispute}/markAsSolved', [
         DisputeController::class, 'markAsSolved',
     ])->name('dispute.markAsSolved');
+
+    Route::post('dispute/{dispute}/request-close', [
+        DisputeController::class, 'requestClose',
+    ])->name('dispute.requestClose');
 
     // Refunds
     // Route::post('order/refund/{order}', [DisputeController::class, 'refund_request'])->name('refund.request');

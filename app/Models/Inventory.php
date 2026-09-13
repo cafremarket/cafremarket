@@ -4,8 +4,8 @@ namespace App\Models;
 
 use App\Common\Attachable;
 use App\Common\CascadeSoftDeletes;
-use App\Common\Feedbackable;
 use App\Common\Imageable;
+use App\Common\Reviewable;
 use App\Common\Taggable;
 use App\Common\Translatable;
 use Carbon\Carbon;
@@ -22,7 +22,7 @@ use Laravel\Scout\Searchable;
 
 class Inventory extends Inspectable
 {
-    use Attachable, CascadeSoftDeletes, Feedbackable, Filterable, HasFactory, Imageable, Searchable, SoftDeletes, Taggable, Translatable;
+    use Attachable, CascadeSoftDeletes, Filterable, HasFactory, Imageable, Reviewable, Searchable, SoftDeletes, Taggable, Translatable;
 
     const CONDITIONS = ['New', 'Used', 'Refurbished'];
 

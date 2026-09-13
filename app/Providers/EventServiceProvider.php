@@ -91,6 +91,12 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\Dispute\DisputeSolved::class => [
             \App\Listeners\Dispute\NotifyCustomerDisputeSolved::class,
         ],
+        \App\Events\Dispute\DisputeCloseRequested::class => [
+            \App\Listeners\Dispute\NotifyAdminCloseRequested::class,
+        ],
+        \App\Events\Dispute\DisputeClosed::class => [
+            \App\Listeners\Dispute\NotifyPartiesDisputeClosed::class,
+        ],
 
         // Inventory Events
         // Neet to complete

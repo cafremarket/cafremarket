@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\Vendor\OrderFulfillmentController;
 use App\Http\Controllers\Api\Vendor\PackageController;
 use App\Http\Controllers\Api\Vendor\ProductController;
 use App\Http\Controllers\Api\Vendor\RefundController;
+use App\Http\Controllers\Api\Vendor\ReviewController;
 use App\Http\Controllers\Api\Vendor\ReportController;
 use App\Http\Controllers\Api\Vendor\RoleController;
 use App\Http\Controllers\Api\Vendor\SubscriptionController;
@@ -244,9 +245,22 @@ Route::prefix('vendor')->group(function () {
 
         // Disputes (ticket system)
         Route::get('disputes', [DisputeController::class, 'index']);
+        Route::get('disputes/create', [DisputeController::class, 'create']);
+        Route::get('order/{order}/dispute', [DisputeController::class, 'form']);
         Route::get('dispute/{dispute}', [DisputeController::class, 'show']);
         Route::post('order/{order}/dispute', [DisputeController::class, 'store']);
         Route::post('dispute/{dispute}/response', [DisputeController::class, 'response']);
+        Route::post('dispute/{dispute}/resolved', [DisputeController::class, 'markResolved']);
+        Route::post('dispute/{dispute}/request-close', [DisputeController::class, 'requestClose']);
+
+        // Reviews - store + product reviews for the vendor's own shop
+        Route::get('reviews', [ReviewController::class, 'index']);
+        Route::get('reviews/delete-requests', [ReviewController::class, 'deleteRequests']);
+        Route::get('reviews/{review}', [ReviewController::class, 'show']);
+        Route::post('reviews/{review}/reply', [ReviewController::class, 'reply']);
+        Route::put('reviews/{review}/reply', [ReviewController::class, 'reply']);
+        Route::delete('reviews/{review}/reply', [ReviewController::class, 'deleteReply']);
+        Route::post('reviews/{review}/request-delete', [ReviewController::class, 'requestDelete']);
 
         // Cancellation
         Route::get('cancellation/requests', [OrderCancellationController::class, 'index']);
@@ -407,6 +421,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('data/tag_lists', [FormDataController::class, 'tag_lists']);
         Route::get('data/staffs', [FormDataController::class, 'staffs']);
         Route::get('data/dispute_statuses', [FormDataController::class, 'dispute_statuses']);
+        Route::get('data/dispute_types', [FormDataController::class, 'dispute_types']);
         Route::get('data/linked_items', [FormDataController::class, 'linked_items']);
 
         // Other APIs

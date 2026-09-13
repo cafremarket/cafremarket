@@ -7,7 +7,6 @@ use App\Repositories\BaseRepository;
 use App\Repositories\EloquentRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class EloquentDispute extends EloquentRepository implements BaseRepository, DisputeRepository
 {
@@ -20,25 +19,20 @@ class EloquentDispute extends EloquentRepository implements BaseRepository, Disp
 
     public function open()
     {
-        // $query = $this->model->with('dispute_type', 'order', 'customer.avatarImage', 'shop')
-        //     ->withCount('replies')->orderBy('created_at', 'desc');
-
-        // if (Auth::user()->isFromPlatform()) {
-        //     return $query->appealed()->get();
-        // }
-
-        // return $query->mine()->open()->get();
+        return $this->model->with('dispute_type', 'order', 'customer.avatarImage', 'shop')
+            ->withCount('replies')
+            ->open()
+            ->orderByDesc('updated_at')
+            ->get();
     }
 
     public function closed()
     {
-        // if (Auth::user()->isFromPlatform()) {
-        //     return $this->model->closed()->with('dispute_type', 'customer', 'shop')
-        //         ->withCount('replies')->orderBy('created_at', 'desc')->get();
-        // }
-
-        // return $this->model->mine()->closed()->with('customer', 'dispute_type')
-        //     ->withCount('replies')->orderBy('created_at', 'desc')->get();
+        return $this->model->with('dispute_type', 'order', 'customer.avatarImage', 'shop')
+            ->withCount('replies')
+            ->closed()
+            ->orderByDesc('updated_at')
+            ->get();
     }
 
     public function store(Request $request)
@@ -55,7 +49,7 @@ class EloquentDispute extends EloquentRepository implements BaseRepository, Disp
     public function show($id)
     {
         return $this->model->with(['replies' => function ($query) {
-            $query->with('attachments', 'user')->orderBy('id', 'desc');
+            $query->with('attachments', 'user', 'customer')->orderBy('id');
         }])->find($id);
     }
 
@@ -64,8 +58,6 @@ class EloquentDispute extends EloquentRepository implements BaseRepository, Disp
         if (! $dispute instanceof Dispute) {
             $dispute = $this->model->find($dispute);
         }
-
-        $dispute->update($request->all());
 
         $response = $dispute->replies()->create($request->all());
 
@@ -78,6 +70,6 @@ class EloquentDispute extends EloquentRepository implements BaseRepository, Disp
 
     public function recentlyUpdated()
     {
-        return $this->model->whereRaw("disputes.updated_at > '".Carbon::parse('-1 days')->toDateTimeString()."'")->get();
+        return $this->model->where('updated_at', '>', Carbon::parse('-1 days'))->get();
     }
 }

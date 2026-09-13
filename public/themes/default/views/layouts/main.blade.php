@@ -150,6 +150,10 @@
     @include('theme::auth.modals')
   @endunless
 
+  @unless (is_panel_user_on_storefront())
+    @include('theme::popup')
+  @endunless
+
   <script src="{{ theme_asset_url('js/app.js') }}?v={{ is_file(theme_assets_path('js/app.js')) ? filemtime(theme_assets_path('js/app.js')) : time() }}"></script>
 
   {{--  Toast notification --}}
@@ -164,6 +168,10 @@
   @include('theme::scripts.appjs')
 
   @include('theme::scripts.guest_cart')
+
+  @unless (is_panel_user_on_storefront())
+    @include('theme::scripts.popup')
+  @endunless
 
   {{-- Announcement script --}}
   @if (is_incevio_package_loaded('announcement'))

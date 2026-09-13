@@ -8232,15 +8232,22 @@ li.dt-button.button-page-length.active a {
   padding-top: 9px;
 }
 
-/* iCheck */
+/* iCheck line skin — restyled as switch chips (see admin-modern.css) */
 .icheckbox_line-pink,
 .iradio_line-pink {
-  text-transform: uppercase;
+  text-transform: none;
+  border-radius: 999px !important;
 }
 
-.icheckbox_line-pink,
-.iradio_line-pink {
-  border-radius: 0px !important;
+.icheckbox_line-pink .icheck_line-icon.form-control,
+.iradio_line-pink .icheck_line-icon.form-control {
+  float: none !important;
+  width: 42px !important;
+  max-width: 42px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
 /*
