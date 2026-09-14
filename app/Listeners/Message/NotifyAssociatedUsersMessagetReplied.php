@@ -6,6 +6,7 @@ use App\Events\Message\MessageReplied;
 use App\Notifications\Message\Replied as MessageRepliedNotification;
 use App\Services\FCMService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Str;
 
 class NotifyAssociatedUsersMessagetReplied implements ShouldQueue
 {
@@ -15,16 +16,6 @@ class NotifyAssociatedUsersMessagetReplied implements ShouldQueue
      * @var int
      */
     public $tries = 5;
-
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
 
     /**
      * Handle the event.
@@ -37,45 +28,73 @@ class NotifyAssociatedUsersMessagetReplied implements ShouldQueue
             setSystemConfig();
         }
 
+        $repliable = $event->reply->repliable;
+
         // Set shop configuration
-        if ($event->reply->repliable && $event->reply->repliable->shop_id && ! config('shop_settings')) {
-            setSystemConfig($event->reply->repliable->shop_id);
+        if ($repliable && $repliable->shop_id && ! config('shop_settings')) {
+            setSystemConfig($repliable->shop_id);
         }
 
-        $customer_token = optional($event->reply->customer)->fcm_token;
-
-        if (! is_null($customer_token)) {
-            FCMService::send($customer_token, [
-                'title' => trans('notifications.message_replied.subject', ['user' => $event->reply->user->getName(), 'subject' => $event->reply->repliable->subject]),
-                'body' => trans('notifications.new_message.message', ['message' => $event->reply->reply]),
-            ]);
+        $preview = Str::limit(trim(strip_tags((string) $event->reply->reply)), 120);
+        if ($preview === '') {
+            $preview = 'New reply';
         }
+
+        $subject = optional($repliable)->subject;
+        $data = [
+            'type' => 'message',
+            'message_id' => (int) optional($repliable)->id,
+            'order_id' => (int) (optional($repliable)->order_id ?? 0),
+        ];
 
         if ($event->reply->user_id) {
-            if ($event->reply->repliable->customer->email) {
+            // Staff/merchant replied → notify customer
+            $senderName = optional($event->reply->user)->getName() ?: 'Shop';
+            $customerToken = optional(optional($repliable)->customer)->fcm_token;
+
+            if ($customerToken) {
+                FCMService::send($customerToken, [
+                    'title' => trans('notifications.message_replied.subject', [
+                        'user' => $senderName,
+                        'subject' => $subject,
+                    ]),
+                    'body' => $preview,
+                ], 'customer', $data);
+            }
+
+            if (optional(optional($repliable)->customer)->email) {
                 safe_notify(
-                    $event->reply->repliable->customer,
-                    new MessageRepliedNotification($event->reply, $event->reply->repliable->customer->getName()),
+                    $repliable->customer,
+                    new MessageRepliedNotification($event->reply, $repliable->customer->getName()),
                     'message replied customer'
                 );
-            } elseif ($event->reply->repliable->email) {
+            } elseif (optional($repliable)->email) {
                 safe_mail_route_notify(
-                    $event->reply->repliable->email,
-                    new MessageRepliedNotification($event->reply, $event->reply->repliable->name),
+                    $repliable->email,
+                    new MessageRepliedNotification($event->reply, $repliable->name),
                     'message replied guest'
                 );
             }
         } elseif ($event->reply->customer_id) {
-            if ($event->reply->repliable->user->email) {
+            // Customer replied → notify shop / assignee
+            FCMService::sendToShop(optional($repliable)->shop, [
+                'title' => trans('notifications.message_replied.subject', [
+                    'user' => optional(optional($repliable)->customer)->getName() ?: 'Customer',
+                    'subject' => $subject,
+                ]),
+                'body' => $preview,
+            ], $data);
+
+            if (optional(optional($repliable)->user)->email) {
                 safe_notify(
-                    $event->reply->repliable->user,
-                    new MessageRepliedNotification($event->reply, $event->reply->repliable->user->getName()),
+                    $repliable->user,
+                    new MessageRepliedNotification($event->reply, $repliable->user->getName()),
                     'message replied user'
                 );
             } elseif (config('shop_settings.notify_new_message')) {
                 safe_notify(
-                    $event->reply->repliable->shop,
-                    new MessageRepliedNotification($event->reply, $event->reply->repliable->shop->name),
+                    $repliable->shop,
+                    new MessageRepliedNotification($event->reply, $repliable->shop->name),
                     'message replied shop'
                 );
             }

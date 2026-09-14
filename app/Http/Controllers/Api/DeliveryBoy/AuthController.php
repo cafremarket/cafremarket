@@ -115,6 +115,15 @@ class AuthController extends Controller
 
         $deliveryBoy->generateToken('delivery_boy');
 
+        if ($request->filled('fcm_token')) {
+            $deliveryBoy->fcm_token = FCMService::normalizeToken($request->fcm_token) ?: null;
+            $deliveryBoy->save();
+        } elseif (! empty($current->fcm_token) && empty($deliveryBoy->fcm_token)) {
+            // Keep push working after store switch when the new row has no token yet.
+            $deliveryBoy->fcm_token = $current->fcm_token;
+            $deliveryBoy->save();
+        }
+
         return new DeliveryBoyResource($deliveryBoy);
     }
 

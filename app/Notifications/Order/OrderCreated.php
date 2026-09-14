@@ -38,30 +38,22 @@ class OrderCreated extends Notification implements ShouldQueue
     {
         $channels = ['mail'];
 
-        // push notification to vendor
-        $token = optional($this->order->shop->owner)->fcm_token;
+        $orderNumber = $this->order->order_number;
+        $data = [
+            'type' => 'order',
+            'order_id' => (int) $this->order->id,
+            'order_number' => (string) $orderNumber,
+            'status' => (string) $this->order->orderStatus(true),
+        ];
+        $notification = [
+            'title' => trans('notifications.order_created.subject', ['order' => $orderNumber]),
+            'body' => trans('notifications.order_created.message', ['order' => $orderNumber]),
+        ];
+
+        // Customer app push (merchant push is handled by MerchantOrderCreatedNotification)
         $customer_token = optional($this->order->customer)->fcm_token;
-        $warehouse_admin_token = ! is_null($this->order->warehouse) ? optional($this->order->warehouse->manager)->fcm_token : null;
-
-        if (! is_null($token)) {
-            FCMService::send($token, [
-                'title' => trans('notifications.order_created.subject', ['order' => $this->order->order_number]),
-                'body' => trans('notifications.order_created.message', ['order' => $this->order->order_number]),
-            ], 'vendor');
-        }
-
         if (! is_null($customer_token)) {
-            FCMService::send($customer_token, [
-                'title' => trans('notifications.order_created.subject', ['order' => $this->order->order_number]),
-                'body' => trans('notifications.order_created.message', ['order' => $this->order->order_number]),
-            ], 'customer');
-        }
-
-        if (! is_null($warehouse_admin_token)) {
-            FCMService::send($warehouse_admin_token, [
-                'title' => trans('notifications.order_created.subject', ['order' => $this->order->order_number]),
-                'body' => trans('notifications.order_created.message', ['order' => $this->order->order_number]),
-            ], 'vendor');
+            FCMService::send($customer_token, $notification, 'customer', $data);
         }
 
         if ($this->order->device_id !== null) {

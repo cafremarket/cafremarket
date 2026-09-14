@@ -70,13 +70,20 @@ class DeliveryDispatchService
 
         $order->save();
 
-        $token = $rider->fcm_token;
-
-        if ($token) {
+        // Re-read token in case the in-memory rider model is stale.
+        $token = FCMService::normalizeToken(
+            DeliveryBoy::whereKey($rider->id)->value('fcm_token')
+        );
+        if ($token !== '') {
             FCMService::send($token, [
                 'title' => trans('notifications.order_assigned.subject', ['order' => $order->order_number]),
                 'body' => trans('notifications.order_assigned.message'),
-            ], 'delivery');
+            ], 'delivery', [
+                'type' => 'order_assigned',
+                'order_id' => (int) $order->id,
+                'order_number' => (string) $order->order_number,
+                'shop_id' => (int) $order->shop_id,
+            ]);
         }
 
         return $order->fresh();

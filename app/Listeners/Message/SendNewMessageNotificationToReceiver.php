@@ -8,6 +8,7 @@ use App\Models\System;
 use App\Notifications\Message\NewMessage as NewMessageNotification;
 use App\Services\FCMService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Str;
 
 class SendNewMessageNotificationToReceiver implements ShouldQueue
 {
@@ -17,16 +18,6 @@ class SendNewMessageNotificationToReceiver implements ShouldQueue
      * @var int
      */
     public $tries = 5;
-
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
 
     /**
      * Handle the event.
@@ -44,16 +35,24 @@ class SendNewMessageNotificationToReceiver implements ShouldQueue
             setSystemConfig($event->message->shop_id);
         }
 
-        $customer_token = optional($event->message->customer)->fcm_token;
-
-        if (! is_null($customer_token)) {
-            FCMService::send($customer_token, [
-                'title' => trans('notifications.new_message.subject', ['subject' => $event->message->subject]),
-                'body' => trans('notifications.new_message.message', ['message' => $event->message->message]),
-            ]);
+        $preview = Str::limit(trim(strip_tags((string) $event->message->message)), 120);
+        if ($preview === '') {
+            $preview = (string) $event->message->subject;
         }
 
+        $data = [
+            'type' => 'message',
+            'message_id' => (int) $event->message->id,
+            'order_id' => (int) ($event->message->order_id ?? 0),
+        ];
+
         if ($event->message->label == Message::LABEL_INBOX) {
+            // Customer → shop: push vendor app
+            FCMService::sendToShop($event->message->shop, [
+                'title' => trans('notifications.new_message.subject', ['subject' => $event->message->subject]),
+                'body' => $preview,
+            ], $data);
+
             if ($event->message->shop_id) {
                 if (config('shop_settings.notify_new_message')) {
                     safe_notify($event->message->shop, new NewMessageNotification($event->message, $event->message->shop->name), 'new message shop');
@@ -63,6 +62,16 @@ class SendNewMessageNotificationToReceiver implements ShouldQueue
                 safe_notify($system, new NewMessageNotification($event->message, $system->superAdmin->getName()), 'new message system');
             }
         } elseif ($event->message->label == Message::LABEL_SENT) {
+            // Shop → customer: push customer app
+            $customerToken = optional($event->message->customer)->fcm_token;
+
+            if ($customerToken) {
+                FCMService::send($customerToken, [
+                    'title' => trans('notifications.new_message.subject', ['subject' => $event->message->subject]),
+                    'body' => $preview,
+                ], 'customer', $data);
+            }
+
             if ($event->message->order_id && $event->message->email) {
                 safe_mail_route_notify(
                     $event->message->email,

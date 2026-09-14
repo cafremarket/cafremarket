@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -25,14 +26,22 @@ class FCMService
             return false;
         }
 
-        $driver = strtolower((string) config('fcm.driver', 'auto'));
-        $v1Ready = FcmHttpV1Service::isConfigured($audience);
+        try {
+            $driver = strtolower((string) config('fcm.driver', 'auto'));
+            $v1Ready = FcmHttpV1Service::isConfigured($audience);
 
-        if ($driver === 'v1' || ($driver === 'auto' && $v1Ready)) {
-            return FcmHttpV1Service::send($token, $notification, $audience, $data);
+            if ($driver === 'v1' || ($driver === 'auto' && $v1Ready)) {
+                return FcmHttpV1Service::send($token, $notification, $audience, $data);
+            }
+
+            return self::sendLegacy($token, $notification, $audience, $data);
+        } catch (\Throwable $e) {
+            Log::warning('FCM send failed: '.$e->getMessage(), [
+                'audience' => $audience,
+            ]);
+
+            return false;
         }
-
-        return self::sendLegacy($token, $notification, $audience, $data);
     }
 
     /**
@@ -59,6 +68,27 @@ class FCMService
         }
 
         return compact('sent', 'failed');
+    }
+
+    /**
+     * Push to shop owner + staff with an FCM token (vendor app).
+     */
+    public static function sendToShop($shop, array $notification, array $data = []): array
+    {
+        if (! $shop) {
+            return ['sent' => 0, 'failed' => 0];
+        }
+
+        $tokens = User::query()
+            ->where(function ($q) use ($shop) {
+                $q->where('id', $shop->owner_id)
+                    ->orWhere('shop_id', $shop->id);
+            })
+            ->whereNotNull('fcm_token')
+            ->where('fcm_token', '!=', '')
+            ->pluck('fcm_token');
+
+        return self::sendToMany($tokens, $notification, 'vendor', $data);
     }
 
     public static function normalizeToken($token): string

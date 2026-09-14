@@ -4,7 +4,6 @@ namespace App\Notifications\Order;
 
 use App\Models\Order;
 use App\Notifications\Push\HasNotifications;
-use App\Services\FCMService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -34,16 +33,6 @@ class MerchantOrderCreatedNotification extends Notification implements ShouldQue
      */
     public function via($notifiable)
     {
-        // push notification to vendor
-        $token = optional($this->order->shop->owner)->fcm_token;
-
-        if (! is_null($token)) {
-            FCMService::send($token, [
-                'title' => trans('notifications.order_created.subject', ['order' => $this->order->order_number]),
-                'body' => trans('notifications.order_created.message', ['order' => $this->order->order_number]),
-            ], 'vendor');
-        }
-
         if ($this->order->device_id !== null) {
             HasNotifications::pushNotification(self::toArray($notifiable));
         }

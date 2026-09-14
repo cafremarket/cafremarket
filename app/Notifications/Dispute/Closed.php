@@ -4,6 +4,7 @@ namespace App\Notifications\Dispute;
 
 use App\Models\Dispute;
 use App\Notifications\Push\HasNotifications;
+use App\Services\FCMService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -22,6 +23,35 @@ class Closed extends Notification implements ShouldQueue
 
     public function via($notifiable)
     {
+        $orderNumber = optional($this->dispute->order)->order_number;
+        $ticket = $this->dispute->ticketRef();
+        $data = [
+            'type' => 'dispute',
+            'dispute_id' => (int) $this->dispute->id,
+            'order_id' => (int) optional($this->dispute->order)->id,
+            'order_number' => (string) $orderNumber,
+        ];
+        $notification = [
+            'title' => trans('notifications.dispute_closed.subject', [
+                'order_id' => $orderNumber,
+                'ticket' => $ticket,
+            ]),
+            'body' => trans('notifications.dispute_closed.message', [
+                'order_id' => $orderNumber,
+                'ticket' => $ticket,
+            ]),
+        ];
+
+        // Listener notifies customer and shop separately — push only the matching audience.
+        if ($notifiable instanceof \App\Models\Customer) {
+            $customerToken = optional($notifiable)->fcm_token ?: optional($this->dispute->customer)->fcm_token;
+            if ($customerToken) {
+                FCMService::send($customerToken, $notification, 'customer', $data);
+            }
+        } else {
+            FCMService::sendToShop($this->dispute->shop, $notification, $data);
+        }
+
         if (optional($this->dispute->order)->device_id !== null) {
             HasNotifications::pushNotification(self::toArray($notifiable));
         }

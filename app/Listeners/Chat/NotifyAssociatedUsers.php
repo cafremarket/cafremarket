@@ -3,7 +3,6 @@
 namespace App\Listeners\Chat;
 
 use App\Events\Chat\NewMessageEvent;
-use App\Models\User;
 use App\Notifications\Chat\NewMessage;
 use App\Services\FCMService;
 use Illuminate\Support\Str;
@@ -75,36 +74,11 @@ class NotifyAssociatedUsers
 
     protected function pushToVendorShop($shop, array $notification, array $data = []): void
     {
-        if (! $shop) {
-            return;
-        }
-
-        $tokens = User::query()
-            ->where(function ($q) use ($shop) {
-                $q->where('id', $shop->owner_id)
-                    ->orWhere('shop_id', $shop->id);
-            })
-            ->whereNotNull('fcm_token')
-            ->pluck('fcm_token')
-            ->unique()
-            ->filter();
-
-        foreach ($tokens as $token) {
-            $this->pushToToken($token, $notification, 'vendor', $data);
-        }
+        FCMService::sendToShop($shop, $notification, $data);
     }
 
     protected function pushToToken($token, array $notification, string $audience, array $data = []): void
     {
-        $token = FCMService::normalizeToken($token);
-        if ($token === '') {
-            return;
-        }
-
-        try {
-            FCMService::send($token, $notification, $audience, $data);
-        } catch (\Throwable $e) {
-            report($e);
-        }
+        FCMService::send($token, $notification, $audience, $data);
     }
 }

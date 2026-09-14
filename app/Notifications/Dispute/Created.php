@@ -33,7 +33,7 @@ class Created extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        if ($this->dispute->order->device_id !== null) {
+        if (optional($this->dispute->order)->device_id !== null) {
             HasNotifications::pushNotification(self::toArray($notifiable));
         }
 

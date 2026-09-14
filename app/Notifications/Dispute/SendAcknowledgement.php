@@ -4,6 +4,7 @@ namespace App\Notifications\Dispute;
 
 use App\Models\Dispute;
 use App\Notifications\Push\HasNotifications;
+use App\Services\FCMService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -33,7 +34,26 @@ class SendAcknowledgement extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        if ($this->dispute->order->device_id !== null) {
+        $orderNumber = optional($this->dispute->order)->order_number;
+        $customerToken = optional($this->dispute->customer)->fcm_token;
+
+        if ($customerToken) {
+            FCMService::send($customerToken, [
+                'title' => trans('notifications.dispute_acknowledgement.subject', [
+                    'order_id' => $orderNumber,
+                ]),
+                'body' => trans('notifications.dispute_acknowledgement.message', [
+                    'order_id' => $orderNumber,
+                ]),
+            ], 'customer', [
+                'type' => 'dispute',
+                'dispute_id' => (int) $this->dispute->id,
+                'order_id' => (int) optional($this->dispute->order)->id,
+                'order_number' => (string) $orderNumber,
+            ]);
+        }
+
+        if (optional($this->dispute->order)->device_id !== null) {
             HasNotifications::pushNotification(self::toArray($notifiable));
         }
 

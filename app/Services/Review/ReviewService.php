@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Review;
 use App\Models\ReviewSummary;
 use App\Models\Shop;
+use App\Services\Cache\CatalogCache;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -57,6 +58,10 @@ class ReviewService
 
         ReviewSummary::recomputeFor($inventory);
 
+        // Product details (`item:{slug}`) are API-cached; bump so the new review
+        // is visible on the next details fetch instead of a stale empty list.
+        CatalogCache::bumpCatalog($inventory->shop_id);
+
         return $review;
     }
 
@@ -94,6 +99,9 @@ class ReviewService
         }
 
         ReviewSummary::recomputeFor($shop);
+
+        // Shop payload is API-cached; invalidate so storefront/app see the review.
+        CatalogCache::bumpCatalog($shop->id);
 
         return $review;
     }
