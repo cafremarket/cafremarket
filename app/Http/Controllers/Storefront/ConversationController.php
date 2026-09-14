@@ -32,75 +32,47 @@ class ConversationController extends Controller
         $shop = Shop::select(['id'])->where('slug', $slug)->approved()->firstOrFail();
         $customerId = Auth::guard('customer')->id();
 
-        if (
-            is_incevio_package_loaded('liveChat')
-            && class_exists(ChatConversation::class)
-            && Schema::hasTable('chat_conversations')
-        ) {
-            $text = trim((string) $request->input('message'));
-            $subject = trim((string) $request->input('subject'));
-            if ($subject !== '') {
-                $text = ($text !== '' ? $subject."\n\n".$text : $subject);
-            }
-
-            $conversation = ChatConversation::query()
-                ->where('shop_id', $shop->id)
-                ->where('customer_id', $customerId)
-                ->when(
-                    Schema::hasColumn('chat_conversations', 'order_id'),
-                    fn ($q) => $q->whereNull('order_id')
-                )
-                ->first();
-
-            if ($conversation) {
-                $conversation->bumpLastMessage($text, true);
-                $conversation->replies()->create([
-                    'customer_id' => $customerId,
-                    'user_id' => null,
-                    'reply' => $text,
-                    'read' => false,
-                ]);
-            } else {
-                $attrs = [
-                    'shop_id' => $shop->id,
-                    'customer_id' => $customerId,
-                    'message' => $text,
-                    'status' => ChatConversation::STATUS_NEW,
-                ];
-                if (Schema::hasColumn('chat_conversations', 'order_id')) {
-                    $attrs['order_id'] = null;
-                }
-                $conversation = ChatConversation::create($attrs);
-                $conversation->replies()->create([
-                    'customer_id' => $customerId,
-                    'user_id' => null,
-                    'reply' => $text,
-                    'read' => false,
-                ]);
-            }
-
-            if ($request->filled('product_id') && function_exists('livechat_build_product_share_message') === false) {
-                // Product share is handled on product pages via LiveChat widget.
-            }
-
-            return back()->with('success', trans('theme.notify.message_sent'));
+        $text = trim((string) $request->input('message'));
+        $subject = trim((string) $request->input('subject'));
+        if ($subject !== '') {
+            $text = ($text !== '' ? $subject."\n\n".$text : $subject);
         }
 
-        $message = new Message;
-        $message->shop_id = $shop->id;
-        $message->subject = $request->subject;
-        $message->message = $request->message;
-        $message->customer_id = $customerId;
-        $message->product_id = $request->product_id;
-        $message->order_id = null;
-        $message->status = Message::STATUS_NEW;
-        $message->save();
+        $conversation = ChatConversation::query()
+            ->where('shop_id', $shop->id)
+            ->where('customer_id', $customerId)
+            ->when(
+                Schema::hasColumn('chat_conversations', 'order_id'),
+                fn ($q) => $q->whereNull('order_id')
+            )
+            ->first();
 
-        if ($request->hasFile('photo')) {
-            $message->saveAttachments($request->file('photo'));
+        if ($conversation) {
+            $conversation->bumpLastMessage($text, true);
+            $conversation->replies()->create([
+                'customer_id' => $customerId,
+                'user_id' => null,
+                'reply' => $text,
+                'read' => false,
+            ]);
+        } else {
+            $attrs = [
+                'shop_id' => $shop->id,
+                'customer_id' => $customerId,
+                'message' => $text,
+                'status' => ChatConversation::STATUS_NEW,
+            ];
+            if (Schema::hasColumn('chat_conversations', 'order_id')) {
+                $attrs['order_id'] = null;
+            }
+            $conversation = ChatConversation::create($attrs);
+            $conversation->replies()->create([
+                'customer_id' => $customerId,
+                'user_id' => null,
+                'reply' => $text,
+                'read' => false,
+            ]);
         }
-
-        event(new NewMessage($message));
 
         return back()->with('success', trans('theme.notify.message_sent'));
     }

@@ -172,13 +172,11 @@
   </div>
 @endif
 
-{{-- Live Chat --}}
-@if (is_incevio_package_loaded('liveChat'))
+{{-- Live Chat (always enabled — custom) --}}
   <a href="{{ mp_url('merchant/support/chat') }}" class="mp-sidebar__link {{ mp_is('merchant/support/chat*') ? 'is-active' : '' }}">
     <i class="fa fa-comments"></i>
     <span>{{ trans('nav.chats') ?? 'Chat' }}</span>
   </a>
-@endif
 
 {{-- Dispute Tickets --}}
 @can('index', \App\Models\Dispute::class)

@@ -790,7 +790,14 @@ if (! function_exists('is_incevio_package_loaded')) {
     {
         $all_packages = is_array($packages) ? $packages : [$packages];
 
-        foreach ($all_packages as $key => $package) {
+        foreach ($all_packages as $package) {
+            $package = (string) $package;
+
+            // Custom LiveChat is always enabled — never gate on packages.active / plugin API.
+            if (strcasecmp($package, 'livechat') === 0) {
+                continue;
+            }
+
             $className = Str::studly($package);
             $path = "Incevio\Package\\".$className.'\\'.$className.'ServiceProvider';
 

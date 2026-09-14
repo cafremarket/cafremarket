@@ -423,8 +423,7 @@
             <i class="fa fa-angle-left pull-right"></i>
           </a>
           <ul class="treeview-menu">
-            @if (is_incevio_package_loaded('liveChat'))
-              @can('index', \Incevio\Package\LiveChat\Models\ChatConversation::class)
+            @can('index', \Incevio\Package\LiveChat\Models\ChatConversation::class)
                 <li class="{{ Request::is('admin/support/chat*') ? 'active' : '' }}">
                   <a href="{{ url('admin/support/chat') }}">
                     <i class="fa fa-angle-double-right"></i> {{ trans('nav.chats') }}
@@ -432,7 +431,6 @@
                   </a>
                 </li>
               @endcan
-            @endif
 
             @can('index', \App\Models\Message::class)
               <li class="{{ Request::is('admin/support/message*') ? 'active' : '' }}">

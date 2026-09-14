@@ -1,6 +1,5 @@
 @php
-  $isLiveChatInbox = is_incevio_package_loaded('livechat')
-      && $messages instanceof \Illuminate\Support\Collection;
+  $isLiveChatInbox = $messages instanceof \Illuminate\Support\Collection;
 @endphp
 
 @if ($isLiveChatInbox)

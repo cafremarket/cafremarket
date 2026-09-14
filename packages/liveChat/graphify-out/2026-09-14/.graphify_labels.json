@@ -5,7 +5,7 @@
   "3": "SaveChatConversationRequest",
   "4": "App\\Models\\User",
   "5": "ChatSeeder.php",
-  "6": "customer/_conversation.blade.php",
+  "6": "ViewChatConversationRequest",
   "7": "2019_12_06_063720_create_chat_tables.php",
   "8": "Changelog",
   "9": "views/index.blade.php",
@@ -41,6 +41,6 @@
   "39": "script.blade.php",
   "40": "_left_nav.blade.php",
   "41": "livechat_styles.blade.php",
-  "42": "functions.php",
+  "42": "AdminChatController",
   "43": "_conversation.blade.php"
 }

@@ -109,7 +109,7 @@
             </div> <!-- /.row -->
           </div>
 
-          @if (!$isMerchant && is_incevio_package_loaded('livechat'))
+          @if (!$isMerchant)
             @include('liveChat::facebook.fb_chat_config_form')
           @endif
 

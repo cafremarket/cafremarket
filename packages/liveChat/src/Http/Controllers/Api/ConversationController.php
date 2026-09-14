@@ -37,28 +37,24 @@ class ConversationController extends Controller
      */
     public function conversations(Request $request)
     {
-        if (is_incevio_package_loaded('livechat') && Schema::hasTable('chat_conversations')) {
-            $conversations = ChatConversation::query()
-                ->where('customer_id', Auth::guard('api')->id())
-                ->with(['customer', 'shop', 'lastReply'])
-                ->withCount([
-                    // Unread for customer = merchant replies (customer_id null)
-                    'replies as unread_count' => function ($q) {
-                        $q->whereNull('customer_id')
-                            ->where(function ($inner) {
-                                $inner->whereNull('read')
-                                    ->orWhere('read', false)
-                                    ->orWhere('read', 0);
-                            });
-                    },
-                ])
-                ->latest('updated_at')
-                ->get();
+        $conversations = ChatConversation::query()
+            ->where('customer_id', Auth::guard('api')->id())
+            ->with(['customer', 'shop', 'lastReply'])
+            ->withCount([
+                // Unread for customer = merchant replies (customer_id null)
+                'replies as unread_count' => function ($q) {
+                    $q->whereNull('customer_id')
+                        ->where(function ($inner) {
+                            $inner->whereNull('read')
+                                ->orWhere('read', false)
+                                ->orWhere('read', 0);
+                        });
+                },
+            ])
+            ->latest('updated_at')
+            ->get();
 
-            return ConversationResource::collection($conversations);
-        }
-
-        return ConversationResource::collection(collect());
+        return ConversationResource::collection($conversations);
     }
 
     /**
@@ -70,30 +66,24 @@ class ConversationController extends Controller
      */
     public function conversation(ChatConversationRequest $request, Shop $shop)
     {
-        if (is_incevio_package_loaded('livechat') && Schema::hasTable('chat_conversations')) {
-            $conversation = ChatConversation::where([
-                'customer_id' => Auth::guard('api')->id(),
-                'shop_id' => $shop->id,
-            ])
-                ->when(
-                    Schema::hasColumn('chat_conversations', 'order_id'),
-                    fn ($q) => $q->whereNull('order_id')
-                )
-                ->with(['replies.attachments'])
-                ->first();
+        $conversation = ChatConversation::where([
+            'customer_id' => Auth::guard('api')->id(),
+            'shop_id' => $shop->id,
+        ])
+            ->when(
+                Schema::hasColumn('chat_conversations', 'order_id'),
+                fn ($q) => $q->whereNull('order_id')
+            )
+            ->with(['replies.attachments'])
+            ->first();
 
-            if ($conversation) {
-                $conversation->load(['replies.attachments']);
+        if ($conversation) {
+            $conversation->load(['replies.attachments']);
 
-                // Customer opened thread — mark merchant replies as read (clears clock on vendor side after refresh/WS).
-                $conversation->markPeerRepliesAsRead('customer');
+            // Customer opened thread — mark merchant replies as read (clears clock on vendor side after refresh/WS).
+            $conversation->markPeerRepliesAsRead('customer');
 
-                return new ConversationResource($conversation->fresh(['replies.attachments']));
-            }
-
-            return response()->json([
-                'message' => trans('api.welcome_chat'),
-            ]);
+            return new ConversationResource($conversation->fresh(['replies.attachments']));
         }
 
         return response()->json([
@@ -110,133 +100,129 @@ class ConversationController extends Controller
      */
     public function save_conversation(SaveChatConversationRequest $request, Shop $shop)
     {
-        if (is_incevio_package_loaded('livechat') && Schema::hasTable('chat_conversations')) {
-            $msg_object = null;
-            $replyText = trim((string) ($request->input('message') ?? ''));
-            if ($replyText === '' && ($request->hasFile('photo') || $request->filled('photo'))) {
-                $replyText = livechat_message_for_attachment_only();
-            }
-
-            if ($replyText === '' && ! $request->hasFile('photo') && ! $request->filled('photo')) {
-                return response()->json(['message' => trans('validation.required', ['attribute' => 'message'])], 422);
-            }
-
-            $conversation = ChatConversation::where([
-                'customer_id' => $request->customer_id,
-                'shop_id' => $shop->id,
-            ])
-                ->when(
-                    Schema::hasColumn('chat_conversations', 'order_id'),
-                    fn ($q) => $q->whereNull('order_id')
-                )
-                ->first();
-
-            if ($conversation) {
-                $conversation->bumpLastMessage($replyText, true);
-                $msg_object = $conversation->replies()->create([
-                    'customer_id' => $request->customer_id,
-                    'user_id' => $request->user_id,
-                    'reply' => $replyText,
-                    'read' => false,
-                ]);
-
-                try {
-                    if ($request->hasFile('photo')) {
-                        $msg_object->saveAttachments($request->file('photo'));
-                    } elseif ($request->filled('photo')) {
-                        $msg_object->saveAttachments(create_file_from_base64($request->get('photo')));
-                    }
-                } catch (\Throwable $e) {
-                    report($e);
-
-                    return response()->json([
-                        'message' => $e->getMessage() ?: 'Could not store attachment.',
-                    ], 422);
-                }
-            } elseif ($request->customer_id) {
-                $conversation = ChatConversation::create([
-                    'shop_id' => $shop->id,
-                    'customer_id' => $request->customer_id,
-                    'message' => $replyText,
-                    'status' => ChatConversation::STATUS_NEW,
-                ]);
-
-                // Keep a consistent reply object for realtime updates.
-                $msg_object = $conversation->replies()->create([
-                    'customer_id' => $request->customer_id,
-                    'user_id' => $request->user_id,
-                    'reply' => $replyText,
-                    'read' => false,
-                ]);
-
-                try {
-                    if ($request->hasFile('photo')) {
-                        $msg_object->saveAttachments($request->file('photo'));
-                    } elseif ($request->filled('photo')) {
-                        $msg_object->saveAttachments(create_file_from_base64($request->get('photo')));
-                    }
-                } catch (\Throwable $e) {
-                    report($e);
-
-                    return response()->json([
-                        'message' => $e->getMessage() ?: 'Could not store attachment.',
-                    ], 422);
-                }
-            } else {
-                return response(trans('responses.unauthorized'), 401);
-            }
-
-            // Do not fail message sending when realtime provider fails.
-            if ($msg_object) {
-                $attachmentsPayload = livechat_socket_attachments_payload($msg_object);
-                $conversation->refresh();
-                $clock = livechat_format_message_time($msg_object->created_at);
-                $createdAt = optional($msg_object->created_at)->toIso8601String();
-
-                ChatSocketPublisher::publish(
-                    get_chat_room_name($shop->id.$request->customer_id),
-                    'chat.message',
-                    [
-                        'text' => $replyText,
-                        'sender_type' => 'customer',
-                        'conversation_id' => $conversation->id,
-                        'reply_id' => $msg_object->id,
-                        'customer_id' => $request->customer_id,
-                        'time' => $clock,
-                        'created_at' => $createdAt,
-                        'attachments' => $attachmentsPayload,
-                    ]
-                );
-
-                // Also notify vendor room so merchant sidebar/conversation updates in realtime.
-                ChatSocketPublisher::publish(
-                    get_vendor_chat_room_id($shop),
-                    'chat.message',
-                    [
-                        'text' => $replyText,
-                        'sender_type' => 'customer',
-                        'conversation_id' => $conversation->id,
-                        'reply_id' => $msg_object->id,
-                        'customer_id' => $request->customer_id,
-                        'time' => $clock,
-                        'created_at' => $createdAt,
-                        'attachments' => $attachmentsPayload,
-                    ]
-                );
-
-                try {
-                    event(new NewMessageEvent($msg_object, $replyText));
-                } catch (\Throwable $e) {
-                    report($e);
-                }
-            }
-
-            $conversation->load(['replies.attachments']);
-
-            return new ConversationResource($conversation);
+        $msg_object = null;
+        $replyText = trim((string) ($request->input('message') ?? ''));
+        if ($replyText === '' && ($request->hasFile('photo') || $request->filled('photo'))) {
+            $replyText = livechat_message_for_attachment_only();
         }
 
-        return response()->json([]);
+        if ($replyText === '' && ! $request->hasFile('photo') && ! $request->filled('photo')) {
+            return response()->json(['message' => trans('validation.required', ['attribute' => 'message'])], 422);
+        }
+
+        $conversation = ChatConversation::where([
+            'customer_id' => $request->customer_id,
+            'shop_id' => $shop->id,
+        ])
+            ->when(
+                Schema::hasColumn('chat_conversations', 'order_id'),
+                fn ($q) => $q->whereNull('order_id')
+            )
+            ->first();
+
+        if ($conversation) {
+            $conversation->bumpLastMessage($replyText, true);
+            $msg_object = $conversation->replies()->create([
+                'customer_id' => $request->customer_id,
+                'user_id' => $request->user_id,
+                'reply' => $replyText,
+                'read' => false,
+            ]);
+
+            try {
+                if ($request->hasFile('photo')) {
+                    $msg_object->saveAttachments($request->file('photo'));
+                } elseif ($request->filled('photo')) {
+                    $msg_object->saveAttachments(create_file_from_base64($request->get('photo')));
+                }
+            } catch (\Throwable $e) {
+                report($e);
+
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'Could not store attachment.',
+                ], 422);
+            }
+        } elseif ($request->customer_id) {
+            $conversation = ChatConversation::create([
+                'shop_id' => $shop->id,
+                'customer_id' => $request->customer_id,
+                'message' => $replyText,
+                'status' => ChatConversation::STATUS_NEW,
+            ]);
+
+            // Keep a consistent reply object for realtime updates.
+            $msg_object = $conversation->replies()->create([
+                'customer_id' => $request->customer_id,
+                'user_id' => $request->user_id,
+                'reply' => $replyText,
+                'read' => false,
+            ]);
+
+            try {
+                if ($request->hasFile('photo')) {
+                    $msg_object->saveAttachments($request->file('photo'));
+                } elseif ($request->filled('photo')) {
+                    $msg_object->saveAttachments(create_file_from_base64($request->get('photo')));
+                }
+            } catch (\Throwable $e) {
+                report($e);
+
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'Could not store attachment.',
+                ], 422);
+            }
+        } else {
+            return response(trans('responses.unauthorized'), 401);
+        }
+
+        // Do not fail message sending when realtime provider fails.
+        if ($msg_object) {
+            $attachmentsPayload = livechat_socket_attachments_payload($msg_object);
+            $conversation->refresh();
+            $clock = livechat_format_message_time($msg_object->created_at);
+            $createdAt = optional($msg_object->created_at)->toIso8601String();
+
+            ChatSocketPublisher::publish(
+                get_chat_room_name($shop->id.$request->customer_id),
+                'chat.message',
+                [
+                    'text' => $replyText,
+                    'sender_type' => 'customer',
+                    'conversation_id' => $conversation->id,
+                    'reply_id' => $msg_object->id,
+                    'customer_id' => $request->customer_id,
+                    'time' => $clock,
+                    'created_at' => $createdAt,
+                    'attachments' => $attachmentsPayload,
+                ]
+            );
+
+            // Also notify vendor room so merchant sidebar/conversation updates in realtime.
+            ChatSocketPublisher::publish(
+                get_vendor_chat_room_id($shop),
+                'chat.message',
+                [
+                    'text' => $replyText,
+                    'sender_type' => 'customer',
+                    'conversation_id' => $conversation->id,
+                    'reply_id' => $msg_object->id,
+                    'customer_id' => $request->customer_id,
+                    'time' => $clock,
+                    'created_at' => $createdAt,
+                    'attachments' => $attachmentsPayload,
+                ]
+            );
+
+            try {
+                event(new NewMessageEvent($msg_object, $replyText));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        $conversation->load(['replies.attachments']);
+
+        return new ConversationResource($conversation);
     }
 
     /**

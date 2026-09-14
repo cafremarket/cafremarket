@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "database/migrations/2019_12_06_063720_create_chat_tables.php": {
-    "mtime": 1789225411.0084195,
-    "seen": 1789406804.5719318,
-    "ast_hash": "7afcdb6cf753dbdfcd581498247beabc",
+    "mtime": 1703390918.0,
+    "seen": 1788545148.2943523,
+    "ast_hash": "80de331fc78627ea2ad50ccf0e3fad8b",
     "semantic_hash": ""
   },
   "database/migrations/2023_11_20_195811_add_fb_page_id_column_to_shops_table.php": {
@@ -198,15 +198,15 @@
     "semantic_hash": ""
   },
   "resources/views/livechat.blade.php": {
-    "mtime": 1788802558.8885598,
-    "seen": 1789406804.571973,
-    "ast_hash": "bc1d87038ddc37a8fe58e8e48dd77d31",
+    "mtime": 1788545874.938895,
+    "seen": 1788547257.0543187,
+    "ast_hash": "7acbf0ea17463c86f1fc9e89372fc1e3",
     "semantic_hash": ""
   },
   "resources/views/merchant/index.blade.php": {
-    "mtime": 1788802125.3870115,
-    "seen": 1789406804.571975,
-    "ast_hash": "b7d174e2c97aa847adc30156402d895b",
+    "mtime": 1788547063.3927338,
+    "seen": 1788547257.0543213,
+    "ast_hash": "8ae46d30fe921262045f965fd62d8e53",
     "semantic_hash": ""
   },
   "resources/views/partials/livechat_styles.blade.php": {
@@ -216,33 +216,33 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1788802910.1925092,
-    "seen": 1789406804.571977,
-    "ast_hash": "4d9b4f46c5a0d1352d8fe0e5e778c1a0",
+    "mtime": 1703390918.0,
+    "seen": 1788545148.2943785,
+    "ast_hash": "f88488051b0848f9b8d0a2476b65faf4",
     "semantic_hash": ""
   },
   "src/Helpers/functions.php": {
-    "mtime": 1788801728.4385464,
-    "seen": 1789406804.571978,
-    "ast_hash": "24d2e00162d946e9c3d0b160313f87e3",
+    "mtime": 1788545104.3927357,
+    "seen": 1788545148.294379,
+    "ast_hash": "ca40cb6974a0dbdb5496a020554af4b1",
     "semantic_hash": ""
   },
   "src/Http/Controllers/AdminChatController.php": {
-    "mtime": 1789225425.1235158,
-    "seen": 1789406804.5719788,
-    "ast_hash": "5d91e1b35e9b51feb3fc2698ac6a612e",
+    "mtime": 1788547193.0331004,
+    "seen": 1788547257.0543268,
+    "ast_hash": "135234e593968f31b394c60218ac1559",
     "semantic_hash": ""
   },
   "src/Http/Controllers/Api/ConversationController.php": {
-    "mtime": 1789406732.349207,
-    "seen": 1789406804.5719798,
-    "ast_hash": "56d4a995e38f6fbe739c2837b34e710f",
+    "mtime": 1788545128.603035,
+    "seen": 1788545148.2943802,
+    "ast_hash": "ce44b5cde2d636b2d6ce54f9ef79b4da",
     "semantic_hash": ""
   },
   "src/Http/Controllers/ChatController.php": {
-    "mtime": 1789225487.6156385,
-    "seen": 1789406804.5719807,
-    "ast_hash": "f2d42fea67124b840687caee499c32c5",
+    "mtime": 1788544933.1825838,
+    "seen": 1788545148.294381,
+    "ast_hash": "c7c164817618409d3886c33e690c93d6",
     "semantic_hash": ""
   },
   "src/Http/Requests/ChatConversationRequest.php": {
@@ -264,21 +264,21 @@
     "semantic_hash": ""
   },
   "src/LiveChatServiceProvider.php": {
-    "mtime": 1789225416.285001,
-    "seen": 1789406804.5719857,
-    "ast_hash": "85f7115e5d5dcebfd6376f726b3e378e",
+    "mtime": 1703390918.0,
+    "seen": 1788545148.2943838,
+    "ast_hash": "3443a6e771fd0129f92770df1b5e030e",
     "semantic_hash": ""
   },
   "src/Models/ChatConversation.php": {
-    "mtime": 1788801118.1488528,
-    "seen": 1789406804.5719867,
-    "ast_hash": "c406aaee29c81eef939499f01181fafa",
+    "mtime": 1786288414.0602138,
+    "seen": 1788545148.2943847,
+    "ast_hash": "47aa3a53614abd5e2fc9a4105d11ea90",
     "semantic_hash": ""
   },
   "src/Policies/ChatConversationPolicy.php": {
-    "mtime": 1789316950.2407901,
-    "seen": 1789406804.5719876,
-    "ast_hash": "b0a260ce33858de7a814bc5fc483366c",
+    "mtime": 1788542898.8453536,
+    "seen": 1788545148.2943854,
+    "ast_hash": "e99f24fcf8fd97c1475ee329f7056fe0",
     "semantic_hash": ""
   },
   "src/Uninstaller.php": {
@@ -300,21 +300,9 @@
     "semantic_hash": ""
   },
   "resources/views/merchant/_conversation.blade.php": {
-    "mtime": 1788802125.14063,
-    "seen": 1789406804.5719738,
-    "ast_hash": "06b44e79706e3a7fc42c64d337df35c0",
-    "semantic_hash": ""
-  },
-  "resources/views/customer/_conversation.blade.php": {
-    "mtime": 1788802739.6114979,
-    "seen": 1789406804.5719686,
-    "ast_hash": "1757a23274a57de11f97c2db2f4d6b19",
-    "semantic_hash": ""
-  },
-  "src/Http/Controllers/CustomerChatController.php": {
-    "mtime": 1788803327.7024522,
-    "seen": 1789406804.571982,
-    "ast_hash": "f51d5f6f4e289609250cc86dd93087fc",
+    "mtime": 1788547002.6563926,
+    "seen": 1788547257.05432,
+    "ast_hash": "ecf8611a70081623721a974a8dee0d5d",
     "semantic_hash": ""
   }
 }

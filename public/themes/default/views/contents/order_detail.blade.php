@@ -450,7 +450,7 @@
             <p class="text-muted" style="margin-top:0;">
               Chat with the seller in the same live chat. You can share this order’s details like a product card.
             </p>
-            @if (is_incevio_package_loaded('liveChat') && $order->shop)
+            @if ($order->shop)
               <button type="button" class="btn sf-btn-primary sf-open-livechat">
                 <i class="fa fa-comments"></i> {{ trans('theme.button.contact_seller') ?? 'Contact seller' }}
               </button>
