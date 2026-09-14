@@ -102,6 +102,7 @@
         @endif
 
         @include('theme::partials.order_delivery_location', ['order' => $order])
+        @include('theme::partials.order_delivery_proof', ['order' => $order])
 
         @if ($order->is_digital)
           <div class="sf-order-confirm__panel">

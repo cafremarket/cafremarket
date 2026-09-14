@@ -191,4 +191,55 @@ class OrderFulfillmentController extends Controller
 
         return response()->json(['message' => trans('api.order_updated_successfully')], 200);
     }
+
+    /**
+     * Seller-side pickup handoff: the customer reads the OTP shown on their
+     * order page out to the seller in-store, and the seller enters it here.
+     * Verified server-side against the same OTP the customer's app shows, so
+     * this can't be used to hand over an order without the code.
+     * Mirrors confirm_courier_otp() above.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function confirm_pickup_otp(Request $request, Order $order)
+    {
+        $request->validate([
+            'otp' => 'required|string|size:6',
+        ]);
+
+        // Guard the 6-digit code against brute-forcing: 5 attempts per order per 10 minutes.
+        $throttleKey = 'pickup-otp:'.$order->id;
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            return response()->json(['message' => trans('app.too_many_otp_attempts')], 429);
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 600);
+
+        try {
+            DB::transaction(function () use ($order, $request) {
+                $locked = Order::whereKey($order->getKey())->lockForUpdate()->firstOrFail();
+
+                if ($locked->isDelivered()) {
+                    throw new \RuntimeException(trans('app.order_already_delivered'));
+                }
+
+                if (! $locked->pickup()) {
+                    throw new \RuntimeException(trans('app.pickup_details_required'));
+                }
+
+                if (empty($locked->otp) || ! hash_equals((string) $locked->otp, (string) $request->input('otp'))) {
+                    throw new \RuntimeException(trans('app.invalid_otp'));
+                }
+
+                $locked->mark_as_goods_received();
+            });
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+
+        \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
+
+        return response()->json(['message' => trans('api.order_updated_successfully')], 200);
+    }
 }

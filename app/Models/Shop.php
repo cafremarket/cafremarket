@@ -786,11 +786,10 @@ class Shop extends ShopWallet
 
     /**
      * Check if pickup is enabled for the shop.
-     * Pickup fulfilment is disabled system-wide.
      */
     public function isPickupEnabled(): bool
     {
-        return false;
+        return (bool) optional($this->config)->isPickupEnabled();
     }
 
     /**

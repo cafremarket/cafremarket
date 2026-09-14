@@ -109,8 +109,6 @@ class OrderController extends Controller
         try {
             $order = $this->saveOrderFromCart($request, $cart);     // Create the order
 
-            $order->fulfilment_type = $request->fulfilment_type;      // Assign the fulfillment type
-
             $order->currency_id = config('system_settings.currency.id');
 
             if (is_incevio_package_loaded('dynamic-currency')) {    // Added Converted Currency Details
@@ -262,7 +260,6 @@ class OrderController extends Controller
             foreach ($carts as $cart) {
                 $cart = crosscheckAndUpdateOldCartInfo($request, $cart);
                 $order = $this->saveOrderFromCart($request, $cart);
-                $order->fulfilment_type = $request->fulfilment_type;
                 $order->currency_id = config('system_settings.currency.id');
 
                 if (is_incevio_package_loaded('dynamic-currency')) {

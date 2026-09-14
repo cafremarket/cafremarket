@@ -116,6 +116,10 @@ class CheckoutCartRequest extends Request
         // Common rules for order
         $rules['agree'] = 'required';
 
+        if ($this->fulfilment_type === \App\Models\Order::FULFILMENT_TYPE_PICKUP) {
+            $rules['warehouse_id'] = 'required';
+        }
+
         if (! $this->checkAuth()) {
             $email_rules = 'required|email|max:255';
             // $password_rules = 'bail|nullable|min:6';

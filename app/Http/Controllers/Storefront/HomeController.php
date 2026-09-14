@@ -19,6 +19,7 @@ use App\Models\Product;
 use App\Models\Slider;
 use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\Hyperlocal\HyperlocalCatalogService;
+use App\Support\PolicyPages;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -537,6 +538,10 @@ class HomeController extends Controller
     public function openPage($slug)
     {
         $page = Page::where('slug', $slug)->firstOrFail();
+
+        if (PolicyPages::isPolicySlug($page->slug) && PolicyPages::isPlaceholder($page->content)) {
+            $page->content = PolicyPages::resolveContent($page->slug, $page->content);
+        }
 
         return view('theme::page', compact('page'));
     }

@@ -74,8 +74,13 @@ class OrderResource extends JsonResource
             'shop' => $this->when(! $vendor, new ShopLightResource($this->shop, $this->feedback_id, $this->customer_id)),
             'items' => OrderItemResource::collection($this->inventories, $this->currency_id),
             'conversation' => $this->conversation,
-            // The rider must never see the OTP the customer is meant to read out to them.
-            'otp' => $deliveryBoyGuard ? null : ($this->otp ?? null),
+            // Neither the rider nor the vendor should see the OTP the customer is meant
+            // to read out to them — that's the whole point of the handoff check.
+            'otp' => ($deliveryBoyGuard || $vendor) ? null : ($this->otp ?? null),
+            'fulfilment_type' => $this->fulfilment_type,
+            'warehouse' => $this->when($this->pickup(), function () {
+                return new WarehouseResource($this->warehouse);
+            }),
             'fulfillment_method' => $this->fulfillment_method,
             'has_courier' => $this->hasCourier(),
             'reached_at' => optional($this->reached_at)->toIso8601String(),

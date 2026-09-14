@@ -88,7 +88,6 @@ class ConfigController extends Controller
 
     private const MERCHANT_PAGES = [
         'order' => ['label' => 'app.order', 'icon' => 'fa-shopping-cart'],
-        'storefront' => ['label' => 'app.store_front', 'icon' => 'fa-laptop'],
         'support' => ['label' => 'app.support', 'icon' => 'fa-phone'],
         'notifications' => ['label' => 'app.notifications', 'icon' => 'fa-bell-o'],
     ];
@@ -164,7 +163,7 @@ class ConfigController extends Controller
                 'key' => 'hub',
                 'label' => 'Overview',
                 'icon' => 'fa-th-large',
-                'url' => route('admin.setting.config.view'),
+                'url' => panel_route('admin.setting.config.view'),
             ],
         ];
 
@@ -173,7 +172,7 @@ class ConfigController extends Controller
                 'key' => $key,
                 'label' => trans($meta['label']),
                 'icon' => $meta['icon'],
-                'url' => route('admin.setting.config.page', $key),
+                'url' => panel_route('admin.setting.config.page', $key),
             ];
         }
 
@@ -186,7 +185,7 @@ class ConfigController extends Controller
 
         foreach ($pages as $key => $meta) {
             $cards[] = [
-                'url' => route('admin.setting.config.page', $key),
+                'url' => panel_route('admin.setting.config.page', $key),
                 'icon' => $meta['icon'],
                 'title' => trans($meta['label']),
                 'desc' => trans($meta['label']),

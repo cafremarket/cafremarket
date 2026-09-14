@@ -9,8 +9,8 @@ use App\Http\Requests\Validations\CreatePageRequest;
 use App\Http\Requests\Validations\UpdatePageRequest;
 use App\Models\Page;
 use App\Repositories\Page\PageRepository;
+use App\Support\PolicyPages;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class PageController extends Controller
 {
@@ -64,7 +64,7 @@ class PageController extends Controller
     {
         $this->page->store($request);
 
-        Cache::forget('cached_pages');
+        PolicyPages::flushCaches();
 
         return back()->with('success', trans('messages.created', ['model' => $this->model]));
     }
@@ -90,7 +90,7 @@ class PageController extends Controller
     {
         $this->page->update($request, $id);
 
-        Cache::forget('cached_pages');
+        PolicyPages::flushCaches();
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model]));
     }
@@ -106,7 +106,7 @@ class PageController extends Controller
     {
         $this->page->trash($id);
 
-        Cache::forget('cached_pages');
+        PolicyPages::flushCaches();
 
         return back()->with('success', trans('messages.trashed', ['model' => $this->model]));
     }
@@ -122,7 +122,7 @@ class PageController extends Controller
     {
         $this->page->restore($id);
 
-        Cache::forget('cached_pages');
+        PolicyPages::flushCaches();
 
         return back()->with('success', trans('messages.restored', ['model' => $this->model]));
     }
@@ -137,7 +137,7 @@ class PageController extends Controller
     {
         $this->page->destroy($id);
 
-        Cache::forget('cached_pages');
+        PolicyPages::flushCaches();
 
         return back()->with('success', trans('messages.deleted', ['model' => $this->model]));
     }
@@ -151,7 +151,7 @@ class PageController extends Controller
     {
         $this->page->massTrash($request->ids);
 
-        Cache::forget('cached_pages');
+        PolicyPages::flushCaches();
 
         if ($request->ajax()) {
             return response()->json(['success' => trans('messages.trashed', ['model' => $this->model])]);
@@ -169,7 +169,7 @@ class PageController extends Controller
     {
         $this->page->massRestore($request->ids);
 
-        Cache::forget('cached_pages');
+        PolicyPages::flushCaches();
 
         if ($request->ajax()) {
             return response()->json(['success' => trans('messages.restored', ['model' => $this->model])]);
@@ -187,7 +187,7 @@ class PageController extends Controller
     {
         $this->page->massDestroy($request->ids);
 
-        Cache::forget('cached_pages');
+        PolicyPages::flushCaches();
 
         if ($request->ajax()) {
             return response()->json(['success' => trans('messages.deleted', ['model' => $this->model])]);
@@ -205,7 +205,7 @@ class PageController extends Controller
     {
         $this->page->emptyTrash($request);
 
-        Cache::forget('cached_pages');
+        PolicyPages::flushCaches();
 
         if ($request->ajax()) {
             return response()->json(['success' => trans('messages.deleted', ['model' => $this->model])]);

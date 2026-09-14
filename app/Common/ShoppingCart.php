@@ -305,6 +305,16 @@ trait ShoppingCart
         $customerLat = $request->customer_latitude ?? $request->latitude ?? $buyerLocation->latitude();
         $customerLng = $request->customer_longitude ?? $request->longitude ?? $buyerLocation->longitude();
 
+        // Resolve fulfilment type before calculate_grand_total() below — Cart::isPickup()
+        // (set via setFulfilmentType()) is what zeroes out shipping/handling for pickup,
+        // so this must run first. Never trust the warehouse_id blindly: it must belong to
+        // this shop and the shop must actually allow pickup.
+        $warehouse = null;
+        if ($request->fulfilment_type === Order::FULFILMENT_TYPE_PICKUP && optional($cart->shop)->isPickupEnabled()) {
+            $warehouse = $cart->shop->warehouses()->active()->find($request->warehouse_id);
+        }
+        $cart->setFulfilmentType($warehouse ? Order::FULFILMENT_TYPE_PICKUP : Order::FULFILMENT_TYPE_DELIVER);
+
         // Save the order
         // Use getAttributes() — NOT toArray(). Loaded relations like shipTo() are
         // serialized under the same snake_case key ("ship_to") and would overwrite
@@ -325,16 +335,17 @@ trait ShoppingCart
                     'customer_phone_number' => is_array($request->phone) ? null : $request->phone,
                     'buyer_note' => is_array($request->buyer_note) ? null : $request->buyer_note,
                     'device_id' => $request->device_id ?? $cart->device_id,
-                    'fulfilment_type' => Order::FULFILMENT_TYPE_DELIVER,
-                    'warehouse_id' => null,
+                    'fulfilment_type' => $warehouse ? Order::FULFILMENT_TYPE_PICKUP : Order::FULFILMENT_TYPE_DELIVER,
+                    'warehouse_id' => optional($warehouse)->id,
+                    // Pickup OTP is generated immediately so the customer can see it on
+                    // the order confirmation screen right away (courier/delivery OTP is
+                    // generated later, at assignment time — pickup has no such step).
+                    'otp' => $warehouse ? Order::generateDeliveryOtp() : '',
                     'customer_latitude' => $customerLat,
                     'customer_longitude' => $customerLng,
                 ]
             )
         )->save();
-
-        // Delivery only — pickup fulfilment is disabled system-wide.
-        $cart->setFulfilmentType(Order::FULFILMENT_TYPE_DELIVER);
 
         if ($request->has('prescription')) {
             $file = $request->file('prescription');

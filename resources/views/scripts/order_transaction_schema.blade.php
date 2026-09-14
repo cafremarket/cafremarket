@@ -29,7 +29,7 @@
                   'id': '{{ $schema_item->sku }}',
                   'price': {{ $schema_item->pivot->unit_price }},
                   'brand': '{{ $schema_item->brand }}',
-                  'category': '{{ $t_category->name }}',
+                  'category': '{{ $t_category->name ?? '' }}',
                   'variant': '',
                   'quantity': {{ $schema_item->pivot->quantity }}
                 }
@@ -62,7 +62,7 @@
                 'id': '{{ $schema_item->sku }}',
                 'price': {{ $schema_item->sale_price }},
                 'brand': '{{ $schema_item->brand }}',
-                'category': '{{ $t_category->name }}',
+                'category': '{{ $t_category->name ?? '' }}',
                 'variant': '',
                 'quantity': {{ $schema_item->pivot->quantity }}
               }

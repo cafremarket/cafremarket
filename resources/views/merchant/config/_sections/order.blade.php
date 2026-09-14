@@ -3,27 +3,6 @@
             {!! Form::model($config, ['method' => 'PUT', 'route' => [$configUpdateRoute, $config], 'files' => true, 'id' => 'merchant-config-order', 'class' => 'form-horizontal ajax-form', 'data-toggle' => 'validator']) !!}
             <div class="col-sm-8 col-sm-offset-1">
               <div class="form-group">
-                {!! Form::label('order_number_prefix', trans('app.order_number_prefix') . ':', ['class' => 'with-help col-sm-4 control-label']) !!}
-                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.order_number_prefix_suffix') }}"></i>
-                <div class="col-sm-2 nopadding-left">
-                  @if ($can_update)
-                    {!! Form::text('order_number_prefix', $config->order_number_prefix, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.order_number_prefix')]) !!}
-                  @else
-                    <span>{{ $config->order_number_prefix }}</span>
-                  @endif
-                </div>
-
-                {!! Form::label('order_number_suffix', trans('app.and') . ' ' . trans('app.suffix') . ':', ['class' => 'with-help col-sm-3 control-label']) !!}
-                <div class="col-sm-2 nopadding-left">
-                  @if ($can_update)
-                    {!! Form::text('order_number_suffix', $config->order_number_suffix, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.order_number_suffix')]) !!}
-                  @else
-                    <span>{{ $config->order_number_suffix }}</span>
-                  @endif
-                </div>
-              </div>
-
-              <div class="form-group">
                 {!! Form::label('default_tax_id', trans('app.default_tax') . ':', ['class' => 'with-help col-sm-4 control-label']) !!}
                 <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.default_tax_id') }}"></i>
                 <div class="col-sm-7 nopadding-left">
@@ -56,13 +35,6 @@
               </div>
 
               @include('merchant.config.partials._shipping_settings')
-
-              @include('merchant.config.partials._toggle_row', [
-                'field' => 'pay_online',
-                'label' => trans('app.pay_online'),
-                'help' => trans('help.pay_online'),
-                'active' => $config->pay_online == 1,
-              ])
 
               @include('merchant.config.partials._toggle_row', [
                 'field' => 'pickup_enabled',

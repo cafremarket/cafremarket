@@ -20,7 +20,7 @@
     'title' => trans($pageMeta['label']),
     'navItems' => $navItems,
     'active' => $active,
-    'actions' => '<a href="'.e(route('admin.setting.config.view')).'" class="as-btn as-btn--ghost"><i class="fa fa-th-large"></i> Overview</a>',
+    'actions' => '<a href="'.e(panel_route('admin.setting.config.view')).'" class="as-btn as-btn--ghost"><i class="fa fa-th-large"></i> Overview</a>',
   ])
 
   @include('merchant.config._sections.'.$page)

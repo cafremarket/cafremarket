@@ -403,11 +403,10 @@ class Config extends BaseModel
 
     /**
      * Check if pickup is enabled for the shop.
-     * Pickup fulfilment is disabled system-wide.
      */
     public function isPickupEnabled(): bool
     {
-        return false;
+        return (bool) $this->pickup_enabled;
     }
 
     /**

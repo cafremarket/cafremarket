@@ -45,10 +45,20 @@ class OrderCreated extends Notification implements ShouldQueue
             'order_number' => (string) $orderNumber,
             'status' => (string) $this->order->orderStatus(true),
         ];
-        $notification = [
-            'title' => trans('notifications.order_created.subject', ['order' => $orderNumber]),
-            'body' => trans('notifications.order_created.message', ['order' => $orderNumber]),
-        ];
+
+        // Pickup orders get their OTP front-and-center in the push/SMS body
+        // right away, since there's no later "assign courier" step to attach it to.
+        if ($this->order->pickup() && ! empty($this->order->otp)) {
+            $notification = [
+                'title' => trans('notifications.pickup_order_created.subject', ['order' => $orderNumber]),
+                'body' => trans('notifications.pickup_order_created.message', ['order' => $orderNumber, 'otp' => $this->order->otp]),
+            ];
+        } else {
+            $notification = [
+                'title' => trans('notifications.order_created.subject', ['order' => $orderNumber]),
+                'body' => trans('notifications.order_created.message', ['order' => $orderNumber]),
+            ];
+        }
 
         // Customer app push (merchant push is handled by MerchantOrderCreatedNotification)
         $customer_token = optional($this->order->customer)->fcm_token;
@@ -99,9 +109,13 @@ class OrderCreated extends Notification implements ShouldQueue
      */
     public function toSms($notifiable)
     {
-        $notification_message = trans('notifications.order_created.message', ['order' => $this->order->order_number])."\n".get_shop_url($this->order->shop);
+        if ($this->order->pickup() && ! empty($this->order->otp)) {
+            $notification_message = trans('notifications.pickup_order_created.message', ['order' => $this->order->order_number, 'otp' => $this->order->otp]);
+        } else {
+            $notification_message = trans('notifications.order_created.message', ['order' => $this->order->order_number]);
+        }
 
-        return $notification_message;
+        return $notification_message."\n".get_shop_url($this->order->shop);
     }
 
     /**

@@ -102,7 +102,46 @@
                     <input class="form-check-input" type="radio" name="fulfilment_type" id="fulfilment_type_deliver" value="{{ \App\Models\Order::FULFILMENT_TYPE_DELIVER }}" checked>
                     <span><i class="far fa-shipping-fast"></i> {{ trans('theme.ship_to') }}</span>
                   </label>
+                  @if (! $isMultiStore && $checkoutShop && $checkoutShop->isPickupEnabled())
+                    <label class="sf-checkout__fulfil-opt">
+                      <input class="form-check-input" type="radio" name="fulfilment_type" id="fulfilment_type_pickup" value="{{ \App\Models\Order::FULFILMENT_TYPE_PICKUP }}">
+                      <span><i class="far fa-shopping-basket"></i> {{ trans('theme.pickup_from') }}</span>
+                    </label>
+                  @endif
                 </div>
+
+                @if (! $isMultiStore && $checkoutShop && $checkoutShop->isPickupEnabled())
+                  <div class="form-group mb-4 hidden" id="pickup_details">
+                    <div class="row warehouse-address-list">
+                      @forelse ($checkoutShop->warehouses()->active()->get() as $warehouse)
+                        <div class="col-sm-12 col-md-6 textClass">
+                          <div class="address-list-item">
+                            <i class="fa fa-home"></i><strong> {!! $warehouse->name !!} </strong><br>
+                            <i class="fa fa-map-marker"></i> <em>{{ trans('app.address') }} :</em>
+                            {!! optional($warehouse->pickupAddress())->toHtml(', ', false) !!}
+                            @if ($warehouse->pickup_instruction)
+                              <p class="mb-1"><em>{{ trans('theme.pickup_instruction') }} :</em> {{ $warehouse->pickup_instruction }}</p>
+                            @endif
+                            @if (is_array($warehouse->business_days) || ($warehouse->opening_time && $warehouse->close_time))
+                              <p class="mb-1"><em>{{ trans('theme.pickup_time') }} :</em></p>
+                              @if (is_array($warehouse->business_days))
+                                <i class="fa fa-calendar"></i> {{ implode(', ', $warehouse->business_days) }}<br />
+                              @endif
+                              @if ($warehouse->opening_time && $warehouse->close_time)
+                                <i class="fa fa-clock-o"></i> {{ $warehouse->opening_time }} - {{ $warehouse->close_time }}
+                              @endif
+                            @endif
+                            <input type="radio" class="warehouse_id" name="warehouse_id" value="{{ $warehouse->id }}">
+                          </div>
+                        </div>
+                      @empty
+                        <div class="col-sm-12">
+                          <h4 class="my-3 text-info">{{ trans('theme.no_pickup_options') }}</h4>
+                        </div>
+                      @endforelse
+                    </div>
+                  </div>
+                @endif
               @endif
 
               @if (isset($customer) && $customer)

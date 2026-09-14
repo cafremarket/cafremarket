@@ -13,6 +13,7 @@ use App\Models\Message;
 use App\Models\Order;
 use App\Repositories\Message\MessageRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
@@ -73,7 +74,25 @@ class MessageController extends Controller
 
     public function orderConversation(Request $request, Order $order)
     {
-        return view('admin.message._create', compact('order'));
+        if (Auth::user()->isFromMerchant() && $order->shop_id != Auth::user()->merchantId()) {
+            abort(404);
+        }
+
+        $view = Auth::user()->isFromMerchant() ? 'merchant.message._create' : 'admin.message._create';
+
+        return view($view, compact('order'));
+    }
+
+    /**
+     * A merchant may only ever open/reply to a conversation on their own
+     * shop's order — platform staff can open any of them. Mirrors the same
+     * check CreateMessageRequest already applies when starting a new one.
+     */
+    private function abortUnlessMine(Message $message): void
+    {
+        if (Auth::user()->isFromMerchant() && $message->shop_id != Auth::user()->merchantId()) {
+            abort(404);
+        }
     }
 
     /**
@@ -117,11 +136,15 @@ class MessageController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $message = Message::with('replies.attachments', 'replies.customer', 'replies.user')->find($id);
+        $message = Message::with('replies.attachments', 'replies.customer', 'replies.user')->findOrFail($id);
+
+        $this->abortUnlessMine($message);
 
         $message->markAsRead();
 
-        return view('admin.message.show', compact('message'));
+        $view = Auth::user()->isFromMerchant() ? 'merchant.message.show' : 'admin.message.show';
+
+        return view($view, compact('message'));
     }
 
     /**
@@ -176,9 +199,13 @@ class MessageController extends Controller
      */
     public function reply($id, $template = null)
     {
-        $message = $this->message->find($id);
+        $message = Message::findOrFail($id);
 
-        return view('admin.message._reply', compact('message', 'template'));
+        $this->abortUnlessMine($message);
+
+        $view = Auth::user()->isFromMerchant() ? 'merchant.message._reply' : 'admin.message._reply';
+
+        return view($view, compact('message', 'template'));
     }
 
     /**
@@ -190,6 +217,8 @@ class MessageController extends Controller
      */
     public function storeReply(ReplyMessageRequest $request, $id)
     {
+        $this->abortUnlessMine(Message::findOrFail($id));
+
         $reply = $this->message->storeReply($request, $id);
 
         event(new MessageReplied($reply));

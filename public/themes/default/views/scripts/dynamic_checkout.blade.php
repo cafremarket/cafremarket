@@ -129,6 +129,16 @@
           // Reinsert the element at the end of the body
           toggleFormElements(listOfIdForToggle, false); // Reinserts elements with IDs
         }
+
+        // Re-run the shipping/total calculation for the on-screen preview —
+        // isFreeShipping() already knows about pickup, but nothing was
+        // re-triggering it, so the delivery shipping charge stayed on
+        // screen after switching to pickup (backend still charged
+        // correctly at submit time, but the preview was wrong).
+        var checkoutCart = $("#checkout-id").val();
+        if (checkoutCart) {
+          setShippingOptions(checkoutCart);
+        }
       });
 
       // Alter pickup address

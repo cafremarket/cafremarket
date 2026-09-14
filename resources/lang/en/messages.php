@@ -9,6 +9,8 @@ return [
     'imported' => ':model has been imported successfully!',
     'sent' => ':model has been sent successfully!',
     'updated' => ':model has been updated successfully!',
+    'policy_default_applied' => 'Default content applied to :model. Review and save any custom edits as needed.',
+    'policy_defaults_applied' => 'Default policy content applied to :count page(s). Web and apps will use this content immediately.',
     'trashed' => ':model has been moved to trash!',
     'password_reset' => ':model password has been reset successfully!',
     'restored' => ':model has been restored successfully!',

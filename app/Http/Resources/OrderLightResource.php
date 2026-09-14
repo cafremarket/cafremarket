@@ -41,6 +41,7 @@ class OrderLightResource extends JsonResource
             'can_evaluate' => $this->canEvaluate(),
             'tracking_id' => $this->tracking_id,
             'tracking_url' => $this->getTrackingUrl(),
+            'fulfilment_type' => $this->fulfilment_type,
             'fulfillment_method' => $this->fulfillment_method,
             'has_courier' => $this->hasCourier(),
             'courier' => $this->when($this->hasCourier(), function () {

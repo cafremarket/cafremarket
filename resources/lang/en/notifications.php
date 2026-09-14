@@ -127,6 +127,11 @@ return [
         'button_text' => 'Visit the shop',
     ],
 
+    'pickup_order_created' => [
+        'subject' => '[Order ID: :order] your order is ready for pickup!',
+        'message' => 'Thank you for choosing us! Your order [Order ID :order] has been placed successfully. Show code :otp to the seller to collect it.',
+    ],
+
     'merchant_order_created_notification' => [
         'subject' => 'New order [Order ID: :order] has been placed on your shop!',
         'greeting' => 'Hello :merchant',

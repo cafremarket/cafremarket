@@ -67,6 +67,17 @@ class Warehouse extends BaseModel
     }
 
     /**
+     * The address to show for pickup. Most shops never set a separate
+     * warehouse address (the default warehouse created for every shop is
+     * unaddressed), so fall back to the shop's own registered address
+     * rather than showing pickup details as blank.
+     */
+    public function pickupAddress(): ?Address
+    {
+        return $this->address ?: optional($this->shop)->storeAddress();
+    }
+
+    /**
      * Get staff list for the user.
      *
      * @return array
@@ -149,6 +160,15 @@ class Warehouse extends BaseModel
             return explode(',', $business_days);
         }
 
-        return unserialize($business_days);
+        if (empty($business_days)) {
+            return null;
+        }
+
+        // unserialize() returns false (not null) on empty/invalid input — never
+        // hand that back as "business_days", it breaks any consumer expecting
+        // either an array or null (e.g. the mobile apps' JSON parsers).
+        $unserialized = @unserialize($business_days);
+
+        return is_array($unserialized) ? $unserialized : null;
     }
 }

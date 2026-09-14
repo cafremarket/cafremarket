@@ -462,6 +462,46 @@ class OrderController extends Controller
     }
 
     /**
+     * Web-panel pickup handoff: the customer reads the OTP shown on their
+     * order page out to the seller in-store, and the seller enters it here.
+     * Verified server-side against the same OTP the customer's app shows.
+     * Mirrors Api\Vendor\OrderFulfillmentController::confirm_pickup_otp.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function confirmPickupOtp(Request $request, $id)
+    {
+        $request->validate([
+            'otp' => 'required|string|size:6',
+        ]);
+
+        try {
+            \DB::transaction(function () use ($request, $id) {
+                $order = Order::whereKey($id)->lockForUpdate()->firstOrFail();
+
+                if ($order->isDelivered()) {
+                    throw new \RuntimeException(trans('app.order_already_delivered'));
+                }
+
+                if (! $order->pickup()) {
+                    throw new \RuntimeException(trans('app.pickup_details_required'));
+                }
+
+                if (empty($order->otp) || ! hash_equals((string) $order->otp, (string) $request->input('otp'))) {
+                    throw new \RuntimeException(trans('app.invalid_otp'));
+                }
+
+                $order->mark_as_goods_received();
+            });
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+    }
+
+    /**
      * Web-panel alternative to the delivery boy app's OTP confirmation, for
      * shop-owned riders (not couriers). Mirrors Api\DeliveryBoy\OrderController::confirmDelivery.
      *

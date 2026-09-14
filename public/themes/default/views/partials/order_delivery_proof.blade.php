@@ -1,6 +1,9 @@
 @php
   $hasOtp = ! empty($order->otp);
   $hasCourierDetails = $order->hasCourier();
+  $isPickup = $order->pickup();
+  // The pickup address/map itself is shown by order_delivery_location.blade.php —
+  // this partial only needs to know it's a pickup order to label the OTP correctly.
 @endphp
 
 @if ($hasOtp || $hasCourierDetails)
@@ -27,9 +30,11 @@
 
     @if ($hasOtp)
       <div class="sf-order-proof__card sf-order-proof__otp">
-        <span class="sf-order-location__label">@lang('theme.delivery_otp')</span>
+        <span class="sf-order-location__label">@lang($isPickup ? 'app.pickup_otp' : 'theme.delivery_otp')</span>
         <p class="sf-order-proof__otp-help">
-          @if ($hasCourierDetails)
+          @if ($isPickup)
+            @lang('app.pickup_otp_help')
+          @elseif ($hasCourierDetails)
             @lang('theme.delivery_otp_help_courier')
           @else
             @lang('theme.delivery_otp_help_rider')

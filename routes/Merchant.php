@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Admin\MerchantSwitchToCustomer;
+use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\Merchant\DashboardController as MerchantDashboardController;
 use App\Http\Controllers\Merchant\VerificationController as MerchantVerificationController;
 use Illuminate\Support\Facades\Route;
@@ -78,10 +79,53 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
             Route::get('general', [ConfigController::class, 'viewGeneralSetting'])
                 ->name('config.general');
 
+            // Configurations hub (Order/Storefront/Support/Notifications, incl.
+            // the pickup toggle) — mirrors the admin.setting.config.* routes in
+            // routes/admin/Config.php, which this group never included.
+            Route::get('config', [ConfigController::class, 'view'])
+                ->name('config.view');
+
+            Route::get('config/{page}', [ConfigController::class, 'page'])
+                ->where('page', 'inventory|order|views|support|websocket|notifications|storefront')
+                ->name('config.page');
+
+            Route::put('config/updateConfig/{config}', [ConfigController::class, 'updateConfig'])
+                ->name('config.update')->middleware('ajax');
+
+            Route::put('config/notification/{node}/toggle', [ConfigController::class, 'toggleNotification'])
+                ->name('config.notification.toggle')->middleware('ajax');
+
+            Route::get('config/updateBankInfo/{config}', [ConfigController::class, 'editBankInfo'])
+                ->name('bankInfo.edit')->middleware('ajax');
+
+            Route::put('config/updateBankInfo/{config}', [ConfigController::class, 'updateBankInfo'])
+                ->name('bankInfo.update');
+
             include 'admin/PaymentConfig.php';
         });
 
         Route::name('support.')->prefix('support')->group(function () {
+            // Order conversations — the minimal slice of the admin support-ticket
+            // system a seller actually needs (view/reply/start a conversation
+            // tied to one of their own orders). Ownership is enforced in
+            // MessageController (abortUnlessMine) and CreateMessageRequest, not
+            // just by hiding the link — never widen this to the full admin
+            // inbox (labels, mass actions, cross-shop message browsing).
+            Route::get('message/{order}/conversation', [MessageController::class, 'orderConversation'])
+                ->name('orderConversation.create');
+
+            Route::post('message', [MessageController::class, 'store'])
+                ->name('message.store');
+
+            Route::get('message/{message}', [MessageController::class, 'show'])
+                ->name('message.show');
+
+            Route::get('message/{message}/reply/{template?}', [MessageController::class, 'reply'])
+                ->name('message.reply');
+
+            Route::post('message/{message}/storeReply', [MessageController::class, 'storeReply'])
+                ->name('message.storeReply');
+
             if (class_exists(\Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class)) {
                 Route::get('chat', [
                     \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,

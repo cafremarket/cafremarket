@@ -475,6 +475,43 @@
         @include('admin.partials.ui.card_end')
       @endif
 
+      @if ($order->pickup())
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('theme.pickup'),
+          'icon' => 'fa-shopping-basket',
+          'bodyClass' => 'admin-order-sidebar-panel',
+        ])
+          @if ($order->warehouse)
+            <div class="admin-order-sidebar-panel__user">
+              <strong>{{ $order->warehouse->name }}</strong>
+            </div>
+          @endif
+
+          @if (! empty($order->otp) && ! $order->isDelivered() && Auth::user()->isAdmin())
+            <div class="admin-order-sidebar-panel__otp" style="margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+              <small class="text-muted">{{ trans('app.pickup_otp') }}</small>
+              <div style="font-size:20px; font-weight:700; letter-spacing:3px;">{{ $order->otp }}</div>
+              <small class="text-muted">{{ trans('app.pickup_otp_help') }}</small>
+            </div>
+          @endif
+
+          @if (! $order->isDelivered())
+            <div class="admin-order-sidebar-panel__otp-confirm" style="margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+              {!! Form::open(['url' => panel_route('admin.order.pickup.confirmOtp', $order, false), 'method' => 'put']) !!}
+                <label class="control-label" style="font-weight:600;">{{ trans('app.confirm_pickup_otp') }}</label>
+                <p class="text-muted" style="margin-bottom:8px;">{{ trans('app.confirm_pickup_otp_help') }}</p>
+                <div class="input-group">
+                  {!! Form::text('otp', null, ['class' => 'form-control', 'maxlength' => 6, 'pattern' => '[0-9]{6}', 'placeholder' => trans('app.pickup_otp'), 'required']) !!}
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn btn-new">{{ trans('app.confirm') }}</button>
+                  </span>
+                </div>
+              {!! Form::close() !!}
+            </div>
+          @endif
+        @include('admin.partials.ui.card_end')
+      @endif
+
       @if (config('system_settings.vendor_can_view_customer_info'))
         @include('admin.partials.ui.card_start', [
           'title' => trans('app.customer'),
@@ -485,7 +522,9 @@
             <div class="admin-order-sidebar-panel__user">
               <img src="{{ get_avatar_src($order->customer, 'tiny') }}" class="img-circle img-sm" alt="">
               <div>
-                @if (config('system_settings.vendor_can_view_customer_info') && $order->customer_id)
+                @if (Auth::user()->isFromPlatform() && $order->customer_id)
+                  {{-- Full customer profile (order history across every shop) stays
+                       platform-admin only — sellers only ever see this one order's info. --}}
                   <a href="javascript:void(0)" data-link="{{ route('admin.admin.customer.show', $order->customer->id) }}" class="ajax-modal-btn"><strong>{{ $order->customer->getName() }}</strong></a>
                 @else
                   <strong>{{ $order->customer->getName() }}</strong>
@@ -495,14 +534,20 @@
                 @elseif ($order->customer->email)
                   <small class="text-muted">{{ $order->customer->email }}</small>
                 @endif
+                @php
+                  $orderCustomerPhone = optional(optional($order->customer)->address)->phone ?: $order->customer_phone_number;
+                @endphp
+                @if ($orderCustomerPhone)
+                  <br><small class="text-muted"><i class="fa fa-phone"></i> {{ $orderCustomerPhone }}</small>
+                @endif
               </div>
             </div>
 
             <div class="admin-order-sidebar-panel__actions btn-group btn-group-justified">
               @if ($order->conversation)
-                <a href="{{ route('admin.support.message.show', $order->conversation) }}" class="btn btn-sm btn-info btn-flat">{{ trans('app.view_conversations') }}</a>
+                <a href="{{ panel_route('admin.support.message.show', $order->conversation) }}" class="btn btn-sm btn-info btn-flat">{{ trans('app.view_conversations') }}</a>
               @else
-                <a href="javascript:void(0)" data-link="{{ route('admin.support.orderConversation.create', $order->id) }}" class="ajax-modal-btn btn btn-new btn-sm">{{ trans('app.send_message') }}</a>
+                <a href="javascript:void(0)" data-link="{{ panel_route('admin.support.orderConversation.create', $order->id) }}" class="ajax-modal-btn btn btn-new btn-sm">{{ trans('app.send_message') }}</a>
               @endif
               <a href="{{ panel_route('admin.order.order.invoice', $order) }}" class="btn btn-sm btn-default btn-flat">{{ trans('app.invoice') }}</a>
             </div>
@@ -574,11 +619,13 @@
               </fieldset>
               @if ($order->warehouse)
                 <strong>{{ $order->warehouse->name }}</strong><br>
-                {!! $order->warehouse->address->toHtml() !!}
+                {!! optional($order->warehouse->pickupAddress())->toHtml() !!}
                 @if (is_array($order->warehouse->business_days))
                   <em class="fa fa-calendar"></em> {{ trans('app.form.business_days') }} : {{ implode(', ', $order->warehouse->business_days) }} <br>
                 @endif
-                <em class="fa fa-clock-o"></em> {{ trans('app.form.business_hours') }} : {{ $order->warehouse->opening_time }} - {{ $order->warehouse->close_time }}
+                @if ($order->warehouse->opening_time && $order->warehouse->close_time)
+                  <em class="fa fa-clock-o"></em> {{ trans('app.form.business_hours') }} : {{ $order->warehouse->opening_time }} - {{ $order->warehouse->close_time }}
+                @endif
               @else
                 <p><i class="fa fa-warning"></i> {{ trans('app.info_not_found') }}</p>
               @endif

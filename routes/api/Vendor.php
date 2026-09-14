@@ -240,6 +240,7 @@ Route::prefix('vendor')->group(function () {
         Route::post('order/{order}/assign_delivery_boy', [OrderFulfillmentController::class, 'assign_delivery_boy']);
         Route::post('order/{order}/courier', [OrderFulfillmentController::class, 'assign_courier']);
         Route::put('order/{order}/courier/confirm', [OrderFulfillmentController::class, 'confirm_courier_otp']);
+        Route::put('order/{order}/pickup/confirm', [OrderFulfillmentController::class, 'confirm_pickup_otp']);
 
         // Order conversations
 

@@ -26,7 +26,7 @@ class ShopResource extends JsonResource
             'sold_item_count' => $this->total_item_sold,
             'total_sold_amount' => $this->total_sold_amount,
             'active_listings_count' => $this->inventories_count,
-            'pickup_enabled' => false,
+            'pickup_enabled' => $this->isPickupEnabled(),
             'image' => get_logo_url($this, 'full'),
             'rating' => $this->rating(),
             'feedbacks_count' => $this->rating() ? $this->reviewSummary->count : 0,

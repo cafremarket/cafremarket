@@ -57,4 +57,7 @@ Route::post('{order}/courier/assign', [OrderController::class, 'assignCourier'])
 
 Route::put('{order}/courier/confirmOtp', [OrderController::class, 'confirmCourierOtp'])->name('courier.confirmOtp');
 
+// Pickup routes
+Route::put('{order}/pickup/confirmOtp', [OrderController::class, 'confirmPickupOtp'])->name('pickup.confirmOtp');
+
 Route::resource('order', OrderController::class)->except(['update', 'edit']); // order resource routes

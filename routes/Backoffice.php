@@ -139,6 +139,7 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/PdfTemplate.php';
             include 'admin/Faq.php';
             include 'admin/Page.php';
+            include 'admin/PolicyPage.php';
             include 'admin/Blog.php';
         });
 

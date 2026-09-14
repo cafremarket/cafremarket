@@ -742,7 +742,13 @@
             @endif
 
             @can('index', \App\Models\Page::class)
-              <li class="{{ Request::is('admin/utility/page*') ? 'active' : '' }}">
+              <li class="{{ Request::is('admin/utility/policy-page*') ? 'active' : '' }}">
+                <a href="{{ route('admin.utility.policyPage.index') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.policy_pages') }}
+                </a>
+              </li>
+
+              <li class="{{ Request::is('admin/utility/page*') && ! Request::is('admin/utility/policy-page*') ? 'active' : '' }}">
                 <a href="{{ url('admin/utility/page') }}">
                   <i class="fa fa-angle-double-right"></i> {{ trans('nav.pages') }}
                 </a>

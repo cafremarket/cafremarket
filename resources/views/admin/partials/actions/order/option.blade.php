@@ -10,11 +10,11 @@
             <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.fulfill_order') }}" class="fa fa-truck"></i>
           </a>&nbsp;
         @elseif ($order->pickup())
-          {!! Form::open(['route' => ['admin.order.order.markAsPickedUp', $order->id], 'method' => 'put', 'class' => 'inline']) !!}
-          <button type="submit" class="confirm ajax-silent" style="background:none;border:none;padding:0;" data-confirm="{{ trans('app.confirm_picked_up') }}">
-            <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.fulfill_order_pickup') }}" class="fa fa-shopping-basket"></i>
-          </button>
-          {!! Form::close() !!}&nbsp;
+          {{-- Picking up in person requires the customer's OTP, entered on the order
+               detail page — no one-click shortcut, same as the courier/delivery-boy flow. --}}
+          <a href="{{ panel_route('admin.order.order.show', $order->id) }}">
+            <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.confirm_pickup_otp') }}" class="fa fa-shopping-basket"></i>
+          </a>&nbsp;
         @endif
       @endunless
     @endcan

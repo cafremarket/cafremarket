@@ -64,6 +64,7 @@ return [
     'gift_cards' => 'Gift cards',
     'faqs' => 'Faqs',
     'pages' => 'Pages',
+    'policy_pages' => 'Policy Pages',
     'appearance' => 'Appearance',
     'performance' => 'Performance',
     'reports' => 'Reports',

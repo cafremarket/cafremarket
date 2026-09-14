@@ -244,8 +244,11 @@
 
 {{-- Store management --}}
 @can('view', \App\Models\Config::class)
-  <div class="mp-nav-group {{ mp_is('merchant/setting/general*') ? 'is-open' : '' }}">
-    <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is('merchant/setting/general*') ? 'true' : 'false' }}">
+  @php
+    $storeManagementOpen = mp_is('merchant/setting/general*') || mp_is('merchant/setting/config*');
+  @endphp
+  <div class="mp-nav-group {{ $storeManagementOpen ? 'is-open' : '' }}">
+    <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ $storeManagementOpen ? 'true' : 'false' }}">
       <i class="fa fa-shopping-bag"></i>
       <span>{{ trans('nav.store_management') ?? 'Store' }}</span>
       <i class="fa fa-chevron-down mp-nav-group__chevron"></i>
@@ -255,6 +258,10 @@
         <a href="{{ mp_url('merchant/setting/general') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/setting/general*') ? 'is-active' : '' }}">
           <i class="fa fa-cog"></i>
           <span>{{ trans('nav.shop_settings') }}</span>
+        </a>
+        <a href="{{ mp_url('merchant/setting/config') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/setting/config*') ? 'is-active' : '' }}">
+          <i class="fa fa-sliders"></i>
+          <span>{{ trans('nav.configurations') }}</span>
         </a>
       </div>
     </div>
