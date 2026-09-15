@@ -1324,6 +1324,49 @@ class Order extends BaseModel
     }
 
     /**
+     * Payment methods the customer could switch to while this order's bank
+     * transfer proof sits rejected — mirrors the eligibility check the
+     * checkout payment list and the app's paymentOptions API already use
+     * (Api\CheckoutController::paymentOptions), scoped to this order's shop.
+     * Shared by the web order-detail page and the customer API so both offer
+     * the exact same set of methods.
+     *
+     * @return \Illuminate\Support\Collection<int, PaymentMethod>
+     */
+    public function eligiblePaymentSwitchMethods()
+    {
+        if (! $this->isWireTransferRejected()) {
+            return collect();
+        }
+
+        $shop = $this->shop;
+        $activePaymentMethods = PaymentMethod::active()->get();
+        $activePaymentCodes = $activePaymentMethods->pluck('code')->toArray();
+
+        $shopConfig = null;
+        if (vendor_get_paid_directly()) {
+            $activePaymentMethods = $shop->paymentMethods;
+            $shopConfig = $shop;
+        }
+
+        $order = $this;
+
+        return $activePaymentMethods->filter(function ($paymentMethod) use ($activePaymentCodes, $shopConfig, $order) {
+            if ($paymentMethod->code === 'stripe') {
+                return false;
+            }
+
+            if ($order->is_digital && in_array($paymentMethod->code, ['cod', 'wire'], true)) {
+                return false;
+            }
+
+            $config = get_payment_config_info($paymentMethod->code, $shopConfig);
+
+            return in_array($paymentMethod->code, $activePaymentCodes, true) && $config;
+        })->values();
+    }
+
+    /**
      * Get Manual Payment Instructions for the order
      */
     public function manualPaymentInstructions()

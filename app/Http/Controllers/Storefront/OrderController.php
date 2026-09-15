@@ -523,33 +523,7 @@ class OrderController extends Controller
      */
     private function paymentSwitchOptionsFor(Order $order)
     {
-        if (! $order->isWireTransferRejected()) {
-            return collect();
-        }
-
-        $shop = $order->shop;
-        $activePaymentMethods = \App\Models\PaymentMethod::active()->get();
-        $activePaymentCodes = $activePaymentMethods->pluck('code')->toArray();
-
-        $shopConfig = null;
-        if (vendor_get_paid_directly()) {
-            $activePaymentMethods = $shop->paymentMethods;
-            $shopConfig = $shop;
-        }
-
-        return $activePaymentMethods->filter(function ($paymentMethod) use ($activePaymentCodes, $shopConfig, $order) {
-            if ($paymentMethod->code === 'stripe') {
-                return false;
-            }
-
-            if ($order->is_digital && in_array($paymentMethod->code, ['cod', 'wire'], true)) {
-                return false;
-            }
-
-            $config = get_payment_config_info($paymentMethod->code, $shopConfig);
-
-            return in_array($paymentMethod->code, $activePaymentCodes, true) && $config;
-        })->values();
+        return $order->eligiblePaymentSwitchMethods();
     }
 
     /**

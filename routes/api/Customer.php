@@ -175,6 +175,11 @@ Route::middleware('customerApp')->group(function () {
         Route::get('order/{order}/emola/status', [OrderController::class, 'emolaPaymentStatus']);
         Route::post('order/{order}/emola/resend', [OrderController::class, 'resendEmolaPayment']);
 
+        // Bank transfer rejected: re-upload a proof, or switch to a different payment method.
+        // POST (not PUT) — PHP never populates $_FILES for a PUT request, so a
+        // genuine multipart PUT would silently drop the uploaded proof file.
+        Route::post('order/{order}/paymentMethod', [OrderController::class, 'changePaymentMethod']);
+
         // invoice
         Route::get('download/invoice/{order}', [OrderController::class, 'invoice']);
 

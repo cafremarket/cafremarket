@@ -117,6 +117,25 @@ class OrderResource extends JsonResource
                     ];
                 }
             ),
+            'wire_transfer_rejected' => $this->when(! $vendor, $this->isWireTransferRejected()),
+            'wire_transfer_rejection_reason' => $this->when(
+                ! $vendor && $this->isWireTransferRejected(),
+                $this->wire_transfer_rejection_reason
+            ),
+            // Not PaymentMethodResource: that hides `code` on api/order/* paths,
+            // but the app needs it to submit the right payment_method value.
+            'payment_switch_options' => $this->when(
+                ! $vendor && $this->isWireTransferRejected(),
+                function () {
+                    return $this->eligiblePaymentSwitchMethods()->map(function ($method) {
+                        return [
+                            'id' => $method->id,
+                            'code' => $method->code,
+                            'name' => $method->name,
+                        ];
+                    })->values();
+                }
+            ),
         ];
     }
 }
