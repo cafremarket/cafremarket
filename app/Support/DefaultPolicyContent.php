@@ -17,14 +17,14 @@ class DefaultPolicyContent
 
     public static function website(): string
     {
-        return e(rtrim((string) (config('app.url') ?: 'https://cafremarket.someserve.com'), '/'));
+        return e(rtrim((string) (config('app.url') ?: 'https://cafremarket.co.mz'), '/'));
     }
 
     public static function supportEmail(): string
     {
         return e((string) (config('system_settings.support_email')
             ?: config('mail.from.address')
-            ?: 'support@cafremarket.someserve.com'));
+            ?: 'support@cafremarket.co.mz'));
     }
 
     /**

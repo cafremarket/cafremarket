@@ -30,6 +30,9 @@ if (! function_exists('setSystemConfig')) {
 
             config()->set('system_settings', $system_settings);
 
+            // Vendors always see customer info on order pages (no admin toggle).
+            config()->set('system_settings.vendor_can_view_customer_info', true);
+
             setSystemLocale();
 
             setSystemCurrency();

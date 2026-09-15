@@ -512,8 +512,7 @@
         @include('admin.partials.ui.card_end')
       @endif
 
-      @if (config('system_settings.vendor_can_view_customer_info'))
-        @include('admin.partials.ui.card_start', [
+      @include('admin.partials.ui.card_start', [
           'title' => trans('app.customer'),
           'icon' => 'fa-user',
           'bodyClass' => 'admin-order-sidebar-panel',
@@ -650,7 +649,6 @@
               @endif
             @endif
         @include('admin.partials.ui.card_end')
-      @endif
 
       @if ($order->refunds->count())
         @include('admin.partials.ui.card_start', [

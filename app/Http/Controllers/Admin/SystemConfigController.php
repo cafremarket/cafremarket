@@ -172,6 +172,14 @@ class SystemConfigController extends Controller
 
         $this->authorize('update', $system);
 
+        if ($node === 'vendor_can_view_customer_info') {
+            $system->vendor_can_view_customer_info = true;
+            $system->save();
+            event(new SystemConfigUpdated($system));
+
+            return response('success', 200);
+        }
+
         $system->$node = ! $system->$node;
 
         if ($system->save()) {

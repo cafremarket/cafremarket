@@ -56,7 +56,6 @@ class SystemConfig extends BaseModel
         'address_default_state',
         'auto_approve_order',
         'ask_customer_for_email_subscription',
-        'vendor_can_view_customer_info',
         'show_vendor_terms_and_conditions',
         'can_use_own_catalog_only',
         'catalog_system_enable',
@@ -96,7 +95,6 @@ class SystemConfig extends BaseModel
         'customer_needs_approval' => 'boolean',
         'show_customer_terms_and_conditions' => 'boolean',
         'auto_approve_order' => 'boolean',
-        'vendor_can_view_customer_info' => 'boolean',
         'ask_customer_for_email_subscription' => 'boolean',
         'notify_when_vendor_registered' => 'boolean',
         'notify_when_dispute_appealed' => 'boolean',
@@ -146,6 +144,19 @@ class SystemConfig extends BaseModel
     public static function CustomerNeedsApproval()
     {
         return (bool) config('system_settings.customer_needs_approval');
+    }
+
+    /**
+     * Vendors always see customer info on the order page.
+     */
+    public function getVendorCanViewCustomerInfoAttribute($value): bool
+    {
+        return true;
+    }
+
+    public function setVendorCanViewCustomerInfoAttribute($value): void
+    {
+        $this->attributes['vendor_can_view_customer_info'] = true;
     }
 
     public static function vendorRegistrationHasAdditionalFields()

@@ -51,12 +51,6 @@
         ])
       @endif
       @include('admin.system.config._sections._toggle', [
-        'field' => 'vendor_can_view_customer_info',
-        'label' => trans('app.vendor_can_view_customer_info'),
-        'help' => trans('help.vendor_can_view_customer_info'),
-        'active' => (bool) $system->vendor_can_view_customer_info,
-      ])
-      @include('admin.system.config._sections._toggle', [
         'field' => 'show_vendor_terms_and_conditions',
         'label' => trans('app.show_vendor_terms_and_conditions'),
         'help' => trans('help.show_vendor_terms_and_conditions'),
