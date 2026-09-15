@@ -65,6 +65,11 @@ Route::middleware(['auth:customer', 'xssSanitizer'])->group(function () {
         OrderController::class, 'syncEmolaPaymentStatus',
     ])->name('order.emola.sync');
 
+    // Bank transfer rejected: re-upload a proof, or switch to a different payment method.
+    Route::put('order/{order}/paymentMethod', [
+        OrderController::class, 'changePaymentMethod',
+    ])->name('order.paymentMethod.change')->middleware('xssSanitizer');
+
     // Order cancel
     Route::get('order/cancel/{order}/{action?}', [
         OrderCancelController::class, 'showForm',

@@ -166,6 +166,94 @@
   </div><!-- /.container -->
 </section>
 
+@if ($order->isWireTransferRejected())
+  <section id="wire-recovery-section" name="wire-recovery-section" class="account-section mb-3">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 px-3 px-md-0">
+          <div class="sf-panel wire-recovery-panel">
+            <div class="sf-panel__head">
+              <span><i class="fa fa-exclamation-circle text-danger mr-2"></i> @lang('theme.wire_transfer_rejected')</span>
+            </div>
+            <div class="sf-panel__body wire-recovery-body">
+              <div class="wire-recovery-reason">
+                <strong>@lang('theme.wire_transfer_rejected_reason_label'):</strong>
+                {{ $order->wire_transfer_rejection_reason }}
+              </div>
+              <p class="wire-recovery-help">@lang('theme.wire_transfer_rejected_help')</p>
+
+              {!! Form::open([
+                  'route' => ['order.paymentMethod.change', $order],
+                  'method' => 'put',
+                  'files' => true,
+                  'id' => 'wire-recovery-form',
+                  'class' => 'wire-recovery-form',
+              ]) !!}
+
+              <fieldset class="wire-recovery-field-group">
+                <legend class="wire-recovery-label">@lang('theme.choose_payment_method')</legend>
+                <div class="wire-recovery-methods" role="radiogroup">
+                  @foreach ($paymentSwitchOptions as $method)
+                    @php $isDefault = old('payment_method', 'wire') == $method->code; @endphp
+                    <label class="wire-recovery-option">
+                      <input
+                        type="radio"
+                        name="payment_method"
+                        value="{{ $method->code }}"
+                        class="wire-recovery-method-input"
+                        @if ($isDefault) checked @endif
+                        required
+                      >
+                      <span class="wire-recovery-option__label">{{ $method->name }}</span>
+                    </label>
+                  @endforeach
+                </div>
+              </fieldset>
+
+              <div class="wire-recovery-field-group wire-recovery-field" data-for="wire">
+                <label class="wire-recovery-label" for="wire-recovery-proof">@lang('app.attachment')</label>
+                <label for="wire-recovery-proof" class="wire-recovery-upload">
+                  <i class="fa fa-cloud-upload"></i>
+                  <span class="wire-recovery-upload__text">@lang('theme.wire_transfer_proof_upload_hint')</span>
+                  <span class="wire-recovery-upload__filename"></span>
+                </label>
+                <input
+                  id="wire-recovery-proof"
+                  name="wire_transfer_proof"
+                  type="file"
+                  class="wire-recovery-upload-input"
+                  accept=".jpg,.jpeg,.png,.pdf"
+                >
+              </div>
+
+              <div class="wire-recovery-field-group wire-recovery-field" data-for="mpesa">
+                <label class="wire-recovery-label">@lang('packages.mpesa.mpesa_number')</label>
+                <input type="text" name="mpesa_number" class="form-control" value="{{ old('mpesa_number') }}">
+              </div>
+
+              <div class="wire-recovery-field-group wire-recovery-field" data-for="emola">
+                <label class="wire-recovery-label">@lang('theme.emola_number')</label>
+                <input
+                  type="text"
+                  name="emola_number"
+                  class="form-control"
+                  value="{{ old('emola_number') }}"
+                  inputmode="numeric"
+                  maxlength="9"
+                  pattern="^(86|87)[0-9]{7}$"
+                >
+              </div>
+
+              <button type="submit" class="btn sf-btn-primary wire-recovery-submit">@lang('theme.submit_payment')</button>
+              {!! Form::close() !!}
+            </div>
+          </div>
+        </div><!-- /.col-md-12 -->
+      </div><!-- /.row -->
+    </div><!-- /.container -->
+  </section>
+@endif
+
 @if ($order->refunds->count())
   <section id="refund-detail-section" name="refund-detail-section" class="account-section mb-3">
     <div class="container">
@@ -568,6 +656,162 @@
     object-fit: contain;
   }
 
+  .wire-recovery-panel {
+    border: 1px solid #f7c8b8;
+  }
+
+  .wire-recovery-panel .sf-panel__head {
+    background: #fff5f1;
+    color: #c0392b;
+  }
+
+  .wire-recovery-body {
+    padding: 18px;
+    text-align: left;
+  }
+
+  .wire-recovery-reason {
+    background: #fdecea;
+    border: 1px solid #f5c6cb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #6b1a12;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+
+  .wire-recovery-help {
+    color: var(--secondary-text, #868e8e);
+    font-size: 0.88rem;
+    margin-bottom: 18px;
+  }
+
+  fieldset.wire-recovery-field-group {
+    border: 0;
+    padding: 0;
+  }
+
+  .wire-recovery-field-group {
+    margin-bottom: 18px;
+  }
+
+  .wire-recovery-label,
+  legend.wire-recovery-label {
+    display: block;
+    width: 100%;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--primary-text, #333e48);
+    margin-bottom: 10px;
+    padding: 0;
+  }
+
+  .wire-recovery-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /*
+   * Selection is a plain, always-visible native radio (accent-color'd) inside
+   * a clickable card. The card highlight and the conditional field toggling
+   * below both use the CSS :has() selector, so both work purely from HTML —
+   * no JavaScript has to run, load, or avoid colliding with another script
+   * on the page for the core interaction to work.
+   */
+  label.wire-recovery-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1.5px solid #e8edf2;
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    font-weight: 500;
+    margin: 0;
+    transition: border-color .15s ease, background .15s ease;
+  }
+
+  label.wire-recovery-option:hover {
+    border-color: var(--primary-light, #ff944d);
+  }
+
+  label.wire-recovery-option:has(input:checked) {
+    border-color: var(--primary-color, #ff6600);
+    background: #fff8f3;
+  }
+
+  input.wire-recovery-method-input[type="radio"] {
+    position: static;
+    opacity: 1;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    flex: 0 0 20px;
+    accent-color: var(--primary-color, #ff6600);
+    cursor: pointer;
+  }
+
+  .wire-recovery-option__label {
+    flex: 1 1 auto;
+  }
+
+  .wire-recovery-field {
+    display: none;
+  }
+
+  #wire-recovery-form:has(.wire-recovery-method-input[value="wire"]:checked) .wire-recovery-field[data-for="wire"],
+  #wire-recovery-form:has(.wire-recovery-method-input[value="mpesa"]:checked) .wire-recovery-field[data-for="mpesa"],
+  #wire-recovery-form:has(.wire-recovery-method-input[value="emola"]:checked) .wire-recovery-field[data-for="emola"] {
+    display: block;
+  }
+
+  /* JS fallback class (see script below) for browsers without :has() support. */
+  .wire-recovery-field.js-field-visible {
+    display: block;
+  }
+
+  .wire-recovery-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 2px dashed #d8dee5;
+    border-radius: 10px;
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--secondary-text, #868e8e);
+    transition: border-color .15s ease, background .15s ease;
+  }
+
+  .wire-recovery-upload:hover {
+    border-color: var(--primary-color, #ff6600);
+    background: #fff8f3;
+  }
+
+  .wire-recovery-upload i {
+    font-size: 1.3rem;
+    color: var(--primary-color, #ff6600);
+  }
+
+  .wire-recovery-upload__filename:not(:empty) {
+    font-weight: 600;
+    color: var(--primary-text, #333e48);
+  }
+
+  /* Beats the vendor reset `input[type="file"]{display:block}` (higher
+     specificity than a single class) which was making the native file
+     picker button show up duplicated next to the styled dropzone. */
+  input.wire-recovery-upload-input[type="file"] {
+    display: none !important;
+  }
+
+  .wire-recovery-submit {
+    min-width: 160px;
+  }
+
   @media (max-width: 767px) {
     .order-detail-page .account-section,
     .order-detail-page.account-section {
@@ -723,5 +967,69 @@
       $('#customerWireProofPreviewModal').modal('show');
     });
   });
+</script>
+
+<script>
+  // Bank-transfer-rejected recovery form: which payment method is selected,
+  // and which field(s) it needs, is driven entirely by CSS :has() (see the
+  // <style> block above) — a native radio + a plain form, no class toggling
+  // required for the core interaction to work. This script is a pure
+  // enhancement on top of that: it (a) sets `required` correctly on the
+  // field that's actually showing so validation doesn't block on a hidden
+  // one, (b) mirrors the same visibility with a fallback class for browsers
+  // without :has() support, and (c) shows the picked filename. None of this
+  // runs jQuery and none of it is required for selecting a payment method
+  // or submitting the form — if this script fails to load or throws, the
+  // form still works.
+  (function () {
+    'use strict';
+
+    function init() {
+      var form = document.getElementById('wire-recovery-form');
+      if (!form) {
+        return;
+      }
+
+      var radios = form.querySelectorAll('.wire-recovery-method-input');
+      var fields = form.querySelectorAll('.wire-recovery-field');
+      var fileInput = document.getElementById('wire-recovery-proof');
+      var filenameEl = form.querySelector('.wire-recovery-upload__filename');
+
+      function syncFields() {
+        var checked = form.querySelector('.wire-recovery-method-input:checked');
+        var selected = checked ? checked.value : null;
+
+        for (var i = 0; i < fields.length; i++) {
+          var field = fields[i];
+          var isMatch = field.getAttribute('data-for') === selected;
+
+          field.classList.toggle('js-field-visible', isMatch);
+
+          var inputs = field.querySelectorAll('input');
+          for (var j = 0; j < inputs.length; j++) {
+            inputs[j].required = isMatch;
+          }
+        }
+      }
+
+      for (var i = 0; i < radios.length; i++) {
+        radios[i].addEventListener('change', syncFields);
+      }
+
+      syncFields();
+
+      if (fileInput && filenameEl) {
+        fileInput.addEventListener('change', function () {
+          filenameEl.textContent = (fileInput.files && fileInput.files[0]) ? fileInput.files[0].name : '';
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
 </script>
 

@@ -563,6 +563,13 @@
               <a href="{{ route('merchant.support.dispute.create', ['order_id' => $order->id]) }}" class="btn btn-sm btn-warning btn-flat">{{ trans('app.raise_dispute') }}</a>
             @endif
 
+            @if (Auth::user()->isFromPlatform() && $order->wire_transfer_rejected_at)
+              <div class="alert alert-danger">
+                <strong>{{ trans('app.rejected') }}</strong> ({{ $order->wire_transfer_rejected_at->diffForHumans() }}):
+                {{ $order->wire_transfer_rejection_reason }}
+              </div>
+            @endif
+
             @if (Auth::user()->isFromPlatform() && optional($order->paymentMethod)->code === 'wire' && count($order->attachments))
               <fieldset>
                 <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} - Bank Transfer Proof</legend>

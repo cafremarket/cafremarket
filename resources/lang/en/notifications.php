@@ -167,6 +167,13 @@ return [
         'button_text' => 'Visit the shop',
     ],
 
+    'order_wire_transfer_rejected' => [
+        'subject' => '[Order ID: :order] bank transfer proof rejected',
+        'greeting' => 'Hello :customer',
+        'message' => 'Your bank transfer proof of payment for order [Order ID :order] could not be verified.',
+        'button_text' => 'Review your order',
+    ],
+
     'order_assigned' => [
         'subject' => '[Order ID: :order] has been assigned to you!',
         'message' => 'This is a notification to let you know that one new order assigned to you. Please check the order detail.',

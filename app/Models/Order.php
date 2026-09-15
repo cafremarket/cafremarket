@@ -81,6 +81,7 @@ class Order extends BaseModel
         'reached_at' => 'datetime',
         'courier_added_at' => 'datetime',
         'delivered_confirmed_at' => 'datetime',
+        'wire_transfer_rejected_at' => 'datetime',
         'goods_received' => 'boolean',
         'is_digital' => 'boolean',
     ];
@@ -134,6 +135,8 @@ class Order extends BaseModel
         'payment_instruction',
         'wire_transfer_proof_path',
         'wire_transfer_proof_name',
+        'wire_transfer_rejected_at',
+        'wire_transfer_rejection_reason',
         'payment_ref_id',
         'payment_date',
         'payment_status',
@@ -1270,6 +1273,54 @@ class Order extends BaseModel
             static::PAYMENT_STATUS_REFUNDED;
 
         $this->save();
+    }
+
+    /**
+     * Whether this order's bank transfer proof was rejected by admin and is
+     * still waiting on the customer to re-upload a proof or switch methods.
+     */
+    public function isWireTransferRejected(): bool
+    {
+        return optional($this->paymentMethod)->code === 'wire'
+            && $this->wire_transfer_rejected_at !== null
+            && ! $this->isPaid();
+    }
+
+    /**
+     * Admin rejects the customer's bank transfer proof — reverts the order to
+     * "waiting for payment" so the customer can re-upload a proof or pick a
+     * different payment method, and records why for both sides to see.
+     */
+    public function rejectWireTransfer(string $reason): self
+    {
+        $this->wire_transfer_rejected_at = now();
+        $this->wire_transfer_rejection_reason = $reason;
+        $this->payment_status = static::PAYMENT_STATUS_UNPAID;
+
+        if ($this->order_status_id < static::STATUS_CONFIRMED) {
+            $this->order_status_id = static::STATUS_WAITING_FOR_PAYMENT;
+        }
+
+        $this->save();
+
+        $order = $this;
+        \Illuminate\Support\Facades\DB::afterCommit(function () use ($order) {
+            safe_dispatch_order_event(new \App\Events\Order\OrderWireTransferRejected($order), 'OrderWireTransferRejected');
+        });
+
+        return $this;
+    }
+
+    /**
+     * Clear a prior rejection once the customer has acted on it (re-uploaded
+     * a proof, or switched to a different payment method).
+     */
+    public function clearWireTransferRejection(): self
+    {
+        $this->wire_transfer_rejected_at = null;
+        $this->wire_transfer_rejection_reason = null;
+
+        return $this;
     }
 
     /**

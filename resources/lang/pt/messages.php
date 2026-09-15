@@ -90,6 +90,7 @@ return [
         'no_rate_for_the_shipping_zone' => 'The <strong> :zone </strong> shipping zone has no shipping rates. Please create shipping rates to accept orders from this zone.',
         'cant_cal_weight_shipping_rate' => 'Can\'t calculate weight based shipping rate. Because weight are not set for some items.',
         'payment_instructions_help' => 'Estes textos são mostrados aos clientes para cada método de pagamento manual (transferência bancária, pagamento na entrega, ...): "Informações adicionais" ao escolher como pagar no checkout, e "Instruções de pagamento" na página de confirmação do pedido.',
+        'wire_transfer_rejection_reason_placeholder' => 'ex.: O valor não corresponde ao total do pedido, ou o comprovativo está ilegível — o cliente verá esta nota.',
     ],
     'no_changes' => 'Nada para mostrar',
     'no_orders' => 'Nenhum pedido encontrado!',

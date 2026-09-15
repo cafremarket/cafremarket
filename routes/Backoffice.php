@@ -151,6 +151,7 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
         Route::name('order.')->prefix('order')->group(function () {
             Route::get('wire-transfers', [Admin\WireTransferController::class, 'index'])->name('wireTransfers.index');
             Route::put('wire-transfers/{order}/approve', [Admin\WireTransferController::class, 'approve'])->name('wireTransfers.approve');
+            Route::put('wire-transfers/{order}/reject', [Admin\WireTransferController::class, 'reject'])->name('wireTransfers.reject');
         });
 
         // Utility Routes for Admin/Merchant

@@ -50,6 +50,11 @@
             <p class="sf-order-card__meta">
               <span>@lang('theme.status'):</span>
               {!! $order->orderStatus(true) . ' &nbsp; ' . $order->paymentStatusName() !!}
+              @if ($order->isWireTransferRejected())
+                <a href="{{ route('order.detail', $order) }}#wire-recovery-section" class="label label-danger text-uppercase">
+                  <i class="fa fa-exclamation-circle"></i> @lang('theme.wire_transfer_rejected')
+                </a>
+              @endif
             </p>
           </div>
 

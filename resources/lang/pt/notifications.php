@@ -162,6 +162,13 @@ return [
         'button_text' => 'Visite a loja',
     ],
 
+    'order_wire_transfer_rejected' => [
+        'subject' => '[ID do Pedido: :order] comprovativo de transferência bancária rejeitado',
+        'greeting' => 'Olá :customer',
+        'message' => 'O comprovativo de transferência bancária do seu pedido [ID do Pedido: :order] não pôde ser verificado.',
+        'button_text' => 'Rever o seu pedido',
+    ],
+
       'order_assigned' => [
         'subject' => '[Pedido ID: :order] foi atribuído a si!',
         'message' => 'Esta é uma notificação para informar que um novo pedido foi atribuído a si. Por favor, verifique os detalhes do pedido.',

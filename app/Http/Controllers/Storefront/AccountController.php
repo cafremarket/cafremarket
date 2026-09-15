@@ -50,8 +50,8 @@ class AccountController extends Controller
         $data = Customer::where('id', Auth::guard('customer')->user()->id)
             ->with([
                 'orders' => function ($query) {
-                    $query->select(['id', 'customer_id', 'shop_id', 'order_number', 'currency_id', 'item_count', 'grand_total', 'order_status_id', 'created_at'])
-                        ->with(['shop:id,slug,name', 'shop.image'])->latest()->take(5);
+                    $query->select(['id', 'customer_id', 'shop_id', 'order_number', 'currency_id', 'item_count', 'grand_total', 'order_status_id', 'payment_status', 'payment_method_id', 'wire_transfer_rejected_at', 'created_at'])
+                        ->with(['shop:id,slug,name', 'shop.image', 'paymentMethod:id,code'])->latest()->take(5);
                 },
             ])
             ->withCount([
@@ -92,6 +92,7 @@ class AccountController extends Controller
                 'inventories.attachments',
                 'cancellation',
                 'dispute',
+                'paymentMethod:id,code',
             ])
             ->paginate(10);
     }

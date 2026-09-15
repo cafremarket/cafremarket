@@ -134,6 +134,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\Order\OrderPaymentFailed::class => [
             \App\Listeners\Order\NotifyCustomerPaymentFailed::class,
         ],
+        \App\Events\Order\OrderWireTransferRejected::class => [
+            \App\Listeners\Order\NotifyCustomerWireTransferRejected::class,
+        ],
         \App\Events\Order\OrderCancellationRequestCreated::class => [
             \App\Listeners\Order\NotifyMerchantNewOrderCancellationRequest::class,
             \App\Listeners\Order\NotifyCustomerOrderCancellationRequest::class,

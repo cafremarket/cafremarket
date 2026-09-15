@@ -77,7 +77,14 @@
                   <td>{{ $order->created_at->format('M j') }}</td>
                   <td>
                     <a href="{{ route('order.detail', $order) }}">{{ $order->order_number }}</a>
-                    <small class="text-muted d-block">{!! $order->orderStatus() !!}</small>
+                    <small class="text-muted d-block">
+                      {!! $order->orderStatus() !!}
+                      @if ($order->isWireTransferRejected())
+                        <a href="{{ route('order.detail', $order) }}#wire-recovery-section" class="label label-danger text-uppercase">
+                          <i class="fa fa-exclamation-circle"></i> @lang('theme.wire_transfer_rejected')
+                        </a>
+                      @endif
+                    </small>
                   </td>
                   <td>{!! get_formated_currency($order->grand_total, 2, $order->currency_id) !!}</td>
                 </tr>

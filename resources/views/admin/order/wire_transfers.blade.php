@@ -24,11 +24,17 @@
       </tr>
     </thead>
     <tbody>
-      @forelse ($orders as $order)
+      @foreach ($orders as $order)
         <tr>
           <td>
             <a href="{{ route('admin.order.order.show', $order->id) }}">{{ $order->order_number }}</a>
             <span class="indent5">{!! $order->orderStatus() !!}</span>
+            @if ($order->wire_transfer_rejected_at)
+              <br>
+              <span class="label label-danger" data-toggle="tooltip" title="{{ $order->wire_transfer_rejection_reason }}">
+                {{ trans('app.rejected') }} &mdash; {{ $order->wire_transfer_rejected_at->diffForHumans() }}
+              </span>
+            @endif
           </td>
           <td>{{ $order->shop->getName() }}</td>
           <td>{{ $order->customer->getName() }}</td>
@@ -59,17 +65,49 @@
               {!! Form::open(['route' => ['admin.order.wireTransfers.approve', $order], 'method' => 'put', 'class' => 'inline']) !!}
               <button type="submit" class="confirm btn btn-default btn-sm btn-flat"><i class="fa fa-check"></i> {{ trans('app.mark_as_paid') }}</button>
               {!! Form::close() !!}
+
+              <button type="button" class="btn btn-danger btn-sm btn-flat" data-toggle="modal" data-target="#rejectWireModal{{ $order->id }}">
+                <i class="fa fa-times"></i> {{ trans('app.reject') }}
+              </button>
             @endcan
             <a href="{{ route('admin.order.order.show', $order->id) }}" class="btn btn-default btn-sm btn-flat">{{ trans('app.open') }}</a>
           </td>
         </tr>
-      @empty
-        <tr>
-          <td colspan="7" class="text-center">{{ trans('messages.no_orders') }}</td>
-        </tr>
-      @endforelse
+      @endforeach
     </tbody>
   </table>
+
+  {{-- Reject modals live outside the table entirely — a <table>/<tbody> may
+       only contain row elements; a <div> nested inside <tbody> gets silently
+       hoisted out by the browser's HTML parser, which was also confusing
+       DataTables' column detection on this table (table-no-sort auto-inits
+       DataTables — see footer_js.blade.php). --}}
+  @foreach ($orders as $order)
+    @can('fulfill', $order)
+      <div class="modal fade" id="rejectWireModal{{ $order->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            {!! Form::open(['route' => ['admin.order.wireTransfers.reject', $order], 'method' => 'put']) !!}
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">{{ trans('app.reject') }} &mdash; {{ $order->order_number }}</h4>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                {!! Form::label('reason', trans('app.reason') . ':*') !!}
+                {!! Form::textarea('reason', null, ['class' => 'form-control', 'rows' => 3, 'required', 'placeholder' => trans('messages.notice.wire_transfer_rejection_reason_placeholder')]) !!}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">{{ trans('app.cancel') }}</button>
+              {!! Form::submit(trans('app.reject'), ['class' => 'btn btn-danger btn-flat']) !!}
+            </div>
+            {!! Form::close() !!}
+          </div>
+        </div>
+      </div>
+    @endcan
+  @endforeach
 
   @include('admin.partials.ui.card_end')
 @endsection

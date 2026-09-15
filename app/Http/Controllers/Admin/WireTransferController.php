@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -48,6 +49,28 @@ class WireTransferController extends Controller
         abort_unless(optional($order->paymentMethod)->code === 'wire', 404);
 
         $order->markAsPaid();
+
+        return back()->with('success', trans('messages.updated', ['model' => trans('app.model.order')]));
+    }
+
+    /**
+     * Reject the transfer proof — reverts the order to waiting-for-payment
+     * and lets the customer re-upload a proof or switch payment methods.
+     */
+    public function reject(Request $request, Order $order): RedirectResponse
+    {
+        abort_unless(Auth::user()->isFromPlatform(), 403);
+
+        $this->authorize('fulfill', $order);
+
+        abort_unless(optional($order->paymentMethod)->code === 'wire', 404);
+        abort_if($order->isPaid(), 409);
+
+        $request->validate([
+            'reason' => 'required|string|max:1000',
+        ]);
+
+        $order->rejectWireTransfer($request->input('reason'));
 
         return back()->with('success', trans('messages.updated', ['model' => trans('app.model.order')]));
     }
