@@ -218,6 +218,16 @@
                 </a>
               </li>
             @endcan
+
+            @if (Auth::user()->isFromPlatform())
+              @can('index', \App\Models\Order::class)
+                <li class="{{ Request::is('admin/order/wire-transfers*') ? 'active' : '' }}">
+                  <a href="{{ url('admin/order/wire-transfers') }}">
+                    <i class="fa fa-angle-double-right"></i> {{ trans('nav.wire_transfers') }}
+                  </a>
+                </li>
+              @endcan
+            @endif
           </ul>
         </li>
       @endif
@@ -618,6 +628,12 @@
           @endcan
 
           @if (Auth::user()->isFromPlatform())
+            <li class="{{ Request::is('admin/setting/paymentInstructions*') ? 'active' : '' }}">
+              <a href="{{ url('admin/setting/paymentInstructions') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('nav.payment_instructions') }}
+              </a>
+            </li>
+
             @can('view', \App\Models\System::class)
               <li class="{{ Request::is('admin/setting/system/general*') ? 'active' : '' }}">
                 <a href="{{ url('admin/setting/system/general') }}">

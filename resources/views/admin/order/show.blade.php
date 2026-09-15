@@ -309,7 +309,7 @@
       @can('fulfill', $order)
         <div class="admin-card admin-order-actions">
           <div class="admin-card__body admin-order-actions__bar">
-            @if (Auth::user()->canManageOrderPayments())
+            @if (Auth::user()->canManageOrderPayments() && ! (Auth::user()->isFromMerchant() && optional($order->paymentMethod)->code === 'wire'))
               {!! Form::open(['route' => ['admin.order.order.togglePaymentStatus', $order], 'method' => 'put', 'class' => 'inline']) !!}
               <button type="submit" class="confirm ajax-silent btn btn-lg btn-danger">{{ $order->isPaid() ? trans('app.mark_as_unpaid') : trans('app.mark_as_paid') }}</button>
               {!! Form::close() !!}
@@ -543,7 +543,14 @@
             </div>
 
             <div class="admin-order-sidebar-panel__actions btn-group btn-group-justified">
-              @if ($order->conversation)
+              @php
+                $useLiveChatModal = Auth::user()->isFromMerchant()
+                  && class_exists(\Incevio\Package\LiveChat\Models\ChatConversation::class)
+                  && $order->customer_id;
+              @endphp
+              @if ($useLiveChatModal)
+                <a href="javascript:void(0)" data-link="{{ panel_route('admin.support.orderConversation.create', $order->id) }}" class="ajax-modal-btn btn btn-new btn-sm">{{ trans('app.send_message') }}</a>
+              @elseif ($order->conversation)
                 <a href="{{ panel_route('admin.support.message.show', $order->conversation) }}" class="btn btn-sm btn-info btn-flat">{{ trans('app.view_conversations') }}</a>
               @else
                 <a href="javascript:void(0)" data-link="{{ panel_route('admin.support.orderConversation.create', $order->id) }}" class="ajax-modal-btn btn btn-new btn-sm">{{ trans('app.send_message') }}</a>
@@ -556,7 +563,7 @@
               <a href="{{ route('merchant.support.dispute.create', ['order_id' => $order->id]) }}" class="btn btn-sm btn-warning btn-flat">{{ trans('app.raise_dispute') }}</a>
             @endif
 
-            @if (optional($order->paymentMethod)->code === 'wire' && count($order->attachments))
+            @if (Auth::user()->isFromPlatform() && optional($order->paymentMethod)->code === 'wire' && count($order->attachments))
               <fieldset>
                 <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} - Bank Transfer Proof</legend>
               </fieldset>
@@ -577,7 +584,7 @@
                 @endif
                 <br>
               @endforeach
-            @elseif (optional($order->paymentMethod)->code === 'wire' && $order->wire_transfer_proof_path)
+            @elseif (Auth::user()->isFromPlatform() && optional($order->paymentMethod)->code === 'wire' && $order->wire_transfer_proof_path)
               <fieldset>
                 <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} - Bank Transfer Proof</legend>
               </fieldset>

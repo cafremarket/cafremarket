@@ -141,6 +141,7 @@ class OrderController extends Controller
 
         if (Auth::user()->isFromMerchant()) {
             $orders->where('shop_id', Auth::user()->merchantId()); // Merchants must only see their own orders
+            $orders->visibleToVendor(); // Bank transfer orders stay hidden until admin verifies and marks paid
         }
 
         if ($fulfilmentStatus != 0) {
@@ -647,6 +648,12 @@ class OrderController extends Controller
         foreach ($orders as $order) {
             $this->authorize('fulfill', $order);
 
+            // Bank transfer proofs are verified by admin only — never let a
+            // vendor bulk-approve one through the mass payment-status action.
+            if ($assign === 'paid' && Auth::user()->isFromMerchant() && optional($order->paymentMethod)->code === 'wire') {
+                continue;
+            }
+
             switch ($assign) {
                 case 'paid':
                     $order->markAsPaid();
@@ -675,11 +682,13 @@ class OrderController extends Controller
      */
     public function togglePaymentStatus(Request $request, $id)
     {
-        if (Auth::user()->isFromMerchant() && ! vendor_get_paid_directly()) {
+        $order = $this->order->find($id);
+
+        // Bank transfer proofs are verified by admin only, regardless of the
+        // vendor_get_paid_directly setting — never let a vendor self-approve one.
+        if (Auth::user()->isFromMerchant() && (! vendor_get_paid_directly() || optional($order->paymentMethod)->code === 'wire')) {
             return back()->with('warning', trans('messages.failed', ['model' => $this->model_name]));
         }
-
-        $order = $this->order->find($id);
 
         $this->authorize('fulfill', $order); // Check permission
 

@@ -100,6 +100,40 @@ class OrderChatSyncService
     }
 
     /**
+     * Open (or create) the unified shop↔customer LiveChat for an order page.
+     */
+    public static function findOrCreateShopChat(Order $order): ?ChatConversation
+    {
+        $chat = self::findShopChat($order);
+        if ($chat) {
+            return $chat;
+        }
+
+        if (! class_exists(ChatConversation::class) || ! Schema::hasTable('chat_conversations')) {
+            return null;
+        }
+
+        $customerId = $order->customer_id;
+        $shopId = $order->shop_id;
+        if (! $customerId || ! $shopId) {
+            return null;
+        }
+
+        $attrs = [
+            'shop_id' => $shopId,
+            'customer_id' => $customerId,
+            'message' => '',
+            'status' => ChatConversation::STATUS_NEW,
+        ];
+        if (Schema::hasColumn('chat_conversations', 'order_id')) {
+            $attrs['order_id'] = null;
+        }
+
+        return ChatConversation::create($attrs)
+            ->load(['replies.attachments', 'shop', 'customer']);
+    }
+
+    /**
      * Post into the single shop↔customer LiveChat thread.
      *
      * @param  mixed  $attachmentFile  UploadedFile|array|null

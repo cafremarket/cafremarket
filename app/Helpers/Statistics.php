@@ -87,7 +87,7 @@ class Statistics
 
     public static function last_sale()
     {
-        return Order::mine()->withTrashed()->orderBy('created_at', 'desc')->first();
+        return Order::mine()->withTrashed()->visibleToVendor()->orderBy('created_at', 'desc')->first();
     }
 
     /**
@@ -124,7 +124,7 @@ class Statistics
     {
         $query = Auth::user()->isFromPlatform()
             ? Order::withTrashed()
-            : Order::mine()->withTrashed();
+            : Order::mine()->withTrashed()->visibleToVendor();
 
         $row = $query->whereDate('created_at', $day)
             ->selectRaw('
@@ -198,7 +198,8 @@ class Statistics
             return Order::withTrashed()->whereDate('created_at', Carbon::today())->sum('grand_total');
         }
 
-        return Order::mine()->withTrashed()->whereDate('created_at', Carbon::today())->sum('grand_total');
+        return Order::mine()->withTrashed()->visibleToVendor()
+            ->whereDate('created_at', Carbon::today())->sum('grand_total');
     }
 
     public static function yesterdays_sale_amount()
@@ -207,7 +208,7 @@ class Statistics
             return Order::withTrashed()->whereDate('created_at', Carbon::yesterday())->sum('grand_total');
         }
 
-        return Order::mine()->withTrashed()
+        return Order::mine()->withTrashed()->visibleToVendor()
             ->whereDate('created_at', Carbon::yesterday())->sum('grand_total');
     }
 
@@ -288,13 +289,13 @@ class Statistics
 
     public static function latest_order_count($period = 15)
     {
-        return Order::mine()->withTrashed()
+        return Order::mine()->withTrashed()->visibleToVendor()
             ->whereDate('created_at', '>=', Carbon::today()->subDays($period))->count();
     }
 
     public static function todays_order_count()
     {
-        return Order::mine()->withTrashed()->whereDate('created_at', Carbon::today())->count();
+        return Order::mine()->withTrashed()->visibleToVendor()->whereDate('created_at', Carbon::today())->count();
     }
 
     public static function todays_all_order_count()
@@ -304,7 +305,7 @@ class Statistics
 
     public static function yesterday_order_count()
     {
-        return Order::mine()->withTrashed()->whereDate('created_at', Carbon::yesterday())->count();
+        return Order::mine()->withTrashed()->visibleToVendor()->whereDate('created_at', Carbon::yesterday())->count();
     }
 
     public static function yesterday_all_order_count()
@@ -329,7 +330,7 @@ class Statistics
 
     public static function unfulfilled_order_count()
     {
-        return Order::mine()->unfulfilled()->count();
+        return Order::mine()->visibleToVendor()->unfulfilled()->count();
     }
 
     public static function abandoned_carts_count($period = 15)

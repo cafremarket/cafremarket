@@ -142,6 +142,10 @@
               if (typeof initPasswordToggles === 'function') {
                 initPasswordToggles(document.getElementById('myDynamicModal'));
               }
+
+              if (typeof initMerchantOrderChatModal === 'function') {
+                initMerchantOrderChatModal(document.getElementById('myDynamicModal'));
+              }
             })
             .done(function() {
               $('.modal-body input:text:visible:first').focus();
@@ -1893,6 +1897,197 @@
    *
    * @return {mix}
    */
+  /**
+   * Order page "Send Message" modal — uses existing LiveChat reply endpoint.
+   * Bound after ajax-modal HTML inject (scripts in modal HTML are not executed).
+   */
+  function initMerchantOrderChatModal(container) {
+    if (!container) return;
+    var root = container.querySelector('#mpc-order-chat-root');
+    if (!root || root._mpcBound) return;
+    root._mpcBound = true;
+
+    var csrf = root.getAttribute('data-csrf') ||
+      (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+    var sending = false;
+
+    function qs(sel, el) { return (el || root).querySelector(sel); }
+
+    function esc(s) {
+      var d = document.createElement('div');
+      d.textContent = s == null ? '' : String(s);
+      return d.innerHTML;
+    }
+
+    function clock(iso) {
+      try {
+        var d = iso ? new Date(iso) : new Date();
+        if (isNaN(d.getTime())) return '';
+        var h = d.getHours(), m = d.getMinutes(), ap = h >= 12 ? 'PM' : 'AM';
+        h = h % 12; if (!h) h = 12;
+        return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
+      } catch (e) { return ''; }
+    }
+
+    function scrollBox() {
+      var box = qs('#conversationBox');
+      if (box) box.scrollTop = box.scrollHeight;
+    }
+
+    function showError(msg) {
+      var el = qs('#mpc-send-error');
+      if (!el) return;
+      el.hidden = !msg;
+      el.textContent = msg || '';
+    }
+
+    function bubbleHtml(text, outgoing, meta) {
+      meta = meta || {};
+      var cls = outgoing ? 'mpc-bubble mpc-bubble--out' : 'mpc-bubble mpc-bubble--in';
+      var attrs = '';
+      if (meta.replyId) attrs += ' data-reply-id="' + esc(meta.replyId) + '"';
+      if (meta.createdAt) attrs += ' data-created-at="' + esc(meta.createdAt) + '"';
+      if (meta.pending) cls += ' is-pending';
+      return '<div class="' + cls + '"' + attrs + '><div class="mpc-bubble__body">' +
+        '<p class="mpc-bubble__text">' + esc(text || '') + '</p>' +
+        '<time>' + esc(meta.time || '') + '</time></div></div>';
+    }
+
+    function sendReply(form) {
+      if (sending) return;
+      var ta = qs('textarea[name="message"]', form);
+      var fileInput = qs('input[name="photo"]', form);
+      var msg = (ta && ta.value ? ta.value : '').trim();
+      var hasFile = !!(fileInput && fileInput.files && fileInput.files.length);
+      if (!msg && !hasFile) return;
+
+      var url = form.getAttribute('action') || (qs('.mpc-composer') || {}).getAttribute('data-reply-url');
+      if (typeof toPanelUrl === 'function' && url) {
+        url = toPanelUrl(url);
+      }
+      if (!url) {
+        showError('Missing reply URL. Reload the page.');
+        return;
+      }
+
+      sending = true;
+      showError('');
+      var btn = qs('#send-btn', form);
+      if (btn) btn.disabled = true;
+
+      var nowIso = new Date().toISOString();
+      var box = qs('#conversationBox');
+      var hint = box ? box.querySelector('.mpc-thread__hint') : null;
+      if (hint && hint.parentNode) hint.parentNode.removeChild(hint);
+
+      var pending = document.createElement('div');
+      pending.innerHTML = bubbleHtml(msg || '[attachment]', true, {
+        pending: true,
+        createdAt: nowIso,
+        time: clock(nowIso)
+      });
+      var pendingNode = pending.firstChild;
+      if (box && pendingNode) box.appendChild(pendingNode);
+      scrollBox();
+
+      if (ta) ta.value = '';
+      var attachPreview = qs('#mpc-attach-preview');
+      if (attachPreview) attachPreview.hidden = true;
+
+      var fd = new FormData();
+      fd.append('message', msg);
+      fd.append('_token', csrf || (qs('input[name="_token"]', form) || {}).value || '');
+      if (hasFile) {
+        fd.append('photo', fileInput.files[0]);
+        fileInput.value = '';
+      }
+
+      fetch(url, {
+        method: 'POST',
+        body: fd,
+        credentials: 'same-origin',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': csrf
+        }
+      }).then(function (res) {
+        return res.text().then(function (text) {
+          var data = null;
+          try { data = JSON.parse(text); } catch (e) {}
+          return { ok: res.ok, status: res.status, data: data };
+        });
+      }).then(function (result) {
+        sending = false;
+        if (btn) btn.disabled = false;
+        if (!result.ok) {
+          if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
+          if (ta) ta.value = msg;
+          showError('Could not send (HTTP ' + result.status + '). Try again.');
+          return;
+        }
+        if (pendingNode) {
+          pendingNode.classList.remove('is-pending');
+          if (result.data && result.data.reply_id) {
+            pendingNode.setAttribute('data-reply-id', result.data.reply_id);
+          }
+        }
+        scrollBox();
+      }).catch(function () {
+        sending = false;
+        if (btn) btn.disabled = false;
+        if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
+        if (ta) ta.value = msg;
+        showError('Network error. Try again.');
+      });
+    }
+
+    var form = qs('#chat-form');
+    if (form && !form._mpcBound) {
+      form._mpcBound = true;
+      if (typeof toPanelUrl === 'function' && form.getAttribute('action')) {
+        form.setAttribute('action', toPanelUrl(form.getAttribute('action')));
+      }
+      var fileInput = qs('#merchantChatFile', form);
+      var preview = qs('#mpc-attach-preview');
+      var previewName = qs('#mpc-attach-name');
+      var clearBtn = qs('#mpc-attach-clear');
+
+      if (fileInput) {
+        fileInput.addEventListener('change', function () {
+          if (!fileInput.files || !fileInput.files.length) {
+            if (preview) preview.hidden = true;
+            return;
+          }
+          if (previewName) previewName.textContent = fileInput.files[0].name;
+          if (preview) preview.hidden = false;
+        });
+      }
+      if (clearBtn && fileInput) {
+        clearBtn.addEventListener('click', function () {
+          fileInput.value = '';
+          if (preview) preview.hidden = true;
+        });
+      }
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        sendReply(form);
+      });
+      var ta = qs('textarea[name="message"]', form);
+      if (ta) {
+        ta.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendReply(form);
+          }
+        });
+        setTimeout(function () { ta.focus(); }, 200);
+      }
+    }
+
+    scrollBox();
+  }
+
   function getFromPHPHelper(funcName, args = null) {
     var url = "{{ route('helper.getFromPHPHelper') }}";
     var result = 0;

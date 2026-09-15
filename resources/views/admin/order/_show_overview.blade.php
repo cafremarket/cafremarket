@@ -373,7 +373,7 @@
           <a href="{{ route('merchant.support.dispute.create', ['order_id' => $order->id]) }}" class="btn btn-sm btn-warning btn-flat">{{ trans('app.raise_dispute') }}</a>
         @endif
 
-        @if (optional($order->paymentMethod)->code === 'wire' && count($order->attachments))
+        @if (Auth::user()->isFromPlatform() && optional($order->paymentMethod)->code === 'wire' && count($order->attachments))
           <fieldset>
             <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} - Bank Transfer Proof</legend>
           </fieldset>
@@ -386,7 +386,7 @@
             @endif
             <br>
           @endforeach
-        @elseif (optional($order->paymentMethod)->code === 'wire' && $order->wire_transfer_proof_path)
+        @elseif (Auth::user()->isFromPlatform() && optional($order->paymentMethod)->code === 'wire' && $order->wire_transfer_proof_path)
           <fieldset>
             <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} - Bank Transfer Proof</legend>
           </fieldset>

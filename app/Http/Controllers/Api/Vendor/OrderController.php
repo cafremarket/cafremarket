@@ -76,7 +76,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $orders = Order::mine()->withCount(['inventories'])->with('deliveryBoy');
+        $orders = Order::mine()->visibleToVendor()->withCount(['inventories'])->with('deliveryBoy');
 
         $filter = $request->get('filter');
         $payment = $request->get('payment');
@@ -122,8 +122,10 @@ class OrderController extends Controller
      */
     public function mark_as_paid(OrderDetailRequest $request, Order $order)
     {
-        if (Auth::user()->isFromMerchant() && ! vendor_get_paid_directly()) {
-            return response()->json(['message' => $e->getMessage()], 403);
+        // Bank transfer proofs are verified by admin only, regardless of the
+        // vendor_get_paid_directly setting — never let a vendor self-approve one.
+        if (Auth::user()->isFromMerchant() && (! vendor_get_paid_directly() || optional($order->paymentMethod)->code === 'wire')) {
+            return response()->json(['message' => trans('api.something_went_wrong')], 403);
         }
 
         try {

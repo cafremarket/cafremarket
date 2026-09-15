@@ -78,6 +78,12 @@ class OrderController extends Controller
      */
     public function markAsPaid(MyDeliveryRequest $request, Order $order)
     {
+        // Bank transfer proofs are verified by admin only — a rider collects
+        // cash/COD, never a bank transfer, so never let this bypass that check.
+        if (optional($order->paymentMethod)->code === 'wire') {
+            return $this->error(trans('api.something_went_wrong'));
+        }
+
         try {
             $order->markAsPaid();
         } catch (\Exception $e) {

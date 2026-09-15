@@ -30,7 +30,7 @@ class ReportController extends Controller
             ->where('created_at', '>=', $since)
             ->sum('grand_total');
 
-        $ordersCount = Order::mine()->where('created_at', '>=', $since)->count();
+        $ordersCount = Order::mine()->visibleToVendor()->where('created_at', '>=', $since)->count();
         $productsCount = Inventory::mine()->count();
         $stockOutCount = Statistics::stock_out_count();
         $supplierCount = Supplier::mine()->count();

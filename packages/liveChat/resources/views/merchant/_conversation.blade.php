@@ -23,17 +23,22 @@
   }
   $lastDayKey = null;
   $replyUrl = route('merchant.support.chat_conversation.reply', $chat, false);
+  $hideBackButton = $hideBackButton ?? false;
 @endphp
 
 <header class="mpc-thread__head" id="openChatbox-{{ $chat->id }}" data-customer-id="{{ $chat->customer_id }}" data-conversation-id="{{ $chat->id }}" data-order-id="{{ $chat->order_id }}">
+  @unless ($hideBackButton)
   <button type="button" class="mpc-thread__back" id="mpc-back-list" aria-label="Back">
     <i class="fa fa-arrow-left"></i>
   </button>
+  @endunless
   <img src="{{ get_avatar_src($chat->customer, 'mini') }}" class="mpc-thread__avatar" alt="">
   <div class="mpc-thread__peer">
     <strong>{{ $chat->customer->getName() }}</strong>
     <span>
-      @if ($chat->order_id && optional($chat->order)->order_number)
+      @if (!empty($orderContextNumber))
+        Order #{{ $orderContextNumber }}
+      @elseif ($chat->order_id && optional($chat->order)->order_number)
         Order #{{ $chat->order->order_number }}
       @else
         {{ trans('app.customer') ?? 'Customer' }}

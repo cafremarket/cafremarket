@@ -72,6 +72,8 @@ return [
     'chats' => 'Chats',
     'countries' => 'Área de Negócio',
     'cancellations' => 'Cancelamentos',
+    'wire_transfers' => 'Transferências Bancárias',
+    'payment_instructions' => 'Instruções de Pagamento',
     'sales' => 'Vendas',
     'packages' => 'Plugins',
     'inspectable' => 'Inspecionáveis',

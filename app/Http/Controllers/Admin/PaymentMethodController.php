@@ -8,6 +8,7 @@ use App\Models\Config;
 use App\Models\PaymentMethod;
 use App\Models\SystemConfig;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentMethodController extends Controller
 {
@@ -148,6 +149,57 @@ class PaymentMethodController extends Controller
         ];
 
         $config->manualPaymentMethods()->updateExistingPivot($paymentMethod->id, $data);
+
+        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+    }
+
+    /**
+     * Dedicated page for the "additional details" (shown while choosing a
+     * payment method) and "payment instructions" (shown on the order
+     * confirmation page) text of every manual payment method — pulled out of
+     * the wallet settings form so admin can find and edit it directly.
+     *
+     * These are the global wallet_payment_info_{code} / wallet_payment_instructions_{code}
+     * options, which is what actually drives the storefront when the platform
+     * (not the vendor) is the one getting paid — see Order::manualPaymentInstructions().
+     * When vendors get paid directly, each shop's own instructions are edited
+     * per-shop from the Payment Methods page instead.
+     */
+    public function paymentInstructions()
+    {
+        abort_unless(Auth::user()->isFromPlatform(), 403);
+
+        $manualPaymentMethods = PaymentMethod::where('type', PaymentMethod::TYPE_MANUAL)
+            ->orderBy('order')
+            ->get();
+
+        return view('admin.config.payment-method.instructions', compact('manualPaymentMethods'));
+    }
+
+    /**
+     * Save the manual payment instructions for every manual payment method at once.
+     */
+    public function updatePaymentInstructions(Request $request)
+    {
+        abort_unless(Auth::user()->isFromPlatform(), 403);
+
+        if (config('app.demo') == true) {
+            return back()->with('warning', trans('messages.demo_restriction'));
+        }
+
+        $manualPaymentMethods = PaymentMethod::where('type', PaymentMethod::TYPE_MANUAL)->get();
+
+        foreach ($manualPaymentMethods as $method) {
+            update_or_create_option_table_record(
+                "wallet_payment_info_{$method->code}",
+                $request->input("wallet_payment_info_{$method->code}")
+            );
+
+            update_or_create_option_table_record(
+                "wallet_payment_instructions_{$method->code}",
+                $request->input("wallet_payment_instructions_{$method->code}")
+            );
+        }
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
     }

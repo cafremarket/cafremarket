@@ -76,6 +76,8 @@ return [
     'chats' => 'chats',
     'countries' => 'Business Area',
     'cancellations' => 'Cancellations',
+    'wire_transfers' => 'Bank Transfers',
+    'payment_instructions' => 'Payment Instructions',
     'sales' => 'Sales',
     'packages' => 'Plugins',
     'inspectable' => 'inspectables',

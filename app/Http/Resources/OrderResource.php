@@ -95,8 +95,9 @@ class OrderResource extends JsonResource
             }),
             'customer_latitude' => $this->when($deliveryBoyGuard, $this->customer_latitude),
             'customer_longitude' => $this->when($deliveryBoyGuard, $this->customer_longitude),
+            // Bank transfer proof is for admin verification only — never exposed to the store/vendor app.
             'wire_transfer_proofs' => $this->when(
-                optional($this->paymentMethod)->code === 'wire',
+                ! $vendor && optional($this->paymentMethod)->code === 'wire',
                 function () {
                     return $this->attachments->map(function ($attachment) {
                         return [
@@ -108,7 +109,7 @@ class OrderResource extends JsonResource
                 }
             ),
             'wire_transfer_proof' => $this->when(
-                optional($this->paymentMethod)->code === 'wire' && $this->wire_transfer_proof_path,
+                ! $vendor && optional($this->paymentMethod)->code === 'wire' && $this->wire_transfer_proof_path,
                 function () {
                     return [
                         'name' => $this->wire_transfer_proof_name,

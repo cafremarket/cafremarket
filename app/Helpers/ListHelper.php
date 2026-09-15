@@ -797,18 +797,25 @@ class ListHelper
     public static function top_customers($limit = 5)
     {
         return Customer::select('id', 'nice_name', 'name', 'email')
-            ->with('image:path,imageable_id,imageable_type', 'orders:id,customer_id,total')
+            ->with('image:path,imageable_id,imageable_type')
+            ->with(['orders' => function ($query) {
+                $query->select('id', 'customer_id', 'shop_id', 'total')->withArchived();
+
+                if (Auth::user()->merchantId()) {
+                    $query->mine()->visibleToVendor();
+                }
+            }])
             ->whereHas('orders', function ($query) {
                 $query->select('customer_id', 'shop_id', 'total')->withArchived();
 
                 if (Auth::user()->merchantId()) {
-                    $query->mine();
+                    $query->mine()->visibleToVendor();
                 }
             })
             ->withCount(['orders' => function ($q) {
                 $q->withArchived();
                 if (Auth::user()->merchantId()) {
-                    $q->mine();
+                    $q->mine()->visibleToVendor();
                 }
             }])
             ->orderBy('orders_count', 'desc')
@@ -1545,7 +1552,7 @@ class ListHelper
             $limit = 100;
         }
 
-        return Order::mine()->with('customer')->latest()->limit($limit)->get();
+        return Order::mine()->visibleToVendor()->with('customer')->latest()->limit($limit)->get();
     }
 
     /**

@@ -37,6 +37,19 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/Report.php';
             include 'admin/Visitor.php';
         });
+
+        // Manual payment instructions (bank transfer, COD, ...) — global,
+        // platform-wide text, so kept out of the merchant-shared setting/
+        // routes and off the giant wallet settings form.
+        Route::name('setting.')->prefix('setting')->group(function () {
+            Route::get('paymentInstructions', [
+                Admin\PaymentMethodController::class, 'paymentInstructions',
+            ])->name('config.paymentInstructions.index');
+
+            Route::put('paymentInstructions', [
+                Admin\PaymentMethodController::class, 'updatePaymentInstructions',
+            ])->name('config.paymentInstructions.update');
+        });
     });
 
     // Merchant only routes
@@ -130,6 +143,14 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
         Route::name('order.')->prefix('order')->group(function () {
             include 'admin/Order.php';
             include 'admin/Cart.php';
+        });
+
+        // Bank Transfer Verification — admin only. Kept out of admin/Order.php
+        // (shared with the merchant panel via routes/Merchant.php) so the
+        // verification queue and its proof documents are never mirrored to stores.
+        Route::name('order.')->prefix('order')->group(function () {
+            Route::get('wire-transfers', [Admin\WireTransferController::class, 'index'])->name('wireTransfers.index');
+            Route::put('wire-transfers/{order}/approve', [Admin\WireTransferController::class, 'approve'])->name('wireTransfers.approve');
         });
 
         // Utility Routes for Admin/Merchant

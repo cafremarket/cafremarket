@@ -78,6 +78,26 @@ class MessageController extends Controller
             abort(404);
         }
 
+        // Merchant order page: open existing LiveChat (shop↔customer), not the old Message compose form.
+        if (
+            Auth::user()->isFromMerchant()
+            && class_exists(\Incevio\Package\LiveChat\Models\ChatConversation::class)
+            && \Illuminate\Support\Facades\Schema::hasTable('chat_conversations')
+            && $order->customer_id
+        ) {
+            $chat = \App\Services\OrderChatSyncService::findOrCreateShopChat($order);
+
+            if (! $chat) {
+                abort(404);
+            }
+
+            $chat->markAsRead();
+            $chat->markPeerRepliesAsRead('merchant');
+            $chat->loadMissing(['replies.attachments', 'customer', 'shop', 'order']);
+
+            return view('liveChat::merchant._order_chat_modal', compact('order', 'chat'));
+        }
+
         $view = Auth::user()->isFromMerchant() ? 'merchant.message._create' : 'admin.message._create';
 
         return view($view, compact('order'));

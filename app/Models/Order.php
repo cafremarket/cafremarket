@@ -496,6 +496,21 @@ class Order extends BaseModel
     }
 
     /**
+     * Scope a query to hide bank transfer orders still awaiting admin verification
+     * of the customer's proof — the store/vendor panel only ever sees them once paid.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeVisibleToVendor($query)
+    {
+        return $query->where(function ($query) {
+            $query->whereDoesntHave('paymentMethod', function ($paymentMethod) {
+                $paymentMethod->where('code', 'wire');
+            })->orWhere('payment_status', static::PAYMENT_STATUS_PAID);
+        });
+    }
+
+    /**
      * Scope a query to only include unfulfilled orders.
      *
      * @return \Illuminate\Database\Eloquent\Builder
