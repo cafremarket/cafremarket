@@ -121,10 +121,12 @@ class ListHelper
             Order::STATUS_WAITING_FOR_PAYMENT => trans('app.statuses.waiting_for_payment'),
             Order::STATUS_PAYMENT_ERROR => trans('app.statuses.payment_error'),
             Order::STATUS_CONFIRMED => trans('app.statuses.confirmed'),
-            // Order::STATUS_FULFILLED             =>  trans("app.statuses.fulfilled"),
+            Order::STATUS_FULFILLED => trans('app.statuses.fulfilled'),
             Order::STATUS_AWAITING_DELIVERY => trans('app.statuses.awaiting_delivery'),
             Order::STATUS_DELIVERED => trans('app.statuses.delivered'),
             Order::STATUS_RETURNED => trans('app.statuses.refunded'),
+            Order::STATUS_CANCELED => trans('app.canceled'),
+            Order::STATUS_DISPUTED => trans('app.statuses.disputed'),
         ];
     }
 

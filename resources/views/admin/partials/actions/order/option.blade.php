@@ -20,6 +20,22 @@
     @endcan
   @endunless
 
+  @can('cancel', $order)
+    @unless ($order->isCanceled())
+      @if ($order->cancellationFeeApplicable() || cancellation_require_admin_approval())
+        <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class="ajax-modal-btn">
+          <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.cancel_order') }}" class="fa fa-times-circle text-warning"></i>
+        </a>&nbsp;
+      @else
+        {!! Form::open(['route' => ['admin.order.order.cancel', $order], 'method' => 'put', 'class' => 'inline']) !!}
+        <button type="submit" class="confirm ajax-silent btn-link" style="padding:0;border:0;background:transparent;">
+          <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.cancel_order') }}" class="fa fa-times-circle text-warning"></i>
+        </button>
+        {!! Form::close() !!}&nbsp;
+      @endif
+    @endunless
+  @endcan
+
   <a href="{{ panel_route('admin.order.order.show', $order->id) }}">
     <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.open') }}" class="fa fa-expand"></i>
   </a>&nbsp;

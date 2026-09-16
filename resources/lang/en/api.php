@@ -46,6 +46,8 @@ return [
     // Seller API Responses
     'contact_customer' => 'Contact customer',
     'order_updated_successfully' => 'Order updated successfully',
+    'order_canceled' => 'The order has been canceled!',
+    'order_cant_be_canceled' => 'This order can no longer be canceled.',
     'item_updated_successfully' => 'Item updated successfully',
     'account_updated_successfully' => 'Account updated successfully',
     'account_deleted_successfully' => 'Account deleted successfully',

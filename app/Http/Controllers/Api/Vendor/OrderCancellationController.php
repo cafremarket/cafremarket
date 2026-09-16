@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
+use App\Http\Controllers\Api\Vendor\Concerns\ResolvesVendorShop;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CancelationResource;
 use App\Models\Cancellation;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderCancellationController extends Controller
 {
+    use ResolvesVendorShop;
+
     /**
      * All cancellation resquets
      *
@@ -29,18 +33,28 @@ class OrderCancellationController extends Controller
      */
     public function approve_request(Request $request, Order $order)
     {
-        // Check permission
+        $this->assertOwnsShop((int) $order->shop_id);
 
         try {
+            DB::beginTransaction();
             if ($order->cancellation) {
                 $order->cancellation->forceFill([
                     'items' => null,
                     'status' => Cancellation::STATUS_APPROVED,
                 ])->save();
 
+                if (! $order->isCanceled()) {
+                    $order->cancel(false);
+                }
+
+                DB::commit();
+
                 return response()->json(['message' => trans('api.order_updated_successfully')], 200);
             }
+            DB::rollBack();
         } catch (\Exception $e) {
+            DB::rollBack();
+
             return response()->json(['message' => $e->getMessage()], 400);
         }
 
@@ -54,7 +68,7 @@ class OrderCancellationController extends Controller
      */
     public function decline_request(Request $request, Order $order)
     {
-        // Check permission
+        $this->assertOwnsShop((int) $order->shop_id);
 
         try {
             if ($order->cancellation) {
@@ -73,19 +87,40 @@ class OrderCancellationController extends Controller
     }
 
     /**
-     * Cancel order
+     * Cancel order (vendor). Always cancels immediately so mobile/admin lists stay in sync.
      *
-     * @param  OrderDetailRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function cancel(Request $request, Order $order)
     {
+        $this->assertOwnsShop((int) $order->shop_id);
+
+        if ($order->isCanceled()) {
+            return response()->json(['message' => trans('api.order_canceled')], 200);
+        }
+
+        if ($order->isDelivered()) {
+            return response()->json(['message' => trans('api.order_cant_be_canceled')], 422);
+        }
+
+        DB::beginTransaction();
         try {
-            // Need to do, Check how web works
+            if ($order->cancellation) {
+                $order->cancellation->forceFill([
+                    'items' => null,
+                    'status' => Cancellation::STATUS_APPROVED,
+                ])->save();
+            }
+
+            $order->cancel(false);
         } catch (\Exception $e) {
+            DB::rollBack();
+
             return response()->json(['message' => $e->getMessage()], 400);
         }
 
-        return response()->json(['message' => trans('api.order_updated_successfully')], 200);
+        DB::commit();
+
+        return response()->json(['message' => trans('api.order_canceled')], 200);
     }
 }

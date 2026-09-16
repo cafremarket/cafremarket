@@ -158,7 +158,9 @@ class OrderController extends Controller
             $orders->where('order_status_id', $orderStatus);
         }
 
-        $orders = $orders->orderBy('created_at', 'desc')->get();
+        $orders = $orders->with(['cancellation', 'paymentMethod', 'shop', 'customer'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return Datatables::of($orders)
             ->editColumn('checkbox', function ($order) {

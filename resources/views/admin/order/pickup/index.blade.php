@@ -82,6 +82,7 @@
                 <td>{!! $order->paymentStatusName() !!}</td>
                 <td>{!! $order->orderStatus() !!}</td>
                 <td class="row-options admin-row-actions">
+                  @include('admin.partials.actions.order.cancel_action', ['order' => $order])
                   <a href="{{ route('admin.order.order.show', $order->id) }}" class="admin-action-btn" title="{{ trans('app.open') }}" data-toggle="tooltip">
                     <i class="fa fa-expand"></i>
                   </a>
@@ -121,6 +122,7 @@
                 <td>{!! $order->paymentStatusName() !!}</td>
                 <td>{!! $order->orderStatus() !!}</td>
                 <td class="row-options admin-row-actions">
+                  @include('admin.partials.actions.order.cancel_action', ['order' => $order])
                   <a href="{{ route('admin.order.order.show', $order->id) }}" class="admin-action-btn" title="{{ trans('app.open') }}" data-toggle="tooltip">
                     <i class="fa fa-expand"></i>
                   </a>
@@ -161,6 +163,7 @@
                   <td>{!! $order->paymentStatusName() !!}</td>
                   <td>{!! $order->orderStatus() !!}</td>
                   <td class="row-options admin-row-actions">
+                    @include('admin.partials.actions.order.cancel_action', ['order' => $order])
                     <a href="{{ route('admin.order.order.show', $order->id) }}" class="admin-action-btn" title="{{ trans('app.open') }}" data-toggle="tooltip">
                       <i class="fa fa-expand"></i>
                     </a>

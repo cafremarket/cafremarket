@@ -405,7 +405,7 @@ return [
     'this_plan_has_active_subscribers' => 'This plan can not be deleted because it has active subscribers.',
     'max_chat_allowed' => 'Maximum of :size characters.',
     'mobile_slider_image' => 'The slider image for mobile app. The system will hide this slider on mobile if not provided. Keep the ratio 2:1 in size, which means the width of the image should be double of its height.',
-    'config_can_cancel_order_within' => 'Customers will be able to cancel the order within this time after placing the order. Keep it empty to allow cancellation until order fulfillment. Set 0 to disable the cancellation option. Customers can still request cancellation to the vendor.',
+    'config_can_cancel_order_within' => 'Customers can cancel until order fulfillment. Set a positive number of minutes to limit the cancel window after placing the order. Leave empty or 0 to allow cancellation until fulfillment.',
     'mobile_app_slider_hits' => 'Keep the ratio 2:1',
     'enable_live_chat_on_platform' => 'If enabled, vendor will get the option to on/off the live chat on their product page and store page.',
     'enable_live_chat_on_shop' => 'Enable live chat on your product page and store page.',

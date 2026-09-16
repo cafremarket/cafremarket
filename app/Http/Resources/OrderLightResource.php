@@ -40,6 +40,7 @@ class OrderLightResource extends JsonResource
             'goods_received' => $this->goods_received,
             // 'feedback_given' => (bool) $this->feedback_id,
             'can_evaluate' => $this->canEvaluate(),
+            'can_be_canceled' => $this->when(! $vendor, $this->canBeCanceled()),
             'tracking_id' => $this->tracking_id,
             'tracking_url' => $this->getTrackingUrl(),
             'fulfilment_type' => $this->fulfilment_type,

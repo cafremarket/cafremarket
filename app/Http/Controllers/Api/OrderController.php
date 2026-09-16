@@ -212,6 +212,46 @@ class OrderController extends Controller
     }
 
     /**
+     * Cancel the order (customer).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cancel(OrderDetailRequest $request, Order $order)
+    {
+        if ($order->isCanceled()) {
+            return response()->json([
+                'message' => trans('api.order_canceled'),
+                'data' => new OrderResource($order),
+            ], 200);
+        }
+
+        if (! $order->canBeCanceled()) {
+            return response()->json([
+                'message' => trans('api.order_cant_be_canceled'),
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+            $order->cancel();
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            \Log::error('Customer order cancel failed', [
+                'order_id' => $order->id,
+                'message' => $e->getMessage(),
+            ]);
+
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+
+        return response()->json([
+            'message' => trans('api.order_canceled'),
+            'data' => new OrderResource($order->fresh()),
+        ], 200);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @return \Illuminate\Http\Response

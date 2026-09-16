@@ -1,9 +1,7 @@
 {{--
-  Read-only order overview for platform admins.
-  No forms, no ajax-modal-btn triggers, no state-changing links — admins can see
-  everything about an order here, but every action (assign delivery boy, add
-  courier, fulfill, cancel, mark paid, refund, archive, edit admin note, etc.)
-  belongs to the merchant, on the merchant panel's own order page.
+  Order overview for platform admins.
+  Most merchant actions (assign rider/courier, fulfill, refund, etc.) stay on the
+  merchant panel. Platform admins can still cancel an order from this page.
 --}}
 @extends('admin.layouts.master')
 
@@ -27,6 +25,21 @@
         'actions' => $order->orderStatus(),
         'bodyClass' => 'admin-order-detail__main',
       ])
+        @can('cancel', $order)
+          @unless ($order->isCanceled())
+            <div style="margin:0 0 16px;">
+              @if ($order->cancellationFeeApplicable() || cancellation_require_admin_approval())
+                <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class="ajax-modal-btn btn btn-warning">
+                  {{ trans('app.cancel_order') }}
+                </a>
+              @else
+                {!! Form::open(['route' => ['admin.order.order.cancel', $order], 'method' => 'put', 'class' => 'inline']) !!}
+                <button type="submit" class="confirm ajax-silent btn btn-warning">{{ trans('app.cancel_order') }}</button>
+                {!! Form::close() !!}
+              @endif
+            </div>
+          @endunless
+        @endcan
         <div class="admin-order-payment-bar">
           <span class="admin-order-payment-bar__method">
             {{ trans('app.payment') . ': ' . optional($order->paymentMethod)->name }}

@@ -552,11 +552,15 @@ class Order extends BaseModel
     }
 
     /**
-     * Completed deliveries only (for vendor "Fulfilled" tab).
+     * Completed deliveries and canceled orders (vendor "Fulfilled" tab).
+     * Canceled orders must remain visible in the order list after cancel.
      */
     public function scopeDeliveredOnly($query)
     {
-        return $query->where('order_status_id', static::STATUS_DELIVERED);
+        return $query->whereIn('order_status_id', [
+            static::STATUS_DELIVERED,
+            static::STATUS_CANCELED,
+        ]);
     }
 
     /**
@@ -825,23 +829,18 @@ class Order extends BaseModel
      */
     public function canBeCanceled()
     {
-        $minutes = config('system_settings.can_cancel_order_within');
-
-        // Not allowed to cancel
-        if ($minutes === 0) {
-            return false;
-        }
-
         if (! $this->isEligibleForBuyerCancellation()) {
             return false;
         }
 
-        // Allowed until fulfilment
-        if ($minutes === null) {
+        $minutes = config('system_settings.can_cancel_order_within');
+
+        // null / empty / 0: allow until fulfilment (buyer cancel window open)
+        if ($minutes === null || $minutes === '' || (int) $minutes === 0) {
             return true;
         }
 
-        return $this->created_at->addMinutes($minutes) > Carbon::now();
+        return $this->created_at->addMinutes((int) $minutes) > Carbon::now();
     }
 
     /**
@@ -857,10 +856,13 @@ class Order extends BaseModel
 
     /**
      * Shared eligibility for buyer-initiated cancel / cancel-items flows.
+     * Allow until the order is delivered; only block an open cancellation request.
      */
     public function isEligibleForBuyerCancellation(): bool
     {
-        return ! $this->isCanceled() && ! $this->isFulfilled() && ! $this->cancellation;
+        return ! $this->isCanceled()
+            && ! $this->isDelivered()
+            && ! $this->hasPendingCancellationRequest();
     }
 
     /**
@@ -1069,20 +1071,28 @@ class Order extends BaseModel
         // Sync up the inventory. Increase the stock of the order items from the listing
         AdjustQttForCanceledOrder::dispatch($this, $cancelled_items);
 
-        // Refund into wallet if money goes to admin and wallet is loaded
+        // Refund into wallet if money goes to admin and wallet is loaded.
+        // Never block cancellation if the refund path fails — status must still update.
         if (! vendor_get_paid_directly() && $this->isPaid() && customer_has_wallet()) {
-            $amount = $this->grand_total;
+            try {
+                $amount = $this->grand_total;
 
-            if ($partial) {
-                $amount = DB::table('order_items')->where('order_id', $this->id)
-                    ->whereIn('inventory_id', $cancelled_items)
-                    ->select(DB::raw('quantity * unit_price AS total'))
-                    ->get()->sum('total');
+                if ($partial) {
+                    $amount = DB::table('order_items')->where('order_id', $this->id)
+                        ->whereIn('inventory_id', $cancelled_items)
+                        ->select(DB::raw('quantity * unit_price AS total'))
+                        ->get()->sum('total');
+                }
+
+                $cancellation_fee ??= config('system_settings.vendor_order_cancellation_fee');
+
+                $this->refundToWallet($amount, $cancellation_fee);
+            } catch (\Throwable $e) {
+                \Log::error('Order cancel refund failed', [
+                    'order_id' => $this->id,
+                    'message' => $e->getMessage(),
+                ]);
             }
-
-            $cancellation_fee ??= config('system_settings.vendor_order_cancellation_fee');
-
-            $this->refundToWallet($amount, $cancellation_fee);
         }
 
         if ($partial) {

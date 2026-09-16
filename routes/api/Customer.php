@@ -170,6 +170,7 @@ Route::middleware('customerApp')->group(function () {
         Route::get('listing/{slug}/reviews/eligibility', [ReviewController::class, 'product_review_eligibility']);
         Route::post('listing/{slug}/reviews', [ReviewController::class, 'store_product_review']);
         Route::post('order/{order}/goodsReceived', [OrderController::class, 'goods_received']);
+        Route::put('order/{order}/cancel', [OrderController::class, 'cancel']);
 
         // eMola order status + resend (mobile app polling)
         Route::get('order/{order}/emola/status', [OrderController::class, 'emolaPaymentStatus']);
