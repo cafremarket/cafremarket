@@ -552,15 +552,19 @@ class Order extends BaseModel
     }
 
     /**
-     * Completed deliveries and canceled orders (vendor "Fulfilled" tab).
-     * Canceled orders must remain visible in the order list after cancel.
+     * Completed deliveries only (for vendor "Fulfilled" tab).
      */
     public function scopeDeliveredOnly($query)
     {
-        return $query->whereIn('order_status_id', [
-            static::STATUS_DELIVERED,
-            static::STATUS_CANCELED,
-        ]);
+        return $query->where('order_status_id', static::STATUS_DELIVERED);
+    }
+
+    /**
+     * Canceled orders only (for vendor "Cancelled" tab).
+     */
+    public function scopeCanceled($query)
+    {
+        return $query->where('order_status_id', static::STATUS_CANCELED);
     }
 
     /**
@@ -1101,6 +1105,24 @@ class Order extends BaseModel
             // Update order status
             $this->order_status_id = static::STATUS_CANCELED;
             $this->save();
+
+            // Keep a cancellation record so the store panel "Cancellations"
+            // page can list vendor/customer cancellations (not only requests).
+            if ($this->cancellation) {
+                if (! $this->cancellation->isApproved()) {
+                    $this->cancellation->forceFill([
+                        'items' => null,
+                        'status' => Cancellation::STATUS_APPROVED,
+                    ])->save();
+                }
+            } else {
+                $this->cancellation()->create([
+                    'shop_id' => $this->shop_id,
+                    'customer_id' => $this->customer_id,
+                    'items' => null,
+                    'status' => Cancellation::STATUS_APPROVED,
+                ]);
+            }
 
             event(new OrderCancelled($this));
         }

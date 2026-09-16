@@ -21,7 +21,7 @@
         <a href="#open_tab" data-toggle="tab">{{ trans('app.open') }}</a>
       </li>
       <li class="{{ Request::input('tab') == 'archived' ? 'active' : '' }}">
-        <a href="#archived_tab" data-toggle="tab"><i class="fa fa-archive hidden-sm"></i> {{ trans('app.archived') }}</a>
+        <a href="#archived_tab" data-toggle="tab"><i class="fa fa-ban hidden-sm"></i> {{ trans('app.canceled') }}</a>
       </li>
     </ul>
 
@@ -85,34 +85,38 @@
           <thead>
             <tr>
               <th>{{ trans('app.order_number') }}</th>
+              <th>{{ trans('app.order_date') }}</th>
               <th>{{ trans('app.grand_total') }}</th>
               <th>{{ trans('app.payment') }}</th>
-              <th>{{ trans('app.requested_items') }}</th>
-              <th>{{ trans('app.requested_at') }}</th>
               <th>{{ trans('app.status') }}</th>
               <th class="admin-table__actions-col">&nbsp;</th>
             </tr>
           </thead>
           <tbody>
-            @foreach ($cancellations as $cancellation)
-              @unless ($cancellation->isOpen())
-                <tr>
-                  <td>
-                    <a href="{{ route('admin.order.order.show', $cancellation->order) }}">{{ $cancellation->order->order_number }}</a>
-                    <span class="indent5">{!! $cancellation->order->orderStatus() !!}</span>
-                    @if ($cancellation->order->disputed)
-                      <span class="label label-danger indent5">{{ trans('app.statuses.disputed') }}</span>
-                    @endif
-                  </td>
-                  <td>{{ get_formated_currency($cancellation->order->grand_total, 2, $cancellation->order->currency_id) }}</td>
-                  <td>{!! $cancellation->order->paymentStatusName() !!}</td>
-                  <td>{{ $cancellation->items_count . '/' . $cancellation->order->quantity }}</td>
-                  <td>{{ $cancellation->created_at->diffForHumans() }}</td>
-                  <td>{!! $cancellation->statusName() !!}</td>
-                  <td></td>
-                </tr>
-              @endunless
-            @endforeach
+            @forelse (($canceledOrders ?? collect()) as $order)
+              <tr>
+                <td>
+                  <a href="{{ route('admin.order.order.show', $order) }}">{{ $order->order_number }}</a>
+                  <span class="indent5">{!! $order->orderStatus() !!}</span>
+                  @if ($order->disputed)
+                    <span class="label label-danger indent5">{{ trans('app.statuses.disputed') }}</span>
+                  @endif
+                </td>
+                <td>{{ $order->created_at ? $order->created_at->toDayDateTimeString() : '' }}</td>
+                <td>{{ get_formated_currency($order->grand_total, 2, $order->currency_id) }}</td>
+                <td>{!! $order->paymentStatusName() !!}</td>
+                <td>{!! $order->orderStatus() !!}</td>
+                <td class="row-options admin-row-actions">
+                  <a href="{{ panel_route('admin.order.order.show', $order->id) }}">
+                    <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.open') }}" class="fa fa-expand"></i>
+                  </a>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="6" class="text-center text-muted">{{ trans('app.no_data_found') }}</td>
+              </tr>
+            @endforelse
           </tbody>
         </table>
       </div>

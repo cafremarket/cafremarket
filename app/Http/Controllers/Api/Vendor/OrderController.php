@@ -87,6 +87,7 @@ class OrderController extends Controller
             'unfulfilled' => $orders->unfulfilled(),
             'awaiting_delivery' => $orders->awaitingDelivery(),
             'fulfilled' => $orders->deliveredOnly(),
+            'canceled', 'cancelled' => $orders->canceled(),
             'unpaid' => $orders->unpaid(),
             'paid' => $orders->paid(),
             default => $orders,

@@ -33,7 +33,15 @@ class OrderCancellationController extends Controller
         $cancellations = Cancellation::mine()->with('order')
             ->orderBy('created_at', 'desc')->get();
 
-        return view('admin.order.cancellations', compact('cancellations'));
+        // Cancelled orders themselves (status = canceled), including ones
+        // cancelled from the app without an older cancellation request row.
+        $canceledOrders = Order::mine()
+            ->canceled()
+            ->with('cancellation')
+            ->latest()
+            ->get();
+
+        return view('admin.order.cancellations', compact('cancellations', 'canceledOrders'));
     }
 
     /**

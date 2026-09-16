@@ -155,7 +155,13 @@ class OrderController extends Controller
         }
 
         if ($orderStatus != 0) {
-            $orders->where('order_status_id', $orderStatus);
+            // Soft-deleted (archived) canceled orders must still appear when
+            // filtering the store/admin panel by canceled status.
+            if ((int) $orderStatus === Order::STATUS_CANCELED) {
+                $orders->withTrashed()->where('order_status_id', Order::STATUS_CANCELED);
+            } else {
+                $orders->where('order_status_id', $orderStatus);
+            }
         }
 
         $orders = $orders->with(['cancellation', 'paymentMethod', 'shop', 'customer'])
@@ -192,7 +198,7 @@ class OrderController extends Controller
             ->editColumn('option', function ($order) {
                 return view('admin.partials.actions.order.option', compact('order'));
             })
-            ->rawColumns(['checkbox', 'order', 'order_date', 'shop', 'customer_name', 'grand_total', 'payment_status', 'option'])
+            ->rawColumns(['checkbox', 'order', 'order_date', 'shop', 'customer_name', 'grand_total', 'payment_status', 'order_status', 'option'])
             ->make(true);
     }
 
