@@ -1997,6 +1997,8 @@
       var fd = new FormData();
       fd.append('message', msg);
       fd.append('_token', csrf || (qs('input[name="_token"]', form) || {}).value || '');
+      var parentId = (qs('#mpc-parent-id') || {}).value;
+      if (parentId) fd.append('parent_id', parentId);
       if (hasFile) {
         fd.append('photo', fileInput.files[0]);
         fileInput.value = '';

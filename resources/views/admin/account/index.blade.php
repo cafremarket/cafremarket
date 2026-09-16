@@ -37,11 +37,4 @@
 @endsection
 
 @section('page-script')
-  @includeWhen(
-    $section === 'billing'
-      && Auth::user()->isFromMerchant()
-      && \App\Models\SystemConfig::isPaymentConfigured('stripe')
-      && !\App\Models\SystemConfig::isBillingThroughWallet(),
-    'plugins.stripe-scripts'
-  )
 @endsection

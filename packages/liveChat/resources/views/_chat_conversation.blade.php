@@ -31,6 +31,7 @@
                 'is_customer' => (bool) $reply->customer_id,
                 'at' => $reply->created_at,
                 'attachments' => $reply->relationLoaded('attachments') ? $reply->attachments : collect(),
+                'quoted' => $reply->quoted_reply,
             ];
         }
     } elseif (filled($chat->message)) {
@@ -65,9 +66,10 @@
       </div>
     @endif
 
-    <div class="mp-chat-bubble {{ $bubble }}" @if ($item['id']) data-reply-id="{{ $item['id'] }}" @endif data-created-at="{{ optional($item['at'])->toIso8601String() }}">
+    <div class="mp-chat-bubble {{ $bubble }}" @if ($item['id']) data-reply-id="{{ $item['id'] }}" data-quote-text="{{ e(livechat_quoted_snippet($plain)) }}" data-quote-name="{{ $item['is_customer'] ? e($chat->customer->getName()) : e(trans('app.you') ?: 'You') }}" @endif data-created-at="{{ optional($item['at'])->toIso8601String() }}">
       <div class="{{ $who }}">
         <div class="message-text">
+          @include('liveChat::partials._quoted_reply', ['quoted' => $item['quoted'] ?? null])
           @if (is_array($share))
             <div class="shared-product-card">
               <img class="shared-product-thumb" src="{{ $share['image'] ?? '' }}" alt="{{ $share['title'] ?? 'product' }}">
@@ -123,6 +125,7 @@
       'id' => 'chat-form',
       'class' => 'mp-chat-composer__form',
     ]) !!}
+      {!! Form::hidden('parent_id', null, ['id' => 'mpc-parent-id']) !!}
       <label class="mp-chat-composer__attach reply-attachment" title="{{ __('Attachment') }}">
         <i class="fa fa-paperclip"></i>
         <input type="file" id="merchantChatFile" name="photo" accept="image/*,.pdf,.doc,.docx">
@@ -136,3 +139,36 @@
     {!! Form::close() !!}
   </div>
 @endcan
+
+<script>
+(function () {
+  var box = document.getElementById('conversationBox');
+  var parentInput = document.getElementById('mpc-parent-id');
+  if (!box || !parentInput) return;
+  var timer = null;
+  box.addEventListener('pointerdown', function (e) {
+    var bubble = e.target.closest('[data-reply-id]');
+    if (!bubble) return;
+    if (e.target.closest('a,button,input,textarea')) return;
+    timer = setTimeout(function () {
+      parentInput.value = bubble.getAttribute('data-reply-id') || '';
+      var ta = document.querySelector('#chat-form textarea[name="message"]');
+      if (ta) {
+        ta.placeholder = 'Reply: ' + (bubble.getAttribute('data-quote-text') || '');
+        ta.focus();
+      }
+    }, 450);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) {
+    box.addEventListener(ev, function () { clearTimeout(timer); });
+  });
+  box.addEventListener('click', function (e) {
+    var q = e.target.closest('.chat-quote');
+    if (!q) return;
+    e.preventDefault();
+    var id = q.getAttribute('data-parent-id');
+    var target = box.querySelector('[data-reply-id="' + id + '"]');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+})();
+</script>

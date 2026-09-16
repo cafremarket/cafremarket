@@ -12,7 +12,6 @@ use App\Events\Order\OrderUpdated;
 use App\Jobs\AdjustQttForCanceledOrder;
 use App\Services\PdfGenerator;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -1067,7 +1066,7 @@ class Order extends BaseModel
      *
      * @return void
      */
-    public function cancel($partial = false, $cancellation_fee = null)
+    public function cancel($partial = false, $cancellation_fee = null, $reason = null)
     {
         // Check if the system have selected items to cancel, null means whole order will be canceled
         $cancelled_items = $this->cancellation ? $this->cancellation->items : null;
@@ -1075,27 +1074,33 @@ class Order extends BaseModel
         // Sync up the inventory. Increase the stock of the order items from the listing
         AdjustQttForCanceledOrder::dispatch($this, $cancelled_items);
 
-        // Refund into wallet if money goes to admin and wallet is loaded.
-        // Never block cancellation if the refund path fails — status must still update.
-        if (! vendor_get_paid_directly() && $this->isPaid() && customer_has_wallet()) {
-            try {
-                $amount = $this->grand_total;
+        // Paid cancels only open a pending refund. Admin must approve or reject —
+        // never auto-transfer wallet funds or mark the refund completed here.
+        if ($this->isPaid()) {
+            $amount = $this->grand_total;
 
-                if ($partial) {
-                    $amount = DB::table('order_items')->where('order_id', $this->id)
-                        ->whereIn('inventory_id', $cancelled_items)
-                        ->select(DB::raw('quantity * unit_price AS total'))
-                        ->get()->sum('total');
-                }
+            if ($partial) {
+                $amount = DB::table('order_items')->where('order_id', $this->id)
+                    ->whereIn('inventory_id', $cancelled_items)
+                    ->select(DB::raw('quantity * unit_price AS total'))
+                    ->get()->sum('total');
+            }
 
-                $cancellation_fee ??= config('system_settings.vendor_order_cancellation_fee');
+            $refundDescription = is_string($reason) ? trim($reason) : null;
+            if ($refundDescription === '') {
+                $refundDescription = null;
+            }
 
-                $this->refundToWallet($amount, $cancellation_fee);
-            } catch (\Throwable $e) {
-                \Log::error('Order cancel refund failed', [
-                    'order_id' => $this->id,
-                    'message' => $e->getMessage(),
-                ]);
+            $alreadyTracked = $this->refunds()
+                ->whereIn('status', [Refund::STATUS_NEW, Refund::STATUS_APPROVED])
+                ->exists();
+
+            if (! $alreadyTracked) {
+                $this->recordRefund(
+                    $amount,
+                    Refund::STATUS_NEW,
+                    $refundDescription ?: trans('app.cancellation_refund')
+                );
             }
         }
 
@@ -1106,20 +1111,30 @@ class Order extends BaseModel
             $this->order_status_id = static::STATUS_CANCELED;
             $this->save();
 
+            $description = is_string($reason) ? trim($reason) : null;
+            if ($description === '') {
+                $description = null;
+            }
+
             // Keep a cancellation record so the store panel "Cancellations"
             // page can list vendor/customer cancellations (not only requests).
             if ($this->cancellation) {
-                if (! $this->cancellation->isApproved()) {
-                    $this->cancellation->forceFill([
-                        'items' => null,
-                        'status' => Cancellation::STATUS_APPROVED,
-                    ])->save();
+                $payload = [
+                    'items' => null,
+                    'status' => Cancellation::STATUS_APPROVED,
+                ];
+                if ($description !== null) {
+                    $payload['description'] = $description;
+                }
+                if (! $this->cancellation->isApproved() || $description !== null) {
+                    $this->cancellation->forceFill($payload)->save();
                 }
             } else {
                 $this->cancellation()->create([
                     'shop_id' => $this->shop_id,
                     'customer_id' => $this->customer_id,
                     'items' => null,
+                    'description' => $description,
                     'status' => Cancellation::STATUS_APPROVED,
                 ]);
             }
@@ -1224,8 +1239,18 @@ class Order extends BaseModel
     public function markAsRefunded()
     {
         if ($this->isPaid()) {
-            $this->payment_status = static::PAYMENT_STATUS_REFUNDED;
-            $this->save();
+            // Open a pending refund for admin approve/reject — do not auto-complete.
+            $alreadyTracked = $this->refunds()
+                ->whereIn('status', [Refund::STATUS_NEW, Refund::STATUS_APPROVED])
+                ->exists();
+
+            if (! $alreadyTracked) {
+                $this->recordRefund(
+                    $this->grand_total,
+                    Refund::STATUS_NEW,
+                    trans('app.cancellation_refund')
+                );
+            }
 
             event(new OrderUpdated($this));
         }
@@ -1262,49 +1287,59 @@ class Order extends BaseModel
         return $this;
     }
 
+
     /**
-     * Refund the cancellation value to the customers wallet
-     *
-     * @return void
+     * Persist a refund row so the Admin Refunds module can track cancel refunds.
      */
-    private function refundToWallet($amount, $cancellation_fee)
+    public function recordRefund($amount, int $status, ?string $description = null, ?string $failureReason = null): Refund
     {
-        if (! $this->isPaid()) {
-            throw new Exception(trans('exception.order_not_paid_yet'));
+        $payload = [
+            'shop_id' => $this->shop_id,
+            'order_fulfilled' => $this->isFulfilled(),
+            'return_goods' => false,
+            'amount' => $amount,
+            'description' => $description,
+            'status' => $status,
+        ];
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('refunds', 'failure_reason')) {
+            $payload['failure_reason'] = $failureReason;
         }
 
-        if (! customer_has_wallet()) {
-            throw new Exception(trans('exception.customer_wallet_not_enabled'));
+        if (\Illuminate\Support\Facades\Schema::hasColumn('refunds', 'admin_note') && $failureReason) {
+            $payload['admin_note'] = $failureReason;
         }
 
-        $refund = new \Incevio\Package\Wallet\Services\RefundToWallet;
+        return $this->refunds()->create($payload);
+    }
 
-        $refund->sender($this->shop)
-            ->receiver($this->customer)
-            ->amount($amount)
-            ->meta([
-                'type' => trans('packages.wallet.refund'),
-                'description' => trans('packages.wallet.refund_of', ['order' => $this->order_number]),
+    /**
+     * Create missing refund rows for orders already marked refunded/partially refunded.
+     * Used to backfill cancels that ran before Refunds module tracking existed.
+     */
+    public static function backfillMissingRefundRecords(): int
+    {
+        $created = 0;
+
+        static::query()
+            ->whereIn('payment_status', [
+                static::PAYMENT_STATUS_REFUNDED,
+                static::PAYMENT_STATUS_PARTIALLY_REFUNDED,
             ])
-            ->forceTransfer()
-            ->execute();
+            ->whereDoesntHave('refunds')
+            ->orderBy('id')
+            ->chunkById(100, function ($orders) use (&$created) {
+                foreach ($orders as $order) {
+                    $order->recordRefund(
+                        $order->grand_total,
+                        Refund::STATUS_APPROVED,
+                        trans('app.cancellation_refund')
+                    );
+                    $created++;
+                }
+            });
 
-        // Charge the cancellation fee
-        if ($cancellation_fee && $cancellation_fee > 0) {
-            $meta = [
-                'type' => trans('app.cancellation_fee'),
-                'description' => trans('app.cancellation_fee'),
-            ];
-
-            $this->shop->forceWithdraw($cancellation_fee, $meta);
-        }
-
-        // Update payment status
-        $this->payment_status = $amount < $this->grand_total ?
-            static::PAYMENT_STATUS_PARTIALLY_REFUNDED :
-            static::PAYMENT_STATUS_REFUNDED;
-
-        $this->save();
+        return $created;
     }
 
     /**
@@ -1384,10 +1419,6 @@ class Order extends BaseModel
         $order = $this;
 
         return $activePaymentMethods->filter(function ($paymentMethod) use ($activePaymentCodes, $shopConfig, $order) {
-            if ($paymentMethod->code === 'stripe') {
-                return false;
-            }
-
             if ($order->is_digital && in_array($paymentMethod->code, ['cod', 'wire'], true)) {
                 return false;
             }

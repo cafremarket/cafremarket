@@ -88,7 +88,6 @@ if (! function_exists('setSystemCurrency')) {
         $currency = config('system.active_currency');
 
         config([
-            'cashier.currency' => $currency['iso_code'],
             'system_settings.currency' => $currency,
         ]);
     }
@@ -265,18 +264,6 @@ if (! function_exists('get_payment_config_info')) {
         }
 
         switch ($code) {
-            case 'stripe':
-                if ($shop) {
-                    $config = $shop->config->stripe ?? null;
-                } else {
-                    $config = config('services.stripe');
-                }
-
-                return [
-                    'config' => $config,
-                    'msg' => trans('theme.notify.we_dont_save_card_info'),
-                ];
-
             case 'paypal':
                 if ($shop) {
                     $config = $shop->config->paypal ?? null;
@@ -382,7 +369,7 @@ if (! function_exists('get_sales_commission_for_order')) {
 
 if (! function_exists('getPlatformFeeForOrder')) {
     /**
-     * Marketplace commission for Stripe / legacy callers (vendor-side % only).
+     * Marketplace commission for legacy callers (vendor-side % only).
      */
     function getPlatformFeeForOrder($order)
     {
@@ -399,10 +386,14 @@ if (! function_exists('get_activity_str')) {
                 break;
 
             case 'current_billing_plan':
+                if ($old === $new) {
+                    return '';
+                }
+
                 $fromPlan = subscription_plan_label($old);
                 $toPlan = subscription_plan_label($new);
 
-                if (is_null($old) || $old === '' || $old === $new) {
+                if (is_null($old) || $old === '') {
                     return trans('app.activities.subscribed', ['plan' => $toPlan ?? $new]);
                 }
 

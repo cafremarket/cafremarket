@@ -67,7 +67,7 @@ class ShopsSeeder extends BaseSeeder
             $subscriptions[] = [
                 'shop_id' => $shop_id,
                 'type' => 'Business',
-                'stripe_price' => $plan_id,
+                'billing_plan' => $plan_id,
                 'quantity' => 1,
                 'trial_ends_at' => $trial_ends_at,
                 'created_at' => $now,

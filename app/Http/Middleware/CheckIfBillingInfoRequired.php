@@ -7,28 +7,13 @@ use Closure;
 class CheckIfBillingInfoRequired
 {
     /**
-     * Handle an incoming request.
+     * Wallet billing does not require a saved card.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if (
-            ! requires_stripe_card_for_subscription() ||
-            $request->user()->isFromPlatform() ||
-            $request->user()->hasBillingInfo() ||
-            ($request->user()->shop->stripe_id && $request->user()->shop->pm_last_four)
-        ) {
-            return $next($request);
-        }
-
-        $billingRoute = $request->user()->isFromMerchant()
-            ? 'merchant.account.billing'
-            : 'admin.account.billing';
-
-        return $request->ajax() || $request->wantsJson() ?
-            response(trans('messages.no_card_added'), 402)
-            : redirect()->route($billingRoute)->with('error', trans('messages.no_card_added'));
+        return $next($request);
     }
 }

@@ -316,7 +316,7 @@
 
               @if ($order->isPaid() && ((Auth::user()->isFromPlatForm() && !vendor_get_paid_directly()) || (Auth::user()->isFromMerchant() && vendor_get_paid_directly())))
                 @can('initiate', \App\Models\Refund::class)
-                  <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.form', $order) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-default">
+                  <a href="javascript:void(0)" data-link="{{ route('admin.refunds.form', $order) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-default">
                     {{ trans('app.initiate_refund') }}
                   </a>
                 @endcan
@@ -326,21 +326,9 @@
             <div class="admin-order-actions__primary">
               @if (! $order->isFulfilled())
                 @unless ($order->isCanceled() || $order->cancellation)
-                  @if (!$order->cancellationFeeApplicable())
-                    @if (Auth::user()->isFromPlatform())
-                      <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class="ajax-modal-btn btn btn-lg btn-warning">
-                        {{ trans('app.cancel_order') }}
-                      </a>
-                    @else
-                      {!! Form::open(['route' => ['admin.order.order.cancel', $order], 'method' => 'put', 'class' => 'inline']) !!}
-                      <button type="submit" class="confirm ajax-silent btn btn-lg btn-warning">{{ trans('app.cancel_order') }}</button>
-                      {!! Form::close() !!}
-                    @endif
-                  @else
-                    <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class="ajax-modal-btn btn btn-flat btn-lg btn-warning">
-                      {{ trans('app.cancel_order') }}
-                    </a>
-                  @endif
+                  <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class="ajax-modal-btn btn btn-lg btn-warning">
+                    {{ trans('app.cancel_order') }}
+                  </a>
                 @endunless
 
                 @if ($order->deliver() && ! $order->isDelivered())
@@ -475,7 +463,7 @@
         @include('admin.partials.ui.card_end')
       @endif
 
-      @if ($order->pickup())
+      @if ($order->pickup() && ! $order->isCanceled())
         @include('admin.partials.ui.card_start', [
           'title' => trans('theme.pickup'),
           'icon' => 'fa-shopping-basket',
@@ -669,6 +657,7 @@
           'title' => trans('app.refunds'),
           'icon' => 'fa-undo',
           'bodyClass' => 'admin-order-sidebar-panel',
+          'actions' => '<a href="' . e(route('admin.refunds.index', ['q' => $order->order_number])) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-list"></i> ' . e(trans('app.view_all')) . '</a>',
         ])
           <table class="table table-hover admin-table admin-table--compact">
             <tbody>
@@ -678,11 +667,7 @@
                   <td>{{ get_formated_currency($refund->amount, 2, $order->currency_id) }}</td>
                   <td>{!! $refund->statusName() !!}</td>
                   <td class="row-options admin-row-actions">
-                    @if ($refund->isOpen())
-                      @can('approve', $refund)
-                        <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.response', $refund) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.response') }}" data-toggle="tooltip"><i class="fa fa-random"></i></a>
-                      @endcan
-                    @endif
+                    <a href="javascript:void(0)" data-link="{{ route('admin.refunds.response', $refund) }}" class="admin-action-btn ajax-modal-btn" title="{{ $refund->isOpen() ? trans('app.response') : trans('app.detail') }}" data-toggle="tooltip"><i class="fa fa-{{ $refund->isOpen() ? 'random' : 'eye' }}"></i></a>
                   </td>
                 </tr>
               @endforeach

@@ -37,6 +37,7 @@ class RefundObserver
                 }
                 break;
             case Refund::STATUS_DECLINED:
+            case Refund::STATUS_FAILED:
                 if (($refunded_amt > 0) && ($refunded_amt < $order->total)) {
                     $payment_status = Order::PAYMENT_STATUS_PARTIALLY_REFUNDED;
                 } else {

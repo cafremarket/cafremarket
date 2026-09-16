@@ -10,6 +10,10 @@
               'is_customer' => (bool) $reply->customer_id,
               'at' => $reply->created_at,
               'attachments' => $reply->relationLoaded('attachments') ? $reply->attachments : collect(),
+              'quoted' => $reply->quoted_reply,
+              'quote_name' => $reply->customer_id
+                  ? $chat->customer->getName()
+                  : (trans('app.you') ?: 'You'),
           ];
       }
   } elseif (filled($chat->message)) {
@@ -19,6 +23,8 @@
           'is_customer' => true,
           'at' => $chat->created_at,
           'attachments' => collect(),
+          'quoted' => null,
+          'quote_name' => $chat->customer->getName(),
       ];
   }
   $lastDayKey = null;
@@ -72,8 +78,9 @@
       <div class="mpc-day" data-day="{{ $dayKey }}"><span>{{ livechat_format_day_label($item['at']) }}</span></div>
     @endif
 
-    <div class="mpc-bubble {{ $bubble }}" @if ($item['id']) data-reply-id="{{ $item['id'] }}" @endif data-created-at="{{ optional($item['at'])->toIso8601String() }}">
+    <div class="mpc-bubble {{ $bubble }}" @if ($item['id']) data-reply-id="{{ $item['id'] }}" data-quote-text="{{ e(livechat_quoted_snippet($plain)) }}" data-quote-name="{{ e($item['quote_name'] ?? '') }}" data-sender-type="{{ $item['is_customer'] ? 'customer' : 'merchant' }}" @endif data-created-at="{{ optional($item['at'])->toIso8601String() }}">
       <div class="mpc-bubble__body">
+        @include('liveChat::partials._quoted_reply', ['quoted' => $item['quoted'] ?? null])
         @if (is_array($share) && $shareType === 'order')
           <div class="mpc-share mpc-share--order">
             @if (!empty($share['image']))
@@ -129,12 +136,21 @@
 </div>
 
 <div class="mpc-composer" data-reply-url="{{ $replyUrl }}">
+  <div id="mpc-quote-preview" class="mpc-quote-preview" hidden>
+    <div class="mpc-quote-preview__bar"></div>
+    <div class="mpc-quote-preview__meta">
+      <strong id="mpc-quote-name"></strong>
+      <span id="mpc-quote-text"></span>
+    </div>
+    <button type="button" id="mpc-quote-clear" aria-label="Cancel">&times;</button>
+  </div>
   <div id="mpc-attach-preview" class="mpc-composer__preview" hidden>
     <span id="mpc-attach-name"></span>
     <button type="button" id="mpc-attach-clear" aria-label="Remove">&times;</button>
   </div>
   <form id="chat-form" class="mpc-composer__form" method="POST" action="{{ $replyUrl }}" enctype="multipart/form-data" autocomplete="off">
     @csrf
+    <input type="hidden" name="parent_id" id="mpc-parent-id" value="">
     <label class="mpc-composer__attach" title="Attachment">
       <i class="fa fa-paperclip"></i>
       <input type="file" id="merchantChatFile" name="photo" accept="image/*,.pdf,.doc,.docx">

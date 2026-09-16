@@ -87,6 +87,18 @@
           <i class="fa fa-times-circle"></i>
           <span>{{ trans('nav.cancellations') ?? 'Cancellations' }}</span>
         </a>
+        @can('index', \App\Models\Refund::class)
+          @php
+            $pendingRefunds = \App\Helpers\Statistics::open_refund_request_count();
+          @endphp
+          <a href="{{ route('admin.refunds.index') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ Request::is('admin/refunds*') || Request::is('merchant/refunds*') ? 'is-active' : '' }}">
+            <i class="fa fa-undo"></i>
+            <span>{{ trans('nav.refunds') ?? 'Refunds' }}</span>
+            @if ($pendingRefunds > 0)
+              <span class="mp-sidebar__badge">{{ $pendingRefunds }}</span>
+            @endif
+          </a>
+        @endcan
       </div>
     </div>
   </div>

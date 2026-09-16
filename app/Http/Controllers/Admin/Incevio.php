@@ -148,8 +148,6 @@ class Incevio extends Controller
      */
     public function zCart24()
     {
-        // Artisan::call('cashier:webhook --disabled');
-
         $morphs = [
             'addressable_type' => 'addresses',
             'causer_type' => 'activity_log',

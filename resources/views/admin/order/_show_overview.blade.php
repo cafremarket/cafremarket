@@ -28,15 +28,9 @@
         @can('cancel', $order)
           @unless ($order->isCanceled())
             <div style="margin:0 0 16px;">
-              @if ($order->cancellationFeeApplicable() || cancellation_require_admin_approval())
-                <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class="ajax-modal-btn btn btn-warning">
-                  {{ trans('app.cancel_order') }}
-                </a>
-              @else
-                {!! Form::open(['route' => ['admin.order.order.cancel', $order], 'method' => 'put', 'class' => 'inline']) !!}
-                <button type="submit" class="confirm ajax-silent btn btn-warning">{{ trans('app.cancel_order') }}</button>
-                {!! Form::close() !!}
-              @endif
+              <a href="javascript:void(0)" data-link="{{ route('admin.order.cancellation.create', $order) }}" class="ajax-modal-btn btn btn-warning">
+                {{ trans('app.cancel_order') }}
+              </a>
             </div>
           @endunless
         @endcan
@@ -277,6 +271,10 @@
           'title' => trans('app.refunds'),
           'icon' => 'fa-undo',
           'bodyClass' => 'admin-order-sidebar-panel',
+          'actions' => '<a href="' . e(route('admin.refunds.index', ['q' => $order->order_number])) . '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-list"></i> ' . e(trans('app.view_all')) . '</a>'
+            . (Gate::allows('initiate', \App\Models\Refund::class)
+              ? ' <a href="javascript:void(0)" data-link="' . e(route('admin.refunds.form', $order)) . '" class="btn btn-default btn-xs btn-flat ajax-modal-btn"><i class="fa fa-plus"></i> ' . e(trans('app.initiate_refund')) . '</a>'
+              : ''),
         ])
           <table class="table table-hover admin-table admin-table--compact">
             <tbody>
@@ -285,10 +283,24 @@
                   <td class="small">{{ $refund->created_at->diffForHumans() }}</td>
                   <td>{{ get_formated_currency($refund->amount, 2, $order->currency_id) }}</td>
                   <td>{!! $refund->statusName() !!}</td>
+                  <td class="row-options admin-row-actions">
+                    <a href="javascript:void(0)" data-link="{{ route('admin.refunds.response', $refund) }}" class="admin-action-btn ajax-modal-btn" title="{{ $refund->isOpen() ? trans('app.response') : trans('app.detail') }}" data-toggle="tooltip"><i class="fa fa-{{ $refund->isOpen() ? 'random' : 'eye' }}"></i></a>
+                  </td>
                 </tr>
               @endforeach
             </tbody>
           </table>
+        @include('admin.partials.ui.card_end')
+      @elseif (Gate::allows('initiate', \App\Models\Refund::class))
+        @include('admin.partials.ui.card_start', [
+          'title' => trans('app.refunds'),
+          'icon' => 'fa-undo',
+          'bodyClass' => 'admin-order-sidebar-panel',
+        ])
+          <p class="text-muted" style="margin:0 0 10px;">{{ trans('app.no_refunds_yet') }}</p>
+          <a href="javascript:void(0)" data-link="{{ route('admin.refunds.form', $order) }}" class="ajax-modal-btn btn btn-default btn-sm">
+            <i class="fa fa-plus"></i> {{ trans('app.initiate_refund') }}
+          </a>
         @include('admin.partials.ui.card_end')
       @endif
 

@@ -14,8 +14,6 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Cashier\Cashier;
-
 // use Request;
 
 class AppServiceProvider extends ServiceProvider
@@ -108,10 +106,6 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Services\Cache\RedisAvailability::ensure();
 
-        // Need for cashier
-        // Cashier::ignoreMigrations();
-        Cashier::useCustomerModel('App\\Models\\Shop');
-
         // Swallow SMTP / recipient errors system-wide for notification mails.
         $this->app->bind(
             \Illuminate\Notifications\Channels\MailChannel::class,
@@ -188,11 +182,6 @@ class AppServiceProvider extends ServiceProvider
     {
         // Mapping of payment gateways to their respective service classes
         $paymentServices = [
-            'stripe' => [
-                'default' => \App\Services\Payments\StripeWebPaymentService::class,
-                'wallet' => \App\Services\Payments\StripePaymentService::class,
-            ],
-            'saved_card' => \App\Services\Payments\StripePaymentService::class,
             'paypal' => \App\Services\Payments\PaypalPaymentService::class,
             'wire' => \App\Services\Payments\WirePaymentService::class,
             'cod' => \App\Services\Payments\CodPaymentService::class,
@@ -201,14 +190,6 @@ class AppServiceProvider extends ServiceProvider
             'emola' => \App\Services\Payments\EmolaPaymentService::class,
         ];
 
-        // Special handling for Stripe to differentiate between wallet deposits
-        if ($class_name === 'stripe') {
-            return stripos(request()->path(), 'wallet/deposit') !== false
-                ? $paymentServices['stripe']['wallet']
-                : $paymentServices['stripe']['default'];
-        }
-
-        // Lookup the class name in the array
         if (isset($paymentServices[$class_name])) {
             return $paymentServices[$class_name];
         }

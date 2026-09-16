@@ -103,16 +103,24 @@ class OrderCancellationController extends Controller
             return response()->json(['message' => trans('api.order_cant_be_canceled')], 422);
         }
 
+        $request->validate([
+            'reason' => 'required|string|min:3|max:500',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        $reason = trim((string) ($request->input('reason') ?: $request->input('description')));
+
         DB::beginTransaction();
         try {
             if ($order->cancellation) {
                 $order->cancellation->forceFill([
                     'items' => null,
+                    'description' => $reason,
                     'status' => Cancellation::STATUS_APPROVED,
                 ])->save();
             }
 
-            $order->cancel(false);
+            $order->cancel(false, null, $reason);
         } catch (\Exception $e) {
             DB::rollBack();
 

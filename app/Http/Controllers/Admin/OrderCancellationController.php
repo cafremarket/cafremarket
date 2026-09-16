@@ -97,6 +97,8 @@ class OrderCancellationController extends Controller
     {
         $this->authorize('cancel', $order); // Check permission
 
+        $reason = trim((string) ($request->input('description') ?: $request->input('reason') ?: ''));
+
         // Start transaction!
         DB::beginTransaction();
         try {
@@ -105,6 +107,7 @@ class OrderCancellationController extends Controller
                 $order->cancellation()
                     ->create(array_merge($request->all(), [
                         'items' => null,
+                        'description' => $reason,
                         'status' => Cancellation::STATUS_OPEN,
                     ]));
             }
@@ -114,11 +117,12 @@ class OrderCancellationController extends Controller
                 if ($order->cancellation) {
                     $order->cancellation->forceFill([
                         'items' => null,
+                        'description' => $reason,
                         'status' => Cancellation::STATUS_APPROVED,
                     ])->save();
                 }
 
-                $order->cancel(false, $request->cancellation_fee);
+                $order->cancel(false, $request->cancellation_fee, $reason);
             }
         } catch (\Exception $e) {
             \Log::error($e);        // Log the error

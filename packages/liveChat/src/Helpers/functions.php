@@ -176,3 +176,89 @@ if (! function_exists('livechat_build_order_share_message')) {
         return \App\Services\OrderChatSyncService::buildOrderShareMessage($order);
     }
 }
+
+if (! function_exists('livechat_replies_eager_load')) {
+    /**
+     * Eager-load relations for chat reply bubbles (attachments + quoted parent).
+     *
+     * @return array<int, string>
+     */
+    function livechat_replies_eager_load(): array
+    {
+        $rels = ['replies.attachments'];
+        if (\Illuminate\Support\Facades\Schema::hasColumn('replies', 'parent_id')) {
+            $rels[] = 'replies.parent';
+        }
+
+        return $rels;
+    }
+}
+
+if (! function_exists('livechat_quoted_snippet')) {
+    /**
+     * Short plain-text preview of a chat message for quote-reply UI.
+     */
+    function livechat_quoted_snippet(?string $text, int $max = 80): string
+    {
+        $raw = trim((string) $text);
+        if ($raw === '') {
+            return '';
+        }
+
+        if (str_starts_with($raw, '[product_share]')) {
+            $share = json_decode(substr($raw, strlen('[product_share]')), true);
+            $title = is_array($share) ? (string) ($share['title'] ?? '') : '';
+
+            return $title !== '' ? $title : 'Product';
+        }
+
+        if (str_starts_with($raw, '[order_share]')) {
+            $share = json_decode(substr($raw, strlen('[order_share]')), true);
+            if (is_array($share)) {
+                $title = (string) ($share['title'] ?? '');
+                if ($title !== '') {
+                    return $title;
+                }
+                $number = (string) ($share['order_number'] ?? '');
+                if ($number !== '') {
+                    return 'Order #'.$number;
+                }
+            }
+
+            return 'Order';
+        }
+
+        if ($raw === '[attachment]' || strcasecmp($raw, '[attachment]') === 0) {
+            $label = trans('theme.attachment');
+
+            return ($label && $label !== 'theme.attachment') ? (string) $label : 'Attachment';
+        }
+
+        $plain = trim(preg_replace('/\s+/', ' ', strip_tags($raw)) ?? '');
+        if ($plain === '') {
+            return '';
+        }
+
+        $len = function_exists('mb_strlen') ? mb_strlen($plain) : strlen($plain);
+        if ($len > $max) {
+            return (function_exists('mb_substr') ? mb_substr($plain, 0, $max) : substr($plain, 0, $max)).'…';
+        }
+
+        return $plain;
+    }
+}
+
+if (! function_exists('livechat_quote_socket_payload')) {
+    /**
+     * parent_id + quoted_reply fields for WebSocket clients.
+     *
+     * @return array<string, mixed>
+     */
+    function livechat_quote_socket_payload(?\App\Models\Reply $parent): array
+    {
+        return [
+            'parent_id' => $parent?->id,
+            'quoted_reply' => \App\Models\Reply::quoteSnapshot($parent),
+        ];
+    }
+}

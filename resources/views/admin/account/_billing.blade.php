@@ -34,7 +34,7 @@
                     <td>
                       <span class="lead">{{ $plan->name }}</span>
 
-                      @if (optional($current_plan)->stripe_price == $plan->plan_id)
+                      @if (optional($current_plan)->billing_plan == $plan->plan_id)
                         <i class="fa fa-dot-circle-o text-primary indent5" data-toggle="tooltip" title="{{ trans('app.current_plan') }}"></i>
                       @endif
 
@@ -55,15 +55,11 @@
 
                     @if (\Auth::user()->isMerchant())
                       <td class="pull-right">
-                        @if (optional($current_plan)->stripe_price == $plan->plan_id)
+                        @if (optional($current_plan)->billing_plan == $plan->plan_id)
                           @if (Auth::user()->isOnGracePeriod())
                             <a href="{{ mp_route('admin.account.subscription.resume') }}" class="confirm btn btn-lg btn-primary">
                               <i class="fa fa-play"></i> {{ trans('app.resume_subscription') }}
                             </a>
-                          @elseif($current_plan->provider == 'stripe')
-                            {!! Form::open(['url' => mp_route('admin.account.subscription.cancel'), 'method' => 'delete', 'class' => 'inline']) !!}
-                            {!! Form::button('<i class="fa fa-times-circle-o"></i> '.trans('app.cancel'), ['type' => 'submit', 'class' => 'confirm ajax-silent btn btn-lg btn-danger']) !!}
-                            {!! Form::close() !!}
                           @elseif($current_plan->valid())
                             {!! Form::open(['url' => mp_route('admin.account.subscription.cancel'), 'method' => 'delete', 'class' => 'inline']) !!}
                             {!! Form::button('<i class="fa fa-times-circle-o"></i> '.trans('app.remove_subscription'), ['type' => 'submit', 'class' => 'confirm ajax-silent btn btn-lg btn-danger']) !!}
@@ -110,46 +106,6 @@
 
             @if (\App\Models\SystemConfig::isBillingThroughWallet() || is_subscription_enabled())
               @include('admin.account._subscription_billing_methods')
-            @elseif (\App\Models\SystemConfig::isPaymentConfigured('stripe'))
-              {{-- When Stripe is configured for billing --}}
-              @if (isset($billable) && $billable->stripe_id && $billable->pm_last_four)
-                @include('admin.account._creditcard_view', ['billable' => $billable])
-
-                <span class="spacer10"></span>
-                <p class="text-center">
-                  <button type="button" class="btn btn-link" data-toggle="modal" data-target="#cardUpdateModal">
-                    {{ trans('app.update_card') }}
-                    <i class="icon fa fa-edit"></i>
-                  </button>
-                </p>
-
-                <div class="modal fade" id="cardUpdateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                  <div class="modal-dialog modal-sm">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        {{ trans('app.update_card') }}
-                      </div>
-                      <div class="modal-body">
-                        @include('admin.account._card_update')
-                        <div class="spacer10"></div>
-                      </div>
-                    </div> <!-- / .modal-content -->
-                  </div> <!-- / .modal-dialog -->
-                </div>
-              @else
-                <div class="alert alert-info">
-                  <strong><i class="icon fa fa-credit-card"></i></strong>
-                  {{ trans('messages.no_billing_info') }}
-                </div>
-
-                @include('admin.account._card_update')
-              @endif
-            @elseif (is_billing_info_required())
-              <div class="alert alert-warning">
-                <strong><i class="icon fa fa-exclamation-triangle"></i></strong>
-                {{ trans('messages.billing_setup_unavailable') }}
-              </div>
             @else
               <p class="text-muted">{{ trans('messages.billing_not_required_for_plan') }}</p>
             @endif

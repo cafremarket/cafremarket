@@ -32,7 +32,7 @@ class ConversationController extends Controller
      */
     public function conversation(Request $request, Shop $shop)
     {
-        $conversation = ChatConversation::mine()->with('replies')->first();
+        $conversation = ChatConversation::mine()->with(function_exists('livechat_replies_eager_load') ? livechat_replies_eager_load() : ['replies'])->first();
 
         if ($conversation) {
             return new ConversationResource($conversation);
@@ -59,11 +59,18 @@ class ConversationController extends Controller
         if ($conversation) {
             $conversation->markAsUnread();
 
-            $msg_object = $conversation->replies()->create([
+            $quotedParent = class_exists(\App\Models\Reply::class)
+                ? \App\Models\Reply::resolveQuotedParent($conversation, $request)
+                : null;
+            $createAttrs = [
                 'customer_id' => $request->customer_id,
                 'user_id' => $request->user_id,
                 'reply' => $request->message,
-            ]);
+            ];
+            if ($quotedParent) {
+                $createAttrs['parent_id'] = $quotedParent->id;
+            }
+            $msg_object = $conversation->replies()->create($createAttrs);
 
             if ($request->has('photo')) {
                 $file = create_file_from_base64($request->get('photo'));

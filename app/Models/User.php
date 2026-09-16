@@ -404,7 +404,7 @@ class User extends Authenticatable
      */
     public function hasBillingToken()
     {
-        return $this->merchantId() && $this->shop->hasStripeId();
+        return false;
     }
 
     /**

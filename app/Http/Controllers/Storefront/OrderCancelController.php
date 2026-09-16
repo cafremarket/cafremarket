@@ -57,7 +57,17 @@ class OrderCancelController extends Controller
      */
     public function cancel(OrderDetailRequest $request, Order $order)
     {
-        $order->cancel();
+        $request->validate([
+            'reason' => 'required|string|min:3|max:500',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        if (! $order->canBeCanceled()) {
+            return redirect()->back()->with('error', trans('theme.notify.failed'));
+        }
+
+        $reason = trim((string) ($request->input('reason') ?: $request->input('description')));
+        $order->cancel(false, null, $reason);
 
         return redirect()->back()->with('success', trans('theme.order_canceled'));
     }

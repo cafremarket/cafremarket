@@ -21,7 +21,6 @@ class VerifyCsrfToken extends Middleware
         'payment/response/callback',
         'socialite/customer/apple/callback',
         '/build-twiml/*',
-        'stripe/*',
         'payment/callback/*', // Use this common API for all payment webhook callback
         'payment/callback/*/failed', // Use this common API for all payment failed notification callback
     ];

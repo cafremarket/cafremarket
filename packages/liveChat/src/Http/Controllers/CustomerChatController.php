@@ -4,6 +4,7 @@ namespace Incevio\Package\LiveChat\Http\Controllers;
 
 use App\Events\Chat\NewMessageEvent;
 use App\Http\Controllers\Controller;
+use App\Models\Reply;
 use App\Services\ChatSocketPublisher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,19 @@ class CustomerChatController extends Controller
         $this->authorizeCustomer($chat);
 
         $chat->markPeerRepliesAsRead('customer');
-        $chat->loadMissing(['replies.attachments', 'shop.logo', 'order']);
+
+        try {
+            $with = array_merge(
+                function_exists('livechat_replies_eager_load')
+                    ? livechat_replies_eager_load()
+                    : ['replies.attachments'],
+                ['shop.logo', 'shop', 'order']
+            );
+            $chat->loadMissing($with);
+        } catch (\Throwable $e) {
+            report($e);
+            $chat->loadMissing(['replies.attachments', 'shop']);
+        }
 
         return view('liveChat::customer._conversation', compact('chat'));
     }
@@ -43,12 +56,18 @@ class CustomerChatController extends Controller
             return response()->json(['message' => trans('validation.required', ['attribute' => 'message'])], 422);
         }
 
-        $reply = $chat->replies()->create([
+        $quotedParent = Reply::resolveQuotedParent($chat, $request);
+
+        $createAttrs = [
             'customer_id' => $customerId,
             'user_id' => null,
             'reply' => $replyText,
             'read' => false,
-        ]);
+        ];
+        if ($quotedParent) {
+            $createAttrs['parent_id'] = $quotedParent->id;
+        }
+        $reply = $chat->replies()->create($createAttrs);
 
         $chat->bumpLastMessage($replyText, true);
 
@@ -62,7 +81,7 @@ class CustomerChatController extends Controller
         $clock = livechat_format_message_time($reply->created_at);
         $createdAt = optional($reply->created_at)->toIso8601String();
 
-        $payload = [
+        $payload = array_merge([
             'text' => $replyText,
             'sender_type' => 'customer',
             'conversation_id' => $chat->id,
@@ -72,7 +91,7 @@ class CustomerChatController extends Controller
             'time' => $clock,
             'created_at' => $createdAt,
             'attachments' => $attachmentsPayload,
-        ];
+        ], livechat_quote_socket_payload($quotedParent));
 
         $chat->loadMissing('shop');
 
@@ -106,6 +125,8 @@ class CustomerChatController extends Controller
             'time' => $clock,
             'created_at' => $createdAt,
             'attachments' => $attachmentsPayload,
+            'parent_id' => $quotedParent?->id,
+            'quoted_reply' => Reply::quoteSnapshot($quotedParent),
             'ok' => true,
         ], 200);
     }

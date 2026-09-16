@@ -24,25 +24,13 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
-    'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
-        'secret' => env('AWS_SECRET_ACCESS_KEY'),
-        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-    ],
-
-    'stripe' => [
-        'model' => App\Models\Shop::class,
-        'key' => env('STRIPE_KEY'),
-        'secret' => env('STRIPE_SECRET'),
-        'client_id' => env('STRIPE_CLIENT_ID'),
-        'account_id' => env('STRIPE_ACCOUNT_ID'),
-        'webhook' => [
-            'secret' => env('STRIPE_WEBHOOK_SECRET'),
-            'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
+        'ses' => [
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
         ],
-    ],
 
-    'paypal' => [
+        'paypal' => [
         'client_id' => env('PAYPAL_CLIENT_ID'),
         'secret' => env('PAYPAL_CLIENT_SECRET'),
         'merchant_id' => env('PAYPAL_PARTNER_MERCHANT_ID'),

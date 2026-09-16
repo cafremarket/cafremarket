@@ -231,9 +231,16 @@ class OrderController extends Controller
             ], 422);
         }
 
+        $request->validate([
+            'reason' => 'required|string|min:3|max:500',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        $reason = trim((string) ($request->input('reason') ?: $request->input('description')));
+
         try {
             DB::beginTransaction();
-            $order->cancel();
+            $order->cancel(false, null, $reason);
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();

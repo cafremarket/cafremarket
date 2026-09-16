@@ -7,9 +7,9 @@
     // When admin get paid but still give option to vendors on/off a active payment method.
     $active_payment_methods = isset($shop) && !vendor_get_paid_directly() && vendor_can_on_off_payment_method() ? $shop->paymentMethods->pluck('id')->toArray() : [];
 
-    // Prepaid only — hide Cash on Delivery and removed Stripe gateway
+    // Prepaid only — hide Cash on Delivery
     $paymentMethods = $paymentMethods->reject(function ($paymentMethod) {
-        return in_array($paymentMethod->code, ['cod', 'stripe'], true);
+        return in_array($paymentMethod->code, ['cod'], true);
     });
 
     // Don't show manual payment options for downloadables

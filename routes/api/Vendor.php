@@ -279,6 +279,7 @@ Route::prefix('vendor')->group(function () {
         Route::post('refund/initiate', [RefundController::class, 'initiate']);
         Route::post('refund/{refund}/approve', [RefundController::class, 'approve']);
         Route::post('refund/{refund}/decline', [RefundController::class, 'decline']);
+        Route::post('refund/{refund}/mark-issue', [RefundController::class, 'markIssue']);
 
         // Users
         Route::get('users', [UserController::class, 'index']);

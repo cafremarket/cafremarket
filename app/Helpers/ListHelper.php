@@ -227,9 +227,23 @@ class ListHelper
     public static function refund_statuses()
     {
         return [
+            Refund::STATUS_NEW => trans('app.refund_status.pending'),
+            Refund::STATUS_APPROVED => trans('app.refund_status.completed'),
+            Refund::STATUS_DECLINED => trans('app.refund_status.issue'),
+            Refund::STATUS_FAILED => trans('app.refund_status.issue_failed'),
+        ];
+    }
+
+    /**
+     * Legacy refund status labels (New / Approved / Declined) for older UIs.
+     */
+    public static function refund_statuses_legacy()
+    {
+        return [
             Refund::STATUS_NEW => trans('app.statuses.new'),
             Refund::STATUS_APPROVED => trans('app.statuses.approved'),
             Refund::STATUS_DECLINED => trans('app.statuses.declined'),
+            Refund::STATUS_FAILED => trans('app.refund_status.issue_failed'),
         ];
     }
 

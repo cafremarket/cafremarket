@@ -210,15 +210,15 @@ return [
     ],
 
     'refund_approved' => [
-        'subject' => '[Order ID: :order] a refund request has been approved!',
+        'subject' => '[Order ID: :order] refund has been completed!',
         'greeting' => 'Hello :customer',
-        'message' => 'This is a notification to let you know that we have approved a refund request for your order :order. Refunded amount is :amount. We have sent the money to your payment method, it may take few days to effect your account. Contact your payment provider if you don\'t see the money effected in few days.',
+        'message' => 'This is a notification to let you know that a refund for your order :order has been completed. Refunded amount is :amount. We have sent the money to your payment method, it may take few days to effect your account. Contact your payment provider if you don\'t see the money effected in few days.',
     ],
 
     'refund_declined' => [
-        'subject' => '[Order ID: :order] a refund request has been declined!',
+        'subject' => '[Order ID: :order] refund could not be completed!',
         'greeting' => 'Hello :customer',
-        'message' => 'This is a notification to let you know that a refund request has been declined for your order :order. If you\'re not satisfied with the merchant\'s solution, you can contact to the merchant directly from the platform or even you can appeal the dispute on :marketplace. We\'ll step in to solve the issue.',
+        'message' => 'This is a notification to let you know that a refund for your order :order could not be completed (issue). If you\'re not satisfied with the merchant\'s solution, you can contact to the merchant directly from the platform or even you can appeal the dispute on :marketplace. We\'ll step in to solve the issue.',
     ],
 
     // Shop Notifications

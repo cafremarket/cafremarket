@@ -603,25 +603,4 @@ class CheckoutController extends Controller
 
         return null;
     }
-
-    /**
-     * Create a Stripe payment intent, given a card number, expiry month & year, and CVC.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function stripePaymentIntent(Request $request, Cart $cart)
-    {
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-
-        $newToken = \Stripe\Token::create([
-            'card' => [
-                'number' => $request->card_number,
-                'exp_month' => $request->exp_month,
-                'exp_year' => $request->exp_year,
-                'cvc' => $request->cvc,
-            ],
-        ], ['stripe_account' => config('services.stripe.account_id')]);
-
-        return json_encode($newToken);
-    }
 }

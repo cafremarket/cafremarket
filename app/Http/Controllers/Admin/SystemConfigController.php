@@ -124,10 +124,6 @@ class SystemConfigController extends Controller
 
         $paymentMethod = PaymentMethod::findOrFail($id);
 
-        if ($paymentMethod->code === 'stripe') {
-            return response('error', 405);
-        }
-
         $paymentMethod->enabled = ! $paymentMethod->enabled;
 
         if ($paymentMethod->save()) {

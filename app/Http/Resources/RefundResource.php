@@ -23,7 +23,16 @@ class RefundResource extends JsonResource
             'return_goods' => $this->return_goods,
             'amount' => $this->amount,
             'description' => $this->description,
+            'admin_note' => $this->admin_note,
+            'failure_reason' => $this->failure_reason,
             'status' => $this->status,
+            // New module labels: Pending / Completed / Issue
+            'status_label' => $this->statusLabel(),
+            // Legacy labels for older apps: New / Approved / Declined
+            'status_name' => $this->legacyStatusLabel(),
+            'legacy_status' => $this->legacyStatusLabel(),
+            'is_open' => $this->isOpen(),
+            'is_closed' => ! $this->isOpen(),
         ];
     }
 }

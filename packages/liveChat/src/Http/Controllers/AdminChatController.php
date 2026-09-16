@@ -4,6 +4,7 @@ namespace Incevio\Package\LiveChat\Http\Controllers;
 
 use App\Events\Chat\NewMessageEvent;
 use App\Http\Controllers\Controller;
+use App\Models\Reply;
 use App\Services\ChatSocketPublisher;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -45,7 +46,7 @@ class AdminChatController extends Controller
         $chat->markAsRead();
         $chat->markPeerRepliesAsRead('merchant');
 
-        $chat->loadMissing(['replies.attachments']);
+        $chat->loadMissing(livechat_replies_eager_load());
 
         if (livechat_is_merchant_panel()) {
             return view('liveChat::merchant._conversation', compact('chat'));
@@ -79,14 +80,20 @@ class AdminChatController extends Controller
             return response()->json(['message' => 'Empty message'], 422);
         }
 
+        $quotedParent = Reply::resolveQuotedParent($chat, $request);
+
         $userId = $request->input('user_id') ?: Auth::id();
 
-        $reply = $chat->replies()->create([
+        $createAttrs = [
             'customer_id' => null,
             'user_id' => $userId,
             'reply' => $replyText,
             'read' => false,
-        ]);
+        ];
+        if ($quotedParent) {
+            $createAttrs['parent_id'] = $quotedParent->id;
+        }
+        $reply = $chat->replies()->create($createAttrs);
 
         $chat->bumpLastMessage($replyText, false);
 
@@ -101,7 +108,7 @@ class AdminChatController extends Controller
         $clock = livechat_format_message_time($reply->created_at);
         $createdAt = optional($reply->created_at)->toIso8601String();
 
-        $payload = [
+        $payload = array_merge([
             'text' => $replyText,
             'sender_type' => 'merchant',
             'conversation_id' => $chat->id,
@@ -111,7 +118,7 @@ class AdminChatController extends Controller
             'time' => $clock,
             'created_at' => $createdAt,
             'attachments' => $attachmentsPayload,
-        ];
+        ], livechat_quote_socket_payload($quotedParent));
 
         $chat->loadMissing('shop');
 
@@ -145,6 +152,8 @@ class AdminChatController extends Controller
             'time' => $clock,
             'created_at' => $createdAt,
             'attachments' => $attachmentsPayload,
+            'parent_id' => $quotedParent?->id,
+            'quoted_reply' => Reply::quoteSnapshot($quotedParent),
             'ok' => true,
         ], 200);
     }

@@ -24,10 +24,9 @@ return [
         'enabled' => env('SUBSCRIPTION_ENABLED', true),
 
         /*
-         * Set what is the billing method for subs.
-         * Available options are 'stripe','wallet'
+         * Vendor subscription billing method. Wallet (M-Pesa / eMola / balance) only.
          */
-        'billing' => env('SUBSCRIPTION_BILLING', 'stripe'),
+        'billing' => env('SUBSCRIPTION_BILLING', 'wallet'),
 
         /** Vendor marketplace commission % when subscriptions are disabled globally. */
         'default_marketplace_commission' => (float) env('DEFAULT_MARKETPLACE_COMMISSION', 10),

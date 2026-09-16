@@ -254,15 +254,13 @@ if (! function_exists('is_billing_info_required')) {
     }
 }
 
-if (! function_exists('requires_stripe_card_for_subscription')) {
+if (! function_exists('requires_card_for_subscription')) {
     /**
-     * Whether merchants must add a Stripe card before subscribing.
+     * Card-upfront billing is not used. Wallet / mobile money only.
      */
-    function requires_stripe_card_for_subscription()
+    function requires_card_for_subscription()
     {
-        return is_billing_info_required()
-            && ! \App\Models\SystemConfig::isBillingThroughWallet()
-            && \App\Models\SystemConfig::isPaymentConfigured('stripe');
+        return false;
     }
 }
 
@@ -325,6 +323,22 @@ if (! function_exists('subscription_plan_label')) {
         }
 
         return $labels[$planId];
+    }
+}
+
+if (! function_exists('subscription_charge_meta')) {
+    /**
+     * Wallet meta for a subscription fee charge (used as a billing invoice).
+     */
+    function subscription_charge_meta(string $planName, ?string $description = null): array
+    {
+        return [
+            'purpose' => 'subscription',
+            'type' => trans('app.subscription_fee'),
+            'description' => $description ?: trans('packages.subscription.subscription_fee', [
+                'subscription' => $planName,
+            ]),
+        ];
     }
 }
 
@@ -3669,17 +3683,6 @@ if (! function_exists('subscription_billing_type')) {
     }
 }
 
-if (! function_exists('is_stripe_configured')) {
-    /**
-     * Check if the stripe APIs configured
-     */
-    function is_stripe_configured()
-    {
-        return config('services.stripe.client_id') && config('services.stripe.key') &&
-            config('services.stripe.secret') && config('services.stripe.webhook.secret');
-    }
-}
-
 if (! function_exists('chat_socket_client_url')) {
     /**
      * Public WebSocket URL for mobile/web clients.
@@ -4018,17 +4021,6 @@ if (! function_exists('create_file_from_base64')) {
         );
     }
 }
-
-// STRIPE Helper
-// if (! function_exists('getStripeAuthorizeUrl'))
-// {
-//     /**
-//      * Return authorize_url to Stripe connect authorization
-//      */
-//     function getStripeAuthorizeUrl()
-//     {
-//         return "https://connect.stripe.com/oauth/authorize?response_type=code&client_id=" . config('services.stripe.client_id') . "&scope=read_write&state=" . csrf_token();
-//     }
 
 /**
  * This method will return unique random number

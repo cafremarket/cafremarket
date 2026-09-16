@@ -79,8 +79,6 @@ class Shop extends ShopWallet
      * @var array
      */
     protected static $ignoreChangedAttributes = [
-        'stripe_id',
-        'card_brand',
         'card_holder_name',
         'trial_ends_at',
         'hide_trial_notice',
@@ -104,7 +102,6 @@ class Shop extends ShopWallet
         'external_url',
         'timezone_id',
         'current_billing_plan',
-        'stripe_id',
         'card_holder_name',
         'card_brand',
         'card_last_four',
@@ -601,13 +598,19 @@ class Shop extends ShopWallet
             return trans('app.on_generic_trial');
         }
 
-        if (! $this->subscribed($this->current_billing_plan)) {
+        $subscription = $this->activeSubscription();
+
+        if (! $subscription) {
             return trans('app.on_generic_trial');
         }
 
-        $sub = $this->subscription($this->current_billing_plan)->asStripeSubscription();
+        if ($subscription->onTrial()) {
+            return $subscription->trial_ends_at->toFormattedDateString();
+        }
 
-        return Carbon::createFromTimeStamp($sub->current_period_end)->toFormattedDateString();
+        return $subscription->ends_at
+            ? $subscription->ends_at->toFormattedDateString()
+            : trans('app.on_generic_trial');
     }
 
     public static function sellerTypeOptions(): array
@@ -761,7 +764,7 @@ class Shop extends ShopWallet
      */
     public function hasBillingToken()
     {
-        return $this->hasStripeId();
+        return false;
     }
 
     /**

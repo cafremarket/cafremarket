@@ -4,9 +4,7 @@ namespace App\Services\Subscription;
 
 use App\Models\Shop;
 use App\Models\SubscriptionPlan;
-use App\Models\SystemConfig;
 use App\Models\User;
-use App\Jobs\SubscribeShopToNewPlan;
 use Illuminate\Support\Facades\Log;
 
 class SubscriptionPaymentCompletionService
@@ -27,17 +25,7 @@ class SubscriptionPaymentCompletionService
         }
 
         try {
-            if (SystemConfig::isBillingThroughWallet()) {
-                app(WalletSubscriptionService::class)->activate($merchant, $planId);
-            } else {
-                $currentPlan = $merchant->getCurrentPlan();
-
-                if ($currentPlan && $currentPlan->stripe_price === $planId) {
-                    return true;
-                }
-
-                SubscribeShopToNewPlan::dispatchSync($merchant, $planId);
-            }
+            app(WalletSubscriptionService::class)->activate($merchant, $planId);
 
             $merchant->unsetRelation('shop');
             $merchant->load('shop');

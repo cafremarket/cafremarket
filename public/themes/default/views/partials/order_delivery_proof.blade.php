@@ -1,4 +1,9 @@
 @php
+  // Canceled orders must not expose pickup/delivery OTP or courier actions.
+  if ($order->isCanceled()) {
+      return;
+  }
+
   $hasOtp = ! empty($order->otp);
   $hasCourierDetails = $order->hasCourier();
   $isPickup = $order->pickup();

@@ -1,15 +1,22 @@
 @php
   $productSharePrefix = '[product_share]';
   $orderSharePrefix = '[order_share]';
+  $shop = $chat->shop;
+  $youLabel = trans('app.you');
+  $youLabel = ($youLabel && $youLabel !== 'app.you') ? $youLabel : 'You';
+  $sellerLabel = ($shop && $shop->name) ? $shop->name : (trans('theme.seller') ?: 'Seller');
   $threadItems = [];
   if ($chat->replies->isNotEmpty()) {
       foreach ($chat->replies as $reply) {
+          $atts = $reply->relationLoaded('attachments') ? $reply->attachments : collect();
           $threadItems[] = [
               'id' => $reply->id,
               'text' => (string) ($reply->reply ?? ''),
               'is_customer' => (bool) $reply->customer_id,
               'at' => $reply->created_at,
-              'attachments' => $reply->relationLoaded('attachments') ? $reply->attachments : collect(),
+              'attachments' => $atts ?: collect(),
+              'quoted' => $reply->quoted_reply,
+              'quote_name' => $reply->customer_id ? $youLabel : $sellerLabel,
           ];
       }
   } elseif (filled($chat->message)) {
@@ -19,11 +26,12 @@
           'is_customer' => true,
           'at' => $chat->created_at,
           'attachments' => collect(),
+          'quoted' => null,
+          'quote_name' => $youLabel,
       ];
   }
   $lastDayKey = null;
   $replyUrl = route('customer.chat.reply', $chat, false);
-  $shop = $chat->shop;
 @endphp
 
 <header class="cpc-thread__head" id="openChatbox-{{ $chat->id }}"
@@ -69,7 +77,9 @@
           $shareType = 'product';
       }
       $plain = trim($rawText);
-      $atts = $item['attachments'];
+      $atts = $item['attachments'] instanceof \Illuminate\Support\Collection
+          ? $item['attachments']
+          : collect($item['attachments'] ?? []);
       $hidePlain = $atts->isNotEmpty() && ($plain === '' || $plain === '[attachment]');
       // Customer side: my messages are outgoing
       $bubble = $item['is_customer'] ? 'cpc-bubble--out' : 'cpc-bubble--in';
@@ -80,8 +90,9 @@
       <div class="cpc-day" data-day="{{ $dayKey }}"><span>{{ livechat_format_day_label($item['at']) }}</span></div>
     @endif
 
-    <div class="cpc-bubble {{ $bubble }}" @if ($item['id']) data-reply-id="{{ $item['id'] }}" @endif data-created-at="{{ optional($item['at'])->toIso8601String() }}">
+    <div class="cpc-bubble {{ $bubble }}" @if ($item['id']) data-reply-id="{{ $item['id'] }}" data-quote-text="{{ e(livechat_quoted_snippet($plain)) }}" data-quote-name="{{ e($item['quote_name'] ?? '') }}" data-sender-type="{{ $item['is_customer'] ? 'customer' : 'merchant' }}" @endif data-created-at="{{ optional($item['at'])->toIso8601String() }}">
       <div class="cpc-bubble__body">
+        @include('liveChat::partials._quoted_reply', ['quoted' => $item['quoted'] ?? null])
         @if (is_array($share) && $shareType === 'order')
           <div class="cpc-share cpc-share--order">
             @if (!empty($share['image']))
@@ -137,12 +148,21 @@
 </div>
 
 <div class="cpc-composer" data-reply-url="{{ $replyUrl }}">
+  <div id="cpc-quote-preview" class="cpc-quote-preview" hidden>
+    <div class="cpc-quote-preview__bar"></div>
+    <div class="cpc-quote-preview__meta">
+      <strong id="cpc-quote-name"></strong>
+      <span id="cpc-quote-text"></span>
+    </div>
+    <button type="button" id="cpc-quote-clear" aria-label="Cancel">&times;</button>
+  </div>
   <div id="cpc-attach-preview" class="cpc-composer__preview" hidden>
     <span id="cpc-attach-name"></span>
     <button type="button" id="cpc-attach-clear" aria-label="Remove">&times;</button>
   </div>
   <form id="chat-form" class="cpc-composer__form" method="POST" action="{{ $replyUrl }}" enctype="multipart/form-data" autocomplete="off">
     @csrf
+    <input type="hidden" name="parent_id" id="cpc-parent-id" value="">
     <label class="cpc-composer__attach" title="Attachment">
       <i class="fas fa-paperclip"></i>
       <input type="file" id="customerChatFile" name="photo" accept="image/*,.pdf,.doc,.docx">

@@ -5,7 +5,6 @@ namespace App\Services\Subscription;
 use App\Models\Shop;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
-use App\Models\SystemConfig;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +29,7 @@ class WalletSubscriptionService
         $plan = SubscriptionPlan::findOrFail($planId);
         $existing = $merchant->getCurrentPlan();
 
-        if ($existing && $existing->stripe_price === $planId && $existing->valid()) {
+        if ($existing && $existing->billing_plan === $planId && $existing->valid()) {
             return $existing;
         }
 
@@ -43,17 +42,6 @@ class WalletSubscriptionService
 
     protected function assertWalletBillingEnabled(): void
     {
-        $billing = (string) config('system.subscription.billing', 'stripe');
-
-        if ($billing !== 'wallet') {
-            Log::error('Wallet subscription blocked: billing mode is not wallet', [
-                'billing' => $billing,
-                'env' => app()->environment(),
-            ]);
-
-            throw new \RuntimeException(trans('messages.subscription_error'));
-        }
-
         if (! is_incevio_package_loaded(['wallet', 'subscription'])) {
             Log::error('Wallet subscription blocked: wallet or subscription package not loaded');
 
@@ -67,7 +55,7 @@ class WalletSubscriptionService
     {
         return DB::transaction(function () use ($shop, $merchant, $subscription, $plan, $planId) {
             if (
-                $subscription->stripe_price !== $planId
+                $subscription->billing_plan !== $planId
                 && subscription_charges_immediately($merchant, $plan)
                 && (float) $plan->cost > 0
             ) {
@@ -79,8 +67,6 @@ class WalletSubscriptionService
                 [
                     'ends_at' => Carbon::now()->addMonth(),
                     'trial_ends_at' => null,
-                    'stripe_id' => null,
-                    'stripe_status' => null,
                 ]
             ))->save();
 
@@ -105,7 +91,6 @@ class WalletSubscriptionService
                 if ($trialEndsAt) {
                     $endsAt = null;
                 } else {
-                    // No active trial to apply — treat as paid activation.
                     $chargeNow = (float) $plan->cost > 0;
                     $endsAt = Carbon::now()->addMonth();
                 }
@@ -114,12 +99,9 @@ class WalletSubscriptionService
             $subscription = $shop->subscriptions()->create(array_merge(
                 $this->planColumnPayload($plan, $planId),
                 [
-                    'stripe_price' => $planId,
                     'quantity' => 1,
                     'trial_ends_at' => $trialEndsAt,
                     'ends_at' => $endsAt,
-                    'stripe_id' => null,
-                    'stripe_status' => null,
                 ]
             ));
 
@@ -138,12 +120,11 @@ class WalletSubscriptionService
         });
     }
 
-    /**
-     * Support both legacy (name) and current (type) subscription table schemas.
-     */
     protected function planColumnPayload(SubscriptionPlan $plan, string $planId): array
     {
-        $payload = [];
+        $payload = [
+            'billing_plan' => $planId,
+        ];
 
         if (Schema::hasColumn('subscriptions', 'type')) {
             $payload['type'] = $plan->name;
@@ -153,16 +134,9 @@ class WalletSubscriptionService
             $payload['name'] = $plan->name;
         }
 
-        if (Schema::hasColumn('subscriptions', 'stripe_price')) {
-            $payload['stripe_price'] = $planId;
-        }
-
         return $payload;
     }
 
-    /**
-     * Trial end for a new subscription row (never reuse an expired shop trial date).
-     */
     protected function resolveTrialEndsAt(Shop $shop): ?Carbon
     {
         if ($shop->onGenericTrial() && $shop->trial_ends_at && $shop->trial_ends_at->isFuture()) {
@@ -180,14 +154,7 @@ class WalletSubscriptionService
 
     protected function chargeShop(Shop $shop, float $amount, string $planName): void
     {
-        $meta = [
-            'type' => trans('app.subscription_fee'),
-            'description' => trans('packages.subscription.subscription_fee', [
-                'subscription' => $planName,
-            ]),
-        ];
-
-        $shop->forceWithdraw($amount, $meta);
+        $shop->forceWithdraw($amount, subscription_charge_meta($planName));
     }
 
     protected function syncShopBilling(Shop $shop, string $planId, $trialEndsAt): void
@@ -210,7 +177,6 @@ class WalletSubscriptionService
     protected function closeOpenWalletSubscriptions(Shop $shop): void
     {
         $shop->subscriptions()
-            ->whereNull('stripe_id')
             ->where(function ($query) {
                 $query->whereNull('ends_at')
                     ->orWhere('ends_at', '>', now());
@@ -226,7 +192,7 @@ class WalletSubscriptionService
             throw new \RuntimeException(trans('messages.subscription_error'));
         }
 
-        if ($subscription->stripe_price !== $planId) {
+        if ($subscription->billing_plan !== $planId) {
             $this->logVerificationFailure($subscription, $planId, $shopId, 'plan_mismatch');
 
             throw new \RuntimeException(trans('messages.subscription_error'));
@@ -237,7 +203,6 @@ class WalletSubscriptionService
             $missingPaidPeriod = $subscription->ends_at === null
                 && ($subscription->trial_ends_at === null || $subscription->trial_ends_at->isPast());
 
-            // Paid row missing ends_at (or stuck on expired trial) — repair once before failing.
             if ($missingPaidPeriod && $planCost > 0) {
                 $subscription->forceFill([
                     'ends_at' => Carbon::now()->addMonth(),
@@ -263,10 +228,9 @@ class WalletSubscriptionService
             'shop_id' => $shopId,
             'plan_id' => $planId,
             'subscription_id' => $subscription?->id,
-            'stripe_price' => $subscription?->stripe_price,
+            'billing_plan' => $subscription?->billing_plan,
             'ends_at' => $subscription?->ends_at?->toIso8601String(),
             'trial_ends_at' => $subscription?->trial_ends_at?->toIso8601String(),
-            'stripe_id' => $subscription?->stripe_id,
             'billing' => config('system.subscription.billing'),
             'environment' => app()->environment(),
         ]);

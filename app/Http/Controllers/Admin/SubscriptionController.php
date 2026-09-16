@@ -48,11 +48,6 @@ class SubscriptionController extends Controller
         $merchant = $merchant ? User::findOrFail($merchant) : Auth::user();
         $paymentMethod = (string) $request->input('payment_method', 'wallet');
 
-        if (requires_stripe_card_for_subscription() && ! $merchant->hasBillingToken()) {
-            return redirect()->to(mp_route('admin.account.billing'))
-                ->with('error', trans('messages.no_card_added'));
-        }
-
         try {
             $subscription = SubscriptionPlan::findOrFail($plan);
             $currentPlan = $merchant->getCurrentPlan();
@@ -93,29 +88,14 @@ class SubscriptionController extends Controller
                     ->with('error', trans('messages.subscription_payment_failed'));
             }
 
-            if ($currentPlan && $currentPlan->stripe_price === $plan) {
+            if ($currentPlan && $currentPlan->billing_plan === $plan) {
                 return redirect()->to(mp_route('admin.account.billing'))
                     ->with('success', trans('messages.subscribed'));
             }
 
-            if (SystemConfig::isBillingThroughWallet()) {
-                app(WalletSubscriptionService::class)->activate($merchant, $plan);
-                $merchant->unsetRelation('shop');
-                $merchant->unsetRelation('owns');
-            } elseif ($currentPlan) {
-                $currentPlan->swap($plan);
-
-                if ($merchant->shop->current_billing_plan !== $plan) {
-                    $merchant->shop->forceFill(['current_billing_plan' => $plan])->save();
-                }
-
-                $merchant->shop->unsetRelation('subscriptions');
-                $merchant->shop->unsetRelation('currentSubscription');
-            } else {
-                SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
-                $merchant->shop->unsetRelation('subscriptions');
-                $merchant->shop->unsetRelation('currentSubscription');
-            }
+            app(WalletSubscriptionService::class)->activate($merchant, $plan);
+            $merchant->unsetRelation('shop');
+            $merchant->unsetRelation('owns');
 
         } catch (\Throwable $e) {
             Log::error('Subscription Failed: '.$e->getMessage(), [
@@ -146,29 +126,8 @@ class SubscriptionController extends Controller
     {
         $this->authorizeMerchantBilling();
 
-        if (config('app.demo') == true && $request->user()->merchantId() <= config('system.demo.shops', 1)) {
-            return redirect()->to(mp_route('admin.account.billing'))
-                ->with('warning', trans('messages.demo_restriction'));
-        }
-
-        // Create Stripe customer if not exist
-        if (! $request->user()->hasBillingToken()) {
-            $request->user()->shop->createAsStripeCustomer([
-                'email' => $request->user()->email,
-            ]);
-        }
-
-        if ($request->has('payment')) {
-            $request->user()->shop->updateDefaultPaymentMethod($request->input('payment'));
-
-            $request->user()->shop->forceFill(['card_holder_name' => $request->input('name')])->save();
-
-            return redirect()->to(mp_route('admin.account.billing'))
-                ->with('success', trans('messages.card_updated'));
-        }
-
         return redirect()->to(mp_route('admin.account.billing'))
-            ->with('error', trans('messages.trouble_validating_card'))->withInput();
+            ->with('error', trans('messages.billing_setup_unavailable'));
     }
 
     /**
@@ -189,12 +148,10 @@ class SubscriptionController extends Controller
         }
 
         try {
-            $request->user()->getCurrentPlan()->resume();
-        } catch (\Stripe\Error\Card $e) {
-            $response = $e->getJsonBody();
-
+            $request->user()->getCurrentPlan()?->resume();
+        } catch (\Throwable $e) {
             return redirect()->to(mp_route('admin.account.billing'))
-                ->with('error', $response['error']['message']);
+                ->with('error', $e->getMessage() ?: trans('messages.subscription_error'));
         }
 
         return redirect()->to(mp_route('admin.account.billing'))
@@ -215,25 +172,19 @@ class SubscriptionController extends Controller
                 ->with('warning', trans('messages.demo_restriction'));
         }
 
-        $isWallet = false;
-
         try {
             $merchant = $request->user();
             $plan = $merchant->getCurrentPlan();
 
             if ($plan) {
-                $isWallet = $plan->provider === 'wallet';
-
                 $plan->cancel();
 
-                if ($isWallet) {
-                    $shop = $merchant->merchantShop();
+                $shop = $merchant->merchantShop();
 
-                    if ($shop) {
-                        $shop->forceFill(['current_billing_plan' => null])->saveQuietly();
-                        $shop->unsetRelation('subscriptions');
-                        $shop->unsetRelation('currentSubscription');
-                    }
+                if ($shop) {
+                    $shop->forceFill(['current_billing_plan' => null])->saveQuietly();
+                    $shop->unsetRelation('subscriptions');
+                    $shop->unsetRelation('currentSubscription');
                 }
 
                 $merchant->unsetRelation('shop');
@@ -241,20 +192,13 @@ class SubscriptionController extends Controller
             } else {
                 throw new \Exception(trans('responses.subscription_404'));
             }
-        } catch (\Stripe\Error\Card $e) {
-            $response = $e->getJsonBody();
-
-            return redirect()->to(mp_route('admin.account.billing'))
-                ->with(['error' => $response['error']['message']]);
         } catch (\Exception $e) {
             return redirect()->to(mp_route('admin.account.billing'))
                 ->with(['error' => $e->getMessage()]);
         }
 
         return redirect()->to(mp_route('admin.account.billing'))
-            ->with('success', $isWallet
-                ? trans('messages.subscription_removed')
-                : trans('messages.subscription_cancelled'));
+            ->with('success', trans('messages.subscription_removed'));
     }
 
     /**
@@ -282,13 +226,7 @@ class SubscriptionController extends Controller
             $currentPlan = $shop->owner->getCurrentPlan();
 
             if ($currentPlan) {
-                // Update the local plan
-                $currentPlan->update(['trial_ends_at' => $new_end_time->getTimestamp()]);
-
-                // Now update the plan on stripe
-                if ($currentPlan->stripe_id || config('system.subscription.billing') == 'stripe') {
-                    $currentPlan->extendTrial($new_end_time);
-                }
+                $currentPlan->extendTrial($new_end_time);
             }
 
             if ($shop->onGenericTrial() || $shop->hasExpiredPlan()) {
@@ -325,11 +263,10 @@ class SubscriptionController extends Controller
     {
         $this->authorizeMerchantBilling();
 
-        return $request->user()->shop
-            ->downloadInvoice($invoiceId, [
-                'vendor' => get_platform_title(),
-                'product' => trans('app.subscription_fee'),
-            ]);
+        $shop = $request->user()->shop;
+        $transaction = $shop->transactions()->whereKey($invoiceId)->firstOrFail();
+
+        return $transaction->invoice('download');
     }
 
     /**

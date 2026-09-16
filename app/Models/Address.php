@@ -318,28 +318,4 @@ class Address extends BaseModel
 
         return ! empty($address) ? array_filter($address) : null;
     }
-
-    /**
-     * Get address for stripe.
-     *
-     * @return array|null
-     */
-    public function toStripeAddress()
-    {
-        $address = [];
-        $address['line1'] = $this->address_line_1;
-        $address['line2'] = $this->address_line_2;
-        $address['postal_code'] = $this->zip_code;
-        $address['city'] = $this->city;
-
-        if ($this->state) {
-            $address['state'] = $this->state?->iso_code;
-        }
-
-        if ($this->country) {
-            $address['country'] = $this->country?->iso_code;
-        }
-
-        return ! empty($address) ? array_filter($address) : null;
-    }
 }

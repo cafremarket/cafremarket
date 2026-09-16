@@ -47,6 +47,7 @@ class OrderCancellationRequest extends Request
             return [
                 'cancellation_reason_id' => 'required|integer',
                 'items' => 'required_without:all_items|array',
+                'description' => 'nullable|string|max:500',
             ];
         }
 
@@ -54,11 +55,14 @@ class OrderCancellationRequest extends Request
         if ($this->user()->isFromPlatform()) {
             return [
                 'cancellation_fee' => 'required|numeric|min:0',
+                'description' => 'required|string|min:3|max:500',
             ];
         }
 
         // When vendor cancel
-        return [];
+        return [
+            'description' => 'required|string|min:3|max:500',
+        ];
     }
 
     /**
@@ -71,6 +75,7 @@ class OrderCancellationRequest extends Request
         return [
             'cancellation_reason_id.required' => trans('theme.cancellation_reason_required'),
             'items.required_without' => trans('theme.select_cancel_items_required'),
+            'description.required' => trans('app.cancellation_reason_required'),
         ];
     }
 }

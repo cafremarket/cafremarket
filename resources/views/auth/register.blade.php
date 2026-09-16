@@ -16,7 +16,7 @@
             <h3 class="admin-auth-card__title">{{ trans('app.form.register') }}</h3>
             <p class="admin-auth-card__subtitle">{{ get_site_title() }}</p>
 
-            {!! Form::open(['route' => 'register', 'id' => config('system_settings.required_card_upfront') ? 'stripe-form' : 'registration-form', 'data-toggle' => 'validator', 'files' => true, 'class' => 'admin-auth-form']) !!}
+            {!! Form::open(['route' => 'register', 'id' => 'registration-form', 'data-toggle' => 'validator', 'files' => true, 'class' => 'admin-auth-form']) !!}
 
             @if (is_subscription_enabled())
               <div class="form-group has-feedback">

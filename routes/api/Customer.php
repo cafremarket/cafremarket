@@ -108,9 +108,6 @@ Route::middleware('customerApp')->group(function () {
     Route::get('cart/{cart}/paymentOptions', [CheckoutController::class, 'paymentOptions']);
     Route::get('cart/{cart}/paymentOptions/debug', [CheckoutController::class, 'paymentOptionsDebug']);
 
-    // Stripe
-    Route::post('cart/{cart}/stripePaymentIntent', [CheckoutController::class, 'stripePaymentIntent']);
-
     // M-Pesa order status (polling – same as Laravel web mpesa/{order}/status)
     Route::get('mpesa/order/{order}/status', [MpesaPaymentController::class, 'paymentStatus']);
 

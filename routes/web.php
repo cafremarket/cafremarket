@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Cashier\Http\Controllers\WebhookController;
 
 // Common
 include 'Common.php';
@@ -16,10 +15,6 @@ include 'Backoffice.php';
 include 'Merchant.php';
 
 // Webhooks
-// Route::post('webhook/stripe', [WebhookController::class, 'handleStripeCallback']); 		// Stripe
-Route::post('stripe/webhook', [WebhookController::class, 'handleWebhook'])->name('cashier.webhook');
-
-// eMola / Movitel payment callback (alternate URL — also available at POST /api/emola/callback)
 Route::post('payment/callback/emola', \App\Http\Controllers\Api\EmolaCallbackController::class)
     ->name('payment.callback.emola');
 

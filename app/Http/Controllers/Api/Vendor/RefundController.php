@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
-use App\Common\Authorizable;
 use App\Events\Refund\RefundApproved;
 use App\Events\Refund\RefundDeclined;
 use App\Events\Refund\RefundInitiated;
@@ -16,8 +15,6 @@ use Illuminate\Support\Facades\DB;
 
 class RefundController extends Controller
 {
-    // use Authorizable;
-
     private $model_name;
 
     private $refund;
@@ -35,27 +32,36 @@ class RefundController extends Controller
     }
 
     /**
-     * Display open listing of the resource.
+     * Display listing of refunds by tab/status.
+     * Accepts: pending|completed|issue (and legacy open|closed aliases).
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($status = 'open')
+    public function index($status = 'pending')
     {
-        $refunds = Refund::mine();
+        $refunds = Refund::mine()->with(['order']);
 
-        // When the orders need to filter
         switch ($status) {
-            case 'closed':
+            case 'completed':
+                $refunds = $refunds->completed();
+                break;
+
+            case 'closed': // legacy: completed + issue
                 $refunds = $refunds->closed();
                 break;
 
-            case 'open':
+            case 'issue':
+                $refunds = $refunds->issue();
+                break;
+
+            case 'pending':
+            case 'open': // legacy alias for pending
             default:
-                $refunds = $refunds->open();
+                $refunds = $refunds->pending();
                 break;
         }
 
-        return RefundResource::collection($refunds->get());
+        return RefundResource::collection($refunds->latest()->get());
     }
 
     /**
@@ -71,29 +77,28 @@ class RefundController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function initiate(InitiateRefundRequest $request)
     {
-        // Start transaction!
+        // Never auto-complete on initiate — admin/vendor must approve or reject.
+        $request->merge(['status' => Refund::STATUS_NEW]);
+
         DB::beginTransaction();
 
         try {
             $refund = $this->refund->store($request);
 
-            $this->refund_to_wallet($refund);
-
             event(new RefundInitiated($refund, $request->filled('notify_customer')));
         } catch (\Exception $e) {
-            \Log::error($e);        // Log the error
+            \Log::error($e);
 
-            DB::rollback();         // rollback the transaction and log the error
+            DB::rollback();
 
             return response()->json(['message' => $e->getMessage()], 400);
         }
 
-        DB::commit();           // Everything is fine. Now commit the transaction
+        DB::commit();
 
         return response()->json(['message' => trans('api.refund_has_been_created_successfully')], 200);
     }
@@ -113,10 +118,15 @@ class RefundController extends Controller
 
     public function approve(Request $request, $id)
     {
-
         $refund = $this->refund->approve($id);
 
-        $this->refund_to_wallet($refund);
+        try {
+            $this->refund_to_wallet($refund);
+        } catch (\Exception $e) {
+            $this->refund->markIssue($refund, $e->getMessage());
+
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
 
         event(new RefundApproved($refund, $request->filled('notify_customer')));
 
@@ -125,9 +135,21 @@ class RefundController extends Controller
 
     public function decline(Request $request, $id)
     {
-        $refund = $this->refund->decline($id);
+        $adminNote = trim((string) $request->input('admin_note', ''));
+        $refund = $this->refund->decline($id, $adminNote !== '' ? $adminNote : null);
 
         event(new RefundDeclined($refund, $request->filled('notify_customer')));
+
+        return response()->json(['message' => trans('api.refund_updated_successfully')]);
+    }
+
+    public function markIssue(Request $request, $id)
+    {
+        $request->validate([
+            'admin_note' => 'required|string|min:3|max:500',
+        ]);
+
+        $this->refund->markIssue($id, trim($request->input('admin_note')));
 
         return response()->json(['message' => trans('api.refund_updated_successfully')]);
     }

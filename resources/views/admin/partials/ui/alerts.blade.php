@@ -29,7 +29,6 @@
 @include('admin.partials._global_notice')
 
 @if (Auth::check() && Auth::user()->isFromMerchant())
-  @if (Auth::user()->hasBillingInfo() || !requires_stripe_card_for_subscription())
     @unless (Auth::user()->isVerified())
       <div class="admin-alert admin-alert--info admin-alert--dismissible no-print">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -62,5 +61,4 @@
     @endif
 
     @include('admin.partials._listings_notice')
-  @endif
 @endif

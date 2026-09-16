@@ -72,12 +72,12 @@ class SubscriptionController extends Controller
                         $plan->marketplace_commission_type ?? 'percent'
                     ),
                     'is_current' => $currentPlanId === $plan->plan_id
-                        || ($subscription && $subscription->stripe_price === $plan->plan_id),
+                        || ($subscription && $subscription->billing_plan === $plan->plan_id),
                 ];
             })
             ->values();
 
-        $billingMethod = config('system.subscription.billing', 'stripe');
+        $billingMethod = 'wallet';
         $walletBilling = SystemConfig::isBillingThroughWallet();
 
         $status = 'none';
@@ -99,7 +99,7 @@ class SubscriptionController extends Controller
             } elseif ($subscription->valid()) {
                 $status = 'active';
                 $endsAt = optional($subscription->ends_at)->toIso8601String();
-                $canCancel = $subscription->provider === 'stripe' || $walletBilling;
+                $canCancel = $walletBilling;
             } else {
                 $status = 'expired';
             }
@@ -138,9 +138,8 @@ class SubscriptionController extends Controller
                 'enabled' => true,
                 'billing_method' => $billingMethod,
                 'wallet_billing' => $walletBilling,
-                'requires_stripe_card' => requires_stripe_card_for_subscription(),
-                'has_billing_info' => $user->hasBillingInfo()
-                    || ($shop->stripe_id && $shop->pm_last_four),
+                'requires_card' => false,
+                'has_billing_info' => true,
                 'wallet_balance' => $walletBalance,
                 'wallet_balance_formatted' => get_formated_currency(
                     $walletBalance,
@@ -191,13 +190,6 @@ class SubscriptionController extends Controller
             ], 422);
         }
 
-        if (requires_stripe_card_for_subscription() && ! $merchant->hasBillingToken()) {
-            return response()->json([
-                'message' => trans('messages.no_card_added'),
-                'billing_required' => true,
-            ], 402);
-        }
-
         try {
             $subscriptionPlan = SubscriptionPlan::findOrFail($plan);
             $currentPlan = $merchant->getCurrentPlan();
@@ -232,32 +224,15 @@ class SubscriptionController extends Controller
                 ], 400);
             }
 
-            if ($currentPlan && $currentPlan->stripe_price === $plan) {
+            if ($currentPlan && $currentPlan->billing_plan === $plan) {
                 return response()->json([
                     'message' => trans('messages.subscribed'),
                 ]);
             }
 
-            if (SystemConfig::isBillingThroughWallet()) {
-                app(WalletSubscriptionService::class)->activate($merchant, $plan);
-                $merchant->unsetRelation('shop');
-                $merchant->unsetRelation('owns');
-            } elseif ($currentPlan) {
-                $currentPlan->swap($plan);
-
-                if ($merchant->shop->current_billing_plan !== $plan) {
-                    $merchant->shop->forceFill([
-                        'current_billing_plan' => $plan,
-                    ])->save();
-                }
-
-                $merchant->shop->unsetRelation('subscriptions');
-                $merchant->shop->unsetRelation('currentSubscription');
-            } else {
-                SubscribeShopToNewPlan::dispatchSync($merchant, $plan);
-                $merchant->shop->unsetRelation('subscriptions');
-                $merchant->shop->unsetRelation('currentSubscription');
-            }
+            app(WalletSubscriptionService::class)->activate($merchant, $plan);
+            $merchant->unsetRelation('shop');
+            $merchant->unsetRelation('owns');
 
         } catch (\Throwable $e) {
             Log::error('Vendor API subscription failed: '.$e->getMessage(), [

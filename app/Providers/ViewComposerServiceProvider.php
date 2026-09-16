@@ -519,10 +519,6 @@ class ViewComposerServiceProvider extends ServiceProvider
                 $view->with('current_plan', Auth::user()->getCurrentPlan());
 
                 $view->with('billable', Auth::user()->shop);
-
-                if (SystemConfig::isPaymentConfigured('stripe')) {
-                    $view->with('intent', Auth::user()->shop->createSetupIntent());
-                }
             }
         );
     }
@@ -756,12 +752,15 @@ class ViewComposerServiceProvider extends ServiceProvider
     private function composeRefundInitiationForm()
     {
         View::composer(
-
-            'admin.refund._initiate',
-
+            [
+                'admin.refund._initiate', // legacy view name
+                'admin.refunds._initiate',
+            ],
             function ($view) {
                 $view->with('orders', ListHelper::paid_orders());
-                $view->with('statuses', ListHelper::refund_statuses());
+                $statuses = ListHelper::refund_statuses();
+                unset($statuses[\App\Models\Refund::STATUS_DECLINED], $statuses[\App\Models\Refund::STATUS_FAILED]);
+                $view->with('statuses', $statuses);
             }
         );
     }
@@ -1155,9 +1154,7 @@ class ViewComposerServiceProvider extends ServiceProvider
 
             function ($view) {
                 $view->with('payment_method_types', ListHelper::payment_method_types());
-                $view->with('payment_methods', PaymentMethod::where('enabled', 1)
-                    ->where('code', '!=', 'stripe')
-                    ->get());
+                $view->with('payment_methods', PaymentMethod::where('enabled', 1)->get());
                 $view->with('config', Config::findOrFail(Auth::user()->merchantId()));
             }
         );
@@ -1198,7 +1195,7 @@ class ViewComposerServiceProvider extends ServiceProvider
                 $view->with('countries', ListHelper::countries());
                 $view->with('states', ListHelper::states());
                 $view->with('payment_method_types', ListHelper::payment_method_types());
-                $view->with('payment_methods', PaymentMethod::where('code', '!=', 'stripe')->get());
+                $view->with('payment_methods', PaymentMethod::all());
                 $view->with('shipping_method_types', ListHelper::shipping_method_types());
                 $view->with('shipping_methods', ShippingMethod::all());
             }

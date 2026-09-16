@@ -175,20 +175,16 @@ class SystemConfig extends BaseModel
      */
     public static function isBillingThroughWallet()
     {
-        if (config('system.subscription.billing') == 'wallet') {
-            $dependencies = ['wallet', 'subscription'];
+        $dependencies = ['wallet', 'subscription'];
 
-            if (is_incevio_package_loaded($dependencies)) {
-                return true;
-            }
-
-            \Illuminate\Support\Facades\Log::warning(
-                'Wallet subscription billing is configured but required packages are not active.',
-                ['dependencies' => $dependencies]
-            );
-
-            return false;
+        if (is_incevio_package_loaded($dependencies)) {
+            return true;
         }
+
+        \Illuminate\Support\Facades\Log::warning(
+            'Wallet subscription billing is configured but required packages are not active.',
+            ['dependencies' => $dependencies]
+        );
 
         return false;
     }
@@ -202,9 +198,6 @@ class SystemConfig extends BaseModel
     public static function isPaymentConfigured($code)
     {
         switch ($code) {
-            case 'stripe':
-                return (bool) (config('services.stripe.key') && config('services.stripe.client_id') && config('services.stripe.secret'));
-
             case 'paypal':
                 return (bool) (config('paypal_payment.account.client_id') && config('paypal_payment.account.client_secret'));
 

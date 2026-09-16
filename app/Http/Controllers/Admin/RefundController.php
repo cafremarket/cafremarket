@@ -8,6 +8,7 @@ use App\Events\Refund\RefundDeclined;
 use App\Events\Refund\RefundInitiated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\InitiateRefundRequest;
+use App\Models\Refund;
 use App\Repositories\Refund\RefundRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,17 +35,45 @@ class RefundController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (top-level Refunds module).
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $refunds = $this->refund->open();
+        // Sync refunded orders that never got a refunds row (pre-module cancels).
+        // Idempotent: only creates rows for orders with no refunds yet.
+        try {
+            \App\Models\Order::backfillMissingRefundRecords();
+        } catch (\Throwable $e) {
+            \Log::warning('Refunds backfill skipped: '.$e->getMessage());
+        }
 
-        $closed = $this->refund->closed();
+        $tab = $request->get('tab', $request->get('status', 'pending'));
 
-        return view('admin.refund.index', compact('refunds', 'closed'));
+        // Legacy open/closed query values map onto the new tabs.
+        $tab = match ($tab) {
+            'open', 'new' => 'pending',
+            'closed', 'approved' => 'completed',
+            'declined', 'failed' => 'issue',
+            default => $tab,
+        };
+
+        if (! in_array($tab, ['pending', 'completed', 'issue'], true)) {
+            $tab = 'pending';
+        }
+
+        $search = trim((string) $request->get('q', ''));
+
+        $refunds = $this->refund->forTab($tab, $search !== '' ? $search : null);
+
+        $counts = [
+            'pending' => $this->refund->pending()->count(),
+            'completed' => $this->refund->completed()->count(),
+            'issue' => $this->refund->issue()->count(),
+        ];
+
+        return view('admin.refunds.index', compact('refunds', 'tab', 'search', 'counts'));
     }
 
     /**
@@ -59,18 +88,24 @@ class RefundController extends Controller
             $order = $this->refund->findOrder($order);
         }
 
-        return view('admin.refund._initiate', compact('order'));
+        // Initiate always opens Pending — completion only via Approve.
+        $statuses = [
+            Refund::STATUS_NEW => trans('app.refund_status.pending'),
+        ];
+
+        return view('admin.refunds._initiate', compact('order', 'statuses'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function initiate(InitiateRefundRequest $request)
     {
-        // Start transaction!
+        // Never auto-complete on initiate — admin must approve or reject.
+        $request->merge(['status' => Refund::STATUS_NEW]);
+
         DB::beginTransaction();
         try {
             $refund = $this->refund->store($request);
@@ -85,24 +120,22 @@ class RefundController extends Controller
 
             $wallet->verifyWithdraw($shop, $request->amount);
 
-            $this->refund_to_wallet($refund);
-
             event(new RefundInitiated($refund, $request->filled('notify_customer')));
         } catch (\Exception $e) {
-            \Log::error($e);        // Log the error
+            \Log::error($e);
 
-            DB::rollback();         // rollback the transaction and log the error
+            DB::rollback();
 
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        DB::commit();           // Everything is fine. Now commit the transaction
+        DB::commit();
 
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
     }
 
     /**
-     * Display the specified resource.
+     * Display the response / approve-decline modal.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -111,14 +144,20 @@ class RefundController extends Controller
     {
         $refund = $this->refund->find($id);
 
-        return view('admin.refund._response', compact('refund'));
+        return view('admin.refunds._response', compact('refund'));
     }
 
     public function approve(Request $request, $id)
     {
         $refund = $this->refund->approve($id);
 
-        $this->refund_to_wallet($refund);
+        try {
+            $this->refund_to_wallet($refund);
+        } catch (\Exception $e) {
+            $this->refund->markIssue($refund, $e->getMessage());
+
+            return back()->with('error', $e->getMessage());
+        }
 
         event(new RefundApproved($refund, $request->filled('notify_customer')));
 
@@ -127,9 +166,21 @@ class RefundController extends Controller
 
     public function decline(Request $request, $id)
     {
-        $refund = $this->refund->decline($id);
+        $adminNote = trim((string) $request->input('admin_note', ''));
+        $refund = $this->refund->decline($id, $adminNote !== '' ? $adminNote : null);
 
         event(new RefundDeclined($refund, $request->filled('notify_customer')));
+
+        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+    }
+
+    public function markIssue(Request $request, $id)
+    {
+        $request->validate([
+            'admin_note' => 'required|string|min:3|max:500',
+        ]);
+
+        $this->refund->markIssue($id, trim($request->input('admin_note')));
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
     }

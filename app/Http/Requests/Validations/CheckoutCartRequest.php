@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Validations;
 
-use App\Common\CanCreateStripeCustomer;
 use App\Http\Requests\Request;
 use App\Models\Address;
 use App\Models\Customer;
@@ -12,8 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class CheckoutCartRequest extends Request
 {
-    use CanCreateStripeCustomer;
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -80,19 +77,9 @@ class CheckoutCartRequest extends Request
             $this->merge(['customer_id' => $customer->id]);
         }
 
-        // Create Stripe Customer for future use
-        if (
-            $this->checkAuth() &&
-            $this->has('remember_the_card') &&
-            $this->input('payment_method') == 'stripe'
-        ) {
-            // Set Payee to use in payment gateway
-            $this->merge(['payee' => $this->createStripeCustomer()]);
-        }
-
         // Get payment method id
         if ($this->payment_method && ! $this->payment_method_id) {
-            $code = $this->payment_method == 'saved_card' ? 'stripe' : $this->payment_method;
+            $code = $this->payment_method;
 
             // Set payment method id
             $this->merge([

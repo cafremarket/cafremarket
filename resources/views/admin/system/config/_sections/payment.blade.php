@@ -33,7 +33,7 @@
               <div class="col-sm-6">
                 @foreach ($payment_providers as $payment_provider)
                   <!-- Skip removed gateways and wallet (wallet has its own setting) -->
-                  @continue(in_array($payment_provider->code, ['zcart-wallet', 'stripe'], true))
+                  @continue($payment_provider->code === 'zcart-wallet')
 
                   @php
                     $logo_path = sys_image_path('payment-methods') . "{$payment_provider->code}.png";

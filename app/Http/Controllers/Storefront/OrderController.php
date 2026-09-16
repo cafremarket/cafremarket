@@ -872,13 +872,6 @@ class OrderController extends Controller
         switch ($gateway) {
             case 'paypal':
                 return $request->has('token') && $request->has('PayerID');
-
-            case 'stripeWeb':
-                $stripeWeb = new \App\Services\Payments\StripeWebPaymentService($request);
-                $stripeWeb->setConfig();
-                $stripeWeb->verifyPaidPayment();
-
-                return $stripeWeb->status == PaymentService::STATUS_PAID;
         }
 
         return false;

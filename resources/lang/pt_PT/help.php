@@ -145,7 +145,7 @@ return [
 
     'subscription_name' => 'Dê um nome significativo ao plano de subscrição.',
 
-    'subscription_plan_id' => 'Se estiver a usar um sistema de subscrição baseado em Stripe, insira aqui o ID do plano Stripe.',
+    'subscription_plan_id' => 'Identificador único deste plano de subscrição.',
 
     'featured_subscription' => 'Deve haver apenas uma subscrição em destaque.',
 
@@ -465,6 +465,8 @@ return [
 
         'refund_return_goods' => 'O artigo foi devolvido para si?',
 
+        'refund_requires_approval' => 'Os reembolsos ficam Pendentes até um administrador Aprovar ou Rejeitar. A transferência para a carteira só acontece na Aprovação.',
+
         'customer_paid' => 'O cliente pagou <strong><em> :amount </em></strong>, incluindo todos os impostos, despesas de envio e outros.',
 
         'order_refunded' => 'Reembolsado anteriormente <strong><em> :amount </em></strong> do total <strong><em> :total </em></strong>',
@@ -536,8 +538,6 @@ return [
     'config_additional_details' => 'Exibido na página do método de pagamento, enquanto o cliente escolhe como pagar.',
 
     'config_payment_instructions' => 'Exibido na página de agradecimento, após o cliente ter efetuado a encomenda.',
-
-    'config_stripe_publishable_key' => 'As chaves API publicáveis destinam-se apenas a identificar a sua conta na Stripe, não são secretas e podem ser publicadas com segurança.',
 
     'config_paypal_express_account' => 'Normalmente, o endereço de e-mail da sua aplicação PayPal. Crie a sua aplicação PayPal aqui: https://developer.paypal.com/webapps/developer/applications/myapps',
 

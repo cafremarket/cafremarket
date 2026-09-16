@@ -44,12 +44,18 @@
         </div>
       @endif
 
-      {{-- <small>
-              {!! Form::checkbox('notify_customer', 1, null, ['class' => 'icheck', 'checked']) !!}
-              {!! Form::label('notify_customer', strtoupper(trans('app.notify_customer')), ['class' => 'indent5']) !!}
-              <i class="fa fa-question-circle indent5" data-toggle="tooltip" data-placement="top" title="{{ trans('help.notify_customer') }}"></i>
-			</small> --}}
-      {{-- <p class="help-block">* {{ trans('app.form.required_fields') }}</p> --}}
+      <div class="form-group">
+        {!! Form::label('description', trans('app.cancellation_reason') . ' *') !!}
+        {!! Form::textarea('description', null, [
+          'class' => 'form-control',
+          'rows' => 3,
+          'required',
+          'minlength' => 3,
+          'maxlength' => 500,
+          'placeholder' => trans('app.cancellation_reason_placeholder'),
+        ]) !!}
+        <div class="help-block with-errors"></div>
+      </div>
     </div>
     <div class="modal-footer">
       {!! Form::submit(trans('app.cancel_order'), ['class' => 'btn btn-flat btn-new']) !!}

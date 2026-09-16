@@ -4,11 +4,13 @@ namespace App\Models;
 
 class Refund extends BaseModel
 {
-    const STATUS_NEW = 1;         // Default
+    const STATUS_NEW = 1;         // Pending (default)
 
-    const STATUS_APPROVED = 2;
+    const STATUS_APPROVED = 2;    // Completed
 
-    const STATUS_DECLINED = 3;
+    const STATUS_DECLINED = 3;    // Issue (declined)
+
+    const STATUS_FAILED = 4;      // Issue (wallet/payment failure)
 
     /**
      * The database table used by the model.
@@ -16,13 +18,6 @@ class Refund extends BaseModel
      * @var string
      */
     protected $table = 'refunds';
-
-    /**
-     * All of the relationships to be touched.
-     *
-     * @var array
-     */
-    // protected $touches = ['order'];
 
     /**
      * The attributes that are mass assignable.
@@ -36,6 +31,8 @@ class Refund extends BaseModel
         'return_goods',
         'amount',
         'description',
+        'admin_note',
+        'failure_reason',
         'status',
     ];
 
@@ -56,14 +53,6 @@ class Refund extends BaseModel
     }
 
     /**
-     * Get the customer for the refund.
-     */
-    // public function customer()
-    // {
-    //     return $this->order->customer();
-    // }
-
-    /**
      * Set the order_fulfilled.
      */
     public function setOrderFulfilledAttribute($value)
@@ -80,23 +69,59 @@ class Refund extends BaseModel
     }
 
     /**
-     * Scope a query to only include records from the users shop.
+     * Pending refunds awaiting action.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', static::STATUS_NEW);
+    }
+
+    /**
+     * Completed (approved) refunds.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', static::STATUS_APPROVED);
+    }
+
+    /**
+     * Issue refunds (declined or failed).
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIssue($query)
+    {
+        return $query->whereIn('status', [static::STATUS_DECLINED, static::STATUS_FAILED]);
+    }
+
+    /**
+     * Scope a query to only include open (pending) records.
+     * Legacy alias for pending (status 1).
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeOpen($query)
     {
-        return $query->where('status', '<', static::STATUS_APPROVED);
+        return $query->pending();
     }
 
     /**
-     * Scope a query to only include records from the users shop.
+     * Scope a query to only include closed (non-pending) records.
+     * Legacy: Approved/Completed + Declined/Failed (statuses 2, 3, 4).
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeClosed($query)
     {
-        return $query->where('status', '>=', static::STATUS_APPROVED);
+        return $query->whereIn('status', [
+            static::STATUS_APPROVED,
+            static::STATUS_DECLINED,
+            static::STATUS_FAILED,
+        ]);
     }
 
     /**
@@ -110,17 +135,34 @@ class Refund extends BaseModel
     }
 
     /**
-     * Check if the refund is open
+     * Search by order number.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearch($query, ?string $term)
+    {
+        $term = trim((string) $term);
+        if ($term === '') {
+            return $query;
+        }
+
+        return $query->whereHas('order', function ($q) use ($term) {
+            $q->where('order_number', 'like', '%'.$term.'%');
+        });
+    }
+
+    /**
+     * Check if the refund is open / pending
      *
      * @return bool
      */
     public function isOpen()
     {
-        return $this->status < static::STATUS_APPROVED;
+        return $this->status == static::STATUS_NEW;
     }
 
     /**
-     * Check if the refund has been approved
+     * Check if the refund has been approved / completed
      *
      * @return bool
      */
@@ -139,17 +181,70 @@ class Refund extends BaseModel
         return $this->status == static::STATUS_DECLINED;
     }
 
+    /**
+     * Check if the refund failed (wallet/payment)
+     *
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->status == static::STATUS_FAILED;
+    }
+
+    /**
+     * Whether this refund is in the Issue bucket.
+     *
+     * @return bool
+     */
+    public function isIssue()
+    {
+        return $this->isDeclined() || $this->isFailed();
+    }
+
+    /**
+     * Plain-text status label for API, email, and push.
+     */
+    public function statusLabel(): string
+    {
+        return match ((int) $this->status) {
+            static::STATUS_NEW => trans('app.refund_status.pending'),
+            static::STATUS_APPROVED => trans('app.refund_status.completed'),
+            static::STATUS_DECLINED => trans('app.refund_status.issue'),
+            static::STATUS_FAILED => trans('app.refund_status.issue_failed'),
+            default => (string) $this->status,
+        };
+    }
+
+    /**
+     * Legacy plain-text label (New / Approved / Declined) for older clients.
+     */
+    public function legacyStatusLabel(): string
+    {
+        return match ((int) $this->status) {
+            static::STATUS_NEW => trans('app.statuses.new'),
+            static::STATUS_APPROVED => trans('app.statuses.approved'),
+            static::STATUS_DECLINED => trans('app.statuses.declined'),
+            static::STATUS_FAILED => trans('app.refund_status.issue_failed'),
+            default => (string) $this->status,
+        };
+    }
+
     public function statusName()
     {
         switch ($this->status) {
             case static::STATUS_NEW:
-                return '<span class="label label-outline">'.trans('app.statuses.new').'</span>';
+                return '<span class="label label-outline">'.trans('app.refund_status.pending').'</span>';
 
             case static::STATUS_APPROVED:
-                return '<span class="label label-primary">'.trans('app.statuses.approved').'</span>';
+                return '<span class="label label-primary">'.trans('app.refund_status.completed').'</span>';
 
             case static::STATUS_DECLINED:
-                return '<span class="label label-danger">'.trans('app.statuses.declined').'</span>';
+                return '<span class="label label-danger">'.trans('app.refund_status.issue').'</span>';
+
+            case static::STATUS_FAILED:
+                return '<span class="label label-danger">'.trans('app.refund_status.issue_failed').'</span>';
         }
+
+        return null;
     }
 }

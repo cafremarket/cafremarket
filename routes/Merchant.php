@@ -67,6 +67,11 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
             include 'admin/Order.php';
         });
 
+        // Top-level Refunds module (mirrors admin.refunds.*)
+        Route::name('refunds.')->group(function () {
+            include 'admin/Refunds.php';
+        });
+
         Route::name('setting.')->prefix('setting')->group(function () {
             include 'admin/UserRole.php';
 
@@ -178,6 +183,9 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
                 \App\Http\Controllers\Merchant\DisputeController::class,
                 'requestClose',
             ])->name('dispute.requestClose');
+
+            // Legacy Support → Refunds redirects (bookmarks / old forms)
+            include 'admin/Refund.php';
         });
 
         Route::name('review.')->prefix('review')->group(function () {

@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Common\Addressable;
 use App\Common\ApiAuthTokens;
 use App\Common\Attachable;
-use App\Common\Billable;
 use App\Common\HasHumanAttributes;
 use App\Common\Imageable;
 use App\Common\Taggable;
@@ -22,7 +21,7 @@ use Laravel\Scout\Searchable;
 
 class Customer extends CustomerWallet
 {
-    use Addressable, ApiAuthTokens, Attachable, Billable, HasFactory, HasHumanAttributes, Imageable, Notifiable, Searchable, SoftDeletes, Taggable;
+    use Addressable, ApiAuthTokens, Attachable, HasFactory, HasHumanAttributes, Imageable, Notifiable, Searchable, SoftDeletes, Taggable;
 
     /**
      * The database table used by the model.
@@ -112,10 +111,6 @@ class Customer extends CustomerWallet
         'sex',
         'phone',
         'description',
-        'stripe_id',
-        'card_holder_name',
-        'card_brand',
-        'card_last_four',
         'active',
         'approval_status',
         'remember_token',
@@ -315,7 +310,7 @@ class Customer extends CustomerWallet
      */
     public function hasBillingToken()
     {
-        return $this->hasStripeId();
+        return false;
     }
 
     /**

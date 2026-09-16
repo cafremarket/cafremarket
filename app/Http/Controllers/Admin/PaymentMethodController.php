@@ -50,10 +50,6 @@ class PaymentMethodController extends Controller
         $config = $this->checkPermission($request);
         $paymentMethod = PaymentMethod::findOrFail($id);
 
-        if ($paymentMethod->code === 'stripe') {
-            return back()->with('error', trans('messages.failed', ['model' => $this->model_name]));
-        }
-
         $config->paymentMethods()->syncWithoutDetaching($id);
 
         if (! vendor_get_paid_directly()) {

@@ -2,182 +2,130 @@
 
 namespace App\Models;
 
-use Laravel\Cashier\Subscription as CashierSubscription;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
-class Subscription extends CashierSubscription
+class Subscription extends Model
 {
-    /**
-     * Wallet subscriptions do not use Cashier subscription items.
-     *
-     * @var array
-     */
+    protected $table = 'subscriptions';
+
     protected $with = [];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array
-     */
-    // protected $appends = ['provider_plan'];
+    protected $fillable = [
+        'shop_id',
+        'type',
+        'name',
+        'billing_plan',
+        'quantity',
+        'trial_ends_at',
+        'ends_at',
+    ];
 
-    /**
-     * Get the "provider_plan" attribute from the model.
-     *
-     * @return string
-     */
-    // public function getProviderPlanAttribute()
-    // {
-    //     return Spark::billsUsingStripe()
-    //                     ? $this->stripe_price : $this->braintree_plan;
-    // }
+    protected $casts = [
+        'trial_ends_at' => 'datetime',
+        'ends_at' => 'datetime',
+        'quantity' => 'integer',
+    ];
 
-    /**
-     * Get the model related to the subscription.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function owner()
     {
         return $this->belongsTo(Shop::class, 'shop_id');
     }
 
-    /**
-     * Swap the subscription to a new Stripe plan.
-     *
-     * @param  string  $plan
-     * @param  array  $options
-     * @return $this
-     *
-     * @throws \Laravel\Cashier\Exceptions\SubscriptionUpdateFailure
-     */
+    public function shop()
+    {
+        return $this->owner();
+    }
+
     public function swap($plan, $options = [])
     {
-        // Local subscription
-        if (SystemConfig::isBillingThroughWallet()) {
-            $subscriptionPlan = SubscriptionPlan::findOrFail($plan);
+        $subscriptionPlan = SubscriptionPlan::findOrFail($plan);
 
-            if (
-                $this->stripe_price !== $plan
-                && (float) $subscriptionPlan->cost > 0
-                && ! $this->onTrial()
-            ) {
-                $meta = [
-                    'type' => trans('app.subscription_fee'),
-                    'description' => trans('packages.subscription.subscription_fee', [
-                        'subscription' => $subscriptionPlan->name,
-                    ]),
-                ];
-
-                $this->owner->forceWithdraw((float) $subscriptionPlan->cost, $meta);
-            }
-
-            $this->fill([
-                'stripe_price' => $plan,
-                'type' => $subscriptionPlan->name,
-                'ends_at' => now()->addMonth(),
-                'trial_ends_at' => null,
-            ])->save();
-
-            return $this;
+        if (
+            $this->billing_plan !== $plan
+            && (float) $subscriptionPlan->cost > 0
+            && ! $this->onTrial()
+        ) {
+            $this->owner->forceWithdraw(
+                (float) $subscriptionPlan->cost,
+                subscription_charge_meta($subscriptionPlan->name)
+            );
         }
 
-        // Stripe
-        return parent::swap($plan, $options);
+        $this->fill([
+            'billing_plan' => $plan,
+            'type' => $subscriptionPlan->name,
+            'ends_at' => now()->addMonth(),
+            'trial_ends_at' => null,
+        ])->save();
+
+        return $this;
     }
 
-    /**
-     * Determine if the subscription is active, on trial, or within its grace period.
-     *
-     * @return bool
-     */
+    public function onTrial()
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+    }
+
     public function valid()
     {
-        // Local subscription
-        if ($this->provider == 'wallet') {
-            return $this->active() || $this->onTrial();
-        }
-
-        // Stripe
-        return parent::valid();
+        return $this->active() || $this->onTrial();
     }
 
-    /**
-     * Wallet subs use ends_at as paid-through date, not Stripe cancellation.
-     */
     public function canceled()
     {
-        if ($this->provider == 'wallet') {
-            return $this->ends_at !== null && $this->ends_at->isPast();
-        }
-
-        return ! is_null($this->ends_at);
+        return $this->ends_at !== null && $this->ends_at->isPast();
     }
 
-    /**
-     * Wallet billing has no cancel grace period.
-     */
     public function onGracePeriod()
     {
-        if ($this->provider == 'wallet') {
+        return false;
+    }
+
+    public function active()
+    {
+        if ($this->onTrial()) {
+            return true;
+        }
+
+        if ($this->ends_at === null) {
             return false;
         }
 
-        return parent::onGracePeriod();
-    }
-
-    /**
-     * Determine if the subscription is active.
-     *
-     * @return bool
-     */
-    public function active()
-    {
-        if ($this->provider == 'wallet') {
-            if ($this->onTrial()) {
-                return true;
-            }
-
-            // Paid wallet subscriptions always set ends_at; null means trial-only (handled above).
-            if ($this->ends_at === null) {
-                return false;
-            }
-
-            return $this->ends_at->isFuture();
-        }
-
-        return parent::active();
+        return $this->ends_at->isFuture();
     }
 
     public function cancel()
     {
-        if ($this->provider == 'wallet') {
-            $this->forceFill([
-                'ends_at' => now(),
-                'trial_ends_at' => null,
-            ])->save();
+        $this->forceFill([
+            'ends_at' => now(),
+            'trial_ends_at' => null,
+        ])->save();
 
-            return $this;
-        }
-
-        return parent::cancel();
+        return $this;
     }
 
-    /**
-     * Cancel the subscription immediately.
-     *
-     * @return $this
-     */
     public function cancelNow()
     {
-        if ($this->provider == 'wallet') {
-            return $this->cancel();
-        }
+        return $this->cancel();
+    }
 
-        return parent::cancelNow();
+    public function resume()
+    {
+        return $this;
+    }
+
+    public function extendTrial($date)
+    {
+        $this->forceFill([
+            'trial_ends_at' => $date instanceof Carbon ? $date : Carbon::parse($date),
+        ])->save();
+
+        return $this;
     }
 
     public function getProviderAttribute()
     {
-        return $this->stripe_id ? 'stripe' : 'wallet';
+        return 'wallet';
     }
 }

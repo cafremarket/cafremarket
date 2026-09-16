@@ -36,7 +36,7 @@ $active_payment_methods = $config->paymentMethods->pluck('id')->toArray();
                 <div class="col-sm-7">
                   @foreach ($payment_providers as $payment_provider)
                     <!-- Skip removed gateways and wallet -->
-                    @continue(in_array($payment_provider->code, ['zcart-wallet', 'stripe'], true))
+                    @continue($payment_provider->code === 'zcart-wallet')
 
                     @php
                       $logo_path = sys_image_path('payment-methods') . "{$payment_provider->code}.png";

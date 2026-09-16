@@ -89,10 +89,6 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\Inventory\EloquentInventory::class
         );
         $this->app->singleton(
-            \App\Contracts\Repositories\InvoiceRepository::class,
-            \App\Repositories\Billing\InvoiceRepository::class
-        );
-        $this->app->singleton(
             \App\Repositories\Manufacturer\ManufacturerRepository::class,
             \App\Repositories\Manufacturer\EloquentManufacturer::class
         );

@@ -1,4 +1,9 @@
 @php
+  // Hide pickup/delivery location map + directions once the order is canceled.
+  if ($order->isCanceled()) {
+      return;
+  }
+
   $isPickup = $order->pickup();
   $warehouse = $isPickup ? $order->warehouse : null;
   $pickupAddress = $warehouse ? $warehouse->pickupAddress() : null;

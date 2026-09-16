@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\Chat\NewMessageEvent;
 use App\Models\Order;
+use App\Models\Reply;
 use App\Services\ChatSocketPublisher;
 use Illuminate\Support\Facades\Schema;
 use Incevio\Package\LiveChat\Models\ChatConversation;
@@ -95,7 +96,12 @@ class OrderChatSyncService
                 Schema::hasColumn('chat_conversations', 'order_id'),
                 fn ($q) => $q->whereNull('order_id')
             )
-            ->with(['replies.attachments', 'shop', 'customer'])
+            ->with(array_merge(
+                function_exists('livechat_replies_eager_load')
+                    ? livechat_replies_eager_load()
+                    : ['replies.attachments'],
+                ['shop', 'customer']
+            ))
             ->first();
     }
 
@@ -130,7 +136,12 @@ class OrderChatSyncService
         }
 
         return ChatConversation::create($attrs)
-            ->load(['replies.attachments', 'shop', 'customer']);
+            ->load(array_merge(
+                function_exists('livechat_replies_eager_load')
+                    ? livechat_replies_eager_load()
+                    : ['replies.attachments'],
+                ['shop', 'customer']
+            ));
     }
 
     /**
@@ -144,7 +155,8 @@ class OrderChatSyncService
         string $senderType = 'customer',
         bool $shareOrder = false,
         $userId = null,
-        $attachmentFile = null
+        $attachmentFile = null,
+        ?int $parentId = null
     ): ?ChatConversation {
         if (! class_exists(ChatConversation::class) || ! Schema::hasTable('chat_conversations')) {
             return null;
@@ -172,7 +184,7 @@ class OrderChatSyncService
         }
 
         if ($text !== '' && $text !== ' ') {
-            $chat = self::appendReply($chat, $shopId, $customerId, $text, $senderType, $userId, $order);
+            $chat = self::appendReply($chat, $shopId, $customerId, $text, $senderType, $userId, $order, $parentId);
             if ($hasAttachment && $chat) {
                 $lastReply = $chat->replies()->latest('id')->first();
                 if ($lastReply) {
@@ -184,7 +196,7 @@ class OrderChatSyncService
                 }
             }
         } elseif ($text === ' ' && $hasAttachment) {
-            $chat = self::appendReply($chat, $shopId, $customerId, $text, $senderType, $userId, $order);
+            $chat = self::appendReply($chat, $shopId, $customerId, $text, $senderType, $userId, $order, $parentId);
             if ($chat) {
                 $lastReply = $chat->replies()->latest('id')->first();
                 if ($lastReply) {
@@ -197,7 +209,12 @@ class OrderChatSyncService
             }
         }
 
-        return $chat?->fresh(['replies.attachments', 'shop', 'customer']);
+        return $chat?->fresh(array_merge(
+            function_exists('livechat_replies_eager_load')
+                ? livechat_replies_eager_load()
+                : ['replies.attachments'],
+            ['shop', 'customer']
+        ));
     }
 
     protected static function appendReply(
@@ -207,7 +224,8 @@ class OrderChatSyncService
         string $replyText,
         string $senderType,
         $userId,
-        Order $order
+        Order $order,
+        ?int $parentId = null
     ): ChatConversation {
         if (! $chat) {
             $attrs = [
@@ -236,8 +254,16 @@ class OrderChatSyncService
             $replyAttrs['user_id'] = $userId;
         }
 
+        $quotedParent = null;
+        if ($parentId && Schema::hasColumn('replies', 'parent_id')) {
+            $quotedParent = Reply::resolveQuotedParent($chat, ['parent_id' => $parentId]);
+            if ($quotedParent) {
+                $replyAttrs['parent_id'] = $quotedParent->id;
+            }
+        }
+
         $chatReply = $chat->replies()->create($replyAttrs);
-        self::publishRealtime($chat, $chatReply, $replyText, $senderType);
+        self::publishRealtime($chat, $chatReply, $replyText, $senderType, $quotedParent);
 
         try {
             event(new NewMessageEvent($chatReply, $replyText));
@@ -252,7 +278,8 @@ class OrderChatSyncService
         ChatConversation $chat,
         $chatReply,
         string $replyText,
-        string $senderType
+        string $senderType,
+        ?Reply $quotedParent = null
     ): void {
         $chat->loadMissing('shop');
 
@@ -265,7 +292,7 @@ class OrderChatSyncService
             : optional($chatReply->created_at)->format('H:i');
 
         $isOrderShare = str_starts_with($replyText, self::ORDER_SHARE_PREFIX);
-        $payload = [
+        $payload = array_merge([
             'text' => $replyText,
             'sender_type' => $senderType,
             'conversation_id' => $chat->id,
@@ -276,7 +303,9 @@ class OrderChatSyncService
             'time' => $clock,
             'created_at' => optional($chatReply->created_at)->toIso8601String(),
             'attachments' => $attachmentsPayload,
-        ];
+        ], function_exists('livechat_quote_socket_payload')
+            ? livechat_quote_socket_payload($quotedParent)
+            : []);
 
         try {
             ChatSocketPublisher::publish(

@@ -179,6 +179,77 @@
       return String(text || '').slice(0, 72);
     }
 
+    function quoteHtml(quoted) {
+      if (!quoted || !quoted.id) return '';
+      return '<button type="button" class="chat-quote" data-parent-id="' + esc(quoted.id) + '">' +
+        '<strong>' + esc(quoted.sender_name || '') + '</strong>' +
+        '<span>' + esc(quoted.reply || '') + '</span></button>';
+    }
+
+    function currentQuote() {
+      var idEl = qs('#cpc-parent-id');
+      var id = idEl && idEl.value ? parseInt(idEl.value, 10) : 0;
+      if (!id) return null;
+      return {
+        id: id,
+        sender_name: (qs('#cpc-quote-name') || {}).textContent || '',
+        reply: (qs('#cpc-quote-text') || {}).textContent || ''
+      };
+    }
+
+    function setQuoteFromBubble(bubble) {
+      if (!bubble) return;
+      var id = bubble.getAttribute('data-reply-id');
+      if (!id) return;
+      var idEl = qs('#cpc-parent-id');
+      var preview = qs('#cpc-quote-preview');
+      var nameEl = qs('#cpc-quote-name');
+      var textEl = qs('#cpc-quote-text');
+      if (idEl) idEl.value = id;
+      if (nameEl) nameEl.textContent = bubble.getAttribute('data-quote-name') || 'Reply';
+      if (textEl) textEl.textContent = bubble.getAttribute('data-quote-text') || '';
+      if (preview) preview.hidden = false;
+      var ta = qs('#chat-form textarea[name="message"]');
+      if (ta) ta.focus();
+    }
+
+    function clearQuote() {
+      var idEl = qs('#cpc-parent-id');
+      var preview = qs('#cpc-quote-preview');
+      if (idEl) idEl.value = '';
+      if (preview) preview.hidden = true;
+    }
+
+    function bindQuoteUi() {
+      var box = qs('#conversationBox');
+      if (box && !box._quoteBound) {
+        box._quoteBound = true;
+        var timer = null;
+        box.addEventListener('pointerdown', function (e) {
+          var bubble = e.target.closest('.cpc-bubble');
+          if (!bubble || !bubble.getAttribute('data-reply-id')) return;
+          if (e.target.closest('a,button,input,textarea')) return;
+          timer = setTimeout(function () { setQuoteFromBubble(bubble); }, 450);
+        });
+        ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) {
+          box.addEventListener(ev, function () { clearTimeout(timer); });
+        });
+        box.addEventListener('click', function (e) {
+          var q = e.target.closest('.chat-quote');
+          if (!q) return;
+          e.preventDefault();
+          var id = q.getAttribute('data-parent-id');
+          var target = qs('#conversationBox [data-reply-id="' + id + '"]');
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
+      var clearBtn = qs('#cpc-quote-clear');
+      if (clearBtn && !clearBtn._bound) {
+        clearBtn._bound = true;
+        clearBtn.addEventListener('click', clearQuote);
+      }
+    }
+
     function bubbleHtml(text, outgoing, meta) {
       meta = meta || {};
       var share = parseShare(text);
@@ -198,6 +269,7 @@
       } else {
         body = '<p class="cpc-bubble__text">' + esc(text || '') + '</p>';
       }
+      if (meta.quoted) body = quoteHtml(meta.quoted) + body;
       if (meta.attachments && meta.attachments.length) {
         body += '<div class="cpc-atts">';
         meta.attachments.forEach(function (a) {
@@ -217,6 +289,13 @@
       if (meta.replyId) attrs += ' data-reply-id="' + esc(meta.replyId) + '"';
       if (meta.pending) attrs += ' data-pending="1"';
       if (meta.createdAt) attrs += ' data-created-at="' + esc(meta.createdAt) + '"';
+      var qName = meta.quoteName || (outgoing ? 'You' : '');
+      var qText = meta.quoteText || String(text || '').slice(0, 80);
+      if (meta.replyId) {
+        attrs += ' data-quote-name="' + esc(qName) + '"';
+        attrs += ' data-quote-text="' + esc(qText) + '"';
+        attrs += ' data-sender-type="' + esc(outgoing ? 'customer' : 'merchant') + '"';
+      }
       return '<div class="' + cls + '"' + attrs + '><div class="cpc-bubble__body">' + body +
         '<time>' + esc(meta.time || clock(meta.createdAt)) + '</time></div></div>';
     }
@@ -306,6 +385,7 @@
         pane.innerHTML = html;
         scrollBox();
         bindComposer();
+        bindQuoteUi();
         var head = qs('.cpc-thread__head');
         if (head) subscribeRoom(head.getAttribute('data-ws-room') || '');
       }).catch(function (err) {
@@ -355,6 +435,7 @@
         });
         ta.focus();
       }
+      bindQuoteUi();
     }
 
     function sendReply(form) {
@@ -382,9 +463,17 @@
       var nowIso = new Date().toISOString();
       var box = qs('#conversationBox');
 
+      var quoted = currentQuote();
       ensureDay(nowIso);
       var pending = document.createElement('div');
-      pending.innerHTML = bubbleHtml(msg || '[attachment]', true, { pending: true, createdAt: nowIso, time: clock(nowIso) });
+      pending.innerHTML = bubbleHtml(msg || '[attachment]', true, {
+        pending: true,
+        createdAt: nowIso,
+        time: clock(nowIso),
+        quoted: quoted,
+        quoteName: 'You',
+        quoteText: msg
+      });
       var pendingNode = pending.firstChild;
       if (box && pendingNode) box.appendChild(pendingNode);
       scrollBox();
@@ -396,6 +485,7 @@
       var fd = new FormData();
       fd.append('message', msg);
       fd.append('_token', csrf || (qs('input[name="_token"]', form) || {}).value || '');
+      if (quoted && quoted.id) fd.append('parent_id', String(quoted.id));
       if (hasFile) {
         fd.append('photo', fileInput.files[0]);
         fileInput.value = '';
@@ -424,6 +514,7 @@
           return;
         }
         var data = result.data || {};
+        clearQuote();
         if (pendingNode) {
           pendingNode.removeAttribute('data-pending');
           if (data.reply_id) pendingNode.setAttribute('data-reply-id', String(data.reply_id));
@@ -436,7 +527,10 @@
               replyId: data.reply_id,
               createdAt: data.created_at,
               time: data.time,
-              attachments: data.attachments
+              attachments: data.attachments,
+              quoted: data.quoted_reply || quoted,
+              quoteName: 'You',
+              quoteText: data.message || msg
             });
             if (wrap.firstChild) pendingNode.parentNode.replaceChild(wrap.firstChild, pendingNode);
           }
@@ -512,7 +606,10 @@
           replyId: result.reply_id,
           createdAt: result.created_at,
           time: result.time,
-          attachments: result.attachments
+          attachments: result.attachments,
+          quoted: result.quoted_reply,
+          quoteName: outgoing ? 'You' : ((qs('.cpc-thread__peer strong') || {}).textContent || ''),
+          quoteText: result.text
         });
         if (box && wrap.firstChild) box.appendChild(wrap.firstChild);
         scrollBox();

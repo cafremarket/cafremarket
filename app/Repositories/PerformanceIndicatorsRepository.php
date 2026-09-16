@@ -45,7 +45,7 @@ class PerformanceIndicatorsRepository implements Contract
     }
 
     /**
-     * Active paying subscribers on a plan (wallet + Stripe).
+     * Active paying subscribers on a plan.
      */
     public function subscribers(SubscriptionPlan $plan)
     {
@@ -91,7 +91,7 @@ class PerformanceIndicatorsRepository implements Contract
                 $query->select(DB::raw(1))
                     ->from('subscriptions')
                     ->whereColumn('subscriptions.shop_id', 'shops.id')
-                    ->where('subscriptions.stripe_price', $plan->plan_id)
+                    ->where('subscriptions.billing_plan', $plan->plan_id)
                     ->where('subscriptions.trial_ends_at', '>', $now)
                     ->where(function ($inner) use ($now) {
                         $inner->whereNull('subscriptions.ends_at')
@@ -104,7 +104,7 @@ class PerformanceIndicatorsRepository implements Contract
     }
 
     /**
-     * Subscriptions that are not cancelled/expired (Stripe or wallet billing).
+     * Subscriptions that are not cancelled/expired.
      */
     protected function activeSubscriptionsForPlan(SubscriptionPlan $plan, Carbon $now): Builder
     {
@@ -118,7 +118,7 @@ class PerformanceIndicatorsRepository implements Contract
     protected function subscriptionsForPlan(SubscriptionPlan $plan): Builder
     {
         return DB::table('subscriptions')
-            ->where('stripe_price', $plan->plan_id);
+            ->where('billing_plan', $plan->plan_id);
     }
 
     /**
@@ -133,7 +133,7 @@ class PerformanceIndicatorsRepository implements Contract
                 $query->select(DB::raw(1))
                     ->from('subscriptions')
                     ->whereColumn('subscriptions.shop_id', 'shops.id')
-                    ->where('subscriptions.stripe_price', $plan->plan_id)
+                    ->where('subscriptions.billing_plan', $plan->plan_id)
                     ->where(function ($inner) use ($now) {
                         $inner->whereNull('subscriptions.ends_at')
                             ->orWhere('subscriptions.ends_at', '>', $now);

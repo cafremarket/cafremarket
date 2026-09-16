@@ -1,34 +1,35 @@
+@php
+  $walletInvoices = $billable
+    ? $billable->subscriptionFeeTransactions()
+    : collect();
+@endphp
+
 <ul class="list-group">
-  @if ($billable->stripe_id && $billable->invoices())
-    @foreach ($billable->invoices() as $invoice)
-      <table class="table">
-        <thead>
+  @if ($walletInvoices->isNotEmpty())
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{{ trans('app.date') }}</th>
+          <th>{{ trans('app.description') }}</th>
+          <th>{{ trans('app.status') }}</th>
+          <th>{{ trans('app.amount') }}</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach ($walletInvoices as $transaction)
           <tr>
-            <th>{{ trans('app.date') }}</th>
-            <th>{{ trans('app.description') }}</th>
-            <th>{{ trans('app.status') }}</th>
-            <th>{{ trans('app.amount') }}</th>
-            <th>&nbsp;</th>
+            <td>{{ $transaction->created_at?->toFormattedDateString() }}</td>
+            <td>{{ $transaction->meta['description'] ?? trans('app.subscription_fee') }}</td>
+            <td>{!! $transaction->statusName() !!}</td>
+            <td>{{ get_formated_currency(abs((float) $transaction->amount), 2, config('system_settings.currency.id')) }}</td>
+            <td>
+              <a href="{{ route('wallet.transaction.invoice', $transaction) }}"><i class="fa fa-cloud-download" data-toggle="tooltip" data-placement="top" title="{{ trans('app.download') }}"></i></a>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @foreach ($invoice->subscriptions() as $subscription)
-            <tr>
-              {{-- <td>{{ $invoice->date()->toFormattedDateString() }}</td> --}}
-              <td>{{ \Carbon\Carbon::createFromTimestamp($invoice->asStripeInvoice()->created)->toFormattedDateString() }}</td>
-              <td>
-                {{ trans('app.invoice_for', ['start' => $subscription->startDateAsCarbon()->toFormattedDateString(), 'end' => $subscription->endDateAsCarbon()->toFormattedDateString()]) }}
-              </td>
-              <td>{{ trans('app.' . $invoice->status) }}</td>
-              <td>{{ $invoice->total() }}</td>
-              <td>
-                <a href="{{ mp_route('admin.account.subscription.invoice', $invoice->id) }}"><i class="fa fa-cloud-download" data-toggle="tooltip" data-placement="top" title="{{ trans('app.download') }}"></i></a>
-              </td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    @endforeach
+        @endforeach
+      </tbody>
+    </table>
   @else
     <span class="indent5">{{ trans('app.no_invoice') }}</span>
   @endif

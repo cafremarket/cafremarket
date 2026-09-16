@@ -12,7 +12,7 @@
   $historySkipAttrs = [
     'updated_at', 'created_at', 'deleted_at', 'otp', 'otp_hash',
     'latitude', 'longitude', 'delivery_lat', 'delivery_lng',
-    'razorpay_order_id', 'razorpay_payment_id', 'stripe_payment_intent',
+    'razorpay_order_id', 'razorpay_payment_id',
     'payment_instruction', 'admin_note',
   ];
 @endphp

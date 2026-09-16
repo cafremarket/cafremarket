@@ -3,72 +3,85 @@
 namespace Incevio\Package\Subscription;
 
 use Carbon\Carbon;
-// use DateTimeInterface;
-use Laravel\Cashier\SubscriptionBuilder as CashierSubscriptionBuilder;
+use Illuminate\Support\Facades\Log;
 
-class SubscriptionBuilder extends CashierSubscriptionBuilder
+class SubscriptionBuilder
 {
     public $plan;
 
-    /**
-     * The subscription fee
-     *
-     * @var float|int
-     */
+    protected $owner;
+
+    protected $type;
+
     protected $subscriptionFee = 0;
 
-    /**
-     * @param  mixed  $owner
-     * @param  string  $name
-     * @param  string  $plan
-     */
+    protected $skipTrial = false;
+
+    protected $trialExpires = null;
+
     public function __construct($owner, $name, $plan)
     {
-        parent::__construct($owner, $name, $plan);
-
+        $this->owner = $owner;
+        $this->type = $name;
         $this->plan = $plan;
     }
 
     public function setSubscriptionFee($price)
     {
         $this->subscriptionFee = $price;
+
+        return $this;
     }
 
-    /**
-     * Create a new Local subscription.
-     *
-     * @param  \Stripe\PaymentMethod|string|null  $paymentMethod
-     * @param  array  $options
-     * @return \Laravel\Cashier\Subscription
-     */
+    public function trialDays($days)
+    {
+        $this->trialExpires = Carbon::now()->addDays((int) $days);
+
+        return $this;
+    }
+
+    public function skipTrial()
+    {
+        $this->skipTrial = true;
+        $this->trialExpires = null;
+
+        return $this;
+    }
+
     public function create($paymentMethod = null, array $customerOptions = [], array $subscriptionOptions = [])
     {
         $trialEndsAt = $this->skipTrial ? null : $this->trialExpires;
 
         try {
-            $subscription = $this->owner->subscriptions()
-                ->create([
-                    'type' => $this->type,
-                    'stripe_price' => $this->plan,
-                    'quantity' => 1,
-                    'trial_ends_at' => $trialEndsAt,
-                    'ends_at' => $trialEndsAt ? null : Carbon::now()->addMonth(),
-                ]);
+            $payload = [
+                'billing_plan' => $this->plan,
+                'quantity' => 1,
+                'trial_ends_at' => $trialEndsAt,
+                'ends_at' => $trialEndsAt ? null : Carbon::now()->addMonth(),
+            ];
+
+            if (\Illuminate\Support\Facades\Schema::hasColumn('subscriptions', 'type')) {
+                $payload['type'] = $this->type;
+            }
+
+            if (\Illuminate\Support\Facades\Schema::hasColumn('subscriptions', 'name')) {
+                $payload['name'] = $this->type;
+            }
+
+            $subscription = $this->owner->subscriptions()->create($payload);
 
             $trialActive = $subscription->trial_ends_at && $subscription->trial_ends_at->isFuture();
 
             if (! $trialActive && $this->subscriptionFee > 0) {
-                $meta = [
-                    'type' => trans('app.subscription_fee'),
-                    'description' => trans('packages.subscription.subscription_fee', ['subscription' => $this->type]),
-                ];
-
-                $this->owner->forceWithdraw($this->subscriptionFee, $meta);
+                $this->owner->forceWithdraw(
+                    $this->subscriptionFee,
+                    subscription_charge_meta((string) $this->type)
+                );
             }
         } catch (\Throwable $e) {
-            \Log::error($e);
+            Log::error($e);
 
-            throw new \Exception($e->getMessage() ?: trans('messages.subscription_error'));
+            throw new \RuntimeException($e->getMessage() ?: trans('messages.subscription_error'));
         }
 
         return $subscription;

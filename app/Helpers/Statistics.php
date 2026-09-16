@@ -387,11 +387,15 @@ class Statistics
 
     public static function open_refund_request_count($shop = null)
     {
-        if ($shop && Auth::user()->isFromPlatform()) {
-            return Refund::where('shop_id', $shop)->open()->count();
+        if (Auth::user()->isFromPlatform()) {
+            if ($shop) {
+                return Refund::where('shop_id', $shop)->pending()->count();
+            }
+
+            return Refund::pending()->count();
         }
 
-        return Refund::mine()->open()->count();
+        return Refund::mine()->pending()->count();
     }
 
     public static function refund_request_count($period = null, $shop = null)

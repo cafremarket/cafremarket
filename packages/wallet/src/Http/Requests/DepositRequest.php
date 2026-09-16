@@ -2,7 +2,6 @@
 
 namespace Incevio\Package\Wallet\Http\Requests;
 
-use App\Common\CanCreateStripeCustomer;
 use App\Exceptions\PaymentFailedException;
 use App\Http\Requests\Request;
 use App\Services\Emola\EmolaSpec;
@@ -11,8 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class DepositRequest extends Request
 {
-    use CanCreateStripeCustomer;
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -34,16 +31,9 @@ class DepositRequest extends Request
      */
     public function rules()
     {
-        // Create Stripe Customer for future use
-        if ($this->has('remember_the_card') && $this->input('payment_method') == 'stripe') {
-            $this->merge([
-                'payee' => $this->createStripeCustomer(),
-            ]);
-        }
-
         $rules = [
             'amount' => 'required|numeric|min:1',
-            'payment_method' => $this->input('payment_method') == 'saved_card' ? '' : 'required|exists:payment_methods,code',
+            'payment_method' => 'required|exists:payment_methods,code',
         ];
 
         if ($this->input('payment_method') === 'mpesa') {

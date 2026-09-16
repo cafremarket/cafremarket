@@ -17,48 +17,74 @@ class EloquentRefund extends EloquentRepository implements BaseRepository, Refun
         $this->model = $refund;
     }
 
-    public function all()
+    protected function baseQuery()
     {
-        $query = $this->model->with('order');
+        $query = $this->model->with(['order.customer', 'shop']);
 
-        if (Auth::user()->isFromPlatform()) {
-            return $query->get();
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
         }
 
-        return $query->mine()->get();
+        return $query;
+    }
+
+    public function all()
+    {
+        return $this->baseQuery()->latest()->get();
     }
 
     public function open()
     {
-        $query = $this->model->open()->with('order');
-
-        if (Auth::user()->isFromPlatform()) {
-            return $query->get();
-        }
-
-        return $query->mine()->get();
+        return $this->baseQuery()->pending()->latest()->get();
     }
 
     public function closed()
     {
-        $query = $this->model->closed()->with('order');
+        return $this->baseQuery()->closed()->latest()->get();
+    }
 
-        if (Auth::user()->isFromPlatform()) {
-            return $query->get();
+    public function pending()
+    {
+        return $this->baseQuery()->pending()->latest()->get();
+    }
+
+    public function completed()
+    {
+        return $this->baseQuery()->completed()->latest()->get();
+    }
+
+    public function issue()
+    {
+        return $this->baseQuery()->issue()->latest()->get();
+    }
+
+    public function forTab(string $tab, ?string $search = null)
+    {
+        $query = $this->baseQuery()->search($search);
+
+        $query = match ($tab) {
+            'completed' => $query->completed(),
+            'issue' => $query->issue(),
+            default => $query->pending(),
+        };
+
+        return $query->latest()->get();
+    }
+
+    public function pendingCount(): int
+    {
+        $query = $this->model->pending();
+
+        if (! Auth::user()->isFromPlatform()) {
+            $query->mine();
         }
 
-        return $query->mine()->get();
+        return $query->count();
     }
 
     public function statusOf($status)
     {
-        $query = $this->model->statusOf($status)->with('order');
-
-        if (Auth::user()->isFromPlatform()) {
-            return $query->get();
-        }
-
-        return $query->mine()->get();
+        return $this->baseQuery()->statusOf($status)->latest()->get();
     }
 
     public function approve($refund)
@@ -72,13 +98,33 @@ class EloquentRefund extends EloquentRepository implements BaseRepository, Refun
         return $refund;
     }
 
-    public function decline($refund)
+    public function decline($refund, ?string $adminNote = null)
     {
         if (! $refund instanceof Refund) {
             $refund = $this->getInst($refund);
         }
 
-        $refund->update(['status' => Refund::STATUS_DECLINED]);
+        $payload = ['status' => Refund::STATUS_DECLINED];
+        if ($adminNote !== null && $adminNote !== '') {
+            $payload['admin_note'] = $adminNote;
+        }
+
+        $refund->update($payload);
+
+        return $refund;
+    }
+
+    public function markIssue($refund, string $adminNote)
+    {
+        if (! $refund instanceof Refund) {
+            $refund = $this->getInst($refund);
+        }
+
+        $refund->update([
+            'status' => Refund::STATUS_FAILED,
+            'admin_note' => $adminNote,
+            'failure_reason' => $adminNote,
+        ]);
 
         return $refund;
     }

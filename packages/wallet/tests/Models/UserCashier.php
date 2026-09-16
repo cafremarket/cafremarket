@@ -5,7 +5,6 @@ namespace Incevio\Package\Wallet\Test\Models;
 use Illuminate\Database\Eloquent\Model;
 use Incevio\Package\Wallet\Traits\HasWallets;
 use Incevio\Package\Wallet\Traits\MorphOneWallet;
-use Laravel\Cashier\Billable;
 
 /**
  * Class User.
@@ -15,7 +14,7 @@ use Laravel\Cashier\Billable;
  */
 class UserCashier extends Model
 {
-    use Billable, HasWallets, MorphOneWallet;
+    use HasWallets, MorphOneWallet;
 
     public function getTable(): string
     {

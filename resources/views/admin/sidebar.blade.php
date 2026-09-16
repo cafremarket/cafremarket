@@ -232,6 +232,22 @@
         </li>
       @endif
 
+      {{-- ===== REFUNDS (top-level module) ===== --}}
+      @can('index', \App\Models\Refund::class)
+        @php
+          $pendingRefunds = \App\Helpers\Statistics::open_refund_request_count();
+        @endphp
+        <li class="{{ Request::is('admin/refunds*') ? 'active' : '' }}">
+          <a href="{{ route('admin.refunds.index') }}">
+            <i class="fa fa-undo"></i>
+            <span>{{ trans('nav.refunds') }}</span>
+            @if ($pendingRefunds > 0)
+              <span class="label label-warning pull-right">{{ $pendingRefunds }}</span>
+            @endif
+          </a>
+        </li>
+      @endcan
+
       {{-- ===== PEOPLE & VENDORS ===== --}}
       @if (Auth::user()->isFromPlatform() && (Gate::allows('index', \App\Models\User::class) || Gate::allows('index', \App\Models\Customer::class)))
         <li class="nav-section"><span class="nav-section-label">{{ trans('nav.vendors') ?? 'People' }}</span></li>
@@ -421,11 +437,11 @@
       @endif
 
       {{-- ===== SUPPORT ===== --}}
-      @if (Gate::allows('index', \App\Models\Message::class) || Gate::allows('index', \App\Models\Ticket::class) || Gate::allows('index', \App\Models\Dispute::class) || Gate::allows('index', \App\Models\Refund::class) || Gate::allows('index', \Incevio\Package\LiveChat\Models\ChatConversation::class))
+      @if (Gate::allows('index', \App\Models\Message::class) || Gate::allows('index', \App\Models\Ticket::class) || Gate::allows('index', \App\Models\Dispute::class) || Gate::allows('index', \Incevio\Package\LiveChat\Models\ChatConversation::class))
         <li class="nav-section"><span class="nav-section-label">{{ trans('nav.support') ?? 'Support' }}</span></li>
       @endif
 
-      @if (Gate::allows('index', \App\Models\Message::class) || Gate::allows('index', \App\Models\Ticket::class) || Gate::allows('index', \App\Models\Dispute::class) || Gate::allows('index', \App\Models\Refund::class) || Gate::allows('index', \Incevio\Package\LiveChat\Models\ChatConversation::class))
+      @if (Gate::allows('index', \App\Models\Message::class) || Gate::allows('index', \App\Models\Ticket::class) || Gate::allows('index', \App\Models\Dispute::class) || Gate::allows('index', \Incevio\Package\LiveChat\Models\ChatConversation::class))
         <li class="treeview {{ Request::is('admin/support*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
             <i class="fa fa-support"></i>
@@ -468,9 +484,10 @@
               </li>
             @endcan
 
+            {{-- Legacy Support → Refunds entry (points to top-level Refunds module) --}}
             @can('index', \App\Models\Refund::class)
               <li class="{{ Request::is('admin/support/refund*') ? 'active' : '' }}">
-                <a href="{{ url('admin/support/refund') }}">
+                <a href="{{ route('admin.refunds.index') }}">
                   <i class="fa fa-angle-double-right"></i> {{ trans('nav.refunds') }}
                 </a>
               </li>

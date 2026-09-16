@@ -45,7 +45,7 @@
           $disputeActions .= '<a href="' . route('admin.order.order.show', $dispute->order->id) . '" class="btn btn-default btn-flat btn-sm"><i class="fa fa-shopping-cart"></i> ' . e(trans('app.order_details')) . '</a> ';
         }
         if (!$dispute->order->refunds->count() && Gate::allows('initiate', \App\Models\Refund::class)) {
-          $disputeActions .= '<a href="javascript:void(0)" data-link="' . route('admin.support.refund.form', $dispute->order->id) . '" class="ajax-modal-btn btn btn-new btn-flat btn-sm">' . e(trans('app.initiate_refund')) . '</a> ';
+          $disputeActions .= '<a href="javascript:void(0)" data-link="' . route('admin.refunds.form', $dispute->order->id) . '" class="ajax-modal-btn btn btn-new btn-flat btn-sm">' . e(trans('app.initiate_refund')) . '</a> ';
         }
         if (Gate::allows('response', $dispute) && $dispute->isOpen()) {
           $disputeActions .= '<a href="javascript:void(0)" data-link="' . route('admin.support.dispute.response', $dispute) . '" class="ajax-modal-btn btn btn-info btn-flat btn-sm"><i class="fa fa-reply"></i> ' . e(trans('app.response')) . '</a> ';
@@ -144,7 +144,7 @@
                   <td class="row-options admin-row-actions">
                     @if ($refund->isOpen())
                       @can('approve', $refund)
-                        <a href="javascript:void(0)" data-link="{{ route('admin.support.refund.response', $refund) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.response') }}" data-toggle="tooltip"><i class="fa fa-random"></i></a>
+                        <a href="javascript:void(0)" data-link="{{ route('admin.refunds.response', $refund) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.response') }}" data-toggle="tooltip"><i class="fa fa-random"></i></a>
                       @endcan
                     @endif
                   </td>

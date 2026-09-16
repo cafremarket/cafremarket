@@ -328,12 +328,14 @@
           <table class="table order-detail-stack-table" id="buyer-order-table" name="buyer-order-table">
             <tbody>
               @unless ($order->is_digital)
-                <tr class="order-detail-location-row">
-                  <td colspan="3" class="order-detail-location-cell">
-                    @include('theme::partials.order_delivery_proof', ['order' => $order])
-                    @include('theme::partials.order_delivery_location', ['order' => $order, 'compact' => true])
-                  </td>
-                </tr>
+                @unless ($order->isCanceled())
+                  <tr class="order-detail-location-row">
+                    <td colspan="3" class="order-detail-location-cell">
+                      @include('theme::partials.order_delivery_proof', ['order' => $order])
+                      @include('theme::partials.order_delivery_location', ['order' => $order, 'compact' => true])
+                    </td>
+                  </tr>
+                @endunless
               @endunless
 
               <tr class="buyer-payment-info-head bg-light order-detail-address-head">

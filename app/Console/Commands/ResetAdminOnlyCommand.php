@@ -60,7 +60,6 @@ class ResetAdminOnlyCommand extends Command
             'config_mpesa',
             'config_paypal_express',
             'config_paypals',
-            'config_stripes',
             'configs',
             'contact_us',
             'coupon_customer',

@@ -58,7 +58,7 @@
                 <div class="col-sm-7">
                   @foreach ($payment_providers as $payment_provider)
                     {{-- Skip the wallet because wallet setting has option to activate --}}
-                    @continue(in_array($payment_provider->code, ['zcart-wallet', 'stripe'], true))
+                    @continue($payment_provider->code === 'zcart-wallet')
 
                     @php
                       $has_config = false;

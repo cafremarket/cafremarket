@@ -69,7 +69,7 @@ class Initiated extends Notification implements ShouldQueue
         return [
             'order' => $this->refund->order->order_number,
             'device_id' => $this->refund->order->device_id,
-            'status' => $this->refund->statusName(),
+            'status' => $this->refund->statusLabel(),
             'amount' => $this->refund->amount,
             'subject' => trans('notifications.refund_initiated.subject', ['order' => $this->refund->order->order_number]),
             'message' => trans('notifications.refund_initiated.message', ['order' => $this->refund->order->order_number]),

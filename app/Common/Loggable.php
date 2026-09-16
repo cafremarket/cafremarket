@@ -35,8 +35,32 @@ trait Loggable
 
     public function getActivitylogOptions(): LogOptions
     {
-        $logOptions = LogOptions::defaults();
+        $options = LogOptions::defaults();
 
-        return $logOptions->logAll();
+        if (! empty(static::$logFillable)) {
+            $options->logFillable();
+        } else {
+            $options->logAll();
+        }
+
+        if (! empty(static::$logOnlyDirty)) {
+            $options->logOnlyDirty();
+        }
+
+        $options->dontSubmitEmptyLogs();
+
+        if (
+            property_exists(static::class, 'ignoreChangedAttributes')
+            && is_array(static::$ignoreChangedAttributes)
+            && static::$ignoreChangedAttributes !== []
+        ) {
+            $options->logExcept(static::$ignoreChangedAttributes);
+        }
+
+        if (property_exists(static::class, 'logName') && ! empty(static::$logName)) {
+            $options->useLogName(static::$logName);
+        }
+
+        return $options;
     }
 }

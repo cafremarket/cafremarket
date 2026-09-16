@@ -5,6 +5,7 @@ namespace Incevio\Package\LiveChat\Http\Controllers\Api;
 use App\Events\Chat\NewMessageEvent;
 use App\Http\Resources\ConversationResource;
 use App\Models\Customer;
+use App\Models\Reply;
 use App\Models\Shop;
 use App\Http\Controllers\Controller;
 // use App\Http\Requests\Validations\OrderDetailRequest;
@@ -74,16 +75,16 @@ class ConversationController extends Controller
                 Schema::hasColumn('chat_conversations', 'order_id'),
                 fn ($q) => $q->whereNull('order_id')
             )
-            ->with(['replies.attachments'])
+            ->with(livechat_replies_eager_load())
             ->first();
 
         if ($conversation) {
-            $conversation->load(['replies.attachments']);
+            $conversation->load(livechat_replies_eager_load());
 
             // Customer opened thread — mark merchant replies as read (clears clock on vendor side after refresh/WS).
             $conversation->markPeerRepliesAsRead('customer');
 
-            return new ConversationResource($conversation->fresh(['replies.attachments']));
+            return new ConversationResource($conversation->fresh(livechat_replies_eager_load()));
         }
 
         return response()->json([
@@ -120,14 +121,22 @@ class ConversationController extends Controller
             )
             ->first();
 
+        $quotedParent = $conversation
+            ? Reply::resolveQuotedParent($conversation, $request)
+            : null;
+
         if ($conversation) {
             $conversation->bumpLastMessage($replyText, true);
-            $msg_object = $conversation->replies()->create([
+            $createAttrs = [
                 'customer_id' => $request->customer_id,
                 'user_id' => $request->user_id,
                 'reply' => $replyText,
                 'read' => false,
-            ]);
+            ];
+            if ($quotedParent) {
+                $createAttrs['parent_id'] = $quotedParent->id;
+            }
+            $msg_object = $conversation->replies()->create($createAttrs);
 
             try {
                 if ($request->hasFile('photo')) {
@@ -151,12 +160,16 @@ class ConversationController extends Controller
             ]);
 
             // Keep a consistent reply object for realtime updates.
-            $msg_object = $conversation->replies()->create([
+            $createAttrs = [
                 'customer_id' => $request->customer_id,
                 'user_id' => $request->user_id,
                 'reply' => $replyText,
                 'read' => false,
-            ]);
+            ];
+            if ($quotedParent) {
+                $createAttrs['parent_id'] = $quotedParent->id;
+            }
+            $msg_object = $conversation->replies()->create($createAttrs);
 
             try {
                 if ($request->hasFile('photo')) {
@@ -181,36 +194,28 @@ class ConversationController extends Controller
             $conversation->refresh();
             $clock = livechat_format_message_time($msg_object->created_at);
             $createdAt = optional($msg_object->created_at)->toIso8601String();
+            $socketPayload = array_merge([
+                'text' => $replyText,
+                'sender_type' => 'customer',
+                'conversation_id' => $conversation->id,
+                'reply_id' => $msg_object->id,
+                'customer_id' => $request->customer_id,
+                'time' => $clock,
+                'created_at' => $createdAt,
+                'attachments' => $attachmentsPayload,
+            ], livechat_quote_socket_payload($quotedParent));
 
             ChatSocketPublisher::publish(
                 get_chat_room_name($shop->id.$request->customer_id),
                 'chat.message',
-                [
-                    'text' => $replyText,
-                    'sender_type' => 'customer',
-                    'conversation_id' => $conversation->id,
-                    'reply_id' => $msg_object->id,
-                    'customer_id' => $request->customer_id,
-                    'time' => $clock,
-                    'created_at' => $createdAt,
-                    'attachments' => $attachmentsPayload,
-                ]
+                $socketPayload
             );
 
             // Also notify vendor room so merchant sidebar/conversation updates in realtime.
             ChatSocketPublisher::publish(
                 get_vendor_chat_room_id($shop),
                 'chat.message',
-                [
-                    'text' => $replyText,
-                    'sender_type' => 'customer',
-                    'conversation_id' => $conversation->id,
-                    'reply_id' => $msg_object->id,
-                    'customer_id' => $request->customer_id,
-                    'time' => $clock,
-                    'created_at' => $createdAt,
-                    'attachments' => $attachmentsPayload,
-                ]
+                $socketPayload
             );
 
             try {
@@ -220,7 +225,7 @@ class ConversationController extends Controller
             }
         }
 
-        $conversation->load(['replies.attachments']);
+        $conversation->load(livechat_replies_eager_load());
 
         return new ConversationResource($conversation);
     }
@@ -291,12 +296,11 @@ class ConversationController extends Controller
         $chat->markAsRead();
         $chat->markPeerRepliesAsRead('merchant');
 
-        $chat->load([
+        $chat->load(array_merge([
             'replies' => function ($q) {
                 $q->orderBy('id');
             },
-            'replies.attachments',
-        ]);
+        ], livechat_replies_eager_load()));
 
         return new ConversationResource($chat);
     }
@@ -318,13 +322,19 @@ class ConversationController extends Controller
             return response()->json(['message' => trans('validation.required', ['attribute' => 'message'])], 422);
         }
 
+        $quotedParent = Reply::resolveQuotedParent($chat, $request);
+
         // Merchant replies must not set customer_id (match web admin behavior).
-        $reply = $chat->replies()->create([
+        $createAttrs = [
             'customer_id' => null,
             'user_id' => Auth::guard('vendor_api')->id(),
             'reply' => $replyText,
             'read' => false,
-        ]);
+        ];
+        if ($quotedParent) {
+            $createAttrs['parent_id'] = $quotedParent->id;
+        }
+        $reply = $chat->replies()->create($createAttrs);
 
         $chat->bumpLastMessage($replyText, false);
 
@@ -345,7 +355,7 @@ class ConversationController extends Controller
         $attachmentsPayload = livechat_socket_attachments_payload($reply);
         $clock = livechat_format_message_time($reply->created_at);
 
-        $payload = [
+        $payload = array_merge([
             'text' => $replyText,
             'sender_type' => 'merchant',
             'conversation_id' => $chat->id,
@@ -354,7 +364,7 @@ class ConversationController extends Controller
             'time' => $clock,
             'created_at' => optional($reply->created_at)->toIso8601String(),
             'attachments' => $attachmentsPayload,
-        ];
+        ], livechat_quote_socket_payload($quotedParent));
 
         ChatSocketPublisher::publish(
             get_chat_room_name($chat->shop_id.$chat->customer_id),
@@ -380,6 +390,8 @@ class ConversationController extends Controller
             'message' => 'Replied successfully',
             'reply_id' => $reply->id,
             'read' => false,
+            'parent_id' => $quotedParent?->id,
+            'quoted_reply' => Reply::quoteSnapshot($quotedParent),
         ], 200);
     }
 

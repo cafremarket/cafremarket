@@ -402,6 +402,8 @@
         if (csrf) {
           fd.append('_token', csrf);
         }
+        var parentId = $('#mpc-parent-id').val() || $('#chat-form input[name="parent_id"]').val();
+        if (parentId) fd.append('parent_id', parentId);
         if (fdFile) {
           fd.append('photo', fdFile);
         }

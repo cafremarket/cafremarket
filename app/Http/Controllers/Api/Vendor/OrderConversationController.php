@@ -29,7 +29,7 @@ class OrderConversationController extends Controller
 
         $chat->markPeerRepliesAsRead('merchant');
 
-        return new ConversationResource($chat->fresh(['replies.attachments', 'shop', 'customer']));
+        return new ConversationResource($chat->fresh(array_merge(livechat_replies_eager_load(), ['shop', 'customer'])));
     }
 
     /**
@@ -63,7 +63,8 @@ class OrderConversationController extends Controller
             'merchant',
             $shareOrder,
             $userId,
-            $attachment
+            $attachment,
+            (int) $request->input('parent_id', 0) ?: null
         );
 
         if (! $chat) {

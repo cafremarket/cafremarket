@@ -105,7 +105,7 @@ class ChargeSubscriptionFee extends Command
                             // When no custom subscription fee set for the vendor
                             // Get subscription fee amount
                             if ($cost === null) {
-                                $cost = $subsc_plans->where('plan_id', $subscription->stripe_id)
+                                $cost = $subsc_plans->where('plan_id', $subscription->billing_plan)
                                     ->first()->cost;
 
                                 Log::channel('subscription')->info('Cost of the subscription plan: ' . $cost);
@@ -126,11 +126,15 @@ class ChargeSubscriptionFee extends Command
                                     // SubscriptionJob::dispatch($owner, SubscriptionBillingFailedNotice::class, $real_expiry_time);
                                     // Send notice to vendor
                                 } else {
-                                    $meta = [
-                                        'type' => trans('app.subscription_fee'),
-                                        'subscription_id' => $subscription->stripe_id,
-                                        'description' => trans('packages.subscription.subscription_fee_for', ['subscription' => $subscription->name, 'from' => $real_expiry_time, 'to' => $next_billing_at])
-                                    ];
+                                    $meta = subscription_charge_meta(
+                                        (string) $subscription->name,
+                                        trans('packages.subscription.subscription_fee_for', [
+                                            'subscription' => $subscription->name,
+                                            'from' => $real_expiry_time,
+                                            'to' => $next_billing_at,
+                                        ])
+                                    );
+                                    $meta['subscription_id'] = $subscription->billing_plan;
 
                                     $owner->withdraw($cost ? $cost : 0, $meta);
 

@@ -333,14 +333,6 @@ class Config extends BaseModel
     }
 
     /**
-     * Get the stripe for the shop.
-     */
-    public function stripe()
-    {
-        return $this->hasOne(ConfigStripe::class, 'shop_id');
-    }
-
-    /**
      * Get the paypal for the shop.
      */
     public function paypal()

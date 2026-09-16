@@ -206,6 +206,11 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/Review.php';
         });
 
+        // Top-level Refunds module
+        Route::name('refunds.')->group(function () {
+            include 'admin/Refunds.php';
+        });
+
         // Others
         // Route::resource('role', 'RoleController');
         // Route::resource('comment', 'CommentController');

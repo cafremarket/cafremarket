@@ -217,15 +217,15 @@ return [
     ],
 
     'refund_approved' => [
-        'subject' => '[Pedido ID: :order] um pedido de reembolso foi aprovado!',
+        'subject' => '[Pedido ID: :order] o reembolso foi concluído!',
         'greeting' => 'Olá :customer',
-        'message' => 'Esta é uma notificação para informar que aprovámos o pedido de reembolso para o seu pedido :order. O valor reembolsado é :amount. Enviámos o dinheiro para o seu método de pagamento; pode levar alguns dias até refletir na sua conta. Contacte o seu provedor de pagamento se o valor não aparecer em alguns dias.',
+        'message' => 'Esta é uma notificação para informar que o reembolso do seu pedido :order foi concluído. O valor reembolsado é :amount. Enviámos o dinheiro para o seu método de pagamento; pode levar alguns dias até refletir na sua conta. Contacte o seu provedor de pagamento se o valor não aparecer em alguns dias.',
     ],
 
     'refund_declined' => [
-        'subject' => '[Pedido ID: :order] um pedido de reembolso foi recusado!',
+        'subject' => '[Pedido ID: :order] o reembolso não pôde ser concluído!',
         'greeting' => 'Olá :customer',
-        'message' => 'Esta é uma notificação para informar que o pedido de reembolso para o seu pedido :order foi recusado. Se não estiver satisfeito com a solução do vendedor, pode entrar em contacto diretamente com o vendedor através da plataforma ou até apresentar recurso da disputa no :marketplace. Interviremos para resolver o problema.',
+        'message' => 'Esta é uma notificação para informar que o reembolso do seu pedido :order não pôde ser concluído (problema). Se não estiver satisfeito com a solução do vendedor, pode entrar em contacto diretamente com o vendedor através da plataforma ou até apresentar recurso da disputa no :marketplace. Interviremos para resolver o problema.',
     ],
 
     // Shop Notifications

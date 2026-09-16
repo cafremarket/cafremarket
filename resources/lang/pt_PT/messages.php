@@ -49,7 +49,7 @@ return [
     'payment_method_activation_success' => 'Ativado com sucesso! Agora você pode aceitar pagamentos usando este método.',
     'payment_method_activation_failed' => 'Falha na ativação do método de pagamento! Tente novamente.',
     'payment_method_disconnect_success' => 'Desconectado com sucesso!',
-    'payment_method_disconnect_failed' => 'Este aplicativo não está conectado à conta Stripe, ou a conta não existe.',
+    'payment_method_disconnect_failed' => 'Este aplicativo não está conectado à conta de pagamento, ou a conta não existe.',
     'invoice_sent_to_customer' => 'A fatura foi enviada ao cliente.',
     'freezed_model' => 'Este registro está congelado pelas configurações do sistema. O aplicativo precisa desse valor para funcionar corretamente.',
     'email_verification_notice' => 'Seu e-mail não foi verificado, por favor verifique para obter acesso completo.',
@@ -288,9 +288,7 @@ return [
 
     'package_inactive' => ':package is inactive, please activate from admin panel.',
 
-    'misconfigured_subscription_stripe' => 'The system found misconfigured Stripe subscriptions. Please check your settings. Read the documentation if need help.',
-
-    'misconfigured_subscription_wallet' => 'Wallet based subscription required WALLET and LOCAL SUBSCRIPTION packages to function. Please contact support team for help. System will try to use STRIPE subscription unless these requirements met.',
+    'misconfigured_subscription_wallet' => 'Wallet based subscription requires the WALLET and LOCAL SUBSCRIPTION packages to function. Please contact the support team for help.',
 
     'some_item_out_of_stock' => 'Few items are not available right now. We\'ve added all available item',
 
