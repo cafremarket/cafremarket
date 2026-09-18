@@ -47,13 +47,15 @@ class Package extends BaseModel
     }
 
     /**
-     * Deactivate the package
+     * Packages stay always active — deactivation is a no-op.
      *
      * @var void
      */
     public function deactivate()
     {
-        $this->active = false;
-        $this->save();
+        if (! $this->active) {
+            $this->active = true;
+            $this->save();
+        }
     }
 }

@@ -139,6 +139,7 @@ class PackagesController extends Controller
 
     public function activation(AdminOnlyAccessRequest $request, string $slug)
     {
+        // Enable/disable removed — installed packages are always active.
         if ($this->isDemo()) {
             return response('error', 444);
         }
@@ -146,15 +147,19 @@ class PackagesController extends Controller
         $package = Package::where('slug', $slug)->first();
 
         if ($package) {
-            $package->active = ! $package->active;
-            $package->save();
-            Artisan::call('cache:clear');
+            if (! $package->active) {
+                $package->active = true;
+                $package->save();
+                Artisan::call('cache:clear');
+            }
 
             return response('success', 200);
         }
 
         if ($unregistered = $this->scanPackages($slug)) {
+            $unregistered['active'] = true;
             Package::create($unregistered);
+            Artisan::call('cache:clear');
         }
 
         return response('success', 200);

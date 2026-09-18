@@ -84,7 +84,7 @@ class PackageInstaller
     private function packageAttributes(): array
     {
         return array_merge($this->package, [
-            'active' => $this->package['active'] ?? 1,
+            'active' => true,
         ]);
     }
 

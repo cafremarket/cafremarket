@@ -42,10 +42,6 @@
             $can_load = is_incevio_package_loaded($arr);
             $dependencies = count($arr) > 1 ? strrev(implode(strrev(', ' . trans('app.and') . ' '), explode(strrev(','), strrev($dependencies), 2))) : $dependencies;
           }
-
-          if ($registered && $registered->active && !$can_load) {
-            $registered->deactivate();
-          }
         @endphp
         <tr>
           <td>
@@ -59,17 +55,15 @@
               </div>
             </div>
             @if ($registered)
-              @unless ($registered->active && $package['active'] == false)
-                @if (config('app.demo') == true)
-                  <span class="text-muted small" title="{!! trans('messages.demo_restriction') !!}" data-toggle="tooltip"><i class="fa fa-trash-o"></i> {{ trans('app.uninstall') }}</span>
-                @else
-                  {!! Form::open(['route' => ['admin.package.uninstall', $package['slug']], 'class' => 'admin-inline-form']) !!}
-                  <button type="submit" class="confirm btn btn-link btn-sm" data-confirm="{!! trans('help.confirm_uninstall_package', ['package' => $package['name']]) !!}">
-                    <i class="fa fa-trash-o"></i> {{ trans('app.uninstall') }}
-                  </button>
-                  {!! Form::close() !!}
-                @endif
-              @endunless
+              @if (config('app.demo') == true)
+                <span class="text-muted small" title="{!! trans('messages.demo_restriction') !!}" data-toggle="tooltip"><i class="fa fa-trash-o"></i> {{ trans('app.uninstall') }}</span>
+              @else
+                {!! Form::open(['route' => ['admin.package.uninstall', $package['slug']], 'class' => 'admin-inline-form']) !!}
+                <button type="submit" class="confirm btn btn-link btn-sm" data-confirm="{!! trans('help.confirm_uninstall_package', ['package' => $package['name']]) !!}">
+                  <i class="fa fa-trash-o"></i> {{ trans('app.uninstall') }}
+                </button>
+                {!! Form::close() !!}
+              @endif
             @elseif($can_load)
               @if (config('app.demo') == true)
                 <span class="text-muted small" title="{!! trans('messages.demo_restriction') !!}" data-toggle="tooltip"><i class="fa fa-wrench"></i> {{ trans('app.install') }}</span>
@@ -80,15 +74,7 @@
           </td>
           <td>
             @if ($registered)
-              @if ($package['active'] == true)
-                <span class="label label-primary">{{ trans('app.activated') }}</span>
-              @else
-                <div class="handle horizontal">
-                  <a href="javascript:void(0)" data-link="{{ route('admin.package.switch', $package['slug']) }}" type="button" class="btn btn-md btn-secondary btn-toggle {{ $registered && $registered->active ? 'active' : '' }}" data-doafter="reload" data-toggle="button" aria-pressed="{{ $registered && $registered->active ? 'true' : 'false' }}" autocomplete="off" {{ $can_load ? '' : 'disabled' }}>
-                    <div class="btn-handle"></div>
-                  </a>
-                </div>
-              @endif
+              <span class="label label-primary">{{ trans('app.activated') }}</span>
             @endif
           </td>
           <td>

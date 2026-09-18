@@ -787,7 +787,7 @@ if (! function_exists('is_incevio_package_loaded')) {
         foreach ($all_packages as $package) {
             $package = (string) $package;
 
-            // Custom LiveChat is always enabled — never gate on packages.active / plugin API.
+            // Packages are always active when present — no enable/disable gate.
             if (strcasecmp($package, 'livechat') === 0) {
                 continue;
             }
@@ -795,25 +795,9 @@ if (! function_exists('is_incevio_package_loaded')) {
             $className = Str::studly($package);
             $path = "Incevio\Package\\".$className.'\\'.$className.'ServiceProvider';
 
-            // Check if the package file exist
             if (! class_exists($path)) {
                 return false;
             }
-
-            // Retrieve the package and set to cache
-            $registered = Cache::rememberForever(
-                'package.'.$package,
-                function () use ($package) {
-                    return DB::table('packages')->where('slug', $package)->first() ?? false;
-                }
-            );
-
-            // If class exist then check if the package is active
-            if ($registered && $registered->active) {
-                continue;
-            }
-
-            return false;
         }
 
         return true;

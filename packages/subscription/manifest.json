@@ -11,7 +11,7 @@
   "license": "Copyright reserved to the Incevio",
   "dependency": "wallet",
   "warning": "",
-  "active": false,
+  "active": true,
   "provider": "Subscription\\SubscriptionServiceProvider",
   "compatible": "2.18.0",
   "version": "1.6.0"
