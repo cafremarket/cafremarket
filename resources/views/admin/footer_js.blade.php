@@ -10,6 +10,34 @@
         return url;
       }
 
+      // Never rewrite impersonation entry/exit — those routes exist only under /admin.
+      if (/\/admin\/secret(Login|Logout)(\/|$|\?)/.test(url) || /^admin\/secret(Login|Logout)(\/|$|\?)/.test(url)) {
+        return url;
+      }
+
+      // Platform-only admin areas have no merchant mirror — send shop settings / dashboard.
+      var platformOnly = [
+        { re: /\/admin\/seller(\/|$|\?)/, to: '/merchant/setting/general' },
+        { re: /^admin\/seller(\/|$|\?)/, to: 'merchant/setting/general' },
+        { re: /\/admin\/(report|packages|package|admin)(\/|$|\?)/, to: '/merchant/dashboard' },
+        { re: /^admin\/(report|packages|package|admin)(\/|$|\?)/, to: 'merchant/dashboard' }
+      ];
+
+      for (var i = 0; i < platformOnly.length; i++) {
+        if (platformOnly[i].re.test(url)) {
+          if (url.indexOf('http') === 0) {
+            try {
+              var parsed = new URL(url);
+              return parsed.origin + platformOnly[i].to;
+            } catch (e) {
+              return platformOnly[i].to;
+            }
+          }
+
+          return platformOnly[i].to;
+        }
+      }
+
       if (window.__merchantPanel) {
         if (url.indexOf('/admin/') !== -1) {
           return url.replace('/admin/', '/merchant/');

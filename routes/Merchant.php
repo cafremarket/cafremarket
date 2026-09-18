@@ -2,11 +2,25 @@
 
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\ConfigController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MerchantSwitchToCustomer;
 use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\Merchant\DashboardController as MerchantDashboardController;
 use App\Http\Controllers\Merchant\VerificationController as MerchantVerificationController;
 use Illuminate\Support\Facades\Route;
+
+// Fallbacks for admin URLs wrongly rewritten to /merchant/… (bookmarks, back button, old links).
+Route::middleware(['auth'])->prefix('merchant')->group(function () {
+    Route::get('secretLogin/{user}', [
+        AdminDashboardController::class,
+        'secretLogin',
+    ])->name('merchant.user.secretLogin');
+
+    // admin/seller/* is platform-only — merchants manage their own store settings.
+    Route::any('seller/{any?}', function () {
+        return redirect()->to('/merchant/setting/general');
+    })->where('any', '.*')->name('merchant.seller.fallback');
+});
 
 Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchant')->group(function () {
     Route::get('switchToCustomer', [

@@ -19,7 +19,17 @@ class InitSettings
             return $next($request);
         }
 
-        if ($request->session()->has('impersonated')) {
+        // Keep the real admin identity for secret login/logout so authorize()
+        // and BlockMerchantFromAdmin do not treat the request as a merchant hit.
+        $skipImpersonation = $request->is(
+            'admin/secretLogin',
+            'admin/secretLogin/*',
+            'admin/secretLogout',
+            'merchant/secretLogin',
+            'merchant/secretLogin/*'
+        );
+
+        if ($request->session()->has('impersonated') && ! $skipImpersonation) {
             Auth::onceUsingId($request->session()->get('impersonated'));
         }
 

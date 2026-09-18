@@ -52,7 +52,9 @@ class DashboardController extends Controller
         $user = Auth::guard('web')->user();
         Cache::forget('permissions_'.$user->id);
 
-        return redirect()->route('admin.admin.dashboard')
+        // Land on the merchant panel — avoid /admin/dashboard which BlockMerchant
+        // would rewrite and which historically produced merchant/secretLogin 404s.
+        return redirect()->route('merchant.dashboard')
             ->with('success', trans('messages.secret_logged_in'));
     }
 
