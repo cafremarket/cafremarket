@@ -21,9 +21,6 @@ Route::post('attribute/massDestroy', [AttributeController::class, 'massDestroy']
 Route::delete('attribute/emptyTrash', [AttributeController::class, 'emptyTrash'])
     ->name('attribute.emptyTrash');
 
-Route::post('attribute/reorder', [AttributeController::class, 'reorder'])
-    ->name('attribute.reorder');
-
 Route::resource('attribute', AttributeController::class)->except('show');
 
 // Translation Routes

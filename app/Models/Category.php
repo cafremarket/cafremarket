@@ -2,17 +2,21 @@
 
 namespace App\Models;
 
+use App\Common\CascadeSoftDeletes;
 use App\Common\Imageable;
 use App\Common\Translatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Scout\Searchable;
 
+/**
+ * Top-level, admin-managed category. Stores can only select from these
+ * (and their SubCategory children) — they can never create, edit, or
+ * delete a Category.
+ */
 class Category extends BaseModel
 {
-    use HasFactory, Imageable, Searchable, SoftDeletes, Translatable;
+    use CascadeSoftDeletes, HasFactory, Imageable, SoftDeletes, Translatable;
 
     /**
      * The database table used by the model.
@@ -22,49 +26,26 @@ class Category extends BaseModel
     protected $table = 'categories';
 
     /**
-     * The attributes that should be mutated to dates. (as carbon instances)
-     *
-     * @var array
-     */
-    protected $dates = [
-        'created_at',
-        'updated_at',
-    ];
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'shop_id',
         'name',
-        'category_sub_group_id',
         'slug',
         'description',
         'active',
-        'order',
         'featured',
         'meta_title',
         'meta_description',
     ];
 
     /**
-     * Get the indexable data array for the model.
+     * Cascade Soft Deletes Relationships
      *
-     * @return array
+     * @var array
      */
-    public function toSearchableArray()
-    {
-        $searchable = [];
-        $searchable['id'] = (string) $this->id;
-        $searchable['name'] = $this->name;
-        $searchable['slug'] = $this->slug;
-        $searchable['active'] = (bool) $this->active;
-        $searchable['created_at'] = $this->created_at->timestamp;
-
-        return $searchable;
-    }
+    protected $cascadeDeletes = ['subCategories'];
 
     /**
      * The boot method for the Category model.
@@ -86,38 +67,11 @@ class Category extends BaseModel
     }
 
     /**
-     * Get all listings for the category.
+     * Get the SubCategories under this Category.
      */
-    public function listings()
+    public function subCategories()
     {
-        return $this->belongsToMany(Inventory::class, 'category_product', null, 'product_id', null, 'product_id')
-            ->whereNull('inventories.parent_id')
-            ->groupBy('inventories.product_id', 'inventories.shop_id');
-    }
-
-    /**
-     * Get the subGroups for the category.
-     */
-    public function subGroup()
-    {
-        return $this->belongsTo(CategorySubGroup::class, 'category_sub_group_id')->withTrashed();
-    }
-
-    /**
-     * Get the products for the category.
-     */
-    public function products()
-    {
-        return $this->belongsToMany(Product::class);
-    }
-
-    /**
-     * Get the attributes of respective categories.
-     */
-    public function attrsList(): BelongsToMany
-    {
-        return $this->belongsToMany(Attribute::class, 'attribute_categories')
-            ->orderBy('order', 'asc')->withTimestamps();
+        return $this->hasMany(SubCategory::class, 'category_id')->orderBy('name', 'asc');
     }
 
     public function translations()
@@ -133,20 +87,15 @@ class Category extends BaseModel
         $this->attributes['featured'] = (bool) $value;
     }
 
-    // /**
-    //  * Get subGroups list for the category.
-    //  *
-    //  * @return array
-    //  */
-    // public function getCatSubGrpsAttribute()
-    // {
-    //     if (count($this->subGroups)) return $this->subGroups->pluck('id')->toArray();
-    // }
+    public function getNameAttribute($value)
+    {
+        return $this->translateAttribute('name') ?? $value;
+    }
 
-    // public static function findBySlug($slug)
-    // {
-    //     return $this->where('slug', $slug)->firstOrFail();
-    // }
+    public function getDescriptionAttribute($value)
+    {
+        return $this->translateAttribute('description') ?? $value;
+    }
 
     /**
      * Scope a query to only include Featured records.
@@ -156,40 +105,6 @@ class Category extends BaseModel
     public function scopeFeatured($query)
     {
         return $query->where('featured', 1);
-    }
-
-    /**
-     * Categories available to the current merchant (own + platform).
-     */
-    public function scopeForMerchantCatalog($query, ?int $shopId = null)
-    {
-        $shopId = $shopId ?: optional(auth()->user())->merchantId();
-
-        return $query->where(function ($q) use ($shopId) {
-            $q->whereNull('shop_id');
-
-            if ($shopId) {
-                $q->orWhere('shop_id', $shopId);
-            }
-        });
-    }
-
-    /**
-     * Setters
-     */
-    public function setOrderAttribute($value)
-    {
-        $this->attributes['order'] = $value ?? 100;
-    }
-
-    public function getNameAttribute($value)
-    {
-        return $this->translateAttribute('name') ?? $value;
-    }
-
-    public function getDescriptionAttribute($value)
-    {
-        return $this->translateAttribute('description') ?? $value;
     }
 
     protected function getTranslationDisabledRoutes()

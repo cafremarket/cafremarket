@@ -7,24 +7,12 @@
         <ol class="breadcrumb nav-breadcrumb sf-search-breadcrumb">
           @include('theme::headers.lists.home')
 
-          @if ($category && Request::has('ingrp'))
-            <li class="active">{{ $category->name }}</li>
-          @elseif($category && Request::has('insubgrp') && Request::get('insubgrp') != 'all')
-            <li>
-              <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->group->slug }}">
-                {{ $category->group->name }}
-              </a>
-            </li>
+          @if ($category && Request::has('insubgrp') && Request::get('insubgrp') != 'all')
             <li class="active">{{ $category->name }}</li>
           @elseif($category && Request::has('in'))
             <li>
-              <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->subGroup->group->slug }}">
-                {{ $category->subGroup->group->name }}
-              </a>
-            </li>
-            <li>
-              <a class="link-filter-opt" data-name="insubgrp" data-value="{{ $category->subGroup->slug }}">
-                {{ $category->subGroup->name }}
+              <a class="link-filter-opt" data-name="insubgrp" data-value="{{ $category->category->slug }}">
+                {{ $category->category->name }}
               </a>
             </li>
             <li class="active">{{ $category->name }}</li>

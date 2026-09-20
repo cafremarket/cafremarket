@@ -11,9 +11,12 @@ use App\Repositories\Category\CategoryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
+/**
+ * Categories are fully platform/admin-managed — this controller (and its
+ * views/routes) is only reachable by platform admins, never merchants.
+ */
 class CategoryController extends Controller
 {
     use Authorizable;
@@ -39,7 +42,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        abort_unless(Auth::user()->isFromMerchant(), 403);
+        abort_unless(Auth::user()->isFromPlatform(), 403);
 
         $trashes = $this->category->trashOnly();
 
@@ -50,16 +53,10 @@ class CategoryController extends Controller
     public function getCategories(Request $request)
     {
         $category = Category::with(
-            'subGroup:id,name,category_group_id,deleted_at',
-            'subGroup.group:id,name,deleted_at',
             'featureImage',
             'coverImage',
             'translations',
-        )->withCount(['products', 'listings']);
-
-        if (! auth()->user()->isFromPlatform()) {
-            $category->mine();
-        }
+        )->withCount(['subCategories']);
 
         $data = Datatables::of($category)
             ->editColumn('checkbox', function ($category) {
@@ -77,17 +74,11 @@ class CategoryController extends Controller
             ->editColumn('name', function ($category) {
                 return view('admin.category.partials.name', compact('category'));
             })
-            ->editColumn('attrs_list_count', function ($category) {
-                return view('admin.category.partials.attributes', compact('category'));
-            })
-            ->editColumn('listings_count', function ($category) {
-                return view('admin.category.partials.listings', compact('category'));
-            })
-            ->editColumn('products_count', function ($category) {
-                return view('admin.category.partials.products', compact('category'));
+            ->editColumn('sub_categories_count', function ($category) {
+                return $category->sub_categories_count;
             });
 
-        $rawColumns = ['cover_image', 'feature_image', 'name', 'attrs_list_count', 'listings_count', 'products_count', 'checkbox', 'option'];
+        $rawColumns = ['cover_image', 'feature_image', 'name', 'checkbox', 'option'];
 
         return $data->rawColumns($rawColumns)->make(true);
     }
@@ -110,13 +101,9 @@ class CategoryController extends Controller
      */
     public function store(CreateCategoryRequest $request)
     {
-        $category = $this->category->store($request);
+        $this->category->store($request);
 
         Cache::forget('all_categories');
-
-        DB::transaction(function () use ($category, $request) {
-            $category->attrsList()->sync($request->attrsList);
-        });
 
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
     }
@@ -143,13 +130,9 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, $id)
     {
-        $category = $this->category->update($request, $id);
+        $this->category->update($request, $id);
 
         $this->treat_cache($request, $id);
-
-        DB::transaction(function () use ($category, $request) {
-            $category->attrsList()->sync($request->attrsList);
-        });
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
     }
@@ -162,11 +145,11 @@ class CategoryController extends Controller
      */
     public function trash(Request $request, $id)
     {
-        // Check for association with products
-        if ($this->category->find($id)->products->count()) {
-            $notice = trans('messages.model_has_association', ['model' => $this->model_name, 'associate' => trans('app.products')]);
+        // Check for association with sub-categories
+        if ($this->category->find($id)->subCategories->count()) {
+            $notice = trans('messages.model_has_association', ['model' => $this->model_name, 'associate' => trans('app.subcategories')]);
 
-            return back()->with('error', trans('messages.failed'))->with('global_notice', $notice);
+            return back()->with('error', $notice)->with('global_notice', $notice);
         }
 
         $this->category->trash($id);

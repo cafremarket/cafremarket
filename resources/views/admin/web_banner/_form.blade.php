@@ -84,11 +84,6 @@
         </div>
 
         <div class="form-group">
-          {!! Form::label('order', trans('app.form.position')) !!}
-          {!! Form::number('order', null, ['class' => 'form-control', 'min' => 0, 'placeholder' => '1']) !!}
-        </div>
-
-        <div class="form-group">
           {!! Form::label('effect', trans('app.zoom_effect')) !!}
           {!! Form::select('effect', [0 => trans('app.no'), 1 => trans('app.yes')], isset($banner) ? null : 0, ['class' => 'form-control']) !!}
         </div>

@@ -47,7 +47,6 @@ class CreateAttributeRequest extends Request
                     return $query->where('shop_id', $shopId)->whereNull('deleted_at');
                 }),
             ],
-            'order' => 'integer|nullable',
         ];
     }
 

@@ -1,7 +1,7 @@
 {{-- Catalog product Attributes tab (select attributes; variants managed when listing has inventory) --}}
 @php
   $selectedProductAttrs = isset($product)
-    ? $product->categories->pluck('attrsList')->flatten()->pluck('id')->unique()->values()->all()
+    ? $product->subCategories->pluck('attrsList')->flatten()->pluck('id')->unique()->values()->all()
     : [];
   $variantInventories = isset($product)
     ? $product->inventories->whereNotNull('parent_id')

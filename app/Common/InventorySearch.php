@@ -6,9 +6,8 @@ use App\Helpers\ListHelper;
 use App\Http\Requests\Validations\ProductSearchRequest;
 use App\Http\Resources\ListingResource;
 use App\Models\Category;
-use App\Models\CategoryGroup;
-use App\Models\CategorySubGroup;
 use App\Models\Inventory;
+use App\Models\SubCategory;
 use App\Models\State;
 use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\Hyperlocal\HyperlocalCatalogService;
@@ -103,21 +102,14 @@ trait InventorySearch
 
         // When search within a category
         if ($request->has('in')) {
-            $category = Category::where('slug', $request->input('in'))
+            $category = SubCategory::where('slug', $request->input('in'))
                 ->with('attrsList.attributeValues')->active()->firstOrFail();
 
             $listings = $category->listings()->available()->get();
 
             $items = $items->intersect($listings);
         } elseif ($request->has('insubgrp') && ($request->input('insubgrp') != 'all')) {
-            $category = CategorySubGroup::where('slug', $request->input('insubgrp'))
-                ->active()->firstOrFail();
-
-            $listings = prepareFilteredListings($request, $category);
-
-            $items = $items->intersect($listings);
-        } elseif ($request->has('ingrp')) {
-            $category = CategoryGroup::where('slug', $request->input('ingrp'))
+            $category = Category::where('slug', $request->input('insubgrp'))
                 ->active()->firstOrFail();
 
             $listings = prepareFilteredListings($request, $category);
@@ -296,9 +288,8 @@ trait InventorySearch
                     'featureImage:path,imageable_id,imageable_type,type',
                     'image:path,imageable_id,imageable_type',
                     'images:path,imageable_id,imageable_type,order',
-                    'categories:id,name,slug,category_sub_group_id',
-                    'categories.subGroup:id,name,slug,category_group_id',
-                    'categories.subGroup.group:id,name,slug',
+                    'subCategories:id,name,slug,category_id',
+                    'subCategories.category:id,name,slug',
                 ]);
             },
             'reviewSummary:rating,count,reviewable_id,reviewable_type',

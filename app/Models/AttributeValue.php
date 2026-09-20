@@ -28,7 +28,6 @@ class AttributeValue extends BaseModel
         'value',
         'color',
         'attribute_id',
-        'order',
     ];
 
     /**

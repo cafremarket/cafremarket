@@ -18,7 +18,6 @@ class AttributeValueLightResource extends JsonResource
             'id' => $this->id,
             'value' => $this->value,
             'color' => $this->color,
-            'order' => $this->order,
         ];
     }
 }

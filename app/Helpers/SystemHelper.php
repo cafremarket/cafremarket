@@ -532,10 +532,10 @@ if (! function_exists('prepareFilteredListings')) {
         return collect($t_listings)->flatten();
     }
 
-    function prepareFilteredListings($request, $categoryGroup)
+    function prepareFilteredListings($request, $category)
     {
         $t_listings = [];
-        foreach ($categoryGroup->categories as $t_category) {
+        foreach ($category->subCategories as $t_category) {
             $t_products = $t_category->listings()
                 ->available()->filter($request->all())
                 ->withCount([

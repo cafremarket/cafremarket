@@ -26,11 +26,20 @@
     @include('theme::sections.banners', ['banners' => $banners['group_3']])
   @endif
 
-  @include('theme::sections.deal_of_the_day')
+  {{-- 3. Category section --}}
+  @include('theme::sections.featured_categories')
+
+  {{-- 4. Vendor section — nearby stores based on delivery address --}}
+  @include('theme::sections.nearby_stores')
+
+  {{-- 5. Featured products (slider) --}}
   @include('theme::sections.featured_products')
 
-  {{-- Nearby stores based on delivery address --}}
-  @include('theme::sections.nearby_stores')
+  {{-- 6. Deal of the day (slider) --}}
+  @include('theme::sections.deal_of_the_day')
+
+  {{-- 7. Recently added products (grid, capped at 20 on web) --}}
+  @include('theme::sections.recently_added_products')
 @endsection
 
 @section('scripts')

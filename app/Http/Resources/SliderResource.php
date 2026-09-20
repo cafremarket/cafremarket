@@ -22,7 +22,6 @@ class SliderResource extends JsonResource
             'image' => (new ImageResource($this->mobileImage))->size('main_slider'),
             'sub_title_color' => $this->sub_title_color,
             'link' => $this->link,
-            'order' => (int) $this->order,
         ];
     }
 }

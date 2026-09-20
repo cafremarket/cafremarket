@@ -93,7 +93,6 @@
                 @endcan
               </div>
             </div>
-            <span class="wb-card__order">#{{ $banner->order }}</span>
             <span class="wb-card__width">
               {{ $bannerType === Banner::TYPE_SLIDER ? trans('app.banner_type_slider') : ($col === Banner::LAYOUT_THIRD ? '1/3' : 'Full') }}
             </span>

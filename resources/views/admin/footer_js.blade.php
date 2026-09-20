@@ -694,23 +694,8 @@
           'name': 'name'
         },
         {
-          'data': 'attrs_list_count',
-          'name': 'attrs_list_count',
-          'searchable': false
-        },
-        {
-          'data': 'products_count',
-          'name': 'products_count',
-          'searchable': false
-        },
-        {
-          'data': 'listings_count',
-          'name': 'listings_count',
-          'searchable': false
-        },
-        {
-          'data': 'order',
-          'name': 'order',
+          'data': 'sub_categories_count',
+          'name': 'sub_categories_count',
           'searchable': false
         },
         {
@@ -1401,12 +1386,9 @@
       if (slug && slug.length >= 3) {
         var route = "{{ Route::current()->getName() }}";
 
-        if (route.match(/categorySubGroup/i)) {
-          var tbl = 'category_sub_groups';
-          var url = 'categories/';
-        } else if (route.match(/categoryGroup/i)) {
-          var tbl = 'category_groups';
-          var url = 'categorygrp/';
+        if (route.match(/subcategory/i)) {
+          var tbl = 'sub_categories';
+          var url = 'category/';
         } else if (route.match(/category/i)) {
           var tbl = 'categories';
           var url = 'category/';

@@ -46,8 +46,8 @@ class FreshScoutIndexes extends Command
         $this->call('scout:flush', ['model' => "App\Models\Customer"]);
         $this->call('scout:import', ['model' => "App\Models\Customer"]);
 
-        $this->call('scout:flush', ['model' => "App\Models\Category"]);
-        $this->call('scout:import', ['model' => "App\Models\Category"]);
+        $this->call('scout:flush', ['model' => "App\Models\SubCategory"]);
+        $this->call('scout:import', ['model' => "App\Models\SubCategory"]);
 
         return 0;
     }

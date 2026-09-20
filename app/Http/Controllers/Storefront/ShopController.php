@@ -82,7 +82,7 @@ class ShopController extends Controller
         $banners = Cache::rememberForever('banners'.$shop->id, function () use ($shop) {
             return Banner::with('featureImage:path,imageable_id,imageable_type')
                 ->where('shop_id', $shop->id)
-                ->orderBy('order', 'asc')->get()
+                ->orderBy('id', 'asc')->get()
                 ->groupBy('group_id')->toArray();
         });
 
@@ -93,7 +93,7 @@ class ShopController extends Controller
         $recent = ListHelper::latest_shop_items($shop, 10);
 
         $sliders = Cache::rememberForever('sliders'.$shop->id, function () use ($shop) {
-            return Slider::orderBy('order', 'asc')
+            return Slider::orderBy('id', 'asc')
                 ->where('shop_id', $shop->id)
                 ->with([
                     'featureImage:path,imageable_id,imageable_type',

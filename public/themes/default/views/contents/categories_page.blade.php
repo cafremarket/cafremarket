@@ -6,30 +6,25 @@
       </div>
     </div>
     <div class="row">
-      @foreach (($all_categories ?? []) as $categoryGroup)
-        @if ($categoryGroup->subGroups->count())
+      @foreach (($all_categories ?? []) as $category)
+        @if ($category->subCategories->count())
           <div class="col-md-3 col-sm-6 bg-light category-widget mb-4">
             <section class="category-banner-img-wrapper">
-              <div class="banner banner-o-hid" style="background-image:url( {{ get_cover_img_src($categoryGroup, 'category') }} );">
+              <div class="banner banner-o-hid" style="background-image:url( {{ get_cover_img_src($category, 'category') }} );">
                 <div class="banner-caption">
-                  <span class="lead">{{ $categoryGroup->name }}</span>
+                  <span class="lead">{{ $category->name }}</span>
                 </div>
               </div>
             </section>
-            @foreach ($categoryGroup->subGroups as $subGroup)
-              <h5 class="nav-category-inner-title">
-                <a href="{{ route('categories.browse', $subGroup->slug) }}">{{ $subGroup->name }}</a>
-              </h5>
-              <ul class="nav-category-inner-list">
-                @foreach ($subGroup->categories as $cat)
-                  <li>          <a href="{{ get_category_url($cat) }}">{{ $cat->name }}</a>
-                    @if ($cat->description)
-                      <p>{!! $cat->description !!}</p>
-                    @endif
-                  </li>
-                @endforeach
-              </ul>
-            @endforeach
+            <ul class="nav-category-inner-list">
+              @foreach ($category->subCategories as $cat)
+                <li>          <a href="{{ get_category_url($cat) }}">{{ $cat->name }}</a>
+                  @if ($cat->description)
+                    <p>{!! $cat->description !!}</p>
+                  @endif
+                </li>
+              @endforeach
+            </ul>
           </div><!-- /.col-md-3 -->
 
           @if ($loop->iteration % 4 == 0)

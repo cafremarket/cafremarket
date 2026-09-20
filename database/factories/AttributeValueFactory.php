@@ -26,7 +26,6 @@ class AttributeValueFactory extends Factory
             'value' => $this->faker->word,
             'color' => $this->faker->hexcolor,
             'attribute_id' => $this->faker->randomElement(DB::table('attributes')->pluck('id')->toArray()),
-            'order' => $this->faker->randomDigit,
         ];
     }
 }

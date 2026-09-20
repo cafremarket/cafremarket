@@ -35,7 +35,7 @@ class ProductResource extends JsonResource
                 ]
                 : null,
             'requirement_shipping' => $this->requires_shipping,
-            'categories' => CategoryLightResource::collection($this->categories),
+            'categories' => CategoryLightResource::collection($this->subCategories),
             'origin' => optional($this->origin)->name,
             'listing_count' => $this->inventories_count,
             'description' => $this->description,

@@ -948,7 +948,7 @@ a.sf-btn-primary:focus,
 }
 
 .nearby-store-card {
-  border-radius: 14px !important;
+  border-radius: 12px !important;
   border: 1px solid #eee !important;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
@@ -956,6 +956,28 @@ a.sf-btn-primary:focus,
 .nearby-store-card:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
+}
+
+.nearby-store-card h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 8px !important;
+}
+
+.nearby-store-card .btn {
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.nearby-store-card .product-info-rating {
+  font-size: 0.75rem;
+  margin: 4px 0 0;
+}
+
+.nearby-store-card .product-info-rating .rating-count {
+  display: none;
 }
 
 /* Hide legacy account sidebar styles */
@@ -1405,7 +1427,7 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
 }
 
 .sf-stores-grid .nearby-store-card {
-  padding: 24px 20px 20px;
+  padding: 16px 12px 14px;
   background: #fff;
   height: 100%;
 }
@@ -1527,7 +1549,7 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
 }
 
 .sf-home-stores-section .sf-stores-grid .nearby-store-card {
-  padding: 24px 20px 20px;
+  padding: 16px 12px 14px;
   background: #fff;
   height: 100%;
 }
@@ -1541,10 +1563,10 @@ body.sf-homepage .top-nav-left .delivery-location-chip {
 
 .sf-vendors-page { background: #f8fafc; }
 .sf-vendors-page .nearby-stores-section { padding-top: 28px; }
-.sf-vendors-grid .nearby-store-card { padding: 24px 20px 20px; background: #fff; height: 100%; }
+.sf-vendors-grid .nearby-store-card { padding: 16px 12px 14px; background: #fff; height: 100%; }
 
 .sf-shop-card__meta {
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   color: var(--secondary-text, #868e8e);
   margin: 0;
 }
@@ -5611,18 +5633,63 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
 }
 
 .featured-items-inner .items-slider {
-  flex: 0 0 226px;
-  max-width: 226px;
-  width: 226px;
+  flex: 0 0 184px;
+  max-width: 184px;
+  width: 184px;
   visibility: visible !important;
   opacity: 1 !important;
 }
 
+/* Category tiles are smaller than product cards — square image + name only. */
+.featured-categories-items .items-slider {
+  flex: 0 0 110px;
+  max-width: 110px;
+  width: 110px;
+  margin: 0 6px;
+}
+
+.featured-category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+.featured-category-card__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  background-color: #f2f2f2;
+  background-size: cover;
+  background-position: center;
+}
+
+.featured-category-card__name {
+  display: block;
+  margin-top: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 @media screen and (max-width: 767px) {
   .featured-items-inner .items-slider {
-    flex: 0 0 48%;
-    max-width: 48%;
-    width: 48%;
+    flex: 0 0 31%;
+    max-width: 31%;
+    width: 31%;
+  }
+
+  .featured-categories-items .items-slider {
+    flex: 0 0 110px;
+    max-width: 110px;
+    width: 110px;
   }
 }
 
@@ -6162,7 +6229,7 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  padding: 12px 14px 14px;
+  padding: 10px 10px 12px;
 }
 
 .sf-product-card .product-info-title {
@@ -6171,29 +6238,57 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 2.4em;
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   line-height: 1.2em;
 }
 
 .sf-product-card .product-info-availability {
-  font-size: 0.78rem;
+  display: none;
+}
+
+.sf-product-card__price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+  min-width: 0;
 }
 
 .sf-product-card .product-info-price {
-  margin-top: auto;
-  padding-top: 6px;
-  /* Reserve room for the optional strikethrough old-price line so a
-     discounted card isn't taller than a regular-price card next to it —
-     matters most inside Slick sliders, which don't equalize slide height. */
-  min-height: 44px;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: baseline;
-  gap: 0 6px;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  min-width: 0;
+  font-size: 15px;
+}
+
+.sf-product-card .product-info-price-new {
+  white-space: nowrap;
+  font-weight: 700;
 }
 
 .sf-product-card .product-info-price .old-price {
-  flex-basis: 100%;
+  flex: 0 1 auto;
+  flex-basis: auto;
+  white-space: nowrap;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.sf-product-card .product-info-feature-list {
+  position: static !important;
+  display: block;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .sf-product-card__shop {
@@ -6232,7 +6327,7 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
    each fixed-width slide. Gives the gap between cards that used to come
    from the old .box wrapper (margin: 1px 5px), which the redesign dropped. */
 .items-slider {
-  margin: 0 8px;
+  margin: 0 6px;
 }
 
 .items-slider .sf-product-card {
@@ -6261,6 +6356,28 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
 .sf-pdp__seller-distance i {
   color: var(--primary-color, #ff6600);
   margin-right: 3px;
+}
+
+/* Recently Added uses the same compact product card as homepage sliders. */
+.sf-product-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 184px);
+  gap: 12px;
+  justify-content: flex-start;
+}
+
+@media (max-width: 991px) {
+  .sf-product-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+}
+
+@media (max-width: 575px) {
+  .sf-product-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
 }
 
 /* ── Quick view modal ────────────────────────────────────────────── */

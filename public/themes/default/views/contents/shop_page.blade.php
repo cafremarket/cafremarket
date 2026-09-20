@@ -113,7 +113,7 @@
       </div>
 
       <div id="products-tab" class="tab-pane {{ $isStoreProducts ? 'active' : '' }}">
-        @include('theme::contents.product_list', ['colum' => 3])
+        @include('theme::contents.product_list', ['colum' => 2])
       </div>
 
       <div id="return-policy-tab" class="tab-pane">

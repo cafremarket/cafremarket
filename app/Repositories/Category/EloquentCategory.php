@@ -6,9 +6,11 @@ use App\Models\Category;
 use App\Repositories\BaseRepository;
 use App\Repositories\EloquentRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Categories are fully platform/admin-managed — no per-shop scoping here.
+ */
 class EloquentCategory extends EloquentRepository implements BaseRepository, CategoryRepository
 {
     protected $model;
@@ -20,54 +22,25 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
 
     public function all()
     {
-        $query = $this->model->with(
-            'subGroup:id,name,category_group_id,deleted_at',
-            'subGroup.group:id,name,deleted_at',
-            'featureImage',
-            'coverImage'
-        )->withCount('products', 'listings');
-
-        if (! Auth::user()->isFromPlatform()) {
-            $query->mine();
-        }
-
-        return $query->get();
+        return $this->model->with('featureImage', 'coverImage')
+            ->withCount('subCategories')
+            ->orderBy('name', 'asc')
+            ->get();
     }
 
     public function trashOnly()
     {
-        $query = $this->model->with(
-            'subGroup:id,name,category_group_id,deleted_at',
-            'subGroup.group:id,name,deleted_at'
-        )->onlyTrashed();
-
-        if (! Auth::user()->isFromPlatform()) {
-            $query->mine();
-        }
-
-        return $query->get();
+        return $this->model->onlyTrashed()->get();
     }
 
     public function find($id)
     {
-        $query = $this->model->newQuery();
-
-        if (! Auth::user()->isFromPlatform()) {
-            $query->mine();
-        }
-
-        return $query->findOrFail($id);
+        return $this->model->newQuery()->findOrFail($id);
     }
 
     public function findTrash($id)
     {
-        $query = $this->model->onlyTrashed();
-
-        if (! Auth::user()->isFromPlatform()) {
-            $query->mine();
-        }
-
-        return $query->findOrFail($id);
+        return $this->model->onlyTrashed()->findOrFail($id);
     }
 
     public function store(Request $request)
@@ -103,19 +76,13 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
 
     public function massDestroy($ids)
     {
-        $query = $this->model->withTrashed()->whereIn('id', $ids);
-
-        if (! Auth::user()->isFromPlatform()) {
-            $query->mine();
-        }
-
-        $categories = $query->get();
+        $categories = $this->model->withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($categories as $category) {
             $category->flushImages();
         }
 
-        $result = $query->forceDelete();
+        $result = $this->model->withTrashed()->whereIn('id', $ids)->forceDelete();
 
         $this->clear_cache($result);
 
@@ -124,19 +91,13 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
 
     public function emptyTrash()
     {
-        $query = $this->model->onlyTrashed();
-
-        if (! Auth::user()->isFromPlatform()) {
-            $query->mine();
-        }
-
-        $categories = $query->get();
+        $categories = $this->model->onlyTrashed()->get();
 
         foreach ($categories as $category) {
             $category->flushImages();
         }
 
-        $result = $query->forceDelete();
+        $result = $this->model->onlyTrashed()->forceDelete();
 
         $this->clear_cache($result);
 
@@ -148,7 +109,6 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
         if ($result) {
             Cache::forget('all_categories');
             Cache::forget('category_list_for_form');
-            Cache::forget('category_list_for_form_shop_'.(Auth::user()?->merchantId() ?? 'platform'));
         }
 
         return $result;

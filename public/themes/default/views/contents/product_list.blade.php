@@ -90,7 +90,7 @@
         @endphp
 
         @forelse ($products as $item)
-          <div class="col-6 col-sm-4 col-md-3 col-lg-4 col-xl-{{ $colum ?? '3' }} px-2 mb-4 categoryCard">
+          <div class="col-4 col-sm-3 col-md-3 col-lg-3 col-xl-{{ $colum ?? '2' }} px-2 mb-3 categoryCard">
             @include('theme::partials._product_card', [
               'item' => $item,
               'distance' => $sf_card_distances->get($item->shop_id),

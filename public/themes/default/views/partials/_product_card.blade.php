@@ -72,12 +72,14 @@
       @lang('theme.availability'): <span>{{ $item->stock_quantity > 0 ? trans('theme.in_stock') : trans('theme.out_of_stock') }}</span>
     </div>
 
-    @include('theme::layouts.pricing', ['item' => $item])
+    <div class="sf-product-card__price-row">
+      @include('theme::layouts.pricing', ['item' => $item])
 
-    <ul class="product-info-feature-list">
-      @if (config('system_settings.show_item_conditions'))
-        <li>{!! $item->condition !!}</li>
-      @endif
-    </ul>
+      <ul class="product-info-feature-list">
+        @if (config('system_settings.show_item_conditions'))
+          <li>{!! $item->condition !!}</li>
+        @endif
+      </ul>
+    </div>
   </div>
 </div>

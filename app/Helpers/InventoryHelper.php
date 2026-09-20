@@ -67,7 +67,7 @@ class InventoryHelper
 
         // Sync categories
         if ($data['category_list']) {
-            $product->categories()->sync($data['category_list']);
+            $product->subCategories()->sync($data['category_list']);
         }
 
         // Upload featured image

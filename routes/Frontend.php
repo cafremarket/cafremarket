@@ -94,9 +94,11 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         HomeController::class, 'browseCategorySubGrp',
     ])->name('categories.browse');
 
-    Route::get('categorygrp/{slug}', [
-        HomeController::class, 'browseCategoryGroup',
-    ])->name('categoryGrp.browse');
+    // Old bookmarked group-level URLs — the CategoryGroup level no longer
+    // exists (collapsed into the 2-level Category/SubCategory model).
+    Route::get('categorygrp/{slug}', function () {
+        return redirect()->route('categories', [], 301);
+    });
 
     Route::get('search', [
         HomeController::class, 'search',

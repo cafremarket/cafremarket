@@ -30,7 +30,6 @@ class UpdateLanguageRequest extends Request
             'code' => 'required|unique:languages,code,'.$id,
             'php_locale_code' => 'required|unique:languages,php_locale_code,'.$id,
             'active' => 'required',
-            'order' => 'nullable|numeric',
         ];
     }
 }

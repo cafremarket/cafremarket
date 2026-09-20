@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductLightResource;
-use App\Models\Category;
+use App\Models\SubCategory;
 use App\Models\Customer;
 use App\Models\Inventory;
 use App\Models\Message;
@@ -236,7 +236,7 @@ class SearchController extends Controller
             return Response::json($results);
         }
 
-        $categories = Category::search($term)->where('active', 1)->take(15)->get();
+        $categories = SubCategory::search($term)->where('active', 1)->take(15)->get();
 
         foreach ($categories as $category) {
             $results[] = ['text' => $category->name, 'id' => $category->id];

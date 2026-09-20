@@ -13,7 +13,7 @@
       : '',
     'bodyClass' => 'responsive-table',
   ])
-      <table class="table table-hover admin-table table-2nd-no-sort" id="sortable" data-action="{{ Route('admin.catalog.attributeValue.reorder') }}">
+      <table class="table table-hover admin-table table-2nd-no-sort">
         <thead>
           <tr>
             @can('massDelete', \App\Models\AttributeValue::class)
@@ -43,8 +43,6 @@
                 </div>
               </th>
             @endcan
-            <th width="7px">{{ trans('app.#') }}</th>
-            <th>{{ trans('app.position') }}</th>
             <th>{{ trans('app.values') }}</th>
             <th>{{ trans('app.color') }}</th>
             <th>{{ trans('app.pattern') }}</th>
@@ -57,10 +55,6 @@
               @can('massDelete', \App\Models\AttributeValue::class)
                 <td><input id="{{ $attributeValue->id }}" type="checkbox" class="massCheck"></td>
               @endcan
-              <td>
-                <i data-toggle="tooltip" data-placement="top" title="{{ trans('app.move') }}" class="fa fa-arrows sort-handler"></i>
-              </td>
-              <td><span class="order"> {{ $attributeValue->order }} </span></td>
               <td>{{ $attributeValue->value }}</td>
               <td>
                 @if ($attributeValue->color)

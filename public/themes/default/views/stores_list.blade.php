@@ -39,7 +39,7 @@
         @else
           <div class="row sf-stores-grid">
             @foreach ($shops as $shop)
-              <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-4 col-6 mb-3">
                 @include('theme::partials._shop_card', [
                   'shop' => $shop,
                   'distance' => isset($distances) ? ($distances[$shop->id] ?? null) : null,

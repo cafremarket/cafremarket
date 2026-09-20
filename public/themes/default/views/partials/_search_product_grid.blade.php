@@ -17,7 +17,7 @@
 
   <div class="row sf-search-grid">
     @foreach ($products as $item)
-      <div class="col-6 col-sm-4 col-lg-3 mb-4">
+      <div class="col-4 col-sm-3 col-lg-2 mb-3">
         @include('theme::partials._product_card', [
           'item' => $item,
           'distance' => $sf_search_distances->get($item->shop_id),

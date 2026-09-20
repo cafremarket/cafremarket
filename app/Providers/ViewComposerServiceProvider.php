@@ -63,7 +63,7 @@ class ViewComposerServiceProvider extends ServiceProvider
 
         $this->composeCategoryForm();
 
-        $this->composeCategorySubGroupForm();
+        $this->composeSubCategoryForm();
 
         $this->composeConfigPage();
 
@@ -237,7 +237,7 @@ class ViewComposerServiceProvider extends ServiceProvider
     {
         View::composer(
 
-            'admin.category._form',
+            'admin.category._formSubCat',
 
             function ($view) {
                 $view->with('attrsList', ListHelper::attributes());
@@ -246,16 +246,16 @@ class ViewComposerServiceProvider extends ServiceProvider
     }
 
     /**
-     * compose partial view of CategorySubGroupForm form
+     * compose partial view of SubCategory form
      */
-    private function composeCategorySubGroupForm()
+    private function composeSubCategoryForm()
     {
         View::composer(
 
-            'admin.category._formSubGrp',
+            'admin.category._formSubCat',
 
             function ($view) {
-                $view->with('catGroups', ListHelper::categoryGrps());
+                $view->with('catGroups', ListHelper::topCategories());
             }
         );
     }

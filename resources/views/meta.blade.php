@@ -25,10 +25,10 @@
   }
 
   // For Categories
-  elseif (Request::is('categories/*') || Request::is('categorygrp/*') || Request::is('category/*')) {
-      $category = $category ?? $categorySubGroup ?? $categoryGroup ?? null;
+  elseif (Request::is('categories/*') || Request::is('category/*')) {
+      $category = $category ?? null;
       if (! $category) {
-          \Illuminate\Support\Facades\Log::debug('meta.blade.php: category/categorySubGroup/categoryGroup all missing for a category-like URL.', ['url' => url()->current()]);
+          \Illuminate\Support\Facades\Log::debug('meta.blade.php: $category missing for a category-like URL.', ['url' => url()->current()]);
       }
       $SEOtitle = optional($category)->meta_title ?? $SEOtitle;
       $SEOdescription = optional($category)->meta_description ?? $SEOdescription;

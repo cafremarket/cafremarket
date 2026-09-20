@@ -28,7 +28,6 @@ class CreateLanguageRequest extends Request
             'code' => 'required|unique:languages',
             'php_locale_code' => 'required|unique:languages',
             'active' => 'required',
-            'order' => 'nullable|numeric',
         ];
     }
 }

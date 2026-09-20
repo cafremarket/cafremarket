@@ -32,7 +32,6 @@ class Attribute extends BaseModel
         'shop_id',
         'name',
         'attribute_type_id',
-        'order',
     ];
 
     /**
@@ -75,7 +74,7 @@ class Attribute extends BaseModel
      */
     public function attributeValues()
     {
-        return $this->hasMany(AttributeValue::class)->orderBy('order', 'asc');
+        return $this->hasMany(AttributeValue::class)->orderBy('value', 'asc');
     }
 
     /**
@@ -97,11 +96,11 @@ class Attribute extends BaseModel
     }
 
     /**
-     * Get the categories for the attributes.
+     * Get the sub-categories for the attribute.
      */
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class, 'attribute_categories')->withTimestamps();
+        return $this->belongsToMany(SubCategory::class, 'attribute_categories', 'attribute_id', 'category_id')->withTimestamps();
     }
 
     /**

@@ -9,8 +9,6 @@ use App\Http\Controllers\Api\Vendor\AuthController;
 use App\Http\Controllers\Api\Vendor\CarrierController;
 use App\Http\Controllers\Api\Vendor\CartController;
 use App\Http\Controllers\Api\Vendor\CategoryController;
-use App\Http\Controllers\Api\Vendor\CategoryGroupController;
-use App\Http\Controllers\Api\Vendor\CategorySubGroupController;
 use App\Http\Controllers\Api\Vendor\ConfigController;
 use App\Http\Controllers\Api\Vendor\DashboardController;
 use App\Http\Controllers\Api\Vendor\DeliveryBoyController;
@@ -108,38 +106,12 @@ Route::prefix('vendor')->group(function () {
         Route::put('attribute-value/{attribute_value_id}/restore', [AttributeValueController::class, 'restore']);
         Route::delete('attribute-value/{attribute_value_id}/delete', [AttributeValueController::class, 'destroy']);
 
-        // Category Groups
-        Route::get('category-groups', [CategoryGroupController::class, 'index']);
-        Route::get('category-group/{category_group}', [CategoryGroupController::class, 'show']);
-        Route::post('category-group/create', [CategoryGroupController::class, 'store']);
-        Route::match(['post', 'put'], 'category-group/{category_group}/update', [CategoryGroupController::class, 'update']);
-        Route::delete('category-group/{category_group}/trash', [CategoryGroupController::class, 'trash']);
-        Route::put('category-group/{category_group_id}/restore', [CategoryGroupController::class, 'restore']);
-        Route::delete('category-group/{category_group_id}/delete', [CategoryGroupController::class, 'destroy']);
-        Route::get('category-group/translate/{category_group}/{language}', [CategoryGroupController::class, 'showTranslation']);
-        Route::post('category-group/translate/{category_group}/{language}', [CategoryGroupController::class, 'storeTranslation']);
-
-        // Category Sub-Groups
-        Route::get('category-sub-groups', [CategorySubGroupController::class, 'index']);
-        Route::post('category-sub-group/create', [CategorySubGroupController::class, 'store']);
-        Route::get('category-sub-group/{sub_group}', [CategorySubGroupController::class, 'show']);
-        Route::match(['post', 'put'], 'category-sub-group/{sub_group}/update', [CategorySubGroupController::class, 'update']);
-        Route::delete('category-sub-group/{sub_group}/trash', [CategorySubGroupController::class, 'trash']);
-        Route::put('category-sub-group/{sub_group_id}/restore', [CategorySubGroupController::class, 'restore']);
-        Route::delete('category-sub-group/{sub_group_id}/delete', [CategorySubGroupController::class, 'destroy']);
-        Route::get('category-sub-group/translate/{category_sub_group}/{language}', [CategorySubGroupController::class, 'showTranslation']);
-        Route::post('category-sub-group/translate/{category_sub_group}/{language}', [CategorySubGroupController::class, 'storeTranslation']);
-
-        // Categories
+        // Categories are fully admin-managed — stores can only browse the
+        // published list to pick one when creating/editing a product, so
+        // only read-only routes are exposed here (no create/update/delete).
+        Route::get('category-groups', [CategoryController::class, 'topCategories']);
         Route::get('categories', [CategoryController::class, 'index']);
         Route::get('category/{category}', [CategoryController::class, 'show']);
-        Route::post('category/create', [CategoryController::class, 'store']);
-        Route::match(['post', 'put'], 'category/{category}/update', [CategoryController::class, 'update']);
-        Route::delete('category/{category}/trash', [CategoryController::class, 'trash']);
-        Route::put('category/{category_id}/restore', [CategoryController::class, 'restore']);
-        Route::delete('category/{category_id}/delete', [CategoryController::class, 'destroy']);
-        Route::get('category/translate/{category}/{language}', [CategoryController::class, 'showTranslation']);
-        Route::post('category/translate/{category}/{language}', [CategoryController::class, 'storeTranslation']);
 
         // Manufacturers
         Route::get('manufacturers', [ManufacturerController::class, 'index']);
@@ -406,8 +378,6 @@ Route::prefix('vendor')->group(function () {
         Route::get('data/item_conditions', [FormDataController::class, 'item_conditions']);
         Route::get('data/seo_tags', [FormDataController::class, 'seo_tags']);
         Route::get('data/category_subgroups', [FormDataController::class, 'category_subgroups']);
-        Route::get('data/category_subgroups_with_parent', [FormDataController::class, 'category_subgroups_with_parent']);
-        Route::get('data/category_groups', [FormDataController::class, 'category_groups']);
         Route::get('data/categories', [FormDataController::class, 'categories']);
         Route::get('data/categories_with_parent', [FormDataController::class, 'categories_with_parent']);
         Route::get('data/attribute_types', [FormDataController::class, 'attribute_types']);

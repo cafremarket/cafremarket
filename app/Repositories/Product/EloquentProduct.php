@@ -75,7 +75,7 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
         $product = parent::store($request);
 
         if ($request->has('category_list')) {
-            $product->categories()->sync($request->input('category_list'));
+            $product->subCategories()->sync($request->input('category_list'));
         }
 
         if ($request->has('tag_list')) {
@@ -95,7 +95,7 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
 
         $product = parent::update($request, $id);
 
-        $product->categories()->sync($request->input('category_list', []));
+        $product->subCategories()->sync($request->input('category_list', []));
 
         $product->syncTags($product, $request->input('tag_list', []));
 

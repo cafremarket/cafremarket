@@ -52,7 +52,6 @@ class KeepSystemLanguagesCommand extends Command
             [
                 'php_locale_code' => 'en_US',
                 'language' => 'English',
-                'order' => 1,
                 'rtl' => false,
                 'active' => true,
                 'deleted_at' => null,
@@ -65,7 +64,6 @@ class KeepSystemLanguagesCommand extends Command
             [
                 'php_locale_code' => 'pt_PT',
                 'language' => 'Portuguese',
-                'order' => 2,
                 'rtl' => false,
                 'active' => true,
                 'deleted_at' => null,

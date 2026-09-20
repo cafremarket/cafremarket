@@ -3,96 +3,66 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\CategoryGroupResource;
 use App\Http\Resources\CategoryResource;
-use App\Http\Resources\CategorySubGroupResource;
+use App\Http\Resources\SubCategoryResource;
 use App\Models\Category;
-use App\Models\CategoryGroup;
-use App\Models\CategorySubGroup;
+use App\Models\SubCategory;
 use App\Http\Controllers\Api\Concerns\CachesApiResponses;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
     use CachesApiResponses;
+
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (sub-categories, optionally filtered
+     * by their parent top-level category).
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $sub_group = null)
+    public function index(Request $request, $category = null)
     {
-        return $this->rememberApi('categories:'.($sub_group ?: 'all'), function () use ($sub_group) {
-            $categories = Category::active();
+        return $this->rememberApi('categories:'.($category ?: 'all'), function () use ($category) {
+            $categories = SubCategory::active();
 
-            if ($sub_group) {
-                $categories = $categories->where('category_sub_group_id', $sub_group);
+            if ($category) {
+                $categories = $categories->where('category_id', $category);
             }
 
             $categories = $categories->with(['coverImage', 'featureImage'])
-                ->orderBy('order', 'asc')->get();
+                ->orderBy('name', 'asc')->get();
+
+            return SubCategoryResource::collection($categories);
+        });
+    }
+
+    /**
+     * Display a listing of the resource (top-level categories).
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function categorySubGroup()
+    {
+        return $this->rememberApi('category-subgroups', function () {
+            $categories = Category::with(['coverImage', 'featureImage'])
+                ->orderBy('name', 'asc')
+                ->active()->get();
 
             return CategoryResource::collection($categories);
         });
     }
 
     /**
-     * Display a listing of the resource.
+     * Curated, admin-flagged categories for the homepage.
      *
      * @return \Illuminate\Http\Response
      */
-    public function categoryGroup()
-    {
-        return $this->rememberApi('category-groups', function () {
-            $categories = CategoryGroup::with(['coverImage', 'logoImage'])
-                ->orderBy('order', 'asc')
-                ->active()->get();
-
-            return CategoryGroupResource::collection($categories);
-        });
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function categorySubGroup(Request $request, $group = null)
-    {
-        return $this->rememberApi('category-subgroups:'.($group ?: 'all'), function () use ($group) {
-            $categories = CategorySubGroup::active();
-
-            if ($group) {
-                $categories = $categories->where('category_group_id', $group);
-            }
-
-            $categories = $categories->with(['coverImage'])
-                ->orderBy('order', 'asc')
-                ->get();
-
-            return CategorySubGroupResource::collection($categories);
-        });
-    }
-
     public function featuredCategories()
     {
-        return CategoryResource::collection(collect([]));
-    }
-
-    /**
-     * Leaf categories under a category group (subgroups flattened — matches storefront browse).
-     */
-    public function categoriesOfGroup($group)
-    {
-        return $this->rememberApi('categories-of-group:'.$group, function () use ($group) {
-            $subGroupIds = CategorySubGroup::query()
-                ->where('category_group_id', $group)
-                ->pluck('id');
-
-            $categories = Category::active()
-                ->whereIn('category_sub_group_id', $subGroupIds)
+        return $this->rememberApi('featured-categories', function () {
+            $categories = Category::active()->featured()
                 ->with(['coverImage', 'featureImage'])
-                ->orderBy('order', 'asc')
+                ->orderBy('name', 'asc')
                 ->get();
 
             return CategoryResource::collection($categories);

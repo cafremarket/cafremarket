@@ -11,13 +11,12 @@ use App\Http\Resources\ListingResource;
 use App\Http\Resources\OfferResource;
 use App\Http\Resources\ShippingOptionResource;
 use App\Models\Category;
-use App\Models\CategoryGroup;
-use App\Models\CategorySubGroup;
 use App\Models\Inventory;
 use App\Models\Manufacturer;
 use App\Models\Product;
 use App\Models\Shop;
 use App\Models\State;
+use App\Models\SubCategory;
 use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\Hyperlocal\HyperlocalCatalogService;
 use App\Http\Controllers\Api\Concerns\CachesApiResponses;
@@ -143,8 +142,8 @@ class ListingController extends Controller
                     }]);
             },
             'attributeValues' => function ($q) {
-                $q->select('id', 'attribute_values.attribute_id', 'value', 'color', 'order')
-                    ->with('attribute:id,name,attribute_type_id,order')->orderBy('order');
+                $q->select('id', 'attribute_values.attribute_id', 'value', 'color')
+                    ->with('attribute:id,name,attribute_type_id')->orderBy('value');
             },
             'latestReviews' => function ($q) {
                 $q->with('customer:id,nice_name,name')->take(3);
@@ -288,35 +287,17 @@ class ListingController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @param  string  $slug  category_slug
-     * @return \Illuminate\Http\Response
-     */
-    public function categoryGroup(Request $request, $slug)
-    {
-        $categoryGroup = CategoryGroup::where('slug', $slug)->active()->firstOrFail();
-
-        $all_products = prepareFilteredListings($request, $categoryGroup);
-
-        // Paginate the results
-        $listings = $all_products->paginate(config('mobile_app.view_listing_per_page', 8))
-            ->appends($request->except('page'));
-
-        return ListingResource::collection($listings);
-    }
-
-    /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (products in every SubCategory
+     * under this top-level Category — was categorySubGroup()).
      *
      * @param  string  $slug  category_slug
      * @return \Illuminate\Http\Response
      */
     public function categorySubGroup(Request $request, $slug)
     {
-        $categorySubGroup = CategorySubGroup::where('slug', $slug)->active()->firstOrFail();
+        $category = Category::where('slug', $slug)->active()->firstOrFail();
 
-        $all_products = prepareFilteredListings($request, $categorySubGroup);
+        $all_products = prepareFilteredListings($request, $category);
 
         // Paginate the results
         $listings = $all_products->paginate(config('mobile_app.view_listing_per_page', 8))
@@ -328,12 +309,12 @@ class ListingController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  string  $slug  category_slug
+     * @param  string  $slug  sub_category_slug
      * @return \Illuminate\Http\Response
      */
     public function category(Request $request, $slug)
     {
-        $category = Category::where('slug', $slug)->active()->firstOrFail();
+        $category = SubCategory::where('slug', $slug)->active()->firstOrFail();
 
         // Take only available items
         $all_products = $category->listings()->available();
@@ -345,6 +326,52 @@ class ListingController extends Controller
                 'image:path,imageable_id,imageable_type',
             ])
             ->paginate(config('mobile_app.view_listing_per_page', 8))
+            ->appends($request->except('page'));
+
+        return ListingResource::collection($listings);
+    }
+
+    /**
+     * Recently added products, marketplace-wide — paginated for infinite scroll
+     * (the homepage "Recently Added Products" section on the app).
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function recentlyAdded(Request $request)
+    {
+        $catalog = app(HyperlocalCatalogService::class);
+        $buyerLocation = app(BuyerLocationService::class);
+        $buyerLocation->syncFromCustomer();
+
+        if ($catalog->requiresLocationForBrowse() && ! $buyerLocation->hasLocation()) {
+            return response()->json([
+                'message' => trans('theme.set_location_to_shop'),
+                'require_location' => true,
+                'data' => [],
+            ], 422);
+        }
+
+        $items = Inventory::query()
+            ->where('active', 1)
+            ->whereNull('parent_id')
+            ->whereHas('shop', function ($q) {
+                $q->approved();
+            });
+
+        if (config('system_settings.hide_out_of_stock_items')) {
+            $items->where('stock_quantity', '>', 0);
+        }
+
+        $items = scope_inventory_for_buyer($items);
+
+        $listings = $items
+            ->with([
+                'reviewSummary:rating,count,reviewable_id,reviewable_type',
+                'image:path,imageable_id,imageable_type',
+                'product.featureImage:path,imageable_id,imageable_type,type',
+            ])
+            ->latest()
+            ->paginate(20)
             ->appends($request->except('page'));
 
         return ListingResource::collection($listings);

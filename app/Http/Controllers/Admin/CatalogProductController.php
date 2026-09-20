@@ -40,9 +40,9 @@ class CatalogProductController extends Controller
         }
 
         if (Auth::user()->isFromPlatform()) {
-            $trashes = Product::onlyTrashed()->with('categories', 'featureImage')->get();
+            $trashes = Product::onlyTrashed()->with('subCategories', 'featureImage')->get();
         } else {
-            $trashes = Product::mine()->onlyTrashed()->with('categories', 'featureImage')->get();
+            $trashes = Product::mine()->onlyTrashed()->with('subCategories', 'featureImage')->get();
         }
 
         return view('admin.product.index', compact('trashes'));
@@ -51,7 +51,7 @@ class CatalogProductController extends Controller
     // function will process the ajax request
     public function getProducts(Request $request)
     {
-        $products = Product::with('categories', 'shop.logo', 'featureImage', 'image')
+        $products = Product::with('subCategories', 'shop.logo', 'featureImage', 'image')
             ->withCount('inventories');
 
         // When accessing by a merchant user
@@ -139,7 +139,7 @@ class CatalogProductController extends Controller
         }
 
         if ($request->has('category_list')) {
-            $product->categories()->sync($request->input('category_list'));
+            $product->subCategories()->sync($request->input('category_list'));
         }
 
         if ($request->has('attrsList')) {
@@ -184,7 +184,7 @@ class CatalogProductController extends Controller
     public function edit($id)
     {
         $product = Product::with([
-            'categories.attrsList',
+            'subCategories.attrsList',
             'inventories.attributeValues',
             'inventories.image',
             'taxes',
@@ -223,12 +223,12 @@ class CatalogProductController extends Controller
         $product->update($request->except(['video', 'images', 'image', 'digital_file', 'delete_image', 'delete_video']));
 
         if ($request->has('category_list')) {
-            $product->categories()->sync($request->input('category_list'));
+            $product->subCategories()->sync($request->input('category_list'));
         }
 
         if ($request->has('attrsList')) {
             sync_product_category_attributes(
-                $request->input('category_list', $product->categories()->pluck('categories.id')->all()),
+                $request->input('category_list', $product->subCategories()->pluck('sub_categories.id')->all()),
                 $request->input('attrsList', [])
             );
         }

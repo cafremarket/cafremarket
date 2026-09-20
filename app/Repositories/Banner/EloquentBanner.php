@@ -18,7 +18,7 @@ class EloquentBanner extends EloquentRepository implements BannerRepository, Bas
     // public function all()
     // {
     //     return $this->model->with('featureImage', 'mobileImage')
-    //         ->orderBy('order', 'asc')->get();
+    //         ->orderBy('id', 'asc')->get();
     // }
 
     public function destroy($id)

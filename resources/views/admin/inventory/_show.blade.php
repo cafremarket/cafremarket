@@ -256,7 +256,7 @@
               <tr>
                 <th class="text-right">{{ trans('app.categories') }}: </th>
                 <td style="width: 75%;">
-                  @foreach ($inventory->product->categories as $category)
+                  @foreach ($inventory->product->subCategories as $category)
                     <span class="label label-outline">{{ $category->name }}</span>
                   @endforeach
                 </td>

@@ -15,7 +15,7 @@
 
       <div class="row sf-stores-grid">
         @foreach ($nearbyShopsPaginator as $row)
-          <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+          <div class="col-xl-2 col-lg-3 col-md-4 col-sm-4 col-6 mb-3">
             @include('theme::partials._shop_card', [
               'shop' => $row['shop'],
               'distance' => $row['distance_km'] ?? null,

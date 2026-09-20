@@ -3941,6 +3941,17 @@ body.rtl .product-list-top-filter .pull-right {
   list-style: none;
 }
 
+/* Grid cards: the condition badge ("New"/"Used") was pinned to a fixed
+   bottom offset via absolute positioning, so it overlapped the strikethrough
+   regular price whenever a discount made the price block wrap to two lines.
+   Let it flow normally, right-aligned right under the price, instead. */
+.product-grid-view .product-info-feature-list {
+  position: static;
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+}
+
 .product-info-feature-list>li {
   margin-inline-start: 5px;
   padding-inline-start: 5px;
@@ -8155,7 +8166,7 @@ select.category::before {
 
 .items-slider {
   flex-shrink: 0;
-  flex-basis: 226px;
+  flex-basis: 184px;
 }
 
 .items-slider:hover .box-title,

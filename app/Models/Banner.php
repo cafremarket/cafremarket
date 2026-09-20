@@ -55,7 +55,6 @@ class Banner extends BaseModel
         'columns',
         'shop_id',
         'channel',
-        'order',
         'effect',
         'hide_text',
         'display_type',
@@ -79,14 +78,6 @@ class Banner extends BaseModel
     public function group()
     {
         return $this->belongsTo(BannerGroup::class);
-    }
-
-    /**
-     * Setters
-     */
-    public function setOrderAttribute($value)
-    {
-        $this->attributes['order'] = $value ?? 100;
     }
 
     // public function setOptionsAttribute($value)

@@ -2,13 +2,13 @@
 
 @section('content')
   <!-- CATEGORY COVER IMAGE -->
-  @include('theme::banners.category_cover', ['category' => $categorySubGroup])
+  @include('theme::banners.category_cover', ['category' => $category])
 
   <!-- HEADER SECTION -->
-  @include('theme::headers.category_sub_group_page', ['category' => $categorySubGroup])
+  @include('theme::headers.category_sub_group_page', ['category' => $category])
 
   <!-- CONTENT SECTION -->
-  @include('theme::contents.category_page', ['category' => $categorySubGroup])
+  @include('theme::contents.category_page')
 
   <!-- BROWSING ITEMS -->
   @include('theme::sections.recent_views')

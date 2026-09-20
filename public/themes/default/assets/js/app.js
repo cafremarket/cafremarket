@@ -4823,18 +4823,18 @@ if (sectionTitle) {
 
 		// Featured + Deal of the Day: CSS flex rows (no Slick — avoids .slick-slider { visibility:hidden })
 		(function initHorizontalProductScroll() {
-			var step = 240;
+			var step = 196;
 			function scrollRow($row, delta) {
 				if (!$row.length) return;
 				$row.stop().animate({ scrollLeft: $row.scrollLeft() + delta }, 250);
 			}
 			$('.featured-items-left').off('click.featuredScroll').on('click.featuredScroll', function (e) {
 				e.preventDefault();
-				scrollRow($('.featured-items-inner').not('.deal-of-the-day-items').first(), -step);
+				scrollRow($('.featured-items-inner').not('.deal-of-the-day-items').not('.featured-categories-items').first(), -step);
 			});
 			$('.featured-items-right').off('click.featuredScroll').on('click.featuredScroll', function (e) {
 				e.preventDefault();
-				scrollRow($('.featured-items-inner').not('.deal-of-the-day-items').first(), step);
+				scrollRow($('.featured-items-inner').not('.deal-of-the-day-items').not('.featured-categories-items').first(), step);
 			});
 			$('.deal-day-left').off('click.dealScroll').on('click.dealScroll', function (e) {
 				e.preventDefault();
@@ -4843,6 +4843,14 @@ if (sectionTitle) {
 			$('.deal-day-right').off('click.dealScroll').on('click.dealScroll', function (e) {
 				e.preventDefault();
 				scrollRow($('.deal-of-the-day-items').first(), step);
+			});
+			$('.featured-categories-left').off('click.featuredCategoriesScroll').on('click.featuredCategoriesScroll', function (e) {
+				e.preventDefault();
+				scrollRow($('.featured-categories-items').first(), -130);
+			});
+			$('.featured-categories-right').off('click.featuredCategoriesScroll').on('click.featuredCategoriesScroll', function (e) {
+				e.preventDefault();
+				scrollRow($('.featured-categories-items').first(), 130);
 			});
 		})();
 

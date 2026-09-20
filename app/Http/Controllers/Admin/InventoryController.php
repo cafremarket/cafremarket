@@ -213,7 +213,7 @@ class InventoryController extends Controller
                 ->with('warning', trans('messages.inventory_exist'));
         }
 
-        $product->load('categories.attrsList.attributeValues');
+        $product->load('subCategories.attrsList.attributeValues');
 
         $attributes = ListHelper::getAttributesBy($product);
 
@@ -241,7 +241,7 @@ class InventoryController extends Controller
                 ->with('warning', trans('messages.inventory_exist'));
         }
 
-        $product = Product::with('categories.attrsList.attributeValues')->findOrFail($id);
+        $product = Product::with('subCategories.attrsList.attributeValues')->findOrFail($id);
 
         $attributes = ListHelper::getAttributesBy($product);
 
@@ -275,7 +275,7 @@ class InventoryController extends Controller
 
         $attributes = Attribute::find(array_keys($variants))->pluck('name', 'id');
 
-        $product = Product::with('categories.attrsList.attributeValues')->findOrFail($id);
+        $product = Product::with('subCategories.attrsList.attributeValues')->findOrFail($id);
 
         $linkable_items = ListHelper::inventories();
 

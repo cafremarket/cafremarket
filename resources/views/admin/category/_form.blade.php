@@ -38,36 +38,16 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-3 nopadding-right">
-    <div class="form-group">
-      {!! Form::label('active', trans('app.form.status') . '*', ['class' => 'with-help']) !!}
-      {!! Form::select('active', ['1' => 'Active', '0' => 'Inactive'], null, ['class' => 'form-control select2-normal', 'placeholder' => trans('app.placeholder.status'), 'required']) !!}
-      <div class="help-block with-errors"></div>
-    </div>
-  </div>
-
-  <div class="col-md-3 nopadding-left nopadding-right">
-    <div class="form-group">
-      {!! Form::label('order', trans('app.form.position'), ['class' => 'with-help']) !!}
-      <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.display_order') }}"></i>
-      {!! Form::number('order', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.position')]) !!}
-      <div class="help-block with-errors"></div>
-    </div>
-  </div>
+<div class="form-group">
+  {!! Form::label('active', trans('app.form.status') . '*', ['class' => 'with-help']) !!}
+  {!! Form::select('active', ['1' => 'Active', '0' => 'Inactive'], null, ['class' => 'form-control select2-normal', 'placeholder' => trans('app.placeholder.status'), 'required']) !!}
+  <div class="help-block with-errors"></div>
 </div>
 
 <div class="form-group">
   {!! Form::label('description', trans('app.form.description') . trans('app.form.optional'), ['class' => 'with-help']) !!}
   <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.category_desc') }}"></i>
   {!! Form::textarea('description', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.category_description'), 'rows' => '1']) !!}
-</div>
-
-<div class="form-group">
-  {!! Form::label('attrsList[]', trans('app.attributes'), ['class' => 'with-help']) !!}
-  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.category_attributes') }}"></i>
-  {!! Form::select('attrsList[]', $attrsList, null, ['class' => 'form-control select2-normal', 'multiple' => 'multiple']) !!}
-  <div class="help-block with-errors"></div>
 </div>
 
 <div class="row">

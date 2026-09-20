@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\ExportCategoryRequest;
 use App\Http\Requests\Validations\ProductImportRequest;
 use App\Http\Requests\Validations\ProductUploadRequest;
-use App\Models\Category;
+use App\Models\SubCategory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -117,7 +117,7 @@ class ProductUploadController extends Controller
             }
 
             // Find categories and make the category_list. Ignore the row if category not found
-            $data['category_list'] = Category::whereIn('slug', explode(',', $data['categories']))->pluck('id')->toArray();
+            $data['category_list'] = SubCategory::whereIn('slug', explode(',', $data['categories']))->pluck('id')->toArray();
 
             if (empty($data['category_list'])) {
                 $this->pushIntoFailed($data, trans('help.invalid_category'));
@@ -154,7 +154,7 @@ class ProductUploadController extends Controller
      */
     public function downloadCategorySlugs(ExportCategoryRequest $request)
     {
-        $categories = Category::select('name', 'slug')->get();
+        $categories = SubCategory::select('name', 'slug')->get();
 
         return (new FastExcel($categories))->download('categories.xlsx');
     }

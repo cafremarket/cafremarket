@@ -147,7 +147,7 @@ class ProductController extends Controller
         }
 
         if ($request->has('category_list')) {
-            $storedProduct->categories()->sync($request->input('category_list'));
+            $storedProduct->subCategories()->sync($request->input('category_list'));
         }
 
         if ($request->has('attrsList')) {
@@ -613,14 +613,14 @@ class ProductController extends Controller
         if (! empty($attributeIds)) {
             $attributes = Attribute::with('attributeValues')
                 ->whereIn('id', (array) $attributeIds)
-                ->orderBy('order')
+                ->orderBy('name')
                 ->get();
         } elseif (! empty($categoryIds)) {
             $attributes = Attribute::with('attributeValues')
                 ->whereHas('categories', function ($query) use ($categoryIds) {
                     $query->whereIn('categories.id', (array) $categoryIds);
                 })
-                ->orderBy('order')
+                ->orderBy('name')
                 ->get();
         } else {
             $attributes = collect();

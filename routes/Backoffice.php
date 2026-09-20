@@ -26,6 +26,9 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
     // Featured Products (homepage curated)
     include 'admin/FeaturedProducts.php';
 
+    // Featured Categories (homepage curated)
+    include 'admin/FeaturedCategories.php';
+
     // Store → product picker AJAX
     include 'admin/ProductPicker.php';
 
@@ -112,10 +115,11 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
             include 'admin/Shop.php';
         });
 
-        // Catalog taxonomy is store-managed. Groups/Sub Groups removed.
-        // Routes stay registered under admin.* names so shared views + toPanelUrl keep working.
+        // Catalog taxonomy (Category/SubCategory) is fully platform/admin-managed —
+        // stores can only select from the published list, never create/edit/delete.
         Route::name('catalog.')->prefix('catalog')->group(function () {
             include 'admin/Category.php';
+            include 'admin/SubCategory.php';
             include 'admin/Product.php';
             include 'admin/Attribute.php';
             include 'admin/AttributeValues.php';

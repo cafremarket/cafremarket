@@ -9,14 +9,13 @@ use App\Http\Requests\Validations\BrowseProductRequest;
 use App\Models\Attribute;
 use App\Models\Banner;
 use App\Models\Category;
-use App\Models\CategoryGroup;
-use App\Models\CategorySubGroup;
 use App\Models\Country;
 use App\Models\Inventory;
 use App\Models\Manufacturer;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\Slider;
+use App\Models\SubCategory;
 use App\Services\Hyperlocal\BuyerLocationService;
 use App\Services\Hyperlocal\HyperlocalCatalogService;
 use App\Support\PolicyPages;
@@ -52,7 +51,7 @@ class HomeController extends Controller
         $buyerLocation->ensureDeliveryLocation();
 
         $sliders = Cache::rememberForever('sliders', function () {
-            return Slider::orderBy('order', 'asc')
+            return Slider::orderBy('id', 'asc')
                 ->with([
                     'featureImage:path,imageable_id,imageable_type',
                     'mobileImage:path,imageable_id,imageable_type',
@@ -65,8 +64,15 @@ class HomeController extends Controller
             return Banner::with('featureImage:path,imageable_id,imageable_type')
                 ->whereNull('shop_id')
                 ->forWeb()
-                ->orderBy('order', 'asc')->get()
+                ->orderBy('id', 'asc')->get()
                 ->groupBy('group_id')->toArray();
+        });
+
+        $featuredCategories = Cache::rememberForever('featured_categories_web', function () {
+            return Category::active()->featured()
+                ->with(['coverImage', 'featureImage'])
+                ->orderBy('name', 'asc')
+                ->get();
         });
 
         $latitude = $buyerLocation->latitude();
@@ -80,6 +86,12 @@ class HomeController extends Controller
         $featuredItems = $catalog->sortByShopDistance($catalog->filterInventories(get_featured_items()));
         $dealOfTheDay = $catalog->filterInventories(get_deal_of_the_day())->values();
 
+        // Recently Added Products — capped at 20 on the web (no "load more" here;
+        // the app shows the same feed with infinite scroll via /api/recently-added-products).
+        $recentlyAddedItems = $catalog->filterInventories(
+            ListHelper::latest_available_items(20)
+        )->values();
+
         return view('theme::index', compact(
             'banners',
             'sliders',
@@ -88,7 +100,9 @@ class HomeController extends Controller
             'longitude',
             'buyerAddress',
             'featuredItems',
+            'featuredCategories',
             'dealOfTheDay',
+            'recentlyAddedItems',
         ));
     }
 
@@ -106,12 +120,9 @@ class HomeController extends Controller
 
         $catalog = app(HyperlocalCatalogService::class);
 
-        $category = Category::where('slug', $slug)
+        $category = SubCategory::where('slug', $slug)
             ->with([
-                'subGroup' => function ($q) {
-                    $q->select(['id', 'slug', 'name', 'category_group_id'])->active();
-                },
-                'subGroup.group' => function ($q) {
+                'category' => function ($q) {
                     $q->select(['id', 'slug', 'name'])->active();
                 },
                 'attrsList' => function ($q) {
@@ -119,17 +130,6 @@ class HomeController extends Controller
                 },
             ])
             ->active()->firstOrFail();
-
-        // Store categories use shop-scoped URLs, not the system /category/{slug} path.
-        if (! empty($category->shop_id)) {
-            $shopSlug = optional(\App\Models\Shop::select('id', 'slug')->find($category->shop_id))->slug;
-            if ($shopSlug) {
-                return redirect()->route('shop.category.browse', [
-                    'slug' => $shopSlug,
-                    'category' => $category->slug,
-                ], 301);
-            }
-        }
 
         // Avoid loading every listing into memory just for min/max price.
         $listingsBase = $catalog->scopeInventoryQuery($category->listings()->available());
@@ -173,12 +173,12 @@ class HomeController extends Controller
         $used = null;
         $refurbished = null;
 
-        $categorySubGroup = CategorySubGroup::where('slug', $slug)
+        $category = Category::where('slug', $slug)
             ->with([
-                'categories' => function (\Illuminate\Database\Eloquent\Relations\HasMany $q) {
-                    $q->select(['id', 'slug', 'category_sub_group_id', 'name'])->whereHas('listings')->active();
+                'subCategories' => function (\Illuminate\Database\Eloquent\Relations\HasMany $q) {
+                    $q->select(['id', 'slug', 'category_id', 'name'])->whereHas('listings')->active();
                 },
-                'categories.listings' => function (\Illuminate\Database\Eloquent\Relations\BelongsToMany $d) use ($now, $request, &$min, &$max, &$new, &$used, &$refurbished) {
+                'subCategories.listings' => function (\Illuminate\Database\Eloquent\Relations\BelongsToMany $d) use ($now, $request, &$min, &$max, &$new, &$used, &$refurbished) {
                     /** @var \App\Models\Inventory $d */
                     $all_results = $d->available()->get();
                     $min = floor($all_results->min('sale_price'));
@@ -199,7 +199,7 @@ class HomeController extends Controller
             ->active()->firstOrFail();
 
         /** @var \Illuminate\Database\Eloquent\Builder $all_products * */
-        $all_products = prepareFilteredListingsNew($request, $categorySubGroup->categories);
+        $all_products = prepareFilteredListingsNew($request, $category->subCategories);
 
         if ($catalog->isEnabled()) {
             $all_products = $catalog->filterInventories($all_products);
@@ -211,70 +211,7 @@ class HomeController extends Controller
         $products = $all_products->paginate(config('system.view_listing_per_page', 16))
             ->appends($request->except('page'));
 
-        return view('theme::category_sub_group', compact('categorySubGroup', 'products', 'priceRange'));
-    }
-
-    /**
-     * Browse listings by category group
-     *
-     * @param  string  $slug
-     * @return \Illuminate\View\View
-     */
-    public function browseCategoryGroup(BrowseProductRequest $request, $slug, $sortby = null)
-    {
-        if ($gate = hyperlocal_browse_gate_view()) {
-            return $gate;
-        }
-
-        $catalog = app(HyperlocalCatalogService::class);
-        $now = Carbon::now();
-        $min = null;
-        $max = null;
-        $new = null;
-        $used = null;
-        $refurbished = null;
-
-        $categoryGroup = CategoryGroup::where('slug', $slug)->with([
-            'categories' => function (\Illuminate\Database\Eloquent\Relations\HasManyThrough $q) {
-                $q->select(['categories.id', 'categories.slug', 'categories.category_sub_group_id', 'categories.name'])
-                    ->where('categories.active', 1)->whereHas('listings')->withCount('listings');
-            },
-            'categories.listings' => function (\Illuminate\Database\Eloquent\Relations\BelongsToMany $d) use ($now, $request, &$min, &$max, &$new, &$used, &$refurbished) {
-                /** @var \App\Models\Inventory $d */
-                $all_results = $d->available()->get();
-                $min = floor($all_results->min('sale_price'));
-                $max = ceil($all_results->max('sale_price'));
-
-                $results2 = $d->available()->filter($request->all())->withCount([
-                    'orders' => function ($query) use ($now) {
-                        $query->where('order_items.created_at', '>=', $now->subHours(config('system.popular.hot_item.period', 24)));
-                    },
-                ])->with([
-                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
-                    'shop:id,slug,name,id_verified,phone_verified,address_verified',
-                    'image:path,imageable_id,imageable_type',
-                ])->get();
-
-                $new = $results2->where('condition', trans('app.new'))->count();
-                $used = $results2->where('condition', trans('app.used'))->count();
-                $refurbished = $results2->where('condition', trans('app.refurbished'))->count();
-            },
-        ])->active()->firstOrFail();
-
-        /** @var \Illuminate\Database\Eloquent\Builder $all_products */
-        $all_products = prepareFilteredListingsNew($request, $categoryGroup->categories);
-
-        if ($catalog->isEnabled()) {
-            $all_products = $catalog->filterInventories($all_products);
-        }
-
-        $priceRange = compact('min', 'max');
-
-        // Paginate the results
-        $products = $all_products->paginate(config('system.view_listing_per_page', 16))
-            ->appends($request->except('page'));
-
-        return view('theme::category_group', compact('categoryGroup', 'products', 'priceRange'));
+        return view('theme::category_sub_group', compact('category', 'products', 'priceRange'));
     }
 
     /**
@@ -312,7 +249,7 @@ class HomeController extends Controller
             'product' => function ($q) use ($item) {
                 $q->select('id', 'brand', 'model_number', 'mpn', 'gtin', 'gtin_type', 'origin_country', 'slug', 'description', 'video_path', 'downloadable', 'manufacturer_id', 'sale_count', 'created_at')
                     ->with([
-                        'categories:id,slug,name,shop_id,category_sub_group_id',
+                        'subCategories:id,slug,name,category_id',
                     ])
                     ->withCount(['inventories' => function ($query) use ($item) {
                         $query->where('shop_id', '!=', $item->shop_id)
@@ -321,8 +258,8 @@ class HomeController extends Controller
                     }]);
             },
             'attributeValues' => function ($q) {
-                $q->select('id', 'attribute_values.attribute_id', 'value', 'color', 'order')
-                    ->with('attribute:id,name,attribute_type_id,order');
+                $q->select('id', 'attribute_values.attribute_id', 'value', 'color')
+                    ->with('attribute:id,name,attribute_type_id');
             },
             'shop' => function ($q) {
                 $q->withCount([
@@ -369,12 +306,12 @@ class HomeController extends Controller
                 ->pluck('attribute_value_id')->toArray();
         }
 
-        $attributes = Attribute::select('id', 'name', 'attribute_type_id', 'order')
+        $attributes = Attribute::select('id', 'name', 'attribute_type_id')
             ->whereIn('id', $attr_pivots->pluck('attribute_id'))
             ->with(['attributeValues' => function ($query) use ($attr_pivots) {
-                $query->whereIn('id', $attr_pivots->pluck('attribute_value_id'))->orderBy('order');
+                $query->whereIn('id', $attr_pivots->pluck('attribute_value_id'))->orderBy('value');
             }])
-            ->orderBy('order')->get();
+            ->orderBy('name')->get();
 
         $related = ListHelper::related_products($item);
         $linked_items = ListHelper::linked_items($item);
@@ -442,14 +379,14 @@ class HomeController extends Controller
             ->select('attribute_id', 'inventory_id', 'attribute_value_id')
             ->whereIn('inventory_id', $variants->pluck('id'))->get();
 
-        $attributes = Attribute::select('id', 'name', 'attribute_type_id', 'order')
+        $attributes = Attribute::select('id', 'name', 'attribute_type_id')
             ->whereIn('id', $attr_pivots->pluck('attribute_id'))
             ->with([
                 'attributeValues' => function ($query) use ($attr_pivots) {
-                    $query->whereIn('id', $attr_pivots->pluck('attribute_value_id'))->orderBy('order');
+                    $query->whereIn('id', $attr_pivots->pluck('attribute_value_id'))->orderBy('value');
                 },
             ])
-            ->orderBy('order')->get();
+            ->orderBy('name')->get();
 
         $item_attrs = $attr_pivots->where('inventory_id', $item->id)
             ->pluck('attribute_value_id')->toArray();

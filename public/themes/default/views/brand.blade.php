@@ -54,7 +54,7 @@
 
   <section>
     <div class="container">
-      @include('theme::contents.product_list', ['colum' => 3])
+      @include('theme::contents.product_list', ['colum' => 2])
     </div><!-- /.container -->
   </section>
 

@@ -1,5 +1,5 @@
 {{-- Catalog --}}
-@if (Gate::allows('index', \App\Models\Product::class) || Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\Attribute::class) || Gate::allows('index', \App\Models\Manufacturer::class))
+@if (Gate::allows('index', \App\Models\Product::class) || Gate::allows('index', \App\Models\Attribute::class) || Gate::allows('index', \App\Models\Manufacturer::class))
   <div class="mp-nav-group {{ mp_is_any(['merchant/catalog*', 'merchant/stock/product*']) ? 'is-open' : '' }}">
     <button type="button" class="mp-nav-group__toggle" aria-expanded="{{ mp_is_any(['merchant/catalog*', 'merchant/stock/product*']) ? 'true' : 'false' }}">
       <i class="fa fa-tags"></i>
@@ -16,12 +16,6 @@
           <a href="{{ mp_url('merchant/stock/product/digital') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/stock/product/digital*') ? 'is-active' : '' }}">
             <i class="fa fa-cloud-download"></i>
             <span>{{ trans('nav.digital_products') }}</span>
-          </a>
-        @endcan
-        @can('index', \App\Models\Category::class)
-          <a href="{{ mp_url('merchant/catalog/category') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/catalog/category') && ! mp_is('merchant/catalog/categoryGroup*') && ! mp_is('merchant/catalog/categorySubGroup*') ? 'is-active' : '' }}">
-            <i class="fa fa-sitemap"></i>
-            <span>{{ trans('nav.categories') }}</span>
           </a>
         @endcan
         @can('index', \App\Models\Attribute::class)

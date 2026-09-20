@@ -9,7 +9,7 @@
 <aside class="category-filters sf-search-filters">
   <div class="sf-search-filters__head">
     <h3><i class="fas fa-sliders-h"></i> {{ trans('theme.filters') }}</h3>
-    <a href="{{ route('inCategoriesSearch', array_filter(Request::only(['q', 'in', 'insubgrp', 'ingrp']))) }}" class="sf-search-filters__clear">
+    <a href="{{ route('inCategoriesSearch', array_filter(Request::only(['q', 'in', 'insubgrp']))) }}" class="sf-search-filters__clear">
       {{ trans('theme.clear_all_filters') }}
     </a>
   </div>
@@ -18,25 +18,14 @@
     <div class="sf-filter-section">
       <h4>{{ trans('theme.category') }}</h4>
       <div class="sf-filter-crumbs">
-        @if (Request::has('ingrp'))
-          <span class="sf-filter-crumb sf-filter-crumb--active">
-            {{ $category->name }}
-            <a href="javascript:void(0)" class="clear-filter" data-name="ingrp" aria-label="{{ trans('theme.button.clear') }}">&times;</a>
-          </span>
-        @elseif(Request::has('insubgrp') && Request::get('insubgrp') != 'all')
-          <a href="javascript:void(0)" class="sf-filter-crumb link-filter-opt" data-name="ingrp" data-value="{{ $category->group->slug }}">
-            {{ $category->group->name }}
-          </a>
+        @if (Request::has('insubgrp') && Request::get('insubgrp') != 'all')
           <span class="sf-filter-crumb sf-filter-crumb--active">
             {{ $category->name }}
             <a href="javascript:void(0)" class="clear-filter" data-name="insubgrp" aria-label="{{ trans('theme.button.clear') }}">&times;</a>
           </span>
         @elseif(Request::has('in'))
-          <a href="javascript:void(0)" class="sf-filter-crumb link-filter-opt" data-name="ingrp" data-value="{{ $category->subGroup->group->slug }}">
-            {{ $category->subGroup->group->name }}
-          </a>
-          <a href="javascript:void(0)" class="sf-filter-crumb link-filter-opt" data-name="insubgrp" data-value="{{ $category->subGroup->slug }}">
-            {{ $category->subGroup->name }}
+          <a href="javascript:void(0)" class="sf-filter-crumb link-filter-opt" data-name="insubgrp" data-value="{{ $category->category->slug }}">
+            {{ $category->category->name }}
           </a>
           <span class="sf-filter-crumb sf-filter-crumb--active">
             {{ $category->name }}

@@ -113,26 +113,12 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-6 nopadding-right">
-    <div class="form-group">
-      {!! Form::label('order', trans('app.form.position'), ['class' => 'with-help']) !!}
-      <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.slider_order') }}"></i>
+<div class="form-group">
+  {!! Form::label('text_position', trans('app.text_position'), ['class' => 'with-help']) !!}
+  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.slider_text_position') }}"></i>
 
-      {!! Form::number('order', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.position')]) !!}
-      <div class="help-block with-errors"></div>
-    </div>
-  </div>
-
-  <div class="col-md-6 nopadding-left">
-    <div class="form-group">
-      {!! Form::label('text_position', trans('app.text_position'), ['class' => 'with-help']) !!}
-      <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.slider_text_position') }}"></i>
-
-      {!! Form::select('text_position', ['right' => trans('app.right'), 'left' => trans('app.left')], isset($slider) ? null : 'right', ['class' => 'form-control']) !!}
-      <div class="help-block with-errors"></div>
-    </div>
-  </div>
+  {!! Form::select('text_position', ['right' => trans('app.right'), 'left' => trans('app.left')], isset($slider) ? null : 'right', ['class' => 'form-control']) !!}
+  <div class="help-block with-errors"></div>
 </div>
 
 <div class="row">

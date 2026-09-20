@@ -34,7 +34,6 @@ class WebBannerController extends Controller
             ->whereNull('shop_id')
             ->forWeb()
             ->orderBy('group_id')
-            ->orderBy('order')
             ->get();
 
         $groups = BannerGroup::orderBy('id')->get();

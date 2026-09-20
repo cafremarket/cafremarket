@@ -8,7 +8,6 @@ class CategoryTranslation extends TranslationModel
 
     protected $fillable = [
         'category_id',
-        'slug',
         'lang',
         'translation',
     ];

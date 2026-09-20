@@ -19,7 +19,6 @@ class AttributeValueResource extends JsonResource
             'value' => $this->value,
             'color' => $this->color,
             'attribute_id' => $this->attribute_id,
-            'order' => $this->order,
             'attribute' => new AttributeLightResource($this->attribute),
         ];
     }

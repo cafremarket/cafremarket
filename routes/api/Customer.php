@@ -48,9 +48,8 @@ Route::middleware('customerApp')->group(function () {
 
     // Categories
     Route::get('trending-categories', [CategoryController::class, 'trendingCategories']);
-    Route::get('category-grps', [CategoryController::class, 'categoryGroup']);
+    Route::get('featured-categories', [CategoryController::class, 'featuredCategories']);
     Route::get('category-subgrps/{group?}', [CategoryController::class, 'categorySubGroup']);
-    Route::get('categories/group/{group}', [CategoryController::class, 'categoriesOfGroup']);
     Route::get('categories/{sub_group?}', [CategoryController::class, 'index']);
 
     // Shops
@@ -81,11 +80,11 @@ Route::middleware('customerApp')->group(function () {
     Route::post('variant/{slug}', [ListingController::class, 'variant']);
     Route::get('listing/category/{slug}', [ListingController::class, 'category']);
     Route::get('listing/category-subgrp/{slug}', [ListingController::class, 'categorySubGroup']);
-    Route::get('listing/category-grp/{slug}', [ListingController::class, 'categoryGroup']);
     Route::post('listing/{item}/shipTo', [ListingController::class, 'shipTo']);
     Route::get('listing/{slug}/feedbacks', [FeedbackController::class, 'show_item_feedbacks']);
     Route::get('listing/{slug}/reviews', [ReviewController::class, 'show_item_reviews']);
     Route::get('recently_viewed_items', [ListingController::class, 'recently_viewed']);
+    Route::get('recently-added-products', [ListingController::class, 'recentlyAdded']);
 
     // Location lookup (public — same geocode as web; save stays auth-only)
     Route::get('customer/location/search', [CustomerLocationController::class, 'searchAddress']);

@@ -4,8 +4,6 @@ use App\Helpers\ListHelper;
 use App\Models\Cancellation;
 use App\Models\Cart;
 use App\Models\Category;
-use App\Models\CategoryGroup;
-use App\Models\CategorySubGroup;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\DeliveryBoy;
@@ -452,22 +450,10 @@ if (! function_exists('get_category_url')) {
             return url('/');
         }
 
-        $shopSlug = null;
+        // Categories are fully admin-managed now — no shop-scoped category URLs.
+        if ($shop) {
+            $shopSlug = $shop instanceof Shop ? $shop->slug : $shop;
 
-        if ($shop instanceof Shop) {
-            $shopSlug = $shop->slug;
-        } elseif (is_string($shop) && $shop !== '') {
-            $shopSlug = $shop;
-        } elseif (! empty($category->shop_id)) {
-            $shopSlug = optional(Shop::select('id', 'slug')->find($category->shop_id))->slug
-                ?? (Auth::guard('web')->check()
-                    && Auth::user()->isFromMerchant()
-                    && Auth::user()->shop
-                    ? Auth::user()->shop->slug
-                    : null);
-        }
-
-        if ($shopSlug && (! empty($category->shop_id) || $shop)) {
             return route('shop.category.browse', ['slug' => $shopSlug, 'category' => $slug]);
         }
 
@@ -925,7 +911,6 @@ if (! function_exists('ensure_shop_attribute_presets')) {
         $presets = [
             'Colour' => [
                 'type' => \App\Models\Attribute::TYPE_COLOR,
-                'order' => 1,
                 'values' => [
                     ['Black', '#000000'], ['White', '#ffffff'], ['Red', '#e53935'],
                     ['Blue', '#1e88e5'], ['Green', '#43a047'], ['Yellow', '#fdd835'],
@@ -934,27 +919,22 @@ if (! function_exists('ensure_shop_attribute_presets')) {
             ],
             'Size' => [
                 'type' => \App\Models\Attribute::TYPE_SELECT,
-                'order' => 2,
                 'values' => [['XS'], ['S'], ['M'], ['L'], ['XL'], ['XXL'], ['3XL']],
             ],
             'Material' => [
                 'type' => \App\Models\Attribute::TYPE_SELECT,
-                'order' => 3,
                 'values' => [['Cotton'], ['Polyester'], ['Leather'], ['Wool'], ['Silk'], ['Denim'], ['Metal'], ['Plastic']],
             ],
             'Style' => [
                 'type' => \App\Models\Attribute::TYPE_SELECT,
-                'order' => 4,
                 'values' => [['Casual'], ['Formal'], ['Sport'], ['Classic'], ['Modern']],
             ],
             'Gender' => [
                 'type' => \App\Models\Attribute::TYPE_RADIO,
-                'order' => 5,
                 'values' => [['Men'], ['Women'], ['Unisex'], ['Kids']],
             ],
             'Storage' => [
                 'type' => \App\Models\Attribute::TYPE_SELECT,
-                'order' => 6,
                 'values' => [['32GB'], ['64GB'], ['128GB'], ['256GB'], ['512GB'], ['1TB']],
             ],
         ];
@@ -970,7 +950,6 @@ if (! function_exists('ensure_shop_attribute_presets')) {
                     'shop_id' => $shopId,
                     'name' => $name,
                     'attribute_type_id' => $meta['type'],
-                    'order' => $meta['order'],
                 ]);
             } elseif (method_exists($attribute, 'trashed') && $attribute->trashed()) {
                 $attribute->restore();
@@ -991,7 +970,6 @@ if (! function_exists('ensure_shop_attribute_presets')) {
                     'attribute_id' => $attribute->id,
                     'value' => $value,
                     'color' => $color,
-                    'order' => $i + 1,
                 ]);
             }
         }
@@ -1014,7 +992,7 @@ if (! function_exists('sync_product_category_attributes')) {
         $attributeIds = array_values(array_unique(array_map('intval', $attributeIds)));
 
         foreach ($categoryIds as $categoryId) {
-            $category = \App\Models\Category::find($categoryId);
+            $category = \App\Models\SubCategory::find($categoryId);
             if ($category) {
                 $category->attrsList()->syncWithoutDetaching($attributeIds);
             }
@@ -4385,51 +4363,6 @@ if (! function_exists('shop_ships_to_country')) {
         }
 
         return false;
-    }
-}
-
-if (! function_exists('ensure_default_category_sub_group_id')) {
-    /**
-     * Categories still require a category_sub_group_id FK.
-     * Sub-group UI was removed, so ensure a shared default exists and return its id.
-     */
-    function ensure_default_category_sub_group_id(): int
-    {
-        $group = CategoryGroup::withTrashed()->firstOrCreate(
-            ['slug' => 'general'],
-            [
-                'name' => 'General',
-                'description' => 'Default category group',
-                'active' => 1,
-                'order' => 100,
-            ]
-        );
-
-        if (method_exists($group, 'trashed') && $group->trashed()) {
-            $group->restore();
-        }
-
-        $subGroup = CategorySubGroup::withTrashed()->firstOrCreate(
-            ['slug' => 'general'],
-            [
-                'name' => 'General',
-                'category_group_id' => $group->id,
-                'description' => 'Default category sub group',
-                'active' => 1,
-                'order' => 100,
-            ]
-        );
-
-        if (method_exists($subGroup, 'trashed') && $subGroup->trashed()) {
-            $subGroup->restore();
-        }
-
-        if ((int) $subGroup->category_group_id !== (int) $group->id) {
-            $subGroup->category_group_id = $group->id;
-            $subGroup->save();
-        }
-
-        return (int) $subGroup->id;
     }
 }
 

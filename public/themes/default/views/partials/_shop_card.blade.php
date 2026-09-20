@@ -1,6 +1,6 @@
 <div class="card-box text-center h-100 nearby-store-card">
   <a href="{{ route('show.store', $shop->slug) }}" class="text-reset">
-    @include('theme::partials._shop_logo_frame', ['shop' => $shop, 'class' => 'mx-auto'])
+    @include('theme::partials._shop_logo_frame', ['shop' => $shop, 'frameSize' => 'sm', 'class' => 'mx-auto'])
 
     @if (config('system_settings.show_merchant_info_as_vendor'))
       <h4 class="mb-1 mt-2">{!! $shop->owner->getName() !!}</h4>
@@ -27,7 +27,7 @@
 
   @include('theme::layouts.ratings', ['ratings' => $shop->ratings, 'count' => $shop->ratings_count ?? 0])
 
-  <a href="{{ route('show.store', $shop->slug) }}" class="btn btn-default btn-rounded mt-3 waves-effect w-md waves-light">
+  <a href="{{ route('show.store', $shop->slug) }}" class="btn btn-default btn-sm btn-rounded mt-2 waves-effect waves-light">
     {{ trans('theme.visit_shop_page') }}
   </a>
 </div>

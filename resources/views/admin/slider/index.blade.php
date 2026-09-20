@@ -54,7 +54,6 @@
             {{ trans('app.title_color') }}: <strong>{!! $slider->title_color !!}</strong><br>
             {{ trans('app.sub_title_color') }}: <strong>{!! $slider->sub_title_color !!}</strong><br>
             {{ trans('app.alternative_color') }}: <strong>{!! $slider->alt_color !!}</strong><br>
-            {{ trans('app.order') }}: <strong>{!! $slider->order !!}</strong><br>
             {{ trans('app.link') }}: <strong>{!! $slider->link !!}</strong>
           </td>
           <td>{{ $slider->created_at->toFormattedDateString() }}</td>

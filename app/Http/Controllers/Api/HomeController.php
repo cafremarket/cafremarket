@@ -73,7 +73,7 @@ class HomeController extends Controller
             $sliders = Slider::whereHas('mobileImage')
                 ->with('mobileImage')
                 ->where('shop_id', $shop_id)
-                ->orderBy('order', 'asc')
+                ->orderBy('id', 'asc')
                 ->get();
 
             return SliderResource::collection($sliders);
@@ -93,7 +93,7 @@ class HomeController extends Controller
             $banners = Banner::with(['featureImage'])
                 ->where('shop_id', $shop_id)
                 ->when($shop_id === null, fn ($q) => $q->forApp())
-                ->orderBy('order', 'asc')
+                ->orderBy('id', 'asc')
                 ->get();
 
             return BannerResource::collection($banners);

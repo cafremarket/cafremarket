@@ -28,7 +28,6 @@ class BannerResource extends JsonResource
             'display_type' => $this->display_type ?: 'single',
             'hide_text' => (bool) $this->hide_text,
             'channel' => $this->channel ?: 'web',
-            'order' => (int) ($this->order ?: 100),
         ];
     }
 }

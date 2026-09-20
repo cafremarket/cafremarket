@@ -64,7 +64,6 @@ class GuestCustomerApiTest extends TestCase
                     ],
                     'sub_title_color',
                     'link',
-                    'order',
                 ],
             ],
         ]);

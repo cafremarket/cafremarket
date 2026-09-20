@@ -5,7 +5,7 @@
         var product = {
             'sku': '{{ $item->sku }}',
             'title': '{{ $item->title }}',
-            'category': {!! json_encode($item->product->categories->pluck('name')) !!},
+            'category': {!! json_encode($item->product->subCategories->pluck('name')) !!},
             'price': {{ $item->current_sale_price() }},
             'customer_id': {{ $cart->customer_id ?? 'null' }}
         };

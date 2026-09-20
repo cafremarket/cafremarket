@@ -1,6 +1,6 @@
 <section>
   <div class="container category-single-page">
-    @include('theme::contents.product_list', ['colum' => 3])
+    @include('theme::contents.product_list', ['colum' => 2])
 
     @if (config('system_settings.show_seo_info_to_frontend'))
       <div class="row">

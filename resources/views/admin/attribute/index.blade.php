@@ -20,15 +20,13 @@
     'actions' => view('admin.attribute._header_actions')->render(),
   ])
 
-  <table class="table table-hover admin-table table-2nd-no-sort" id="sortable" data-action="{{ Route('admin.catalog.attribute.reorder') }}">
+  <table class="table table-hover admin-table table-2nd-no-sort">
     <thead>
       <tr>
         @include('admin.partials.ui.mass_checkbox_header', ['model' => $attributeModel, 'massActions' => $massActions])
         @cannot('massDelete', $attributeModel)
           <th class="massActionWrapper"></th>
         @endcannot
-        <th width="7px">{{ trans('app.#') }}</th>
-        <th>{{ trans('app.position') }}</th>
         <th>{{ trans('app.name') }}</th>
         <th>{{ trans('app.categories') }}</th>
         <th>{{ trans('app.entities') }}</th>
@@ -43,8 +41,6 @@
           @else
             <td><input type="checkbox" disabled></td>
           @endcan
-          <td><i class="fa fa-arrows sort-handler admin-table__sort-handle" data-toggle="tooltip" title="{{ trans('app.move') }}"></i></td>
-          <td><span class="order">{{ $attribute->order }}</span></td>
           <td>
             @can('view', $attribute)
               <a href="{{ route('admin.catalog.attribute.entities', $attribute->id) }}">{{ $attribute->name }}</a>

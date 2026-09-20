@@ -47,13 +47,4 @@ class EloquentAttributeValue extends EloquentRepository implements AttributeValu
 
         return parent::emptyTrash();
     }
-
-    public function reorder(array $attributeValues)
-    {
-        foreach ($attributeValues as $id => $order) {
-            $this->model->findOrFail($id)->update(['order' => $order]);
-        }
-
-        return true;
-    }
 }

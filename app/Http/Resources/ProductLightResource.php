@@ -18,7 +18,7 @@ class ProductLightResource extends JsonResource
             'id' => $this->id,
             'slug' => $this->slug,
             'name' => $this->name,
-            'categories' => $this->categories->pluck('name', 'id'),
+            'categories' => $this->subCategories->pluck('name', 'id'),
             'model_number' => $this->model_number,
             'gtin' => $this->gtin,
             'gtin_type' => $this->gtin_type,

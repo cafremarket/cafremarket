@@ -62,7 +62,6 @@ class DeduplicatePortugueseLanguageCommand extends Command
                 'code' => $keepCode,
                 'php_locale_code' => 'pt_PT',
                 'language' => 'Portuguese',
-                'order' => 100,
                 'rtl' => false,
                 'active' => true,
             ]);

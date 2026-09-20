@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ListHelper;
-use App\Models\Category;
 use App\Models\DisputeType;
 use App\Models\Product;
 use App\Models\Shop;
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,7 +28,7 @@ class FormDataController extends Controller
      *
      * @return array
      */
-    public function category_attributes(Category $category_id)
+    public function category_attributes(SubCategory $category_id)
     {
         return ListHelper::category_attributes($category_id);
     }
@@ -124,37 +124,17 @@ class FormDataController extends Controller
     }
 
     /**
-     * subcategory groups
+     * Top-level categories (used as the "parent" dropdown for sub-categories)
      *
      * @return array
      */
     public function category_subgroups()
     {
-        return ListHelper::catSubGrps();
+        return ListHelper::topCategories();
     }
 
     /**
-     * subcategory groups
-     *
-     * @return array
-     */
-    public function category_subgroups_with_parent()
-    {
-        return ListHelper::catGrpSubGrpListArray();
-    }
-
-    /**
-     * category group
-     *
-     * @return array
-     */
-    public function category_groups()
-    {
-        return ListHelper::categoryGrps();
-    }
-
-    /**
-     * Return category list with id and name
+     * Return category list with id and name (sub-categories)
      *
      * @return array
      */

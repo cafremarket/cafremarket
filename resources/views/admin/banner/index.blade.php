@@ -52,7 +52,6 @@
           <td class="small">
             {{ trans('app.group') }}: <strong>{!! $banner->group ? $banner->group->name : trans('app.unspecified') !!}</strong><br>
             {{ trans('app.columns') }}: <strong>{!! $banner->columns !!}</strong><br>
-            {{ trans('app.order') }}: <strong>{!! $banner->order !!}</strong><br>
             {{ trans('app.link_label') }}: <strong>{!! $banner->link_label !!}</strong><br>
             {{ trans('app.link') }}: <strong>{!! $banner->link !!}</strong>
           </td>

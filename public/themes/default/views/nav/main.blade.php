@@ -157,14 +157,10 @@
                 <select class="category search-category-select" name="insubgrp" id="niceSelect">
                   <option value="all">{{ trans('theme.all_categories') }}</option>
 
-                  @foreach (($search_category_list ?? []) as $search_category_grp)
-                    <optgroup label="{{ $search_category_grp->name }}">
-                      @foreach ($search_category_grp->subGroups as $search_category)
-                        <option value="{{ $search_category->slug }}" {{ Request::get('insubgrp') == $search_category->slug ? 'selected' : '' }}>
-                          {{ $search_category->name }}
-                        </option>
-                      @endforeach
-                    </optgroup>
+                  @foreach (($search_category_list ?? []) as $search_category)
+                    <option value="{{ $search_category->slug }}" {{ Request::get('insubgrp') == $search_category->slug ? 'selected' : '' }}>
+                      {{ $search_category->name }}
+                    </option>
                   @endforeach
                 </select> <!-- /.category -->
               </div> <!-- /.search-box-select -->

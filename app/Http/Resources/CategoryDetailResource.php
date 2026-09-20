@@ -19,7 +19,7 @@ class CategoryDetailResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'featured' => (bool) $this->featured,
-            'category_sub_group_id' => $this->category_sub_group_id,
+            'category_id' => $this->category_id,
             'feature_image' => get_storage_file_url(optional($this->featureImage)->path, 'medium'),
             'cover_image' => get_cover_img_src($this, 'category'),
             'meta_title' => $this->meta_title,

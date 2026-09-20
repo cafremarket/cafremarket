@@ -41,7 +41,7 @@ class SliderController extends Controller
     {
         $sliders = Slider::with('featureImage', 'mobileImage')
             ->where('shop_id', Auth::user()->shop_id)
-            ->orderBy('order', 'asc')->get();
+            ->orderBy('id', 'asc')->get();
 
         return view('admin.slider.index', compact('sliders'));
     }

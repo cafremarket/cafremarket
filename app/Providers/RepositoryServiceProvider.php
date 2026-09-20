@@ -53,12 +53,8 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\Category\EloquentCategory::class
         );
         $this->app->singleton(
-            \App\Repositories\CategoryGroup\CategoryGroupRepository::class,
-            \App\Repositories\CategoryGroup\EloquentCategoryGroup::class
-        );
-        $this->app->singleton(
-            \App\Repositories\CategorySubGroup\CategorySubGroupRepository::class,
-            \App\Repositories\CategorySubGroup\EloquentCategorySubGroup::class
+            \App\Repositories\SubCategory\SubCategoryRepository::class,
+            \App\Repositories\SubCategory\EloquentSubCategory::class
         );
         $this->app->singleton(
             \App\Repositories\Coupon\CouponRepository::class,

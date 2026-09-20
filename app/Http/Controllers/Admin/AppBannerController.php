@@ -34,7 +34,6 @@ class AppBannerController extends Controller
             ->whereNull('shop_id')
             ->forApp()
             ->orderBy('group_id')
-            ->orderBy('order')
             ->get();
 
         $groups = BannerGroup::orderBy('id')->get();

@@ -20,7 +20,6 @@ class AttributeLightResource extends JsonResource
             'attribute_type' => $this->attributeType->type,
             'entities_count' => $this->attribute_values_count,
             'categories_count' => $this->categories_count,
-            'order' => (int) $this->order,
         ];
     }
 }

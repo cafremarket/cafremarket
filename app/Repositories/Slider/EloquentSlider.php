@@ -17,7 +17,7 @@ class EloquentSlider extends EloquentRepository implements BaseRepository, Slide
 
     public function all()
     {
-        return $this->model->with('featureImage', 'mobileImage')->orderBy('order', 'asc')->get();
+        return $this->model->with('featureImage', 'mobileImage')->orderBy('id', 'asc')->get();
     }
 
     public function destroy($id)

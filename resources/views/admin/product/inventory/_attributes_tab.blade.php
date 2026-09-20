@@ -1,7 +1,7 @@
 {{-- Attributes & Variations (WooCommerce-style panel content) --}}
 @php
   $selectedProductAttrs = isset($product)
-    ? $product->categories->pluck('attrsList')->flatten()->pluck('id')->unique()->values()->all()
+    ? $product->subCategories->pluck('attrsList')->flatten()->pluck('id')->unique()->values()->all()
     : [];
   $hasVariants = isset($product) && $product->inventories->whereNotNull('parent_id')->count() > 0;
 @endphp

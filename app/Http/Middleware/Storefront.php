@@ -93,7 +93,7 @@ class Storefront
             View::share('trending_keywords', $trending_keywords);
         }
 
-        // $languages = \App\Language::orderBy('order', 'asc')->active()->get();
+        // $languages = \App\Language::orderBy('language', 'asc')->active()->get();
 
         // Update the visitor table for state
         if (config('report.collect_visitor_data')) {

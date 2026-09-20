@@ -71,23 +71,12 @@
         </div>
       </div>
 
-      <div class="col-md-4 nopadding-left nopadding-right">
+      <div class="col-md-4 nopadding-left">
         <div class="form-group">
           {!! Form::label('columns', trans('app.form.columns'), ['class' => 'with-help']) !!}
           <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.bs_columns') }}"></i>
 
           {!! Form::select('columns', ['3' => 3, '4' => 4, '6' => 6, '8' => 8, '12' => 12], isset($banner) ? null : 12, ['class' => 'form-control select2-normal', 'placeholder' => trans('app.placeholder.columns')]) !!}
-
-          <div class="help-block with-errors"></div>
-        </div>
-      </div>
-
-      <div class="col-md-4 nopadding-left">
-        <div class="form-group">
-          {!! Form::label('order', trans('app.form.position'), ['class' => 'with-help']) !!}
-          <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.banner_order') }}"></i>
-
-          {!! Form::number('order', null, ['class' => 'form-control', 'placeholder' => trans('app.placeholder.position')]) !!}
 
           <div class="help-block with-errors"></div>
         </div>

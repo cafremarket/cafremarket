@@ -40,9 +40,9 @@ class ProductController extends Controller
 
         if ($filter == 'trash') {
             $products = Product::mine()->onlyTrashed()
-                ->with('featureImage', 'image', 'categories');
+                ->with('featureImage', 'image', 'subCategories');
         } else {
-            $products = Product::mine()->with('featureImage', 'image', 'categories');
+            $products = Product::mine()->with('featureImage', 'image', 'subCategories');
         }
 
         if ($search !== '') {

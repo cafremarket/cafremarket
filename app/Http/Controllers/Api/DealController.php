@@ -68,8 +68,8 @@ class DealController extends Controller
                     }]);
             },
             'attributeValues' => function ($q) {
-                $q->select('id', 'attribute_values.attribute_id', 'value', 'color', 'order')
-                    ->with('attribute:id,name,attribute_type_id,order')->orderBy('order');
+                $q->select('id', 'attribute_values.attribute_id', 'value', 'color')
+                    ->with('attribute:id,name,attribute_type_id')->orderBy('value');
             },
             'latestReviews' => function ($q) {
                 $q->with('customer:id,nice_name,name');

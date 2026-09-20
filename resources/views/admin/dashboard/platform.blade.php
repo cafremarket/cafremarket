@@ -481,10 +481,10 @@
                 <td><img src="{{ get_storage_file_url(optional($category->featureImage)->path, 'tiny') }}" class="img-sm admin-table__banner-thumb" alt=""></td>
                 <td>{{ $category->name }}</td>
                 <td><span class="label label-outline">{{ $category->listings_sum_sold_quantity }}</span></td>
-                <td class="small">{{ $category->subGroup->name }} <i class="fa fa-angle-right"></i> {{ $category->subGroup->group->name }}</td>
+                <td class="small">{{ $category->category->name }}</td>
                 <td class="row-options admin-row-actions">
                   @can('update', $category)
-                    <a href="javascript:void(0)" data-link="{{ route('admin.catalog.category.edit', $category->id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.edit') }}" data-toggle="tooltip"><i class="fa fa-edit"></i></a>
+                    <a href="javascript:void(0)" data-link="{{ route('admin.catalog.subcategory.edit', $category->id) }}" class="admin-action-btn ajax-modal-btn" title="{{ trans('app.edit') }}" data-toggle="tooltip"><i class="fa fa-edit"></i></a>
                   @endcan
                 </td>
               </tr>

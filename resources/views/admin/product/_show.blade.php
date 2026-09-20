@@ -105,7 +105,7 @@
               <tr>
                 <th>{{ trans('app.categories') }}: </th>
                 <td>
-                  @foreach ($product->categories as $category)
+                  @foreach ($product->subCategories as $category)
                     <span class="label label-outline">{{ $category->name }}</span>
                   @endforeach
                 </td>

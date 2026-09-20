@@ -23,7 +23,7 @@
             'products': [
               @foreach ($order->inventories as $schema_item)
                 @php
-                  $t_category = $schema_item->product->categories->first();
+                  $t_category = $schema_item->product->subCategories->first();
                 @endphp {
                   'name': '{{ $schema_item->title }}',
                   'id': '{{ $schema_item->sku }}',
@@ -56,7 +56,7 @@
           'products': [
             @foreach ($order->inventories as $schema_item)
               @php
-                $t_category = $schema_item->product->categories->first();
+                $t_category = $schema_item->product->subCategories->first();
               @endphp {
                 'name': '{{ $schema_item->title }}',
                 'id': '{{ $schema_item->sku }}',

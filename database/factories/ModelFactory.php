@@ -159,7 +159,6 @@ use Illuminate\Support\Str;
 //         'value' => $faker->word,
 //         'color' => $faker->hexcolor,
 //         'attribute_id' => $faker->randomElement(\DB::table('attributes')->pluck('id')->toArray()),
-//         'order' => $faker->randomDigit,
 //     ];
 // });
 

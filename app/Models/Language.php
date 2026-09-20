@@ -61,12 +61,4 @@ class Language extends BaseModel
     {
         $this->attributes['rtl'] = (bool) $value;
     }
-
-    /**
-     * Setters
-     */
-    public function setOrderAttribute($value)
-    {
-        $this->attributes['order'] = $value ?? 100;
-    }
 }

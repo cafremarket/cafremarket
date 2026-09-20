@@ -7,8 +7,6 @@ use App\Models\Attribute;
 use App\Models\BaseModel;
 use App\Models\Blog;
 use App\Models\Category;
-use App\Models\CategoryGroup;
-use App\Models\CategorySubGroup;
 use App\Models\Customer;
 use App\Models\Dispute;
 use App\Models\Inventory;
@@ -26,6 +24,7 @@ use App\Models\Refund;
 use App\Models\Role;
 use App\Models\ShippingMethod;
 use App\Models\Shop;
+use App\Models\SubCategory;
 use App\Models\Supplier;
 use App\Models\Ticket;
 use App\Models\User;
@@ -376,7 +375,7 @@ class ListHelper
     public static function availableLocales()
     {
         return Cache::rememberForever('active_locales', function () {
-            $locales = Language::orderBy('order', 'asc')->active()->get();
+            $locales = Language::orderBy('language', 'asc')->active()->get();
             $hasPortuguese = false;
 
             return $locales->filter(function ($locale) use (&$hasPortuguese) {
@@ -413,7 +412,7 @@ class ListHelper
 
     public static function availableTranslationLocales()
     {
-        return Language::orderBy('order', 'asc')
+        return Language::orderBy('language', 'asc')
             ->where('code', '!=', config('system_settings.default_language'))
             ->active()->get();
     }
@@ -426,21 +425,12 @@ class ListHelper
     public static function categoriesForTheme($all = false)
     {
         return Cache::rememberForever('all_categories', function () use ($all) {
-            $result = CategoryGroup::select('id', 'name', 'slug', 'icon')
+            $result = Category::select('id', 'name', 'slug')
                 ->with([
                     'logoImage:id,path,imageable_id,imageable_type',
                     'backgroundImage:id,path,imageable_id,imageable_type',
-                    'subGroups' => function ($query) use ($all) {
-                        $query->select('id', 'slug', 'category_group_id', 'name');
-
-                        if (! $all) {
-                            $query->active()->has('categories.products.inventories');
-                        }
-
-                        $query->orderBy('categories_count', 'desc')->withCount('categories');
-                    },
-                    'subGroups.categories' => function ($q) use ($all) {
-                        $q->select('id', 'category_sub_group_id', 'name', 'slug', 'description');
+                    'subCategories' => function ($q) use ($all) {
+                        $q->select('id', 'category_id', 'name', 'slug', 'description');
 
                         if (! $all) {
                             $q->active()->has('products.inventories');
@@ -449,67 +439,32 @@ class ListHelper
                 ]);
 
             if (! $all) {
-                $result->has('subGroups.categories.products.inventories')->active();
+                $result->has('subCategories.products.inventories')->active();
             }
 
-            return $result->orderBy('order', 'asc')->get();
+            return $result->orderBy('name', 'asc')->get();
         });
     }
 
     /**
-     * Get list of all available category group
+     * Get list of all available top-level categories (for parent-category dropdowns).
      *
      * @return Collection
      */
-    public static function categoryGrps()
+    public static function topCategories()
     {
-        return DB::table('category_groups')->where('deleted_at', null)->orderBy('name', 'asc')->pluck('name', 'id');
+        return Category::orderBy('name', 'asc')->pluck('name', 'id');
     }
 
     /**
-     * Get list of category sub-group
-     *
-     * @return Collection
-     */
-    public static function catSubGrps()
-    {
-        return CategorySubGroup::orderBy('name', 'asc')->pluck('name', 'id');
-    }
-
-    /**
-     * Get list of category sub-group under the given category
-     *
-     * @return Collection
-     */
-    public static function thisCatSubGrps($category)
-    {
-        return DB::table('category_sub_groups')->where('deleted_at', null)
-            ->where('category_group_id', $category)->orderBy('name', 'asc')->pluck('name', 'id');
-    }
-
-    /**
-     * Get categories list for form dropdown.
+     * Get sub-categories list for form dropdown.
      *
      * @return array
      */
     public static function categories()
     {
-        $user = Auth::user();
-
-        if ($user && $user->isFromMerchant() && $user->merchantId()) {
-            $shopId = $user->merchantId();
-
-            return Cache::rememberForever('category_list_for_form_shop_'.$shopId, function () use ($shopId) {
-                return DB::table('categories')
-                    ->whereNull('deleted_at')
-                    ->where('shop_id', $shopId)
-                    ->orderBy('name', 'asc')
-                    ->pluck('name', 'id');
-            });
-        }
-
         return Cache::rememberForever('category_list_for_form', function () {
-            return DB::table('categories')->whereNull('deleted_at')->orderBy('name', 'asc')->pluck('name', 'id');
+            return DB::table('sub_categories')->whereNull('deleted_at')->orderBy('name', 'asc')->pluck('name', 'id');
         });
     }
 
@@ -521,71 +476,44 @@ class ListHelper
     public static function search_categories()
     {
         return Cache::remember('search_category_list', config('cache.remember.categories', 0), function () {
-            return CategoryGroup::select('id', 'name', 'slug')
-                ->with(['subGroups' => function ($q) {
-                    $q->select('name', 'slug', 'category_group_id')->active();
+            return Category::select('id', 'name', 'slug')
+                ->with(['subCategories' => function ($q) {
+                    $q->select('id', 'name', 'slug', 'category_id')->active();
                 }])
-                ->whereHas('subGroups', function ($q) {
+                ->whereHas('subCategories', function ($q) {
                     $q->active();
                 })
-                ->orderBy('order', 'desc')
+                ->orderBy('name', 'desc')
                 ->active()->get();
         });
     }
 
     /**
-     * Get all catGrpSubGrpListArray
-     *
-     * @return array
-     */
-    public static function catGrpSubGrpListArray()
-    {
-        $groups = [];
-        foreach (self::categoryGrps() as $key => $value) {
-            $list = [];
-
-            foreach (self::thisCatSubGrps($key) as $key2 => $value2) {
-                $list[$key2] = $value2;
-            }
-
-            if (count($list)) {
-                $groups[$value] = $list;
-            }
-        }
-
-        return $groups;
-    }
-
-    /**
-     * Get all catWithSubGrpList
+     * Get all categories, each with its sub-categories keyed by id => name.
+     * Used for the admin product-form category picker (grouped <optgroup>).
      *
      * @return array
      */
     public static function catWithSubGrpListArray()
     {
-        $categoryGroups = CategoryGroup::select(['id', 'name'])->active()
+        $categories = Category::select(['id', 'name'])->active()
             ->orderBy('name', 'asc')
             ->with([
-                'subGroups' => function ($q) {
-                    $q->select(['id', 'name', 'category_group_id'])->orderBy('name', 'asc')->active();
-                },
-                'subGroups.categories' => function ($q) {
-                    $q->select(['id', 'category_sub_group_id', 'name'])->active();
+                'subCategories' => function ($q) {
+                    $q->select(['id', 'name', 'category_id'])->orderBy('name', 'asc')->active();
                 },
             ])->get();
 
         $grps = [];
-        foreach ($categoryGroups as $categoryGroup) {
-            foreach ($categoryGroup->subGroups as $categorySubGroup) {
-                $list = [];
+        foreach ($categories as $category) {
+            $list = [];
 
-                foreach ($categorySubGroup->categories as $category) {
-                    $list[$category->id] = $category->name;
-                }
+            foreach ($category->subCategories as $subCategory) {
+                $list[$subCategory->id] = $subCategory->name;
+            }
 
-                if (count($list)) {
-                    $grps[$categoryGroup->name.' &#9656; '.$categorySubGroup->name.' &#9662;'] = $list;
-                }
+            if (count($list)) {
+                $grps[$category->name] = $list;
             }
         }
 
@@ -944,7 +872,7 @@ class ListHelper
         $rows = DB::table('languages')
             ->whereNull('deleted_at')
             ->where('active', BaseModel::ACTIVE)
-            ->orderBy('order', 'asc')
+            ->orderBy('language', 'asc')
             ->get(['code', 'language']);
 
         $languages = collect();
@@ -1209,7 +1137,7 @@ class ListHelper
     public static function top_selling_categories()
     {
         return Cache::remember('top_selling_categories_dashboard', 7200, function () {
-            return Category::with('featureImage', 'subGroup.group')
+            return SubCategory::with('featureImage', 'category')
                 ->withSum('listings', 'sold_quantity')
                 ->orderByDesc('listings_sum_sold_quantity')
                 ->limit(8)
@@ -1410,7 +1338,7 @@ class ListHelper
      */
     public static function related_products($item, $limit = 10)
     {
-        $catIds = $item->product->categories->pluck('id');
+        $catIds = $item->product->subCategories->pluck('id');
 
         $productIDs = DB::table('category_product')
             ->whereIn('category_id', $catIds)
@@ -1774,7 +1702,7 @@ class ListHelper
     public static function attributeWithValues()
     {
         return Attribute::where('deleted_at', null)
-            ->with('attributeValues')->orderBy('order', 'asc')->get();
+            ->with('attributeValues')->orderBy('name', 'asc')->get();
     }
 
     /**
@@ -1941,7 +1869,7 @@ class ListHelper
      */
     public static function getAttributesBy(Product $product)
     {
-        if ($attrs = $product->categories->pluck('attrsList')) {
+        if ($attrs = $product->subCategories->pluck('attrsList')) {
             return $attrs->flatten()->unique('id');
         }
 
@@ -1955,7 +1883,7 @@ class ListHelper
      */
     public static function product_attributes(Product $product)
     {
-        $attrs = $product->categories->pluck('attrsList');
+        $attrs = $product->subCategories->pluck('attrsList');
 
         return self::get_attr_list_with_values($attrs->flatten()->unique('id'));
     }
@@ -1965,7 +1893,7 @@ class ListHelper
      *
      * @return array
      */
-    public static function category_attributes(Category $category)
+    public static function category_attributes(SubCategory $category)
     {
         return self::get_attr_list_with_values($category->attrsList);
     }
@@ -1984,9 +1912,9 @@ class ListHelper
 
         if ($ids = $attrs->pluck('id')) {
             $values = DB::table('attribute_values')
-                ->select('id', 'value', 'color', 'attribute_id', 'order')
+                ->select('id', 'value', 'color', 'attribute_id')
                 ->whereIn('attribute_id', $ids)
-                ->orderBy('order')->get();
+                ->orderBy('value')->get();
 
             foreach ($attrs as $attr) {
                 $result[$attr->id] = [

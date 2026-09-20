@@ -30,7 +30,7 @@ class LanguageController extends Controller
      */
     public function index(AdminOnlyAccessRequest $request)
     {
-        $languages = Language::orderBy('active', 'desc')->orderBy('order', 'asc')->get();
+        $languages = Language::orderBy('active', 'desc')->orderBy('language', 'asc')->get();
 
         $trashes = Language::onlyTrashed()->get();
 
@@ -55,7 +55,13 @@ class LanguageController extends Controller
      */
     public function store(CreateLanguageRequest $request)
     {
-        $language = Language::create($request->all());
+        $language = Language::create($request->only([
+            'language',
+            'code',
+            'php_locale_code',
+            'rtl',
+            'active',
+        ]));
 
         // Clear active_locales from cache
         Cache::forget('active_locales');
@@ -85,7 +91,13 @@ class LanguageController extends Controller
             return back()->with('warning', trans('messages.demo_restriction'));
         }
 
-        $language->update($request->all());
+        $language->update($request->only([
+            'language',
+            'code',
+            'php_locale_code',
+            'rtl',
+            'active',
+        ]));
 
         // Clear active_locales from cache
         Cache::forget('active_locales');

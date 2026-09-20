@@ -21,7 +21,4 @@ Route::post('attributeValue/massDestroy', [AttributeValueController::class, 'mas
 Route::delete('attributeValue/emptyTrash', [AttributeValueController::class, 'emptyTrash'])
     ->name('attributeValue.emptyTrash');
 
-Route::post('attributeValue/reorder', [AttributeValueController::class, 'reorder'])
-    ->name('attributeValue.reorder');
-
 Route::resource('attributeValue', AttributeValueController::class)->except('index', 'create');

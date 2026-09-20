@@ -110,7 +110,6 @@ class demoCatalogSeeder extends Seeder
                                 $attribute = Attribute::create([
                                     'name' => $k,
                                     'attribute_type_id' => 2,
-                                    'order' => 10,
                                     'created_at' => $now,
                                     'updated_at' => $now,
                                 ]);

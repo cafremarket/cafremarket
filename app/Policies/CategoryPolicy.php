@@ -7,18 +7,22 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
+/**
+ * Categories are fully platform/admin-managed — stores never own or
+ * manage them, so this policy has no per-shop ownership branch.
+ */
 class CategoryPolicy
 {
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view categorys.
+     * Determine whether the user can view categories.
      *
      * @return mixed
      */
     public function index(User $user)
     {
-        return $user->isFromMerchant()
+        return $user->isFromPlatform()
             && (new Authorize($user, 'view_category'))->check();
     }
 
@@ -29,21 +33,19 @@ class CategoryPolicy
      */
     public function view(User $user, Category $category)
     {
-        if ($user->isFromMerchant() && ! $this->ownsCategory($user, $category)) {
-            return false;
-        }
-
-        return (new Authorize($user, 'view_category', $category))->check();
+        return $user->isFromPlatform()
+            && (new Authorize($user, 'view_category', $category))->check();
     }
 
     /**
-     * Determine whether the user can create Categorys.
+     * Determine whether the user can create Categories.
      *
      * @return mixed
      */
     public function create(User $user)
     {
-        return (new Authorize($user, 'add_category'))->check();
+        return $user->isFromPlatform()
+            && (new Authorize($user, 'add_category'))->check();
     }
 
     /**
@@ -53,11 +55,8 @@ class CategoryPolicy
      */
     public function update(User $user, Category $category)
     {
-        if ($user->isFromMerchant() && ! $this->ownsCategory($user, $category)) {
-            return false;
-        }
-
-        return (new Authorize($user, 'edit_category', $category))->check();
+        return $user->isFromPlatform()
+            && (new Authorize($user, 'edit_category', $category))->check();
     }
 
     /**
@@ -67,25 +66,18 @@ class CategoryPolicy
      */
     public function delete(User $user, Category $category)
     {
-        if ($user->isFromMerchant() && ! $this->ownsCategory($user, $category)) {
-            return false;
-        }
-
-        return (new Authorize($user, 'delete_category', $category))->check();
+        return $user->isFromPlatform()
+            && (new Authorize($user, 'delete_category', $category))->check();
     }
 
     /**
-     * Determine whether the user can delete the Product.
+     * Determine whether the user can mass-delete Categories.
      *
      * @return mixed
      */
     public function massDelete(User $user)
     {
-        return (new Authorize($user, 'delete_category'))->check();
-    }
-
-    private function ownsCategory(User $user, Category $category): bool
-    {
-        return (int) $category->shop_id === (int) $user->merchantId();
+        return $user->isFromPlatform()
+            && (new Authorize($user, 'delete_category'))->check();
     }
 }

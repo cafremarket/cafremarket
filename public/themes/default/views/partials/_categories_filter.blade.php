@@ -15,35 +15,10 @@
     <ul class="cateogry-filters-list">
       @if (Request::is('search'))
         <li>
-          @if (Request::has('ingrp'))
-            <h4>{{ $category->name }}</h4>
+          @if (Request::has('insubgrp') && Request::get('insubgrp') != 'all')
             @php
               $t_categories = $products
-                  ->pluck('product.categories')
-                  ->flatten()
-                  ->unique();
-              $t_categories = $t_categories
-                  ->pluck('subGroup.slug')
-                  ->flatten()
-                  ->unique()
-                  ->toArray();
-            @endphp
-
-            <ul>
-              @foreach ($category->subGroups as $slug => $category)
-                @if (in_array($category->slug, $t_categories))
-                  <li>
-                    <a class="link-filter-opt" data-name="insubgrp" data-value="{{ $category->slug }}">
-                      {{ $category->name }}
-                    </a>
-                  </li>
-                @endif
-              @endforeach
-            </ul>
-          @elseif(Request::has('insubgrp') && Request::get('insubgrp') != 'all')
-            @php
-              $t_categories = $products
-                  ->pluck('product.categories')
+                  ->pluck('product.subCategories')
                   ->flatten()
                   ->unique();
               $t_categories = $t_categories
@@ -55,23 +30,17 @@
 
             <h4>
               <i class="fas fa-angle-left"></i>
-              <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->group->slug }}">
-                {{ $category->group->name }}
-              </a>
-            </h4>
-            <h4>
-              <i class="fas fa-angle-left"></i>
-              <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->slug }}">
+              <a class="link-filter-opt" data-name="insubgrp" data-value="{{ $category->slug }}">
                 {{ $category->name }}
               </a>
             </h4>
 
             <ul>
-              @foreach ($category->categories as $category)
-                @if (in_array($category->slug, $t_categories))
+              @foreach ($category->subCategories as $subCategory)
+                @if (in_array($subCategory->slug, $t_categories))
                   <li>
-                    <a class="link-filter-opt" data-name="in" data-value="{{ $category->slug }}">
-                      {{ $category->name }}
+                    <a class="link-filter-opt" data-name="in" data-value="{{ $subCategory->slug }}">
+                      {{ $subCategory->name }}
                     </a>
                   </li>
                 @endif
@@ -80,14 +49,8 @@
           @elseif(Request::has('in'))
             <h4>
               <i class="fas fa-angle-left"></i>
-              <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->subGroup->group->slug }}">
-                {{ $category->subGroup->group->name }}
-              </a>
-            </h4>
-            <h4>
-              <i class="fas fa-angle-left"></i>
-              <a class="link-filter-opt" data-name="insubgrp" data-value="{{ $category->subGroup->slug }}">
-                {{ $category->subGroup->name }}
+              <a class="link-filter-opt" data-name="insubgrp" data-value="{{ $category->category->slug }}">
+                {{ $category->category->name }}
               </a>
             </h4>
 
@@ -97,49 +60,30 @@
           @else
             @php
               $t_categories = $products
-                  ->pluck('product.categories')
+                  ->pluck('product.subCategories')
                   ->flatten()
                   ->unique();
               $t_categories = $t_categories
-                  ->pluck('subGroup.group')
+                  ->pluck('category')
                   ->flatten()
                   ->unique();
             @endphp
 
             @foreach ($t_categories as $category)
         <li>
-          <a class="link-filter-opt" data-name="ingrp" data-value="{{ $category->slug }}">
+          <a class="link-filter-opt" data-name="insubgrp" data-value="{{ $category->slug }}">
             {{ $category->name }}
           </a>
         </li>
       @endforeach
       @endif
       </li>
-    @elseif(Request::is('categorygrp/*'))
-      <li>
-        <h4><i class="fas fa-angle-right"></i> {{ $categoryGroup->name }}</h4>
-
-        <ul>
-          @foreach ($categoryGroup->subGroups as $slug => $t_category)
-            {{-- @if ($t_category->categories->count()) --}}
-            <li><a href="{{ route('categories.browse', $t_category->slug) }}">{{ $t_category->name }}</a></li>
-            {{-- @endif --}}
-          @endforeach
-        </ul>
-      </li>
     @elseif(Request::is('categories/*'))
       <li>
-        <h4>
-          <i class="fas fa-angle-left"></i>
-          <a href="{{ route('categoryGrp.browse', $categorySubGroup->group->slug) }}">
-            {{ $categorySubGroup->group->name }}
-          </a>
-        </h4>
-
-        <h4><i class="fas fa-angle-right"></i> {{ $categorySubGroup->name }}</h4>
+        <h4><i class="fas fa-angle-right"></i> {{ $category->name }}</h4>
 
         <ul>
-          @foreach ($categorySubGroup->categories as $slug => $t_category)
+          @foreach ($category->subCategories as $slug => $t_category)
             <li><a href="{{ get_category_url($t_category) }}">{{ $t_category->name }}</a></li>
           @endforeach
         </ul>
@@ -148,20 +92,13 @@
       <li>
         <h4>
           <i class="fas fa-angle-left"></i>
-          <a href="{{ route('categoryGrp.browse', $category->subGroup->group->slug) }}">
-            {{ $category->subGroup->group->name }}
-          </a>
-        </h4>
-
-        <h4>
-          <i class="fas fa-angle-left"></i>
-          <a href="{{ route('categories.browse', $category->subGroup->slug) }}">
-            {{ $category->subGroup->name }}
+          <a href="{{ route('categories.browse', $category->category->slug) }}">
+            {{ $category->category->name }}
           </a>
         </h4>
 
         <ul>
-          @foreach ($category->subGroup->categories as $t_category)
+          @foreach ($category->category->subCategories as $t_category)
             <li>
               @if ($t_category->slug == $category->slug)
                 <strong>{{ $t_category->name }}</strong>

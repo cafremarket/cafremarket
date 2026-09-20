@@ -50,15 +50,6 @@ class EloquentAttribute extends EloquentRepository implements AttributeRepositor
         return $entities;
     }
 
-    public function reorder(array $attributes)
-    {
-        foreach ($attributes as $id => $order) {
-            $this->model->findOrFail($id)->update(['order' => $order]);
-        }
-
-        return true;
-    }
-
     public function getAttributeTypeId($attribute)
     {
         return $this->model->findOrFail($attribute)->attribute_type_id;

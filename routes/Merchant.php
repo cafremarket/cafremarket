@@ -52,8 +52,10 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
             include 'admin/ShopReport.php';
         });
 
+        // Categories are platform/admin-managed only — stores select from the
+        // published list when creating a product, but never manage the list
+        // itself, so no admin/Category.php or admin/SubCategory.php here.
         Route::name('catalog.')->prefix('catalog')->group(function () {
-            include 'admin/Category.php';
             include 'admin/Attribute.php';
             include 'admin/AttributeValues.php';
             include 'admin/Product.php';

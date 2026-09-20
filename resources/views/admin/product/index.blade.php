@@ -72,7 +72,7 @@
           <td>{{ $trash->type }}</td>
           <td>{{ $trash->model_number }}</td>
           <td>
-            @foreach ($trash->categories as $category)
+            @foreach ($trash->subCategories as $category)
               <span class="label label-outline">{{ $category->name }}</span>
             @endforeach
           </td>

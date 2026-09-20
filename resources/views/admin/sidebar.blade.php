@@ -93,6 +93,36 @@
         </li>
       @endif
 
+      {{-- ===== CATEGORIES (Platform admin only) =====
+           Categories are the shared taxonomy every store picks from — unlike
+           products/attributes/manufacturers above, they are never store-managed. --}}
+      @if (Auth::user()->isFromPlatform() && (Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\SubCategory::class)))
+        <li class="treeview {{ Request::is('admin/catalog/category*') || Request::is('admin/catalog/subcategory*') ? 'active' : '' }}">
+          <a href="javascript:void(0)">
+            <i class="fa fa-sitemap"></i>
+            <span>{{ trans('nav.categories') }}</span>
+            <i class="fa fa-angle-left pull-right"></i>
+          </a>
+          <ul class="treeview-menu">
+            @can('index', \App\Models\Category::class)
+              <li class="{{ Request::is('admin/catalog/category*') ? 'active' : '' }}">
+                <a href="{{ url('admin/catalog/category') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.categories') }}
+                </a>
+              </li>
+            @endcan
+
+            @can('index', \App\Models\SubCategory::class)
+              <li class="{{ Request::is('admin/catalog/subcategory*') ? 'active' : '' }}">
+                <a href="{{ url('admin/catalog/subcategory') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.subcategories') }}
+                </a>
+              </li>
+            @endcan
+          </ul>
+        </li>
+      @endif
+
       @if (Gate::allows('index', \App\Models\Inventory::class) || Gate::allows('index', \App\Models\Warehouse::class) || Gate::allows('index', \App\Models\Supplier::class))
         <li class="treeview {{ Request::is('admin/stock*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
@@ -544,7 +574,7 @@
         @unless (Auth::user()->isFromMerchant())
           <li class="nav-section"><span class="nav-section-label">{{ trans('nav.promotions') ?? 'Marketing' }}</span></li>
         @endunless
-        <li class="treeview {{ Request::is('admin/deal-of-the-day*') || Request::is('admin/featured-products*') || Request::is('admin/promotion/push-campaign*') || Request::is('admin/promotions/trendingKeywords*') ? 'active' : '' }}">
+        <li class="treeview {{ Request::is('admin/deal-of-the-day*') || Request::is('admin/featured-products*') || Request::is('admin/featured-categories*') || Request::is('admin/promotion/push-campaign*') || Request::is('admin/promotions/trendingKeywords*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
             <i class="fa fa-bullhorn"></i>
             <span>{{ trans('nav.promotions') ?? 'Marketing' }}</span>
@@ -559,6 +589,11 @@
               <li class="{{ Request::is('admin/featured-products*') ? 'active' : '' }}">
                 <a href="{{ route('admin.featuredProducts') }}">
                   <i class="fa fa-angle-double-right"></i> <span>{{ trans('app.featured_items') }}</span>
+                </a>
+              </li>
+              <li class="{{ Request::is('admin/featured-categories*') ? 'active' : '' }}">
+                <a href="{{ route('admin.featuredCategories') }}">
+                  <i class="fa fa-angle-double-right"></i> <span>{{ trans('app.featured_categories') }}</span>
                 </a>
               </li>
               <li class="{{ Request::is('admin/promotion/push-campaign*') ? 'active' : '' }}">

@@ -36,10 +36,6 @@
             </tr>
           @endif
           <tr>
-            <th class="text-right">{{ trans('app.position') }}:</th>
-            <td style="width: 75%;">{{ $attributeValue->order }}</td>
-          </tr>
-          <tr>
             <th class="text-right">{{ trans('app.available_from') }}:</th>
             <td style="width: 75%;">{{ $attributeValue->created_at->toFormattedDateString() }}</td>
           </tr>

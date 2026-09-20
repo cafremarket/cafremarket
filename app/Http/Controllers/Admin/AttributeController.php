@@ -48,7 +48,7 @@ class AttributeController extends Controller
         $attributes = Attribute::mine()
             ->with('attributeType')
             ->withCount(['attributeValues', 'categories'])
-            ->orderBy('order')
+            ->orderBy('name')
             ->get();
 
         $trashes = $this->attribute->trashOnly();
@@ -204,16 +204,6 @@ class AttributeController extends Controller
         $this->attribute->destroy($id);
 
         return back()->with('success', trans('messages.deleted', ['model' => $this->model_name]));
-    }
-
-    /**
-     * Save sorting order for attributes by ajax
-     */
-    public function reorder(Request $request)
-    {
-        $this->attribute->reorder($request->all());
-
-        return response('success!', 200);
     }
 
     /**

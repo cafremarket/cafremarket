@@ -32,16 +32,7 @@ class Slider extends BaseModel
         'text_position',
         'link',
         'shop_id',
-        'order',
     ];
-
-    /**
-     * Setters
-     */
-    public function setOrderAttribute($value)
-    {
-        $this->attributes['order'] = $value ?? 100;
-    }
 
     /**
      * Scope a query to only include mobile slider.

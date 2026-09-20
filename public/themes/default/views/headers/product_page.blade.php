@@ -1,9 +1,7 @@
 @php
   $shop = $item->shop;
-  $productCategories = optional($item->product)->categories ?? collect();
-  $t_category = $productCategories->first(function ($category) use ($shop) {
-      return $shop && (int) $category->shop_id === (int) $shop->id;
-  }) ?: $productCategories->first();
+  $productCategories = optional($item->product)->subCategories ?? collect();
+  $t_category = $productCategories->first();
 @endphp
 <nav class="sf-pdp-crumb" aria-label="breadcrumb">
   <div class="container">

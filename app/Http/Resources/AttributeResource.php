@@ -19,8 +19,7 @@ class AttributeResource extends JsonResource
             'name' => $this->name,
             'attribute_type' => $this->attributeType,
             'values' => AttributeValueLightResource::collection($this->attributeValues),
-            'categories' => CategoryResource::collection($this->categories),
-            'order' => (int) $this->order,
+            'categories' => SubCategoryResource::collection($this->categories),
         ];
     }
 }

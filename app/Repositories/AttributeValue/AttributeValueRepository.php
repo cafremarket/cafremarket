@@ -7,6 +7,4 @@ interface AttributeValueRepository
     public function create($id = null);
 
     public function getAttribute($id);
-
-    public function reorder(array $attributeValues);
 }

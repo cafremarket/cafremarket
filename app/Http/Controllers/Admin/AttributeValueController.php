@@ -143,16 +143,6 @@ class AttributeValueController extends Controller
     }
 
     /**
-     * Save sorting order for attributes by ajax
-     */
-    public function reorder(Request $request)
-    {
-        $this->attribute_value->reorder($request->all());
-
-        return response('success!', 200);
-    }
-
-    /**
      * Trash the mass resources.
      *
      * @return \Illuminate\Http\Response

@@ -150,11 +150,11 @@ class Product extends Inspectable
     }
 
     /**
-     * Get the categories for the product.
+     * Get the sub-categories for the product.
      */
-    public function categories()
+    public function subCategories()
     {
-        return $this->belongsToMany(Category::class)->withTimestamps();
+        return $this->belongsToMany(SubCategory::class, 'category_product', 'product_id', 'category_id')->withTimestamps();
     }
 
     /**
@@ -299,8 +299,8 @@ class Product extends Inspectable
      */
     public function getCategoryListAttribute()
     {
-        if (count($this->categories)) {
-            return $this->categories->pluck('id')->toArray();
+        if (count($this->subCategories)) {
+            return $this->subCategories->pluck('id')->toArray();
         }
     }
 
@@ -345,7 +345,7 @@ class Product extends Inspectable
      */
     public function hasAttributes(): bool
     {
-        if ($attrs = $this->categories->pluck('attrsList')) {
+        if ($attrs = $this->subCategories->pluck('attrsList')) {
             return count($attrs->flatten()->unique('id')) > 0;
         }
 

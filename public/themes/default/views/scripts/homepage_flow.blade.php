@@ -174,7 +174,7 @@
   .nearby-store-card {
     transition: transform 0.2s, box-shadow 0.2s;
     border-radius: 12px;
-    padding: 20px 16px;
+    padding: 16px 12px;
   }
   .nearby-store-card:hover {
     transform: translateY(-4px);
