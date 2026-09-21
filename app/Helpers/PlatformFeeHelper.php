@@ -85,7 +85,7 @@ if (! function_exists('get_marketplace_commission_for_order')) {
 
 if (! function_exists('get_vendor_settlement_for_order')) {
     /**
-     * @return array{gross: float, sales_commission: float, marketplace_commission: float, total_deductions: float, net: float}
+     * @return array{gross: float, sales_commission: float, marketplace_commission: float, affiliate_commission: float, total_deductions: float, net: float}
      */
     function get_vendor_settlement_for_order($order): array
     {
@@ -99,6 +99,7 @@ if (! function_exists('get_vendor_settlement_for_order')) {
             'gross' => $settlement['gross'],
             'sales_commission' => $settlement['marketplace_commission'],
             'marketplace_commission' => $settlement['marketplace_commission'],
+            'affiliate_commission' => $settlement['affiliate_commission'] ?? 0,
             'total_deductions' => $settlement['total_deductions'],
             'net' => $settlement['net'],
         ];

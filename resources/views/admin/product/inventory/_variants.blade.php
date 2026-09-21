@@ -78,6 +78,10 @@
           'priceValue' => number_format((float) $variant->sale_price, 2, '.', ''),
           'offerPriceName' => 'variant_offer_prices[' . $variant->id . ']',
           'offerPriceValue' => $variant->offer_price,
+          'commissionName' => 'variant_affiliate_commissions[' . $variant->id . ']',
+          'commissionValue' => $variant->affiliate_commission_percentage,
+          'enabledName' => 'variant_affiliate_enabled[' . $variant->id . ']',
+          'enabledValue' => $variant->isAffiliateEnabled(),
         ])
       </td>
     </tr>

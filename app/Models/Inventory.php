@@ -65,6 +65,8 @@ class Inventory extends Inspectable
         'stuff_pick' => 'boolean',
         'auctionable' => 'boolean',
         'active' => 'boolean',
+        'is_chat_custom' => 'boolean',
+        'affiliate_enabled' => 'boolean',
     ];
 
     /**
@@ -132,7 +134,9 @@ class Inventory extends Inspectable
         'auction_end',
         'bid_accept_action',
         'affiliate_commission_percentage',
+        'affiliate_enabled',
         'shopify_id',
+        'is_chat_custom',
     ];
 
     /**
@@ -541,13 +545,35 @@ class Inventory extends Inspectable
     }
 
     /**
-     * Check if the inventory has affiliate commission.
+     * Check if the inventory is eligible for affiliate marketing and has a commission rate.
+     *
+     * Products are affiliate-eligible by default unless the vendor disables them.
      *
      * @return bool
      */
     public function hasAffiliateCommission()
     {
-        return $this->affiliates_percentage > 0;
+        if (! $this->isAffiliateEnabled()) {
+            return false;
+        }
+
+        return (float) $this->affiliates_percentage > 0;
+    }
+
+    /**
+     * Whether affiliate marketing is enabled for this listing (default: yes).
+     */
+    public function isAffiliateEnabled(): bool
+    {
+        $attributes = $this->getAttributes();
+
+        if (! array_key_exists('affiliate_enabled', $attributes)) {
+            return true;
+        }
+
+        return $attributes['affiliate_enabled'] === null
+            ? true
+            : (bool) $attributes['affiliate_enabled'];
     }
 
     /**
@@ -619,6 +645,17 @@ class Inventory extends Inspectable
         return $this->hasOffer() ? get_percentage_of($this->sale_price, $this->offer_price) : 0;
     }
 
+    public function setAffiliateCommissionPercentageAttribute($value)
+    {
+        if ($value === null || $value === '') {
+            $this->attributes['affiliate_commission_percentage'] = null;
+
+            return;
+        }
+
+        $this->attributes['affiliate_commission_percentage'] = max(0, min(100, (float) $value));
+    }
+
     /**
      * Get the affiliates percentage attribute. Return default shop affiliate commission percentage if null.
      *
@@ -626,7 +663,13 @@ class Inventory extends Inspectable
      */
     public function getAffiliatesPercentageAttribute()
     {
-        return is_null($this->affiliate_commission_percentage) ? getShopConfig($this->shop_id, 'default_affiliate_commission_percentage') : $this->affiliate_commission_percentage;
+        if (! is_null($this->affiliate_commission_percentage)) {
+            return (float) $this->affiliate_commission_percentage;
+        }
+
+        $default = getShopConfig($this->shop_id, 'default_affiliate_commission_percentage');
+
+        return is_null($default) || $default === '' ? 5.0 : (float) $default;
     }
 
     /**

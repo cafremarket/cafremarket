@@ -35,6 +35,21 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 
+if (! function_exists('auth_web_user')) {
+    /**
+     * Platform/merchant User from the web guard only.
+     * Safe when customer/affiliate guards are the active Auth::user().
+     *
+     * @return \App\Models\User|null
+     */
+    function auth_web_user()
+    {
+        $user = Auth::guard('web')->user();
+
+        return ($user instanceof User) ? $user : null;
+    }
+}
+
 if (! function_exists('get_platform_title')) {
     /**
      * Return shop title or the application title
@@ -140,8 +155,10 @@ if (! function_exists('get_site_title')) {
      */
     function get_site_title()
     {
-        if (Auth::guard('web')->check() && Auth::user()->isFromMerchant() && Auth::user()->shop) {
-            return Auth::user()->shop->name;
+        $user = Auth::guard('web')->user();
+
+        if ($user && method_exists($user, 'isFromMerchant') && $user->isFromMerchant() && $user->shop) {
+            return $user->shop->name;
         }
 
         return get_platform_title();
@@ -217,7 +234,9 @@ if (! function_exists('panel_route_name')) {
      */
     function panel_route_name(string $name): string
     {
-        if (request()->is('merchant/*') && \Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->isFromMerchant()) {
+        $webUser = auth_web_user();
+
+        if (request()->is('merchant/*') && $webUser && $webUser->isFromMerchant()) {
             $merchantName = str_starts_with($name, 'admin.')
                 ? 'merchant.'.substr($name, 6)
                 : $name;
@@ -427,8 +446,10 @@ if (! function_exists('get_shop_url')) {
         }
 
         // When slug is not given and user is vendor stuff
-        if (Auth::guard('web')->check() && Auth::user()->isFromMerchant()) {
-            return url('/shop/'.Auth::user()->shop->slug);
+        $user = Auth::guard('web')->user();
+
+        if ($user && method_exists($user, 'isFromMerchant') && $user->isFromMerchant() && $user->shop) {
+            return url('/shop/'.$user->shop->slug);
         }
 
         return url('/');
@@ -437,12 +458,19 @@ if (! function_exists('get_shop_url')) {
 
 if (! function_exists('get_category_url')) {
     /**
-     * Public category URL — store-scoped when the category belongs to a shop.
+     * Public catalog URL.
+     * Category: /categories/{slug}
+     * SubCategory: /{category-slug}/{subcategory-slug}
      */
     function get_category_url($category, $shop = null): string
     {
         if (is_string($category)) {
-            return route('category.browse', $category);
+            $sub = \App\Models\SubCategory::where('slug', $category)->with('category')->first();
+            if ($sub) {
+                return get_category_url($sub, $shop);
+            }
+
+            return route('categories.browse', $category);
         }
 
         $slug = $category->slug ?? null;
@@ -450,14 +478,36 @@ if (! function_exists('get_category_url')) {
             return url('/');
         }
 
-        // Categories are fully admin-managed now — no shop-scoped category URLs.
-        if ($shop) {
-            $shopSlug = $shop instanceof Shop ? $shop->slug : $shop;
+        $isSubCategory = $category instanceof \App\Models\SubCategory
+            || $category->getAttribute('category_id');
 
-            return route('shop.category.browse', ['slug' => $shopSlug, 'category' => $slug]);
+        if ($isSubCategory) {
+            if (! $category->relationLoaded('category')) {
+                $category->load('category');
+            }
+
+            $parentSlug = optional($category->category)->slug;
+            if (! $parentSlug) {
+                return url('/'.$slug);
+            }
+
+            if ($shop) {
+                $shopSlug = $shop instanceof \App\Models\Shop ? $shop->slug : $shop;
+
+                return route('shop.category.browse', [
+                    'slug' => $shopSlug,
+                    'category' => $parentSlug,
+                    'subcategory' => $slug,
+                ]);
+            }
+
+            return route('category.browse', [
+                'category' => $parentSlug,
+                'subcategory' => $slug,
+            ]);
         }
 
-        return route('category.browse', $slug);
+        return route('categories.browse', $slug);
     }
 }
 
@@ -717,7 +767,9 @@ if (! function_exists('getPaginationValue')) {
     {
         $default = 10;
 
-        if (Auth::check() && Auth::user()->isFromPlatform()) {
+        $user = auth_web_user();
+
+        if ($user && $user->isFromPlatform()) {
             $value = (int) (config('system_settings.pagination') ?? $default);
         } else {
             $value = (int) (config('shop_settings.pagination') ?? $default);
@@ -888,7 +940,7 @@ if (! function_exists('ensure_shop_attribute_presets')) {
      */
     function ensure_shop_attribute_presets(?int $shopId = null): void
     {
-        $shopId = $shopId ?: (Auth::check() ? Auth::user()->merchantId() : null);
+        $shopId = $shopId ?: (auth_web_user()?->merchantId());
         if (! $shopId) {
             return;
         }
@@ -2400,7 +2452,7 @@ if (! function_exists('get_formated_order_number')) {
         $order_id = $order_id ?? str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
 
         if ($shop_id == null && Auth::guard('web')->check()) {
-            $shop_id = Auth::user()->merchantId();
+            $shop_id = auth_web_user()?->merchantId();
         }
 
         return getShopConfig($shop_id, 'order_number_prefix').$order_id.getShopConfig($shop_id, 'order_number_suffix');
@@ -4025,7 +4077,8 @@ if (! function_exists('update_env')) {
     function update_env($data = []): void
     {
         // When the user is admin
-        if (Auth::user()->isAdmin()) {
+        $webUser = auth_web_user();
+        if ($webUser && method_exists($webUser, 'isAdmin') && $webUser->isAdmin()) {
             if (! empty($data)) {
                 $env = new \App\Services\EnvManager;
                 foreach ($data as $key => $value) {
@@ -4143,6 +4196,51 @@ if (! function_exists('get_featured_items')) {
 
             return collect($ids)->map(function ($id) use ($items) {
                 return $items->get($id);
+            })->filter()->values();
+        });
+    }
+}
+
+if (! function_exists('get_featured_shops')) {
+    /**
+     * Homepage curated featured shops (admin-picked, in the order they were picked).
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    function get_featured_shops()
+    {
+        $ids = get_from_option_table('featured_shops', []);
+        if (empty($ids) || ! is_array($ids)) {
+            return collect([]);
+        }
+
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        if (empty($ids)) {
+            return collect([]);
+        }
+
+        $cacheKey = 'featured_shops_'.md5(implode(',', $ids));
+
+        return Cache::remember($cacheKey, (int) config('performance.ttl.shops', 180), function () use ($ids) {
+            $shops = \App\Models\Shop::query()
+                ->whereIn('id', $ids)
+                ->active()
+                ->withCount([
+                    'inventories as active_inventories_count' => function ($q) {
+                        $q->where('active', 1);
+                    },
+                ])
+                ->with([
+                    'logoImage',
+                    'config',
+                    'owner:id,name',
+                    'reviewSummary:rating,count,reviewable_id,reviewable_type',
+                ])
+                ->get()
+                ->keyBy('id');
+
+            return collect($ids)->map(function ($id) use ($shops) {
+                return $shops->get($id);
             })->filter()->values();
         });
     }

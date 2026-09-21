@@ -84,6 +84,12 @@
             <li><a href="{{ url('/selling#howItWorks') }}">{{ trans('theme.nav.how_it_works') }}</a></li>
             <li><a href="{{ url('/selling#faqs') }}">{{ trans('theme.nav.faq') }}</a></li>
             @if (is_incevio_package_loaded('affiliate'))
+              <li>
+                <a href="{{ auth()->guard('affiliate')->check() ? route('affiliate.dashboard') : route('affiliate.login.form') }}" class="sf-footer-seller-link">
+                  <i class="fal fa-handshake"></i>
+                  {{ auth()->guard('affiliate')->check() ? trans('packages.affiliate.affiliate_dashboard') : trans('packages.affiliate.login') }}
+                </a>
+              </li>
               <li><a href="{{ route('affiliate.register.form') }}">{{ trans('packages.affiliate.become_an_affiliate') }}</a></li>
             @endif
             @foreach (($pages ?? collect())->where('position', 'footer_2nd_column') as $page)

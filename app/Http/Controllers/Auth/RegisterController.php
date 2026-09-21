@@ -21,7 +21,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 
 class RegisterController extends Controller
@@ -101,11 +100,12 @@ class RegisterController extends Controller
                 DB::rollback();
                 Log::error('Vendor Registration Failed: '.$e->getMessage());
 
-                // Set error messages:
-                $error = new MessageBag;
-                $error->add('errors', trans('responses.vendor_config_failed'));
-
-                return redirect()->to($this->vendorRegisterUrl())->withErrors($error)->withInput();
+                return registration_failure_response(
+                    $e,
+                    $this->vendorRegisterUrl(),
+                    'vendor',
+                    trans('responses.vendor_config_failed')
+                );
             }
 
             // Everything is fine. Now commit the transaction
@@ -141,11 +141,12 @@ class RegisterController extends Controller
             DB::rollback();
             Log::error('Vendor Registration Failed: '.$e->getMessage());
 
-            // Set error messages:
-            $error = new MessageBag;
-            $error->add('errors', trans('responses.vendor_config_failed'));
-
-            return redirect()->to($this->vendorRegisterUrl())->withErrors($error)->withInput();
+            return registration_failure_response(
+                $e,
+                $this->vendorRegisterUrl(),
+                'vendor',
+                trans('responses.vendor_config_failed')
+            );
         }
 
         // Everything is fine. Now commit the transaction

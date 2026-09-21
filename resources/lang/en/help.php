@@ -428,6 +428,7 @@ return [
     'best_finds_under' => 'This is for the homepage <em>Best Finds Under</em> product carousel. The system will pick best selling items under this price limit.',
     'featured_items' => 'This is for the homepage <em>Featured</em> section. We suggest to set 5-10 items.',
     'featured_categories' => 'This is for the homepage <em>Featured Categories</em> section. We suggest to set 10-15 categories.',
+    'featured_shops' => 'This is for the homepage <em>Featured Stores</em> section. Only the stores picked here are shown on the homepage — the section stays hidden until you pick at least one.',
     'trending_now_categories' => 'This is for the homepage <em>Trending Now Categories</em> section. We suggest to set 2-4 categories.',
     'featured_brands' => 'This is for the homepage <em>Featured Brands</em> section. We suggest to set 4 brands.',
     'featured_vendors' => 'This is for the homepage <em>Featured Vendors</em> section. Maximum 3 vendors can be chosen for this section.',

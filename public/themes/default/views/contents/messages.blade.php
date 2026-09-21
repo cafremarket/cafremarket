@@ -379,7 +379,19 @@
         credentials: 'same-origin',
         headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html', 'X-CSRF-TOKEN': csrf }
       }).then(function (res) {
-        if (!res.ok) throw new Error('Failed to load conversation (' + res.status + ')');
+        if (!res.ok) {
+          var notFound = res.status === 404;
+          var title = notFound
+            ? @json(trans('theme.chat_not_found'))
+            : 'Could not open chat';
+          var detail = notFound
+            ? ''
+            : ('HTTP ' + res.status);
+          var err = new Error(title);
+          err._title = title;
+          err._detail = detail;
+          throw err;
+        }
         return res.text();
       }).then(function (html) {
         pane.innerHTML = html;
@@ -389,7 +401,10 @@
         var head = qs('.cpc-thread__head');
         if (head) subscribeRoom(head.getAttribute('data-ws-room') || '');
       }).catch(function (err) {
-        pane.innerHTML = '<div class="cpc__placeholder"><h3>Could not open chat</h3><p>' + esc(err.message || 'Error') + '</p></div>';
+        var title = (err && err._title) || 'Could not open chat';
+        var detail = (err && err._detail) || (err && err.message) || 'Error';
+        pane.innerHTML = '<div class="cpc__placeholder"><h3>' + esc(title) + '</h3>' +
+          (detail && detail !== title ? '<p>' + esc(detail) + '</p>' : '') + '</div>';
       });
     }
 

@@ -25,6 +25,10 @@ class LoginController extends Controller
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
+        ], [
+            'email.required' => trans('packages.affiliate.email_required'),
+            'email.email' => trans('packages.affiliate.email_invalid'),
+            'password.required' => trans('packages.affiliate.password_required'),
         ]);
 
         if ($this->attemptLogin($request)) {
@@ -36,6 +40,21 @@ class LoginController extends Controller
         }
 
         return $this->sendFailedLoginResponse($request);
+    }
+
+    /**
+     * Failed login — show a clear message on the affiliate login form.
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        $message = trans('auth.failed');
+
+        return redirect()->route('affiliate.login.form')
+            ->withInput($request->only($this->username()))
+            ->withErrors([
+                $this->username() => $message,
+            ])
+            ->with('error', $message);
     }
 
     protected function guard()

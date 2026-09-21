@@ -147,12 +147,27 @@ class InventoryController extends Controller
         // $this->authorize('update', $inventory); // Check permission
 
         try {
+            // Ensure boolean affiliate toggle is cast correctly for mobile clients.
+            if (is_incevio_package_loaded('affiliate') && $request->has('affiliate_enabled')) {
+                $request->merge([
+                    'affiliate_enabled' => $request->boolean('affiliate_enabled'),
+                ]);
+            }
+
             $this->inventory->update($request, $inventory);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
 
-        return response()->json(['message' => trans('api.data_updated_successfully')], 200);
+        return response()->json([
+            'message' => trans('api.data_updated_successfully'),
+            'data' => is_incevio_package_loaded('affiliate') ? [
+                'id' => $inventory->fresh()->id,
+                'affiliate_enabled' => $inventory->fresh()->isAffiliateEnabled(),
+                'affiliate_commission_percentage' => $inventory->fresh()->affiliate_commission_percentage,
+                'effective_affiliate_commission_percentage' => $inventory->fresh()->affiliates_percentage,
+            ] : null,
+        ], 200);
     }
 
     /**
@@ -168,12 +183,30 @@ class InventoryController extends Controller
         try {
             $data = ! is_incevio_package_loaded('pharmacy') ? $request->except('expiry_date') : $request->all();
 
+            if (is_incevio_package_loaded('affiliate')) {
+                if ($request->has('affiliate_enabled')) {
+                    $data['affiliate_enabled'] = $request->boolean('affiliate_enabled');
+                }
+                if ($request->exists('affiliate_commission_percentage')) {
+                    $value = $request->input('affiliate_commission_percentage');
+                    $data['affiliate_commission_percentage'] = ($value === '' || $value === null) ? null : $value;
+                }
+            }
+
             $inventory->update($data);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
 
-        return response()->json(['message' => trans('api.item_updated_successfully')], 200);
+        return response()->json([
+            'message' => trans('api.item_updated_successfully'),
+            'data' => is_incevio_package_loaded('affiliate') ? [
+                'id' => $inventory->id,
+                'affiliate_enabled' => $inventory->isAffiliateEnabled(),
+                'affiliate_commission_percentage' => $inventory->affiliate_commission_percentage,
+                'effective_affiliate_commission_percentage' => $inventory->affiliates_percentage,
+            ] : null,
+        ], 200);
     }
 
     /**

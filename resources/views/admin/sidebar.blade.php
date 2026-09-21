@@ -95,31 +95,14 @@
 
       {{-- ===== CATEGORIES (Platform admin only) =====
            Categories are the shared taxonomy every store picks from — unlike
-           products/attributes/manufacturers above, they are never store-managed. --}}
-      @if (Auth::user()->isFromPlatform() && (Gate::allows('index', \App\Models\Category::class) || Gate::allows('index', \App\Models\SubCategory::class)))
-        <li class="treeview {{ Request::is('admin/catalog/category*') || Request::is('admin/catalog/subcategory*') ? 'active' : '' }}">
-          <a href="javascript:void(0)">
+           products/attributes/manufacturers above, they are never store-managed.
+           Subcategories are managed from each category's action button. --}}
+      @if (Auth::user()->isFromPlatform() && Gate::allows('index', \App\Models\Category::class))
+        <li class="{{ Request::is('admin/catalog/category*') || Request::is('admin/catalog/subcategory*') ? 'active' : '' }}">
+          <a href="{{ url('admin/catalog/category') }}">
             <i class="fa fa-sitemap"></i>
             <span>{{ trans('nav.categories') }}</span>
-            <i class="fa fa-angle-left pull-right"></i>
           </a>
-          <ul class="treeview-menu">
-            @can('index', \App\Models\Category::class)
-              <li class="{{ Request::is('admin/catalog/category*') ? 'active' : '' }}">
-                <a href="{{ url('admin/catalog/category') }}">
-                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.categories') }}
-                </a>
-              </li>
-            @endcan
-
-            @can('index', \App\Models\SubCategory::class)
-              <li class="{{ Request::is('admin/catalog/subcategory*') ? 'active' : '' }}">
-                <a href="{{ url('admin/catalog/subcategory') }}">
-                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.subcategories') }}
-                </a>
-              </li>
-            @endcan
-          </ul>
         </li>
       @endif
 
@@ -296,7 +279,7 @@
         );
       @endphp
       @if ($showPlatformAdminMenu)
-        <li class="treeview {{ Request::is('admin/admin*') || Request::is('address/addresses/customer*') || Request::is('admin/inspector*') || Request::is('admin/affiliate') ? 'active' : '' }}">
+        <li class="treeview {{ Request::is('admin/admin*') || Request::is('address/addresses/customer*') || Request::is('admin/inspector*') || Request::is('admin/affiliate*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
             <i class="fa fa-user-secret"></i>
             <span>{{ trans('nav.admin') }}</span>
@@ -319,7 +302,7 @@
               </li>
             @endcan
 
-            @if (is_incevio_package_loaded('affiliate') && Auth::user()->isSuperAdmin())
+            @if (is_incevio_package_loaded('affiliate') && Auth::user()->isFromPlatform())
               @include('affiliate::admin._sidebar_nav')
             @endif
 
@@ -574,7 +557,7 @@
         @unless (Auth::user()->isFromMerchant())
           <li class="nav-section"><span class="nav-section-label">{{ trans('nav.promotions') ?? 'Marketing' }}</span></li>
         @endunless
-        <li class="treeview {{ Request::is('admin/deal-of-the-day*') || Request::is('admin/featured-products*') || Request::is('admin/featured-categories*') || Request::is('admin/promotion/push-campaign*') || Request::is('admin/promotions/trendingKeywords*') ? 'active' : '' }}">
+        <li class="treeview {{ Request::is('admin/deal-of-the-day*') || Request::is('admin/featured-products*') || Request::is('admin/featured-categories*') || Request::is('admin/featured-shops*') || Request::is('admin/promotion/push-campaign*') || Request::is('admin/promotions/trendingKeywords*') ? 'active' : '' }}">
           <a href="javascript:void(0)">
             <i class="fa fa-bullhorn"></i>
             <span>{{ trans('nav.promotions') ?? 'Marketing' }}</span>
@@ -594,6 +577,11 @@
               <li class="{{ Request::is('admin/featured-categories*') ? 'active' : '' }}">
                 <a href="{{ route('admin.featuredCategories') }}">
                   <i class="fa fa-angle-double-right"></i> <span>{{ trans('app.featured_categories') }}</span>
+                </a>
+              </li>
+              <li class="{{ Request::is('admin/featured-shops*') ? 'active' : '' }}">
+                <a href="{{ route('admin.featuredShops') }}">
+                  <i class="fa fa-angle-double-right"></i> <span>{{ trans('app.featured_shops') }}</span>
                 </a>
               </li>
               <li class="{{ Request::is('admin/promotion/push-campaign*') ? 'active' : '' }}">

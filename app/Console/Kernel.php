@@ -82,9 +82,7 @@ class Kernel extends ConsoleKernel
             $schedule->command('wallet:release-payment')->daily();
         }
 
-        if (is_incevio_package_loaded('affiliate')) {
-            $schedule->command('affiliate:release-commissions')->daily();
-        }
+        // Affiliate commissions release immediately on delivery (no cron).
 
         // Auction check and process. Runes every hour
         if (is_incevio_package_loaded('auction')) {

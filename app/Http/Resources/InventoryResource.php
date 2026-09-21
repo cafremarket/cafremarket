@@ -53,6 +53,12 @@ class InventoryResource extends JsonResource
                 'id' => $tag->id,
                 'name' => $tag->name,
             ])->values()->all(),
+            $this->mergeWhen(is_incevio_package_loaded('affiliate'), [
+                'affiliate_enabled' => $this->isAffiliateEnabled(),
+                'affiliate_commission_percentage' => $this->affiliate_commission_percentage,
+                'effective_affiliate_commission_percentage' => $this->affiliates_percentage,
+                'affiliate_commission_text' => $this->affiliate_commission_percentage_text,
+            ]),
         ];
     }
 }

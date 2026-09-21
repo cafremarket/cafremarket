@@ -18,7 +18,7 @@ class OrderChatSyncService
 {
     public const ORDER_SHARE_PREFIX = '[order_share]';
 
-    public static function buildOrderSharePayload(Order $order): array
+    public static function buildOrderSharePayload(Order $order, bool $isCustom = false): array
     {
         $order->loadMissing(['shop', 'inventories.image']);
 
@@ -33,10 +33,21 @@ class OrderChatSyncService
         }
 
         try {
-            $url = route('order.detail', $order);
+            $path = route('order.detail', $order, false);
         } catch (\Throwable $e) {
-            $url = url('/order/'.$order->id);
+            $path = '/order/'.$order->id;
         }
+
+        // Build the absolute URL from the CURRENT REQUEST's own Host header
+        // rather than config('app.url'). Some environments override APP_URL
+        // at the webserver/OS level in a way this app's own .env/config()
+        // never sees, so a link built from config('app.url') can silently
+        // point at the wrong domain (e.g. a leftover "localhost") even
+        // though the browser is really on a different one. The request's
+        // own host always matches whatever domain is actually being used.
+        $url = app()->runningInConsole()
+            ? url($path)
+            : request()->getSchemeAndHttpHost().$path;
 
         $status = '';
         try {
@@ -63,13 +74,14 @@ class OrderChatSyncService
             'url' => $url,
             'image' => $image,
             'items_count' => $order->inventories->count(),
+            'is_custom' => $isCustom,
         ];
     }
 
-    public static function buildOrderShareMessage(Order $order): string
+    public static function buildOrderShareMessage(Order $order, bool $isCustom = false): string
     {
         return self::ORDER_SHARE_PREFIX.json_encode(
-            self::buildOrderSharePayload($order),
+            self::buildOrderSharePayload($order, $isCustom),
             JSON_UNESCAPED_UNICODE
         );
     }
@@ -156,7 +168,8 @@ class OrderChatSyncService
         bool $shareOrder = false,
         $userId = null,
         $attachmentFile = null,
-        ?int $parentId = null
+        ?int $parentId = null,
+        bool $isCustomOrder = false
     ): ?ChatConversation {
         if (! class_exists(ChatConversation::class) || ! Schema::hasTable('chat_conversations')) {
             return null;
@@ -171,8 +184,12 @@ class OrderChatSyncService
         $chat = self::findShopChat($order);
 
         if ($shareOrder) {
-            $shareMsg = self::buildOrderShareMessage($order);
-            $chat = self::appendReply($chat, $shopId, $customerId, $shareMsg, $senderType, $userId, $order);
+            $sharePayload = self::buildOrderSharePayload($order, $isCustomOrder);
+            $shareMsg = self::ORDER_SHARE_PREFIX.json_encode($sharePayload, JSON_UNESCAPED_UNICODE);
+            $chat = self::appendReply(
+                $chat, $shopId, $customerId, $shareMsg, $senderType, $userId, $order,
+                null, Reply::TYPE_ORDER_SHARE, $sharePayload
+            );
         }
 
         $text = trim($replyText);
@@ -225,7 +242,9 @@ class OrderChatSyncService
         string $senderType,
         $userId,
         Order $order,
-        ?int $parentId = null
+        ?int $parentId = null,
+        ?string $type = null,
+        ?array $payload = null
     ): ChatConversation {
         if (! $chat) {
             $attrs = [
@@ -245,6 +264,14 @@ class OrderChatSyncService
         $replyAttrs = [
             'reply' => $replyText,
             'read' => false,
+            'type' => $type ?? (
+                $replyText === (function_exists('livechat_message_for_attachment_only')
+                    ? livechat_message_for_attachment_only()
+                    : '[attachment]')
+                    ? Reply::TYPE_ATTACHMENT
+                    : Reply::TYPE_TEXT
+            ),
+            'payload' => $payload,
         ];
         if ($senderType === 'customer') {
             $replyAttrs['customer_id'] = $customerId;
@@ -291,7 +318,7 @@ class OrderChatSyncService
             ? livechat_format_message_time($chatReply->created_at)
             : optional($chatReply->created_at)->format('H:i');
 
-        $isOrderShare = str_starts_with($replyText, self::ORDER_SHARE_PREFIX);
+        $resolvedType = $chatReply->resolvedType();
         $payload = array_merge([
             'text' => $replyText,
             'sender_type' => $senderType,
@@ -299,10 +326,12 @@ class OrderChatSyncService
             'reply_id' => $chatReply->id,
             'customer_id' => $chat->customer_id,
             'shop_id' => $chat->shop_id,
-            'chat_type' => $isOrderShare ? 'order_share' : 'product',
+            'chat_type' => $resolvedType === Reply::TYPE_ORDER_SHARE ? 'order_share' : 'product',
             'time' => $clock,
             'created_at' => optional($chatReply->created_at)->toIso8601String(),
             'attachments' => $attachmentsPayload,
+            'type' => $resolvedType,
+            'payload' => $chatReply->resolvedPayload(),
         ], function_exists('livechat_quote_socket_payload')
             ? livechat_quote_socket_payload($quotedParent)
             : []);

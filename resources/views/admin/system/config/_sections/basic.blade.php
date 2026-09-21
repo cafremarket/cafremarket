@@ -116,16 +116,9 @@
     @if (is_incevio_package_loaded('affiliate'))
       <fieldset>
         <legend>{{ trans('nav.affiliate') ?? 'Affiliate' }}</legend>
-        <div class="form-group">
-          {!! Form::label('affiliate_commission_release_in_days', trans('packages.affiliate.affiliate_commission_release_in_days') . ':', ['class' => 'with-help col-sm-6 control-label']) !!}
-          <div class="col-sm-5 nopadding-left">
-            @if ($can_update)
-              {!! Form::number('affiliate_commission_release_in_days', $system->affiliate_commission_release_in_days, ['class' => 'form-control', 'min' => 0]) !!}
-            @else
-              <span>{{ $system->affiliate_commission_release_in_days }}</span>
-            @endif
-          </div>
-        </div>
+        <p class="help-block" style="padding: 0 15px 10px;">
+          {{ trans('packages.affiliate.affiliate_commission_release_direct_help') }}
+        </p>
         @include('admin.system.config._sections._toggle', [
           'field' => 'publicly_show_affiliate_commission',
           'label' => trans('packages.affiliate.publicly_show_affiliate_commission'),

@@ -88,7 +88,7 @@
           @endforeach
         </ul>
       </li>
-    @elseif(Request::is('category/*'))
+    @elseif(Request::routeIs('category.browse') || Request::is('category/*'))
       <li>
         <h4>
           <i class="fas fa-angle-left"></i>

@@ -46,6 +46,7 @@ class FeaturedCategoriesController extends Controller
         Category::whereIn('id', $ids)->update(['featured' => true]);
 
         Cache::forget('all_categories');
+        Cache::forget('all_categories_v2');
         Cache::forget('featured_categories_web');
         CatalogCache::bumpCatalog();
 

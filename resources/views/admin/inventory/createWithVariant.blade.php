@@ -185,6 +185,11 @@
             <th>{{ trans('app.form.offer_price') }}
               <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.offer_price') }}"><sup><i class="fa fa-question"></i></sup></small>
             </th>
+            @if (is_incevio_package_loaded('affiliate'))
+              <th>{{ trans('packages.affiliate.affiliate_commission') }}
+                <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.help_commission_field') }}"><sup><i class="fa fa-question"></i></sup></small>
+              </th>
+            @endif
             <th><i class="fa fa-trash-o"></i></th>
           </tr>
         </thead>
@@ -256,6 +261,13 @@
                   {!! Form::number('offer_price[' . $i . ']', null, ['class' => 'form-control offerPrice', 'step' => 'any', 'placeholder' => trans('app.placeholder.offer_price')]) !!}
                 </div>
               </td>
+              @if (is_incevio_package_loaded('affiliate'))
+                <td>
+                  <div class="form-group">
+                    {!! Form::number('affiliate_commission[' . $i . ']', null, ['class' => 'form-control', 'step' => '0.01', 'min' => 0, 'max' => 100, 'placeholder' => '%']) !!}
+                  </div>
+                </td>
+              @endif
               <td>
                 <div class="form-group text-muted">
                   <i class="fa fa-close deleteThisRow" data-toggle="tooltip" data-placement="left" title="{{ trans('help.delete_this_combination') }}"></i>

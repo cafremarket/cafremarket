@@ -20,7 +20,7 @@
           @if (auth()->guard('affiliate')->check())
             <li><a href="{{ route('affiliate.dashboard') }}">{{ trans('packages.affiliate.affiliate_dashboard') }}</a></li>
           @else
-            <li><a href="{{ route('affiliate.login') }}">{{ trans('packages.affiliate.login') }}</a></li>
+            <li><a href="{{ route('affiliate.login.form') }}">{{ trans('packages.affiliate.login') }}</a></li>
           @endif
         @endif
       </ul>

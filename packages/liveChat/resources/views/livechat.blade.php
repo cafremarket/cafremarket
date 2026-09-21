@@ -57,7 +57,9 @@
                   'title' => 'Order #'.$order->order_number,
                   'status' => '',
                   'total' => '',
-                  'url' => url('/order/'.$order->id),
+                  // Built from the current request's own host, not config('app.url') —
+                  // see OrderChatSyncService::buildOrderSharePayload() for why.
+                  'url' => request()->getSchemeAndHttpHost().'/order/'.$order->id,
                   'image' => '',
               ];
           }
@@ -104,15 +106,46 @@
             </div>
           </div>
           <div class="chat-composer-row">
-            <label id="chat_composer_attach" class="chat-composer-btn chat-composer-btn--attach" title="Attach file">
-              <input type="file" id="chatBoxFile" name="photo" class="chat-composer-file-input" accept="image/*,.pdf,.doc,.docx" tabindex="-1">
-              <span class="chat-composer-btn-icon" aria-hidden="true"><i class="fa fa-paperclip"></i></span>
-              <span class="chat-sr-only">Attach file</span>
-            </label>
+            <div class="chat-attach-wrap">
+              <button type="button" id="chat_attach_toggle" class="chat-composer-btn chat-composer-btn--attach" title="Attach" aria-haspopup="true" aria-expanded="false">
+                <span class="chat-composer-btn-icon" aria-hidden="true"><i class="fa fa-plus"></i></span>
+                <span class="chat-sr-only">Attachment options</span>
+              </button>
+              <div id="chat_attach_menu" class="chat-attach-menu" hidden>
+                <label id="chat_composer_attach" class="chat-attach-menu-item" title="Media">
+                  <input type="file" id="chatBoxFile" name="photo" class="chat-composer-file-input" accept="image/*,.pdf,.doc,.docx" tabindex="-1">
+                  <span class="chat-attach-menu-icon" aria-hidden="true"><i class="fa fa-image"></i></span>
+                  <span class="chat-attach-menu-label">Media</span>
+                </label>
+                <button type="button" id="chat_attach_product" class="chat-attach-menu-item">
+                  <span class="chat-attach-menu-icon" aria-hidden="true"><i class="fa fa-shopping-bag"></i></span>
+                  <span class="chat-attach-menu-label">Share Product</span>
+                </button>
+                <button type="button" id="chat_attach_order" class="chat-attach-menu-item">
+                  <span class="chat-attach-menu-icon" aria-hidden="true"><i class="fa fa-receipt"></i></span>
+                  <span class="chat-attach-menu-label">Share Order</span>
+                </button>
+              </div>
+            </div>
             <input id="chatBoxMsg" name="chat_message" type="text" placeholder="Send a message" class="chat_field chat_message chat-composer-msg" aria-label="Chat message input" autocomplete="off">
             <button type="button" id="fchat_send" class="chat-composer-btn chat-composer-btn--send" aria-label="Send message">
               <span class="chat-composer-btn-icon" aria-hidden="true"><i class="fa fa-paper-plane"></i></span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="chat_picker_modal" class="chat-modal" hidden>
+        <div class="chat-modal-card">
+          <div class="chat-modal-head">
+            <span id="chat_picker_title">Share</span>
+            <button type="button" class="chat-modal-close" data-modal-close aria-label="Close">&times;</button>
+          </div>
+          <div class="chat-modal-body">
+            <input type="text" id="chat_picker_search" class="chat-modal-input" placeholder="Search…">
+            <div id="chat_picker_list" class="chat-picker-list">
+              <p class="chat-picker-empty">Loading…</p>
+            </div>
           </div>
         </div>
       </div>
@@ -209,7 +242,7 @@
                     'title' => 'Order #'.$order->order_number,
                     'status' => '',
                     'total' => '',
-                    'url' => url('/order/'.$order->id),
+                    'url' => request()->getSchemeAndHttpHost().'/order/'.$order->id,
                     'image' => '',
                 ];
             }
@@ -364,6 +397,18 @@
         return wrap;
       }
 
+      function escText(s) {
+        var d = document.createElement('div');
+        d.textContent = s == null ? '' : String(s);
+        return d.innerHTML;
+      }
+
+      function linkifyText(s) {
+        return escText(s).replace(/(https?:\/\/[^\s<]+)/g, function (url) {
+          return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+        });
+      }
+
       function formatChatClock(isoOrDate) {
         try {
           var d = isoOrDate ? new Date(isoOrDate) : new Date();
@@ -420,7 +465,21 @@
 
       function buildChatNode(message, isAdmin, attachments, meta) {
         meta = meta || {};
-        var payload = getSharedPayload(message);
+        var type = meta.type || null;
+        var metaPayload = meta.payload || null;
+        if (metaPayload && typeof metaPayload === 'string') {
+          try { metaPayload = JSON.parse(metaPayload); } catch (e) { metaPayload = null; }
+        }
+
+        var payload = null;
+        if (type === 'product_share' || type === 'order_share') {
+          payload = metaPayload || getSharedPayload(message);
+          if (payload) payload.__shareType = (type === 'order_share') ? 'order' : 'product';
+        } else if (!type || type === 'text' || type === 'attachment') {
+          // No explicit type (older message) — fall back to prefix-sniffing.
+          payload = getSharedPayload(message);
+        }
+
         var cls = isAdmin ? 'chat_msg_item chat_msg_item_admin' : 'chat_msg_item chat_msg_item_user';
         var node = $('<span>').addClass(cls);
         if (meta.replyId) {
@@ -435,10 +494,40 @@
           node.append(attBlock);
         }
 
-        if (!payload) {
+        if (type === 'location' && metaPayload) {
+          if (isAdmin) {
+            agent_avatar.clone().prependTo(node);
+          }
+          var locWrap = $('<div>').addClass('chat-shared-product-wrap');
+          var locCard = $('<div>').addClass('chat-shared-product chat-shared-location');
+          $('<div>').addClass('chat-shared-share-icon').html('<i class="fa fa-map-marker"></i>').appendTo(locCard);
+          var locBody = $('<div>').addClass('chat-shared-product-body').appendTo(locCard);
+          $('<div>').addClass('chat-shared-product-title').text(metaPayload.label || 'Location').appendTo(locBody);
+          var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' +
+            encodeURIComponent((metaPayload.lat || '') + ',' + (metaPayload.lng || ''));
+          $('<a>').addClass('chat-shared-product-link').attr('href', mapsUrl).attr('target', '_blank').attr('rel', 'noopener')
+            .text('Open in Maps').appendTo(locBody);
+          locWrap.append(locCard);
+          node.append(locWrap);
+        } else if (type === 'contact' && metaPayload) {
+          if (isAdmin) {
+            agent_avatar.clone().prependTo(node);
+          }
+          var conWrap = $('<div>').addClass('chat-shared-product-wrap');
+          var conCard = $('<div>').addClass('chat-shared-product chat-shared-contact');
+          $('<div>').addClass('chat-shared-share-icon').html('<i class="fa fa-user"></i>').appendTo(conCard);
+          var conBody = $('<div>').addClass('chat-shared-product-body').appendTo(conCard);
+          $('<div>').addClass('chat-shared-product-title').text(metaPayload.name || 'Contact').appendTo(conBody);
+          if (metaPayload.phone) {
+            $('<div>').addClass('chat-shared-product-price').text(metaPayload.phone).appendTo(conBody);
+            $('<a>').addClass('chat-shared-product-link').attr('href', 'tel:' + metaPayload.phone).text('Call').appendTo(conBody);
+          }
+          conWrap.append(conCard);
+          node.append(conWrap);
+        } else if (!payload) {
           var text = (message || '').trim();
           if (text && text !== '[attachment]') {
-            node.append($('<span>').addClass('chat-msg-text').text(text));
+            node.append($('<span>').addClass('chat-msg-text').html(linkifyText(text)));
           }
         } else {
           if (isAdmin) {
@@ -508,6 +597,136 @@
         clearAttachmentPreview();
       });
 
+      // ---- Attachment menu (WhatsApp-style "+" popover) ----
+      (function bindAttachMenu() {
+        var toggleBtn = document.getElementById('chat_attach_toggle');
+        var menu = document.getElementById('chat_attach_menu');
+        if (!toggleBtn || !menu) return;
+
+        function closeMenu() {
+          menu.hidden = true;
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+        function openMenu() {
+          menu.hidden = false;
+          toggleBtn.setAttribute('aria-expanded', 'true');
+        }
+        toggleBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (menu.hidden) { openMenu(); } else { closeMenu(); }
+        });
+        document.addEventListener('click', function(e) {
+          if (!menu.hidden && !menu.contains(e.target) && e.target !== toggleBtn) {
+            closeMenu();
+          }
+        });
+
+        var mediaLabel = document.getElementById('chat_composer_attach');
+        if (mediaLabel) {
+          mediaLabel.addEventListener('click', function() { closeMenu(); });
+        }
+
+        var productBtn = document.getElementById('chat_attach_product');
+        if (productBtn) {
+          productBtn.addEventListener('click', function() {
+            closeMenu();
+            openPickerModal('product');
+          });
+        }
+
+        var orderBtn = document.getElementById('chat_attach_order');
+        if (orderBtn) {
+          orderBtn.addEventListener('click', function() {
+            closeMenu();
+            openPickerModal('order');
+          });
+        }
+      })();
+
+      function appendChatError(text) {
+        var response = $('<p>').addClass('text-danger').text(text);
+        $('#chat_conversation').append(response);
+        updateScroll();
+      }
+
+      // ---- Product / Order picker modal ----
+      var pickerFetchToken = 0;
+      var pickerSearchDebounce = null;
+      function openPickerModal(kind) {
+        var modal = document.getElementById('chat_picker_modal');
+        if (!modal) return;
+        $('#chat_picker_title').text(kind === 'order' ? 'Share an order' : 'Share a product');
+        $('#chat_picker_search').val('').show().attr('placeholder', kind === 'order' ? 'Search by order number…' : 'Search…');
+        modal.setAttribute('data-picker-kind', kind);
+        modal.hidden = false;
+        loadPickerItems(kind, '');
+      }
+      function closePickerModal() {
+        var modal = document.getElementById('chat_picker_modal');
+        if (modal) modal.hidden = true;
+      }
+      $(document).on('click', '#chat_picker_modal', function(e) {
+        if (e.target.id === 'chat_picker_modal' || $(e.target).is('[data-modal-close]')) {
+          closePickerModal();
+        }
+      });
+      $(document).on('input', '#chat_picker_search', function() {
+        var modal = document.getElementById('chat_picker_modal');
+        var kind = modal ? modal.getAttribute('data-picker-kind') : 'product';
+        var term = $.trim($(this).val());
+        if (pickerSearchDebounce) clearTimeout(pickerSearchDebounce);
+        pickerSearchDebounce = setTimeout(function() { loadPickerItems(kind, term); }, 300);
+      });
+
+      function loadPickerItems(kind, term) {
+        var myToken = ++pickerFetchToken;
+        var $list = $('#chat_picker_list');
+        $list.html('<p class="chat-picker-empty">Loading…</p>');
+        var url = (kind === 'order'
+          ? "{{ route('chat.orders', $shop->id) }}"
+          : "{{ route('chat.products', $shop->id) }}") + (term ? ('?q=' + encodeURIComponent(term)) : '');
+        $.ajax({
+          url: url,
+          method: 'GET',
+          beforeSend: setChatAjaxHeaders,
+          success: function(res) {
+            if (myToken !== pickerFetchToken) return;
+            var items = (res && res.data) || [];
+            if (!items.length) {
+              $list.html('<p class="chat-picker-empty">Nothing to show.</p>');
+              return;
+            }
+            $list.empty();
+            items.forEach(function(item) {
+              var card = $('<button type="button">').addClass('chat-picker-item');
+              if (item.image) {
+                $('<img>').addClass('chat-picker-item-img').attr('src', item.image).attr('alt', '').appendTo(card);
+              }
+              var body = $('<div>').addClass('chat-picker-item-body').appendTo(card);
+              $('<div>').addClass('chat-picker-item-title').text(item.title || item.order_number || '').appendTo(body);
+              var subtitle = kind === 'order'
+                ? ((item.total || '') + (item.status ? ' · ' + item.status : ''))
+                : (item.price || '');
+              $('<div>').addClass('chat-picker-item-sub').text(subtitle).appendTo(body);
+              card.on('click', function() {
+                closePickerModal();
+                if (kind === 'order') {
+                  sendTheMessage(orderSharePrefix + JSON.stringify(item), { type: 'order_share', payload: item });
+                } else {
+                  sendTheMessage(sharePrefix + JSON.stringify(item), { type: 'product_share', payload: item });
+                }
+              });
+              $list.append(card);
+            });
+          },
+          error: function() {
+            if (myToken !== pickerFetchToken) return;
+            $list.html('<p class="chat-picker-empty">Could not load. Try again.</p>');
+          },
+        });
+      }
+
       // Send on Enter only inside chat box (Shift+Enter for new line)
       $("#chatBoxMsg").on('keydown', function(event) {
         if (event.key === 'Enter') {
@@ -572,13 +791,13 @@
 
       $("#fchat_share_product").on('click', function() {
         if (!shareProductMessage) return;
-        sendTheMessage(shareProductMessage);
+        sendTheMessage(shareProductMessage, { type: 'product_share', payload: shareProductPayload });
         hideProductSharePreview();
       });
 
       $("#fchat_share_order").on('click', function() {
         if (!shareOrderMessage) return;
-        sendTheMessage(shareOrderMessage);
+        sendTheMessage(shareOrderMessage, { type: 'order_share', payload: shareOrderPayload });
         hideOrderSharePreview();
       });
 
@@ -693,9 +912,11 @@
         }
       }
 
-      // Send the message
-      function sendTheMessage(customMessage) {
+      // Send the message. `extra` (optional) = { type, payload } for
+      // location/contact/product_share/order_share messages.
+      function sendTheMessage(customMessage, extra) {
         if (isSendingMessage) return;
+        extra = extra || {};
 
         var fileInput = document.getElementById('chatBoxFile');
         var hasFile = fileInput && fileInput.files && fileInput.files.length;
@@ -713,6 +934,8 @@
         var pendingNode = buildChatNode(msg || (hasFile ? "{{ trans('theme.attachment') }}" : ''), false, null, {
           createdAt: nowIso,
           time: formatChatClock(nowIso),
+          type: extra.type,
+          payload: extra.payload,
         }).attr('data-pending', '1');
         $("#chat_conversation").append(pendingNode);
         updateScroll();
@@ -733,6 +956,8 @@
           fd.append('shop_slug', "{{ $shop->slug }}");
           fd.append('_token', "{{ csrf_token() }}");
           fd.append('photo', fdFile);
+          if (extra.type) { fd.append('type', extra.type); }
+          if (extra.payload) { fd.append('payload', JSON.stringify(extra.payload)); }
 
           if (typeof window.fetch === 'function') {
             window.fetch(chatPostUrl, {
@@ -765,14 +990,18 @@
           return;
         }
 
+        var ajaxData = {
+          'message': msg,
+          'shop_slug': "{{ $shop->slug }}",
+          '_token': "{{ csrf_token() }}",
+        };
+        if (extra.type) { ajaxData.type = extra.type; }
+        if (extra.payload) { ajaxData.payload = JSON.stringify(extra.payload); }
+
         $.ajax({
           url: chatPostUrl,
           type: 'POST',
-          data: {
-            'message': msg,
-            'shop_slug': "{{ $shop->slug }}",
-            '_token': "{{ csrf_token() }}",
-          },
+          data: ajaxData,
           beforeSend: setChatAjaxHeaders,
           complete: function(xhr) {
             handleChatSendComplete(xhr.status, pendingNode, xhr);
@@ -808,13 +1037,82 @@
 
       //Load Old Chats
       function loadOldChat() {
+        var loadTimedOut = false;
+        var loadTimer = setTimeout(function() {
+          loadTimedOut = true;
+          showChatLoadError(0, null);
+        }, 12000);
+
+        function showWelcomePrompt() {
+          var response = $('<span>').addClass('chat_msg_item chat_msg_item_admin').text("{!! trans('theme.chat_welcome') !!}");
+          agent_avatar.clone().prependTo(response);
+          $("#chat_conversation").html('').append(response);
+          updateScroll();
+        }
+
+        function showChatLoadError(status, payload) {
+          var $box = $('#chat_conversation');
+          // Guests always get a 403 here (history requires a logged-in customer) —
+          // leave the "please login" prompt alone, that's expected, not a failure.
+          if ($box.find('.chat_login_prompt').length) return;
+          // Only replace the placeholder — never stomp a conversation that
+          // already loaded (e.g. a slow retry resolving after a fresh poll).
+          if ($box.find('.chat_msg_item, .chat-day-sep').length) return;
+
+          var msg = @json(trans('theme.chat_load_failed'));
+          var showRetry = true;
+
+          if (status === 404) {
+            // No shop / no thread — invite them to start chatting instead of a network error.
+            msg = @json(trans('theme.chat_not_found'));
+            if (payload && payload.code === 'chat_not_found' && payload.message) {
+              msg = String(payload.message);
+            }
+            showRetry = false;
+          } else if (status === 401 || status === 403 || status === 419) {
+            msg = @json(trans('theme.session_expired'));
+          } else if (status === 405) {
+            msg = 'Request blocked (AJAX required). Please refresh the page.';
+          } else if (payload && payload.message) {
+            msg = String(payload.message);
+          }
+
+          $box.html('');
+          var $err = $('<div>').addClass('chat-load-error');
+          $('<p>').text(msg).appendTo($err);
+          if (showRetry) {
+            $('<button type="button">').addClass('chat-load-retry').text(@json(trans('theme.chat_retry')))
+              .on('click', function() {
+                $box.html('<p class="chat_connecting text-primary">' + @json(trans('theme.connecting')) + '</p>');
+                loadOldChat();
+              }).appendTo($err);
+          } else {
+            // 404: keep composer usable — welcome bubble so they can still send the first message.
+            $('<button type="button">').addClass('chat-load-retry').text(@json(trans('theme.chat_welcome')))
+              .on('click', function() {
+                showWelcomePrompt();
+              }).appendTo($err);
+          }
+          $box.append($err);
+        }
+
         $.ajax({
           url: "{{ route('chat.conversation', $shop->id) }}",
+          dataType: 'json',
           beforeSend: setChatAjaxHeaders,
           success: function(result) {
+            clearTimeout(loadTimer);
+            if (loadTimedOut) return; // error UI (with its own retry) already took over
+
             $("#chat_conversation").html('');
 
-            if (result) {
+            // Explicit "not found" payload with 200 should not happen; treat empty/null as new chat.
+            if (result && result.code === 'chat_not_found') {
+              showChatLoadError(404, result);
+              return;
+            }
+
+            if (result && (result.id || (result.replies && result.replies.length) || result.message)) {
               var replies = result.replies || [];
               // conversation.message is an inbox preview (last text) — never render it as a bubble when replies exist.
               if (!replies.length) {
@@ -823,6 +1121,8 @@
                 $("#chat_conversation").append(buildChatNode(result.message, false, result.attachments, {
                   createdAt: legacyAt,
                   time: formatChatClock(legacyAt),
+                  type: result.type,
+                  payload: result.payload,
                 }));
               } else {
                 var lastDay = null;
@@ -841,16 +1141,26 @@
                     replyId: reply.id,
                     createdAt: at,
                     time: formatChatClock(at),
+                    type: reply.type,
+                    payload: reply.payload,
                   }));
                 });
               }
             } else {
-              var response = $('<span>').addClass('chat_msg_item chat_msg_item_admin').text("{!! trans('theme.chat_welcome') !!}");
-              agent_avatar.prependTo(response);
-              $("#chat_conversation").append(response);
+              showWelcomePrompt();
             }
 
             updateScroll();
+          },
+          error: function(xhr) {
+            clearTimeout(loadTimer);
+            var payload = null;
+            try {
+              payload = xhr.responseJSON || (xhr.responseText ? JSON.parse(xhr.responseText) : null);
+            } catch (e) {
+              payload = null;
+            }
+            showChatLoadError(xhr && xhr.status ? xhr.status : 0, payload);
           }
         });
       }
@@ -888,6 +1198,76 @@
         })();
         var wsUrl = window.__chatWsUrl;
         var socket = null;
+
+        // Cross-tab sync: every open tab already gets its own WebSocket
+        // subscribed to this same room (the server broadcasts to every
+        // subscriber), so multiple tabs already update live independently.
+        // BroadcastChannel closes the one real gap — if THIS tab's socket is
+        // mid-reconnect and misses a message that another tab's socket did
+        // catch, that other tab relays it here so nothing is ever missed
+        // regardless of this tab's own connection state.
+        var chatBroadcast = null;
+        try {
+          if (typeof BroadcastChannel !== 'undefined') {
+            chatBroadcast = new BroadcastChannel('zcart_livechat_' + room);
+          }
+        } catch (e) {
+          chatBroadcast = null;
+        }
+
+        function handleIncomingChatMessage(result, fromBroadcast) {
+          var senderType = result.sender_type || '';
+
+          // Dedup when WS replay / multi-tab / cross-tab broadcast delivers
+          // the same reply again.
+          if (result.reply_id &&
+              $('#chat_conversation [data-reply-id="' + result.reply_id + '"]').length) {
+            return;
+          }
+
+          if (senderType !== 'merchant') {
+            return;
+          }
+
+          var renderer = (typeof window.buildChatNode === 'function')
+            ? window.buildChatNode
+            : function(message) {
+                return $('<span>').addClass('chat_msg_item chat_msg_item_admin').text(message || '');
+              };
+
+          if (typeof window.ensureStorefrontDaySep === 'function') {
+            window.ensureStorefrontDaySep(result.created_at || new Date().toISOString());
+          }
+
+          var response = renderer(result.text || '', true, result.attachments || [], {
+            replyId: result.reply_id,
+            createdAt: result.created_at,
+            time: result.time || (typeof window.formatChatClock === 'function' ? window.formatChatClock(result.created_at) : ''),
+            type: result.type,
+            payload: result.payload,
+          });
+          if (result.reply_id && response && response.attr) {
+            response.attr('data-reply-id', result.reply_id);
+          }
+          $("#chat_conversation").append(response);
+          if (typeof window.updateScroll === 'function') {
+            window.updateScroll();
+          } else {
+            var objDiv = document.getElementById("chat_conversation");
+            if (objDiv) objDiv.scrollTop = objDiv.scrollHeight;
+          }
+
+          if (!fromBroadcast && chatBroadcast) {
+            try { chatBroadcast.postMessage(result); } catch (e) {}
+          }
+        }
+
+        if (chatBroadcast) {
+          chatBroadcast.onmessage = function(ev) {
+            handleIncomingChatMessage(ev.data, true);
+          };
+        }
+
         function connectSocket() {
           try {
             socket = new WebSocket(wsUrl);
@@ -915,44 +1295,7 @@
               return;
             }
 
-            var result = parsed.data;
-            var senderType = result.sender_type || '';
-
-            // Dedup when WS replay / multi-tab delivers the same reply again.
-            if (result.reply_id &&
-                $('#chat_conversation [data-reply-id="' + result.reply_id + '"]').length) {
-              return;
-            }
-
-            if (senderType !== 'merchant') {
-              return;
-            }
-
-            var renderer = (typeof window.buildChatNode === 'function')
-              ? window.buildChatNode
-              : function(message) {
-                  return $('<span>').addClass('chat_msg_item chat_msg_item_admin').text(message || '');
-                };
-
-            if (typeof window.ensureStorefrontDaySep === 'function') {
-              window.ensureStorefrontDaySep(result.created_at || new Date().toISOString());
-            }
-
-            var response = renderer(result.text || '', true, result.attachments || [], {
-              replyId: result.reply_id,
-              createdAt: result.created_at,
-              time: result.time || (typeof window.formatChatClock === 'function' ? window.formatChatClock(result.created_at) : ''),
-            });
-            if (result.reply_id && response && response.attr) {
-              response.attr('data-reply-id', result.reply_id);
-            }
-            $("#chat_conversation").append(response);
-            if (typeof window.updateScroll === 'function') {
-              window.updateScroll();
-            } else {
-              var objDiv = document.getElementById("chat_conversation");
-              if (objDiv) objDiv.scrollTop = objDiv.scrollHeight;
-            }
+            handleIncomingChatMessage(parsed.data, false);
           };
 
           socket.onclose = function() {

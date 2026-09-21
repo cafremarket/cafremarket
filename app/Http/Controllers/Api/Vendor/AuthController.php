@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -68,11 +67,12 @@ class AuthController extends Controller
             DB::rollback();
             Log::error('Vendor Registration Failed: '.$e->getMessage());
 
-            // Set error messages:
-            $error = new MessageBag;
-            $error->add('errors', trans('responses.vendor_config_failed'));
-
-            return response()->json($error);
+            return registration_failure_response(
+                $e,
+                null,
+                'vendor',
+                trans('responses.vendor_config_failed')
+            );
         }
 
         // Everything is fine. Now commit the transaction
@@ -136,7 +136,10 @@ class AuthController extends Controller
             return new MerchantResource($user);
         }
 
-        return response()->json(['message' => trans('api.auth_failed')], 401);
+        return response()->json([
+            'message' => trans('api.auth_failed'),
+            'errors' => ['email' => [trans('api.auth_failed')]],
+        ], 401);
     }
 
     /**

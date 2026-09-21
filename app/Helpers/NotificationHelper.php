@@ -1,9 +1,6 @@
 <?php
 
 use App\Models\EmailLog;
-use App\Models\System;
-use App\Notifications\SuperAdmin\MailDeliveryFailed;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
@@ -11,33 +8,38 @@ use Illuminate\Support\Facades\Schema;
 if (! function_exists('is_mail_transport_error')) {
     function is_mail_transport_error(\Throwable $e): bool
     {
+        // Never swallow auth / validation / DB uniqueness errors as "mail" failures.
+        if ($e instanceof \Illuminate\Validation\ValidationException
+            || $e instanceof \Illuminate\Auth\AuthenticationException
+            || $e instanceof \Illuminate\Database\QueryException
+            || (function_exists('is_unique_constraint_violation') && is_unique_constraint_violation($e))) {
+            return false;
+        }
+
         $class = $e::class;
-        $message = strtolower($e->getMessage());
 
         if (
-            str_contains($class, 'Mailer')
-            || str_contains($class, 'Mail')
-            || str_contains($class, 'UnexpectedResponseException')
+            str_contains($class, 'Symfony\\Component\\Mailer')
+            || str_contains($class, 'Swift_')
             || str_contains($class, 'TransportException')
             || str_contains($class, 'RfcComplianceException')
         ) {
             return true;
         }
 
-        return str_contains($message, 'mail')
-            || str_contains($message, 'smtp')
+        $message = strtolower($e->getMessage());
+
+        // Strip common auth wording that contains "mail" / "email" so messages like
+        // "This email is already registered" are never treated as SMTP failures.
+        $message = str_replace(['email', 'already registered', 'already has an account'], '', $message);
+
+        return str_contains($message, 'smtp')
             || str_contains($message, 'starttls')
             || str_contains($message, 'stream_socket')
-            || str_contains($message, 'certificate')
-            || str_contains($message, 'connection could not be established')
             || str_contains($message, 'failed to authenticate')
             || str_contains($message, 'recipient address rejected')
-            || str_contains($message, 'user unknown')
-            || str_contains($message, 'mailbox')
             || str_contains($message, 'expected response code')
-            || str_contains($message, '550 ')
-            || str_contains($message, '553 ')
-            || str_contains($message, '554 ');
+            || str_contains($message, 'mailbox');
     }
 }
 
@@ -78,31 +80,11 @@ if (! function_exists('notify_super_admin_mail_failure')) {
      */
     function notify_super_admin_mail_failure(string $errorMessage, string $context = '', ?int $orderId = null): void
     {
-        try {
-            $cacheKey = 'mail_failure_admin_notified_'.md5(substr($errorMessage, 0, 120));
-
-            if (Cache::has($cacheKey)) {
-                return;
-            }
-
-            Cache::put($cacheKey, 1, now()->addMinutes(30));
-
-            $system = System::select('id')->first();
-
-            if (! $system) {
-                return;
-            }
-
-            $admin = $system->superAdmin();
-
-            if (! $admin) {
-                return;
-            }
-
-            $admin->notify(new MailDeliveryFailed($errorMessage, $context, $orderId));
-        } catch (\Throwable $e) {
-            Log::error('Could not notify super admin about mail failure: '.$e->getMessage());
-        }
+        Log::channel('mail')->warning('Mail delivery failed.', [
+            'context' => $context,
+            'order_id' => $orderId,
+            'error' => $errorMessage,
+        ]);
     }
 }
 

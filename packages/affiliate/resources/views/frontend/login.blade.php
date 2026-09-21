@@ -14,6 +14,24 @@
 
           <div class="form-section customer-login">
             <h3 class="text-center mt-0">{{ trans('packages.affiliate.login') }}</h3>
+
+            @if (session('success'))
+              <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            @if (session('error'))
+              <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
+            @if ($errors->any())
+              <div class="alert alert-danger">
+                <ul class="mb-0">
+                  @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                  @endforeach
+                </ul>
+              </div>
+            @endif
             {!! Form::open(['route' => 'affiliate.login', 'id' => 'loginForm-1', 'data-toggle' => 'validator']) !!}
             <div class="form-group has-feedback">
               {!! Form::email('email', null, ['id' => 'email', 'class' => 'form-control input-lg', 'placeholder' => trans('theme.placeholder.email'), 'required']) !!}
@@ -46,9 +64,10 @@
               {{ trans('theme.forgot_password') }}
             </a>
 
-            <a class="btn btn-link" href="{{ route('affiliate.register.form') }}" class="text-center">
-              {{ trans('theme.register_here') }}
+            <a class="btn btn-link" href="{{ route('affiliate.register.form') }}">
+              {{ trans('packages.affiliate.become_an_affiliate') }}
             </a>
+
             @include('affiliate::frontend._demo_login')
           </div>
         </div> <!-- /.login-form-section -->

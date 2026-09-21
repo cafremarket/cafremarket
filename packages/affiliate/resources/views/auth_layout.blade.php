@@ -47,6 +47,24 @@
 
 <body class="hold-transition login-page">
   <div class="login-box">
+    @if (session('success'))
+      <div class="alert alert-success">
+        {{ session('success') }}
+      </div>
+    @endif
+
+    @if (session('error'))
+      <div class="alert alert-danger">
+        {{ session('error') }}
+      </div>
+    @endif
+
+    @if (session('warning'))
+      <div class="alert alert-warning">
+        {{ session('warning') }}
+      </div>
+    @endif
+
     @if (count($errors) > 0)
       <div class="alert alert-danger">
         <strong>{{ trans('theme.error') }}!</strong> {{ trans('messages.input_error') }}<br><br>

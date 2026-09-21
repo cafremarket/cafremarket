@@ -12,6 +12,11 @@ class SelfAddressUpdateRequest extends Request
         if ($this->has('state_id') && $this->input('state_id') === '') {
             $this->merge(['state_id' => null]);
         }
+
+        // Address type is not editable on the storefront wizard — keep the existing value.
+        if (! $this->filled('address_type') && $this->route('address')) {
+            $this->merge(['address_type' => $this->route('address')->address_type]);
+        }
     }
 
     /**

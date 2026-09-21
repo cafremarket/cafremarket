@@ -424,11 +424,13 @@ class ListHelper
      */
     public static function categoriesForTheme($all = false)
     {
-        return Cache::rememberForever('all_categories', function () use ($all) {
+        return Cache::rememberForever('all_categories_v2', function () use ($all) {
             $result = Category::select('id', 'name', 'slug')
                 ->with([
                     'logoImage:id,path,imageable_id,imageable_type',
                     'backgroundImage:id,path,imageable_id,imageable_type',
+                    'featureImage:id,path,imageable_id,imageable_type',
+                    'coverImage:id,path,imageable_id,imageable_type',
                     'subCategories' => function ($q) use ($all) {
                         $q->select('id', 'category_id', 'name', 'slug', 'description');
 
@@ -518,6 +520,36 @@ class ListHelper
         }
 
         return $grps;
+    }
+
+    /**
+     * Nested catalog tree keyed by category id, for cascading product pickers.
+     *
+     * @return array<int, array{name:string, subcategories:array<int,string>}>
+     */
+    public static function catalogTree()
+    {
+        $categories = Category::select(['id', 'name'])
+            ->orderBy('name', 'asc')
+            ->with([
+                'subCategories' => function ($q) {
+                    $q->select(['id', 'name', 'category_id'])->orderBy('name', 'asc');
+                },
+            ])->get();
+
+        $tree = [];
+        foreach ($categories as $category) {
+            $subs = [];
+            foreach ($category->subCategories as $subCategory) {
+                $subs[$subCategory->id] = $subCategory->name;
+            }
+            $tree[$category->id] = [
+                'name' => $category->name,
+                'subcategories' => $subs,
+            ];
+        }
+
+        return $tree;
     }
 
     /**

@@ -17,6 +17,9 @@ Route::get('category/{category}/restore', [CategoryController::class, 'restore']
 Route::get('category/getMoreCategories', [CategoryController::class, 'getCategories'])
     ->name('category.getMore')->middleware('ajax');
 
+Route::get('category/{category}/subcategories', [CategoryController::class, 'show'])
+    ->name('category.show');
+
 Route::resource('category', CategoryController::class)->except('show');
 
 // Translation routes

@@ -82,19 +82,25 @@ class OrderController extends Controller
         $payment = $request->get('payment');
         $search = trim((string) $request->get('q', ''));
 
+        // Chat-quote orders wait on the CUSTOMER to pick a payment method and
+        // pay (Api\OrderController::changePaymentMethod) — until then they
+        // don't belong in the vendor's regular "needs your attention: unpaid"
+        // bucket, which is for orders the vendor already placed/confirmed.
+        $genuinelyUnpaid = fn ($q) => $q->unpaid()->where('is_chat_quote', false);
+
         // When the orders need to filter
         $orders = match ($filter) {
             'unfulfilled' => $orders->unfulfilled(),
             'awaiting_delivery' => $orders->awaitingDelivery(),
             'fulfilled' => $orders->deliveredOnly(),
             'canceled', 'cancelled' => $orders->canceled(),
-            'unpaid' => $orders->unpaid(),
+            'unpaid' => $genuinelyUnpaid($orders),
             'paid' => $orders->paid(),
             default => $orders,
         };
 
         if (in_array($payment, ['paid', 'unpaid'], true)) {
-            $orders = $payment === 'paid' ? $orders->paid() : $orders->unpaid();
+            $orders = $payment === 'paid' ? $orders->paid() : $genuinelyUnpaid($orders);
         }
 
         if ($search !== '') {

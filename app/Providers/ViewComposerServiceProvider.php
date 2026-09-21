@@ -338,6 +338,8 @@ class ViewComposerServiceProvider extends ServiceProvider
                 }
 
                 $view->with('categories', ListHelper::categories());
+                $view->with('parentCategories', ListHelper::topCategories());
+                $view->with('catalogTree', ListHelper::catalogTree());
 
                 $view->with('manufacturers', ListHelper::manufacturers());
 

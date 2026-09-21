@@ -1,4 +1,4 @@
-<li class="{{ Request::is('admin/affiliate') && ! Request::is('admin/affiliate/commissions*') ? 'active' : '' }}">
+<li class="{{ Request::is('admin/affiliate') || Request::is('admin/affiliate/getAffiliates*') ? 'active' : '' }}">
   <a href="{{ route('admin.affiliate.index') }}">
     <i class="fa fa-angle-double-right"></i> {{ trans('packages.affiliate.affiliates') }}
     @include('partials._addon_badge')

@@ -219,24 +219,46 @@ final class OrderCheckoutFeeService
     }
 
     /**
-     * @return array{gross: float, marketplace_commission: float, total_deductions: float, net: float}
+     * @return array{gross: float, marketplace_commission: float, affiliate_commission: float, total_deductions: float, net: float}
      */
     public static function vendorSettlementForOrder(Order $order): array
     {
         $gross = max(0, round((float) $order->grand_total, 2));
         $marketplaceCommission = self::marketplaceCommissionForOrder($order);
-        $totalDeductions = round($marketplaceCommission, 2);
+        $affiliateCommission = self::affiliateCommissionForOrder($order);
+        $totalDeductions = round($marketplaceCommission + $affiliateCommission, 2);
 
         return [
             'gross' => $gross,
             'marketplace_commission' => $marketplaceCommission,
+            'affiliate_commission' => $affiliateCommission,
             'total_deductions' => $totalDeductions,
             'net' => max(0, round($gross - $totalDeductions, 2)),
         ];
     }
 
+    public static function affiliateCommissionForOrder(Order $order): float
+    {
+        if (! is_incevio_package_loaded('affiliate')) {
+            return 0.0;
+        }
+
+        $stored = max(0, round((float) ($order->affiliate_commission_amount ?? 0), 2));
+
+        if ($stored > 0) {
+            return $stored;
+        }
+
+        if (class_exists(\Incevio\Package\Affiliate\Services\AffiliateCommissionService::class)) {
+            return app(\Incevio\Package\Affiliate\Services\AffiliateCommissionService::class)
+                ->amountForOrder($order);
+        }
+
+        return 0.0;
+    }
+
     /**
-     * @return array{gross: float, marketplace_commission: float, total_deductions: float, net: float}
+     * @return array{gross: float, marketplace_commission: float, affiliate_commission: float, total_deductions: float, net: float}
      */
     public static function vendorSettlementPreview(
         float|int|string $baseAmount,
@@ -256,6 +278,7 @@ final class OrderCheckoutFeeService
         return [
             'gross' => $gross,
             'marketplace_commission' => $marketplaceCommission,
+            'affiliate_commission' => 0.0,
             'total_deductions' => round($marketplaceCommission, 2),
             'net' => max(0, round($gross - $marketplaceCommission, 2)),
         ];

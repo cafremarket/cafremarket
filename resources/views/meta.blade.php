@@ -25,7 +25,7 @@
   }
 
   // For Categories
-  elseif (Request::is('categories/*') || Request::is('category/*')) {
+  elseif (Request::is('categories/*') || Request::is('category/*') || Request::routeIs('category.browse')) {
       $category = $category ?? null;
       if (! $category) {
           \Illuminate\Support\Facades\Log::debug('meta.blade.php: $category missing for a category-like URL.', ['url' => url()->current()]);

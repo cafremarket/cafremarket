@@ -1,116 +1,77 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="{{ app()->getLocale() }}">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no">
   <meta name="author" content="{{ config('system_settings.name') ?? config('app.name') }}">
-
-  <title>{!! $title ?? get_site_title() !!}</title>
+  <title>
+    @hasSection('page_title')
+      @yield('page_title') —
+    @elseif(isset($page_title))
+      {!! strip_tags($page_title) !!} —
+    @endif
+    {{ trans('packages.affiliate.affiliate') }} — {{ get_platform_title() }}
+  </title>
 
   <link rel="manifest" href="{{ asset('site.webmanifest') }}">
   <link rel="icon" href="{{ get_icon_url('system', 'thumbnail') }}" type="image/x-icon" />
   <link rel="apple-touch-icon" href="{{ get_icon_url('system', 'thumbnail') }}">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+  <link href="{{ asset('css/admin-modern.css') }}?v={{ @filemtime(public_path('css/admin-modern.css')) ?: time() }}" rel="stylesheet">
+  <link href="{{ asset('css/merchant-panel.css') }}?v={{ @filemtime(public_path('css/merchant-panel.css')) ?: time() }}" rel="stylesheet">
 
-  <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,300italic,400italic,600italic' rel='stylesheet'>
-
-  <!-- Scripts -->
-  <link href="/css/app.css" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" 
-        crossorigin="anonymous">
-    </script>
-
-
-  <!-- START Page specific Stylesheets -->
   @yield('page-style')
-  <!-- END Page specific Stylesheets -->
-
-  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
 
   @if (is_incevio_package_loaded('otp-login'))
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
   @endif
-
-  <style>
-    .iti {
-      display: block;
-    }
-  </style>
+  <style>.iti { display: block; }</style>
 </head>
-<!--
-  BODY TAG OPTIONS:
-  =================
-  Apply one or more of the following classes to get the
-  desired effect
-  |---------------------------------------------------------|
-  | SKINS         | skin-blue                               |
-  |               | skin-blue-light                         |
-  |               | skin-black                              |
-  |               | skin-black-light                        |
-  |               | skin-purple                             |
-  |               | skin-purple-light                       |
-  |               | skin-yellow                             |
-  |               | skin-yellow-light                       |
-  |               | skin-red                                |
-  |               | skin-red-light                          |
-  |               | skin-green                              |
-  |               | skin-green-light                        |
-  |---------------------------------------------------------|
-  |LAYOUT OPTIONS | fixed                                   |
-  |               | layout-boxed                            |
-  |               | layout-top-nav                          |
-  |               | sidebar-collapse                        |
-  |               | sidebar-mini                            |
-  |---------------------------------------------------------|
-  -->
 
-<body class="hold-transition skin-red sidebar-mini">
-  <div class="wrapper">
-    @include('affiliate::backend._nav_header')
-
+<body class="mp-body mp-body--panel">
+  <script>window.__merchantPanel = true;</script>
+  <div class="mp-app">
     @include('affiliate::backend._sidebar')
+    <div class="mp-sidebar-overlay" id="mp-sidebar-overlay" hidden aria-hidden="true"></div>
 
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      @if (View::hasSection('buttons') || isset($page_title))
-        <section class="content-header">
-          <h1>
-            {!! $page_title ?? '' !!}
+    <div class="mp-main">
+      <header class="mp-topbar">
+        <button type="button" class="mp-sidebar-toggle" id="mp-sidebar-toggle" aria-label="{{ trans('app.toggle_navigation') }}" aria-expanded="false" aria-controls="mp-sidebar">
+          <i class="fa fa-bars"></i>
+        </button>
+        <h1 class="mp-topbar__title">
+          @hasSection('page_title')
+            @yield('page_title')
+          @elseif(isset($page_title))
+            {!! strip_tags($page_title) !!}
+          @else
+            {{ trans('packages.affiliate.affiliate') }}
+          @endif
+        </h1>
+        <div class="mp-topbar__actions">
+          <a href="{{ url('/') }}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i> {{ trans('app.store_front') }}</a>
+          <a href="{{ route('affiliate.profile') }}">{{ auth()->guard('affiliate')->user()->getName() }}</a>
+          @if (Request::session()->has('impersonated'))
+            <a href="{{ route('admin.secretLogout') }}">{{ trans('app.log_out') }}</a>
+          @else
+            <a href="{{ route('affiliate.logout') }}">{{ trans('app.log_out') }}</a>
+          @endif
+        </div>
+      </header>
 
-            <small>{!! $page_description ?? '' !!}</small>
-          </h1>
-          <span class='opt-button'>
-
-            @yield('buttons')
-
-          </span>
-        </section>
-      @endif
-
-      <!-- Main content -->
-      <section class="content">
-        {{-- If the user is impersonated --}}
-        @if (Request::session()->has('impersonated'))
-          <div class="callout callout-info">
-            <p>
-              <strong><i class="icon ion-md-nuclear"></i> {{ trans('app.alert') }}</strong>
-              {{ trans('messages.you_are_impersonated') }}
-              <a href="{{ route('admin.secretLogout') }}" class="nav-link pull-right"><i class="fa fa-sign-out" data-toggle="tooltip" data-placement="top" title="{{ trans('app.log_out') }}"></i></a>
-            </p>
-          </div>
+      <div class="mp-content mp-content--admin">
+        @if (View::hasSection('page_title') || View::hasSection('buttons') || isset($page_title))
+          @include('affiliate::backend._page_header')
         @endif
 
-        <!-- VALIDATION ERRORS -->
+        @include('admin.partials.ui.alerts')
+
         @if (count($errors) > 0)
           <div class="alert alert-danger">
             <strong>{{ trans('app.error') }}!</strong> {{ trans('messages.input_error') }}<br><br>
@@ -122,55 +83,28 @@
           </div>
         @endif
 
-        {{-- Main content --}}
         @yield('content')
-
-      </section>
-      <!-- /.content -->
+      </div>
     </div>
-    <!-- /.content-wrapper -->
-
-    @include('admin.footer')
-
-    <!-- /.control-sidebar -->
-    <!-- Add the sidebar's background. This div must be placed
-           immediately after the control sidebar -->
-    <div class="control-sidebar-bg"></div>
-
-    <!--Modal-->
-    <div id="myDynamicModal" class="modal fade" aria-hidden="true" data-backdrop="static" data-keyboard="false"></div>
-  </div><!-- ./wrapper -->
-
-  <div class="loader">
-    <center>
-      <img class="loading-image" src="{{ asset('images/gears.gif') }}" alt="busy...">
-    </center>
   </div>
 
-  <script src='/js/app.js'></script>
+  <div id="myDynamicModal" class="modal fade admin-modal" aria-hidden="true" data-backdrop="static" data-keyboard="false"></div>
 
-  {{-- START (Required by only the datetimepicker, Remove it after find a solution) --}}
-  {{-- <script>var $Original = jQuery.noConflict(true);</script> --}}
-  <!-- jQuery 2.1.4  -->
-  {{-- <script src="{{ asset("assets/plugins/jQuery/jQuery-2.1.4.min.js") }}"></script> --}}
-  {{-- END (Required by only the datetimepicker) --}}
+  <div class="loader admin-loader">
+    <div class="admin-loader__spinner"></div>
+  </div>
 
-  <!-- Notification -->
+  <script src="{{ asset('js/app.js') }}"></script>
   @include('admin.notification')
-
-  <!-- START Page specific Script -->
   @yield('page-script')
-  <!-- END Page specific Script -->
-
 
   @if (is_incevio_package_loaded('otp-login'))
     @include('otp-login::scripts')
   @endif
 
-  <!-- Scripts -->
   @include('affiliate::scripts.footer_js')
-
+  <script src="{{ asset('js/admin-modern.js') }}"></script>
+  @include('scripts.password_toggle')
   @stack('script')
 </body>
-
 </html>

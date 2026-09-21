@@ -39,6 +39,7 @@ class Product extends Inspectable
         'requires_shipping' => 'boolean',
         'downloadable' => 'boolean',
         'active' => 'boolean',
+        'is_chat_custom' => 'boolean',
     ];
 
     /**
@@ -76,6 +77,7 @@ class Product extends Inspectable
         'sale_count',
         'active',
         'shopify_id',
+        'is_chat_custom',
     ];
 
     /**
@@ -153,6 +155,14 @@ class Product extends Inspectable
      * Get the sub-categories for the product.
      */
     public function subCategories()
+    {
+        return $this->belongsToMany(SubCategory::class, 'category_product', 'product_id', 'category_id')->withTimestamps();
+    }
+
+    /**
+     * Alias kept for older admin/vendor eager-loads that still request "categories".
+     */
+    public function categories()
     {
         return $this->belongsToMany(SubCategory::class, 'category_product', 'product_id', 'category_id')->withTimestamps();
     }

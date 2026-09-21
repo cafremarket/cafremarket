@@ -108,6 +108,7 @@ class EloquentCategory extends EloquentRepository implements BaseRepository, Cat
     {
         if ($result) {
             Cache::forget('all_categories');
+            Cache::forget('all_categories_v2');
             Cache::forget('category_list_for_form');
         }
 

@@ -14,17 +14,25 @@
 
           <div class="form-section">
             <h3 class="text-center mt-0">{{ trans('packages.affiliate.affiliate_register') }}</h3>
+
+            @if (session('error'))
+              <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
+            @if ($errors->any())
+              <div class="alert alert-danger">
+                <ul class="mb-0">
+                  @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                  @endforeach
+                </ul>
+              </div>
+            @endif
             {!! Form::open(['route' => 'affiliate.register', 'id' => 'form', 'data-toggle' => 'validator', 'files' => true]) !!}
             <div class="form-group has-feedback">
               {!! Form::text('name', null, ['class' => 'form-control input-lg', 'placeholder' => trans('theme.placeholder.full_name'), 'required']) !!}
               <span class="glyphicon glyphicon-user form-control-feedback"></span>
               <div class="help-block with-errors"></div>
-            </div>
-
-            <div class="form-group has-feedback">
-              {!! Form::text('username', null, ['class' => 'form-control input-lg', 'id' => 'js-username', 'placeholder' => trans('packages.affiliate.placeholder_username'), 'required']) !!}
-              <span class="glyphicon glyphicon-user form-control-feedback"></span>
-              <div class="help-block with-errors"><span id="js-username-feedback"></span></div>
             </div>
 
             <div class="form-group has-feedback">
@@ -56,7 +64,7 @@
               <div class="col-sm-7">
                 <div class="form-group">
                   <label for="terms_and_conditions">
-                    {!! Form::checkbox('agree', null, null, ['class' => 'icheck', 'id' => 'terms_and_conditions', 'required']) !!} {!! trans('theme.input_label.i_agree_with_terms') !!}
+                    {!! Form::checkbox('agree', 1, false, ['class' => 'icheck', 'id' => 'terms_and_conditions', 'required']) !!} {!! trans('theme.input_label.i_agree_with_terms') !!}
                   </label>
                   <div class="help-block with-errors"></div>
                 </div>
@@ -66,14 +74,10 @@
               </div>
             </div>
             {!! Form::close() !!}
-            <a href="{{ route('affiliate.login.form') }}" class="btn btn-link">{{ trans('theme.have_an_account') }}</a>
+            <a href="{{ route('affiliate.login.form') }}" class="btn btn-link">{{ trans('packages.affiliate.login') }}</a>
           </div> <!-- /.form-section -->
         </div> <!-- /.login-form-section -->
       </div> <!-- /.form-container -->
     </div> <!-- /.login-section -->
   </div> <!-- /.box -->
-@endsection
-
-@section('scripts')
-  @include('affiliate::scripts.affiliate_username_validation')
 @endsection

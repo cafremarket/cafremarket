@@ -45,6 +45,32 @@
                 <div class="help-block with-errors"></div>
               </div>
             </div>
+
+            @if (is_incevio_package_loaded('affiliate'))
+              <div class="col-md-4 nopadding-left">
+                <div class="form-group">
+                  {!! Form::label('affiliate_commission_percentage', trans('packages.affiliate.affiliate_commission'), ['class' => 'with-help']) !!}
+                  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.help_commission_field') }}"></i>
+                  <div class="input-group">
+                    <input name="affiliate_commission_percentage" value="{{ isset($variant) ? $variant->affiliate_commission_percentage : $inventory->affiliate_commission_percentage }}" type="number" step="0.01" min="0" max="100" placeholder="{{ trans('packages.affiliate.placeholder_commission_field') }}" class="form-control">
+                    <span class="input-group-addon">%</span>
+                  </div>
+                  <div class="help-block with-errors">
+                    <small class="text-muted"><i class="fa fa-info-circle"></i> {{ trans('packages.affiliate.when_empty_commission_will_calculated_from_default') }}</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 nopadding-left">
+                <div class="form-group" style="margin-top: 25px;">
+                  {!! Form::hidden('affiliate_enabled', 0) !!}
+                  <label>
+                    {!! Form::checkbox('affiliate_enabled', 1, isset($variant) ? $variant->isAffiliateEnabled() : $inventory->isAffiliateEnabled(), ['class' => 'icheck']) !!}
+                    {{ trans('packages.affiliate.affiliate_enabled') }}
+                  </label>
+                </div>
+              </div>
+            @endif
           </div>
 
           <fieldset>

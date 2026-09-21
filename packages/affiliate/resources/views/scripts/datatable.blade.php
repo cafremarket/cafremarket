@@ -14,8 +14,18 @@ $('#all-affiliates-table').DataTable($.extend({}, dataTableOptions, {
       },
       {
         'data': 'email',
-        'name': 'email',
-        'orderable': false,
+        'name': 'email'
+      },
+      {
+        'data': 'phone',
+        'name': 'phone',
+        'defaultContent': '—'
+      },
+      {
+        'data': 'status',
+        'name': 'active',
+        'orderable': true,
+        'searchable': false
       },
       {
         'data': 'option',

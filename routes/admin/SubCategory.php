@@ -19,6 +19,9 @@ Route::delete('subcategory/emptyTrash', [SubCategoryController::class, 'emptyTra
 Route::get('subcategory/{subcategory}/restore', [SubCategoryController::class, 'restore'])
     ->name('subcategory.restore');
 
+Route::get('subcategory/{subcategory}/products', [SubCategoryController::class, 'show'])
+    ->name('subcategory.show');
+
 Route::resource('subcategory', SubCategoryController::class)->except('show');
 
 // Translation routes

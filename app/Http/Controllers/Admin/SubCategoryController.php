@@ -6,10 +6,10 @@ use App\Common\Authorizable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateSubCategoryRequest;
 use App\Http\Requests\Validations\UpdateSubCategoryRequest;
+use App\Models\Category;
 use App\Repositories\SubCategory\SubCategoryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -30,7 +30,7 @@ class SubCategoryController extends Controller
     public function __construct(SubCategoryRepository $subCategory)
     {
         parent::__construct();
-        $this->model_name = trans('app.model.category');
+        $this->model_name = trans('app.model.subcategory');
         $this->subCategory = $subCategory;
     }
 
@@ -43,11 +43,28 @@ class SubCategoryController extends Controller
     {
         abort_unless(Auth::user()->isFromPlatform(), 403);
 
-        $subCategories = $this->subCategory->all();
+        return redirect()->route('admin.catalog.category.index');
+    }
 
-        $trashes = $this->subCategory->trashOnly();
+    /**
+     * Show the subcategory with its products.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        abort_unless(Auth::user()->isFromPlatform(), 403);
 
-        return view('admin.category.subcategory', compact('subCategories', 'trashes'));
+        $subCategory = $this->subCategory->find($id);
+        $subCategory->load(['category', 'featureImage', 'coverImage']);
+
+        $products = $subCategory->products()
+            ->with(['featureImage', 'image', 'subCategories'])
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.category.subcategory_show', compact('subCategory', 'products'));
     }
 
     /**
@@ -55,9 +72,17 @@ class SubCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('admin.category._createSubCat');
+        $preselectedCategoryId = $request->integer('category_id') ?: null;
+
+        if (! $preselectedCategoryId) {
+            return redirect()->route('admin.catalog.category.index');
+        }
+
+        $parentCategory = Category::findOrFail($preselectedCategoryId);
+
+        return view('admin.category._createSubCat', compact('preselectedCategoryId', 'parentCategory'));
     }
 
     /**
@@ -74,7 +99,8 @@ class SubCategoryController extends Controller
             $subCategory->attrsList()->sync($request->attrsList);
         });
 
-        return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
+        return $this->redirectToParentCategory($subCategory->category_id)
+            ->with('success', trans('messages.created', ['model' => $this->model_name]));
     }
 
     /**
@@ -86,8 +112,10 @@ class SubCategoryController extends Controller
     public function edit($id)
     {
         $subCategory = $this->subCategory->find($id);
+        $preselectedCategoryId = (int) $subCategory->category_id;
+        $parentCategory = $subCategory->category;
 
-        return view('admin.category._editSubCat', compact('subCategory'));
+        return view('admin.category._editSubCat', compact('subCategory', 'preselectedCategoryId', 'parentCategory'));
     }
 
     /**
@@ -105,7 +133,8 @@ class SubCategoryController extends Controller
             $subCategory->attrsList()->sync($request->attrsList);
         });
 
-        return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+        return $this->redirectToParentCategory($subCategory->category_id)
+            ->with('success', trans('messages.updated', ['model' => $this->model_name]));
     }
 
     /**
@@ -116,16 +145,21 @@ class SubCategoryController extends Controller
      */
     public function trash(Request $request, $id)
     {
+        $subCategory = $this->subCategory->find($id);
+
         // Check for association with products
-        if ($this->subCategory->find($id)->products->count()) {
+        if ($subCategory->products->count()) {
             $notice = trans('messages.model_has_association', ['model' => $this->model_name, 'associate' => trans('app.products')]);
 
-            return back()->with('error', $notice)->with('global_notice', $notice);
+            return $this->redirectToParentCategory($subCategory->category_id)
+                ->with('error', $notice)->with('global_notice', $notice);
         }
 
+        $categoryId = $subCategory->category_id;
         $this->subCategory->trash($id);
 
-        return back()->with('success', trans('messages.trashed', ['model' => $this->model_name]));
+        return $this->redirectToParentCategory($categoryId)
+            ->with('success', trans('messages.trashed', ['model' => $this->model_name]));
     }
 
     /**
@@ -136,9 +170,13 @@ class SubCategoryController extends Controller
      */
     public function restore(Request $request, $id)
     {
+        $subCategory = $this->subCategory->findTrash($id);
+        $categoryId = $subCategory->category_id;
+
         $this->subCategory->restore($id);
 
-        return back()->with('success', trans('messages.restored', ['model' => $this->model_name]));
+        return $this->redirectToParentCategory($categoryId)
+            ->with('success', trans('messages.restored', ['model' => $this->model_name]));
     }
 
     /**
@@ -149,9 +187,13 @@ class SubCategoryController extends Controller
      */
     public function destroy(Request $request, $id)
     {
+        $subCategory = $this->subCategory->findTrash($id);
+        $categoryId = $subCategory->category_id;
+
         $this->subCategory->destroy($id);
 
-        return back()->with('success', trans('messages.deleted', ['model' => $this->model_name]));
+        return $this->redirectToParentCategory($categoryId)
+            ->with('success', trans('messages.deleted', ['model' => $this->model_name]));
     }
 
     /**
@@ -167,7 +209,8 @@ class SubCategoryController extends Controller
             return response()->json(['success' => trans('messages.trashed', ['model' => $this->model_name])]);
         }
 
-        return back()->with('success', trans('messages.trashed', ['model' => $this->model_name]));
+        return redirect()->route('admin.catalog.category.index')
+            ->with('success', trans('messages.trashed', ['model' => $this->model_name]));
     }
 
     /**
@@ -183,7 +226,8 @@ class SubCategoryController extends Controller
             return response()->json(['success' => trans('messages.deleted', ['model' => $this->model_name])]);
         }
 
-        return back()->with('success', trans('messages.deleted', ['model' => $this->model_name]));
+        return redirect()->route('admin.catalog.category.index')
+            ->with('success', trans('messages.deleted', ['model' => $this->model_name]));
     }
 
     /**
@@ -199,6 +243,22 @@ class SubCategoryController extends Controller
             return response()->json(['success' => trans('messages.deleted', ['model' => $this->model_name])]);
         }
 
-        return back()->with('success', trans('messages.deleted', ['model' => $this->model_name]));
+        return redirect()->route('admin.catalog.category.index')
+            ->with('success', trans('messages.deleted', ['model' => $this->model_name]));
+    }
+
+    /**
+     * Send the admin back to the parent category page (where subcategories are managed).
+     *
+     * @param  int|null  $categoryId
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function redirectToParentCategory($categoryId)
+    {
+        if ($categoryId) {
+            return redirect()->route('admin.catalog.category.show', $categoryId);
+        }
+
+        return redirect()->route('admin.catalog.category.index');
     }
 }

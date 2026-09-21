@@ -1,37 +1,51 @@
-<section>
-  <div id="all-categories-wrapper">
-    <div class="container">
-      <div class="row">
-        @foreach (($all_categories ?? []) as $category)
-          @if ($category->subCategories->count())
-            <div class="col-12 mb-5 pt-4 pb-3 category-grp-wrapper" @if ($category->backgroundImage) style="background-image: url('{{ get_storage_file_url(optional($category->backgroundImage)->path, 'full') }}')" @endif>
-              <h2 class="mb-2">
-                <a href="{{ route('categories.browse', $category->slug) }}">
-                  {{ Str::upper($category->name) }}
-                </a>
-              </h2>
+<section class="sf-shop-by-category">
+  <div class="container">
+    <header class="sf-shop-by-category__header">
+      <h1 class="sf-shop-by-category__title">
+        {{ trans('theme.shop_by_category') }}
+      </h1>
+    </header>
 
-              <div class="row px-3">
-                <div class="col-6 col-md-4 col-lg-3 pl-1 pr-3 my-2">
-                  <ul class="nav-category-inner-list show-hide-content less">
-                    @foreach ($category->subCategories as $cat)
-                      <li>
-                        <a href="{{ get_category_url($cat) }}">{{ $cat->name }}</a>
-                      </li>
-                    @endforeach
-                  </ul>
+    @php
+      $shopCategories = collect($all_categories ?? [])->filter(function ($category) {
+        return $category->subCategories && $category->subCategories->count();
+      });
+    @endphp
 
-                  @if ($category->subCategories->count() > 3)
-                    <a href="javascript::void(0)" class="small show-hide-content-btn">
-                      {{ trans('theme.show_more') }} <i class="fa fa-angle-down"></i>
-                    </a>
-                  @endif
-                </div><!-- /.col-3 -->
-              </div> <!-- /.row -->
-            </div><!-- /.col-12 -->
-          @endif
+    @if ($shopCategories->isEmpty())
+      <p class="sf-shop-by-category__empty text-center text-muted py-5">
+        {{ trans('theme.no_category_found') }}
+      </p>
+    @else
+      <div class="sf-shop-by-category__grid">
+        @foreach ($shopCategories as $category)
+          @php
+            $featurePath = optional($category->featureImage)->path;
+            $coverPath = optional($category->coverImage)->path;
+            $logoPath = optional($category->logoImage)->path;
+            $imageUrl = $featurePath
+              ? get_storage_file_url($featurePath, 'medium')
+              : ($coverPath
+                ? get_storage_file_url($coverPath, 'medium')
+                : ($logoPath
+                  ? get_storage_file_url($logoPath, 'medium')
+                  : asset('images/placeholders/category_cover.jpg')));
+          @endphp
+          <a
+            href="{{ route('categories.browse', $category->slug) }}"
+            class="sf-category-circle"
+            title="{{ $category->name }}"
+          >
+            <span
+              class="sf-category-circle__media"
+              style="background-image: url('{{ $imageUrl }}');"
+              role="img"
+              aria-label="{{ $category->name }}"
+            ></span>
+            <span class="sf-category-circle__name">{{ $category->name }}</span>
+          </a>
         @endforeach
-      </div> <!-- /.row -->
-    </div> <!-- /.container -->
-  </div> <!-- /#all-categories-wrapper -->
+      </div>
+    @endif
+  </div>
 </section>

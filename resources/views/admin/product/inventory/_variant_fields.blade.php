@@ -1,8 +1,10 @@
-{{-- General fields for one variant: image, SKU, stock, price, offer pricing.
+{{-- General fields for one variant: image, SKU, stock, price, offer pricing, affiliate commission.
      Rendered once per variant row inside a hidden `.variant-fields` wrapper; JS relocates
      this block into the shared manage-modal when "Manage" is clicked, and back on close. --}}
 @php
   $hasOffer = ! empty($offerPriceValue);
+  $commissionName = $commissionName ?? null;
+  $commissionValue = $commissionValue ?? null;
 @endphp
 <div class="variant-fields">
   <div class="variant-fields__image">
@@ -60,4 +62,37 @@
       </div>
     </div>
   </div>
+
+  @if (is_incevio_package_loaded('affiliate') && $commissionName)
+    @php
+      $enabledName = $enabledName ?? null;
+      $enabledValue = array_key_exists('enabledValue', get_defined_vars()) ? $enabledValue : true;
+    @endphp
+    @if ($enabledName)
+      <div class="form-group">
+        {!! Form::hidden($enabledName, 0) !!}
+        <label>
+          {!! Form::checkbox($enabledName, 1, (bool) $enabledValue, ['class' => 'icheck variant-affiliate-enabled']) !!}
+          {{ trans('packages.affiliate.affiliate_enabled') }}
+        </label>
+      </div>
+    @endif
+    <div class="form-group">
+      <label class="control-label with-help">{{ trans('packages.affiliate.affiliate_commission') }}</label>
+      <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.help_commission_field') }}"></i>
+      <div class="input-group">
+        {!! Form::number($commissionName, $commissionValue, [
+          'class' => 'form-control variant-affiliate-commission',
+          'min' => 0,
+          'max' => 100,
+          'step' => '0.01',
+          'placeholder' => trans('packages.affiliate.placeholder_commission_field'),
+        ]) !!}
+        <span class="input-group-addon">%</span>
+      </div>
+      <div class="help-block">
+        <small class="text-muted"><i class="fa fa-info-circle"></i> {{ trans('packages.affiliate.when_empty_commission_will_calculated_from_default') }}</small>
+      </div>
+    </div>
+  @endif
 </div>

@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Validations;
 
+use App\Http\Requests\Concerns\ValidatesProductCategories;
 use App\Http\Requests\Request;
 
 class CreateCatalogProductRequest extends Request
 {
+    use ValidatesProductCategories;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -29,13 +31,14 @@ class CreateCatalogProductRequest extends Request
             'shop_id' => $shop?->id,
             'slug' => generate_unique_listing_slug((string) ($this->input('slug') ?: $this->input('name') ?: 'product')),
         ]);
+
+        $this->prepareProductCategories();
     }
 
     public function rules()
     {
-        return [
+        return array_merge($this->productCategoryRules(), [
             'shop_id' => 'required|exists:shops,id',
-            'category_list' => 'required',
             'name' => 'required|unique:products',
             'slug' => 'required|alpha_dash',
             'description' => 'required',
@@ -45,7 +48,12 @@ class CreateCatalogProductRequest extends Request
             'images.*' => 'mimes:jpg,jpeg,png,gif,svg',
             'video' => ['nullable', 'file', new \App\Rules\ProductVideoFile],
             'delete_video' => 'nullable|boolean',
-        ];
+        ]);
+    }
+
+    public function withValidator($validator)
+    {
+        $this->withProductCategoryValidator($validator);
     }
 
     /**
@@ -55,8 +63,6 @@ class CreateCatalogProductRequest extends Request
      */
     public function messages()
     {
-        return [
-            'category_list.required' => trans('validation.category_list_required'),
-        ];
+        return $this->productCategoryMessages();
     }
 }

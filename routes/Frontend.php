@@ -70,9 +70,22 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         ShopController::class, 'products',
     ])->name('shop.products');
 
-    Route::get('shop/{slug}/category/{category}', [
+    Route::get('shop/{slug}/category/{category}/{subcategory}', [
         ShopController::class, 'category',
     ])->name('shop.category.browse');
+
+    Route::get('shop/{slug}/category/{category}', function ($slug, $category) {
+        $sub = \App\Models\SubCategory::where('slug', $category)->with('category')->first();
+        if ($sub && $sub->category) {
+            return redirect()->route('shop.category.browse', [
+                'slug' => $slug,
+                'category' => $sub->category->slug,
+                'subcategory' => $sub->slug,
+            ], 301);
+        }
+
+        abort(404);
+    });
 
     Route::get('shop/{slug}/reviews', [
         ShopController::class, 'reviews',
@@ -86,13 +99,29 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         HomeController::class, 'categories',
     ])->name('categories');
 
-    Route::get('category/{slug}', [
-        HomeController::class, 'browseCategory',
-    ])->name('category.browse');
-
     Route::get('categories/{slug}', [
         HomeController::class, 'browseCategorySubGrp',
     ])->name('categories.browse');
+
+    Route::get('category/{slug}', function ($slug) {
+        $sub = \App\Models\SubCategory::where('slug', $slug)->with('category')->first();
+        if ($sub && $sub->category) {
+            return redirect()->route('category.browse', [
+                'category' => $sub->category->slug,
+                'subcategory' => $sub->slug,
+            ], 301);
+        }
+
+        $parent = \App\Models\Category::where('slug', $slug)->first();
+        if ($parent) {
+            return redirect()->route('categories.browse', $parent->slug, 301);
+        }
+
+        abort(404);
+    });
+
+    // /{category-slug}/{subcategory-slug} is registered last in routes/web.php
+    // so /admin/*, /merchant/*, and other prefixed routes are never stolen.
 
     // Old bookmarked group-level URLs — the CategoryGroup level no longer
     // exists (collapsed into the 2-level Category/SubCategory model).
@@ -163,6 +192,15 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         Route::post('contact/{slug}', [
             ConversationController::class, 'contact',
         ])->name('seller.contact');
+
+        // Web chat "Share Product" / "Share Order" pickers (customer dashboard + storefront widget).
+        Route::get('shop/{shop}/chat/products', [
+            ConversationController::class, 'shopProductsForChat',
+        ])->name('chat.products');
+
+        Route::get('shop/{shop}/chat/orders', [
+            ConversationController::class, 'myOrdersForChat',
+        ])->name('chat.orders');
 
         Route::get('message/{message}/archive', [
             ConversationController::class, 'archive',

@@ -32,3 +32,14 @@ if (!function_exists('current_affiliates_link_for_item')) {
             ->first();
     }
 }
+
+if (! function_exists('get_affiliate_commission_for_order')) {
+    function get_affiliate_commission_for_order($order): float
+    {
+        if (! $order instanceof \App\Models\Order) {
+            $order = \App\Models\Order::findOrFail($order);
+        }
+
+        return \App\Services\OrderCheckoutFeeService::affiliateCommissionForOrder($order);
+    }
+}

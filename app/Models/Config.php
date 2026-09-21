@@ -382,7 +382,18 @@ class Config extends BaseModel
 
     public function setDefaultAffiliateCommissionPercentageAttribute($value)
     {
-        $this->attributes['default_affiliate_commission_percentage'] = (float) $value;
+        if ($value === null || $value === '') {
+            $this->attributes['default_affiliate_commission_percentage'] = 5.0;
+
+            return;
+        }
+
+        $this->attributes['default_affiliate_commission_percentage'] = max(0, min(100, (float) $value));
+    }
+
+    public function getDefaultAffiliateCommissionPercentageAttribute($value)
+    {
+        return is_null($value) ? 5.0 : (float) $value;
     }
 
     /**

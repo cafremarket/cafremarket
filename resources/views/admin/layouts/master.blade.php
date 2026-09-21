@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 @php
+  $webUser = auth_web_user();
   $useMerchantPanelLayout = request()->is('merchant/*')
-    && Auth::check()
-    && Auth::user()->isFromMerchant();
+    && $webUser
+    && $webUser->isFromMerchant();
 @endphp
 <head>
   <meta charset="utf-8">
@@ -17,7 +18,7 @@
       @elseif(isset($page_title))
         {!! strip_tags($page_title) !!} —
       @endif
-      {{ optional(Auth::user()->shop)->name ?? get_platform_title() }}
+      {{ optional($webUser?->shop)->name ?? get_platform_title() }}
     @else
       {!! $title ?? get_site_title() !!}
     @endif

@@ -133,14 +133,7 @@
         'class' => 'admin-form-section',
         'bodyClass' => '',
       ])
-          <div class="form-group">
-            {!! Form::label('category_list[]', trans('app.form.categories') . '*') !!}
-            {!! Form::select('category_list[]', $categories, null, ['class' => 'form-control select2-normal', 'multiple' => 'multiple', 'required']) !!}
-            <div class="help-block with-errors"></div>
-            <div class="help-block text-muted">
-              <i class="fa fa-tags"></i> {{ trans('help.attributes_on_next_tab') }}
-            </div>
-          </div>
+          @include('admin.product._category_picker')
 
           <div class="form-group">
             <p class="help-block">{{ trans('help.product_taxes') }}</p>

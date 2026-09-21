@@ -33,6 +33,13 @@
             <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('help.sale_price') }}"><sup><i class="fa fa-question"></i></sup></small>
           </th>
 
+          @if (is_incevio_package_loaded('affiliate'))
+            <th>
+              {{ trans('packages.affiliate.affiliate_commission') }}
+              <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.help_commission_field') }}"><sup><i class="fa fa-question"></i></sup></small>
+            </th>
+          @endif
+
           <th><i class="fa fa-trash-o"></i></th>
         </tr>
       </thead>
@@ -100,6 +107,23 @@
           ])
         </div>
       </td>
+
+      @if (is_incevio_package_loaded('affiliate'))
+        <td>
+          <div class="form-group">
+            <div class="input-group">
+              {!! Form::number('variant_affiliate_commissions[' . $variant->id . ']', $variant->affiliate_commission_percentage, [
+                'class' => 'form-control',
+                'min' => 0,
+                'max' => 100,
+                'step' => '0.01',
+                'placeholder' => '%',
+              ]) !!}
+              <span class="input-group-addon">%</span>
+            </div>
+          </div>
+        </td>
+      @endif
 
       <td>
         <div class="form-group text-muted">

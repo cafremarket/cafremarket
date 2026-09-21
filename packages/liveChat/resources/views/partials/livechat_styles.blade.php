@@ -184,6 +184,34 @@
     padding: 8px 18px;
   }
 
+  #zcart_chat .chat-load-error {
+    text-align: center;
+    color: var(--lc-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 28px 8px;
+  }
+
+  #zcart_chat .chat-load-error p {
+    margin: 0 0 12px;
+  }
+
+  #zcart_chat .chat-load-retry {
+    display: inline-block;
+    margin: 0 auto;
+    background: var(--lc-accent);
+    border: 1px solid var(--lc-accent);
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  #zcart_chat .chat-load-retry:hover {
+    opacity: 0.9;
+  }
+
   #zcart_chat .chat .chat_converse .chat_msg_item {
     position: relative;
     margin: 0 0 14px;
@@ -568,6 +596,210 @@
     color: inherit;
     text-decoration: underline;
     font-size: 12px;
+  }
+
+  #zcart_chat .chat-attach-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  #zcart_chat .chat-attach-menu {
+    position: absolute;
+    left: 0;
+    bottom: 46px;
+    background: #fff;
+    border: 1px solid var(--lc-line);
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+    padding: 6px;
+    min-width: 176px;
+    z-index: 5;
+  }
+
+  #zcart_chat .chat-attach-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--lc-ink);
+    cursor: pointer;
+    text-align: left;
+    margin: 0;
+  }
+
+  #zcart_chat .chat-attach-menu-item:hover {
+    background: var(--lc-soft);
+  }
+
+  #zcart_chat .chat-attach-menu-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--lc-soft);
+    color: var(--lc-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  #zcart_chat .chat-shared-share-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--lc-soft);
+    color: var(--lc-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  #zcart_chat .chat-modal {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.42);
+    display: flex;
+    align-items: flex-end;
+    z-index: 20;
+  }
+
+  #zcart_chat .chat-modal[hidden] {
+    display: none;
+  }
+
+  #zcart_chat .chat-modal-card {
+    background: #fff;
+    width: 100%;
+    max-height: 82%;
+    border-radius: 18px 18px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #zcart_chat .chat-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--lc-line);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--lc-ink);
+  }
+
+  #zcart_chat .chat-modal-close {
+    border: 0;
+    background: transparent;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--lc-muted);
+    cursor: pointer;
+  }
+
+  #zcart_chat .chat-modal-body {
+    padding: 14px 16px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  #zcart_chat .chat-modal-input {
+    width: 100%;
+    border: 1px solid var(--lc-line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    background: var(--lc-soft);
+  }
+
+  #zcart_chat .chat-modal-error {
+    color: #dc2626;
+    font-size: 12px;
+    margin: 0 0 8px;
+  }
+
+  #zcart_chat .chat-modal-foot {
+    padding: 12px 16px;
+    border-top: 1px solid var(--lc-line);
+  }
+
+  #zcart_chat .chat-modal-btn {
+    width: 100%;
+    border: 0;
+    background: var(--lc-accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  #zcart_chat .chat-picker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  #zcart_chat .chat-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--lc-line);
+    background: #fff;
+    border-radius: 12px;
+    padding: 8px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+  }
+
+  #zcart_chat .chat-picker-item:hover {
+    background: var(--lc-soft);
+  }
+
+  #zcart_chat .chat-picker-item-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  #zcart_chat .chat-picker-item-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #zcart_chat .chat-picker-item-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--lc-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #zcart_chat .chat-picker-item-sub {
+    font-size: 12px;
+    color: var(--lc-accent);
+    font-weight: 600;
+  }
+
+  #zcart_chat .chat-picker-empty {
+    text-align: center;
+    color: var(--lc-muted);
+    font-size: 13px;
+    padding: 20px 0;
   }
 
   #zcart_chat .status {

@@ -17,6 +17,7 @@ class CategoryLightResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'category_id' => $this->resource->getAttribute('category_id'),
             $this->mergeWhen($request->is('api/vendor/categories'), [
                 'featured' => (bool) $this->featured,
                 'category_id' => $this->category_id,

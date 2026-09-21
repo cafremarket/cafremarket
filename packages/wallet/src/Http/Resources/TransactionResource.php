@@ -20,6 +20,7 @@ class TransactionResource extends JsonResource
         $paymentTotal = $showBreakdown ? $this->depositPaymentTotal() : null;
         $platformFee = $showBreakdown ? $this->depositPlatformFee() : 0.0;
         $marketplaceCommission = (float) ($this->getFromMetaData('marketplace_commission') ?: 0);
+        $affiliateCommission = (float) ($this->getFromMetaData('affiliate_commission') ?: 0);
         $grossSaleAmount = (float) ($this->getFromMetaData('gross_sale_amount') ?: 0);
 
         return [
@@ -48,6 +49,10 @@ class TransactionResource extends JsonResource
                 ? get_formated_currency($marketplaceCommission, 2, $currencyId)
                 : null,
             'marketplace_commission_raw' => $marketplaceCommission > 0 ? $marketplaceCommission : null,
+            'affiliate_commission' => $affiliateCommission > 0
+                ? get_formated_currency($affiliateCommission, 2, $currencyId)
+                : null,
+            'affiliate_commission_raw' => $affiliateCommission > 0 ? $affiliateCommission : null,
             'gross_sale_amount' => $grossSaleAmount > 0
                 ? get_formated_currency($grossSaleAmount, 2, $currencyId)
                 : null,

@@ -244,6 +244,10 @@ Route::prefix('vendor')->group(function () {
         // Order Conversations
         Route::get('order/{order}/conversations', [OrderConversationController::class, 'index']);
         Route::post('order/{order}/conversations', [OrderConversationController::class, 'respond']);
+        Route::post('chat/{chat}/custom-order', [OrderConversationController::class, 'storeCustomOrder']);
+        Route::get('chat/search/inventory', [OrderConversationController::class, 'searchInventory']);
+        Route::post('chat/calculate-order-totals', [OrderConversationController::class, 'calculateOrderTotals']);
+        Route::get('chat/{chat}/orders', [OrderConversationController::class, 'searchOrders']);
 
         // Refunds
         Route::get('refunds/{status?}', [RefundController::class, 'index']);
@@ -361,9 +365,13 @@ Route::prefix('vendor')->group(function () {
         Route::get('reports', [ReportController::class, 'index']);
         Route::get('reports/sales-chart', [ReportController::class, 'salesChart']);
 
-        // Affiliate
+        // Affiliate (shop default + per-product commission / enable-disable)
         Route::get('affiliate', [AffiliateController::class, 'index']);
+        Route::get('affiliate/products', [AffiliateController::class, 'products']);
         Route::put('affiliate/update', [AffiliateController::class, 'update']);
+        Route::match(['put', 'post'], 'affiliate/inventories/bulk', [AffiliateController::class, 'bulkUpdate']);
+        Route::put('affiliate/inventories/{inventory}/toggle', [AffiliateController::class, 'toggleInventory']);
+        Route::put('affiliate/inventories/{inventory}', [AffiliateController::class, 'updateInventory']);
 
         // Form data
         Route::get('data/{category_id}/category_attributes', [FormDataController::class, 'category_attributes']);
@@ -380,6 +388,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('data/category_subgroups', [FormDataController::class, 'category_subgroups']);
         Route::get('data/categories', [FormDataController::class, 'categories']);
         Route::get('data/categories_with_parent', [FormDataController::class, 'categories_with_parent']);
+        Route::get('data/catalog_tree', [FormDataController::class, 'catalog_tree']);
         Route::get('data/attribute_types', [FormDataController::class, 'attribute_types']);
         Route::get('data/shops', [FormDataController::class, 'shops']);
         Route::get('data/attributes', [FormDataController::class, 'attributes']);

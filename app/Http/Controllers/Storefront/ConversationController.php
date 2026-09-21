@@ -9,6 +9,7 @@ use App\Http\Requests\Validations\ArchiveMessageRequest;
 use App\Http\Requests\Validations\ContactSellerRequest;
 use App\Http\Requests\Validations\OrderConversationRequest;
 use App\Http\Requests\Validations\ReplyMyMessageRequest;
+use App\Models\Inventory;
 use App\Models\Message;
 use App\Models\Order;
 use App\Models\Reply;
@@ -174,5 +175,61 @@ class ConversationController extends Controller
         $message->archive();
 
         return back()->with('success', trans('theme.message_archived'));
+    }
+
+    /**
+     * This shop's catalog listings, for the web chat "Share Product" picker.
+     * Excludes hidden chat-custom items (they're not real catalog products).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function shopProductsForChat(Request $request, Shop $shop)
+    {
+        $term = trim((string) $request->get('q', ''));
+
+        $inventories = Inventory::query()
+            ->active()
+            ->where('shop_id', $shop->id)
+            ->where('is_chat_custom', false)
+            ->when($term !== '', fn ($q) => $q->where('title', 'like', '%'.$term.'%'))
+            ->with(['image', 'attributeValues'])
+            ->latest('id')
+            ->take(20)
+            ->get();
+
+        return response()->json([
+            'data' => $inventories->map(fn (Inventory $inventory) => [
+                'slug' => $inventory->slug,
+                'title' => \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::titleWithVariant($inventory),
+                'price' => get_formated_currency($inventory->current_sale_price()),
+                'raw_price' => (float) $inventory->current_sale_price(),
+                'image' => get_storage_file_url(optional($inventory->image)->path, 'tiny_thumb'),
+                'url' => storefront_product_url($inventory),
+            ]),
+        ]);
+    }
+
+    /**
+     * The current customer's own orders with this shop, for the web chat
+     * "Share Order" picker.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function myOrdersForChat(Request $request, Shop $shop)
+    {
+        $customerId = Auth::guard('customer')->id();
+        $term = trim((string) $request->get('q', ''));
+
+        $orders = Order::query()
+            ->where('shop_id', $shop->id)
+            ->where('customer_id', $customerId)
+            ->when($term !== '', fn ($q) => $q->where('order_number', 'like', '%'.$term.'%'))
+            ->latest('id')
+            ->take(20)
+            ->get();
+
+        return response()->json([
+            'data' => $orders->map(fn (Order $order) => OrderChatSyncService::buildOrderSharePayload($order)),
+        ]);
     }
 }

@@ -29,6 +29,9 @@ Route::middleware(['auth', 'blockMerchantFromAdmin'])->name('admin.')->prefix('a
     // Featured Categories (homepage curated)
     include 'admin/FeaturedCategories.php';
 
+    // Featured Stores (homepage curated)
+    include 'admin/FeaturedShops.php';
+
     // Store → product picker AJAX
     include 'admin/ProductPicker.php';
 

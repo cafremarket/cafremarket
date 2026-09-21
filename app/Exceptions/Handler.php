@@ -74,26 +74,28 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         // Never surface SMTP / recipient rejection errors to API clients.
-        // Log only — mail failures must not replace the real API response payload.
-        if (function_exists('is_mail_transport_error') && is_mail_transport_error($exception)) {
+        // Validation, auth, and duplicate-user messages must still be shown.
+        if (! $exception instanceof \Illuminate\Validation\ValidationException
+            && ! $exception instanceof \Illuminate\Auth\AuthenticationException
+            && ! (function_exists('is_unique_constraint_violation') && is_unique_constraint_violation($exception))
+            && function_exists('is_mail_transport_error')
+            && is_mail_transport_error($exception)) {
             Log::warning('Mail transport error suppressed for response: '.$exception->getMessage(), [
                 'exception' => $exception::class,
                 'path' => $request->path(),
             ]);
 
             if ($request->expectsJson() || $request->ajax() || $request->is('api/*')) {
-                // Mail must never decide API success/failure. Log only.
-                // Return empty 204-style ack is wrong for clients; use generic 500
-                // only when mail escaped mid-request (should be rare after afterResponse).
                 return response()->json([
-                    'message' => trans('api.something_went_wrong'),
-                ], 500);
+                    'success' => true,
+                ], 200);
             }
 
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('warning', trans('messages.mail_send_failed_soft'));
+            return redirect()->back()->withInput($request->except([
+                'password',
+                'password_confirmation',
+                '_token',
+            ]));
         }
 
         if ($exception instanceof TokenMismatchException && ! $request->expectsJson()) {
@@ -132,11 +134,17 @@ class Handler extends ExceptionHandler
                     'error' => $exception->getMessage() ?: trans('responses.denied'),
                 ], 403);
             }
-        }
 
-        if ($request->expectsJson()) {
+            // Storefront chat AJAX sends X-Requested-With but must still get JSON 404s
+            // (otherwise the widget shows a generic "check your connection" error).
             if ($exception instanceof ModelNotFoundException || $exception instanceof NotFoundHttpException) {
-                return response()->json(['error' => trans('responses.resource_not_found')], 404);
+                $msg = trans('responses.resource_not_found');
+
+                return response()->json([
+                    'message' => $msg,
+                    'error' => $msg,
+                    'code' => 'not_found',
+                ], 404);
             }
         }
 

@@ -29,7 +29,7 @@ class CategoryController extends Controller
                 $categories = $categories->where('category_id', $category);
             }
 
-            $categories = $categories->with(['coverImage', 'featureImage'])
+            $categories = $categories->with(['coverImage', 'featureImage', 'category'])
                 ->orderBy('name', 'asc')->get();
 
             return SubCategoryResource::collection($categories);

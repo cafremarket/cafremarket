@@ -79,6 +79,14 @@ class CartController extends Controller
             return response()->json(['message' => trans('api.404')], 404);
         }
 
+        // Capture affiliate ref from customer app (ref / affiliate_code / X-Affiliate-Code).
+        if (is_incevio_package_loaded('affiliate')
+            && class_exists(\Incevio\Package\Affiliate\Services\AffiliateAttributionService::class)
+        ) {
+            app(\Incevio\Package\Affiliate\Services\AffiliateAttributionService::class)
+                ->captureFromRequest($request);
+        }
+
         // Check if the item is a downloadable one
         $downloadable = $item->product->downloadable;
 

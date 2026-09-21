@@ -23,7 +23,6 @@
           'wizardId' => 'create-address-wizard',
           'countries' => $countries,
           'states' => $states,
-          'address_types' => $address_types,
         ])
       {!! Form::close() !!}
 

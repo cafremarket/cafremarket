@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Validations;
 
+use App\Http\Requests\Concerns\ValidatesProductCategories;
 use App\Http\Requests\Request;
 
 class UpdateCatalogProductRequest extends Request
 {
+    use ValidatesProductCategories;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -21,12 +23,16 @@ class UpdateCatalogProductRequest extends Request
      *
      * @return array
      */
+    protected function prepareForValidation()
+    {
+        $this->prepareProductCategories();
+    }
+
     public function rules()
     {
         $id = $this->route('product');
 
-        return [
-            'category_list' => 'required',
+        return array_merge($this->productCategoryRules(), [
             'name' => 'required|composite_unique:products,name, '.$id,
             'description' => 'required',
             'active' => 'required',
@@ -34,7 +40,12 @@ class UpdateCatalogProductRequest extends Request
             'max_price' => 'nullable|numeric|min:'.$this->min_price ?? 0,
             'video' => ['nullable', 'file', new \App\Rules\ProductVideoFile],
             'delete_video' => 'nullable|boolean',
-        ];
+        ]);
+    }
+
+    public function withValidator($validator)
+    {
+        $this->withProductCategoryValidator($validator);
     }
 
     /**
@@ -44,8 +55,6 @@ class UpdateCatalogProductRequest extends Request
      */
     public function messages()
     {
-        return [
-            'category_list.required' => trans('validation.category_list_required'),
-        ];
+        return $this->productCategoryMessages();
     }
 }

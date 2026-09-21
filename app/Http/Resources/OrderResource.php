@@ -33,6 +33,7 @@ class OrderResource extends JsonResource
             'order_status' => $this->orderStatus(true),
             'payment_status' => $this->paymentStatusName(true),
             'payment_is_paid' => $this->isPaid(),
+            'is_chat_quote' => (bool) $this->is_chat_quote,
             'payment_method_code' => optional($this->paymentMethod)->code,
             'can_resend_emola_payment' => $this->canResendEmolaPayment(),
             'suggested_emola_number' => $this->suggestedEmolaNumber(),
@@ -125,8 +126,11 @@ class OrderResource extends JsonResource
             ),
             // Not PaymentMethodResource: that hides `code` on api/order/* paths,
             // but the app needs it to submit the right payment_method value.
+            // Shown whenever wire transfer was rejected, or — more generally —
+            // whenever the order simply isn't paid yet (e.g. a vendor-built
+            // chat quote), matching Order::eligiblePaymentSwitchMethods().
             'payment_switch_options' => $this->when(
-                ! $vendor && $this->isWireTransferRejected(),
+                ! $vendor && ($this->isWireTransferRejected() || ! $this->isPaid()),
                 function () {
                     return $this->eligiblePaymentSwitchMethods()->map(function ($method) {
                         return [

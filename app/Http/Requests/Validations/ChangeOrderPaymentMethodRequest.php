@@ -6,9 +6,11 @@ use App\Http\Requests\Request;
 use App\Models\Customer;
 
 /**
- * Only reachable while an order's bank transfer proof is sitting rejected —
- * lets the customer either re-upload a proof (payment_method stays 'wire')
- * or switch to a different payment method entirely.
+ * Reachable in two cases: while an order's bank transfer proof is sitting
+ * rejected (re-upload a proof, or switch to a different payment method), or
+ * — more generally — whenever the order simply isn't paid yet (e.g. a
+ * vendor-built chat quote, where the customer never picked a payment
+ * method in the first place, or any other still-unpaid order).
  */
 class ChangeOrderPaymentMethodRequest extends Request
 {
@@ -29,7 +31,7 @@ class ChangeOrderPaymentMethodRequest extends Request
             return false;
         }
 
-        return $order->isWireTransferRejected();
+        return $order->isWireTransferRejected() || ! $order->isPaid();
     }
 
     /**

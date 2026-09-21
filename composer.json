@@ -92,6 +92,7 @@
       "App\\": "app/",
       "Incevio\\Package\\": "packages/",
       "Incevio\\Package\\Wallet\\": "packages/wallet/src/",
+      "Incevio\\Package\\Affiliate\\": "packages/affiliate/src/",
       "Database\\Factories\\": "database/factories/",
       "Database\\Seeders\\": "database/seeders/"
     },

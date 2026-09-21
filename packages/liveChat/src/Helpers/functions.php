@@ -1,5 +1,21 @@
 <?php
 
+if (! function_exists('livechat_linkify_html')) {
+    /**
+     * Escapes a plain chat message, then wraps bare URLs in a real link —
+     * safe against XSS since the regex only ever runs against already-
+     * escaped text. Mirrors the client-side `linkify()` used for
+     * client-rendered (realtime/optimistic) bubbles so first-paint and
+     * realtime bubbles look identical.
+     */
+    function livechat_linkify_html(?string $text): string
+    {
+        $escaped = e((string) $text);
+
+        return preg_replace('/(https?:\/\/[^\s<]+)/', '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>', $escaped);
+    }
+}
+
 if (! function_exists('livechat_message_for_attachment_only')) {
     /**
      * Stored reply/message body when the user sends a file with no caption.

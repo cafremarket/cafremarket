@@ -1,8 +1,17 @@
-<div class="form-group">
-  {!! Form::label('category_id', trans('app.form.category') . '*') !!}
-  {!! Form::select('category_id', $catGroups, null, ['class' => 'form-control select2', 'placeholder' => trans('app.placeholder.category'), 'required']) !!}
-  <div class="help-block with-errors"></div>
-</div>
+@if (!empty($preselectedCategoryId))
+  {!! Form::hidden('category_id', $preselectedCategoryId) !!}
+  <input type="hidden" id="parent-category-slug" value="{{ optional($parentCategory)->slug }}">
+  <div class="form-group">
+    {!! Form::label('category_id_display', trans('app.form.category')) !!}
+    <p class="form-control-static"><strong>{{ isset($parentCategory) ? $parentCategory->name : ($catGroups[$preselectedCategoryId] ?? '') }}</strong></p>
+  </div>
+@else
+  <div class="form-group">
+    {!! Form::label('category_id', trans('app.form.category') . '*') !!}
+    {!! Form::select('category_id', $catGroups, null, ['class' => 'form-control select2', 'placeholder' => trans('app.placeholder.category'), 'required']) !!}
+    <div class="help-block with-errors"></div>
+  </div>
+@endif
 
 <div class="form-group">
   {!! Form::label('name', trans('app.form.subcategory_name') . '*') !!}

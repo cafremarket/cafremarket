@@ -16,9 +16,17 @@ class AffiliateCommission extends Model
         'affiliate_link_id',
         'inventory_id',
         'order_id',
+        'customer_id',
+        'customer_email',
+        'clicked_at',
         'paid',
         'commission_rate',
         'total_commission',
+    ];
+
+    protected $casts = [
+        'paid' => 'boolean',
+        'clicked_at' => 'datetime',
     ];
 
     public function affiliate()

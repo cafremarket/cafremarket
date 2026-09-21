@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests\Validations;
 
+use App\Http\Requests\Concerns\ValidatesProductCategories;
 use App\Http\Requests\Request;
 use App\Models\Inventory;
 
 class UpdateProductRequest extends Request
 {
+    use ValidatesProductCategories;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -60,6 +62,8 @@ class UpdateProductRequest extends Request
                 ? \Illuminate\Support\Str::limit($plainDescription, $metaDescLimit, '')
                 : null,
         ]);
+
+        $this->prepareProductCategories();
     }
 
     /**
@@ -87,8 +91,7 @@ class UpdateProductRequest extends Request
 
         $inventoryId = Inventory::where('product_id', $id)->pluck('id')->first();
 
-        $rules = [
-            'category_list' => 'required',
+        $rules = array_merge($this->productCategoryRules(), [
             'name' => 'required',
             'sale_price' => 'nullable|numeric|min:0',
             'offer_price' => 'nullable|numeric',
@@ -100,7 +103,7 @@ class UpdateProductRequest extends Request
             'image' => 'mimes:jpg,jpeg,png,gif,svg',
             'video' => ['nullable', 'file', new \App\Rules\ProductVideoFile],
             'delete_video' => 'nullable|boolean',
-        ];
+        ]);
 
         $rules['sku'] = 'bail|nullable|composite_unique:inventories,sku,shop_id:'.$shop_id.','.$inventoryId;
         $rules['slug'] = 'bail|required|alpha_dash';
@@ -113,6 +116,11 @@ class UpdateProductRequest extends Request
         return $rules;
     }
 
+    public function withValidator($validator)
+    {
+        $this->withProductCategoryValidator($validator);
+    }
+
     /**
      * Get the error messages for the defined validation rules.
      *
@@ -120,8 +128,6 @@ class UpdateProductRequest extends Request
      */
     public function messages()
     {
-        return [
-            'category_list.required' => trans('validation.category_list_required'),
-        ];
+        return $this->productCategoryMessages();
     }
 }

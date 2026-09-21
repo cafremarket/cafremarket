@@ -166,21 +166,33 @@
   </div><!-- /.container -->
 </section>
 
-@if ($order->isWireTransferRejected())
+@php
+  $isWireRejected = $order->isWireTransferRejected();
+  $needsPayment = $isWireRejected || ! $order->isPaid();
+@endphp
+@if ($needsPayment)
   <section id="wire-recovery-section" name="wire-recovery-section" class="account-section mb-3">
     <div class="container">
       <div class="row">
         <div class="col-12 px-3 px-md-0">
           <div class="sf-panel wire-recovery-panel">
             <div class="sf-panel__head">
-              <span><i class="fa fa-exclamation-circle text-danger mr-2"></i> @lang('theme.wire_transfer_rejected')</span>
+              @if ($isWireRejected)
+                <span><i class="fa fa-exclamation-circle text-danger mr-2"></i> @lang('theme.wire_transfer_rejected')</span>
+              @else
+                <span><i class="fa fa-credit-card mr-2"></i> @lang('theme.complete_your_payment')</span>
+              @endif
             </div>
             <div class="sf-panel__body wire-recovery-body">
-              <div class="wire-recovery-reason">
-                <strong>@lang('theme.wire_transfer_rejected_reason_label'):</strong>
-                {{ $order->wire_transfer_rejection_reason }}
-              </div>
-              <p class="wire-recovery-help">@lang('theme.wire_transfer_rejected_help')</p>
+              @if ($isWireRejected)
+                <div class="wire-recovery-reason">
+                  <strong>@lang('theme.wire_transfer_rejected_reason_label'):</strong>
+                  {{ $order->wire_transfer_rejection_reason }}
+                </div>
+                <p class="wire-recovery-help">@lang('theme.wire_transfer_rejected_help')</p>
+              @else
+                <p class="wire-recovery-help">@lang('theme.order_awaiting_payment_help')</p>
+              @endif
 
               {!! Form::open([
                   'route' => ['order.paymentMethod.change', $order],
@@ -194,7 +206,7 @@
                 <legend class="wire-recovery-label">@lang('theme.choose_payment_method')</legend>
                 <div class="wire-recovery-methods" role="radiogroup">
                   @foreach ($paymentSwitchOptions as $method)
-                    @php $isDefault = old('payment_method', 'wire') == $method->code; @endphp
+                    @php $isDefault = old('payment_method', $isWireRejected ? 'wire' : '') == $method->code; @endphp
                     <label class="wire-recovery-option">
                       <input
                         type="radio"
@@ -412,9 +424,12 @@
                     <div class="product-info">
                       {{ $item->pivot->item_description }}
 
-                      <a href="{{ storefront_product_url($item) }}" class="ml-2" target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.show_product_page') }}">
-                        <i class="fa fa-external-link" aria-hidden="true"></i>
-                      </a>
+                      @unless ($item->is_chat_custom)
+                        {{-- A chat-custom line item isn't a real catalog listing — no public product page to link to. --}}
+                        <a href="{{ storefront_product_url($item) }}" class="ml-2" target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('theme.show_product_page') }}">
+                          <i class="fa fa-external-link" aria-hidden="true"></i>
+                        </a>
+                      @endunless
 
                       @if ($order->cancellation && $order->cancellation->isItemInRequest($item->id))
                         <span class="label label-danger pl-2">

@@ -16,6 +16,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Incevio\Package\Affiliate\Services\AffiliateAttributionService;
+use Incevio\Package\Affiliate\Services\AffiliateCommissionService;
 
 /**
  * Attach this Trait to a User (or other model) for easier read/writes on Addresses
@@ -62,6 +64,10 @@ trait ShoppingCart
             return response()->json([
                 'message' => panel_user_storefront_message(),
             ], 403);
+        }
+
+        if (is_incevio_package_loaded('affiliate')) {
+            app(AffiliateAttributionService::class)->captureFromRequest($request);
         }
 
         $slugsArray = json_decode($slug, true);
@@ -400,20 +406,13 @@ trait ShoppingCart
                 'created_at' => $item->pivot->created_at,
                 'updated_at' => $item->pivot->updated_at,
             ];
-
-            if (is_incevio_package_loaded('affiliate') && Session::has('affiliate_marketer_id')) {
-                $affiliate_link = $item->affiliateLinks()
-                    ->where('affiliate_id', Session::get('affiliate_marketer_id'))
-                    ->first();
-
-                if ($item->hasAffiliateCommission()) {
-                    $affiliate_link->increment('order_count', $item->pivot->quantity);
-                    $affiliate_link->createCommission($order->id, $item);
-                }
-            }
         }
 
         DB::table('order_items')->insert($order_items);
+
+        if (is_incevio_package_loaded('affiliate')) {
+            app(AffiliateCommissionService::class)->applyToOrder($order, $cart->inventories);
+        }
 
         foreach ($order->inventories as $item) {
             $item->increment('sold_quantity', $item->pivot->quantity);

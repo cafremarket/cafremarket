@@ -208,6 +208,9 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
             'linked_items' => $request->input('linked_items'),
             'meta_title' => $request->input('meta_title'),
             'meta_description' => $request->input('meta_description'),
+            'affiliate_enabled' => $request->has('affiliate_enabled')
+                ? $request->boolean('affiliate_enabled')
+                : true,
         ];
 
         // Arrays
@@ -217,6 +220,8 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
         $purchase_prices = $request->input('purchase_price', []);
         $sale_prices = $request->input('sale_price', []);
         $offer_prices = $request->input('offer_price', []);
+        $affiliate_commissions = $request->input('affiliate_commission', $request->input('affiliate_commissions', []));
+        $affiliate_enableds = $request->input('affiliate_enableds', []);
         $images = $request->file('image');
 
         if (! is_array($skus) || count($skus) === 0) {
@@ -260,6 +265,10 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
                 'purchase_price' => $purchase_prices[$key] ?? null,
                 'sale_price' => $sale_prices[$key] ?? 0,
                 'offer_price' => ! empty($offer_prices[$key]) ? $offer_prices[$key] : null,
+                'affiliate_commission_percentage' => $affiliate_commissions[$key] ?? null,
+                'affiliate_enabled' => array_key_exists($key, $affiliate_enableds)
+                    ? filter_var($affiliate_enableds[$key], FILTER_VALIDATE_BOOLEAN)
+                    : ($commonInfo['affiliate_enabled'] ?? true),
                 'slug' => Str::slug($request->input('slug').' '.$sku, '-'),
                 'parent_id' => $parent_id,
             ];

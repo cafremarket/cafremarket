@@ -104,7 +104,10 @@ class RegisterController extends Controller
             $rules['g-recaptcha-response'] = 'required|recaptcha';
         }
 
-        $messages = [];
+        $messages = [
+            'email.unique' => trans('validation.register_email_unique'),
+            'phone.unique' => trans('validation.register_phone_unique'),
+        ];
         if (is_incevio_package_loaded('buyerGroup')) {
             $rules['buyer_group_id'] = 'required|exists:buyer_groups,id';
             $messages['buyer_group_id.required'] = trans('packages.buyer_group_required');
@@ -173,12 +176,22 @@ class RegisterController extends Controller
 
             $data['phone'] = $phone;
 
-            Customer::createOrReclaimFromTrash($data);
+            try {
+                Customer::createOrReclaimFromTrash($data);
+            } catch (\Throwable $e) {
+                throw_registration_unique_validation($e);
+                throw $e;
+            }
 
             return redirect()->route('phoneverification.notice')->with(['phone_number' => $phone]);
         }
 
-        $customer = Customer::createOrReclaimFromTrash($data);
+        try {
+            $customer = Customer::createOrReclaimFromTrash($data);
+        } catch (\Throwable $e) {
+            throw_registration_unique_validation($e);
+            throw $e;
+        }
 
         if (is_incevio_package_loaded('zipcode')) {
             $customer->addresses()->create($request->all());

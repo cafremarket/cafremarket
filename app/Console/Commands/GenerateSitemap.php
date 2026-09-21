@@ -63,11 +63,18 @@ class GenerateSitemap extends Command
                 }
             });
 
-        // sub-categories
-        DB::table('sub_categories')->select('slug')
-            ->orderBy('id')->chunk(100, function ($cats) use ($sitemap) {
+        // sub-categories: /{category-slug}/{subcategory-slug}
+        DB::table('sub_categories as sc')
+            ->join('categories as c', 'c.id', '=', 'sc.category_id')
+            ->whereNull('sc.deleted_at')
+            ->whereNull('c.deleted_at')
+            ->select('c.slug as category_slug', 'sc.slug as subcategory_slug')
+            ->orderBy('sc.id')->chunk(100, function ($cats) use ($sitemap) {
                 foreach ($cats as $cat) {
-                    $sitemap->add(route('category.browse', $cat->slug));
+                    $sitemap->add(route('category.browse', [
+                        'category' => $cat->category_slug,
+                        'subcategory' => $cat->subcategory_slug,
+                    ]));
                 }
             });
 

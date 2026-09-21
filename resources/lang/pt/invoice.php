@@ -31,6 +31,7 @@ return [
     'wallet_credit' => 'Crédito na carteira',
     'gross_sale' => 'Total do pedido (bruto)',
     'marketplace_commission' => 'Comissão do marketplace',
+    'affiliate_commission' => 'Comissão de afiliado',
     'vendor_net' => 'Líquido creditado ao vendedor',
     'additional_info' => 'Informações Adicionais',
     'footer_note' => 'Esta é uma fatura gerada automaticamente e não requer assinatura.',

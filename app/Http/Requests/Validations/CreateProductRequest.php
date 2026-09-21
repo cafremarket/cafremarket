@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Validations;
 
+use App\Http\Requests\Concerns\ValidatesProductCategories;
 use App\Http\Requests\Request;
 
 class CreateProductRequest extends Request
 {
+    use ValidatesProductCategories;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -63,15 +65,16 @@ class CreateProductRequest extends Request
                 ? \Illuminate\Support\Str::limit($plainDescription, $metaDescLimit, '')
                 : null,
         ]);
+
+        $this->prepareProductCategories();
     }
 
     public function rules()
     {
         $user = $this->user();
 
-        return [
+        return array_merge($this->productCategoryRules(), [
             'shop_id' => 'required|exists:shops,id',
-            'category_list' => 'required',
             'name' => 'required',
             'slug' => 'required|alpha_dash',
             'description' => 'required',
@@ -86,7 +89,12 @@ class CreateProductRequest extends Request
             'offer_price' => 'nullable|numeric',
             'available_from' => 'nullable|date',
             'offer_prices.*' => 'nullable|numeric|min:0',
-        ];
+        ]);
+    }
+
+    public function withValidator($validator)
+    {
+        $this->withProductCategoryValidator($validator);
     }
 
     /**
@@ -96,8 +104,6 @@ class CreateProductRequest extends Request
      */
     public function messages()
     {
-        return [
-            'category_list.required' => trans('validation.category_list_required'),
-        ];
+        return $this->productCategoryMessages();
     }
 }

@@ -878,6 +878,33 @@
       minimumResultsForSearch: 7,
     });
 
+    (function () {
+      function catalogTree() {
+        var el = document.getElementById('catalog-tree-json');
+        if (!el) return {};
+        try { return JSON.parse(el.textContent || '{}'); } catch (e) { return {}; }
+      }
+
+      function populateSubcategories(parentId, selected) {
+        var tree = catalogTree();
+        var node = tree[parentId] || tree[String(parentId)] || {};
+        var subs = node.subcategories || {};
+        var $el = $('select.js-subcategory-list');
+        if (!$el.length) return;
+
+        selected = (selected || $el.val() || []).map(String);
+        $el.empty();
+        $.each(subs, function (id, name) {
+          $el.append(new Option(name, id, false, selected.indexOf(String(id)) !== -1));
+        });
+        $el.trigger('change');
+      }
+
+      $(document).on('change', 'select.js-parent-category', function () {
+        populateSubcategories($(this).val(), []);
+      });
+    })();
+
     $(".select2-tag").select2({
       placeholder: "{{ trans('app.placeholder.tags') }}",
       tags: true,
@@ -1386,12 +1413,13 @@
       if (slug && slug.length >= 3) {
         var route = "{{ Route::current()->getName() }}";
 
-        if (route.match(/subcategory/i)) {
+        if ($('#parent-category-slug').length || route.match(/subcategory/i)) {
           var tbl = 'sub_categories';
-          var url = 'category/';
+          var parentSlug = ($('#parent-category-slug').val() || '').replace(/^\/+|\/+$/g, '');
+          var url = parentSlug ? (parentSlug + '/') : '';
         } else if (route.match(/category/i)) {
           var tbl = 'categories';
-          var url = 'category/';
+          var url = 'categories/';
         } else if (route.match(/product/i) || route.match(/inventory/i)) {
           var tbl = 'products';
           var url = 'shop/{{ optional(optional(Auth::user())->shop)->slug ?? "shop" }}/';

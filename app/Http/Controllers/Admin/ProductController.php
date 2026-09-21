@@ -175,6 +175,8 @@ class ProductController extends Controller
             'stock_quantity' => $request->stock_quantity,
             'purchase_price' => $request->purchase_price,
             'sale_price' => $request->sale_price,
+            'affiliate_commission_percentage' => $request->input('affiliate_commission_percentage'),
+            'affiliate_enabled' => $request->boolean('affiliate_enabled', true),
             'available_form' => $request->available_form,
             'offer_price' => $request->offer_price,
             'shipping_weight' => $request->shipping_weight,
@@ -209,6 +211,8 @@ class ProductController extends Controller
             $stock_quantities = $request->input('stock_quantities');
             $sale_prices = $request->input('sale_prices');
             $offer_prices = $request->input('offer_prices', []);
+            $affiliate_commissions = $request->input('affiliate_commissions', []);
+            $affiliate_enabled_variants = $request->input('affiliate_enabled_variants', []);
             $images = $request->file('variant_images');
             $variants = $request->input('variants');
             $tag_lists = $request->input('tag_list');
@@ -260,6 +264,8 @@ class ProductController extends Controller
                 $stock_quantities,
                 $sale_prices,
                 $offer_prices,
+                $affiliate_commissions,
+                $affiliate_enabled_variants,
                 $images,
                 $variants,
                 $commonInfo,
@@ -273,6 +279,8 @@ class ProductController extends Controller
                     'stock_quantity' => $stock_quantities[$key] ?? 0,
                     'sale_price' => $sale_prices[$key] ?? 0,
                     'offer_price' => $offer_prices[$key] ?? null,
+                    'affiliate_commission_percentage' => $affiliate_commissions[$key] ?? null,
+                    'affiliate_enabled' => filter_var($affiliate_enabled_variants[$key] ?? true, FILTER_VALIDATE_BOOLEAN),
                     'slug' => generate_unique_listing_slug($request->input('slug').' '.$skus[$key]),
                 ]);
 
@@ -369,6 +377,7 @@ class ProductController extends Controller
     {
         $product = Product::with([
             'categories.attrsList',
+            'subCategories',
             'inventories.attributeValues',
             'inventories.attributes',
             'inventories.image',
@@ -482,6 +491,8 @@ class ProductController extends Controller
         $variant_quantities = $request->get('variant_quantities');
         $variant_prices = $request->get('variant_prices');
         $variant_offer_prices = $request->get('variant_offer_prices', []);
+        $variant_affiliate_commissions = $request->get('variant_affiliate_commissions', []);
+        $variant_affiliate_enabled = $request->get('variant_affiliate_enabled', []);
         $variant_images = $request->file('variant_images');
 
         $oldVariants = Inventory::where('parent_id', $inventoryId)->get();
@@ -501,6 +512,8 @@ class ProductController extends Controller
                     'stock_quantity' => $variant_quantities[$key],
                     'sale_price' => $variant_prices[$key],
                     'offer_price' => $variant_offer_prices[$key] ?? null,
+                    'affiliate_commission_percentage' => $variant_affiliate_commissions[$key] ?? null,
+                    'affiliate_enabled' => filter_var($variant_affiliate_enabled[$key] ?? true, FILTER_VALIDATE_BOOLEAN),
                 ];
 
                 // Merge the common info and dynamic info to data array
@@ -584,6 +597,8 @@ class ProductController extends Controller
             'min_order_quantity' => $parent->min_order_quantity,
             'user_id' => $request->user()->id,
             'sale_price' => $request->get('sale_price'),
+            'affiliate_commission_percentage' => $request->get('affiliate_commission_percentage'),
+            'affiliate_enabled' => $request->boolean('affiliate_enabled', true),
         ];
 
         $variant = $product->inventories()->create($data);

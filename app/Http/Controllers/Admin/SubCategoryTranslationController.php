@@ -183,7 +183,7 @@ class SubCategoryTranslationController extends Controller
         $failed_rows = $this->getFailedList();
 
         if (empty($failed_rows)) {
-            return redirect()->route('admin.catalog.subcategory.index');
+            return redirect()->route('admin.catalog.category.index');
         }
 
         return view('admin.category.subcategory._translation_import_failed', compact('failed_rows'));

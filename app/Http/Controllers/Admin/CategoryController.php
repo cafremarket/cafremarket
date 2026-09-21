@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateCategoryRequest;
 use App\Http\Requests\Validations\UpdateCategoryRequest;
 use App\Models\Category;
+use App\Models\Product;
 use App\Repositories\Category\CategoryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -75,12 +76,46 @@ class CategoryController extends Controller
                 return view('admin.category.partials.name', compact('category'));
             })
             ->editColumn('sub_categories_count', function ($category) {
-                return $category->sub_categories_count;
+                $url = route('admin.catalog.category.show', $category->id);
+
+                return '<a href="'.$url.'">'.(int) $category->sub_categories_count.'</a>';
             });
 
-        $rawColumns = ['cover_image', 'feature_image', 'name', 'checkbox', 'option'];
+        $rawColumns = ['cover_image', 'feature_image', 'name', 'sub_categories_count', 'checkbox', 'option'];
 
         return $data->rawColumns($rawColumns)->make(true);
+    }
+
+    /**
+     * Show the category with its subcategories and products.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        abort_unless(Auth::user()->isFromPlatform(), 403);
+
+        $category = $this->category->find($id);
+        $category->load(['featureImage', 'coverImage']);
+
+        $subCategories = $category->subCategories()
+            ->with('featureImage', 'coverImage')
+            ->withCount('products')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        $trashes = $category->subCategories()->onlyTrashed()->get();
+
+        $products = Product::query()
+            ->whereHas('subCategories', function ($q) use ($category) {
+                $q->where('sub_categories.category_id', $category->id);
+            })
+            ->with(['featureImage', 'image', 'subCategories'])
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.category.show', compact('category', 'subCategories', 'trashes', 'products'));
     }
 
     /**
@@ -104,6 +139,7 @@ class CategoryController extends Controller
         $this->category->store($request);
 
         Cache::forget('all_categories');
+        Cache::forget('all_categories_v2');
 
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
     }
@@ -249,5 +285,6 @@ class CategoryController extends Controller
         $ids = is_array($id) ? $id : [$id];
 
         Cache::forget('all_categories');
+        Cache::forget('all_categories_v2');
     }
 }

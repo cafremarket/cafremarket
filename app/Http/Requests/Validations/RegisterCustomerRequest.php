@@ -63,6 +63,8 @@ class RegisterCustomerRequest extends Request
     {
         return [
             'email.unique' => trans('validation.register_email_unique'),
+            'phone.unique' => trans('validation.register_phone_unique'),
+            'agree.required' => trans('validation.accepted', ['attribute' => 'terms']),
         ];
     }
 }

@@ -10,6 +10,28 @@ class Reply extends BaseModel
 {
     use Attachable, HasFactory;
 
+    const TYPE_TEXT = 'text';
+
+    const TYPE_ATTACHMENT = 'attachment';
+
+    const TYPE_LOCATION = 'location';
+
+    const TYPE_CONTACT = 'contact';
+
+    const TYPE_PRODUCT_SHARE = 'product_share';
+
+    const TYPE_ORDER_SHARE = 'order_share';
+
+    /**
+     * Legacy magic-string prefixes once used to encode a message "type"
+     * directly inside the plain-text body. New replies use the `type`/
+     * `payload` columns instead — these are kept only to render old rows.
+     */
+    const LEGACY_PREFIXES = [
+        '[product_share]' => self::TYPE_PRODUCT_SHARE,
+        '[order_share]' => self::TYPE_ORDER_SHARE,
+    ];
+
     /**
      * The database table used by the model.
      *
@@ -31,6 +53,7 @@ class Reply extends BaseModel
      */
     protected $casts = [
         'read' => 'boolean',
+        'payload' => 'array',
     ];
 
     /**
@@ -46,6 +69,8 @@ class Reply extends BaseModel
         'repliable_id',
         'repliable_type',
         'parent_id',
+        'type',
+        'payload',
     ];
 
     /**
@@ -127,6 +152,73 @@ class Reply extends BaseModel
             'sender_name' => $reply->getName(),
             'sender_type' => $reply->customer_id ? 'customer' : 'merchant',
         ];
+    }
+
+    /**
+     * Parse the legacy `[product_share]{json}` / `[order_share]{json}` prefix
+     * convention out of a plain-text body. Used only as a read-time fallback
+     * for rows created before the `type`/`payload` columns existed.
+     *
+     * @return array{type: string, payload: array<string, mixed>|null}
+     */
+    public static function legacyTypeFromBody(?string $reply): array
+    {
+        $body = (string) $reply;
+
+        foreach (self::LEGACY_PREFIXES as $prefix => $type) {
+            if (! str_starts_with($body, $prefix)) {
+                continue;
+            }
+
+            $json = substr($body, strlen($prefix));
+            $payload = json_decode($json, true);
+
+            if (! is_array($payload)) {
+                $start = strpos($json, '{');
+                $end = strrpos($json, '}');
+                if ($start !== false && $end !== false && $end > $start) {
+                    $payload = json_decode(substr($json, $start, $end - $start + 1), true);
+                }
+            }
+
+            return ['type' => $type, 'payload' => is_array($payload) ? $payload : null];
+        }
+
+        if (trim($body) === '[attachment]') {
+            return ['type' => self::TYPE_ATTACHMENT, 'payload' => null];
+        }
+
+        return ['type' => self::TYPE_TEXT, 'payload' => null];
+    }
+
+    /**
+     * The real `type` when it's anything other than the column default,
+     * else derived from the legacy body prefix (covers both pre-migration
+     * rows and genuinely plain-text messages, which parse back to TYPE_TEXT).
+     */
+    public function resolvedType(): string
+    {
+        $type = $this->getAttribute('type');
+
+        if (filled($type) && $type !== self::TYPE_TEXT) {
+            return $type;
+        }
+
+        return self::legacyTypeFromBody($this->reply)['type'];
+    }
+
+    /**
+     * The real `payload` when set, else derived from the legacy body prefix.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function resolvedPayload(): ?array
+    {
+        if (filled($this->getAttribute('payload'))) {
+            return $this->getAttribute('payload');
+        }
+
+        return self::legacyTypeFromBody($this->reply)['payload'];
     }
 
     /**

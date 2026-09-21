@@ -153,6 +153,18 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
                     'index',
                 ])->name('chat_conversation.index');
 
+                // Fixed-segment route registered before the chat/{chat} wildcard below
+                // so "search" is never captured as a {chat} route-model-binding id.
+                Route::get('chat/search/inventory', [
+                    \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,
+                    'searchInventory',
+                ])->name('chat_conversation.searchInventory');
+
+                Route::post('chat/calculate-order-totals', [
+                    \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,
+                    'calculateOrderTotals',
+                ])->name('chat_conversation.calculateTotals');
+
                 Route::get('chat/{chat}', [
                     \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,
                     'show',
@@ -162,6 +174,16 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
                     \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,
                     'reply',
                 ])->name('chat_conversation.reply');
+
+                Route::post('chat/{chat}/custom-order', [
+                    \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,
+                    'createCustomOrder',
+                ])->name('chat_conversation.customOrder');
+
+                Route::get('chat/{chat}/orders', [
+                    \Incevio\Package\LiveChat\Http\Controllers\AdminChatController::class,
+                    'searchOrders',
+                ])->name('chat_conversation.searchOrders');
             }
 
             // Dispute tickets (ticket workflow — not chat)

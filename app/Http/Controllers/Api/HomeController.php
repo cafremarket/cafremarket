@@ -178,6 +178,19 @@ class HomeController extends Controller
     }
 
     /**
+     * Admin-curated featured stores for the app homepage.
+     * Only these show — never the full nearby/all shops list.
+     *
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection The collection of ShopLightResource
+     */
+    public function featuredShops()
+    {
+        return $this->rememberApi('shops:featured', function () {
+            return ShopLightResource::collection(get_featured_shops());
+        }, null, 'shops');
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param  string  $slug  The slug of the shop.

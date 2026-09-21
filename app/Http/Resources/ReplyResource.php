@@ -17,6 +17,8 @@ class ReplyResource extends JsonResource
         return [
             'id' => $this->id,
             'reply' => $this->reply,
+            'type' => $this->resolvedType(),
+            'payload' => $this->resolvedPayload(),
             'user' => $this->when($this->user_id, new UserResource($this->user)),
             'customer' => $this->when($this->customer_id, new CustomerLightResource($this->customer)),
             'read' => $this->read,

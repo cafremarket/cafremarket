@@ -19,6 +19,8 @@ class SubCategoryResource extends JsonResource
             'category_id' => $this->category_id,
             'name' => $this->name,
             'slug' => $this->slug,
+            'category_slug' => optional($this->category)->slug,
+            'url' => get_category_url($this->resource),
             'description' => $this->description,
             'featured' => (bool) $this->featured,
             'feature_image' => $this->when($this->featureImage, get_storage_file_url(optional($this->featureImage)->path, 'medium')),

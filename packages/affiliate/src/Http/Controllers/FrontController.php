@@ -3,31 +3,52 @@
 namespace Incevio\Package\Affiliate\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
-use Incevio\Package\Affiliate\Models\Affiliate;
 use Incevio\Package\Affiliate\Models\AffiliateLink;
+use Incevio\Package\Affiliate\Services\AffiliateAttributionService;
 
 class FrontController extends Controller
 {
-  /**
-   * Handle the visit to an affiliate link.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\RedirectResponse
-   */
-  public function visit(string $affiliate_username, string $slug)
-  {
-    $affiliate = Affiliate::where('username', $affiliate_username)->firstOrFail();
+    public function visitShort(string $code)
+    {
+        $affiliateLink = AffiliateLink::where('slug', $code)->firstOrFail();
 
-    $affiliateLink = $affiliate->affiliateLinks()
-      ->where('slug', $slug)
-      ->firstOrFail();
+        return $this->redirectFromLink($affiliateLink);
+    }
 
-    $affiliateLink->increment('visitor_count');
+    /**
+     * Handle the visit to an affiliate link.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function visit(string $affiliate, string $slug)
+    {
+        $affiliateLink = AffiliateLink::where('slug', $slug)->firstOrFail();
 
-    Session::put('affiliate_marketer_id', $affiliateLink->affiliate_id);
+        return $this->redirectFromLink($affiliateLink);
+    }
 
-    return redirect()->to(storefront_product_url($affiliateLink->inventory));
-  }
+    protected function redirectFromLink(AffiliateLink $affiliateLink)
+    {
+        abort_unless($affiliateLink->inventory, 404);
+
+        $affiliateLink->increment('visitor_count');
+
+        app(AffiliateAttributionService::class)->remember($affiliateLink);
+
+        // Customer app deep-link: return JSON when requested instead of web redirect.
+        if (request()->expectsJson() || request()->wantsJson()) {
+            $inventory = $affiliateLink->inventory;
+
+            return response()->json([
+                'data' => [
+                    'affiliate_code' => $affiliateLink->slug,
+                    'product_slug' => $inventory->slug,
+                    'inventory_id' => (int) $inventory->id,
+                    'redirect_url' => storefront_product_url($inventory),
+                ],
+            ]);
+        }
+
+        return redirect()->to(storefront_product_url($affiliateLink->inventory));
+    }
 }

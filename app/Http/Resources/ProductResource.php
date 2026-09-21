@@ -67,6 +67,9 @@ class ProductResource extends JsonResource
             'height' => optional($inventory)->height,
             'meta_title' => optional($inventory)->meta_title,
             'meta_description' => optional($inventory)->meta_description,
+            'affiliate_enabled' => $inventory ? $inventory->isAffiliateEnabled() : true,
+            'affiliate_commission_percentage' => optional($inventory)->affiliate_commission_percentage,
+            'effective_affiliate_commission_percentage' => $inventory ? $inventory->affiliates_percentage : null,
             'origin_country_id' => $this->origin_country,
             'taxes' => $this->taxes->map(fn ($tax) => [
                 'id' => $tax->id,

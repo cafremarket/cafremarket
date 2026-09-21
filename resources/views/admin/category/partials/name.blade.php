@@ -1,6 +1,6 @@
 <td>
   <h5>
-    {{ $category->name }}
+    <a href="{{ route('admin.catalog.category.show', $category->id) }}">{{ $category->name }}</a>
     @if ($category->featured)
       <small class="label label-primary indent10">{{ trans('app.featured') }}</small>
     @endif

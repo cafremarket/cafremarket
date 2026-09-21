@@ -19,13 +19,7 @@
                 {!! Form::label('name', trans('app.name') . '*') !!}
                 {!! Form::text('name', null, ['class' => 'form-control', 'placeholder' => trans('theme.placeholder.full_name'), 'required']) !!}
             </div>
-    
-            <div class="form-group">
-                {!! Form::label('username', trans('packages.affiliate.username') . '*') !!}
-                {!! Form::text('username', null, ['class' => 'form-control', 'id' => 'js-username', 'placeholder' => trans('packages.affiliate.placeholder_username'), 'required']) !!}
-                <span id="js-username-feedback"></span>
-            </div>
-            
+
             <div class="form-group">
                 {!! Form::label('email', trans('app.email') . '*') !!}
                 {!! Form::email('email', null, ['class' => 'form-control', 'placeholder' => trans('theme.placeholder.valid_email'), 'required']) !!}
@@ -45,8 +39,4 @@
         {!! Form::close() !!}
     </div>
   </div>
-@endsection
-
-@section('page-script')
-  @include('affiliate::scripts.affiliate_username_validation')
 @endsection

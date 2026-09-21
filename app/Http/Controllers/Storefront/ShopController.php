@@ -164,13 +164,15 @@ class ShopController extends Controller
     }
 
     /**
-     * Browse a store-scoped category within a shop.
+     * Browse a subcategory within a shop at
+     * /shop/{shop}/category/{category-slug}/{subcategory-slug}.
      *
      * @param  string  $slug  shop slug
-     * @param  string  $category  category slug
+     * @param  string  $category  parent category slug
+     * @param  string  $subcategory  subcategory slug
      * @return \Illuminate\Http\Response|\Illuminate\Contracts\View\View
      */
-    public function category(BrowseProductRequest $request, $slug, $category)
+    public function category(BrowseProductRequest $request, $slug, $category, $subcategory)
     {
         $shop = Shop::where('slug', $slug)->approved()->withCount([
             'inventories' => function ($q) {
@@ -182,11 +184,14 @@ class ShopController extends Controller
             return response()->view('theme::errors.503', [], 503);
         }
 
-        $categoryModel = \App\Models\Category::where('slug', $category)
-            ->where(function ($q) use ($shop) {
-                $q->where('shop_id', $shop->id)->orWhereNull('shop_id');
-            })
+        $parent = \App\Models\Category::where('slug', $category)->active()->firstOrFail();
+
+        $categoryModel = \App\Models\SubCategory::where('slug', $subcategory)
+            ->where('category_id', $parent->id)
             ->with([
+                'category' => function ($q) {
+                    $q->select(['id', 'slug', 'name'])->active();
+                },
                 'attrsList' => function ($q) {
                     $q->with('attributeValues');
                 },

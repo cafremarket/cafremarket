@@ -86,12 +86,8 @@
       <button type="button" class="btn btn-link sf-address-wizard__change addr-wizard-back">{{ trans('theme.change') }}</button>
     </div>
 
-    @if (isset($address_types))
-      <div class="sf-form-group">
-        <label class="sf-form-label" for="{{ $wizardId }}-address-type">{{ trans('theme.placeholder.address_type') }} *</label>
-        {!! Form::select('address_type', $address_types, optional($address)->address_type, ['id' => $wizardId . '-address-type', 'class' => 'form-control sf-input', 'placeholder' => trans('theme.placeholder.address_type'), 'required']) !!}
-        <div class="help-block with-errors"></div>
-      </div>
+    @if (optional($address)->address_type)
+      {!! Form::hidden('address_type', $address->address_type) !!}
     @endif
 
     <div class="sf-form-group">

@@ -30,6 +30,30 @@ use Incevio\Package\LiveChat\Models\ChatConversation;
 class ConversationController extends Controller
 {
     /**
+     * Resolve the `type`/`payload` to persist for an incoming message,
+     * preferring explicit request fields and falling back to inferring
+     * an attachment-only message the same way the body placeholder does.
+     *
+     * @return array{type: string, payload: array<string, mixed>|null}
+     */
+    protected function resolveIncomingType(Request $request, string $replyText): array
+    {
+        $type = $request->input('type');
+        $payload = $request->input('payload');
+        $payload = is_array($payload) ? $payload : null;
+
+        if ($type) {
+            return ['type' => $type, 'payload' => $payload];
+        }
+
+        if ($replyText === livechat_message_for_attachment_only()) {
+            return ['type' => Reply::TYPE_ATTACHMENT, 'payload' => null];
+        }
+
+        return ['type' => Reply::TYPE_TEXT, 'payload' => null];
+    }
+
+    /**
      * Show all conversations
      *
      * @param  \Illuminate\Http\Request  $request
@@ -124,6 +148,7 @@ class ConversationController extends Controller
         $quotedParent = $conversation
             ? Reply::resolveQuotedParent($conversation, $request)
             : null;
+        $incoming = $this->resolveIncomingType($request, $replyText);
 
         if ($conversation) {
             $conversation->bumpLastMessage($replyText, true);
@@ -132,6 +157,8 @@ class ConversationController extends Controller
                 'user_id' => $request->user_id,
                 'reply' => $replyText,
                 'read' => false,
+                'type' => $incoming['type'],
+                'payload' => $incoming['payload'],
             ];
             if ($quotedParent) {
                 $createAttrs['parent_id'] = $quotedParent->id;
@@ -165,6 +192,8 @@ class ConversationController extends Controller
                 'user_id' => $request->user_id,
                 'reply' => $replyText,
                 'read' => false,
+                'type' => $incoming['type'],
+                'payload' => $incoming['payload'],
             ];
             if ($quotedParent) {
                 $createAttrs['parent_id'] = $quotedParent->id;
@@ -203,6 +232,8 @@ class ConversationController extends Controller
                 'time' => $clock,
                 'created_at' => $createdAt,
                 'attachments' => $attachmentsPayload,
+                'type' => $msg_object->resolvedType(),
+                'payload' => $msg_object->resolvedPayload(),
             ], livechat_quote_socket_payload($quotedParent));
 
             ChatSocketPublisher::publish(
@@ -323,6 +354,7 @@ class ConversationController extends Controller
         }
 
         $quotedParent = Reply::resolveQuotedParent($chat, $request);
+        $incoming = $this->resolveIncomingType($request, $replyText);
 
         // Merchant replies must not set customer_id (match web admin behavior).
         $createAttrs = [
@@ -330,6 +362,8 @@ class ConversationController extends Controller
             'user_id' => Auth::guard('vendor_api')->id(),
             'reply' => $replyText,
             'read' => false,
+            'type' => $incoming['type'],
+            'payload' => $incoming['payload'],
         ];
         if ($quotedParent) {
             $createAttrs['parent_id'] = $quotedParent->id;
@@ -364,6 +398,8 @@ class ConversationController extends Controller
             'time' => $clock,
             'created_at' => optional($reply->created_at)->toIso8601String(),
             'attachments' => $attachmentsPayload,
+            'type' => $reply->resolvedType(),
+            'payload' => $reply->resolvedPayload(),
         ], livechat_quote_socket_payload($quotedParent));
 
         ChatSocketPublisher::publish(
@@ -392,6 +428,8 @@ class ConversationController extends Controller
             'read' => false,
             'parent_id' => $quotedParent?->id,
             'quoted_reply' => Reply::quoteSnapshot($quotedParent),
+            'type' => $reply->resolvedType(),
+            'payload' => $reply->resolvedPayload(),
         ], 200);
     }
 

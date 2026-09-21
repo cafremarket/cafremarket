@@ -18,6 +18,7 @@ class LocaleController extends Controller
         Session::put('locale', $locale);
 
         Cache::forget('all_categories');
+        Cache::forget('all_categories_v2');
 
         return redirect()->back();
     }

@@ -99,6 +99,9 @@ class RegisterMerchantRequest extends Request
     {
         return [
             'email.unique' => trans('validation.register_email_unique'),
+            'phone.unique' => trans('validation.register_phone_unique'),
+            'shop_name.unique' => trans('validation.register_shop_name_unique'),
+            'slug.unique' => trans('validation.register_slug_unique'),
             'extra_info.required' => trans('packages.smartForm.form_data_requied_validation_msg'),
         ];
     }

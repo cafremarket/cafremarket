@@ -67,25 +67,4 @@ class AccountController extends Controller
 
         return back()->with('success', trans('packages.affiliate.notification_password_updated'));
     }
-
-    /**
-     * Check if a username already exists.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function userNameExists(Request $request)
-    {
-        $query = Affiliate::where('username', $request->username);
-
-        if (Auth::guard('affiliate')->check()) {
-            $query->where('id', '!=', Auth::guard('affiliate')->id());
-        } elseif ($request->has('id')) {
-            $query->where('id', '!=', $request->id);
-        }
-
-        return response()->json([
-            'exists' => $query->exists()
-        ]);
-    }
 }

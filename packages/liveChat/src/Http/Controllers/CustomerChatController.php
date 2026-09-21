@@ -20,7 +20,11 @@ class CustomerChatController extends Controller
     {
         $this->authorizeCustomer($chat);
 
-        $chat->markPeerRepliesAsRead('customer');
+        try {
+            $chat->markPeerRepliesAsRead('customer');
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         try {
             $with = array_merge(
@@ -58,11 +62,22 @@ class CustomerChatController extends Controller
 
         $quotedParent = Reply::resolveQuotedParent($chat, $request);
 
+        $type = $request->input('type');
+        $payload = $request->input('payload');
+        $payload = is_array($payload) ? $payload : null;
+        if (! $type) {
+            $type = $replyText === livechat_message_for_attachment_only()
+                ? Reply::TYPE_ATTACHMENT
+                : Reply::TYPE_TEXT;
+        }
+
         $createAttrs = [
             'customer_id' => $customerId,
             'user_id' => null,
             'reply' => $replyText,
             'read' => false,
+            'type' => $type,
+            'payload' => $payload,
         ];
         if ($quotedParent) {
             $createAttrs['parent_id'] = $quotedParent->id;
@@ -81,7 +96,7 @@ class CustomerChatController extends Controller
         $clock = livechat_format_message_time($reply->created_at);
         $createdAt = optional($reply->created_at)->toIso8601String();
 
-        $payload = array_merge([
+        $socketPayload = array_merge([
             'text' => $replyText,
             'sender_type' => 'customer',
             'conversation_id' => $chat->id,
@@ -91,6 +106,8 @@ class CustomerChatController extends Controller
             'time' => $clock,
             'created_at' => $createdAt,
             'attachments' => $attachmentsPayload,
+            'type' => $reply->resolvedType(),
+            'payload' => $reply->resolvedPayload(),
         ], livechat_quote_socket_payload($quotedParent));
 
         $chat->loadMissing('shop');
@@ -99,14 +116,14 @@ class CustomerChatController extends Controller
             ChatSocketPublisher::publish(
                 get_chat_room_name($chat->shop_id.$chat->customer_id),
                 'chat.message',
-                $payload
+                $socketPayload
             );
 
             if ($chat->shop) {
                 ChatSocketPublisher::publish(
                     get_vendor_chat_room_id($chat->shop),
                     'chat.message',
-                    $payload
+                    $socketPayload
                 );
             }
         } catch (\Throwable $e) {
@@ -127,6 +144,8 @@ class CustomerChatController extends Controller
             'attachments' => $attachmentsPayload,
             'parent_id' => $quotedParent?->id,
             'quoted_reply' => Reply::quoteSnapshot($quotedParent),
+            'type' => $reply->resolvedType(),
+            'payload' => $reply->resolvedPayload(),
             'ok' => true,
         ], 200);
     }
@@ -136,7 +155,7 @@ class CustomerChatController extends Controller
         $customerId = Auth::guard('customer')->id();
 
         if (! $customerId || (int) $chat->customer_id !== (int) $customerId) {
-            abort(404);
+            abort(404, trans('theme.chat_not_found'));
         }
     }
 }

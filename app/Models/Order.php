@@ -83,6 +83,7 @@ class Order extends BaseModel
         'wire_transfer_rejected_at' => 'datetime',
         'goods_received' => 'boolean',
         'is_digital' => 'boolean',
+        'is_chat_quote' => 'boolean',
     ];
 
     /**
@@ -170,6 +171,7 @@ class Order extends BaseModel
         'courier_added_at',
         'delivered_confirmed_at',
         'otp',
+        'is_chat_quote',
     ];
 
     const FULFILLMENT_METHOD_DELIVERY_BOY = 'delivery_boy';
@@ -308,6 +310,35 @@ class Order extends BaseModel
     public function affiliateCommissions()
     {
         return $this->hasMany(\Incevio\Package\Affiliate\Models\AffiliateCommission::class);
+    }
+
+    /**
+     * Release unpaid affiliate commissions to the affiliate wallet immediately on delivery.
+     * No holding period / cron — payout is direct when the order is delivered and paid.
+     */
+    public function releaseAffiliateCommissions(bool $force = false): void
+    {
+        if (! is_incevio_package_loaded('affiliate') || ! is_incevio_package_loaded('wallet')) {
+            return;
+        }
+
+        if (! $force && ! $this->isPaid()) {
+            return;
+        }
+
+        $this->loadMissing('affiliateCommissions');
+
+        foreach ($this->affiliateCommissions as $commission) {
+            try {
+                if (! $commission->isPaid()) {
+                    $commission->markAsPaid();
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::channel('wallet')->error(
+                    'Affiliate commission release failed for order #'.$this->order_number.': '.$e->getMessage()
+                );
+            }
+        }
     }
 
     /**
@@ -792,6 +823,11 @@ class Order extends BaseModel
             }
         }
 
+        // Release affiliate commissions after delivery (same settlement moment as vendor wallet).
+        if (! $alreadyDelivered && $this->isPaid()) {
+            $this->releaseAffiliateCommissions();
+        }
+
         return $this;
     }
 
@@ -1177,16 +1213,7 @@ class Order extends BaseModel
         $this->save();
 
         // Vendor Cafrepay wallet is credited only after the order is delivered.
-
-        if (is_incevio_package_loaded('affiliate')) {
-            $release_in_days = config('system_settings.affiliate_commission_release_in_days');
-
-            if (isset($release_in_days) && $release_in_days === 0) {
-                $this->affiliateCommissions->each(function ($commission) {
-                    $commission->markAsPaid();
-                });
-            }
-        }
+        // Affiliate commissions are also released only after delivery (direct, no cron).
 
         if ($this->shop->periodic_sold_amount) {    // Update shop's periodic sold amount
             $this->shop->periodic_sold_amount += $this->total;
@@ -1391,18 +1418,20 @@ class Order extends BaseModel
     }
 
     /**
-     * Payment methods the customer could switch to while this order's bank
-     * transfer proof sits rejected — mirrors the eligibility check the
-     * checkout payment list and the app's paymentOptions API already use
-     * (Api\CheckoutController::paymentOptions), scoped to this order's shop.
-     * Shared by the web order-detail page and the customer API so both offer
-     * the exact same set of methods.
+     * Payment methods the customer could switch to — either while this
+     * order's bank transfer proof sits rejected, or more generally whenever
+     * the order simply isn't paid yet (e.g. a vendor-built chat quote that
+     * never had a payment method chosen at all). Mirrors the eligibility
+     * check the checkout payment list and the app's paymentOptions API
+     * already use (Api\CheckoutController::paymentOptions), scoped to this
+     * order's shop. Shared by the web order-detail page and the customer
+     * API so both offer the exact same set of methods.
      *
      * @return \Illuminate\Support\Collection<int, PaymentMethod>
      */
     public function eligiblePaymentSwitchMethods()
     {
-        if (! $this->isWireTransferRejected()) {
+        if (! $this->isWireTransferRejected() && $this->isPaid()) {
             return collect();
         }
 

@@ -21,7 +21,10 @@ class SitemapCrawlProfile extends CrawlProfile
     {
         $path = $url->getPath();
 
+        $segments = array_values(array_filter(explode('/', trim($path, '/'))));
+
         if (
+            count($segments) === 2 ||
             str_contains($path, 'product') ||
             str_contains($path, 'category') ||
             str_contains($path, 'categories') ||

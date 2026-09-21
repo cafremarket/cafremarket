@@ -20,29 +20,95 @@ use Incevio\Package\LiveChat\Models\ChatConversation;
 class ChatController extends Controller
 {
     /**
-     * Show feedback form.
+     * Resolve the `type`/`payload` to persist for an incoming message,
+     * preferring explicit request fields and falling back to inferring
+     * an attachment-only message the same way the body placeholder does.
+     * Mirrors Api\ConversationController::resolveIncomingType().
+     *
+     * @return array{type: string, payload: array<string, mixed>|null}
+     */
+    protected function resolveIncomingType(\Illuminate\Http\Request $request, string $replyText): array
+    {
+        $type = $request->input('type');
+        $payload = $request->input('payload');
+        $payload = is_array($payload) ? $payload : null;
+
+        if ($type) {
+            return ['type' => $type, 'payload' => $payload];
+        }
+
+        if ($replyText === livechat_message_for_attachment_only()) {
+            return ['type' => Reply::TYPE_ATTACHMENT, 'payload' => null];
+        }
+
+        return ['type' => Reply::TYPE_TEXT, 'payload' => null];
+    }
+
+    /**
+     * Load an existing shop↔customer conversation for the storefront widget.
+     * Returns null (200) when no thread exists yet — frontend shows the welcome prompt.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  int|string  $shop  Shop id or slug (resolved manually so missing shops return JSON, not an HTML 404)
      *
      * @return \Illuminate\Http\Response
      */
-    public function conversation(ChatConversationRequest $request, Shop $shop)
+    public function conversation(ChatConversationRequest $request, $shop)
     {
+        $shopModel = $this->resolveShop($shop);
+
+        if (! $shopModel) {
+            return response()->json([
+                'message' => trans('theme.chat_not_found'),
+                'code' => 'chat_not_found',
+            ], 404);
+        }
+
         if (! Schema::hasTable('chat_conversations')) {
             return response()->json(null);
         }
 
         $conversation = ChatConversation::where([
             'customer_id' => Auth::guard('customer')->id(),
-            'shop_id' => $shop->id,
+            'shop_id' => $shopModel->id,
         ])->with(livechat_replies_eager_load())->first();
 
         if ($conversation) {
-            $conversation->markPeerRepliesAsRead('customer');
-            $conversation->load(livechat_replies_eager_load());
+            try {
+                $conversation->markPeerRepliesAsRead('customer');
+            } catch (\Throwable $e) {
+                report($e);
+            }
+
+            try {
+                $conversation->load(livechat_replies_eager_load());
+            } catch (\Throwable $e) {
+                report($e);
+                $conversation->loadMissing(['replies.attachments']);
+            }
         }
 
         return response()->json($conversation);
+    }
+
+    /**
+     * Resolve shop by id or slug without throwing ModelNotFoundException.
+     */
+    protected function resolveShop($shop): ?Shop
+    {
+        $key = is_scalar($shop) ? trim((string) $shop) : '';
+        if ($key === '') {
+            return null;
+        }
+
+        return Shop::query()
+            ->where(function ($q) use ($key) {
+                if (ctype_digit($key)) {
+                    $q->where('id', (int) $key);
+                }
+                $q->orWhere('slug', $key);
+            })
+            ->first();
     }
 
     /**
@@ -82,6 +148,8 @@ class ChatController extends Controller
             ? Reply::resolveQuotedParent($conversation, $request)
             : null;
 
+        $resolvedType = $this->resolveIncomingType($request, $replyText);
+
         if ($conversation) {
             $conversation->bumpLastMessage($replyText, true);
             $createAttrs = [
@@ -89,6 +157,8 @@ class ChatController extends Controller
                 'user_id' => $request->user_id,
                 'reply' => $replyText,
                 'read' => false,
+                'type' => $resolvedType['type'],
+                'payload' => $resolvedType['payload'],
             ];
             if ($quotedParent) {
                 $createAttrs['parent_id'] = $quotedParent->id;
@@ -107,6 +177,8 @@ class ChatController extends Controller
                 'user_id' => $request->user_id,
                 'reply' => $replyText,
                 'read' => false,
+                'type' => $resolvedType['type'],
+                'payload' => $resolvedType['payload'],
             ];
             if ($quotedParent) {
                 $createAttrs['parent_id'] = $quotedParent->id;
@@ -136,6 +208,8 @@ class ChatController extends Controller
             'time' => $clock,
             'created_at' => optional($msg_object->created_at)->toIso8601String(),
             'attachments' => $attachmentsPayload,
+            'type' => $resolvedType['type'],
+            'payload' => $resolvedType['payload'],
         ], livechat_quote_socket_payload($quotedParent));
 
         ChatSocketPublisher::publish($room, 'chat.message', $socketPayload);
@@ -157,6 +231,8 @@ class ChatController extends Controller
             'attachments' => $attachmentsPayload,
             'parent_id' => $quotedParent?->id,
             'quoted_reply' => Reply::quoteSnapshot($quotedParent),
+            'type' => $resolvedType['type'],
+            'payload' => $resolvedType['payload'],
         ], 200);
     }
 }

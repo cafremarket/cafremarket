@@ -66,6 +66,10 @@
             'priceValue' => null,
             'offerPriceName' => 'offer_prices[' . $loop->index . ']',
             'offerPriceValue' => null,
+            'commissionName' => 'affiliate_commissions[' . $loop->index . ']',
+            'commissionValue' => null,
+            'enabledName' => 'affiliate_enabled_variants[' . $loop->index . ']',
+            'enabledValue' => true,
           ])
         </td>
       </tr>

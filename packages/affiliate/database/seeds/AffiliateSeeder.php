@@ -19,7 +19,6 @@ class AffiliateSeeder extends Seeder
         DB::table('affiliates')->insert([
             'id' => 1,
             'name' => 'Demo Affiliate',
-            'username' => 'affiliate',
             'email' => 'affiliate@demo.com',
             'password' => bcrypt('123456'),
             'active' => 1,

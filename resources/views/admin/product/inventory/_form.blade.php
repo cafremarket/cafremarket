@@ -118,6 +118,43 @@
                     @endif
                   </div>
                 </div>
+
+                @if (is_incevio_package_loaded('affiliate'))
+                  <div class="form-group">
+                    {!! Form::hidden('affiliate_enabled', 0) !!}
+                    <label>
+                      {!! Form::checkbox(
+                        'affiliate_enabled',
+                        1,
+                        ! isset($inventory) || $inventory->isAffiliateEnabled(),
+                        ['class' => 'icheck']
+                      ) !!}
+                      {{ trans('packages.affiliate.affiliate_enabled') }}
+                    </label>
+                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.help_affiliate_enabled') }}"></i>
+                    <div class="help-block">
+                      <small class="text-muted"><i class="fa fa-info-circle"></i> {{ trans('packages.affiliate.help_affiliate_enabled') }}</small>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    {!! Form::label('affiliate_commission_percentage', trans('packages.affiliate.affiliate_commission'), ['class' => 'with-help']) !!}
+                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.help_commission_field') }}"></i>
+                    <div class="input-group">
+                      {!! Form::number('affiliate_commission_percentage', isset($inventory) ? $inventory->affiliate_commission_percentage : null, [
+                        'class' => 'form-control',
+                        'step' => '0.01',
+                        'min' => '0',
+                        'max' => '100',
+                        'placeholder' => trans('packages.affiliate.placeholder_commission_field'),
+                      ]) !!}
+                      <span class="input-group-addon">%</span>
+                    </div>
+                    <div class="help-block">
+                      <small class="text-muted"><i class="fa fa-info-circle"></i> {{ trans('packages.affiliate.when_empty_commission_will_calculated_from_default') }}</small>
+                    </div>
+                  </div>
+                @endif
               </div>
             </div>
 
@@ -568,12 +605,7 @@
       <div class="wc-panel">
         <div class="wc-panel__title">{{ trans('app.form.categories') }} *</div>
         <div class="wc-panel__body">
-          {!! Form::select('category_list[]', $categories, null, [
-            'class' => 'form-control select2-normal',
-            'multiple' => 'multiple',
-            'required',
-          ]) !!}
-          <div class="help-block with-errors"></div>
+          @include('admin.product._category_picker')
         </div>
       </div>
 

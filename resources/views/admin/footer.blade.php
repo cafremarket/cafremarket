@@ -1,7 +1,7 @@
 <!-- Main Footer -->
 <footer class="main-footer">
   <div class="pull-right hidden-xs">
-    @if (auth()->guard('web')->check() && auth()->user()->isSuperAdmin())
+    @if (auth()->guard('web')->user()?->isSuperAdmin())
       <a href="https://cafremarket.co.mz/" target="_blank" style="color:#6366f1;font-weight:500;">
         Cafremarket v{{ \App\Models\System::VERSION }}
       </a>

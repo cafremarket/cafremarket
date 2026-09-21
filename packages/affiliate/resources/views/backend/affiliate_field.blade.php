@@ -5,7 +5,22 @@
   'bodyClass' => '',
   'actions' => '<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>',
 ])
+    @php
+      $affiliateEnabled = ! isset($inventory) || $inventory->isAffiliateEnabled();
+    @endphp
     <div class="row">
+      <div class="form-group col-md-12">
+        {!! Form::hidden('affiliate_enabled', 0) !!}
+        <label>
+          {!! Form::checkbox('affiliate_enabled', 1, $affiliateEnabled, ['class' => 'icheck']) !!}
+          {{ trans('packages.affiliate.affiliate_enabled') }}
+        </label>
+        <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.help_affiliate_enabled') }}"></i>
+        <div class="help-block">
+          <small class="text-muted"><i class="fa fa-info-circle"></i> {{ trans('packages.affiliate.help_affiliate_enabled') }}</small>
+        </div>
+      </div>
+
       <div class="form-group col-md-12">
         {!! Form::label('affiliate_commission_percentage', trans('packages.affiliate.affiliate_commission'), ['class' => 'with-help']) !!}
         <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.help_commission_field') }}"></i>

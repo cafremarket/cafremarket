@@ -70,4 +70,19 @@ class CreateMerchantRequest extends Request
 
         return $rules;
     }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'email.unique' => trans('validation.register_email_unique'),
+            'phone.unique' => trans('validation.register_phone_unique'),
+            'shop_name.unique' => trans('validation.register_shop_name_unique'),
+            'slug.unique' => trans('validation.register_slug_unique'),
+        ];
+    }
 }

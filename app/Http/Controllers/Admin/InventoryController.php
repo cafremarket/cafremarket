@@ -460,6 +460,7 @@ class InventoryController extends Controller
         $variant_skus = $request->get('variant_skus');
         $variant_quantities = $request->get('variant_quantities');
         $variant_prices = $request->get('variant_prices');
+        $variant_affiliate_commissions = $request->get('variant_affiliate_commissions', []);
         $variant_images = $request->file('variant_images');
 
         $oldVariants = Inventory::where('parent_id', $id)->get();
@@ -478,6 +479,7 @@ class InventoryController extends Controller
                     'sku' => $variant_sku,
                     'stock_quantity' => $variant_quantities[$key],
                     'sale_price' => $variant_prices[$key],
+                    'affiliate_commission_percentage' => $variant_affiliate_commissions[$key] ?? null,
                 ];
 
                 // Merge the common info and dynamic info to data array
@@ -687,6 +689,8 @@ class InventoryController extends Controller
             'min_order_quantity' => $inventory->min_order_quantity,
             'user_id' => $request->user()->id,
             'sale_price' => $request->get('sale_price'),
+            'affiliate_commission_percentage' => $request->get('affiliate_commission_percentage'),
+            'affiliate_enabled' => $request->boolean('affiliate_enabled', true),
         ];
 
         $variant = Inventory::create($data);

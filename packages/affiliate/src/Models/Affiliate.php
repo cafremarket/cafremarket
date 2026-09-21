@@ -7,7 +7,6 @@ use App\Common\Imageable;
 use App\Common\Addressable;
 use App\Common\ApiAuthTokens;
 use App\Common\HasHumanAttributes;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
 use \Incevio\Package\Wallet\Traits\HasWallet;
@@ -30,16 +29,22 @@ class Affiliate extends Authenticatable
 
     protected $fillable = [
         'name',
-        'username',
         'email',
         'phone',
         'pay_to',
         'password',
+        'active',
         'last_visited_at',
         'last_visited_from',
         'read_announcements_at',
         'remember_token',
         'verification_token',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+        'last_visited_at' => 'datetime',
+        'read_announcements_at' => 'datetime',
     ];
 
     public function affiliateLinks()
@@ -64,10 +69,5 @@ class Affiliate extends Authenticatable
         $this->attributes['password'] = Hash::needsRehash($password)
             ? Hash::make($password)
             : $password;
-    }
-
-    public function getAffiliateUserName()
-    {
-        return $this->username ?? Auth::guard('affiliate')->user()->username;
     }
 }

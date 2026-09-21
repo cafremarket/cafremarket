@@ -34,6 +34,11 @@ class QuickInventoryUpdateRequest extends Request
             'active' => 'required',
         ];
 
+        if (is_incevio_package_loaded('affiliate')) {
+            $rules['affiliate_commission_percentage'] = 'nullable|numeric|min:0|max:100';
+            $rules['affiliate_enabled'] = 'nullable|boolean';
+        }
+
         if (is_incevio_package_loaded('pharmacy')) {
             $expiry_date_required = get_from_option_table('pharmacy_expiry_date_required', 1);
 

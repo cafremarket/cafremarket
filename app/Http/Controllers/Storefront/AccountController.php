@@ -198,7 +198,6 @@ class AccountController extends Controller
     private function addresses()
     {
         // Supply important data to the views
-        View::share('address_types', ListHelper::address_types());
         View::share('countries', ListHelper::countries());
 
         return Auth::guard('customer')->user();
@@ -380,13 +379,11 @@ class AccountController extends Controller
 
         $countries = ListHelper::countries(); // Country list for ship_to dropdown
 
-        $address_types = ListHelper::address_types();
-
         $states = config('system_settings.address_default_state') ? ListHelper::states(config('system_settings.address_default_country')) : [];
 
         return view(
             'theme::modals._create_address',
-            compact('countries', 'states', 'address_types')
+            compact('countries', 'states')
         )->render();
     }
 
@@ -420,9 +417,8 @@ class AccountController extends Controller
 
         $countries = ListHelper::countries(); // Country list for ship_to dropdown
         $states = $address->state_id ? ListHelper::states($address->country_id) : [];
-        $address_types = ListHelper::address_types();
 
-        return view('theme::modals._edit_address', compact('address', 'countries', 'states', 'address_types'))->render();
+        return view('theme::modals._edit_address', compact('address', 'countries', 'states'))->render();
     }
 
     /**

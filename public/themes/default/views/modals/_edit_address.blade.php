@@ -8,7 +8,7 @@
           <i class="fa fa-pencil"></i>
         </span>
         <div>
-          <h4 class="sf-address-modal__title">{{ ($address->address_type ?? trans('theme.address')) . ' ' . trans('theme.address') }}</h4>
+          <h4 class="sf-address-modal__title">{{ $address->address_title ?: trans('theme.address') }}</h4>
           <p class="sf-address-modal__subtitle">{{ trans('theme.address_step_details_help') }}</p>
         </div>
       </div>
@@ -24,7 +24,6 @@
           'address' => $address,
           'countries' => $countries,
           'states' => $states,
-          'address_types' => $address_types,
         ])
       {!! Form::close() !!}
 

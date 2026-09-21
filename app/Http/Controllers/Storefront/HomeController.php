@@ -79,7 +79,15 @@ class HomeController extends Controller
         $longitude = $buyerLocation->longitude();
         $buyerAddress = $buyerLocation->addressText();
 
-        $nearbyShopsPaginator = $catalog->nearbyShopsPaginated();
+        // Admin-curated homepage stores — only these show on the homepage,
+        // never the full nearby-shops list (that stays on the store directory page).
+        $shopDistances = $catalog->shopDistances();
+        $featuredShops = get_featured_shops()->map(function ($shop) use ($shopDistances) {
+            return [
+                'shop' => $shop,
+                'distance_km' => $shopDistances->get($shop->id),
+            ];
+        })->values();
 
         // Curated lists, then keep only products from shops deliverable to the buyer location.
         // Featured products: nearest store's products first, farthest store's products last.
@@ -95,7 +103,7 @@ class HomeController extends Controller
         return view('theme::index', compact(
             'banners',
             'sliders',
-            'nearbyShopsPaginator',
+            'featuredShops',
             'latitude',
             'longitude',
             'buyerAddress',
@@ -107,12 +115,13 @@ class HomeController extends Controller
     }
 
     /**
-     * Browse category based products
+     * Browse subcategory products at /{category-slug}/{subcategory-slug}.
      *
-     * @param  string  $slug
+     * @param  string  $category  parent category slug
+     * @param  string  $subcategory  subcategory slug
      * @return \Illuminate\View\View
      */
-    public function browseCategory(BrowseProductRequest $request, $slug, $sortby = null)
+    public function browseCategory(BrowseProductRequest $request, $category, $subcategory, $sortby = null)
     {
         if ($gate = hyperlocal_browse_gate_view()) {
             return $gate;
@@ -120,7 +129,10 @@ class HomeController extends Controller
 
         $catalog = app(HyperlocalCatalogService::class);
 
-        $category = SubCategory::where('slug', $slug)
+        $parent = Category::where('slug', $category)->active()->firstOrFail();
+
+        $category = SubCategory::where('slug', $subcategory)
+            ->where('category_id', $parent->id)
             ->with([
                 'category' => function ($q) {
                     $q->select(['id', 'slug', 'name'])->active();

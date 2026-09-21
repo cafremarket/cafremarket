@@ -30,6 +30,11 @@ class InventoryLightResource extends JsonResource
             'active' => $this->active,
             'shop_id' => $this->shop_id,
             'image' => get_inventory_img_src($this, 'medium'),
+            $this->mergeWhen(is_incevio_package_loaded('affiliate'), [
+                'affiliate_enabled' => $this->isAffiliateEnabled(),
+                'affiliate_commission_percentage' => $this->affiliate_commission_percentage,
+                'effective_affiliate_commission_percentage' => $this->affiliates_percentage,
+            ]),
         ];
     }
 }

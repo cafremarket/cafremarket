@@ -22,7 +22,7 @@
             data-address-id="{{ $address->id }}"
           >
             <div class="sf-address-card__head">
-              <span class="sf-address-card__type">{{ $address->address_type }}</span>
+              <span class="sf-address-card__type">{{ $address->address_title }}</span>
               @if ($activeAddressId === $address->id)
                 <span class="sf-address-card__badge">
                   <i class="fa fa-check-circle" aria-hidden="true"></i> {{ trans('theme.current') }}
@@ -30,7 +30,7 @@
               @endif
             </div>
             <div class="sf-address-card__body text-left">
-              {!! $address->toHtml() !!}
+              {!! $address->toHtml('<br/>', false) !!}
             </div>
           </button>
         @empty

@@ -29,8 +29,8 @@
   {{-- 3. Category section --}}
   @include('theme::sections.featured_categories')
 
-  {{-- 4. Vendor section — nearby stores based on delivery address --}}
-  @include('theme::sections.nearby_stores')
+  {{-- 4. Vendor section — admin-curated featured stores only --}}
+  @include('theme::sections.featured_stores')
 
   {{-- 5. Featured products (slider) --}}
   @include('theme::sections.featured_products')

@@ -55,6 +55,7 @@ Route::middleware('customerApp')->group(function () {
     // Shops
     Route::get('shops/nearby', [NearbyShopController::class, 'index']);
     Route::get('shops/nearby/map', [NearbyShopController::class, 'map']);
+    Route::get('shops/featured', [HomeController::class, 'featuredShops']);
     Route::get('shops', [HomeController::class, 'allShops']);
     Route::get('shop/{slug}', [HomeController::class, 'shop']);
     Route::get('shop/{slug}/listings', [ListingController::class, 'shop']);
@@ -78,6 +79,7 @@ Route::middleware('customerApp')->group(function () {
     Route::get('listings/{list?}', [ListingController::class, 'index']);
     Route::get('listing/{slug}', [ListingController::class, 'item']);
     Route::post('variant/{slug}', [ListingController::class, 'variant']);
+    Route::get('listing/category/{category}/{subcategory}', [ListingController::class, 'category']);
     Route::get('listing/category/{slug}', [ListingController::class, 'category']);
     Route::get('listing/category-subgrp/{slug}', [ListingController::class, 'categorySubGroup']);
     Route::post('listing/{item}/shipTo', [ListingController::class, 'shipTo']);

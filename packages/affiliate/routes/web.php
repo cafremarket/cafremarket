@@ -34,7 +34,7 @@ Route::prefix('admin/affiliate')->name('admin.affiliate.')
 
         Route::get('create',[
             AffiliateController::class, 'create'
-        ])->name('create');
+        ])->name('create')->middleware('ajax');
 
         Route::post('store',[
             AffiliateController::class, 'store'
@@ -51,6 +51,10 @@ Route::prefix('admin/affiliate')->name('admin.affiliate.')
         Route::delete('/delete/{affiliate}', [
             AffiliateController::class, 'destroy'
         ])->name('destroy');
+
+        Route::post('massDestroy', [
+            AffiliateController::class, 'massDestroy'
+        ])->name('massDestroy');
 
         Route::get('getAffiliates', [
             AffiliateController::class, 'getAffiliates'
@@ -91,10 +95,6 @@ Route::prefix('affiliate')->name('affiliate.')->middleware('web')->group(functio
     Route::post('login', [
         LoginController::class, 'login'
     ])->name('login');
-
-    Route::get('form/validate', [
-        AccountController::class, 'userNameExists'
-    ])->name('form.validate')->middleware('ajax');
 
     Route::middleware('auth:affiliate')->group(function () {
         Route::get('dashboard', [
@@ -146,6 +146,14 @@ Route::prefix('affiliate')->name('affiliate.')->middleware('web')->group(functio
         ])->name('chartData.visitor.link')->middleware('ajax');
 
         // Affiliate Links Routes
+        Route::get('link/products', [
+            AffiliateLinkController::class, 'products'
+        ])->name('link.products');
+
+        Route::post('link/create', [
+            AffiliateLinkController::class, 'storeFromPicker'
+        ])->name('link.create');
+
         Route::resource('link', AffiliateLinkController::class)->except('show', 'create', 'store');
         
         Route::get('link/{link}/commissions', [
@@ -161,6 +169,10 @@ Route::prefix('affiliate')->name('affiliate.')->middleware('web')->group(functio
 });
 
 // Public Affiliate Link Routes
+Route::get('a/{code}', [
+    FrontController::class, 'visitShort'
+])->name('affiliate.short')->middleware('web')->where('code', '[A-Za-z0-9]+');
+
 Route::get('visit/{affiliate}/{slug}', [
     FrontController::class, 'visit'
 ])->name('affiliate.link')->middleware('web');

@@ -42,6 +42,10 @@ class VendorShopConfigResource extends JsonResource
             'default_warehouse_id' => $this->default_warehouse_id,
             'default_supplier_id' => $this->default_supplier_id,
             'default_packaging_ids' => $this->default_packaging_ids,
+            $this->mergeWhen(is_incevio_package_loaded('affiliate'), [
+                'default_affiliate_commission_percentage' => $this->default_affiliate_commission_percentage,
+                'affiliate_module_enabled' => true,
+            ]),
             'notify_new_message' => (bool) $this->notify_new_message,
             'notify_alert_quantity' => (bool) $this->notify_alert_quantity,
             'notify_inventory_out' => (bool) $this->notify_inventory_out,

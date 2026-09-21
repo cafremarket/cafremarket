@@ -114,6 +114,14 @@ class ListingController extends Controller
      */
     public function item(Request $request, $slug)
     {
+        // Capture affiliate ref before any response caching (must not be memoized).
+        if (is_incevio_package_loaded('affiliate')
+            && class_exists(\Incevio\Package\Affiliate\Services\AffiliateAttributionService::class)
+        ) {
+            app(\Incevio\Package\Affiliate\Services\AffiliateAttributionService::class)
+                ->captureFromRequest($request);
+        }
+
         return $this->rememberApi('item:'.$slug, function () use ($request, $slug) {
             return $this->buildItemPayload($request, $slug);
         }, null, 'item');
@@ -307,14 +315,23 @@ class ListingController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Display listings in a subcategory.
      *
-     * @param  string  $slug  sub_category_slug
+     * @param  string  $slug  subcategory slug, or parent category slug when $subcategory is set
+     * @param  string|null  $subcategory  subcategory slug (nested URL)
      * @return \Illuminate\Http\Response
      */
-    public function category(Request $request, $slug)
+    public function category(Request $request, $slug, $subcategory = null)
     {
-        $category = SubCategory::where('slug', $slug)->active()->firstOrFail();
+        if ($subcategory) {
+            $parent = Category::where('slug', $slug)->active()->firstOrFail();
+            $category = SubCategory::where('slug', $subcategory)
+                ->where('category_id', $parent->id)
+                ->active()
+                ->firstOrFail();
+        } else {
+            $category = SubCategory::where('slug', $slug)->active()->firstOrFail();
+        }
 
         // Take only available items
         $all_products = $category->listings()->available();

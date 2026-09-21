@@ -52,7 +52,12 @@ class AuthController extends Controller
             }
         }
 
-        $customer = Customer::createOrReclaimFromTrash($data);
+        try {
+            $customer = Customer::createOrReclaimFromTrash($data);
+        } catch (\Throwable $e) {
+            throw_registration_unique_validation($e);
+            throw $e;
+        }
 
         $jwt = $customer->generateToken();
 
@@ -150,7 +155,10 @@ class AuthController extends Controller
             return new CustomerResource($customer);
         }
 
-        return response()->json(['message' => trans('api.auth_failed')], 401);
+        return response()->json([
+            'message' => trans('api.auth_failed'),
+            'errors' => ['email' => [trans('api.auth_failed')]],
+        ], 401);
     }
 
     public function logout(Request $request)

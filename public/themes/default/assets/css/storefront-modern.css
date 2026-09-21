@@ -6517,3 +6517,119 @@ img.sf-shop-logo.sf-shop-logo--default:not(.sf-shop-logo-frame img) {
 .sf-product-card__shop--out-of-range .sf-product-card__distance {
   font-weight: 600;
 }
+
+/* -- Shop by category (categories page) -----------------------------
+   Target-style circular tiles: soft gray disc + product/category image
+   + label underneath. Desktop aims for ~6 columns. ----------------- */
+.sf-shop-by-category {
+  padding: 28px 0 48px;
+  background: #fff;
+}
+
+.sf-shop-by-category__header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.sf-shop-by-category__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #111;
+  line-height: 1.2;
+}
+
+.sf-shop-by-category__empty {
+  font-size: 0.95rem;
+}
+
+.sf-shop-by-category__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 28px 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+.sf-category-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.sf-category-circle:hover,
+.sf-category-circle:focus {
+  text-decoration: none;
+  color: inherit;
+  transform: translateY(-2px);
+}
+
+.sf-category-circle__media {
+  display: block;
+  width: 100%;
+  max-width: 148px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: #f2f2f2;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.sf-category-circle:hover .sf-category-circle__media,
+.sf-category-circle:focus .sf-category-circle__media {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06), 0 8px 20px rgba(0, 0, 0, 0.08);
+  background-color: #ececec;
+}
+
+.sf-category-circle__name {
+  display: block;
+  margin-top: 12px;
+  max-width: 100%;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #222;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 991px) {
+  .sf-shop-by-category__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px 16px;
+  }
+}
+
+@media screen and (max-width: 575px) {
+  .sf-shop-by-category {
+    padding: 20px 0 36px;
+  }
+
+  .sf-shop-by-category__header {
+    margin-bottom: 20px;
+  }
+
+  .sf-shop-by-category__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px 12px;
+  }
+
+  .sf-category-circle__media {
+    max-width: 110px;
+  }
+
+  .sf-category-circle__name {
+    margin-top: 8px;
+    font-size: 0.82rem;
+  }
+}

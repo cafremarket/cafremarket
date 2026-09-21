@@ -65,6 +65,11 @@ class CreateInventoryRequest extends Request
             $rules['expiry_date'] = (bool) $expiry_date_required ? 'required|date' : 'nullable|date';
         }
 
+        if (is_incevio_package_loaded('affiliate')) {
+            $rules['affiliate_commission_percentage'] = 'nullable|numeric|min:0|max:100';
+            $rules['affiliate_enabled'] = 'nullable|boolean';
+        }
+
         return $rules;
     }
 

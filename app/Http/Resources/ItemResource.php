@@ -73,6 +73,15 @@ class ItemResource extends JsonResource
             'labels' => $this->getLabels(),
             'linked_items' => ItemLightResource::collection(ListHelper::linked_items($this)),
             'listed_at' => date('F j, Y', strtotime($this->available_from)),
+            $this->mergeWhen(
+                is_incevio_package_loaded('affiliate')
+                    && (bool) config('system_settings.publicly_show_affiliate_commission'),
+                [
+                    'affiliate_enabled' => $this->isAffiliateEnabled(),
+                    'affiliate_commission_percentage' => $this->affiliates_percentage,
+                    'affiliate_commission_text' => $this->affiliate_commission_percentage_text,
+                ]
+            ),
             // 'variants' => ListHelper::variants_of_product($this, $this->shop_id),
         ];
     }

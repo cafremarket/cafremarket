@@ -6,7 +6,7 @@
   <div class="col-sm-7 nopadding-left">
     @if ($can_update)
       <div class="input-group">
-        {!! Form::number('default_affiliate_commission_percentage', $config->default_affiliate_commission_percentage, ['min' => 0, 'max' => 100, 'step' => 0.01, 'class' => 'form-control', 'placeholder' => trans('packages.affiliate.placeholder_default_affiliate_commission_percentage')]) !!}
+        {!! Form::number('default_affiliate_commission_percentage', $config->default_affiliate_commission_percentage ?? 5, ['min' => 0, 'max' => 100, 'step' => 0.01, 'class' => 'form-control', 'placeholder' => trans('packages.affiliate.placeholder_default_affiliate_commission_percentage')]) !!}
         <div class="input-group-addon">%</div>
       </div>
     @else

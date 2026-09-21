@@ -86,6 +86,8 @@ class ProductController extends Controller
                     'offer_price' => $request->offer_price,
                     'offer_start' => $request->offer_start,
                     'offer_end' => $request->offer_end,
+                    'affiliate_commission_percentage' => $request->input('affiliate_commission_percentage'),
+                    'affiliate_enabled' => $request->boolean('affiliate_enabled', true),
                     'free_shipping' => $request->input('free_shipping', 0),
                     'shipping_weight' => $request->filled('shipping_weight') ? $request->shipping_weight : null,
                     'active' => $request->active,
@@ -140,6 +142,7 @@ class ProductController extends Controller
                     $stockQuantities = $request->input('stock_quantities', []);
                     $salePrices = $request->input('sale_prices', []);
                     $offerPrices = $request->input('offer_prices', []);
+                    $affiliateCommissions = $request->input('affiliate_commissions', []);
                     $variants = $request->input('variants', []);
                     $images = $request->file('variant_images');
                     $tagLists = $request->input('tag_list');
@@ -187,6 +190,7 @@ class ProductController extends Controller
                         $stockQuantities,
                         $salePrices,
                         $offerPrices,
+                        $affiliateCommissions,
                         $images,
                         $variants,
                         $commonInfo,
@@ -200,6 +204,7 @@ class ProductController extends Controller
                             'stock_quantity' => $stockQuantities[$key] ?? 0,
                             'sale_price' => $salePrices[$key] ?? 0,
                             'offer_price' => ! empty($offerPrices[$key]) ? $offerPrices[$key] : null,
+                            'affiliate_commission_percentage' => $affiliateCommissions[$key] ?? null,
                             'slug' => generate_unique_listing_slug($request->input('slug').' '.$skus[$key]),
                         ]);
 
@@ -295,6 +300,10 @@ class ProductController extends Controller
                     'offer_price' => $request->offer_price,
                     'offer_start' => $request->input('offer_start', $inventory->offer_start),
                     'offer_end' => $request->input('offer_end', $inventory->offer_end),
+                    'affiliate_commission_percentage' => $request->input('affiliate_commission_percentage', $inventory->affiliate_commission_percentage),
+                    'affiliate_enabled' => $request->has('affiliate_enabled')
+                        ? $request->boolean('affiliate_enabled')
+                        : $inventory->isAffiliateEnabled(),
                     'free_shipping' => $request->input('free_shipping', $inventory->free_shipping),
                     'shipping_weight' => $request->input('shipping_weight', $inventory->shipping_weight),
                     'active' => $request->active,

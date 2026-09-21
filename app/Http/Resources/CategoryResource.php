@@ -18,6 +18,7 @@ class CategoryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
+            'url' => route('categories.browse', $this->slug),
             'featured' => (bool) $this->featured,
             'description' => $this->when($this->description, $this->description),
             'feature_image' => $this->when($this->featureImage, get_storage_file_url(optional($this->featureImage)->path, 'medium')),

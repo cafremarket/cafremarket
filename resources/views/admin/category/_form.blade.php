@@ -21,7 +21,7 @@
       @if ($shopUrlBase)
         <p class="help-block text-muted" style="margin-top:6px;">
           {{ trans('app.form.url') ?? 'URL' }}:
-          <code id="mp-category-url-preview">{{ $shopUrlBase }}/category/<span class="mp-category-slug-preview">{{ old('slug', optional($category ?? null)->slug) }}</span></code>
+          <code id="mp-category-url-preview">{{ $shopUrlBase }}/categories/<span class="mp-category-slug-preview">{{ old('slug', optional($category ?? null)->slug) }}</span></code>
         </p>
         <script>
           (function () {

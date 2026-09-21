@@ -1,4 +1,8 @@
 {{-- Flash alerts, validation errors, and platform notices --}}
+@php
+  $webUser = auth_web_user();
+@endphp
+
 @if (Request::session()->has('impersonated'))
   <div class="admin-alert admin-alert--info no-print">
     <div class="admin-alert__icon"><i class="fa fa-user-secret"></i></div>
@@ -28,8 +32,8 @@
 
 @include('admin.partials._global_notice')
 
-@if (Auth::check() && Auth::user()->isFromMerchant())
-    @unless (Auth::user()->isVerified())
+@if ($webUser && $webUser->isFromMerchant())
+    @unless ($webUser->isVerified())
       <div class="admin-alert admin-alert--info admin-alert--dismissible no-print">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <div class="admin-alert__icon"><i class="fa fa-info-circle"></i></div>
@@ -41,15 +45,15 @@
       </div>
     @endunless
 
-    @if (optional(Auth::user()->shop)->config && ! Auth::user()->shop->isVerified())
+    @if (optional($webUser->shop)->config && ! $webUser->shop->isVerified())
       <div class="admin-alert admin-alert--warning admin-alert--dismissible no-print">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <div class="admin-alert__icon"><i class="fa fa-shield"></i></div>
         <div class="admin-alert__body">
           <strong>{{ trans('app.verification') }}</strong>
-          @if (Auth::user()->shop->config->pending_verification)
+          @if ($webUser->shop->config->pending_verification)
             {{ trans('messages.verification_request_pending_notice') }}
-          @elseif (Auth::user()->shop->config->verification_rejected_at)
+          @elseif ($webUser->shop->config->verification_rejected_at)
             {{ trans('messages.verification_request_rejected_notice') }}
             <a href="{{ route('admin.setting.verify') }}">{{ trans('app.get_verified') }}</a>
           @else

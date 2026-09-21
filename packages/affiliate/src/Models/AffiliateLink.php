@@ -4,6 +4,7 @@ namespace Incevio\Package\Affiliate\Models;
 
 use App\Models\Inventory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Incevio\Package\Affiliate\Models\AffiliateCommission;
@@ -45,10 +46,18 @@ class AffiliateLink extends Model
      */
     public function getFullUrlAttribute()
     {
-        return route('affiliate.link', [
-            'affiliate' => $this->affiliate->username ,
-            'slug' => $this->slug,
-        ]);
+        return route('affiliate.short', ['code' => $this->slug]);
+    }
+
+    public static function generateUniqueSlug(): string
+    {
+        $length = max(6, (int) config('affiliate.short_code_length', 8));
+
+        do {
+            $slug = Str::lower(Str::random($length));
+        } while (static::where('slug', $slug)->exists());
+
+        return $slug;
     }
 
     /**
@@ -60,14 +69,17 @@ class AffiliateLink extends Model
      */
     public function createCommission($order_id, $item)
     {
-        $total_commission = $item->pivot->unit_price * $item->pivot->quantity * ($item->affiliates_percentage / 100);
+        $quantity = (float) data_get($item, 'pivot.quantity', 1);
+        $unitPrice = (float) data_get($item, 'pivot.unit_price', $item->current_sale_price());
+        $rate = (float) $item->affiliates_percentage;
+        $total_commission = round($unitPrice * $quantity * ($rate / 100), 2);
 
         return AffiliateCommission::create([
             'affiliate_id' => $this->affiliate_id,
             'affiliate_link_id' => $this->id,
             'inventory_id' => $this->inventory_id,
             'order_id' => $order_id,
-            'commission_rate' => $item->affiliates_percentage,
+            'commission_rate' => $rate,
             'total_commission' => $total_commission,
         ]);
     }

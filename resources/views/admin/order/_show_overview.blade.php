@@ -103,7 +103,9 @@
                       </td>
                       <td class="nopadding-right" width="55%">
                         {{ $item->pivot->item_description }}
-                        <a href="{{ storefront_product_url($item) }}" target="_blank" class="indent5 small"><i class="fa fa-external-link"></i></a>
+                        @unless ($item->is_chat_custom)
+                          <a href="{{ storefront_product_url($item) }}" target="_blank" class="indent5 small"><i class="fa fa-external-link"></i></a>
+                        @endunless
                       </td>
                       <td class="nopadding-right text-right" width="15%">
                         {{ get_formated_currency($item->pivot->unit_price, 2, $order->currency_id) }}

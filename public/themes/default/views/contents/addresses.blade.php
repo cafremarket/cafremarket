@@ -20,7 +20,7 @@
         @forelse($addresses->addresses as $address)
           <article class="sf-address-card" id="address-{{ $address->id }}">
             <div class="sf-address-card__head">
-              <span class="sf-address-card__type">{{ $address->address_type }}</span>
+              <span class="sf-address-card__type">{{ $address->address_title }}</span>
               <div class="sf-address-card__actions">
                 <a href="{{ route('my.address.edit', $address) }}" class="modalAction btn btn-default btn-xs" title="@lang('theme.edit')">
                   <i class="fas fa-edit" aria-hidden="true"></i>
@@ -31,7 +31,7 @@
               </div>
             </div>
             <div class="sf-address-card__body">
-              {!! $address->toHtml() !!}
+              {!! $address->toHtml('<br/>', false) !!}
             </div>
           </article>
         @empty

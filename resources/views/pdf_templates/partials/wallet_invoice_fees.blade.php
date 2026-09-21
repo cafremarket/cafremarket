@@ -12,7 +12,8 @@
     }
     $grossSale = (float) ($meta['gross_sale_amount'] ?? 0);
     $marketplaceCommission = (float) ($meta['marketplace_commission'] ?? $meta['sales_commission'] ?? 0);
-    if (! $isDeposit && $marketplaceCommission <= 0 && $platformFee > 0) {
+    $affiliateCommission = (float) ($meta['affiliate_commission'] ?? 0);
+    if (! $isDeposit && $marketplaceCommission <= 0 && $platformFee > 0 && $affiliateCommission <= 0) {
         $marketplaceCommission = $platformFee;
     }
     $netVendor = (float) ($meta['net_vendor_amount'] ?? $transaction->amount);
@@ -30,15 +31,23 @@
     <td style="background: #e6f2ff"><strong>@lang('invoice.total_paid_mobile')</strong></td>
     <td style="background: #e6f2ff"><strong>{{ get_formated_currency($chargeTotal > 0 ? $chargeTotal : $transaction->amount + $platformFee, 2) }}</strong></td>
   </tr>
-@elseif (! $isDeposit && $grossSale > 0 && $marketplaceCommission > 0)
+@elseif (! $isDeposit && $grossSale > 0 && ($marketplaceCommission > 0 || $affiliateCommission > 0))
   <tr>
     <td>@lang('invoice.gross_sale')</td>
     <td>{{ get_formated_currency($grossSale, 2) }}</td>
   </tr>
+  @if ($marketplaceCommission > 0)
   <tr>
     <td>@lang('invoice.marketplace_commission')</td>
     <td>{{ get_formated_currency($marketplaceCommission, 2) }}</td>
   </tr>
+  @endif
+  @if ($affiliateCommission > 0)
+  <tr>
+    <td>@lang('invoice.affiliate_commission')</td>
+    <td>{{ get_formated_currency($affiliateCommission, 2) }}</td>
+  </tr>
+  @endif
   <tr>
     <td style="background: #e6f2ff"><strong>@lang('invoice.vendor_net')</strong></td>
     <td style="background: #e6f2ff"><strong>{{ get_formated_currency($netVendor, 2) }}</strong></td>

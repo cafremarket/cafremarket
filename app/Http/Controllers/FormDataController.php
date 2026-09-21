@@ -154,6 +154,16 @@ class FormDataController extends Controller
     }
 
     /**
+     * Nested catalog tree (category → subcategories) for product pickers.
+     *
+     * @return array
+     */
+    public function catalog_tree()
+    {
+        return ListHelper::catalogTree();
+    }
+
+    /**
      * Function return attribute types
      */
     public function attribute_types()

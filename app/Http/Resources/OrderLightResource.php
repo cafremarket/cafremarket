@@ -27,6 +27,9 @@ class OrderLightResource extends JsonResource
             'order_status' => $this->orderStatus(true),
             'payment_status' => $this->paymentStatusName(true),
             'payment_is_paid' => $this->isPaid(),
+            // A chat-built quote awaiting the customer's own payment choice —
+            // vendor UIs should badge this distinctly, not as a regular unpaid order.
+            'is_chat_quote' => (bool) $this->is_chat_quote,
             'wire_transfer_rejected' => $this->when(! $vendor, $this->isWireTransferRejected()),
             'message_to_customer' => $this->message_to_customer,
             'grand_total' => get_formated_currency($this->grand_total, 2, $this->currency_id),
