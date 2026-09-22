@@ -1031,4 +1031,13 @@ return [
     'get_directions' => 'Get directions',
     'ordered_items' => 'Ordered items',
     'cancel_items_disabled' => 'Cancel items is temporarily unavailable.',
+    'order_feedback' => 'Order Feedback',
+    'rate_this_order' => 'Rate this order',
+    'rate_this_order_help' => 'How was your experience with this order? You can leave feedback only once.',
+    'order_feedback_placeholder' => 'Tell us about your order experience (optional)',
+    'submit_order_feedback' => 'Submit Feedback',
+    'your_order_feedback' => 'Your feedback',
+    'order_feedback_saved' => 'Thank you! Your order feedback has been saved.',
+    'order_feedback_already_given' => 'You have already given feedback for this order.',
+    'order_feedback_not_allowed' => 'You can leave feedback once the order has been delivered.',
 ];

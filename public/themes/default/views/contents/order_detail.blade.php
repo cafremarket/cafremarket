@@ -527,6 +527,14 @@
                 </tr>
               @endif
 
+              @unless ($order->isCanceled())
+                <tr class="order-feedback-row">
+                  <td colspan="3" style="padding:0;">
+                    @include('theme::partials.order_feedback', ['order' => $order])
+                  </td>
+                </tr>
+              @endunless
+
               @if ($order->buyer_note)
                 <tr class="order-info-footer">
                   <td colspan="3">

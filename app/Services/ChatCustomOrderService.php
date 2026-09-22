@@ -2,10 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\Address;
+use App\Models\Customer;
 use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ShippingRate;
+use App\Models\ShippingZone;
 use App\Models\Shop;
+use App\Models\Tax;
 use App\Models\User;
 use App\Repositories\Order\OrderRepository;
 use Illuminate\Http\Request;
@@ -22,6 +27,102 @@ use Incevio\Package\LiveChat\Models\ChatConversation;
  */
 class ChatCustomOrderService
 {
+    /**
+     * Saved addresses of the chat's customer, formatted for the address
+     * selector on the "Create custom order" form (web modal + vendor app).
+     *
+     * @return array{data: array<int, array>, default_shipping_address_id: int|null, default_billing_address_id: int|null}
+     */
+    public function customerAddresses(ChatConversation $chat): array
+    {
+        $customer = $chat->customer;
+
+        if (! $customer) {
+            return ['data' => [], 'default_shipping_address_id' => null, 'default_billing_address_id' => null];
+        }
+
+        $addresses = $customer->addresses()->get();
+        $defaultShipping = $customer->shippingAddress ?? $customer->primaryAddress ?? $addresses->first();
+        $defaultBilling = $customer->billingAddress ?? $defaultShipping;
+
+        return [
+            'data' => $addresses->map(function (Address $address) use ($chat) {
+                $zone = get_shipping_zone_of($chat->shop_id, $address->country_id, $address->state_id);
+
+                return [
+                    'id' => $address->id,
+                    'address_type' => $address->address_type,
+                    'address_title' => $address->address_title,
+                    'address_line_1' => $address->address_line_1,
+                    'address_line_2' => $address->address_line_2,
+                    'landmark' => $address->landmark,
+                    'city' => $address->city,
+                    'state' => optional($address->state)->name,
+                    'zip_code' => $address->zip_code,
+                    'country' => optional($address->country)->name,
+                    'phone' => $address->phone,
+                    'formatted' => $address->toString(),
+                    'shipping_zone' => isset($zone->id) ? ['id' => $zone->id, 'name' => $zone->name] : null,
+                ];
+            })->values()->all(),
+            'default_shipping_address_id' => optional($defaultShipping)->id,
+            'default_billing_address_id' => optional($defaultBilling)->id,
+        ];
+    }
+
+    /**
+     * The shop's own configured Tax/Shipping defaults used to pre-fill the
+     * "Create custom order" form instead of starting every quote at 0.
+     *
+     * @return array{shipping: float, tax: float, tax_type: string}
+     */
+    public function orderDefaults(ChatConversation $chat): array
+    {
+        $defaults = ['shipping' => 0.0, 'tax' => 0.0, 'tax_type' => 'amount'];
+        $shop = $chat->shop;
+
+        if (! $shop) {
+            return $defaults;
+        }
+
+        $defaultTax = $shop->taxes()->where('active', true)->orderBy('id')->first();
+        if ($defaultTax) {
+            $defaults['tax'] = (float) $defaultTax->taxrate;
+            $defaults['tax_type'] = $defaultTax->type === Tax::TYPE_PERCENT ? 'percent' : 'amount';
+        }
+
+        $defaultZone = ShippingZone::where('shop_id', $shop->id)->where('active', true)->orderBy('id')->first();
+        if ($defaultZone) {
+            $defaultRate = ShippingRate::where('shipping_zone_id', $defaultZone->id)->orderBy('rate')->first();
+            if ($defaultRate) {
+                $defaults['shipping'] = (float) $defaultRate->rate;
+            }
+        }
+
+        return $defaults;
+    }
+
+    /**
+     * Find an address that belongs to the chat's customer.
+     */
+    protected function customerAddress(ChatConversation $chat, $addressId): ?Address
+    {
+        if (! $addressId || ! $chat->customer_id) {
+            return null;
+        }
+
+        $address = Address::where('id', $addressId)
+            ->where('addressable_type', Customer::class)
+            ->where('addressable_id', $chat->customer_id)
+            ->first();
+
+        if (! $address) {
+            throw new \InvalidArgumentException(trans('validation.exists', ['attribute' => 'address']));
+        }
+
+        return $address;
+    }
+
     /**
      * Create a hidden catalog item to back one custom line item.
      */
@@ -126,6 +227,22 @@ class ChatCustomOrderService
             ?? optional($shop->paymentMethods()->where('enabled', true)->orderBy('order')->first())->id
             ?? 1;
 
+        // Seller-selected customer addresses (from the address selector).
+        // The Order mutators turn an address ID into its formatted string.
+        $shippingAddress = $this->customerAddress($chat, $totals['shipping_address_id'] ?? null);
+        $billingAddress = $this->customerAddress($chat, $totals['billing_address_id'] ?? null) ?? $shippingAddress;
+        $addressFields = [];
+
+        if ($shippingAddress) {
+            $zone = get_shipping_zone_of($shop->id, $shippingAddress->country_id, $shippingAddress->state_id);
+
+            $addressFields = [
+                'ship_to' => $shippingAddress->id,
+                'shipping_address' => $shippingAddress->id,
+                'shipping_zone_id' => $zone->id ?? null,
+            ];
+        }
+
         // Reuse the exact request the controller received — it is already
         // authenticated as this vendor (auth:vendor_api sets the default
         // guard for $request->user()), so merging our fields onto it and
@@ -139,14 +256,14 @@ class ChatCustomOrderService
             'payment_method_id' => $paymentMethodId,
             'payment_status' => Order::PAYMENT_STATUS_UNPAID,
             'is_chat_quote' => true,
-            'billing_address' => $totals['billing_address'] ?? '',
+            'billing_address' => $billingAddress ? $billingAddress->id : ($totals['billing_address'] ?? ''),
             'shipping' => (float) ($totals['shipping_cost'] ?? 0),
             'taxes' => (float) ($totals['tax'] ?? 0),
             'discount' => (float) ($totals['discount'] ?? 0),
             'packaging' => 0,
             'cart' => $cart,
             'delete_the_cart' => false,
-        ]);
+        ] + $addressFields);
 
         $order = app(OrderRepository::class)->store($request);
 

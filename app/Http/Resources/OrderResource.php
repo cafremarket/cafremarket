@@ -67,6 +67,8 @@ class OrderResource extends JsonResource
             'delivery_date' => $this->delivery_date ? date('F j, Y', strtotime($this->delivery_date)) : null,
             'goods_received' => $this->goods_received,
             // 'feedback_given' => (bool) $this->feedback_id,
+            'can_give_order_feedback' => $this->when(! $request->is('api/vendor/*') && ! $request->is('api/deliveryboy/*'), fn () => $this->canGiveOrderFeedback()),
+            'order_feedback' => $this->orderFeedback ? new OrderFeedbackResource($this->orderFeedback) : null,
             'can_evaluate' => $this->canEvaluate(),
             'can_be_canceled' => $this->when(! $vendor, $this->canBeCanceled()),
             'tracking_id' => $this->tracking_id,

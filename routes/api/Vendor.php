@@ -194,6 +194,7 @@ Route::prefix('vendor')->group(function () {
 
         // Orders
         Route::get('data/customers', [OrderController::class, 'searchCustomers']);
+        Route::get('data/customer/{customer}/addresses', [OrderController::class, 'customerAddresses']);
         Route::post('order/create', [OrderController::class, 'store']);
         Route::get('orders', [OrderController::class, 'index']);
         Route::get('order/{order}', [OrderController::class, 'show']);
@@ -245,6 +246,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('order/{order}/conversations', [OrderConversationController::class, 'index']);
         Route::post('order/{order}/conversations', [OrderConversationController::class, 'respond']);
         Route::post('chat/{chat}/custom-order', [OrderConversationController::class, 'storeCustomOrder']);
+        Route::get('chat/{chat}/customer-addresses', [OrderConversationController::class, 'customerAddresses']);
         Route::get('chat/search/inventory', [OrderConversationController::class, 'searchInventory']);
         Route::post('chat/calculate-order-totals', [OrderConversationController::class, 'calculateOrderTotals']);
         Route::get('chat/{chat}/orders', [OrderConversationController::class, 'searchOrders']);

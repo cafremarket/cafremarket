@@ -39,6 +39,7 @@ class ConversationResource extends JsonResource
             // Prefer latest reply text so inbox always shows the newest chat line.
             'message' => $lastMessage !== '' ? $lastMessage : $this->message,
             'order_id' => $this->when($this->order_id, (int) $this->order_id),
+            'order_number' => $this->when($this->order_id, fn () => optional($this->order)->order_number),
             'item' => $this->when($this->item, new ItemLightResource($this->item)),
             'status' => $this->status,
             'is_unread' => $unreadCount > 0,

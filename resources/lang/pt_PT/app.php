@@ -1960,4 +1960,9 @@ return [
     'in_stock' => 'Em stock',
     'view_all' => 'Ver tudo',
     'reset' => 'Repor',
+    'order_feedback' => 'Avaliação da encomenda',
+    'order_feedbacks' => 'Avaliações de encomendas',
+    'no_order_feedback_yet' => 'O cliente ainda não avaliou esta encomenda.',
+    'no_order_feedbacks' => 'Nenhuma avaliação de encomenda encontrada.',
+    'average_rating' => 'Classificação média',
 ];

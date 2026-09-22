@@ -8,6 +8,7 @@ use App\Http\Requests\Validations\CreateOrderRequest;
 use App\Http\Requests\Validations\OrderDetailRequest;
 use App\Http\Resources\OrderLightResource;
 use App\Http\Resources\OrderResource;
+use App\Models\Address;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Repositories\Order\OrderRepository;
@@ -48,12 +49,61 @@ class OrderController extends Controller
     }
 
     /**
+     * List the saved addresses of a customer so the vendor can pick
+     * the shipping/billing address while creating an order.
+     */
+    public function customerAddresses($customer)
+    {
+        $customer = Customer::where('active', true)->findOrFail($customer);
+        $shopId = Auth::user()->merchantId();
+
+        $defaultShipping = $customer->shippingAddress ?? $customer->primaryAddress ?? $customer->addresses()->first();
+        $defaultBilling = $customer->billingAddress ?? $defaultShipping;
+
+        $addresses = $customer->addresses()->get()->map(function ($address) use ($shopId) {
+            $zone = get_shipping_zone_of($shopId, $address->country_id, $address->state_id);
+
+            return [
+                'id' => $address->id,
+                'address_type' => $address->address_type,
+                'address_title' => $address->address_title,
+                'address_line_1' => $address->address_line_1,
+                'address_line_2' => $address->address_line_2,
+                'landmark' => $address->landmark,
+                'city' => $address->city,
+                'state' => optional($address->state)->name,
+                'zip_code' => $address->zip_code,
+                'country' => optional($address->country)->name,
+                'phone' => $address->phone,
+                'formatted' => $address->toString(),
+                'shipping_zone' => isset($zone->id) ? ['id' => $zone->id, 'name' => $zone->name] : null,
+            ];
+        });
+
+        return response()->json([
+            'data' => $addresses,
+            'default_shipping_address_id' => optional($defaultShipping)->id,
+            'default_billing_address_id' => optional($defaultBilling)->id,
+        ]);
+    }
+
+    /**
      * Create order manually (vendor).
      */
     public function store(CreateOrderRequest $request)
     {
         if (is_null($request->input('cart'))) {
             return response()->json(['message' => trans('theme.notify.cart_empty')], 422);
+        }
+
+        // Resolve the shipping zone from the selected shipping address
+        if (! $request->filled('shipping_zone_id') && $request->filled('ship_to')) {
+            $address = Address::find($request->input('ship_to'));
+            $zone = $address ? get_shipping_zone_of($request->user()->merchantId(), $address->country_id, $address->state_id) : null;
+
+            if (isset($zone->id)) {
+                $request->merge(['shipping_zone_id' => $zone->id]);
+            }
         }
 
         try {
@@ -76,7 +126,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $orders = Order::mine()->visibleToVendor()->withCount(['inventories'])->with('deliveryBoy');
+        $orders = Order::mine()->visibleToVendor()->withCount(['inventories'])->with(['deliveryBoy', 'orderFeedback']);
 
         $filter = $request->get('filter');
         $payment = $request->get('payment');

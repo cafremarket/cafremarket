@@ -44,26 +44,17 @@
       $orderDefaultBillingAddress = trim(strip_tags(preg_replace('/<br\s*\/?>/i', "\n", $rawBillingAddress)));
   }
 
+  // Customer's saved addresses for the address selector in the custom order modal
+  $orderAddresses = $chat->customer_id
+      ? app(\App\Services\ChatCustomOrderService::class)->customerAddresses($chat)
+      : ['data' => [], 'default_shipping_address_id' => null, 'default_billing_address_id' => null];
+
   // Pre-fill Tax/Shipping from the shop's own configured defaults instead of
   // starting every quote at 0 — the seller can still edit before sharing.
-  $orderDefaultTax = 0;
-  $orderDefaultTaxType = 'amount';
-  $orderDefaultShipping = 0;
-  if ($chat->shop) {
-      $defaultTax = $chat->shop->taxes()->where('active', true)->orderBy('id')->first();
-      if ($defaultTax) {
-          $orderDefaultTax = (float) $defaultTax->taxrate;
-          $orderDefaultTaxType = $defaultTax->type === \App\Models\Tax::TYPE_PERCENT ? 'percent' : 'amount';
-      }
-
-      $defaultZone = \App\Models\ShippingZone::where('shop_id', $chat->shop->id)->where('active', true)->orderBy('id')->first();
-      if ($defaultZone) {
-          $defaultRate = \App\Models\ShippingRate::where('shipping_zone_id', $defaultZone->id)->orderBy('rate')->first();
-          if ($defaultRate) {
-              $orderDefaultShipping = (float) $defaultRate->rate;
-          }
-      }
-  }
+  $orderDefaults = app(\App\Services\ChatCustomOrderService::class)->orderDefaults($chat);
+  $orderDefaultTax = $orderDefaults['tax'];
+  $orderDefaultTaxType = $orderDefaults['tax_type'];
+  $orderDefaultShipping = $orderDefaults['shipping'];
 @endphp
 
 <header class="mpc-thread__head" id="openChatbox-{{ $chat->id }}" data-customer-id="{{ $chat->customer_id }}" data-conversation-id="{{ $chat->id }}" data-order-id="{{ $chat->order_id }}">
@@ -327,8 +318,28 @@
 
     <p class="mpc-modal-hint">The customer picks their own payment method and pays once they open this order — no need to choose one here.</p>
 
-    <label for="mpc-order-billing">Billing address</label>
-    <textarea id="mpc-order-billing" rows="3" placeholder="Billing address">{{ $orderDefaultBillingAddress }}</textarea>
+    @if (count($orderAddresses['data']))
+      <div class="mpc-addr-section"
+           data-default-shipping="{{ $orderAddresses['default_shipping_address_id'] }}"
+           data-default-billing="{{ $orderAddresses['default_billing_address_id'] }}">
+        <label class="mpc-addr-heading">Shipping address</label>
+        @include('liveChat::merchant.partials._address_options', ['name' => 'mpc_ship_addr', 'addresses' => $orderAddresses['data'], 'selected' => $orderAddresses['default_shipping_address_id']])
+
+        <label class="mpc-addr-same">
+          <input type="checkbox" id="mpc-order-same-billing" {{ $orderAddresses['default_billing_address_id'] == $orderAddresses['default_shipping_address_id'] ? 'checked' : '' }}>
+          <span>Billing address same as shipping</span>
+        </label>
+
+        <div id="mpc-bill-addr-wrap" {{ $orderAddresses['default_billing_address_id'] == $orderAddresses['default_shipping_address_id'] ? 'hidden' : '' }}>
+          <label class="mpc-addr-heading">Billing address</label>
+          @include('liveChat::merchant.partials._address_options', ['name' => 'mpc_bill_addr', 'addresses' => $orderAddresses['data'], 'selected' => $orderAddresses['default_billing_address_id']])
+        </div>
+      </div>
+    @else
+      <p class="mpc-addr-empty"><i class="fa fa-info-circle"></i> This customer has no saved address yet — type the billing address below.</p>
+      <label for="mpc-order-billing">Billing address</label>
+      <textarea id="mpc-order-billing" rows="3" placeholder="Billing address">{{ $orderDefaultBillingAddress }}</textarea>
+    @endif
 
     <label for="mpc-order-note">Note to customer (optional)</label>
     <textarea id="mpc-order-note" rows="2" placeholder="e.g. Thanks for your order! Here's a custom quote…"></textarea>

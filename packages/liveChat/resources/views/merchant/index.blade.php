@@ -758,8 +758,39 @@
     var taxInfo = qs('#mpc-tax-info'), shippingInfo = qs('#mpc-shipping-info');
     if (taxInfo) taxInfo.hidden = true;
     if (shippingInfo) shippingInfo.hidden = true;
+    resetOrderAddresses();
     recalcOrderTotals();
     if (modal) modal.hidden = false;
+  }
+
+  // Pre-select the customer's default shipping/billing address and wire the
+  // "billing same as shipping" toggle.
+  function resetOrderAddresses() {
+    var section = qs('.mpc-addr-section');
+    if (!section) return;
+
+    var defShip = section.getAttribute('data-default-shipping');
+    var defBill = section.getAttribute('data-default-billing') || defShip;
+    var check = function (name, value) {
+      var input = qs('input[name="' + name + '"][value="' + value + '"]') || qs('input[name="' + name + '"]');
+      if (input) input.checked = true;
+    };
+    check('mpc_ship_addr', defShip);
+    check('mpc_bill_addr', defBill);
+
+    var same = qs('#mpc-order-same-billing');
+    var billWrap = qs('#mpc-bill-addr-wrap');
+    if (same) {
+      same.checked = !defBill || defBill === defShip;
+      if (billWrap) billWrap.hidden = same.checked;
+      if (!same._mpcBound) {
+        same._mpcBound = true;
+        same.addEventListener('change', function () {
+          var wrap = qs('#mpc-bill-addr-wrap');
+          if (wrap) wrap.hidden = same.checked;
+        });
+      }
+    }
   }
 
   function bindOrderTotalsInputs() {
@@ -801,6 +832,19 @@
       billing_address: ((qs('#mpc-order-billing') || {}).value || '').trim(),
       note: ((qs('#mpc-order-note') || {}).value || '').trim()
     };
+
+    // Seller-selected customer addresses (address selector)
+    if (qs('.mpc-addr-section')) {
+      var shipAddr = qs('input[name="mpc_ship_addr"]:checked');
+      var sameBilling = qs('#mpc-order-same-billing');
+      var billAddr = (sameBilling && sameBilling.checked) ? shipAddr : qs('input[name="mpc_bill_addr"]:checked');
+      if (!shipAddr || !billAddr) {
+        if (err) { err.hidden = false; err.textContent = 'Please select the shipping and billing address.'; }
+        return;
+      }
+      body.shipping_address_id = parseInt(shipAddr.value, 10);
+      body.billing_address_id = parseInt(billAddr.value, 10);
+    }
 
     var submitBtn = qs('#mpc-order-submit');
     if (submitBtn) submitBtn.disabled = true;

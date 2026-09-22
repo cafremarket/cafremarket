@@ -431,6 +431,14 @@ class Order extends BaseModel
     }
 
     /**
+     * Get the customer's overall feedback for this order (one order, one feedback).
+     */
+    public function orderFeedback()
+    {
+        return $this->hasOne(OrderFeedback::class);
+    }
+
+    /**
      * Set tag date formate
      */
     public function setShippingDateAttribute($value)
@@ -985,6 +993,27 @@ class Order extends BaseModel
     public static function generateDeliveryOtp(): string
     {
         return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Check if the customer can leave the (single) order feedback for this order:
+     * the order must be delivered/received, not canceled, and not rated yet.
+     *
+     * @return bool
+     */
+    public function canGiveOrderFeedback()
+    {
+        if ($this->isCanceled()) {
+            return false;
+        }
+
+        if (! ($this->order_status_id == static::STATUS_DELIVERED || $this->goods_received)) {
+            return false;
+        }
+
+        return $this->relationLoaded('orderFeedback')
+            ? is_null($this->orderFeedback)
+            : ! $this->orderFeedback()->exists();
     }
 
     /**

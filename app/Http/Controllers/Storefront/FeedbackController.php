@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\OrderDetailRequest;
+use App\Http\Requests\Validations\OrderFeedbackCreateRequest;
 use App\Http\Requests\Validations\ProductReviewCreateRequest;
 use App\Http\Requests\Validations\StoreReviewCreateRequest;
 use App\Models\Inventory;
@@ -98,5 +99,31 @@ class FeedbackController extends Controller
         }
 
         return back()->with('success', trans('theme.notify.your_feedback_saved'));
+    }
+
+    /**
+     * Save the customer's overall feedback for an order. One order, one feedback.
+     *
+     * @param  App\Models\Order  $order
+     * @return \Illuminate\Http\Response
+     */
+    public function save_order_feedback(OrderFeedbackCreateRequest $request, Order $order)
+    {
+        if ($order->orderFeedback()->exists()) {
+            return back()->with('warning', trans('theme.order_feedback_already_given'));
+        }
+
+        if (! $order->canGiveOrderFeedback()) {
+            return back()->with('warning', trans('theme.order_feedback_not_allowed'));
+        }
+
+        $order->orderFeedback()->create([
+            'shop_id' => $order->shop_id,
+            'customer_id' => $order->customer_id,
+            'rating' => $request->input('rating'),
+            'comment' => $request->input('comment'),
+        ]);
+
+        return back()->with('success', trans('theme.order_feedback_saved'));
     }
 }

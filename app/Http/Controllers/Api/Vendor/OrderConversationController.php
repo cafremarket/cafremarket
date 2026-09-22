@@ -87,6 +87,25 @@ class OrderConversationController extends Controller
      * discount) from inside this chat thread and share it as an order
      * card in the same conversation.
      */
+    /**
+     * Saved addresses of the chat's customer, for the address selector on
+     * the "Create custom order" sheet.
+     */
+    public function customerAddresses(ChatConversation $chat)
+    {
+        $vendor = Auth::guard('vendor_api')->user();
+
+        if ((int) $chat->shop_id !== (int) $vendor->merchantId()) {
+            return response()->json(['message' => trans('responses.unauthorized')], 403);
+        }
+
+        $service = app(ChatCustomOrderService::class);
+
+        return response()->json($service->customerAddresses($chat) + [
+            'order_defaults' => $service->orderDefaults($chat),
+        ]);
+    }
+
     public function storeCustomOrder(Request $request, ChatConversation $chat)
     {
         $vendor = Auth::guard('vendor_api')->user();
@@ -110,6 +129,8 @@ class OrderConversationController extends Controller
             'discount' => 'nullable|numeric|min:0',
             'payment_method_id' => 'nullable|integer',
             'billing_address' => 'nullable|string',
+            'shipping_address_id' => 'nullable|integer',
+            'billing_address_id' => 'nullable|integer',
             'note' => 'nullable|string|max:2000',
         ]);
 
@@ -125,6 +146,8 @@ class OrderConversationController extends Controller
                     'discount' => $data['discount'] ?? 0,
                     'payment_method_id' => $data['payment_method_id'] ?? null,
                     'billing_address' => $data['billing_address'] ?? null,
+                    'shipping_address_id' => $data['shipping_address_id'] ?? null,
+                    'billing_address_id' => $data['billing_address_id'] ?? null,
                     'note' => trim((string) ($data['note'] ?? '')),
                 ]
             );

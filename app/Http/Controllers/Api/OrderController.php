@@ -40,6 +40,7 @@ class OrderController extends Controller
                 'inventories.image:path,imageable_id,imageable_type',
                 'dispute:id,order_id',
                 'paymentMethod:id,code',
+                'orderFeedback',
             ])
             ->paginate(config('mobile_app.view_listing_per_page', 8));
 
@@ -59,6 +60,7 @@ class OrderController extends Controller
             'conversation:id,order_id,user_id,customer_id,subject,message,product_id,status,updated_at',
             'conversation.attachments',
             'feedback',
+            'orderFeedback',
         ]);
 
         return new OrderResource($order);

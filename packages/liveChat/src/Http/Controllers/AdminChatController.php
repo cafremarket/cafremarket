@@ -225,6 +225,8 @@ class AdminChatController extends Controller
             'discount' => 'nullable|numeric|min:0',
             'payment_method_id' => 'nullable|integer',
             'billing_address' => 'nullable|string',
+            'shipping_address_id' => 'nullable|integer',
+            'billing_address_id' => 'nullable|integer',
             'note' => 'nullable|string|max:2000',
         ]);
 
@@ -240,6 +242,8 @@ class AdminChatController extends Controller
                     'discount' => $data['discount'] ?? 0,
                     'payment_method_id' => $data['payment_method_id'] ?? null,
                     'billing_address' => $data['billing_address'] ?? null,
+                    'shipping_address_id' => $data['shipping_address_id'] ?? null,
+                    'billing_address_id' => $data['billing_address_id'] ?? null,
                     'note' => trim((string) ($data['note'] ?? '')),
                 ]
             );

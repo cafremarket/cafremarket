@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Validations\OrderDetailRequest;
 use App\Http\Requests\DeliveryBoy\DeliveryBoyFeedbackCreateRequest;
+use App\Http\Requests\Validations\OrderFeedbackCreateRequest;
 use App\Http\Requests\Validations\ProductFeedbackCreateRequest;
 use App\Http\Requests\Validations\ShopFeedbackCreateRequest;
 use App\Http\Resources\FeedbackResource;
+use App\Http\Resources\OrderFeedbackResource;
 use App\Http\Resources\ReviewResource;
 use App\Models\Inventory;
 use App\Models\Order;
@@ -121,5 +124,46 @@ class FeedbackController extends Controller
         }
 
         return response()->json(['message' => trans('api.your_feedback_saved')], 200);
+    }
+
+    /**
+     * Get the customer's feedback for this order (null when not given yet).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show_order_feedback(OrderDetailRequest $request, Order $order)
+    {
+        return response()->json([
+            'can_give_order_feedback' => $order->canGiveOrderFeedback(),
+            'data' => $order->orderFeedback ? new OrderFeedbackResource($order->orderFeedback) : null,
+        ]);
+    }
+
+    /**
+     * Save the customer's feedback for this order. One order, one feedback.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function save_order_feedback(OrderFeedbackCreateRequest $request, Order $order)
+    {
+        if ($order->orderFeedback()->exists()) {
+            return response()->json(['message' => trans('api.you_already_gave_feedback')], 422);
+        }
+
+        if (! $order->canGiveOrderFeedback()) {
+            return response()->json(['message' => trans('api.order_feedback_not_allowed')], 422);
+        }
+
+        $feedback = $order->orderFeedback()->create([
+            'shop_id' => $order->shop_id,
+            'customer_id' => $order->customer_id,
+            'rating' => $request->input('rating'),
+            'comment' => $request->input('comment'),
+        ]);
+
+        return response()->json([
+            'message' => trans('api.your_feedback_saved'),
+            'data' => new OrderFeedbackResource($feedback),
+        ], 200);
     }
 }

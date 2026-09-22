@@ -847,4 +847,13 @@ return [
     'get_directions' => 'Obter direções',
     'ordered_items' => 'Artigos encomendados',
     'cancel_items_disabled' => 'Cancelar artigos está temporariamente indisponível.',
+    'order_feedback' => 'Avaliação da encomenda',
+    'rate_this_order' => 'Avaliar esta encomenda',
+    'rate_this_order_help' => 'Como foi a sua experiência com esta encomenda? Só pode avaliar uma vez.',
+    'order_feedback_placeholder' => 'Conte-nos sobre a sua experiência (opcional)',
+    'submit_order_feedback' => 'Enviar avaliação',
+    'your_order_feedback' => 'A sua avaliação',
+    'order_feedback_saved' => 'Obrigado! A sua avaliação foi guardada.',
+    'order_feedback_already_given' => 'Já avaliou esta encomenda.',
+    'order_feedback_not_allowed' => 'Pode avaliar a encomenda depois de ela ser entregue.',
 ];

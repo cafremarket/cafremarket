@@ -373,6 +373,8 @@
     </div> <!-- /.col-md-8 -->
 
     <div class="col-md-4 admin-order-detail__sidebar">
+      @include('admin.order._order_feedback')
+
       @if (Auth::user()->isFromPlatform())
         @include('admin.partials.ui.card_start', [
           'title' => trans('app.shop'),

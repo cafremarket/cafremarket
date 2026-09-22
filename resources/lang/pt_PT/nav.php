@@ -111,4 +111,5 @@ return [
     'stock_movements' => 'Movimentos de stock',
     'stock_transfers' => 'Transferências de stock',
 
+    'order_feedbacks' => 'Avaliações de encomendas',
 ];

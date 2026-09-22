@@ -76,6 +76,14 @@ trait Authorizable
         'deliveryboys' => 'fulfill',
         'shipping_label' => 'view',
         'confirmOtp' => 'fulfill',
+        'details' => 'view',
+        'downloadSelected' => 'view',
+        'searchCustomer' => 'add',
+        'addressShippingInfo' => 'add',
+        'fulfillment' => 'fulfill',
+        'markAsPickedUp' => 'fulfill',
+        'adminNote' => 'fulfill',
+        'assignPaymentStatus' => 'fulfill',
     ];
 
     /**

@@ -13,6 +13,11 @@ Route::middleware(['xssSanitizer'])->group(function () {
         FeedbackController::class, 'save_product_feedbacks',
     ])->name('save.feedback');
 
+    // One order, one feedback: the customer's overall rating of an order.
+    Route::post('order/{order}/order-feedback', [
+        FeedbackController::class, 'save_order_feedback',
+    ])->name('order.orderFeedback.save');
+
     Route::post('shop/feedback/{order}', [
         FeedbackController::class, 'save_shop_feedbacks',
     ])->name('shop.feedback');

@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\Admin\OrderCancellationController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\OrderFeedbackController;
 use Illuminate\Support\Facades\Route;
+
+// Customers' order feedbacks (one per order)
+Route::get('feedbacks', [OrderFeedbackController::class, 'index'])->name('feedbacks.index');
 
 Route::get('order/{order}/invoice', [OrderController::class, 'invoice'])->name('order.invoice');
 
@@ -34,6 +38,8 @@ Route::get('cancellation', [OrderCancellationController::class, 'index'])->name(
 Route::put('cancellation/{order}/{action}', [OrderCancellationController::class, 'handleCancellationRequest'])->name('cancellation.handle');
 
 Route::get('order/searchCustomer', [OrderController::class, 'searchCustomer'])->name('order.searchCustomer');
+
+Route::get('order/addressShippingInfo', [OrderController::class, 'addressShippingInfo'])->name('order.addressShippingInfo')->middleware('ajax');
 
 Route::get('order/{order}/fulfill', [OrderController::class, 'fulfillment'])->name('order.fulfillment');
 

@@ -10,8 +10,21 @@
 
 @section('content')
   @php
-    $shipping_address = $customer->shippingAddress ? $customer->shippingAddress : $customer->primaryAddress;
+    $shipping_address = $customer->shippingAddress ? $customer->shippingAddress : ($customer->primaryAddress ?: $addresses->first());
     $billing_address = $customer->billingAddress ? $customer->billingAddress : $shipping_address;
+
+    // Pre-select the addresses saved on the cart (if any)
+    if (isset($cart->shipping_address) && $addresses->firstWhere('id', $cart->shipping_address)) {
+        $shipping_address = $addresses->firstWhere('id', $cart->shipping_address);
+    }
+    if (isset($cart->billing_address) && $addresses->firstWhere('id', $cart->billing_address)) {
+        $billing_address = $addresses->firstWhere('id', $cart->billing_address);
+    }
+
+    $address_options = $addresses->mapWithKeys(function ($address) {
+        $label = trim(($address->address_title ? $address->address_title . ' - ' : '') . $address->toString());
+        return [$address->id => '[' . strtoupper($address->address_type) . '] ' . $label];
+    });
     $shipping_zone = $shipping_address ? get_shipping_zone_of(Auth::user()->merchantId(), $shipping_address->country_id, $shipping_address->state_id) : null;
 
     $shipping_options = isset($shipping_zone->id) ? getShippingRates($shipping_zone->id) : 'NaN';
@@ -52,8 +65,6 @@
           {{ Form::hidden('shipping', null, ['id' => 'cart-shipping']) }}
           {{ Form::hidden('shipping_zone_id', isset($shipping_zone->id) ? $shipping_zone->id : null, ['id' => 'shipping_zone_id']) }}
           {{ Form::hidden('shipping_rate_id', null, ['id' => 'shipping_rate_id']) }}
-          {{ Form::hidden('shipping_address', $shipping_address ? $shipping_address->id : null) }}
-          {{ Form::hidden('billing_address', $billing_address ? $billing_address->id : null) }}
 
           @include('admin.order._add_to_cart')
 
@@ -130,7 +141,7 @@
                 <tr>
                   <td class="text-right">{{ trans('app.taxes') }} <br />
                     <em class="small">
-                      {{ isset($shipping_zone->name) ? $shipping_zone->name . ' ' : '' }}
+                      <span id="summary-zone-name">{{ isset($shipping_zone->name) ? $shipping_zone->name . ' ' : '' }}</span>
                       <span id="summary-taxrate"></span>%
                       </small>
                   </td>
@@ -178,8 +189,8 @@
               </button>
             @endif
 
-            @if ($shipping_options != 'NaN' && !isset($order_cart) && Gate::allows('create', \App\Models\Order::class))
-              <button name='action' type="submit" class='btn btn-flat btn-lg btn-new'>
+            @if (!isset($order_cart) && Gate::allows('create', \App\Models\Order::class))
+              <button name='action' type="submit" id="place-order-btn" class='btn btn-flat btn-lg btn-new' @if ($shipping_options == 'NaN') style="display: none;" @endif>
                 {{ trans('app.place_order') }}
               </button>
             @endif
@@ -221,42 +232,41 @@
         'class' => 'admin-form-section',
         'bodyClass' => '',
       ])
-          <fieldset>
-            <legend>{{ strtoupper(trans('app.shipping_address')) }}</legend>
-          </fieldset>
-          @if (isset($cart->shipping_address))
-            <a href="javascript:void(0)" data-link="{{ route('address.edit', $cart->shipping_address) }}" class="ajax-modal-btn pull-right indent10 small"><i class="fa fa-edit"></i> {{ trans('app.edit') }} </a>
-            {!! $cart->shippingAddress->toHtml('<br/>', false) !!}
+          @if ($addresses->isEmpty())
+            <p class="text-muted">{{ trans('messages.notice.no_billing_address') }}</p>
+            <a href="javascript:void(0)" data-link="{{ route('address.create', ['customer', $customer->id]) }}" class="ajax-modal-btn btn btn-new"><i class="fa fa-plus-square-o"></i> {{ trans('app.add_address') }} </a>
           @else
-            @if ($shipping_address)
-              <a href="javascript:void(0)" data-link="{{ route('address.edit', $shipping_address->id) }}" class="ajax-modal-btn pull-right indent10 small"><i class="fa fa-edit"></i> {{ trans('app.edit') }} </a>
-              {!! $shipping_address->toHtml('<br/>', false) !!}
-            @else
-              <a href="javascript:void(0)" data-link="{{ route('address.create', ['customer', $customer->id]) }}" class="ajax-modal-btn btn btn-new"><i class="fa fa-plus-square-o"></i> {{ trans('app.add_address') }} </a>
-            @endif
+            <fieldset>
+              <legend>{{ strtoupper(trans('app.shipping_address')) }}</legend>
+            </fieldset>
+            <div class="form-group">
+              {!! Form::select('shipping_address', $address_options, optional($shipping_address)->id, ['id' => 'shipping-address-select', 'class' => 'form-control select2-normal', 'required']) !!}
+            </div>
+            <div class="address-preview well well-sm" id="shipping-address-preview">
+              {!! optional($shipping_address)->toHtml('<br/>', false) !!}
+            </div>
+
+            <fieldset>
+              <legend>{{ strtoupper(trans('app.billing_address')) }}</legend>
+            </fieldset>
+            <small>
+              {!! Form::checkbox('same_as_shipping_address', 1, null, ['id' => 'same_as_shipping_address', 'class' => 'icheck']) !!}
+              {!! Form::label('same_as_shipping_address', strtoupper(trans('app.same_as_shipping_address')), ['class' => 'indent5']) !!}
+            </small>
+
+            <div class="spacer20"></div>
+
+            <div id="billing-address-block">
+              <div class="form-group">
+                {!! Form::select('billing_address', $address_options, optional($billing_address)->id, ['id' => 'billing-address-select', 'class' => 'form-control select2-normal', 'required']) !!}
+              </div>
+              <div class="address-preview well well-sm" id="billing-address-preview">
+                {!! optional($billing_address)->toHtml('<br/>', false) !!}
+              </div>
+            </div>
+
+            <a href="javascript:void(0)" data-link="{{ route('address.create', ['customer', $customer->id]) }}" class="ajax-modal-btn btn btn-default btn-xs"><i class="fa fa-plus-square-o"></i> {{ trans('app.add_address') }} </a>
           @endif
-
-          <fieldset>
-            <legend>{{ strtoupper(trans('app.billing_address')) }}</legend>
-          </fieldset>
-          <small>
-            {!! Form::checkbox('same_as_shipping_address', 1, null, ['id' => 'same_as_shipping_address', 'class' => 'icheck']) !!}
-            {!! Form::label('same_as_shipping_address', strtoupper(trans('app.same_as_shipping_address')), ['class' => 'indent5']) !!}
-          </small>
-
-          <div class="spacer20"></div>
-
-          <div id="billing-address-block">
-            @if (isset($cart->billing_address))
-              <a href="javascript:void(0)" data-link="{{ route('address.edit', $cart->billing_address) }}" class="ajax-modal-btn pull-right indent10 small"><i class="fa fa-edit"></i> {{ trans('app.edit') }} </a>
-              {!! $cart->billingAddress->toHtml('<br/>', false) !!}
-            @else
-              @if ($billing_address)
-                <a href="javascript:void(0)" data-link="{{ route('address.edit', $billing_address->id) }}" class="ajax-modal-btn pull-right indent10 small"><i class="fa fa-edit"></i> {{ trans('app.edit') }} </a>
-                {!! $billing_address->toHtml('<br/>', false) !!}
-              @endif
-            @endif
-          </div>
       @include('admin.partials.ui.card_end')
 
       @include('admin.partials.ui.card_start', [
@@ -315,8 +325,8 @@
         $("#global-alert-box").removeClass('hidden');
       }
 
-      var billing_address = <?= $billing_address ?>;
-      if (billing_address.length == 0) {
+      var billing_address = {{ $billing_address ? 'true' : 'false' }};
+      if (!billing_address) {
         $("#global-alert-msg").html('{!! trans('messages.notice.no_billing_address') . ' ' . '<a class="ajax-modal-btn btn btn-new" href="javascript:void(0)" data-link="' . route('address.create', ['customer', $customer->id]) . '"><i class="fa fa-plus-square-o"></i>' . trans('app.add_address') . '</a>' !!}');
         $("#global-alert-box").removeClass('hidden');
       }
@@ -771,6 +781,53 @@
 
       $('input#same_as_shipping_address').on('ifUnchecked', function() {
         $('#billing-address-block').show();
+      });
+
+      // Address selectors: refresh the preview, and for shipping also the zone, rates and tax
+      function loadAddressInfo(addressId, callback) {
+        if (!addressId) return;
+
+        $.ajax({
+          url: "{{ route('admin.order.order.addressShippingInfo') }}",
+          data: {
+            address_id: addressId,
+            customer_id: "{{ $customer->id }}"
+          },
+          success: callback
+        });
+      }
+
+      $('#billing-address-select').on('change', function() {
+        loadAddressInfo($(this).val(), function(result) {
+          $('#billing-address-preview').html(result.html);
+        });
+      });
+
+      $('#shipping-address-select').on('change', function() {
+        loadAddressInfo($(this).val(), function(result) {
+          $('#shipping-address-preview').html(result.html);
+          $('#shipping_zone_id').val(result.shipping_zone_id || '');
+          $('#summary-zone-name').text(result.shipping_zone_name ? result.shipping_zone_name + ' ' : '');
+
+          // Reset the previously selected shipping rate as it belongs to the old zone
+          shipping_options = result.shipping_zone_id ? (result.shipping_options || []) : NaN;
+          setShippingCost();
+          setTax(result.tax_id);
+
+          $("#global-alert-box").addClass('hidden');
+          if (!result.shipping_zone_id) {
+            $("#global-alert-msg").html('{{ trans('messages.notice.no_shipping_option_for_the_zone') }}');
+            $("#global-alert-box").removeClass('hidden');
+            $('#place-order-btn').hide();
+          } else {
+            if ($.isEmptyObject(shipping_options)) {
+              var zoneName = $('<span>').text(result.shipping_zone_name).html();
+              $("#global-alert-msg").html('{!! trans('messages.notice.no_rate_for_the_shipping_zone', ['zone' => '__ZONE__']) !!}'.replace('__ZONE__', zoneName));
+              $("#global-alert-box").removeClass('hidden');
+            }
+            $('#place-order-btn').show();
+          }
+        });
       });
     }(window.jQuery, window, document));
   </script>

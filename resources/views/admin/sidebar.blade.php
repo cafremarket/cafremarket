@@ -216,6 +216,14 @@
               </li>
             @endcan
 
+            @can('index', \App\Models\Order::class)
+              <li class="{{ Request::is('admin/order/feedbacks*') ? 'active' : '' }}">
+                <a href="{{ route('admin.order.feedbacks.index') }}">
+                  <i class="fa fa-angle-double-right"></i> {{ trans('nav.order_feedbacks') }}
+                </a>
+              </li>
+            @endcan
+
             @can('index', \App\Models\Cart::class)
               <li class="{{ Request::is('admin/order/cart*') ? 'active' : '' }}">
                 <a href="{{ url('admin/order/cart') }}">

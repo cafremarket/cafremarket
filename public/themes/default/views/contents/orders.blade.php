@@ -171,6 +171,8 @@
           </div>
         </div>
 
+        @include('theme::partials.order_feedback', ['order' => $order, 'compact' => true])
+
         @if ($order->message_to_customer)
           <p class="sf-order-card__note">
             <strong>@lang('theme.message_from_seller'):</strong> {{ $order->message_to_customer }}

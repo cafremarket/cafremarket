@@ -509,7 +509,7 @@ class OrderController extends Controller
      */
     public function detail(OrderDetailRequest $request, Order $order)
     {
-        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod', 'shop']);
+        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod', 'shop', 'orderFeedback']);
         $paymentSwitchOptions = $this->paymentSwitchOptionsFor($order);
 
         return view('theme::order_detail', compact('order', 'paymentSwitchOptions'));
@@ -736,7 +736,7 @@ class OrderController extends Controller
             ->latest('id')
             ->firstOrFail();
 
-        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod', 'shop']);
+        $order->load(['inventories.image', 'conversation.replies.attachments', 'paymentMethod', 'shop', 'orderFeedback']);
         $paymentSwitchOptions = $this->paymentSwitchOptionsFor($order);
 
         return view('theme::order_detail', compact('order', 'paymentSwitchOptions'));

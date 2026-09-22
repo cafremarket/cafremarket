@@ -98,4 +98,5 @@ return [
     'low_stock' => 'Low stock',
     'stock_movements' => 'Stock movements',
     'stock_transfers' => 'Stock transfers',
+    'order_feedbacks' => 'Order Feedbacks',
 ];

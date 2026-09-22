@@ -160,6 +160,8 @@ Route::middleware('customerApp')->group(function () {
         Route::post('order/{order}/conversation', [OrderController::class, 'save_conversation']);
         Route::get('order/{order}/track', [OrderController::class, 'track']);
         Route::post('order/{order}/feedback', [FeedbackController::class, 'save_product_feedbacks']);
+        Route::get('order/{order}/order-feedback', [FeedbackController::class, 'show_order_feedback']);
+        Route::post('order/{order}/order-feedback', [FeedbackController::class, 'save_order_feedback']);
         Route::post('order/{order}/review', [ReviewController::class, 'save_product_review']);
 
         // Reviews - eligibility + write-directly-from-product/shop-page

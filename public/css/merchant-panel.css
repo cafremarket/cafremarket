@@ -4058,3 +4058,39 @@ body.mp-sidebar-open {
   gap: 8px;
   margin-top: 16px;
 }
+
+/* Customer address selector — chat "Create custom order" modal */
+.mpc-modal .mpc-addr-heading { font-weight: 600; color: var(--mpc-ink); margin-top: 14px; }
+.mpc-addr-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.mpc-modal label.mpc-addr-card {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--mpc-line);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  color: var(--mpc-ink);
+  font-size: 12px;
+  transition: border-color .15s, background-color .15s;
+}
+.mpc-modal label.mpc-addr-card:hover { border-color: #93c5fd; }
+.mpc-modal label.mpc-addr-card:has(input:checked) { border-color: #2563eb; background: #eff6ff; box-shadow: 0 0 0 1px #2563eb; }
+.mpc-modal .mpc-addr-card input[type="radio"],
+.mpc-modal .mpc-addr-same input[type="checkbox"] { width: auto; padding: 0; margin: 2px 0 0; flex: none; }
+.mpc-addr-card__body { display: flex; flex-direction: column; gap: 1px; min-width: 0; line-height: 1.45; }
+.mpc-addr-card__title { font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.mpc-addr-card__type { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: #e0e7ff; color: #3730a3; }
+.mpc-addr-card__line { color: #475569; word-break: break-word; }
+.mpc-addr-card__zone { margin-top: 3px; font-size: 11px; color: #15803d; }
+.mpc-addr-card__zone--none { color: #b45309; }
+.mpc-modal label.mpc-addr-same { display: flex; align-items: center; gap: 8px; margin: 12px 0 0; color: var(--mpc-ink); font-size: 13px; cursor: pointer; }
+.mpc-addr-empty { margin: 12px 0 0; font-size: 12px; color: #b45309; }

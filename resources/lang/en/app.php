@@ -2149,4 +2149,9 @@ return [
     'in_stock' => 'In stock',
     'view_all' => 'View all',
     'reset' => 'Reset',
+    'order_feedback' => 'Order Feedback',
+    'order_feedbacks' => 'Order Feedbacks',
+    'no_order_feedback_yet' => 'The customer has not left feedback for this order yet.',
+    'no_order_feedbacks' => 'No order feedback found.',
+    'average_rating' => 'Average rating',
 ];

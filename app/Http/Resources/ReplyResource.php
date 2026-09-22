@@ -25,6 +25,7 @@ class ReplyResource extends JsonResource
             'parent_id' => $this->parent_id,
             'quoted_reply' => $this->quoted_reply,
             'updated_at' => $this->updated_at->diffForHumans(),
+            'created_at' => optional($this->created_at)->toIso8601String(),
             'attachments' => AttachmentResource::collection(
                 $this->whenLoaded('attachments', $this->attachments ?? collect())
             ),

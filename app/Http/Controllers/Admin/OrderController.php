@@ -9,6 +9,8 @@ use App\Helpers\ListHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\CreateOrderRequest;
 use App\Http\Requests\Validations\FulfillOrderRequest;
+use App\Models\Address;
+use App\Models\Customer;
 use App\Models\DeliveryBoy;
 use App\Models\Order;
 use App\Repositories\Order\OrderRepository;
@@ -72,7 +74,33 @@ class OrderController extends Controller
             $data['cart'] = $this->order->getCart($request->input('cart_id'));
         }
 
+        $data['addresses'] = $data['customer'] ? $data['customer']->addresses()->get() : collect();
+
         return view('admin.order.create', $data);
+    }
+
+    /**
+     * Return the shipping zone, rates and formatted html of a customer address.
+     * Used by the address selector on the create order page.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addressShippingInfo(Request $request)
+    {
+        $address = Address::where('id', $request->input('address_id'))
+            ->where('addressable_type', Customer::class)
+            ->where('addressable_id', $request->input('customer_id'))
+            ->firstOrFail();
+
+        $zone = get_shipping_zone_of(Auth::user()->merchantId(), $address->country_id, $address->state_id);
+
+        return response()->json([
+            'html' => $address->toHtml('<br/>', false),
+            'shipping_zone_id' => $zone->id ?? null,
+            'shipping_zone_name' => $zone->name ?? null,
+            'tax_id' => $zone->tax_id ?? config('shop_settings.default_tax_id'),
+            'shipping_options' => isset($zone->id) ? getShippingRates($zone->id) : null,
+        ]);
     }
 
     /**

@@ -133,4 +133,5 @@ return [
     'packaging_restored_successfully'            => 'Packaging restored successfully',
     'packaging_destroyed_successfully'           => 'Packaging destroyed successfully',
     'model_translation_saved_successfully'       => ':model translation saved successfully',
+    'order_feedback_not_allowed' => 'Pode avaliar a encomenda depois de ela ser entregue.',
 ];

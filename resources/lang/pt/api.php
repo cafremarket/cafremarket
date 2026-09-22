@@ -135,4 +135,5 @@ return [
     'packaging_destroyed_successfully' => 'Packaging destroyed successfully',
     'model_translation_saved_successfully' => ':model translation saved successfully',
     'location_updated' => 'Location updated successfully',
+    'order_feedback_not_allowed' => 'Pode avaliar a encomenda depois de ela ser entregue.',
 ];
