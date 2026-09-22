@@ -51,7 +51,7 @@
     </div>
     <div class="mp-panel__body">
       <div class="table-responsive">
-        <table class="table table-hover admin-table table-no-sort">
+        <table id="affiliate-links-table" class="table table-hover admin-table">
           <thead>
             <tr>
               <th>{{ trans('app.shop') }}</th>
@@ -65,11 +65,9 @@
             </tr>
           </thead>
           <tbody>
-            @php $hasValidLinks = false; @endphp
             @foreach ($links as $link)
               @if ($link->inventory)
                 @php
-                  $hasValidLinks = true;
                   $variantLabel = $link->inventory->attributeValues
                     ->map(function ($value) {
                       $name = optional($value->attribute)->name;
@@ -112,11 +110,6 @@
                 </tr>
               @endif
             @endforeach
-            @unless ($hasValidLinks)
-              <tr>
-                <td colspan="8" class="text-center text-muted">{{ trans('packages.affiliate.you_dont_have_any_links_yet') }}</td>
-              </tr>
-            @endunless
           </tbody>
         </table>
       </div>
@@ -132,7 +125,7 @@
     </div>
     <div class="mp-panel__body">
       <div class="table-responsive">
-        <table class="table table-hover admin-table table-no-sort">
+        <table id="affiliate-invalid-links-table" class="table table-hover admin-table">
           <thead>
             <tr>
               <th>{{ trans('app.slug') }}</th>
@@ -142,10 +135,8 @@
             </tr>
           </thead>
           <tbody>
-            @php $hasInvalid = false; @endphp
             @foreach ($links as $link)
               @unless ($link->inventory)
-                @php $hasInvalid = true; @endphp
                 <tr>
                   <td>{{ $link->slug }}</td>
                   <td class="text-center">{{ $link->order_count }}</td>
@@ -158,11 +149,6 @@
                 </tr>
               @endunless
             @endforeach
-            @unless ($hasInvalid)
-              <tr>
-                <td colspan="4" class="text-center text-muted">—</td>
-              </tr>
-            @endunless
           </tbody>
         </table>
       </div>
@@ -175,6 +161,51 @@
 @section('page-script')
   <script>
     (function () {
+      function initAffiliateLinksTable(selector, emptyMessage, nonSortableTargets) {
+        var $table = $(selector);
+        if (!$table.length) {
+          return;
+        }
+
+        if ($.fn.DataTable.isDataTable($table[0])) {
+          $table.DataTable().destroy();
+        }
+
+        $table.DataTable({
+          aaSorting: [],
+          iDisplayLength: 10,
+          oLanguage: {
+            sInfo: '_START_ to _END_ of _TOTAL_ entries',
+            sLengthMenu: 'Show _MENU_',
+            sSearch: '',
+            sEmptyTable: emptyMessage,
+            oPaginate: {
+              sNext: '<i class="fa fa-hand-o-right"></i>',
+              sPrevious: '<i class="fa fa-hand-o-left"></i>',
+            },
+          },
+          aoColumnDefs: [{
+            bSortable: false,
+            aTargets: nonSortableTargets
+          }],
+          dom: 'Bfrtip',
+          buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+        });
+      }
+
+      $(function () {
+        initAffiliateLinksTable(
+          '#affiliate-links-table',
+          @json(trans('packages.affiliate.you_dont_have_any_links_yet')),
+          [0, -1]
+        );
+        initAffiliateLinksTable(
+          '#affiliate-invalid-links-table',
+          '—',
+          [0, -1]
+        );
+      });
+
       var shops = @json($shops);
       var shopSelect = document.getElementById('affiliate-shop');
       var productSelect = document.getElementById('affiliate-product');
