@@ -178,11 +178,13 @@
   </div>
 @endif
 
-{{-- Live Chat (always enabled — custom) --}}
+{{-- Live Chat (shop owners always; staff need view_chat_conversation) --}}
+@if (Auth::user()->isMerchant() || Gate::allows('index', \Incevio\Package\LiveChat\Models\ChatConversation::class))
   <a href="{{ mp_url('merchant/support/chat') }}" class="mp-sidebar__link {{ mp_is('merchant/support/chat*') ? 'is-active' : '' }}">
     <i class="fa fa-comments"></i>
     <span>{{ trans('nav.chats') ?? 'Chat' }}</span>
   </a>
+@endif
 
 {{-- Dispute Tickets --}}
 @can('index', \App\Models\Dispute::class)

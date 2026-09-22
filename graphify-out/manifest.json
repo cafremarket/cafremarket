@@ -636,9 +636,9 @@
     "semantic_hash": ""
   },
   "app/Exceptions/Handler.php": {
-    "mtime": 1790015745.314237,
-    "seen": 1790017949.1137106,
-    "ast_hash": "8e0286cf819653739d163c5958a018a4",
+    "mtime": 1790060288.4024386,
+    "seen": 1790070541.7588232,
+    "ast_hash": "bec714e469b6490cdfdc68291546c257",
     "semantic_hash": ""
   },
   "app/Exceptions/PaymentConfigInvalid.php": {
@@ -1416,9 +1416,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Api/Vendor/AffiliateController.php": {
-    "mtime": 1790017743.2242422,
-    "seen": 1790017949.1256733,
-    "ast_hash": "af829331ca795356599035e6f35e372c",
+    "mtime": 1790018158.1416204,
+    "seen": 1790070541.7733772,
+    "ast_hash": "599e199c9dee7cf0b9f2c9f8cff76c2c",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Api/Vendor/AttributeController.php": {
@@ -1494,9 +1494,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Api/Vendor/InventoryController.php": {
-    "mtime": 1764263448.0,
-    "seen": 1788423346.2641563,
-    "ast_hash": "0be7f13f26533f5e10629644547a5def",
+    "mtime": 1790018195.7938619,
+    "seen": 1790070541.7744207,
+    "ast_hash": "1596cdf4073970dbc13b11a7c1d515b5",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Api/Vendor/ManufacturerController.php": {
@@ -1740,9 +1740,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Storefront/AccountController.php": {
-    "mtime": 1790015973.745075,
-    "seen": 1790017949.13065,
-    "ast_hash": "7acbfe34904f2c63868bad8df593da20",
+    "mtime": 1790019237.955986,
+    "seen": 1790070541.7790184,
+    "ast_hash": "abcb1c35b14b6d34a0aaea979c3d40ca",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Storefront/Auth/ForgotPasswordController.php": {
@@ -2322,9 +2322,9 @@
     "semantic_hash": ""
   },
   "app/Http/Requests/Validations/CreateInventoryRequest.php": {
-    "mtime": 1788890823.8628342,
-    "seen": 1788890902.3564734,
-    "ast_hash": "512e9507a7c9e419b36c7c081530a9f3",
+    "mtime": 1790018194.271174,
+    "seen": 1790070541.7903094,
+    "ast_hash": "fb73d280c457ba1789d69a8aa1b0ac64",
     "semantic_hash": ""
   },
   "app/Http/Requests/Validations/CreateInventoryWithVariantRequest.php": {
@@ -2622,9 +2622,9 @@
     "semantic_hash": ""
   },
   "app/Http/Requests/Validations/QuickInventoryUpdateRequest.php": {
-    "mtime": 1788714895.8214686,
-    "seen": 1788801452.2870388,
-    "ast_hash": "2ef36b2086b228cf7f4d5617a1ffa9fb",
+    "mtime": 1790018166.6943913,
+    "seen": 1790070541.795329,
+    "ast_hash": "8d009c1590aa1bf1ea343f4ace7fc2fd",
     "semantic_hash": ""
   },
   "app/Http/Requests/Validations/RefundRequest.php": {
@@ -3228,15 +3228,15 @@
     "semantic_hash": ""
   },
   "app/Http/Resources/InventoryLightResource.php": {
-    "mtime": 1764263448.0,
-    "seen": 1788423346.2644975,
-    "ast_hash": "edae80421c26ee9f5e15ef4982a137b5",
+    "mtime": 1790018137.5875218,
+    "seen": 1790070541.8060114,
+    "ast_hash": "36b16720cebfaf2405b3d1e0aab7de3d",
     "semantic_hash": ""
   },
   "app/Http/Resources/InventoryResource.php": {
-    "mtime": 1781103728.0,
-    "seen": 1788423346.2644985,
-    "ast_hash": "2aae0e018a144fd3fee17d092b91d46a",
+    "mtime": 1790018133.6295452,
+    "seen": 1790070541.8060129,
+    "ast_hash": "87099fb0fb3407689fa2fbec623e9019",
     "semantic_hash": ""
   },
   "app/Http/Resources/ItemLightResource.php": {
@@ -3474,9 +3474,9 @@
     "semantic_hash": ""
   },
   "app/Http/Resources/VendorShopConfigResource.php": {
-    "mtime": 1789136245.5148287,
-    "seen": 1789162009.402482,
-    "ast_hash": "4799dd2b299d8393bdad6bfb9c31e37c",
+    "mtime": 1790018157.8264306,
+    "seen": 1790070541.811021,
+    "ast_hash": "c5df18d617611cfa50fccf7a4e9eab6f",
     "semantic_hash": ""
   },
   "app/Http/Resources/WarehouseLightResource.php": {
@@ -5322,9 +5322,9 @@
     "semantic_hash": ""
   },
   "app/Repositories/Inventory/EloquentInventory.php": {
-    "mtime": 1790014081.777939,
-    "seen": 1790017949.1807141,
-    "ast_hash": "77cb3b91cb3cf3bb3147be57453bbe8c",
+    "mtime": 1790018175.5629885,
+    "seen": 1790070541.845808,
+    "ast_hash": "7591c998ef444fcb69d93b2838e08909",
     "semantic_hash": ""
   },
   "app/Repositories/Inventory/InventoryRepository.php": {
@@ -14466,9 +14466,9 @@
     "semantic_hash": ""
   },
   "packages/affiliate/resources/views/backend/index.blade.php": {
-    "mtime": 1790014716.725162,
-    "seen": 1790017949.3154168,
-    "ast_hash": "e629c77d7603b2d0437d6e8ea4fd3431",
+    "mtime": 1790063071.826139,
+    "seen": 1790070542.0678456,
+    "ast_hash": "6e67204854a764f499b7303fbc9ca057",
     "semantic_hash": ""
   },
   "packages/affiliate/resources/views/backend/master_layout.blade.php": {
@@ -14928,9 +14928,9 @@
     "semantic_hash": ""
   },
   "packages/liveChat/database/seeds/ChatSeeder.php": {
-    "mtime": 1703390918.0,
-    "seen": 1788423346.2670817,
-    "ast_hash": "fc8e3262f1f1e88ef0a78252b0df9baf",
+    "mtime": 1790070450.4452286,
+    "seen": 1790070542.0795066,
+    "ast_hash": "576aa9f3607057ceb1a992b72348f800",
     "semantic_hash": ""
   },
   "packages/liveChat/manifest.json": {
@@ -15108,15 +15108,15 @@
     "semantic_hash": ""
   },
   "packages/liveChat/resources/views/livechat.blade.php": {
-    "mtime": 1790017635.952492,
-    "seen": 1790017949.3236551,
-    "ast_hash": "2dff083db133d2da8b4337f8b0aa52ee",
+    "mtime": 1790060539.6526353,
+    "seen": 1790070542.0841935,
+    "ast_hash": "ec7d389bf2f09a0991028bda50627802",
     "semantic_hash": ""
   },
   "packages/liveChat/routes/web.php": {
-    "mtime": 1788802910.1925092,
-    "seen": 1788884161.6333923,
-    "ast_hash": "4d9b4f46c5a0d1352d8fe0e5e778c1a0",
+    "mtime": 1790060275.9120874,
+    "seen": 1790070542.084716,
+    "ast_hash": "5d8a07b6df22f25066d93bd501f6a631",
     "semantic_hash": ""
   },
   "packages/liveChat/src/Helpers/functions.php": {
@@ -15138,15 +15138,15 @@
     "semantic_hash": ""
   },
   "packages/liveChat/src/Http/Controllers/ChatController.php": {
-    "mtime": 1789967533.8176434,
-    "seen": 1790017949.323932,
-    "ast_hash": "2eeb0044516e794532b3acf79c2bf145",
+    "mtime": 1790060331.1339438,
+    "seen": 1790070542.0850635,
+    "ast_hash": "cae129f71fea1b7edf2e701014d3aeb1",
     "semantic_hash": ""
   },
   "packages/liveChat/src/Http/Requests/ChatConversationRequest.php": {
-    "mtime": 1703390920.0,
-    "seen": 1788423346.2671103,
-    "ast_hash": "9d95ba70dd65a8e81dfc3f0322284d12",
+    "mtime": 1790059322.1611528,
+    "seen": 1790070542.0850668,
+    "ast_hash": "22ec500411e204f95452d87b688efb50",
     "semantic_hash": ""
   },
   "packages/liveChat/src/Http/Requests/SaveChatConversationRequest.php": {
@@ -15174,9 +15174,9 @@
     "semantic_hash": ""
   },
   "packages/liveChat/src/Policies/ChatConversationPolicy.php": {
-    "mtime": 1789316950.2407901,
-    "seen": 1789580904.1390195,
-    "ast_hash": "b0a260ce33858de7a814bc5fc483366c",
+    "mtime": 1790070453.6160223,
+    "seen": 1790070542.085509,
+    "ast_hash": "3cfcb631128aeb9b7f2d68f4fe4a17da",
     "semantic_hash": ""
   },
   "packages/liveChat/src/Uninstaller.php": {
@@ -17532,9 +17532,9 @@
     "semantic_hash": ""
   },
   "public/themes/default/views/contents/messages.blade.php": {
-    "mtime": 1789578458.4212909,
-    "seen": 1789580904.190415,
-    "ast_hash": "91fb367b415595b0049d93c0e10cbd55",
+    "mtime": 1790020340.8198533,
+    "seen": 1790070542.130376,
+    "ast_hash": "ab0434b1a1a72b5c333870264dc46195",
     "semantic_hash": ""
   },
   "public/themes/default/views/contents/offer_page.blade.php": {
@@ -18552,9 +18552,9 @@
     "semantic_hash": ""
   },
   "resources/lang/en/theme.php": {
-    "mtime": 1789993551.495766,
-    "seen": 1790017949.3732316,
-    "ast_hash": "94e18e288f6e20589ff28dc37a7e7ad7",
+    "mtime": 1790059502.3359902,
+    "seen": 1790070542.1493647,
+    "ast_hash": "aff2e9037647bbb8aee9b50f6c1b77c4",
     "semantic_hash": ""
   },
   "resources/lang/en/validation.php": {
@@ -22176,9 +22176,9 @@
     "semantic_hash": ""
   },
   "resources/views/merchant/partials/sidebar_menu.blade.php": {
-    "mtime": 1789842806.854082,
-    "seen": 1790017949.4327695,
-    "ast_hash": "3a4a9997b11fbb8e982d72b22a953325",
+    "mtime": 1790070454.7435594,
+    "seen": 1790070542.2203553,
+    "ast_hash": "fc0d5f184dd4c7feed32aa54552dd3cf",
     "semantic_hash": ""
   },
   "resources/views/merchant/partials/subscription_notice.blade.php": {
@@ -23094,9 +23094,9 @@
     "semantic_hash": ""
   },
   "routes/api/Vendor.php": {
-    "mtime": 1790017745.7904277,
-    "seen": 1790017949.445457,
-    "ast_hash": "44eea4d4614376ab77b2224cb667b290",
+    "mtime": 1790018191.4947486,
+    "seen": 1790070542.2367885,
+    "ast_hash": "a3a9aa1778ec354b9bd7b49496d58703",
     "semantic_hash": ""
   },
   "routes/channels.php": {
@@ -23184,9 +23184,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1790009279.7641232,
-    "seen": 1790017949.4465854,
-    "ast_hash": "ffd08be19e1202165f14b152f93f536f",
+    "mtime": 1790059829.1803987,
+    "seen": 1790070542.239109,
+    "ast_hash": "2341321b06627ebbaafd3aa2491019b1",
     "semantic_hash": ""
   },
   "scripts/fix_admin_card_classes.php": {
@@ -25752,9 +25752,9 @@
     "semantic_hash": ""
   },
   "packages/liveChat/resources/views/partials/livechat_styles.blade.php": {
-    "mtime": 1790017138.4306295,
-    "seen": 1790017949.323841,
-    "ast_hash": "5dd2c07efb190b8e06de5cc67503fbc9",
+    "mtime": 1790018309.2596412,
+    "seen": 1790070542.084713,
+    "ast_hash": "3e28b7dac9ed20e4296d63127656c937",
     "semantic_hash": ""
   },
   "resources/views/merchant/config/partials/_shipping_settings.blade.php": {
@@ -25950,9 +25950,9 @@
     "semantic_hash": ""
   },
   "packages/liveChat/src/Http/Controllers/CustomerChatController.php": {
-    "mtime": 1789901925.875674,
-    "seen": 1790017949.3239334,
-    "ast_hash": "9a83f521a3f5cf4d15f944f0906ec87a",
+    "mtime": 1790020359.0679011,
+    "seen": 1790070542.0850651,
+    "ast_hash": "a204d9e306ea3cf45fa80a68e1e21763",
     "semantic_hash": ""
   },
   "public/themes/default/views/sections/featured_products.blade.php": {
@@ -27549,6 +27549,12 @@
     "mtime": 1789902254.073425,
     "seen": 1790017949.4475589,
     "ast_hash": "0204d5b05f39f66b4cfe06712aa8c1d7",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_09_22_150000_seed_chat_conversation_permissions.php": {
+    "mtime": 1790070447.735407,
+    "seen": 1790070541.8933668,
+    "ast_hash": "bb338b1a83b2e656d5492cfbcea56475",
     "semantic_hash": ""
   }
 }

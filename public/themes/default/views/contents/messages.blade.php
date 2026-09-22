@@ -72,8 +72,8 @@
           @empty
             <div class="cpc__empty-list">
               <i class="fas fa-comments"></i>
-              <p>{{ trans('theme.empty_inbox') ?? 'Your inbox is empty' }}</p>
-              <span>{{ trans('theme.start_chat_hint') ?? 'Message a seller from a product or store page.' }}</span>
+              <p>{{ __('theme.empty_inbox') }}</p>
+              <span>{{ __('theme.start_chat_hint') }}</span>
             </div>
           @endforelse
         </div>
@@ -82,8 +82,8 @@
       <section class="cpc__thread" id="chatConversation">
         <div class="cpc__placeholder">
           <div class="cpc__placeholder-icon"><i class="fas fa-comments"></i></div>
-          <h3>{{ trans('theme.select_conversation') ?? 'Select a conversation' }}</h3>
-          <p>{{ trans('theme.select_conversation_hint') ?? 'Pick a seller on the left to continue chatting.' }}</p>
+          <h3>{{ __('theme.select_conversation') }}</h3>
+          <p>{{ __('theme.select_conversation_hint') }}</p>
         </div>
       </section>
     </div>
@@ -256,16 +256,17 @@
       var body = '';
       if (share && share._shareType === 'order') {
         var line = [share.total, share.status].filter(Boolean).join(' · ');
+        var orderHref = share.order_id ? ('/order/' + encodeURIComponent(share.order_id)) : (share.url || '#');
         body = '<div class="cpc-share cpc-share--order">' +
           (share.image ? '<img src="' + esc(share.image) + '" alt="">' : '') +
           '<div><div class="cpc-share__title">' + esc(share.title || ('Order #' + (share.order_number || ''))) + '</div>' +
           (line ? '<div class="cpc-share__price">' + esc(line) + '</div>' : '') +
-          '<a href="' + esc(share.url || '#') + '" target="_blank" rel="noopener">View order</a></div></div>';
+          '<a href="' + esc(orderHref) + '">{{ __('theme.view_order') }}</a></div></div>';
       } else if (share) {
         body = '<div class="cpc-share"><img src="' + esc(share.image || '') + '" alt=""><div>' +
           '<div class="cpc-share__title">' + esc(share.title || '') + '</div>' +
           '<div class="cpc-share__price">' + esc(share.price || '') + '</div>' +
-          '<a href="' + esc(share.url || '#') + '" target="_blank" rel="noopener">View</a></div></div>';
+          '<a href="' + esc(share.url || '#') + '">{{ __('theme.view_product') }}</a></div></div>';
       } else {
         body = '<p class="cpc-bubble__text">' + esc(text || '') + '</p>';
       }
@@ -413,11 +414,14 @@
       if (!form || form._cpcBound) return;
       form._cpcBound = true;
 
-      var fileInput = qs('#customerChatFile', form);
+      var fileInput = qs('#customerChatFile', form) || qs('#customerChatFile');
       var preview = qs('#cpc-attach-preview');
       var previewName = qs('#cpc-attach-name');
       var clearBtn = qs('#cpc-attach-clear');
       var backBtn = qs('#cpc-back-list');
+      var composer = qs('.cpc-composer');
+      var productsUrl = composer ? (composer.getAttribute('data-products-url') || null) : null;
+      var ordersUrl = composer ? (composer.getAttribute('data-orders-url') || null) : null;
 
       if (backBtn) backBtn.addEventListener('click', function () { setThreadOpen(false); });
       if (fileInput) {
@@ -451,6 +455,233 @@
         ta.focus();
       }
       bindQuoteUi();
+      bindAttachMenu(form, fileInput, productsUrl, ordersUrl);
+    }
+
+    function bindAttachMenu(form, fileInput, productsUrl, ordersUrl) {
+      var attachToggle = qs('#cpc-attach-toggle');
+      var attachMenu = qs('#cpc-attach-menu');
+      if (!attachToggle || !attachMenu || attachToggle._cpcBound) return;
+      attachToggle._cpcBound = true;
+
+      function closeMenu() {
+        attachMenu.hidden = true;
+        attachToggle.setAttribute('aria-expanded', 'false');
+      }
+      function openMenu() {
+        attachMenu.hidden = false;
+        attachToggle.setAttribute('aria-expanded', 'true');
+      }
+
+      attachToggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (attachMenu.hidden) openMenu(); else closeMenu();
+      });
+      document.addEventListener('click', function (e) {
+        if (attachMenu.hidden) return;
+        if (attachMenu.contains(e.target) || attachToggle.contains(e.target)) return;
+        closeMenu();
+      });
+
+      var pickerModal = qs('#cpc-picker-modal');
+      var pickerTitle = qs('#cpc-picker-title');
+      var pickerSearch = qs('#cpc-picker-search');
+      var pickerList = qs('#cpc-picker-list');
+      var pickerItems = [];
+      var pickerMode = null;
+      var pickerSearchDebounce = null;
+      var shareOrderLabel = @json(__('theme.share_order'));
+      var shareProductLabel = @json(__('theme.chat_share_product'));
+
+      function closePicker() {
+        if (pickerModal) pickerModal.hidden = true;
+      }
+      var pickerClose = qs('#cpc-picker-close');
+      if (pickerClose && !pickerClose._cpcBound) {
+        pickerClose._cpcBound = true;
+        pickerClose.addEventListener('click', closePicker);
+      }
+      if (pickerModal && !pickerModal._cpcBound) {
+        pickerModal._cpcBound = true;
+        pickerModal.addEventListener('click', function (e) {
+          if (e.target === pickerModal) closePicker();
+        });
+      }
+
+      function renderPickerList(items) {
+        if (!pickerList) return;
+        pickerList.innerHTML = '';
+        if (!items.length) {
+          pickerList.innerHTML = '<p class="cpc-picker__empty">Nothing found.</p>';
+          return;
+        }
+        items.forEach(function (item, idx) {
+          var row = document.createElement('button');
+          row.type = 'button';
+          row.className = 'cpc-picker__row';
+          row.setAttribute('data-idx', String(idx));
+          var title = pickerMode === 'order' ? (item.title || ('Order #' + (item.order_number || ''))) : (item.title || '');
+          var sub = pickerMode === 'order' ? [item.total, item.status].filter(Boolean).join(' · ') : (item.price || '');
+          row.innerHTML = (item.image ? '<img src="' + esc(item.image) + '" alt="">' : '<span class="cpc-picker__noimg"><i class="fas fa-image"></i></span>') +
+            '<span class="cpc-picker__body"><span class="cpc-picker__title">' + esc(title) + '</span>' +
+            '<span class="cpc-picker__sub">' + esc(sub) + '</span></span>';
+          pickerList.appendChild(row);
+        });
+      }
+
+      function fetchPickerItems(term) {
+        var url = pickerMode === 'order' ? ordersUrl : productsUrl;
+        if (!url) {
+          if (pickerList) pickerList.innerHTML = '<p class="cpc-picker__empty">Not available.</p>';
+          return;
+        }
+        if (term) { url += (url.indexOf('?') === -1 ? '?' : '&') + 'q=' + encodeURIComponent(term); }
+        fetch(url, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
+          .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function (json) {
+            pickerItems = (json && json.data) || [];
+            renderPickerList(pickerItems);
+          })
+          .catch(function () {
+            if (pickerList) pickerList.innerHTML = '<p class="cpc-picker__empty">Could not load.</p>';
+          });
+      }
+
+      function openPickerModal(mode) {
+        pickerMode = mode;
+        if (pickerTitle) pickerTitle.textContent = mode === 'order' ? shareOrderLabel : shareProductLabel;
+        if (pickerSearch) {
+          pickerSearch.value = '';
+          pickerSearch.hidden = false;
+          pickerSearch.placeholder = mode === 'order' ? 'Search by order number…' : 'Search…';
+        }
+        pickerItems = [];
+        renderPickerList([]);
+        if (pickerModal) pickerModal.hidden = false;
+        fetchPickerItems('');
+      }
+
+      if (pickerSearch && !pickerSearch._cpcBound) {
+        pickerSearch._cpcBound = true;
+        pickerSearch.addEventListener('input', function () {
+          var term = pickerSearch.value.trim();
+          if (pickerSearchDebounce) clearTimeout(pickerSearchDebounce);
+          pickerSearchDebounce = setTimeout(function () { fetchPickerItems(term); }, 300);
+        });
+      }
+
+      if (pickerList && !pickerList._cpcBound) {
+        pickerList._cpcBound = true;
+        pickerList.addEventListener('click', function (e) {
+          var row = e.target.closest('.cpc-picker__row');
+          if (!row) return;
+          var idx = parseInt(row.getAttribute('data-idx'), 10);
+          var item = pickerItems[idx];
+          if (!item) return;
+          closePicker();
+          sendSharedItem(form, item, pickerMode === 'order' ? 'order_share' : 'product_share');
+        });
+      }
+
+      attachMenu.addEventListener('click', function (e) {
+        var btn = e.target.closest('.cpc-attach-menu__item');
+        if (!btn || btn.disabled) return;
+        closeMenu();
+        var action = btn.getAttribute('data-action');
+        if (action === 'media') {
+          if (fileInput) fileInput.click();
+        } else if (action === 'product') {
+          openPickerModal('product');
+        } else if (action === 'order') {
+          openPickerModal('order');
+        }
+      });
+    }
+
+    function sendSharedItem(form, item, type) {
+      if (sending || !form || !item || !type) return;
+      var prefix = type === 'order_share' ? '[order_share]' : '[product_share]';
+      var msg = prefix + JSON.stringify(item);
+      var url = form.getAttribute('action') || (qs('.cpc-composer') || {}).getAttribute('data-reply-url');
+      if (!url) {
+        showError('Missing reply URL. Reload the page.');
+        return;
+      }
+
+      sending = true;
+      showError('');
+      var btn = qs('#send-btn', form);
+      if (btn) btn.disabled = true;
+
+      var head = qs('.cpc-thread__head');
+      var conversationId = head ? (head.getAttribute('data-conversation-id') || String(head.id || '').replace('openChatbox-', '')) : '';
+      var shopId = head ? (head.getAttribute('data-shop-id') || '') : '';
+      var nowIso = new Date().toISOString();
+      var box = qs('#conversationBox');
+      var quoted = currentQuote();
+
+      ensureDay(nowIso);
+      var pending = document.createElement('div');
+      pending.innerHTML = bubbleHtml(msg, true, {
+        pending: true,
+        createdAt: nowIso,
+        time: clock(nowIso),
+        quoted: quoted,
+        quoteName: 'You',
+        quoteText: previewText(msg)
+      });
+      var pendingNode = pending.firstChild;
+      if (box && pendingNode) box.appendChild(pendingNode);
+      scrollBox();
+
+      var fd = new FormData();
+      fd.append('message', msg);
+      fd.append('type', type);
+      fd.append('payload', JSON.stringify(item));
+      fd.append('_token', csrf || (qs('input[name="_token"]', form) || {}).value || '');
+      if (quoted && quoted.id) fd.append('parent_id', String(quoted.id));
+
+      updateRowPreview(conversationId, shopId, msg, clock(nowIso));
+
+      fetch(url, {
+        method: 'POST',
+        body: fd,
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf }
+      }).then(function (res) {
+        return res.text().then(function (text) {
+          var data = null;
+          try { data = JSON.parse(text); } catch (e) {}
+          return { ok: res.ok, status: res.status, data: data };
+        });
+      }).then(function (result) {
+        sending = false;
+        if (btn) btn.disabled = false;
+        if (!result.ok) {
+          if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
+          showError('Could not send (HTTP ' + result.status + '). Try again.');
+          return;
+        }
+        var data = result.data || {};
+        clearQuote();
+        if (pendingNode) {
+          pendingNode.removeAttribute('data-pending');
+          if (data.reply_id) pendingNode.setAttribute('data-reply-id', String(data.reply_id));
+          if (data.created_at) pendingNode.setAttribute('data-created-at', data.created_at);
+          var t = pendingNode.querySelector('time');
+          if (t) t.textContent = data.time || clock(data.created_at);
+        }
+        scrollBox();
+      }).catch(function () {
+        sending = false;
+        if (btn) btn.disabled = false;
+        if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
+        showError('Network error. Message not sent.');
+      });
     }
 
     function sendReply(form) {

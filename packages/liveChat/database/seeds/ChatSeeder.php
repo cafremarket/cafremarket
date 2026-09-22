@@ -1,10 +1,8 @@
 <?php
 
-namespace Incevio\Package\Packaging\Database\Seeds;
+namespace Incevio\Package\LiveChat\Database\Seeds;
 
-use Carbon\Carbon;
 use App\Helpers\PackageSeeder;
-use Illuminate\Support\Facades\DB;
 
 class ChatSeeder extends PackageSeeder
 {
@@ -15,7 +13,7 @@ class ChatSeeder extends PackageSeeder
      */
     public function run()
     {
-        // Seed Permissions
+        // Seed Permissions (also covered by migration seed_chat_conversation_permissions)
         $actions = 'view,reply';
         $this->seedPermissions('Chat Conversation', 'Merchant', $actions);
     }

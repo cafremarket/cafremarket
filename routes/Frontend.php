@@ -91,9 +91,22 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         ShopController::class, 'reviews',
     ])->name('shop.reviews');
 
+    // Must be registered BEFORE shop/{shop}/{slug} — that product route used to
+    // allow "/" in {slug} (.*), so /shop/{id}/chat/products was swallowed and
+    // the Share Product / Share Order pickers returned HTML ("Could not load").
+    Route::middleware(['auth:customer'])->group(function () {
+        Route::get('shop/{shop}/chat/products', [
+            ConversationController::class, 'shopProductsForChat',
+        ])->name('chat.products');
+
+        Route::get('shop/{shop}/chat/orders', [
+            ConversationController::class, 'myOrdersForChat',
+        ])->name('chat.orders');
+    });
+
     Route::get('shop/{shop}/{slug}', [
         HomeController::class, 'product',
-    ])->where('slug', '^(?!products$|reviews$|category$).*$')->name('show.product');
+    ])->where('slug', '^(?!products$|reviews$|category$|chat$)[^/]+$')->name('show.product');
 
     Route::get('categories', [
         HomeController::class, 'categories',
@@ -192,15 +205,6 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         Route::post('contact/{slug}', [
             ConversationController::class, 'contact',
         ])->name('seller.contact');
-
-        // Web chat "Share Product" / "Share Order" pickers (customer dashboard + storefront widget).
-        Route::get('shop/{shop}/chat/products', [
-            ConversationController::class, 'shopProductsForChat',
-        ])->name('chat.products');
-
-        Route::get('shop/{shop}/chat/orders', [
-            ConversationController::class, 'myOrdersForChat',
-        ])->name('chat.orders');
 
         Route::get('message/{message}/archive', [
             ConversationController::class, 'archive',

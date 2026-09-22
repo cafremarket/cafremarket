@@ -10,9 +10,14 @@ class ChatConversationPolicy
 {
     /**
      * Determine whether the user can view chat conversations.
+     * Shop owners always can (same pattern as Orders); staff need the slug.
      */
     public function index(User $user)
     {
+        if ($user->isMerchant() && $user->merchantId()) {
+            return true;
+        }
+
         return (new Authorize($user, 'view_chat_conversation'))->check();
     }
 
@@ -21,6 +26,10 @@ class ChatConversationPolicy
      */
     public function reply(User $user)
     {
+        if ($user->isMerchant() && $user->merchantId()) {
+            return true;
+        }
+
         return (new Authorize($user, 'reply_chat_conversation'))->check();
     }
 }

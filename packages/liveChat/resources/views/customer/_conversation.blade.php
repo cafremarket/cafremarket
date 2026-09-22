@@ -75,12 +75,23 @@
       $shareType = null;
       $share = null;
       $rawText = is_string($item['text']) ? $item['text'] : '';
-      if (str_starts_with($rawText, $orderSharePrefix)) {
+      if (in_array($item['type'] ?? null, ['order_share', 'product_share'], true) && is_array($item['payload'] ?? null)) {
+          $share = $item['payload'];
+          $shareType = ($item['type'] === 'order_share') ? 'order' : 'product';
+      } elseif (str_starts_with($rawText, $orderSharePrefix)) {
           $share = json_decode(substr($rawText, strlen($orderSharePrefix)), true);
           $shareType = 'order';
       } elseif (str_starts_with($rawText, $productSharePrefix)) {
           $share = json_decode(substr($rawText, strlen($productSharePrefix)), true);
           $shareType = 'product';
+      }
+      $shareHref = '#';
+      if (is_array($share)) {
+          if ($shareType === 'order' && !empty($share['order_id'])) {
+              $shareHref = route('order.detail', $share['order_id']);
+          } elseif (!empty($share['url'])) {
+              $shareHref = $share['url'];
+          }
       }
       $plain = trim($rawText);
       $atts = $item['attachments'] instanceof \Illuminate\Support\Collection
@@ -131,7 +142,7 @@
                 @if (!empty($share['total']) && !empty($share['status'])) · @endif
                 @if (!empty($share['status'])){{ $share['status'] }}@endif
               </div>
-              <a href="{{ $share['url'] ?? '#' }}" target="_blank" rel="noopener">View order</a>
+              <a href="{{ $shareHref }}">{{ __('theme.view_order') }}</a>
             </div>
           </div>
         @elseif (is_array($share))
@@ -140,7 +151,7 @@
             <div>
               <div class="cpc-share__title">{{ $share['title'] ?? '' }}</div>
               <div class="cpc-share__price">{{ $share['price'] ?? '' }}</div>
-              <a href="{{ $share['url'] ?? '#' }}" target="_blank" rel="noopener">View</a>
+              <a href="{{ $shareHref }}">{{ __('theme.view_product') }}</a>
             </div>
           </div>
         @else
@@ -190,15 +201,15 @@
   <div id="cpc-attach-menu" class="cpc-attach-menu" hidden>
     <button type="button" class="cpc-attach-menu__item" data-action="media">
       <span class="cpc-attach-menu__icon"><i class="fas fa-image"></i></span>
-      <span>{{ trans('theme.media') ?? 'Media' }}</span>
+      <span class="cpc-attach-menu__label">{{ __('theme.media') }}</span>
     </button>
     <button type="button" class="cpc-attach-menu__item" data-action="product" @unless($chatProductsUrl) disabled @endunless>
       <span class="cpc-attach-menu__icon"><i class="fas fa-shopping-bag"></i></span>
-      <span>{{ trans('theme.share_product') ?? 'Share Product' }}</span>
+      <span class="cpc-attach-menu__label">{{ __('theme.chat_share_product') }}</span>
     </button>
     <button type="button" class="cpc-attach-menu__item" data-action="order" @unless($chatOrdersUrl) disabled @endunless>
       <span class="cpc-attach-menu__icon"><i class="fas fa-receipt"></i></span>
-      <span>{{ trans('theme.share_order') ?? 'Share Order' }}</span>
+      <span class="cpc-attach-menu__label">{{ __('theme.share_order') }}</span>
     </button>
   </div>
 
@@ -208,7 +219,7 @@
     <button type="button" class="cpc-composer__attach" id="cpc-attach-toggle" title="{{ trans('theme.attachment') ?? 'Attach' }}" aria-haspopup="true" aria-expanded="false">
       <i class="fas fa-plus"></i>
     </button>
-    <input type="file" id="customerChatFile" name="photo" accept="image/*,.pdf,.doc,.docx" hidden>
+    <input type="file" id="customerChatFile" class="cpc-composer__file" name="photo" accept="image/*,.pdf,.doc,.docx" hidden>
     <textarea id="message" name="message" rows="1" placeholder="{{ trans('theme.placeholder.message') ?? 'Write a message…' }}" maxlength="5000"></textarea>
     <button type="submit" class="cpc-composer__send" id="send-btn" aria-label="Send">
       <i class="fas fa-paper-plane"></i>
@@ -220,7 +231,7 @@
 <div id="cpc-picker-modal" class="cpc-modal" hidden>
   <div class="cpc-modal__card">
     <div class="cpc-modal__head">
-      <strong id="cpc-picker-title">{{ trans('theme.share_product') ?? 'Share a product' }}</strong>
+      <strong id="cpc-picker-title">{{ __('theme.chat_share_product') }}</strong>
       <button type="button" class="cpc-modal__close" id="cpc-picker-close" aria-label="Close">&times;</button>
     </div>
     <div class="cpc-modal__body">
@@ -268,12 +279,76 @@
   .cpc-composer__form textarea { flex: 1; resize: none; border: 1px solid #e2e8f0; border-radius: 18px; padding: 8px 14px; max-height: 90px; font: inherit; }
   .cpc-composer__error { color: #dc2626; font-size: 12px; margin: 0; }
   .cpc-composer__preview, .cpc-quote-preview { display: flex; align-items: center; gap: 8px; background: #f1f5f9; border-radius: 10px; padding: 6px 10px; font-size: 12px; }
-  .cpc-attach-menu { position: absolute; bottom: 100%; left: 12px; margin-bottom: 8px; background: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(15,23,42,.18); padding: 10px; display: grid; grid-template-columns: repeat(3, 64px); gap: 10px; z-index: 5; }
-  .cpc-attach-menu__item { border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: #475569; cursor: pointer; }
+  .cpc-composer__preview[hidden],
+  .cpc-quote-preview[hidden] { display: none !important; }
+  /* Beat vendors.css input[type=file]{display:block} that shows a native "Choose File" next to the composer */
+  input.cpc-composer__file[type="file"],
+  #customerChatFile[type="file"] {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
+  }
+  .cpc-attach-menu {
+    position: absolute;
+    bottom: 100%;
+    left: 12px;
+    margin-bottom: 8px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(15,23,42,.18);
+    padding: 12px 10px 10px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(76px, 1fr));
+    gap: 8px 12px;
+    min-width: 260px;
+    z-index: 20;
+    overflow: visible;
+  }
+  .cpc-attach-menu[hidden] { display: none !important; }
+  .cpc-attach-menu__item {
+    border: 0;
+    background: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 0 2px;
+    min-width: 0;
+    width: 100%;
+    font-size: 11px;
+    line-height: 1.25;
+    color: #475569;
+    cursor: pointer;
+  }
   .cpc-attach-menu__item:disabled { opacity: .4; cursor: not-allowed; }
-  .cpc-attach-menu__icon { width: 44px; height: 44px; border-radius: 50%; background: #f1f5f9; color: #ff6600; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .cpc-attach-menu__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #ff6600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .cpc-attach-menu__label {
+    display: block;
+    width: 100%;
+    max-width: 84px;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.2;
+  }
   .cpc-modal { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-  .cpc-modal[hidden] { display: none; }
+  .cpc-modal[hidden] { display: none !important; }
   .cpc-modal__card { width: min(360px, 92vw); max-height: 80vh; overflow: auto; background: #fff; border-radius: 16px; padding: 0; }
   .cpc-modal__head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #e2e8f0; }
   .cpc-modal__close { border: 0; background: none; font-size: 18px; cursor: pointer; color: #64748b; }
@@ -295,6 +370,14 @@
 <script>
 (function () {
   'use strict';
+
+  // When loaded inside the customer Messages inbox (#customer-chatbox), the parent
+  // page owns composer / attach-menu JS (AJAX innerHTML does not run this script).
+  if (document.getElementById('customer-chatbox')) {
+    var boxOnly = document.getElementById('conversationBox');
+    if (boxOnly) boxOnly.scrollTop = boxOnly.scrollHeight;
+    return;
+  }
 
   var composer = document.querySelector('.cpc-composer');
   if (!composer) { return; }
@@ -359,11 +442,13 @@
       var share = meta.payload;
       var isOrder = meta.type === 'order_share';
       var sub = isOrder ? [share.total, share.status].filter(Boolean).join(' · ') : (share.price || '');
+      var href = (isOrder && share.order_id) ? ('/order/' + encodeURIComponent(share.order_id)) : (share.url || '#');
+      var linkLabel = isOrder ? @json(__('theme.view_order')) : @json(__('theme.view_product'));
       body = '<div class="cpc-share' + (isOrder ? ' cpc-share--order' : '') + '">' +
         (share.image ? '<img src="' + esc(share.image) + '" alt="">' : '') +
         '<div><div class="cpc-share__title">' + esc(share.title || (isOrder ? ('Order #' + (share.order_number || '')) : '')) + '</div>' +
         '<div class="cpc-share__price">' + esc(sub) + '</div>' +
-        '<a href="' + esc(share.url || '#') + '" target="_blank" rel="noopener">' + (isOrder ? 'View order' : 'View') + '</a></div></div>';
+        '<a href="' + esc(href) + '">' + esc(linkLabel) + '</a></div></div>';
     } else {
       var plain = String(text || '').trim();
       if (plain && plain !== '[attachment]') {
@@ -568,7 +653,10 @@
     }
     if (term) { url += (url.indexOf('?') === -1 ? '?' : '&') + 'q=' + encodeURIComponent(term); }
     fetch(url, { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
-      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
       .then(function (json) {
         pickerItems = (json && json.data) || [];
         renderPickerList(pickerItems);
@@ -580,7 +668,7 @@
 
   function openPickerModal(mode) {
     pickerMode = mode;
-    if (pickerTitle) pickerTitle.textContent = mode === 'order' ? 'Share an order' : 'Share a product';
+    if (pickerTitle) pickerTitle.textContent = mode === 'order' ? @json(__('theme.share_order')) : @json(__('theme.chat_share_product'));
     if (pickerSearch) { pickerSearch.value = ''; pickerSearch.hidden = false; pickerSearch.placeholder = mode === 'order' ? 'Search by order number…' : 'Search…'; }
     pickerItems = [];
     renderPickerList([]);
