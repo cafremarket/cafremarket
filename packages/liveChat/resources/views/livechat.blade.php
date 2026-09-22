@@ -849,6 +849,8 @@
         switch (httpStatus) {
           case 200:
             clearAttachmentPreview();
+            // First message: remove welcome / hint so only the real thread shows.
+            $('#chat_conversation .chat_welcome_bubble, #chat_conversation .chat_start_hint').remove();
             if (pendingNode && pendingNode.length) {
               pendingNode.removeAttr('data-pending');
               if (body && body.reply_id) {
@@ -862,8 +864,7 @@
               }
             }
             shouldAppendResponse = false;
-            // Soft refresh once so history stays consistent — no double optimistic+history bubble.
-            setTimeout(loadOldChat, 350);
+            // Do not soft-refresh via loadOldChat — that was wiping first messages.
             break;
 
           case 401:
@@ -1035,7 +1036,7 @@
         }
       }
 
-      //Load Old Chats
+      // Load conversation history — empty thread = first-time welcome (not an error).
       function loadOldChat() {
         var loadTimedOut = false;
         var loadTimer = setTimeout(function() {
@@ -1043,31 +1044,42 @@
           showChatLoadError(0, null);
         }, 12000);
 
-        function showWelcomePrompt() {
-          var response = $('<span>').addClass('chat_msg_item chat_msg_item_admin').text("{!! trans('theme.chat_welcome') !!}");
-          agent_avatar.clone().prependTo(response);
-          $("#chat_conversation").html('').append(response);
+        var historyUrl = @json(route('chat.conversation', $shop->slug ?: $shop->id));
+
+        function showWelcomePrompt(welcomeText, hintText) {
+          var $box = $("#chat_conversation");
+          $box.html('');
+          var welcome = welcomeText || @json(trans('theme.chat_welcome'));
+          var hint = hintText || @json(trans('theme.chat_start_hint'));
+          var $bubble = $('<span>').addClass('chat_msg_item chat_msg_item_admin chat_welcome_bubble').text(welcome);
+          agent_avatar.clone().prependTo($bubble);
+          $box.append($bubble);
+          if (hint) {
+            $box.append($('<p>').addClass('chat_start_hint text-muted').css({
+              'text-align': 'center',
+              'font-size': '12px',
+              'margin': '10px 12px 0',
+              'opacity': '0.85'
+            }).text(hint));
+          }
           updateScroll();
         }
 
         function showChatLoadError(status, payload) {
           var $box = $('#chat_conversation');
-          // Guests always get a 403 here (history requires a logged-in customer) —
-          // leave the "please login" prompt alone, that's expected, not a failure.
           if ($box.find('.chat_login_prompt').length) return;
-          // Only replace the placeholder — never stomp a conversation that
-          // already loaded (e.g. a slow retry resolving after a fresh poll).
-          if ($box.find('.chat_msg_item, .chat-day-sep').length) return;
+          if ($box.find('.chat_msg_item:not(.chat_welcome_bubble), .chat-day-sep').length) return;
+
+          if (payload && (payload.status === 'empty' || payload.is_new === true)) {
+            showWelcomePrompt(payload.welcome, payload.hint);
+            return;
+          }
 
           var msg = @json(trans('theme.chat_load_failed'));
           var showRetry = true;
 
           if (status === 404) {
-            // No shop / no thread — invite them to start chatting instead of a network error.
-            msg = @json(trans('theme.chat_not_found'));
-            if (payload && payload.code === 'chat_not_found' && payload.message) {
-              msg = String(payload.message);
-            }
+            msg = (payload && payload.message) ? String(payload.message) : @json(trans('theme.chat_not_found'));
             showRetry = false;
           } else if (status === 401 || status === 403 || status === 419) {
             msg = @json(trans('theme.session_expired'));
@@ -1087,79 +1099,82 @@
                 loadOldChat();
               }).appendTo($err);
           } else {
-            // 404: keep composer usable — welcome bubble so they can still send the first message.
             $('<button type="button">').addClass('chat-load-retry').text(@json(trans('theme.chat_welcome')))
-              .on('click', function() {
-                showWelcomePrompt();
-              }).appendTo($err);
+              .on('click', function() { showWelcomePrompt(); }).appendTo($err);
           }
           $box.append($err);
         }
 
+        function renderConversation(result) {
+          $("#chat_conversation").html('');
+          var replies = result.replies || [];
+          if (!replies.length) {
+            var legacyAt = result.created_at || new Date().toISOString();
+            ensureStorefrontDaySep(legacyAt);
+            $("#chat_conversation").append(buildChatNode(result.message, false, result.attachments, {
+              createdAt: legacyAt,
+              time: formatChatClock(legacyAt),
+              type: result.type,
+              payload: result.payload,
+            }));
+          } else {
+            var lastDay = null;
+            replies.forEach(function(reply) {
+              var at = reply.created_at || result.updated_at || new Date().toISOString();
+              var day = chatDayKey(at);
+              if (day && day !== lastDay) {
+                lastDay = day;
+                $("#chat_conversation").append(
+                  $('<div>').addClass('chat-day-sep').attr('data-day', day).append(
+                    $('<span>').text(formatChatDayLabel(at))
+                  )
+                );
+              }
+              $("#chat_conversation").append(buildChatNode(reply.reply, !!reply.user_id, reply.attachments, {
+                replyId: reply.id,
+                createdAt: at,
+                time: formatChatClock(at),
+                type: reply.type,
+                payload: reply.payload,
+              }));
+            });
+          }
+          updateScroll();
+        }
+
         $.ajax({
-          url: "{{ route('chat.conversation', $shop->id) }}",
+          url: historyUrl,
           dataType: 'json',
+          cache: false,
           beforeSend: setChatAjaxHeaders,
           success: function(result) {
             clearTimeout(loadTimer);
-            if (loadTimedOut) return; // error UI (with its own retry) already took over
+            if (loadTimedOut) return;
 
-            $("#chat_conversation").html('');
-
-            // Explicit "not found" payload with 200 should not happen; treat empty/null as new chat.
-            if (result && result.code === 'chat_not_found') {
+            if (!result || result.status === 'empty' || result.is_new === true) {
+              if ($('#chat_conversation').find('.chat_msg_item, .chat-day-sep').length) return;
+              showWelcomePrompt(result && result.welcome, result && result.hint);
+              return;
+            }
+            if (result.code === 'chat_not_found') {
               showChatLoadError(404, result);
               return;
             }
-
-            if (result && (result.id || (result.replies && result.replies.length) || result.message)) {
-              var replies = result.replies || [];
-              // conversation.message is an inbox preview (last text) — never render it as a bubble when replies exist.
-              if (!replies.length) {
-                var legacyAt = result.created_at || new Date().toISOString();
-                ensureStorefrontDaySep(legacyAt);
-                $("#chat_conversation").append(buildChatNode(result.message, false, result.attachments, {
-                  createdAt: legacyAt,
-                  time: formatChatClock(legacyAt),
-                  type: result.type,
-                  payload: result.payload,
-                }));
-              } else {
-                var lastDay = null;
-                replies.forEach(function(reply) {
-                  var at = reply.created_at || result.updated_at || new Date().toISOString();
-                  var day = chatDayKey(at);
-                  if (day && day !== lastDay) {
-                    lastDay = day;
-                    $("#chat_conversation").append(
-                      $('<div>').addClass('chat-day-sep').attr('data-day', day).append(
-                        $('<span>').text(formatChatDayLabel(at))
-                      )
-                    );
-                  }
-                  $("#chat_conversation").append(buildChatNode(reply.reply, !!reply.user_id, reply.attachments, {
-                    replyId: reply.id,
-                    createdAt: at,
-                    time: formatChatClock(at),
-                    type: reply.type,
-                    payload: reply.payload,
-                  }));
-                });
-              }
-            } else {
+            var hasHistory = result.id || (result.replies && result.replies.length) || result.message;
+            if (!hasHistory) {
+              if ($('#chat_conversation').find('.chat_msg_item, .chat-day-sep').length) return;
               showWelcomePrompt();
+              return;
             }
-
-            updateScroll();
+            renderConversation(result);
           },
           error: function(xhr) {
             clearTimeout(loadTimer);
             var payload = null;
             try {
               payload = xhr.responseJSON || (xhr.responseText ? JSON.parse(xhr.responseText) : null);
-            } catch (e) {
-              payload = null;
-            }
+            } catch (e) { payload = null; }
+            if ($('#chat_conversation').find('.chat_msg_item, .chat-day-sep').length) return;
             showChatLoadError(xhr && xhr.status ? xhr.status : 0, payload);
           }
         });

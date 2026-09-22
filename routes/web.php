@@ -30,7 +30,8 @@ Route::middleware(['storefront', 'hasCookie'])->group(function () {
         'page', 'product', 'listing', 'shop', 'shops', 'categories', 'category',
         'categorygrp', 'search', 'blog', 'selling', 'customer', 'contact',
         'contact_us', 'message', 'newsletter', 'cart', 'checkout', 'order',
-        'my', 'password', 'register', 'login', 'logout', 'verify', 'socialite',
+        // liveChat package: GET chat/{shop} must not be captured as category/subcategory
+        'chat', 'my', 'password', 'register', 'login', 'logout', 'verify', 'socialite',
         'brand', 'deals', 'admin', 'api', 'merchant', 'vendor', 'test',
         'locale', 'account', 'wishlist', 'compare', 'storage', 'css', 'js',
         'fonts', 'images', 'assets', 'livewire', 'build', 'horizon', 'pulse',

@@ -46,10 +46,13 @@ class ChatController extends Controller
 
     /**
      * Load an existing shop↔customer conversation for the storefront widget.
-     * Returns null (200) when no thread exists yet — frontend shows the welcome prompt.
+     *
+     * First-time (never chatted): HTTP 200 + `{ status: 'empty', is_new: true }`
+     * Existing thread: HTTP 200 + `{ status: 'ok', is_new: false, replies: [...] }`
+     * Unknown shop: HTTP 404 + `{ code: 'chat_not_found' }`
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int|string  $shop  Shop id or slug (resolved manually so missing shops return JSON, not an HTML 404)
+     * @param  int|string  $shop  Shop id or slug
      *
      * @return \Illuminate\Http\Response
      */
@@ -59,40 +62,86 @@ class ChatController extends Controller
 
         if (! $shopModel) {
             return response()->json([
-                'message' => trans('theme.chat_not_found'),
+                'status' => 'error',
                 'code' => 'chat_not_found',
-            ], 404);
+                'message' => trans('theme.chat_not_found'),
+            ], 404)->header('Cache-Control', 'no-store, private');
         }
+
+        $noCache = fn ($payload, int $code = 200) => response()
+            ->json($payload, $code)
+            ->header('Cache-Control', 'no-store, private');
 
         if (! Schema::hasTable('chat_conversations')) {
-            return response()->json(null);
+            return $noCache($this->emptyConversationPayload($shopModel));
         }
 
-        $conversation = ChatConversation::where([
-            'customer_id' => Auth::guard('customer')->id(),
-            'shop_id' => $shopModel->id,
-        ])->with(livechat_replies_eager_load())->first();
+        $customerId = Auth::guard('customer')->id() ?: Auth::guard('api')->id();
 
-        if ($conversation) {
-            try {
-                $conversation->markPeerRepliesAsRead('customer');
-            } catch (\Throwable $e) {
-                report($e);
-            }
+        $conversation = ChatConversation::query()
+            ->where('customer_id', $customerId)
+            ->where('shop_id', $shopModel->id)
+            ->latest('updated_at')
+            ->latest('id')
+            ->first();
 
-            try {
-                $conversation->load(livechat_replies_eager_load());
-            } catch (\Throwable $e) {
-                report($e);
-                $conversation->loadMissing(['replies.attachments']);
-            }
+        // First time — no thread yet. Not an error; widget shows welcome + composer.
+        if (! $conversation) {
+            return $noCache($this->emptyConversationPayload($shopModel));
         }
 
-        return response()->json($conversation);
+        try {
+            $conversation->markPeerRepliesAsRead('customer');
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        try {
+            $rels = livechat_replies_eager_load();
+            $conversation->load([
+                'replies' => function ($q) {
+                    $q->orderBy('id');
+                },
+                'replies.attachments',
+            ]);
+            if (in_array('replies.parent', $rels, true)) {
+                $conversation->load('replies.parent');
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            $conversation->loadMissing(['replies' => function ($q) {
+                $q->orderBy('id');
+            }, 'replies.attachments']);
+        }
+
+        return $noCache(array_merge(
+            ['status' => 'ok', 'is_new' => false],
+            $this->conversationPayload($conversation)
+        ));
+    }
+
+    /**
+     * Payload when customer and shop have never chatted.
+     *
+     * @return array<string, mixed>
+     */
+    protected function emptyConversationPayload(Shop $shop): array
+    {
+        return [
+            'status' => 'empty',
+            'is_new' => true,
+            'id' => null,
+            'shop_id' => (int) $shop->id,
+            'replies' => [],
+            'message' => null,
+            'welcome' => trans('theme.chat_welcome'),
+            'hint' => trans('theme.chat_start_hint'),
+        ];
     }
 
     /**
      * Resolve shop by id or slug without throwing ModelNotFoundException.
+     * Same lookup strategy as save() (slug) plus numeric id for legacy URLs.
      */
     protected function resolveShop($shop): ?Shop
     {
@@ -101,14 +150,65 @@ class ChatController extends Controller
             return null;
         }
 
-        return Shop::query()
-            ->where(function ($q) use ($key) {
-                if (ctype_digit($key)) {
-                    $q->where('id', (int) $key);
+        // Prefer slug (what POST /chat uses), then id.
+        $bySlug = Shop::query()->where('slug', $key)->first();
+        if ($bySlug) {
+            return $bySlug;
+        }
+
+        if (ctype_digit($key)) {
+            return Shop::query()->where('id', (int) $key)->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * Widget-friendly conversation JSON (id, message, replies with user_id/attachments).
+     *
+     * @return array<string, mixed>
+     */
+    protected function conversationPayload(ChatConversation $conversation): array
+    {
+        $replies = [];
+        foreach ($conversation->replies as $reply) {
+            $attachments = [];
+            if ($reply->relationLoaded('attachments')) {
+                foreach ($reply->attachments as $att) {
+                    $attachments[] = [
+                        'id' => $att->id,
+                        'path' => $att->path,
+                        'name' => $att->name,
+                        'extension' => $att->extension,
+                        'url' => get_storage_file_url($att->path),
+                    ];
                 }
-                $q->orWhere('slug', $key);
-            })
-            ->first();
+            }
+
+            $replies[] = [
+                'id' => $reply->id,
+                'reply' => (string) ($reply->reply ?? ''),
+                'user_id' => $reply->user_id,
+                'customer_id' => $reply->customer_id,
+                'created_at' => optional($reply->created_at)->toIso8601String(),
+                'attachments' => $attachments,
+                'type' => method_exists($reply, 'resolvedType') ? $reply->resolvedType() : ($reply->type ?? 'text'),
+                'payload' => method_exists($reply, 'resolvedPayload') ? $reply->resolvedPayload() : ($reply->payload ?? null),
+                'parent_id' => $reply->parent_id ?? null,
+                'quoted_reply' => $reply->quoted_reply ?? null,
+            ];
+        }
+
+        return [
+            'id' => $conversation->id,
+            'shop_id' => (int) $conversation->shop_id,
+            'customer_id' => (int) $conversation->customer_id,
+            'order_id' => $conversation->order_id ? (int) $conversation->order_id : null,
+            'message' => (string) ($conversation->message ?? ''),
+            'created_at' => optional($conversation->created_at)->toIso8601String(),
+            'updated_at' => optional($conversation->updated_at)->toIso8601String(),
+            'replies' => $replies,
+        ];
     }
 
     /**
@@ -142,7 +242,9 @@ class ChatController extends Controller
         $conversation = ChatConversation::where([
             'customer_id' => $request->customer_id,
             'shop_id' => $shop->id
-        ])->first();
+        ])->latest('updated_at')->latest('id')->first();
+
+        $isNewConversation = ! $conversation;
 
         $quotedParent = $conversation
             ? Reply::resolveQuotedParent($conversation, $request)
@@ -165,6 +267,7 @@ class ChatController extends Controller
             }
             $msg_object = $conversation->replies()->create($createAttrs);
         } elseif ($request->customer_id) {
+            // First message ever between this customer and shop — create the thread.
             $conversation = ChatConversation::create([
                 'shop_id' => $shop->id,
                 'customer_id' => $request->customer_id,
@@ -185,7 +288,11 @@ class ChatController extends Controller
             }
             $msg_object = $conversation->replies()->create($createAttrs);
         } else {
-            return response(trans('responses.unauthorized'), 401);
+            return response()->json([
+                'status' => 'error',
+                'code' => 'login_required',
+                'message' => trans('theme.login_to_chat'),
+            ], 401);
         }
 
         if ($request->hasFile('photo')) {
@@ -205,16 +312,22 @@ class ChatController extends Controller
             'conversation_id' => $conversation->id,
             'reply_id' => $msg_object->id,
             'customer_id' => $request->customer_id,
+            'shop_id' => $shop->id,
             'time' => $clock,
             'created_at' => optional($msg_object->created_at)->toIso8601String(),
             'attachments' => $attachmentsPayload,
             'type' => $resolvedType['type'],
             'payload' => $resolvedType['payload'],
+            'is_new' => $isNewConversation,
         ], livechat_quote_socket_payload($quotedParent));
 
-        ChatSocketPublisher::publish($room, 'chat.message', $socketPayload);
-
-        ChatSocketPublisher::publish(get_vendor_chat_room_id($shop), 'chat.message', $socketPayload);
+        // Realtime must never fail the HTTP save (first message especially).
+        try {
+            ChatSocketPublisher::publish($room, 'chat.message', $socketPayload);
+            ChatSocketPublisher::publish(get_vendor_chat_room_id($shop), 'chat.message', $socketPayload);
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         try {
             event(new NewMessageEvent($msg_object, $replyText));
@@ -223,7 +336,8 @@ class ChatController extends Controller
         }
 
         return response()->json([
-            'status' => 'ok',
+            'status' => $isNewConversation ? 'created' : 'ok',
+            'is_new' => $isNewConversation,
             'conversation_id' => $conversation->id,
             'reply_id' => $msg_object->id,
             'time' => $clock,
@@ -233,6 +347,7 @@ class ChatController extends Controller
             'quoted_reply' => Reply::quoteSnapshot($quotedParent),
             'type' => $resolvedType['type'],
             'payload' => $resolvedType['payload'],
-        ], 200);
+            'message' => $replyText,
+        ], 200)->header('Cache-Control', 'no-store, private');
     }
 }

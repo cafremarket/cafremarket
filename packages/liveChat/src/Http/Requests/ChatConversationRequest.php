@@ -26,4 +26,15 @@ class ChatConversationRequest extends Request
     {
         return [];
     }
+
+    /**
+     * Return JSON for the chat widget (never an HTML login redirect).
+     */
+    protected function failedAuthorization()
+    {
+        abort(response()->json([
+            'message' => trans('theme.login_to_chat'),
+            'code' => 'login_required',
+        ], 401)->header('Cache-Control', 'no-store, private'));
+    }
 }

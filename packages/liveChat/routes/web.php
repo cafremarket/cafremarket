@@ -8,12 +8,14 @@ use Incevio\Package\LiveChat\Http\Controllers\CustomerChatController;
 Route::middleware(['web', 'xssSanitizer'])->group(function () {
 
     Route::middleware(['ajax', 'storefront'])->name('chat.')->group(function () {
+        // /chat/{shop} — shop slug preferred (id also works).
+        // "chat" is reserved in routes/web.php so /{category}/{subcategory} cannot steal this.
         Route::get('chat/{shop}', [
-            ChatController::class, 'conversation'
+            ChatController::class, 'conversation',
         ])->name('conversation');
 
         Route::post('chat', [
-            ChatController::class, 'save'
+            ChatController::class, 'save',
         ])->name('start');
     });
 
