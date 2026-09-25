@@ -199,7 +199,7 @@ class CatalogProductTranslationController extends Controller
                 continue;
             }
         }
-        $request->session()->flash('success', trans('messages.imported', ['model' => trans('Product Translation')]));
+        $request->session()->flash('success', trans('messages.imported', ['model' => trans('app.model.product_translation')]));
 
         $failed_rows = $this->getFailedList();
 

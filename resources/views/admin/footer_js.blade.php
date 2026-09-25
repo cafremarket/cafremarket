@@ -2009,7 +2009,7 @@
         url = toPanelUrl(url);
       }
       if (!url) {
-        showError('Missing reply URL. Reload the page.');
+        showError(@json(trans('app.missing_reply_url')));
         return;
       }
 
@@ -2068,7 +2068,7 @@
         if (!result.ok) {
           if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
           if (ta) ta.value = msg;
-          showError('Could not send (HTTP ' + result.status + '). Try again.');
+          showError(@json(trans('app.could_not_send_http')).replace(':status', result.status));
           return;
         }
         if (pendingNode) {
@@ -2083,7 +2083,7 @@
         if (btn) btn.disabled = false;
         if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
         if (ta) ta.value = msg;
-        showError('Network error. Try again.');
+        showError(@json(trans('app.network_error_try_again')));
       });
     }
 

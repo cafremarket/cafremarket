@@ -99,4 +99,5 @@ return [
     'stock_movements' => 'Stock movements',
     'stock_transfers' => 'Stock transfers',
     'order_feedbacks' => 'Order Feedbacks',
+    'affiliate' => 'Affiliate',
 ];

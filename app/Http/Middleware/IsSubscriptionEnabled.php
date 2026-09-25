@@ -15,7 +15,7 @@ class IsSubscriptionEnabled
     public function handle($request, Closure $next)
     {
         if (! is_subscription_enabled()) {
-            abort(403, 'Subscription module is not enabled!');
+            abort(403, trans('messages.subscription_module_disabled'));
         }
 
         return $next($request);

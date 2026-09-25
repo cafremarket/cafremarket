@@ -171,7 +171,7 @@
                             errorsHtml += '</ul>';
                             $('#success').html("<div class='alert alert-danger'>" + errorsHtml + "</div>");
                         } else {
-                            $('#success').html("<div class='alert alert-danger'><strong>" + (response.responseText || 'Something went wrong.') + "</strong></div>");
+                            $('#success').html("<div class='alert alert-danger'><strong>" + (response.responseText || ((window.sfSellingI18n && window.sfSellingI18n.somethingWentWrong) || 'Something went wrong.')) + "</strong></div>");
                         }
                     },
                     complete: function () {

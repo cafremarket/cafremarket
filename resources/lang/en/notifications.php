@@ -439,4 +439,5 @@ return [
         'order' => 'Order',
     ],
 
+    'new_chat_message_title' => 'New chat message',
 ];

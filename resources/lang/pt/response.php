@@ -2,6 +2,6 @@
 
 return [
     'error' => 'Erro!',
-    'invalid_data' => 'Invalid data!',
-    'success' => 'Action has been done successfully!',
+    'invalid_data' => 'Dados inválidos!',
+    'success' => 'Ação realizada com sucesso!',
 ];

@@ -566,7 +566,7 @@
 
             @if (Auth::user()->isFromPlatform() && optional($order->paymentMethod)->code === 'wire' && count($order->attachments))
               <fieldset>
-                <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} - Bank Transfer Proof</legend>
+                <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} {{ trans('app.dash_bank_transfer_proof') }}</legend>
               </fieldset>
 
               @foreach ($order->attachments as $attachment)
@@ -587,7 +587,7 @@
               @endforeach
             @elseif (Auth::user()->isFromPlatform() && optional($order->paymentMethod)->code === 'wire' && $order->wire_transfer_proof_path)
               <fieldset>
-                <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} - Bank Transfer Proof</legend>
+                <legend><i class="fa fa-bank"></i> {{ trans('app.payment') }} {{ trans('app.dash_bank_transfer_proof') }}</legend>
               </fieldset>
               <span>
                 <i class="fa fa-file"></i>
@@ -713,7 +713,7 @@
           <h4 class="modal-title" id="wireProofPreviewTitle">{{ trans('app.preview') }}</h4>
         </div>
         <div class="modal-body text-center">
-          <img id="wireProofPreviewImage" src="" alt="Payment proof"
+          <img id="wireProofPreviewImage" src="" alt="{{ trans('app.payment_proof') }}"
             style="max-width:100%; max-height:70vh; object-fit:contain;">
         </div>
       </div>

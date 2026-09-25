@@ -47,7 +47,7 @@
           >{{ $type === 'percent' ? '%' : $flatSymbol }}</span>
           {!! Form::number($valueKey, $value, ['class' => 'form-control', 'min' => 0, 'step' => 'any']) !!}
         </div>
-        <p class="help-block small text-muted">{{ trans('packages.wallet.platform_fee_type_percent') }}: use 2.5 for 2.5%. {{ trans('packages.wallet.platform_fee_type_flat') }}: fixed MZN per transaction.</p>
+        <p class="help-block small text-muted">{{ trans('packages.wallet.platform_fee_type_percent') }}: {{ trans('packages.wallet.platform_fee_percent_hint') }} {{ trans('packages.wallet.platform_fee_type_flat') }}: {{ trans('packages.wallet.platform_fee_flat_hint') }}</p>
       </div>
     </div>
   </div>

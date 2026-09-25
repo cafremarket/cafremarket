@@ -286,8 +286,8 @@
                       <div class="form-group">
                         <label for="new_tax_type">{{ trans('app.form.type') }}</label>
                         <select id="new_tax_type" class="form-control">
-                          <option value="percent">Percentage</option>
-                          <option value="fixed">Fixed</option>
+                          <option value="percent">{{ trans('app.percentage') }}</option>
+                          <option value="fixed">{{ trans('app.fixed') }}</option>
                         </select>
                       </div>
                     </div>

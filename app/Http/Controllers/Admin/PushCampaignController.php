@@ -60,7 +60,7 @@ class PushCampaignController extends Controller
 
         return redirect()
             ->route('admin.promotion.push_campaign.index')
-            ->with('success', 'Push campaign saved as draft.');
+            ->with('success', trans('messages.push_campaign_saved_draft'));
     }
 
     public function show(PushCampaign $push_campaign)
@@ -77,7 +77,7 @@ class PushCampaignController extends Controller
         $this->authorizeAdmin();
 
         if (! in_array($push_campaign->status, [PushCampaign::STATUS_DRAFT, PushCampaign::STATUS_FAILED], true)) {
-            return back()->with('warning', 'Only draft or failed campaigns can be edited.');
+            return back()->with('warning', trans('messages.push_campaign_edit_not_allowed'));
         }
 
         return view('admin.push_campaign._edit', [
@@ -92,7 +92,7 @@ class PushCampaignController extends Controller
         $this->authorizeAdmin();
 
         if (! in_array($push_campaign->status, [PushCampaign::STATUS_DRAFT, PushCampaign::STATUS_FAILED], true)) {
-            return back()->with('warning', 'Only draft or failed campaigns can be updated.');
+            return back()->with('warning', trans('messages.push_campaign_update_not_allowed'));
         }
 
         $push_campaign->update($this->validated($request));
@@ -103,7 +103,7 @@ class PushCampaignController extends Controller
 
         return redirect()
             ->route('admin.promotion.push_campaign.index')
-            ->with('success', 'Push campaign updated.');
+            ->with('success', trans('messages.push_campaign_updated'));
     }
 
     public function send(PushCampaign $push_campaign)
@@ -118,7 +118,7 @@ class PushCampaignController extends Controller
         $this->authorizeAdmin();
         $push_campaign->delete();
 
-        return back()->with('success', 'Push campaign deleted.');
+        return back()->with('success', trans('messages.push_campaign_deleted'));
     }
 
     protected function dispatchSend(PushCampaign $campaign)
@@ -128,7 +128,7 @@ class PushCampaignController extends Controller
 
         return redirect()
             ->route('admin.promotion.push_campaign.index')
-            ->with('success', 'Push campaign queued. It will send shortly.');
+            ->with('success', trans('messages.push_campaign_queued'));
     }
 
     protected function validated(Request $request): array

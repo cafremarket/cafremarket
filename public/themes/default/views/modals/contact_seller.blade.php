@@ -2,7 +2,7 @@
   <div class="modal-dialog modal-md modal-dialog-centered" role="document">
     <div class="modal-content p-2">
       <div class="modal-header p-3">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ trans('theme.close') }}">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>

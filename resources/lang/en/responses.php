@@ -36,4 +36,5 @@ return [
     'order_assigned_successfully' => 'Order assigned successfully',
     'login_to_access' => 'Please login to access this asset.',
     'not_found' => ':model doesn\'t not exist! try another search.',
+    'unauthorized_action' => 'Unauthorized action.',
 ];

@@ -13,7 +13,7 @@
     <div class="cpc__shell">
       <aside class="cpc__inbox" id="cpc-inbox">
         <div class="cpc__inbox-head">
-          <p>{{ $messages->count() }} {{ \Illuminate\Support\Str::plural('conversation', $messages->count()) }} with sellers</p>
+          <p>{{ trans_choice('theme.n_conversations_with_sellers', $messages->count(), ['count' => $messages->count()]) }}</p>
         </div>
 
         <div class="cpc__search">
@@ -608,7 +608,7 @@
       var msg = prefix + JSON.stringify(item);
       var url = form.getAttribute('action') || (qs('.cpc-composer') || {}).getAttribute('data-reply-url');
       if (!url) {
-        showError('Missing reply URL. Reload the page.');
+        showError(@json(trans('theme.missing_reply_url')));
         return;
       }
 
@@ -663,7 +663,7 @@
         if (btn) btn.disabled = false;
         if (!result.ok) {
           if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
-          showError('Could not send (HTTP ' + result.status + '). Try again.');
+          showError(@json(trans('theme.could_not_send_http')).replace(':status', result.status));
           return;
         }
         var data = result.data || {};
@@ -680,7 +680,7 @@
         sending = false;
         if (btn) btn.disabled = false;
         if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
-        showError('Network error. Message not sent.');
+        showError(@json(trans('theme.network_error_message_not_sent')));
       });
     }
 
@@ -694,7 +694,7 @@
 
       var url = form.getAttribute('action') || (qs('.cpc-composer') || {}).getAttribute('data-reply-url');
       if (!url) {
-        showError('Missing reply URL. Reload the page.');
+        showError(@json(trans('theme.missing_reply_url')));
         return;
       }
 
@@ -756,7 +756,7 @@
         if (!result.ok) {
           if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
           if (ta) ta.value = msg;
-          showError('Could not send (HTTP ' + result.status + '). Try again.');
+          showError(@json(trans('theme.could_not_send_http')).replace(':status', result.status));
           return;
         }
         var data = result.data || {};
@@ -787,7 +787,7 @@
         if (btn) btn.disabled = false;
         if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
         if (ta) ta.value = msg;
-        showError('Network error. Message not sent.');
+        showError(@json(trans('theme.network_error_message_not_sent')));
       });
     }
 

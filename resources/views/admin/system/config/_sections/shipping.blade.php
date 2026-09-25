@@ -61,7 +61,7 @@
                 @empty
                   @if (\App\Models\ShippingMethod::TYPE_ONLINE === $type_id)
                     <div class="pull-right">
-                      <p><i class="fa fa-info-circle"></i> Enhance your customer experience by offering live shipping cost calculations. Keep your customers informed and satisfied with accurate shipping information.</p>
+                      <p><i class="fa fa-info-circle"></i> {{ trans('help.live_shipping_rates_intro') }}</p>
 
                       {{-- External marketplace plugin link removed --}}
                     </div>

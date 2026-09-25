@@ -178,7 +178,7 @@ class SubCategoryTranslationController extends Controller
                 continue;
             }
         }
-        $request->session()->flash('success', trans('messages.imported', ['model' => trans('SubCategory Translation')]));
+        $request->session()->flash('success', trans('messages.imported', ['model' => trans('app.model.subcategory_translation')]));
 
         $failed_rows = $this->getFailedList();
 

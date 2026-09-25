@@ -9,15 +9,15 @@
   <div class="row" style="margin-bottom: 16px;">
     <div class="col-sm-6">
       <a href="{{ route('admin.dealOfTheDay', ['month' => $prevMonth]) }}" class="btn btn-default btn-sm">
-        <i class="fa fa-chevron-left"></i> Previous
+        <i class="fa fa-chevron-left"></i> {{ trans('app.previous') }}
       </a>
       <strong style="margin: 0 12px;">{{ $cursor->format('F Y') }}</strong>
       <a href="{{ route('admin.dealOfTheDay', ['month' => $nextMonth]) }}" class="btn btn-default btn-sm">
-        Next <i class="fa fa-chevron-right"></i>
+        {{ trans('app.next') }} <i class="fa fa-chevron-right"></i>
       </a>
     </div>
     <div class="col-sm-6 text-right">
-      <span class="text-muted">Plan multiple products per day. Select store, tick products, save.</span>
+      <span class="text-muted">{{ trans('help.deal_calendar_intro') }}</span>
     </div>
   </div>
 
@@ -59,7 +59,7 @@
                   data-products="{{ e(json_encode($productMeta)) }}">
                 <div class="deal-day-header">
                   <strong>{{ $day->day }}</strong>
-                  @if ($isToday)<span class="label label-info">Today</span>@endif
+                  @if ($isToday)<span class="label label-info">{{ trans('app.today') }}</span>@endif
                 </div>
                 @if ($dayDeals->isNotEmpty())
                   <div class="deal-day-count">{{ $dayDeals->count() }} product{{ $dayDeals->count() > 1 ? 's' : '' }}</div>
@@ -71,10 +71,10 @@
                     @endif
                   @endforeach
                   @if ($dayDeals->count() > 3)
-                    <div class="text-muted small">+{{ $dayDeals->count() - 3 }} more</div>
+                    <div class="text-muted small">{{ trans('app.plus_n_more', ['count' => $dayDeals->count() - 3]) }}</div>
                   @endif
                 @else
-                  <div class="text-muted small">Click to assign</div>
+                  <div class="text-muted small">{{ trans('app.click_to_assign') }}</div>
                 @endif
               </td>
               @php $day->addDay(); @endphp
@@ -85,15 +85,15 @@
     </table>
   </div>
 
-  <h4 style="margin-top: 24px;">Upcoming planned deals</h4>
+  <h4 style="margin-top: 24px;">{{ trans('app.upcoming_planned_deals') }}</h4>
   @if ($upcoming->isEmpty())
-    <p class="text-muted">No upcoming deals scheduled.</p>
+    <p class="text-muted">{{ trans('app.no_upcoming_deals') }}</p>
   @else
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Products</th>
+          <th>{{ trans('app.date') }}</th>
+          <th>{{ trans('app.products') }}</th>
           <th></th>
         </tr>
       </thead>
@@ -113,7 +113,7 @@
             </td>
             <td class="text-right">
               <button type="button" class="btn btn-xs btn-danger js-clear-deal" data-date="{{ $dateKey }}">
-                Clear
+                {{ trans('app.clear') }}
               </button>
             </td>
           </tr>
@@ -129,39 +129,39 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-          <h4 class="modal-title">Assign Deal of the Day</h4>
+          <h4 class="modal-title">{{ trans('app.assign_deal_of_the_day') }}</h4>
         </div>
         <div class="modal-body">
-          <p>Date: <strong id="deal-modal-date-label"></strong></p>
+          <p>{{ trans('app.date_colon') }} <strong id="deal-modal-date-label"></strong></p>
           <input type="hidden" id="deal-modal-date" value="">
 
           <div class="form-group">
-            <label>Selected products</label>
+            <label>{{ trans('app.selected_products') }}</label>
             <div id="deal-modal-selected" class="deal-selected-chips">
-              <p class="text-muted mb-0">None selected yet.</p>
+              <p class="text-muted mb-0">{{ trans('app.none_selected_yet') }}</p>
             </div>
           </div>
 
           <div class="form-group">
-            <label>1. Select store</label>
+            <label>{{ trans('app.step_select_store') }}</label>
             <select class="form-control" id="deal-modal-shop">
-              <option value="">— Choose a store —</option>
+              <option value="">{{ trans('app.choose_a_store') }}</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>2. Search / choose products (multiple)</label>
-            <input type="text" class="form-control" id="deal-modal-search" placeholder="Filter by name or SKU…" disabled>
+            <label>{{ trans('app.step_choose_products_multiple') }}</label>
+            <input type="text" class="form-control" id="deal-modal-search" placeholder="{{ trans('app.filter_by_name_or_sku') }}" disabled>
           </div>
 
           <div class="product-picker-list" id="deal-modal-list">
-            <p class="text-muted" style="padding:12px;">Select a store to load products.</p>
+            <p class="text-muted" style="padding:12px;">{{ trans('app.select_store_to_load_products') }}</p>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger" id="deal-modal-clear">Clear day</button>
-          <button type="button" class="btn btn-primary" id="deal-modal-save" disabled>Save</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('app.cancel') }}</button>
+          <button type="button" class="btn btn-danger" id="deal-modal-clear">{{ trans('app.clear_day') }}</button>
+          <button type="button" class="btn btn-primary" id="deal-modal-save" disabled>{{ trans('app.form.save') }}</button>
         </div>
       </div>
     </div>
@@ -295,7 +295,7 @@
       var $box = $('#deal-modal-selected');
       var ids = chosenIds();
       if (!ids.length) {
-        $box.html('<p class="text-muted mb-0">None selected yet.</p>');
+        $box.html('<p class="text-muted mb-0">{{ trans('app.none_selected_yet') }}</p>');
         setSaveEnabled();
         return;
       }
@@ -328,7 +328,7 @@
       var $list = $('#deal-modal-list');
       var shopName = currentShopName();
       if (!items.length) {
-        $list.html('<p class="text-muted" style="padding:12px;">No products found for this store.</p>');
+        $list.html('<p class="text-muted" style="padding:12px;">{{ trans('app.no_products_found_for_store') }}</p>');
         return;
       }
       var html = '';
@@ -350,7 +350,7 @@
         var $strong = $(this).find('strong');
         $strong.text(item.title || '');
         if (chosen[String(item.id)]) {
-          $strong.append(' <span class="selected-badge">Selected</span>');
+          $strong.append(' <span class="selected-badge">{{ trans('app.selected') }}</span>');
         }
         var metaBits = [];
         if (item.sku) metaBits.push(item.sku);
@@ -364,15 +364,15 @@
       var shopId = $('#deal-modal-shop').val();
       if (!shopId) {
         $('#deal-modal-search').prop('disabled', true).val('');
-        $('#deal-modal-list').html('<p class="text-muted" style="padding:12px;">Select a store to load products.</p>');
+        $('#deal-modal-list').html('<p class="text-muted" style="padding:12px;">{{ trans('app.select_store_to_load_products') }}</p>');
         return;
       }
       $('#deal-modal-search').prop('disabled', false);
-      $('#deal-modal-list').html('<p class="text-muted" style="padding:12px;">Loading…</p>');
+      $('#deal-modal-list').html('<p class="text-muted" style="padding:12px;">{{ trans('app.loading') }}</p>');
       $.getJSON(productsUrl, { shop_id: shopId, q: $('#deal-modal-search').val() })
         .then(function (res) { renderProducts(res.data || []); })
         .fail(function () {
-          $('#deal-modal-list').html('<p class="text-danger" style="padding:12px;">Failed to load products.</p>');
+          $('#deal-modal-list').html('<p class="text-danger" style="padding:12px;">{{ trans('app.failed_to_load_products') }}</p>');
         });
     }
 
@@ -407,7 +407,7 @@
         } else {
           $('#deal-modal-shop').val('');
           $('#deal-modal-search').prop('disabled', true);
-          $('#deal-modal-list').html('<p class="text-muted" style="padding:12px;">Select a store to load products.</p>');
+          $('#deal-modal-list').html('<p class="text-muted" style="padding:12px;">{{ trans('app.select_store_to_load_products') }}</p>');
         }
       };
 
@@ -460,7 +460,7 @@
       var date = $('#deal-modal-date').val();
       var ids = chosenIds();
       if (!ids.length) {
-        alert('Please select at least one product.');
+        alert(@json(trans('app.select_at_least_one_product')));
         return;
       }
       $.ajax({
@@ -475,13 +475,13 @@
     });
 
     function clearDeal(date) {
-      if (!confirm('Clear all products for ' + date + '?')) return;
+      if (!confirm(@json(trans('app.confirm_clear_day_products')).replace(':date', date))) return;
       $.ajax({
         url: clearUrl,
         method: 'POST',
         data: { _token: csrf, deal_date: date },
         success: function () { window.location.reload(); },
-        error: function () { alert('Failed to clear deal.'); }
+        error: function () { alert(@json(trans('app.failed_to_clear_deal'))); }
       });
     }
 

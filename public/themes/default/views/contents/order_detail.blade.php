@@ -455,7 +455,7 @@
                           @endforeach
 
                           @if (!is_null($item->download_limit) && !is_null($item->pivot->download) && $item->download_limit <= $item->pivot->download)
-                            <span class="text-danger"> You have reached maximum download limit</span>
+                            <span class="text-danger"> {{ trans('theme.maximum_download_limit_reached') }}</span>
                           @elseif (!is_null($item->download_limit) && !is_null($item->pivot->download) && $item->download_limit > $item->pivot->download)
                             <span class="text-info">@lang('theme.download_left', ['download_number' => $item->download_limit - $item->pivot->download, 'download_limit' => $item->download_limit])</span>
                           @endif
@@ -561,14 +561,14 @@
           <div class="sf-panel__head">@lang('theme.section_headings.contact_seller')</div>
           <div class="sf-panel__body" style="padding:16px 18px;">
             <p class="text-muted" style="margin-top:0;">
-              Chat with the seller in the same live chat. You can share this order’s details like a product card.
+              {{ trans('theme.order_chat_help') }}
             </p>
             @if ($order->shop)
               <button type="button" class="btn sf-btn-primary sf-open-livechat">
                 <i class="fa fa-comments"></i> {{ trans('theme.button.contact_seller') ?? 'Contact seller' }}
               </button>
               <span class="help-block" style="display:block;margin-top:8px;">
-                After chat opens, tap <strong>Share</strong> on the order card to send order details.
+                {!! trans('theme.order_chat_share_hint_html') !!}
               </span>
             @else
               <p class="text-muted">{{ trans('theme.chat_unavailable') ?? 'Seller chat is currently unavailable.' }}</p>

@@ -74,7 +74,7 @@ class EmolaGatewayController extends Controller
             Log::error('eMola pay failed', ['order_id' => $validated['order_id'], 'error' => $e->getMessage()]);
 
             return response()->json([
-                'message' => 'Payment failed: '.$e->getMessage(),
+                'message' => trans('api.payment_failed_reason', ['reason' => $e->getMessage()]),
             ], 500);
         }
     }
@@ -145,7 +145,7 @@ class EmolaGatewayController extends Controller
             ->first();
 
         if (! $order) {
-            return response()->json(['message' => 'Order not found'], 404);
+            return response()->json(['message' => trans('api.order_not_found')], 404);
         }
 
         return response()->json([

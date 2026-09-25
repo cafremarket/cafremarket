@@ -21,7 +21,7 @@
   function doTrack() {
     var num = document.getElementById("YQNum").value;
     if (num === "") {
-      alert("Enter your number.");
+      alert(@json(trans('theme.enter_your_number')));
       return;
     }
     YQV5.trackSingle({

@@ -14,7 +14,7 @@
 
     {{-- Need this section to avoid js error --}}
     <ul class="ei-slider-thumbs">
-      <li class="ei-slider-element">Current</li>
+      <li class="ei-slider-element">{{ trans('theme.current') }}</li>
 
       @foreach ($sliders as $slider)
         @if (isset($slider['mobile_image']['path']))

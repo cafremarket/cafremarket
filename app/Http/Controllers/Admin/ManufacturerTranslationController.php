@@ -180,7 +180,7 @@ class ManufacturerTranslationController extends Controller
                 continue;
             }
         }
-        $request->session()->flash('success', trans('messages.imported', ['model' => trans('Manufacturer Translation')]));
+        $request->session()->flash('success', trans('messages.imported', ['model' => trans('app.model.manufacturer_translation')]));
 
         $failed_rows = $this->getFailedList();
 

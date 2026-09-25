@@ -28,7 +28,7 @@ class EmolaPaymentService extends PaymentService
             return $this->chargeWalletDeposit();
         }
 
-        throw new PaymentFailedException('Order not found for eMola payment.');
+        throw new PaymentFailedException(trans('api.order_not_found'));
     }
 
     private function chargeOrder()
@@ -93,7 +93,7 @@ class EmolaPaymentService extends PaymentService
     public function setConfig()
     {
         if (! $this->amount || ! is_numeric($this->amount)) {
-            throw new PaymentFailedException('Invalid amount.');
+            throw new PaymentFailedException(trans('api.invalid_amount'));
         }
 
         $context = $this->order ? EmolaSpec::CONTEXT_ORDER : EmolaSpec::CONTEXT_DEPOSIT;

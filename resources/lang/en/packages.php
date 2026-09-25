@@ -251,6 +251,12 @@ return [
         'detail' => 'Detail',
         'today' => 'Today',
         'wallet_module_not_active' => 'Wallet Module Not Active',
+        'platform_fee_percent_hint' => 'use 2.5 for 2.5%.',
+        'platform_fee_flat_hint' => 'fixed MZN per transaction.',
+        'deposit_label' => 'Deposit',
+        'withdraw_label' => 'Withdraw',
+        'invalid_cart_parts' => 'Invalid cart items.',
+        'amount_required_without_carts' => 'The amount field is required when carts are not provided.',
     ],
     'inspector' => [
         'filter' => 'Filter',

@@ -6,8 +6,8 @@
     'icon' => 'fa-star',
   ])
       <p class="text-muted">
-        Curated products for the homepage Featured section.
-        Pick a store first, then choose products from that store (one listing per product).
+        {{ trans('help.featured_products_intro') }}
+        {{ trans('help.featured_products_pick') }}
       </p>
       <div class="spacer10"></div>
       {!! Form::open(['route' => 'admin.featuredProducts.update', 'class' => 'form-horizontal', 'id' => 'form']) !!}

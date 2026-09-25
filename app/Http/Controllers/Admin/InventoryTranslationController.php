@@ -185,7 +185,7 @@ class InventoryTranslationController extends Controller
                 continue;
             }
         }
-        $request->session()->flash('success', trans('messages.imported', ['model' => trans('Inventory Translation')]));
+        $request->session()->flash('success', trans('messages.imported', ['model' => trans('app.model.inventory_translation')]));
 
         $failed_rows = $this->getFailedList();
 

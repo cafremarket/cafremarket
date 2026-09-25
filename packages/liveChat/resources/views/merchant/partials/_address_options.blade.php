@@ -21,9 +21,9 @@
           <span class="mpc-addr-card__line">P: {{ $address['phone'] }}</span>
         @endif
         @if ($address['shipping_zone'])
-          <span class="mpc-addr-card__zone">Shipping zone: {{ $address['shipping_zone']['name'] }}</span>
+          <span class="mpc-addr-card__zone">{{ trans('app.shipping_zone_colon') }} {{ $address['shipping_zone']['name'] }}</span>
         @else
-          <span class="mpc-addr-card__zone mpc-addr-card__zone--none">No shipping zone covers this address</span>
+          <span class="mpc-addr-card__zone mpc-addr-card__zone--none">{{ trans('app.no_shipping_zone_for_address') }}</span>
         @endif
       </span>
     </label>

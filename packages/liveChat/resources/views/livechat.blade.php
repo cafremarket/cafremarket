@@ -9,7 +9,7 @@
           <span id="chat_head">{{ $shop->name }}</span>
           <span class="agent">{{ optional($agent)->getName() ?? trans('theme.seller') }} <span class="online">· {{ $agent_status }}</span></span>
         </div>
-        <button type="button" class="chat_header_close" id="sf_livechat_close" aria-label="Close chat">&times;</button>
+        <button type="button" class="chat_header_close" id="sf_livechat_close" aria-label="{{ trans('theme.livechat.close_chat') }}">&times;</button>
       </div>
     </div>
 
@@ -27,7 +27,7 @@
     @if (Auth::guard('customer')->check())
       @isset($product)
         <div class="chat-product-share">
-          <div class="chat-product-share-title">{{ trans('theme.ask') ?? 'Ask about this product' }}</div>
+          <div class="chat-product-share-title">{{ trans('theme.livechat.ask_about_product') }}</div>
           <div class="chat-product-share-card">
             <div class="chat-product-share-media">
               <img src="{{ get_storage_file_url(optional($product->image)->path, 'tiny_thumb') }}" alt="{{ $product->title }}">
@@ -37,10 +37,10 @@
               <div class="chat-product-share-price">{{ get_formated_currency($product->current_sale_price(), 2) }}</div>
             </div>
             <div class="chat-product-share-actions">
-              <button id="fchat_share_product" class="chat-product-share-btn" type="button" aria-label="Share product details">
-                Share
+              <button id="fchat_share_product" class="chat-product-share-btn" type="button" aria-label="{{ trans('theme.livechat.share_product_details') }}">
+                {{ trans('theme.livechat.share') }}
               </button>
-              <button type="button" id="fchat_dismiss_product_share" class="chat-product-share-dismiss" aria-label="Dismiss product preview">&times;</button>
+              <button type="button" id="fchat_dismiss_product_share" class="chat-product-share-dismiss" aria-label="{{ trans('theme.livechat.dismiss_product_preview') }}">&times;</button>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@
           }
         @endphp
         <div class="chat-product-share chat-order-share">
-          <div class="chat-product-share-title">Share this order with the seller</div>
+          <div class="chat-product-share-title">{{ trans('theme.livechat.share_order_with_seller') }}</div>
           <div class="chat-product-share-card">
             <div class="chat-product-share-media">
               @if (!empty($orderSharePayload['image']))
@@ -84,10 +84,10 @@
               </div>
             </div>
             <div class="chat-product-share-actions">
-              <button id="fchat_share_order" class="chat-product-share-btn" type="button" aria-label="Share order details">
-                Share
+              <button id="fchat_share_order" class="chat-product-share-btn" type="button" aria-label="{{ trans('theme.livechat.share_order_details') }}">
+                {{ trans('theme.livechat.share') }}
               </button>
-              <button type="button" id="fchat_dismiss_order_share" class="chat-product-share-dismiss" aria-label="Dismiss order preview">&times;</button>
+              <button type="button" id="fchat_dismiss_order_share" class="chat-product-share-dismiss" aria-label="{{ trans('theme.livechat.dismiss_order_preview') }}">&times;</button>
             </div>
           </div>
         </div>
@@ -96,39 +96,39 @@
         <div class="chat-composer-inner">
           <div id="chat-attachment-preview" class="chat-attachment-preview" aria-live="polite" aria-hidden="true" style="display:none">
             <div class="chat-attachment-preview-inner">
-              <span class="chat-attachment-preview-label">Attachment</span>
+              <span class="chat-attachment-preview-label">{{ trans('theme.attachment') }}</span>
               <div class="chat-attachment-preview-row">
                 <img class="chat-attachment-preview-img" alt="" width="44" height="44">
                 <span class="chat-attachment-preview-icon" aria-hidden="true"><i class="fa fa-file-o"></i></span>
                 <span class="chat-attachment-preview-name"></span>
-                <button type="button" id="fchat_remove_attachment" class="chat-attachment-preview-remove" aria-label="Remove attachment">&times;</button>
+                <button type="button" id="fchat_remove_attachment" class="chat-attachment-preview-remove" aria-label="{{ trans('theme.livechat.remove_attachment') }}">&times;</button>
               </div>
             </div>
           </div>
           <div class="chat-composer-row">
             <div class="chat-attach-wrap">
-              <button type="button" id="chat_attach_toggle" class="chat-composer-btn chat-composer-btn--attach" title="Attach" aria-haspopup="true" aria-expanded="false">
+              <button type="button" id="chat_attach_toggle" class="chat-composer-btn chat-composer-btn--attach" title="{{ trans('theme.livechat.attach') }}" aria-haspopup="true" aria-expanded="false">
                 <span class="chat-composer-btn-icon" aria-hidden="true"><i class="fa fa-plus"></i></span>
-                <span class="chat-sr-only">Attachment options</span>
+                <span class="chat-sr-only">{{ trans('theme.livechat.attachment_options') }}</span>
               </button>
               <div id="chat_attach_menu" class="chat-attach-menu" hidden>
-                <label id="chat_composer_attach" class="chat-attach-menu-item" title="Media">
+                <label id="chat_composer_attach" class="chat-attach-menu-item" title="{{ trans('theme.livechat.media') }}">
                   <input type="file" id="chatBoxFile" name="photo" class="chat-composer-file-input" accept="image/*,.pdf,.doc,.docx" tabindex="-1">
                   <span class="chat-attach-menu-icon" aria-hidden="true"><i class="fa fa-image"></i></span>
-                  <span class="chat-attach-menu-label">Media</span>
+                  <span class="chat-attach-menu-label">{{ trans('theme.livechat.media') }}</span>
                 </label>
                 <button type="button" id="chat_attach_product" class="chat-attach-menu-item">
                   <span class="chat-attach-menu-icon" aria-hidden="true"><i class="fa fa-shopping-bag"></i></span>
-                  <span class="chat-attach-menu-label">Share Product</span>
+                  <span class="chat-attach-menu-label">{{ trans('theme.livechat.share_product') }}</span>
                 </button>
                 <button type="button" id="chat_attach_order" class="chat-attach-menu-item">
                   <span class="chat-attach-menu-icon" aria-hidden="true"><i class="fa fa-receipt"></i></span>
-                  <span class="chat-attach-menu-label">Share Order</span>
+                  <span class="chat-attach-menu-label">{{ trans('theme.livechat.share_order') }}</span>
                 </button>
               </div>
             </div>
-            <input id="chatBoxMsg" name="chat_message" type="text" placeholder="Send a message" class="chat_field chat_message chat-composer-msg" aria-label="Chat message input" autocomplete="off">
-            <button type="button" id="fchat_send" class="chat-composer-btn chat-composer-btn--send" aria-label="Send message">
+            <input id="chatBoxMsg" name="chat_message" type="text" placeholder="{{ trans('theme.livechat.send_a_message') }}" class="chat_field chat_message chat-composer-msg" aria-label="{{ trans('theme.livechat.message_input') }}" autocomplete="off">
+            <button type="button" id="fchat_send" class="chat-composer-btn chat-composer-btn--send" aria-label="{{ trans('theme.livechat.send_message') }}">
               <span class="chat-composer-btn-icon" aria-hidden="true"><i class="fa fa-paper-plane"></i></span>
             </button>
           </div>
@@ -138,13 +138,13 @@
       <div id="chat_picker_modal" class="chat-modal" hidden>
         <div class="chat-modal-card">
           <div class="chat-modal-head">
-            <span id="chat_picker_title">Share</span>
-            <button type="button" class="chat-modal-close" data-modal-close aria-label="Close">&times;</button>
+            <span id="chat_picker_title">{{ trans('theme.livechat.share') }}</span>
+            <button type="button" class="chat-modal-close" data-modal-close aria-label="{{ trans('theme.livechat.close') }}">&times;</button>
           </div>
           <div class="chat-modal-body">
-            <input type="text" id="chat_picker_search" class="chat-modal-input" placeholder="Search…">
+            <input type="text" id="chat_picker_search" class="chat-modal-input" placeholder="{{ trans('theme.livechat.search') }}">
             <div id="chat_picker_list" class="chat-picker-list">
-              <p class="chat-picker-empty">Loading…</p>
+              <p class="chat-picker-empty">{{ trans('theme.livechat.loading') }}</p>
             </div>
           </div>
         </div>
@@ -152,13 +152,14 @@
     @endif
   </div>
 
-  <a id="chatbox" class="fchat sf-livechat-fab" aria-label="Open chat">
+  <a id="chatbox" class="fchat sf-livechat-fab" aria-label="{{ trans('theme.livechat.open_chat') }}">
     <i class="chat-icon fas fa-comment"></i>
   </a>
 </div>
 
 <script type="text/javascript">
   "use strict";
+  var LC_I18N = @json(trans('theme.livechat'));
   window.socketConnected = window.socketConnected || false;
   var agent_avatar = $('<div>').addClass('chat_avatar');
   $('<img/>').attr('src', "{{ get_storage_file_url(optional($shop->image)->path, 'thumbnail') }}").appendTo(agent_avatar);
@@ -502,11 +503,11 @@
           var locCard = $('<div>').addClass('chat-shared-product chat-shared-location');
           $('<div>').addClass('chat-shared-share-icon').html('<i class="fa fa-map-marker"></i>').appendTo(locCard);
           var locBody = $('<div>').addClass('chat-shared-product-body').appendTo(locCard);
-          $('<div>').addClass('chat-shared-product-title').text(metaPayload.label || 'Location').appendTo(locBody);
+          $('<div>').addClass('chat-shared-product-title').text(metaPayload.label || LC_I18N.location).appendTo(locBody);
           var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' +
             encodeURIComponent((metaPayload.lat || '') + ',' + (metaPayload.lng || ''));
           $('<a>').addClass('chat-shared-product-link').attr('href', mapsUrl).attr('target', '_blank').attr('rel', 'noopener')
-            .text('Open in Maps').appendTo(locBody);
+            .text(LC_I18N.open_in_maps).appendTo(locBody);
           locWrap.append(locCard);
           node.append(locWrap);
         } else if (type === 'contact' && metaPayload) {
@@ -520,7 +521,7 @@
           $('<div>').addClass('chat-shared-product-title').text(metaPayload.name || 'Contact').appendTo(conBody);
           if (metaPayload.phone) {
             $('<div>').addClass('chat-shared-product-price').text(metaPayload.phone).appendTo(conBody);
-            $('<a>').addClass('chat-shared-product-link').attr('href', 'tel:' + metaPayload.phone).text('Call').appendTo(conBody);
+            $('<a>').addClass('chat-shared-product-link').attr('href', 'tel:' + metaPayload.phone).text(LC_I18N.call).appendTo(conBody);
           }
           conWrap.append(conCard);
           node.append(conWrap);
@@ -546,7 +547,7 @@
             : (payload.price || '');
           $('<div>').addClass('chat-shared-product-price').text(subtitle).appendTo(body);
           $('<a>').addClass('chat-shared-product-link').attr('href', payload.url || '#').attr('target', '_blank')
-            .text(payload.__shareType === 'order' ? 'View order' : 'View').appendTo(body);
+            .text(payload.__shareType === 'order' ? LC_I18N.view_order : LC_I18N.view).appendTo(body);
           wrap.append(card);
           node.append(wrap);
         }
@@ -656,8 +657,8 @@
       function openPickerModal(kind) {
         var modal = document.getElementById('chat_picker_modal');
         if (!modal) return;
-        $('#chat_picker_title').text(kind === 'order' ? 'Share an order' : 'Share a product');
-        $('#chat_picker_search').val('').show().attr('placeholder', kind === 'order' ? 'Search by order number…' : 'Search…');
+        $('#chat_picker_title').text(kind === 'order' ? LC_I18N.share_an_order : LC_I18N.share_a_product);
+        $('#chat_picker_search').val('').show().attr('placeholder', kind === 'order' ? LC_I18N.search_order_number : LC_I18N.search);
         modal.setAttribute('data-picker-kind', kind);
         modal.hidden = false;
         loadPickerItems(kind, '');
@@ -682,7 +683,7 @@
       function loadPickerItems(kind, term) {
         var myToken = ++pickerFetchToken;
         var $list = $('#chat_picker_list');
-        $list.html('<p class="chat-picker-empty">Loading…</p>');
+        $list.html('<p class="chat-picker-empty">{{ trans('theme.livechat.loading') }}</p>');
         var url = (kind === 'order'
           ? "{{ route('chat.orders', $shop->id) }}"
           : "{{ route('chat.products', $shop->id) }}") + (term ? ('?q=' + encodeURIComponent(term)) : '');
@@ -694,7 +695,7 @@
             if (myToken !== pickerFetchToken) return;
             var items = (res && res.data) || [];
             if (!items.length) {
-              $list.html('<p class="chat-picker-empty">Nothing to show.</p>');
+              $list.html($('<p class="chat-picker-empty">').text(LC_I18N.nothing_to_show));
               return;
             }
             $list.empty();
@@ -722,7 +723,7 @@
           },
           error: function() {
             if (myToken !== pickerFetchToken) return;
-            $list.html('<p class="chat-picker-empty">Could not load. Try again.</p>');
+            $list.html($('<p class="chat-picker-empty">').text(LC_I18N.could_not_load));
           },
         });
       }
@@ -894,14 +895,14 @@
           case 405:
             pendingNode.remove();
             clearAttachmentPreview();
-            response = $('<p>').addClass('text-danger').text('Request blocked (AJAX required). Please refresh the page.');
+            response = $('<p>').addClass('text-danger').text(LC_I18N.request_blocked);
             break;
 
           default:
             pendingNode.remove();
             response = $('<p>').addClass('text-danger').text(
               httpStatus === 0
-                ? 'Network error. Check your connection and try again.'
+                ? LC_I18N.network_error
                 : "{!! trans('theme.notify.failed') !!}"
             );
             $('<br/><br/>').prependTo(response);
@@ -1084,7 +1085,7 @@
           } else if (status === 401 || status === 403 || status === 419) {
             msg = @json(trans('theme.session_expired'));
           } else if (status === 405) {
-            msg = 'Request blocked (AJAX required). Please refresh the page.';
+            msg = LC_I18N.request_blocked;
           } else if (payload && payload.message) {
             msg = String(payload.message);
           }

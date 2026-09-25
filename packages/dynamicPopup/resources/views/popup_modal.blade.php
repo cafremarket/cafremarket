@@ -8,7 +8,7 @@
                 @if (get_popup_data()['type'] == 'newsletter')
                 <div id="newsletter-popup-body" class="modal-body row">
                     <div id="newsletter-popup-left-container" class="col-12 col-sm-5">
-                        <img class="img-cover" src="{{ get_popup_data()['background_img'] }}" width="100%" height="100%" alt="example of a banner" />
+                        <img class="img-cover" src="{{ get_popup_data()['background_img'] }}" width="100%" height="100%" alt="{{ trans('theme.popup_banner') }}" />
                     </div>
                     <div  id="newsletter-popup-right-container" class="col-12 col-sm-7">
                         <div class="text-container">
@@ -20,7 +20,7 @@
                         </div>
                         <div id="subscribe_form">
                                 <input id="email" type="email" placeholder="Email" />
-                                <button id="subscribe_btn">Subscribe</button>
+                                <button id="subscribe_btn">{{ trans('theme.button.subscribe') }}</button>
                         </div>
                         <div id="newsletter-popup-hide" class="form-check">
                             <input class="form-check-input icheckbox_minimal-blue" type="checkbox" value="hide" id="js-hide-newsletter-check">
@@ -32,7 +32,7 @@
                 </div>
                 @elseif(get_popup_data()['type'] == 'banner')
                 <div id="newsletter-popup-banner">
-                    <img src="{{ get_popup_data()['background_img'] }}" alt="Popup Banner">
+                    <img src="{{ get_popup_data()['background_img'] }}" alt="{{ trans('theme.popup_banner') }}">
                 </div>
                 <div id="newsletter-popup-banner-hide" class="form-check">
                     <input class="form-check-input icheckbox_minimal-blue" type="checkbox" value="hide" id="js-hide-newsletter-check">

@@ -179,7 +179,7 @@ class CategoryTranslationController extends Controller
                 continue;
             }
         }
-        $request->session()->flash('success', trans('messages.imported', ['model' => trans('Category Translation')]));
+        $request->session()->flash('success', trans('messages.imported', ['model' => trans('app.model.category_translation')]));
 
         $failed_rows = $this->getFailedList();
 

@@ -7,16 +7,16 @@
     <div class="modal-body">
       <p>{{ $campaign->body }}</p>
       <dl class="dl-horizontal">
-        <dt>Audience</dt><dd>{{ $campaign->audience }}</dd>
-        <dt>Type</dt><dd>{{ $campaign->type }}</dd>
-        <dt>Status</dt><dd>{{ $campaign->status }}</dd>
-        <dt>Targets</dt><dd>{{ $campaign->target_count }}</dd>
-        <dt>Sent / Failed</dt><dd>{{ $campaign->sent_count }} / {{ $campaign->failed_count }}</dd>
-        <dt>Deep link</dt><dd>{{ $campaign->deep_link ?: '—' }}</dd>
-        <dt>Image</dt><dd>{{ $campaign->image_url ?: '—' }}</dd>
-        <dt>Sent at</dt><dd>{{ optional($campaign->sent_at)->toDateTimeString() ?: '—' }}</dd>
+        <dt>{{ trans('app.audience') }}</dt><dd>{{ $campaign->audience }}</dd>
+        <dt>{{ trans('app.type') }}</dt><dd>{{ $campaign->type }}</dd>
+        <dt>{{ trans('app.status') }}</dt><dd>{{ $campaign->status }}</dd>
+        <dt>{{ trans('app.targets') }}</dt><dd>{{ $campaign->target_count }}</dd>
+        <dt>{{ trans('app.sent_failed') }}</dt><dd>{{ $campaign->sent_count }} / {{ $campaign->failed_count }}</dd>
+        <dt>{{ trans('app.deep_link') }}</dt><dd>{{ $campaign->deep_link ?: '—' }}</dd>
+        <dt>{{ trans('app.image') }}</dt><dd>{{ $campaign->image_url ?: '—' }}</dd>
+        <dt>{{ trans('app.sent_at') }}</dt><dd>{{ optional($campaign->sent_at)->toDateTimeString() ?: '—' }}</dd>
         @if ($campaign->error_message)
-          <dt>Error</dt><dd class="text-danger">{{ $campaign->error_message }}</dd>
+          <dt>{{ trans('app.error_label') }}</dt><dd class="text-danger">{{ $campaign->error_message }}</dd>
         @endif
       </dl>
     </div>

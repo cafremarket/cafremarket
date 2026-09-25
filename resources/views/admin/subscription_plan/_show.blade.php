@@ -21,7 +21,7 @@
             @if ((bool) config('system_settings.trial_days'))
               <tr>
                 <th class="text-right">{{ trans('app.trial_days') }}:</th>
-                <td><i class="fa fa-pagelines"></i> {{ config('system_settings.trial_days') . ' ' . trans('days') }}</td>
+                <td><i class="fa fa-pagelines"></i> {{ config('system_settings.trial_days') . ' ' . trans_choice('app.days', (int) config('system_settings.trial_days')) }}</td>
               </tr>
             @endif
             <tr>

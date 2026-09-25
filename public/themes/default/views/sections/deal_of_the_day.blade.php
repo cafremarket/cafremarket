@@ -15,8 +15,8 @@
               @if ($dealOfTheDay->count() > 1)
                 <div class="best-deal-arrow">
                   <ul>
-                    <li><button type="button" class="left-arrow slider-arrow slick-arrow deal-day-left" aria-label="left arrow"><i class="fal fa-chevron-left"></i></button></li>
-                    <li><button type="button" class="right-arrow slider-arrow slick-arrow deal-day-right" aria-label="right arrow"><i class="fal fa-chevron-right"></i></button></li>
+                    <li><button type="button" class="left-arrow slider-arrow slick-arrow deal-day-left" aria-label="{{ trans('theme.previous') }}"><i class="fal fa-chevron-left"></i></button></li>
+                    <li><button type="button" class="right-arrow slider-arrow slick-arrow deal-day-right" aria-label="{{ trans('theme.next') }}"><i class="fal fa-chevron-right"></i></button></li>
                   </ul>
                 </div>
               @endif

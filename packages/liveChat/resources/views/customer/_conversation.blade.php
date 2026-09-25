@@ -53,7 +53,7 @@
     <strong>{{ $shop ? $shop->name : (trans('theme.store') ?? 'Store') }}</strong>
     <span>
       @if ($chat->order_id && optional($chat->order)->order_number)
-        Order #{{ $chat->order->order_number }}
+        {{ trans('theme.order') }} #{{ $chat->order->order_number }}
       @elseif ($shop && method_exists($shop, 'verifiedText'))
         {{ $shop->verifiedText() }}
       @else
@@ -116,7 +116,7 @@
           <div class="cpc-share__icon"><i class="fas fa-map-marker-alt"></i></div>
           <div>
             <div class="cpc-share__title">{{ $loc['label'] ?? 'Location' }}</div>
-            <a href="https://www.google.com/maps/search/?api=1&query={{ $loc['lat'] ?? '' }},{{ $loc['lng'] ?? '' }}" target="_blank" rel="noopener">Open in Maps</a>
+            <a href="https://www.google.com/maps/search/?api=1&query={{ $loc['lat'] ?? '' }},{{ $loc['lng'] ?? '' }}" target="_blank" rel="noopener">{{ trans('theme.open_in_maps') }}</a>
           </div>
         </div>
       @elseif ($item['type'] === 'contact' && is_array($item['payload']))
@@ -507,7 +507,7 @@
     }).then(function (result) {
       if (!result.ok) {
         if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
-        showError('Could not send (HTTP ' + result.status + '). Please try again.');
+        showError(@json(trans('theme.could_not_send_http')).replace(':status', result.status));
         return false;
       }
       if (pendingNode && result.data) {
@@ -518,7 +518,7 @@
       return true;
     }).catch(function () {
       if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
-      showError('Network error. Message not sent.');
+      showError(@json(trans('theme.network_error_message_not_sent')));
       return false;
     });
   }

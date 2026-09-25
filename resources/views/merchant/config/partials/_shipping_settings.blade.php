@@ -1,7 +1,7 @@
 {{-- Shop default shipping (free / fixed) --}}
 <div class="form-group">
   {!! Form::label('shipping_type', (trans('app.shipping') ?? 'Shipping').' type:', ['class' => 'with-help col-sm-4 control-label']) !!}
-  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="Shop default shipping. Products can override this."></i>
+  <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="left" title="{{ trans('help.shop_default_shipping') }}"></i>
   <div class="col-sm-7 nopadding-left">
     @if ($can_update)
       {!! Form::select('shipping_type', [

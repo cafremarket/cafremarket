@@ -95,7 +95,7 @@
       data: {
         labels: labelData,
         datasets: [{
-            label: 'Deposit',
+            label: @json(trans('packages.wallet.deposit_label')),
             fill: true,
             backgroundColor: "rgba(0,0,255, 0.6)",
             borderWidth: 1,
@@ -104,7 +104,7 @@
             data: deposit,
           },
           {
-            label: 'Withdraw',
+            label: @json(trans('packages.wallet.withdraw_label')),
             fill: true,
             backgroundColor: "rgba(255,0,0, 0.6)",
             borderWidth: 1,

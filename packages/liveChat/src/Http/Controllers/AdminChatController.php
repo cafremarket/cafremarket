@@ -94,12 +94,12 @@ class AdminChatController extends Controller
         try {
             Gate::authorize('reply', ChatConversation::class);
         } catch (AuthorizationException $e) {
-            return response()->json(['message' => 'Not allowed to reply'], 403);
+            return response()->json(['message' => trans('messages.chat_reply_not_allowed')], 403);
         }
 
         $shopId = Auth::user()?->merchantId();
         if ($shopId && (int) $chat->shop_id !== (int) $shopId) {
-            return response()->json(['message' => 'Conversation not found'], 404);
+            return response()->json(['message' => trans('messages.conversation_not_found')], 404);
         }
 
         $replyText = trim((string) $request->input('message', ''));
@@ -108,7 +108,7 @@ class AdminChatController extends Controller
         }
 
         if ($replyText === '' && ! $request->hasFile('photo') && ! $request->filled('photo')) {
-            return response()->json(['message' => 'Empty message'], 422);
+            return response()->json(['message' => trans('messages.empty_message')], 422);
         }
 
         $quotedParent = Reply::resolveQuotedParent($chat, $request);
@@ -207,11 +207,11 @@ class AdminChatController extends Controller
         $shopId = $vendor?->merchantId();
 
         if (! $shopId || (int) $chat->shop_id !== (int) $shopId) {
-            return response()->json(['message' => 'Conversation not found'], 404);
+            return response()->json(['message' => trans('messages.conversation_not_found')], 404);
         }
 
         if (! $chat->customer_id) {
-            return response()->json(['message' => 'This conversation has no customer to bill'], 422);
+            return response()->json(['message' => trans('messages.conversation_no_customer')], 422);
         }
 
         $data = $request->validate([

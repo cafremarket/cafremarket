@@ -120,7 +120,7 @@
         ).append(
           $('<div>').addClass('shared-product-price').text(payload.price || '')
         ).append(
-          $('<a>').addClass('shared-product-link').attr('href', payload.url || '#').attr('target', '_blank').text('View')
+          $('<a>').addClass('shared-product-link').attr('href', payload.url || '#').attr('target', '_blank').text(@json(trans('theme.livechat.view')))
         )
       );
     }

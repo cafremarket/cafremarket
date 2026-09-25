@@ -76,7 +76,7 @@
     class="form-control"
     accept=".jpg,.jpeg,.png,.pdf"
   >
-  <small class="text-muted">Upload payment proof (JPG, PNG, PDF)</small>
+  <small class="text-muted">{{ trans('theme.wire_transfer_proof_upload_hint') }}</small>
 </div>
 
 <div class="form-group mb-5">

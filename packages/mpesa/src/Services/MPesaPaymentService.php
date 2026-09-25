@@ -115,10 +115,10 @@ class MPesaPaymentService extends PaymentService
         $this->httpClient->setReference($ref);
 
         if (!$this->amount || !is_numeric($this->amount) || $this->amount < 1) {
-            throw new PaymentFailedException("Invalid Amount.");
+            throw new PaymentFailedException(trans('api.invalid_amount'));
         }
         if (!$this->request->mpesa_number || !preg_match('/^[\d\s\+]+$/', $this->request->mpesa_number)) {
-            throw new PaymentFailedException("Invalid M-Pesa number.");
+            throw new PaymentFailedException(trans('api.invalid_mpesa_number'));
         }
 
         return $this;

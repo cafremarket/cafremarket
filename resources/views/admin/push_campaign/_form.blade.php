@@ -28,7 +28,7 @@
 <div class="form-group">
   {!! Form::label('image_url', 'Image URL (optional)') !!}
   {!! Form::text('image_url', null, ['class' => 'form-control', 'placeholder' => 'https://...']) !!}
-  <p class="help-block">HTTPS image recommended for rich notifications on Android/iOS.</p>
+  <p class="help-block">{{ trans('help.push_campaign_image') }}</p>
 </div>
 
 <div class="form-group">

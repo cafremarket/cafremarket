@@ -238,7 +238,7 @@
       $('select#languageChange').ddslick({
         width: "115px",
         imagePosition: "left",
-        selectText: "{{ trans('theme::lang.language_options') }}",
+        selectText: "{{ trans('theme.language') }}",
         onSelected: function(data) {
           var lang = data.selectedData.value;
           if (lang != '{{ \App::getLocale() }}') {
@@ -265,7 +265,7 @@
       $("select#mobile-lang").ddslick({
         width: "100%",
         imagePosition: "left",
-        selectText: "{{ trans('theme::lang.language_options') }}",
+        selectText: "{{ trans('theme.language') }}",
         onSelected: function(data) {
           var lang = data.selectedData.value;
           if (lang != '{{ \App::getLocale() }}') {

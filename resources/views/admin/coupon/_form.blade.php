@@ -24,7 +24,7 @@
       <div class="input-group code-field">
         {!! Form::text('code', null, ['class' => 'form-control code', 'placeholder' => trans('app.placeholder.code'), isset($coupon) ? 'disabled' : 'required']) !!}
         <span class="input-group-btn">
-          <button id="coupon" class="btn btn-lg btn-default generate-code" type="button" {{ isset($coupon) ? 'disabled' : '' }}><i class="fa fa-rocket"></i> Generate</button>
+          <button id="coupon" class="btn btn-lg btn-default generate-code" type="button" {{ isset($coupon) ? 'disabled' : '' }}><i class="fa fa-rocket"></i> {{ trans('app.generate') }}</button>
         </span>
       </div>
       <div class="help-block with-errors"></div>

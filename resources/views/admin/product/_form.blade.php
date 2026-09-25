@@ -145,9 +145,9 @@
               <table class="table table-bordered table-striped">
                 <thead>
                   <tr>
-                    <th>Label</th>
-                    <th>Type</th>
-                    <th>Amount</th>
+                    <th>{{ trans('app.label') }}</th>
+                    <th>{{ trans('app.type') }}</th>
+                    <th>{{ trans('app.amount') }}</th>
                   </tr>
                 </thead>
                 <tbody>

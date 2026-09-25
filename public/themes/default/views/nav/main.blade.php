@@ -141,7 +141,7 @@
         <div class="col-7 col-lg-2 d-flex align-items-center justify-content-sm-between">
           <div class="header-menu-toggler">
             <div class="menu-icon">
-              <a class="main-menu-toggle" href="javascript:void(0);" aria-label="main menu toggle button"><i class="fal fa-bars"></i></a>
+              <a class="main-menu-toggle" href="javascript:void(0);" aria-label="{{ trans('theme.toggle_main_menu') }}"><i class="fal fa-bars"></i></a>
             </div>
           </div> <!-- /.header-menu-toggler -->
 

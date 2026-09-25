@@ -14,10 +14,10 @@
               <div class="best-deal-arrow">
                 <ul>
                   <li>
-                    <button class="left-arrow slider-arrow slick-arrow best-under-left" aria-label="left arrow"><i class="fal fa-chevron-left"></i></button>
+                    <button class="left-arrow slider-arrow slick-arrow best-under-left" aria-label="{{ trans('theme.previous') }}"><i class="fal fa-chevron-left"></i></button>
                   </li>
                   <li>
-                    <button class="right-arrow slider-arrow slick-arrow best-under-right" aria-label="right arrow"><i class="fal fa-chevron-right"></i></button>
+                    <button class="right-arrow slider-arrow slick-arrow best-under-right" aria-label="{{ trans('theme.next') }}"><i class="fal fa-chevron-right"></i></button>
                   </li>
                 </ul>
               </div>

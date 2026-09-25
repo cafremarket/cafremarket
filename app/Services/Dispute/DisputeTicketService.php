@@ -22,7 +22,7 @@ class DisputeTicketService
     {
         if ($order->dispute) {
             throw ValidationException::withMessages([
-                'order' => 'A dispute ticket already exists for this order.',
+                'order' => trans('messages.dispute_ticket_exists'),
             ]);
         }
 
@@ -61,7 +61,7 @@ class DisputeTicketService
         if ($requestedStatus !== null) {
             if (! $isAdmin && in_array($requestedStatus, [Dispute::STATUS_CLOSED, Dispute::STATUS_CLOSE_REQUESTED], true)) {
                 throw ValidationException::withMessages([
-                    'status' => 'Only marketplace admin can close a dispute ticket.',
+                    'status' => trans('messages.dispute_only_admin_can_close'),
                 ]);
             }
 
@@ -115,7 +115,7 @@ class DisputeTicketService
 
         if (! $dispute->isResolved()) {
             throw ValidationException::withMessages([
-                'dispute' => 'Mark the dispute as resolved before requesting admin to close it.',
+                'dispute' => trans('messages.dispute_mark_resolved_first'),
             ]);
         }
 
@@ -133,7 +133,7 @@ class DisputeTicketService
     {
         if (! $admin->isFromPlatform()) {
             throw ValidationException::withMessages([
-                'dispute' => 'Only marketplace admin can close a dispute ticket.',
+                'dispute' => trans('messages.dispute_only_admin_can_close'),
             ]);
         }
 
@@ -201,7 +201,7 @@ class DisputeTicketService
     {
         if ($dispute->isClosed()) {
             throw ValidationException::withMessages([
-                'dispute' => 'This dispute ticket is closed. Only marketplace admin can close tickets, and it cannot be updated after close.',
+                'dispute' => trans('messages.dispute_ticket_closed'),
             ]);
         }
     }

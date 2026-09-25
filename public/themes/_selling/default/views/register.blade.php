@@ -145,7 +145,8 @@
       freeLabel: @json(__('theme.free')),
       perMonthLabel: @json(trans('app.per_month')),
       loadError: @json(trans('theme.selling_page.api_load_error')),
-      fixFieldsMsg: @json(trans('theme.selling_page.fix_highlighted_fields'))
+      fixFieldsMsg: @json(trans('theme.selling_page.fix_highlighted_fields')),
+      errorLabel: @json(trans('theme.error'))
     };
   </script>
   <script src="{{ selling_theme_asset_url('js/selling-auth.js') }}?v={{ @filemtime(selling_theme_assets_path().'/js/selling-auth.js') ?: time() }}"></script>

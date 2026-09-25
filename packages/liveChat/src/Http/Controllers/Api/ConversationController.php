@@ -423,7 +423,7 @@ class ConversationController extends Controller
         }
 
         return response()->json([
-            'message' => 'Replied successfully',
+            'message' => trans('api.replied_successfully'),
             'reply_id' => $reply->id,
             'read' => false,
             'parent_id' => $quotedParent?->id,

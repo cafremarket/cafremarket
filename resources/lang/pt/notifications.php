@@ -109,7 +109,7 @@ return [
         'subject' => ':subject',
         'greeting' => 'Olá :receiver',
         'message' => ':message',
-        'button_text' => 'View the message on site',
+        'button_text' => 'Ver a mensagem no site',
     ],
 
     'message_replied' => [
@@ -313,7 +313,7 @@ return [
 
     // Ticket Notifications
     'ticket_acknowledgement' => [
-        'subject' => '[Ticket ID: :ticket_id] :subject',
+        'subject' => '[Ticket: :ticket_id] :subject',
         'greeting' => 'Olá :user',
         'message' => 'Esta é uma notificação para informar que recebemos o seu ticket :ticket_id com sucesso! A nossa equipa de suporte entrará em contacto consigo o mais breve possível.',
         'button_text' => 'Ver o ticket',
@@ -434,4 +434,9 @@ return [
         'order' => 'Encomenda',
     ],
 
+    'pickup_order_created' => [
+        'subject' => '[Pedido: :order] a sua encomenda está pronta para levantamento!',
+        'message' => 'Obrigado por nos escolher! O seu pedido [Pedido :order] foi realizado com sucesso. Mostre o código :otp ao vendedor para o levantar.',
+    ],
+    'new_chat_message_title' => 'Nova mensagem de conversa',
 ];

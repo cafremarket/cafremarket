@@ -139,7 +139,7 @@
       </div>
     </div>
 
-    <p class="text-info"><i class="fa fa-info-circle"></i> The background color and image has no use in new default theme and will be removed in future update.</p>
+    <p class="text-info"><i class="fa fa-info-circle"></i> {{ trans('help.banner_bg_deprecated') }}</p>
 
     <p class="help-block">* {{ trans('app.form.required_fields') }}</p>
   </div>

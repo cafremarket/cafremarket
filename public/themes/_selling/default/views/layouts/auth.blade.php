@@ -78,6 +78,7 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="{{ selling_theme_asset_url('js/jqBootstrapValidation.min.js') }}"></script>
+  <script>window.sfSellingI18n = { somethingWentWrong: @json(trans('theme.selling_page.something_went_wrong')) };</script>
   <script src="{{ selling_theme_asset_url('js/app.js') }}?v={{ @filemtime(selling_theme_assets_path().'/js/app.js') ?: time() }}"></script>
   @yield('scripts')
 </body>

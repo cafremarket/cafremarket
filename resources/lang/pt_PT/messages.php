@@ -342,4 +342,9 @@ return [
     'no_translation_available' => 'No translation option available! Multiple active languages are needed.',
 
     'uploaded_file_not_blade_file' => 'The template file must have to be a blade.php file',
+
+    // Seller (selling) pages
+    'please_wait' => 'Por favor, aguarde...',
+    'seller_register_next_steps' => 'Depois de se registar, irá verificar a sua loja marcando a localização no mapa e carregando os documentos da empresa.',
+    'seller_login_subtitle' => 'Inicie sessão para gerir a sua loja, encomendas e verificação.',
 ];

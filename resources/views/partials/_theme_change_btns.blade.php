@@ -13,7 +13,7 @@
 </style>
 
 <select class="theme-select" id="zcart-js-theme-select">
-  <option value="light">Light</option>
-  <option value="dark">Dark</option>
-  <option value="blue">Blue and Rose</option>
+  <option value="light">{{ trans('app.theme_light') }}</option>
+  <option value="dark">{{ trans('app.theme_dark') }}</option>
+  <option value="blue">{{ trans('app.theme_blue_rose') }}</option>
 </select>

@@ -139,4 +139,13 @@ return [
     'model_translation_saved_successfully' => ':model translation saved successfully',
     'location_updated' => 'Location updated successfully',
     'order_feedback_not_allowed' => 'You can leave feedback once the order has been delivered.',
+    'sku_already_taken' => 'This SKU is already used by another product. Please use a different SKU.',
+    'payment_failed_reason' => 'Payment failed: :reason',
+    'order_not_found' => 'Order not found',
+    'affiliate_settings_required' => 'Provide affiliate_enabled and/or affiliate_commission_percentage.',
+    'token_required' => 'Token is required',
+    'token_saved' => 'Token saved successfully',
+    'invalid_amount' => 'Invalid amount.',
+    'invalid_mpesa_number' => 'Invalid M-Pesa number.',
+    'replied_successfully' => 'Replied successfully',
 ];

@@ -16,13 +16,13 @@ class NotificationController extends Controller
         $raw = $request->input('token') ?? $request->query('token');
         $token = FCMService::normalizeToken($raw);
         if ($token === '') {
-            return response()->json(['message' => 'Token is required'], 422);
+            return response()->json(['message' => trans('api.token_required')], 422);
         }
 
         $user->fcm_token = $token;
         $user->save();
 
-        return response()->json(['message' => 'Token saved successfully'], 200);
+        return response()->json(['message' => trans('api.token_saved')], 200);
     }
 
     public function getNotifications()

@@ -113,7 +113,7 @@
     if (document.cookie) {
       consentBox.classList.add("hide");
     } else {
-      alert("Cookie can't be set! Please" + " unblock this site from the cookie" + " setting of your browser.");
+      alert(@json(trans('theme.cookie_cant_be_set')));
     }
   }
 

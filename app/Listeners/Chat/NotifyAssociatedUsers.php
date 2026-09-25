@@ -47,7 +47,7 @@ class NotifyAssociatedUsers
                 }
 
                 $this->pushToVendorShop($shop, [
-                    'title' => 'New chat message',
+                    'title' => trans('notifications.new_chat_message_title'),
                     'body' => $sender.': '.$preview,
                 ], [
                     'type' => 'live_chat',

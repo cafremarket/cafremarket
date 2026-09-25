@@ -17,7 +17,7 @@
 
         <div class="mpc__search">
           <i class="fa fa-search"></i>
-          <input type="search" id="mpc-search" placeholder="Search customers…" autocomplete="off">
+          <input type="search" id="mpc-search" placeholder="{{ trans('app.search_customers') }}" autocomplete="off">
         </div>
 
         <div class="mpc__list" id="leftsidebar">
@@ -61,7 +61,7 @@
             @empty
               <div class="mpc__empty-list">
                 <i class="fa fa-inbox"></i>
-                <p>No customer chats yet</p>
+                <p>{{ trans('app.no_customer_chats') }}</p>
               </div>
             @endforelse
           </div>
@@ -71,8 +71,8 @@
       <section class="mpc__thread" id="chatConversation">
         <div class="mpc__placeholder">
           <div class="mpc__placeholder-icon"><i class="fa fa-comments"></i></div>
-          <h3>Select a conversation</h3>
-          <p>Pick a customer on the left to reply in real time.</p>
+          <h3>{{ trans('app.select_a_conversation') }}</h3>
+          <p>{{ trans('help.pick_customer_to_reply') }}</p>
         </div>
       </section>
     </div>
@@ -987,7 +987,7 @@
   function sendExtra(displayText, type, payloadObj) {
     if (sending) return;
     var url = (qs('.mpc-composer') || {}).getAttribute('data-reply-url');
-    if (!url) { showError('Missing reply URL. Reload the page.'); return; }
+    if (!url) { showError(@json(trans('app.missing_reply_url'))); return; }
 
     sending = true;
     showError('');
@@ -1040,7 +1040,7 @@
       sending = false;
       if (!result.ok) {
         if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
-        showError('Could not send (HTTP ' + result.status + '). Try again.');
+        showError(@json(trans('app.could_not_send_http')).replace(':status', result.status));
         return;
       }
       var data = result.data || {};
@@ -1055,7 +1055,7 @@
     }).catch(function () {
       sending = false;
       if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
-      showError('Network error. Message not sent.');
+      showError(@json(trans('app.network_error_message_not_sent')));
     });
   }
 
@@ -1069,7 +1069,7 @@
 
     var url = form.getAttribute('action') || (qs('.mpc-composer') || {}).getAttribute('data-reply-url');
     if (!url) {
-      showError('Missing reply URL. Reload the page.');
+      showError(@json(trans('app.missing_reply_url')));
       return;
     }
 
@@ -1131,7 +1131,7 @@
       if (!result.ok) {
         if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
         if (ta) ta.value = msg;
-        showError('Could not send (HTTP ' + result.status + '). Try again.');
+        showError(@json(trans('app.could_not_send_http')).replace(':status', result.status));
         return;
       }
       var data = result.data || {};
@@ -1162,7 +1162,7 @@
       if (btn) btn.disabled = false;
       if (pendingNode && pendingNode.parentNode) pendingNode.parentNode.removeChild(pendingNode);
       if (ta) ta.value = msg;
-      showError('Network error. Message not sent.');
+      showError(@json(trans('app.network_error_message_not_sent')));
     });
   }
 

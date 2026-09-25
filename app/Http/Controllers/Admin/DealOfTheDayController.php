@@ -96,10 +96,10 @@ class DealOfTheDayController extends Controller
 
         if (empty($validIds)) {
             if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => 'No valid active products selected.'], 422);
+                return response()->json(['success' => false, 'message' => trans('messages.no_valid_active_products_selected')], 422);
             }
 
-            return back()->with('error', 'No valid active products selected.');
+            return back()->with('error', trans('messages.no_valid_active_products_selected'));
         }
 
         // Preserve admin selection order

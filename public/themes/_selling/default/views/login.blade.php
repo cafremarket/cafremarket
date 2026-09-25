@@ -43,7 +43,8 @@
     window.sfSellingAuth = {
       loginError: @json(trans('theme.selling_page.login_error')),
       dashboardUrl: @json(route('merchant.dashboard')),
-      fixFieldsMsg: @json(trans('theme.selling_page.fix_highlighted_fields'))
+      fixFieldsMsg: @json(trans('theme.selling_page.fix_highlighted_fields')),
+      errorLabel: @json(trans('theme.error'))
     };
   </script>
   <script src="{{ selling_theme_asset_url('js/selling-auth.js') }}?v={{ @filemtime(selling_theme_assets_path().'/js/selling-auth.js') ?: time() }}"></script>

@@ -406,7 +406,7 @@ class DepositController extends Controller
 
             if ($customer['base'] <= 0) {
                 return response()->json([
-                    'message' => 'Invalid cart parts',
+                    'message' => trans('packages.wallet.invalid_cart_parts'),
                 ], 422);
             }
 
@@ -447,7 +447,7 @@ class DepositController extends Controller
 
         if ($amount === null || (float) $amount <= 0) {
             return response()->json([
-                'message' => 'The amount field is required when carts are not provided.',
+                'message' => trans('packages.wallet.amount_required_without_carts'),
             ], 422);
         }
 

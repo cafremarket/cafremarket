@@ -239,7 +239,7 @@ return [
   "apple_login_not_available" => "Apple Login is not available on your device",
   "clear_cache" => "Clear Cache",
   "condition" => "Condition",
-  "out_of_stock" => "Out of Stock",
+  "out_of_stock" => 'Esgotado',
   "rating_and_reviews" => "Rating & Reviews",
   "unknown" => "Unknown",
   "product_details" => "Product Details",

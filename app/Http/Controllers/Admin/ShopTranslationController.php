@@ -188,7 +188,7 @@ class ShopTranslationController extends Controller
                 continue;
             }
         }
-        $request->session()->flash('success', trans('messages.imported', ['model' => trans('Shop Translation')]));
+        $request->session()->flash('success', trans('messages.imported', ['model' => trans('app.model.shop_translation')]));
 
         $failed_rows = $this->getFailedList();
 

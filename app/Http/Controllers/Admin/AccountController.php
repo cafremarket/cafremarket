@@ -164,7 +164,7 @@ class AccountController extends Controller
 
         if (! (new Authorize(Auth::user(), 'reply_ticket', $ticket))->check()
             && Auth::id() != $ticket->user_id) {
-            abort(403, 'Unauthorized action.');
+            abort(403, trans('responses.unauthorized_action'));
         }
 
         $ticket->update($request->except('user_id'));
@@ -190,7 +190,7 @@ class AccountController extends Controller
     public function archiveTicket(Request $request, Ticket $ticket)
     {
         if (Auth::id() != $ticket->user_id) {
-            abort(403, 'Unauthorized action.');
+            abort(403, trans('responses.unauthorized_action'));
         }
 
         $ticket->delete();

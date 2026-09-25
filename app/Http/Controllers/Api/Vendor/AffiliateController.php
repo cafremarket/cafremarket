@@ -204,7 +204,7 @@ class AffiliateController extends Controller
 
         if (! $request->has('affiliate_enabled') && ! $request->exists('affiliate_commission_percentage')) {
             return response()->json([
-                'message' => 'Provide affiliate_enabled and/or affiliate_commission_percentage.',
+                'message' => trans('api.affiliate_settings_required'),
             ], 422);
         }
 

@@ -68,9 +68,9 @@
     <strong>{{ $chat->customer->getName() }}</strong>
     <span>
       @if (!empty($orderContextNumber))
-        Order #{{ $orderContextNumber }}
+        {{ trans('app.order') }} #{{ $orderContextNumber }}
       @elseif ($chat->order_id && optional($chat->order)->order_number)
-        Order #{{ $chat->order->order_number }}
+        {{ trans('app.order') }} #{{ $chat->order->order_number }}
       @else
         {{ trans('app.customer') ?? 'Customer' }}
       @endif
@@ -122,7 +122,7 @@
                     ? route('merchant.order.details', $share['order_id'], false)
                     : ($share['url'] ?? '#');
               @endphp
-              <a href="{{ $vendorOrderUrl }}" target="_blank" rel="noopener">View order</a>
+              <a href="{{ $vendorOrderUrl }}" target="_blank" rel="noopener">{{ trans('app.view_order') }}</a>
             </div>
           </div>
         @elseif (is_array($share))
@@ -131,7 +131,7 @@
             <div>
               <div class="mpc-share__title">{{ $share['title'] ?? '' }}</div>
               <div class="mpc-share__price">{{ $share['price'] ?? '' }}</div>
-              <a href="{{ $share['url'] ?? '#' }}" target="_blank" rel="noopener">View</a>
+              <a href="{{ $share['url'] ?? '#' }}" target="_blank" rel="noopener">{{ trans('app.view') }}</a>
             </div>
           </div>
         @elseif ($itemType === \App\Models\Reply::TYPE_LOCATION && is_array($item['payload']))
@@ -139,7 +139,7 @@
             <div class="mpc-share__icon"><i class="fa fa-map-marker"></i></div>
             <div>
               <div class="mpc-share__title">{{ $item['payload']['label'] ?? 'Location' }}</div>
-              <a href="https://www.google.com/maps/search/?api=1&query={{ $item['payload']['lat'] ?? 0 }},{{ $item['payload']['lng'] ?? 0 }}" target="_blank" rel="noopener">Open in Maps</a>
+              <a href="https://www.google.com/maps/search/?api=1&query={{ $item['payload']['lat'] ?? 0 }},{{ $item['payload']['lng'] ?? 0 }}" target="_blank" rel="noopener">{{ trans('app.open_in_maps') }}</a>
             </div>
           </div>
         @elseif ($itemType === \App\Models\Reply::TYPE_CONTACT && is_array($item['payload']))
@@ -149,7 +149,7 @@
               <div class="mpc-share__title">{{ $item['payload']['name'] ?? 'Contact' }}</div>
               <div class="mpc-share__price">{{ $item['payload']['phone'] ?? '' }}</div>
               @if (!empty($item['payload']['phone']))
-                <a href="tel:{{ $item['payload']['phone'] }}">Call</a>
+                <a href="tel:{{ $item['payload']['phone'] }}">{{ trans('app.call') }}</a>
               @endif
             </div>
           </div>
@@ -179,7 +179,7 @@
       </div>
     </div>
   @empty
-    <div class="mpc-thread__hint">No messages yet. Say hello.</div>
+    <div class="mpc-thread__hint">{{ trans('app.no_messages_say_hello') }}</div>
   @endforelse
 </div>
 
@@ -190,7 +190,7 @@
       <strong id="mpc-quote-name"></strong>
       <span id="mpc-quote-text"></span>
     </div>
-    <button type="button" id="mpc-quote-clear" aria-label="Cancel">&times;</button>
+    <button type="button" id="mpc-quote-clear" aria-label="{{ trans('app.cancel') }}">&times;</button>
   </div>
   <div id="mpc-attach-preview" class="mpc-composer__preview" hidden>
     <span id="mpc-attach-name"></span>
@@ -207,16 +207,16 @@
         <input type="file" id="merchantChatFile" name="photo" accept="image/*,.pdf,.doc,.docx">
       </label>
       <div class="mpc-attach-menu" id="mpc-attach-menu">
-        <button type="button" id="mpc-menu-media"><i class="fa fa-paperclip"></i> Media</button>
-        <button type="button" id="mpc-menu-share-product"><i class="fa fa-tag"></i> Share Product</button>
-        <button type="button" id="mpc-menu-share-order"><i class="fa fa-receipt"></i> Share Order</button>
-        <button type="button" id="mpc-menu-order"><i class="fa fa-shopping-bag"></i> Create Order</button>
+        <button type="button" id="mpc-menu-media"><i class="fa fa-paperclip"></i> {{ trans('app.media') }}</button>
+        <button type="button" id="mpc-menu-share-product"><i class="fa fa-tag"></i> {{ trans('app.share_product') }}</button>
+        <button type="button" id="mpc-menu-share-order"><i class="fa fa-receipt"></i> {{ trans('app.share_order') }}</button>
+        <button type="button" id="mpc-menu-order"><i class="fa fa-shopping-bag"></i> {{ trans('app.add_order') }}</button>
       </div>
     </div>
-    <button type="button" class="mpc-attach-toggle" id="mpc-order-shortcut" title="Create custom order">
+    <button type="button" class="mpc-attach-toggle" id="mpc-order-shortcut" title="{{ trans('app.create_custom_order') }}">
       <i class="fa fa-shopping-bag"></i>
     </button>
-    <textarea id="message" name="message" rows="1" placeholder="Write a reply…" maxlength="5000"></textarea>
+    <textarea id="message" name="message" rows="1" placeholder="{{ trans('app.write_a_reply_label') }}" maxlength="5000"></textarea>
     <button type="submit" class="mpc-composer__send" id="send-btn" aria-label="Send">
       <i class="fa fa-send"></i>
     </button>
@@ -228,11 +228,11 @@
      data-products-url="{{ $inventorySearchUrl }}"
      data-orders-url="{{ route('merchant.support.chat_conversation.searchOrders', $chat, false) }}">
   <div class="mpc-modal">
-    <h3 id="mpc-picker-title">Share a product</h3>
-    <input type="text" id="mpc-picker-search" placeholder="Search…">
+    <h3 id="mpc-picker-title">{{ trans('app.share_a_product') }}</h3>
+    <input type="text" id="mpc-picker-search" placeholder="{{ trans('app.search_ellipsis') }}">
     <div id="mpc-picker-list" class="mpc-picker-list"></div>
     <div class="mpc-modal-actions">
-      <button type="button" class="mpc-btn-secondary" id="mpc-picker-close">Close</button>
+      <button type="button" class="mpc-btn-secondary" id="mpc-picker-close">{{ trans('app.close') }}</button>
     </div>
   </div>
 </div>
@@ -244,34 +244,34 @@
      data-default-tax="{{ $orderDefaultTax }}"
      data-default-tax-type="{{ $orderDefaultTaxType }}">
   <div class="mpc-modal mpc-modal--xwide">
-    <h3>Create custom order</h3>
-    <p class="mpc-modal-hint">Search your own catalog for real pricing, or add a one-off custom item — every field below is editable.</p>
+    <h3>{{ trans('app.create_custom_order') }}</h3>
+    <p class="mpc-modal-hint">{{ trans('help.custom_order_intro') }}</p>
 
     <table class="mpc-oi-table">
       <thead>
         <tr>
-          <th class="mpc-oi-th-product">Product</th>
-          <th class="mpc-oi-th-num">Qty</th>
-          <th class="mpc-oi-th-num">Price</th>
-          <th class="mpc-oi-th-num">Total</th>
+          <th class="mpc-oi-th-product">{{ trans('app.model.product') }}</th>
+          <th class="mpc-oi-th-num">{{ trans('app.qty') }}</th>
+          <th class="mpc-oi-th-num">{{ trans('app.price') }}</th>
+          <th class="mpc-oi-th-num">{{ trans('app.total') }}</th>
           <th class="mpc-oi-th-action"></th>
         </tr>
       </thead>
       <tbody id="mpc-order-items"></tbody>
     </table>
     <button type="button" class="mpc-order-add-item-btn" id="mpc-order-add-item">
-      <i class="fa fa-plus-circle"></i> Add item
+      <i class="fa fa-plus-circle"></i> {{ trans('app.add_item') }}
     </button>
 
     <div class="mpc-checkout-summary">
       <div class="mpc-checkout-summary__row">
-        <span>Subtotal</span>
+        <span>{{ trans('app.subtotal') }}</span>
         <strong id="mpc-order-subtotal">0.00</strong>
       </div>
 
       <div class="mpc-checkout-summary__row mpc-checkout-summary__row--input">
         <label for="mpc-order-shipping">
-          Shipping cost
+          {{ trans('app.shipping_cost') }}
           <a href="javascript:void(0);" class="mpc-info-icon" id="mpc-shipping-info" tabindex="0" role="button"
              data-toggle="popover" data-trigger="hover focus click" data-html="true" data-placement="left" data-container="body"
              title="Shipping" data-content="" hidden>
@@ -283,71 +283,71 @@
 
       <div class="mpc-checkout-summary__row mpc-checkout-summary__row--input">
         <label for="mpc-order-tax">
-          Tax
+          {{ trans('app.model.tax') }}
           <a href="javascript:void(0);" class="mpc-info-icon" id="mpc-tax-info" tabindex="0" role="button"
              data-toggle="popover" data-trigger="hover focus click" data-html="true" data-placement="left" data-container="body"
-             title="Tax" data-content="" hidden>
+             title="{{ trans('app.model.tax') }}" data-content="" hidden>
             <i class="fa fa-info-circle"></i>
           </a>
         </label>
         <div class="mpc-order-amount-row">
           <input type="number" id="mpc-order-tax" min="0" step="0.01" value="{{ $orderDefaultTax }}">
           <select id="mpc-order-tax-type">
-            <option value="amount" {{ $orderDefaultTaxType === 'amount' ? 'selected' : '' }}>Fixed</option>
+            <option value="amount" {{ $orderDefaultTaxType === 'amount' ? 'selected' : '' }}>{{ trans('app.fixed') }}</option>
             <option value="percent" {{ $orderDefaultTaxType === 'percent' ? 'selected' : '' }}>%</option>
           </select>
         </div>
       </div>
 
       <div class="mpc-checkout-summary__row mpc-checkout-summary__row--input">
-        <label for="mpc-order-discount">Discount</label>
+        <label for="mpc-order-discount">{{ trans('app.discount') }}</label>
         <div class="mpc-order-amount-row">
           <input type="number" id="mpc-order-discount" min="0" step="0.01" value="0">
           <select id="mpc-order-discount-type">
-            <option value="amount">Fixed</option>
+            <option value="amount">{{ trans('app.fixed') }}</option>
             <option value="percent">%</option>
           </select>
         </div>
       </div>
 
       <div class="mpc-checkout-summary__row mpc-checkout-summary__row--grand">
-        <span>Grand total</span>
+        <span>{{ trans('app.grand_total') }}</span>
         <strong id="mpc-order-grand-total">0.00</strong>
       </div>
     </div>
 
-    <p class="mpc-modal-hint">The customer picks their own payment method and pays once they open this order — no need to choose one here.</p>
+    <p class="mpc-modal-hint">{{ trans('help.custom_order_payment_note') }}</p>
 
     @if (count($orderAddresses['data']))
       <div class="mpc-addr-section"
            data-default-shipping="{{ $orderAddresses['default_shipping_address_id'] }}"
            data-default-billing="{{ $orderAddresses['default_billing_address_id'] }}">
-        <label class="mpc-addr-heading">Shipping address</label>
+        <label class="mpc-addr-heading">{{ trans('app.shipping_address') }}</label>
         @include('liveChat::merchant.partials._address_options', ['name' => 'mpc_ship_addr', 'addresses' => $orderAddresses['data'], 'selected' => $orderAddresses['default_shipping_address_id']])
 
         <label class="mpc-addr-same">
           <input type="checkbox" id="mpc-order-same-billing" {{ $orderAddresses['default_billing_address_id'] == $orderAddresses['default_shipping_address_id'] ? 'checked' : '' }}>
-          <span>Billing address same as shipping</span>
+          <span>{{ trans('app.billing_same_as_shipping') }}</span>
         </label>
 
         <div id="mpc-bill-addr-wrap" {{ $orderAddresses['default_billing_address_id'] == $orderAddresses['default_shipping_address_id'] ? 'hidden' : '' }}>
-          <label class="mpc-addr-heading">Billing address</label>
+          <label class="mpc-addr-heading">{{ trans('app.billing_address') }}</label>
           @include('liveChat::merchant.partials._address_options', ['name' => 'mpc_bill_addr', 'addresses' => $orderAddresses['data'], 'selected' => $orderAddresses['default_billing_address_id']])
         </div>
       </div>
     @else
-      <p class="mpc-addr-empty"><i class="fa fa-info-circle"></i> This customer has no saved address yet — type the billing address below.</p>
-      <label for="mpc-order-billing">Billing address</label>
-      <textarea id="mpc-order-billing" rows="3" placeholder="Billing address">{{ $orderDefaultBillingAddress }}</textarea>
+      <p class="mpc-addr-empty"><i class="fa fa-info-circle"></i> {{ trans('help.customer_no_saved_address') }}</p>
+      <label for="mpc-order-billing">{{ trans('app.billing_address') }}</label>
+      <textarea id="mpc-order-billing" rows="3" placeholder="{{ trans('app.billing_address') }}">{{ $orderDefaultBillingAddress }}</textarea>
     @endif
 
-    <label for="mpc-order-note">Note to customer (optional)</label>
-    <textarea id="mpc-order-note" rows="2" placeholder="e.g. Thanks for your order! Here's a custom quote…"></textarea>
+    <label for="mpc-order-note">{{ trans('app.note_to_customer_optional') }}</label>
+    <textarea id="mpc-order-note" rows="2" placeholder="{{ trans('app.custom_order_note_placeholder') }}"></textarea>
 
     <p id="mpc-order-error" class="mpc-composer__error" hidden></p>
     <div class="mpc-modal-actions">
-      <button type="button" class="mpc-btn-secondary" id="mpc-order-cancel">Cancel</button>
-      <button type="button" class="mpc-btn-primary" id="mpc-order-submit">Create &amp; share</button>
+      <button type="button" class="mpc-btn-secondary" id="mpc-order-cancel">{{ trans('app.cancel') }}</button>
+      <button type="button" class="mpc-btn-primary" id="mpc-order-submit">{{ trans('app.create_and_share') }}</button>
     </div>
   </div>
 </div>

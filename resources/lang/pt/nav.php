@@ -93,4 +93,13 @@ return [
     'stock_movements' => 'Movimentos de stock',
     'stock_transfers' => 'Transferências de stock',
     'order_feedbacks' => 'Avaliações de encomendas',
+    'staff' => 'Equipa',
+    'store_management' => 'Gestão da loja',
+    'stock_overview' => 'Resumo de stock',
+    'slug_change_requests' => 'Pedidos de alteração de URL da loja',
+    'app_banners' => 'Banners da aplicação',
+    'popups' => 'Popups',
+    'policy_pages' => 'Páginas de políticas',
+    'subcategories' => 'Subcategorias',
+    'affiliate' => 'Afiliados',
 ];

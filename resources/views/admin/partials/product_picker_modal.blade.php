@@ -25,7 +25,7 @@
         <button type="button" class="close product-picker-remove" aria-label="Remove">&times;</button>
       </div>
     @empty
-      <p class="text-muted product-picker-empty mb-0">No products selected yet.</p>
+      <p class="text-muted product-picker-empty mb-0">{{ trans('app.no_products_selected_yet') }}</p>
     @endforelse
   </div>
 
@@ -39,28 +39,28 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-        <h4 class="modal-title">Select product</h4>
+        <h4 class="modal-title">{{ trans('app.select_product') }}</h4>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>1. Select store</label>
+          <label>{{ trans('app.step_select_store') }}</label>
           <select class="form-control" id="{{ $pickerId }}-shop">
-            <option value="">— Choose a store —</option>
+            <option value="">{{ trans('app.choose_a_store') }}</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>2. Search products in this store</label>
-          <input type="text" class="form-control" id="{{ $pickerId }}-search" placeholder="Filter by name or SKU…" disabled>
+          <label>{{ trans('app.step_search_store_products') }}</label>
+          <input type="text" class="form-control" id="{{ $pickerId }}-search" placeholder="{{ trans('app.filter_by_name_or_sku') }}" disabled>
         </div>
 
         <div class="product-picker-list" id="{{ $pickerId }}-list">
-          <p class="text-muted">Select a store to load products.</p>
+          <p class="text-muted">{{ trans('app.select_store_to_load_products') }}</p>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="{{ $pickerId }}-confirm" disabled>Add selected</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('app.cancel') }}</button>
+        <button type="button" class="btn btn-primary" id="{{ $pickerId }}-confirm" disabled>{{ trans('app.add_selected') }}</button>
       </div>
     </div>
   </div>
@@ -161,7 +161,7 @@
   function renderSelectedEmpty() {
     if (!$selected.find('.product-picker-chip').length) {
       if (!$selected.find('.product-picker-empty').length) {
-        $selected.html('<p class="text-muted product-picker-empty mb-0">No products selected yet.</p>');
+        $selected.html('<p class="text-muted product-picker-empty mb-0">{{ trans('app.no_products_selected_yet') }}</p>');
       }
     }
   }
@@ -192,7 +192,7 @@
   function renderList(items) {
     var already = selectedIds();
     if (!items.length) {
-      $list.html('<p class="text-muted" style="padding:12px;">No products found for this store.</p>');
+      $list.html('<p class="text-muted" style="padding:12px;">{{ trans('app.no_products_found_for_store') }}</p>');
       return;
     }
     var html = '';
@@ -219,7 +219,7 @@
       var $strong = $(this).find('strong');
       $strong.text(item.title || '');
       if (already[id]) {
-        $strong.append(' <span class="selected-badge">Selected</span>');
+        $strong.append(' <span class="selected-badge">{{ trans('app.selected') }}</span>');
       }
       $(this).find('small').text(item.sku || '');
       $(this).find('.price').text(item.price || '');
@@ -244,20 +244,20 @@
   function loadProducts() {
     var shopId = $shop.val();
     if (!shopId) {
-      $list.html('<p class="text-muted" style="padding:12px;">Select a store to load products.</p>');
+      $list.html('<p class="text-muted" style="padding:12px;">{{ trans('app.select_store_to_load_products') }}</p>');
       $search.prop('disabled', true).val('');
       draft = {};
       updateConfirm();
       return;
     }
     $search.prop('disabled', false);
-    $list.html('<p class="text-muted" style="padding:12px;">Loading…</p>');
+    $list.html('<p class="text-muted" style="padding:12px;">{{ trans('app.loading') }}</p>');
     $.getJSON(productsUrl, { shop_id: shopId, q: $search.val() }).then(function (res) {
       draft = {};
       updateConfirm();
       renderList(res.data || []);
     }).fail(function () {
-      $list.html('<p class="text-danger" style="padding:12px;">Failed to load products.</p>');
+      $list.html('<p class="text-danger" style="padding:12px;">{{ trans('app.failed_to_load_products') }}</p>');
     });
   }
 

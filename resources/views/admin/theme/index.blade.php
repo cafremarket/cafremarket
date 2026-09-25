@@ -107,9 +107,9 @@
   @include('admin.partials.ui.card_tabbed_end')
 
   <div class="admin-promo-card admin-promo-card--success" style="margin-top:20px;">
-    <div class="admin-promo-card__head"><i class="fa fa-rocket"></i> Looking for more personalized theme?</div>
+    <div class="admin-promo-card__head"><i class="fa fa-rocket"></i> {{ trans('app.looking_for_personalized_theme') }}</div>
     <div class="admin-promo-card__body">
-      Send us an email for any kind of modification or custom work as we know the code better than everyone.
+      {{ trans('app.theme_custom_work_help') }}
     </div>
   </div>
 @endsection

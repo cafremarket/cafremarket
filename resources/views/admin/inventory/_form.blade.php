@@ -380,7 +380,7 @@
 
             <div class="form-group">
               {!! Form::label('shipping_type', 'Shipping charge', ['class' => 'with-help']) !!}
-              <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Override shop default. Cart uses the highest shipping amount among products."></i>
+              <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ trans('help.inventory_shipping_override') }}"></i>
               {!! Form::select('shipping_type', [
                 'inherit' => 'Use shop default',
                 'free' => trans('theme.free_shipping') ?: 'Free shipping',

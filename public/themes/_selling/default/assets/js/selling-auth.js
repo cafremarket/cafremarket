@@ -7,7 +7,7 @@
     }
 
     function showAlert($box, message, type) {
-        $box.html('<div class="sf-sell-alert sf-sell-alert--danger" role="alert"><strong>Error!</strong> ' + message + '</div>');
+        $box.html('<div class="sf-sell-alert sf-sell-alert--danger" role="alert"><strong>' + ((window.sfSellingAuth && window.sfSellingAuth.errorLabel) || 'Error!') + '</strong> ' + message + '</div>');
     }
 
     function clearFieldErrors($form) {

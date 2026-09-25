@@ -5,12 +5,12 @@
     </div>
     <div class="col-md-4">
       <label class="radio-inline">
-        <input type="radio" name="recipient_type" value="customer" {{ Auth::guard('customer')->check() ? 'checked' : '' }}> Customer
+        <input type="radio" name="recipient_type" value="customer" {{ Auth::guard('customer')->check() ? 'checked' : '' }}> {{ trans('app.model.customer') }}
       </label>
     </div>
     <div class="col-md-4">
       <label class="radio-inline">
-        <input type="radio" name="recipient_type" value="vendor" {{ !Auth::guard('customer')->check() ? 'checked' : '' }}> Vendor
+        <input type="radio" name="recipient_type" value="vendor" {{ !Auth::guard('customer')->check() ? 'checked' : '' }}> {{ trans('app.vendor') }}
       </label>
     </div>
   </div>

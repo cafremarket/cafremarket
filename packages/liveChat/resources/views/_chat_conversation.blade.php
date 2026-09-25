@@ -76,7 +76,7 @@
               <div class="shared-product-meta">
                 <div class="shared-product-title">{{ $share['title'] ?? '' }}</div>
                 <div class="shared-product-price">{{ $share['price'] ?? '' }}</div>
-                <a class="shared-product-link" href="{{ $share['url'] ?? '#' }}" target="_blank">View</a>
+                <a class="shared-product-link" href="{{ $share['url'] ?? '#' }}" target="_blank">{{ trans('app.view') }}</a>
               </div>
             </div>
           @else
@@ -126,12 +126,12 @@
       'class' => 'mp-chat-composer__form',
     ]) !!}
       {!! Form::hidden('parent_id', null, ['id' => 'mpc-parent-id']) !!}
-      <label class="mp-chat-composer__attach reply-attachment" title="{{ __('Attachment') }}">
+      <label class="mp-chat-composer__attach reply-attachment" title="{{ trans('app.attachment') }}">
         <i class="fa fa-paperclip"></i>
         <input type="file" id="merchantChatFile" name="photo" accept="image/*,.pdf,.doc,.docx">
       </label>
       <div class="mp-chat-composer__field reply-main">
-        <textarea id="message" name="message" placeholder="Write your reply…" class="form-control" rows="1" autocomplete="off"></textarea>
+        <textarea id="message" name="message" placeholder="{{ trans('app.write_your_reply') }}" class="form-control" rows="1" autocomplete="off"></textarea>
       </div>
       <button type="button" class="mp-chat-composer__send reply-send" id="send-btn" aria-label="{{ trans('app.send') ?? 'Send' }}">
         <i class="fa fa-send" aria-hidden="true"></i>

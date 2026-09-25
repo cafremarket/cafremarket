@@ -19,7 +19,7 @@
         <div class="input-group code-field">
           {!! Form::text('pin_code', null, ['class' => 'form-control code', 'placeholder' => trans('app.placeholder.pin_code'), 'required']) !!}
           <span class="input-group-btn">
-            <button id="gc-pin-number" class="btn btn-lg btn-default generate-code" type="button"><i class="fa fa-rocket"></i> Generate</button>
+            <button id="gc-pin-number" class="btn btn-lg btn-default generate-code" type="button"><i class="fa fa-rocket"></i> {{ trans('app.generate') }}</button>
           </span>
         </div>
         <div class="help-block with-errors"></div>
@@ -33,7 +33,7 @@
         <div class="input-group code-field">
           {!! Form::text('serial_number', null, ['class' => 'form-control code', 'placeholder' => trans('app.placeholder.serial_number'), 'required']) !!}
           <span class="input-group-btn">
-            <button id="gc-serial-number" class="btn btn-lg btn-default generate-code" type="button"><i class="fa fa-rocket"></i> Generate</button>
+            <button id="gc-serial-number" class="btn btn-lg btn-default generate-code" type="button"><i class="fa fa-rocket"></i> {{ trans('app.generate') }}</button>
           </span>
         </div>
         <div class="help-block with-errors"></div>

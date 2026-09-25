@@ -43,11 +43,11 @@
     </ul> <!-- ei-slider-large -->
 
     <ul class="ei-slider-thumbs">
-      <li class="ei-slider-element">Current</li>
+      <li class="ei-slider-element">{{ trans('theme.current') }}</li>
 
       @foreach ($sliders as $slider)
         <li>
-          <a href="javascript:void(0);">Slide {{ $loop->count }}</a>
+          <a href="javascript:void(0);">{{ trans('theme.slide_n', ['n' => $loop->count]) }}</a>
 
           <img class="lazy" src="{{ get_storage_file_url($slider['images'][0]['path'] ?? ($slider['feature_image']['path'] ?? null), 'tiny') }}" data-src="{{ get_storage_file_url($slider['images'][0]['path'] ?? ($slider['feature_image']['path'] ?? null), 'cover_thumb') }}" alt="thumbnail {{ $loop->count }}" />
         </li>

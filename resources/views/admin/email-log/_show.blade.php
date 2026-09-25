@@ -31,7 +31,7 @@
           <td><code>{{ $emailLog->notification ?: '-' }}</code></td>
         </tr>
         <tr>
-          <th>Context</th>
+          <th>{{ trans('app.context') }}</th>
           <td>{{ $emailLog->context ?: '-' }}</td>
         </tr>
         @if ($emailLog->error)

@@ -14,8 +14,8 @@
               <div class="header-line"><span></span></div>
               <div class="best-deal-arrow">
                 <ul>
-                  <li><button type="button" class="left-arrow slider-arrow slick-arrow featured-items-left" aria-label="left arrow"><i class="fal fa-chevron-left"></i></button></li>
-                  <li><button type="button" class="right-arrow slider-arrow slick-arrow featured-items-right" aria-label="right arrow"><i class="fal fa-chevron-right"></i></button></li>
+                  <li><button type="button" class="left-arrow slider-arrow slick-arrow featured-items-left" aria-label="{{ trans('theme.previous') }}"><i class="fal fa-chevron-left"></i></button></li>
+                  <li><button type="button" class="right-arrow slider-arrow slick-arrow featured-items-right" aria-label="{{ trans('theme.next') }}"><i class="fal fa-chevron-right"></i></button></li>
                 </ul>
               </div>
             </div>
