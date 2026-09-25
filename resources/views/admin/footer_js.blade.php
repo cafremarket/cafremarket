@@ -15,6 +15,13 @@
         return url;
       }
 
+      // Rewrites below are for the merchant panel only. In the admin panel, /admin/seller/*
+      // (vendor list, store verification, etc.) must be requested as-is — rewriting it to a
+      // merchant URL made AJAX modals load the dashboard instead.
+      if (!window.__merchantPanel) {
+        return url;
+      }
+
       // Platform-only admin areas have no merchant mirror — send shop settings / dashboard.
       var platformOnly = [
         { re: /\/admin\/seller(\/|$|\?)/, to: '/merchant/setting/general' },
@@ -38,14 +45,12 @@
         }
       }
 
-      if (window.__merchantPanel) {
-        if (url.indexOf('/admin/') !== -1) {
-          return url.replace('/admin/', '/merchant/');
-        }
+      if (url.indexOf('/admin/') !== -1) {
+        return url.replace('/admin/', '/merchant/');
+      }
 
-        if (url.indexOf('admin/') === 0) {
-          return url.replace(/^admin\//, 'merchant/');
-        }
+      if (url.indexOf('admin/') === 0) {
+        return url.replace(/^admin\//, 'merchant/');
       }
 
       return url;
