@@ -10,6 +10,7 @@ use App\Http\Requests\Validations\UpdateShopRequest;
 use App\Models\Config;
 use App\Models\Shop;
 use App\Repositories\Shop\ShopRepository;
+use App\Services\Wallet\ShopPayoutAccount;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -136,6 +137,19 @@ class ShopController extends Controller
         }
 
         return response('error', 405);
+    }
+
+    /**
+     * Clear a vendor's locked payout account (bank / M-Pesa / eMola) after a
+     * support-approved change request. The next withdrawal registers the new account.
+     */
+    public function resetPayoutAccount(Request $request, Shop $shop)
+    {
+        $this->authorize('update', $shop);
+
+        ShopPayoutAccount::reset($shop);
+
+        return back()->with('success', trans('packages.wallet.payout_account_reset_done', ['shop' => $shop->name]));
     }
 
     /**

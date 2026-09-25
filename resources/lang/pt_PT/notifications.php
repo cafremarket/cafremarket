@@ -148,6 +148,11 @@ return [
         'button_text' => 'Visit the shop',
     ],
 
+    'merchant_order_paid' => [
+        'subject' => 'Pagamento recebido — Pedido :order',
+        'message' => 'O pagamento de :amount do Pedido :order foi confirmado. Já pode preparar e enviar a encomenda.',
+    ],
+
     'order_paid' => [
         'subject' => '[Order ID: :order] Your order been paid successfully!',
         'greeting' => 'Hello :customer',

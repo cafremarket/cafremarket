@@ -115,9 +115,16 @@
           <p class="mb-3">{{ $profile->shop->pay_to }}</p>
         @endif
 
-        <a class="ajax-modal-btn btn btn-default" href="javascript:void(0)" data-link="{{ mp_route('admin.account.shop.editPayoutInstruction') }}">
-          <i class="fa fa-money"></i> {{ $profile->shop->pay_to ? trans('app.update_payout_instructions') : trans('app.add_payout_instructions') }}
-        </a>
+        @if ($profile->shop->hasLockedPayoutAccount())
+          <p class="help-block small">
+            <i class="fa fa-lock"></i> {{ trans('packages.wallet.payout_account_locked_help') }}
+            <a href="{{ mp_route('admin.account.ticket') }}">{{ trans('packages.wallet.payout_account_contact_support') }}</a>
+          </p>
+        @else
+          <a class="ajax-modal-btn btn btn-default" href="javascript:void(0)" data-link="{{ mp_route('admin.account.shop.editPayoutInstruction') }}">
+            <i class="fa fa-money"></i> {{ $profile->shop->pay_to ? trans('app.update_payout_instructions') : trans('app.add_payout_instructions') }}
+          </a>
+        @endif
       </div>
     @endif
 

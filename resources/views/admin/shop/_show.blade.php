@@ -55,6 +55,25 @@
             </td>
           </tr>
           <tr>
+            <th class="text-right">{{ trans('packages.wallet.payout_account') }}:</th>
+            <td style="width: 75%;">
+              @if ($shop->hasLockedPayoutAccount())
+                <i class="fa fa-lock text-muted"></i>
+                {{ format_payout_instruction_text($shop->payout_method, (array) $shop->payout_details) }}
+                <br /><small class="text-muted">{{ trans('packages.wallet.payout_account_locked_since', ['date' => $shop->payout_locked_at->toDayDateTimeString()]) }}</small>
+                @can('update', $shop)
+                  {!! Form::open(['route' => ['admin.vendor.shop.resetPayoutAccount', $shop], 'method' => 'post', 'style' => 'margin-top: 6px;']) !!}
+                  <button type="submit" class="confirm btn btn-warning btn-sm btn-flat" title="{{ trans('packages.wallet.payout_account_reset_help') }}">
+                    <i class="fa fa-unlock"></i> {{ trans('packages.wallet.payout_account_reset') }}
+                  </button>
+                  {!! Form::close() !!}
+                @endcan
+              @else
+                <span class="text-muted">{{ trans('packages.wallet.payout_account_not_registered') }}</span>
+              @endif
+            </td>
+          </tr>
+          <tr>
             <th class="text-right">{{ trans('app.member_since') }}:</th>
             <td style="width: 75%;">{{ $shop->created_at->toFormattedDateString() }}</td>
           </tr>

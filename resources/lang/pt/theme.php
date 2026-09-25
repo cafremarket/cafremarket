@@ -111,7 +111,7 @@ return [
     'address' => 'Endereço',
     'addresses' => 'Endereços',
     'alert' => 'Alerta',
-    'all_categories' => 'Todas as Categoriass',
+    'all_categories' => 'Todas as categorias',
     'all_items' => 'Todos os Artigos',
     'all_orders' => 'Todos os Pedidos',
     'amount' => 'Valor',

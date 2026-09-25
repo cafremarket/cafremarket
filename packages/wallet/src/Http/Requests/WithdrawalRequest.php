@@ -3,6 +3,7 @@
 namespace Incevio\Package\Wallet\Http\Requests;
 
 use App\Http\Requests\Request;
+use App\Services\Wallet\ShopPayoutAccount;
 use Illuminate\Support\Facades\Auth;
 
 class WithdrawalRequest extends Request
@@ -30,20 +31,12 @@ class WithdrawalRequest extends Request
 
         $rules = [
             'amount' => 'required|numeric|min:'.get_min_withdrawal_limit().'|max:'.$max_withdrawal,
-            'payout_method' => 'required|in:bank_transfer,mpesa,emola',
         ];
 
-        if ($this->input('payout_method') === 'bank_transfer') {
-            $rules['payout_bank_name'] = 'required|string|max:255';
-            $rules['payout_account_holder'] = 'required|string|max:255';
-            $rules['payout_account_number'] = 'required|string|max:255';
-        }
+        // Vendors withdraw to one locked payout account; affiliates keep entering it per request.
+        $shop = Auth::guard('affiliate')->check() ? null : Auth::user()->shop;
 
-        if (in_array($this->input('payout_method'), ['mpesa', 'emola'], true)) {
-            $rules['payout_mobile'] = 'required|string|max:32';
-        }
-
-        return $rules;
+        return array_merge($rules, ShopPayoutAccount::rules($shop, $this));
     }
 
     /**

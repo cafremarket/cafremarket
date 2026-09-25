@@ -129,6 +129,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\Order\OrderPaid::class => [
             \App\Listeners\Order\OrderBeenPaid::class,
+            \App\Listeners\Order\NotifyMerchantOrderPaid::class,
         ],
         \App\Events\Order\OrderPaymentFailed::class => [
             \App\Listeners\Order\NotifyCustomerPaymentFailed::class,

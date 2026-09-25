@@ -19,43 +19,62 @@
       @else
         {!! Form::open(['route' => auth()->guard('affiliate')->check() ? 'affiliate.wallet.withdraw' : 'merchant.wallet.withdraw', 'files' => true, 'id' => 'payout-request-form', 'data-toggle' => 'validator']) !!}
 
-        <div class="form-group">
-          <label>{{ trans('packages.wallet.payout_method') }}</label>
-          {!! Form::select('payout_method', [
-            'bank_transfer' => trans('packages.wallet.payout_method_bank_transfer'),
-            'mpesa' => trans('packages.wallet.payout_method_mpesa'),
-            'emola' => trans('packages.wallet.payout_method_emola'),
-          ], old('payout_method', 'bank_transfer'), ['class' => 'form-control', 'id' => 'payout-method-select', 'required']) !!}
-        </div>
+        @if (!empty($locked_account))
+          {{-- Vendor payout account is locked: every withdrawal goes to this account. --}}
+          <div class="well well-sm">
+            <strong><i class="fa fa-lock"></i> {{ trans('packages.wallet.payout_account_registered') }}</strong><br />
+            {{ $locked_account['instruction'] }}
+            <p class="help-block small" style="margin-bottom: 0;">
+              {{ trans('packages.wallet.payout_account_locked_help') }}
+              @unless (auth()->guard('affiliate')->check())
+                <a href="{{ mp_route('admin.account.ticket') }}">{{ trans('packages.wallet.payout_account_contact_support') }}</a>
+              @endunless
+            </p>
+          </div>
+        @else
+          <div class="form-group">
+            <label>{{ trans('packages.wallet.payout_method') }}</label>
+            {!! Form::select('payout_method', [
+              'bank_transfer' => trans('packages.wallet.payout_method_bank_transfer'),
+              'mpesa' => trans('packages.wallet.payout_method_mpesa'),
+              'emola' => trans('packages.wallet.payout_method_emola'),
+            ], old('payout_method', 'bank_transfer'), ['class' => 'form-control', 'id' => 'payout-method-select', 'required']) !!}
+          </div>
 
-        <div id="payout-details-bank" class="payout-method-panel">
-          <div class="form-group">
-            {!! Form::label('payout_bank_name', trans('packages.wallet.payout_bank_name')) !!}
-            {!! Form::text('payout_bank_name', null, ['class' => 'form-control payout-detail-field', 'data-method' => 'bank_transfer', 'placeholder' => trans('packages.wallet.payout_bank_name')]) !!}
+          <div id="payout-details-bank" class="payout-method-panel">
+            <div class="form-group">
+              {!! Form::label('payout_bank_name', trans('packages.wallet.payout_bank_name')) !!}
+              {!! Form::text('payout_bank_name', null, ['class' => 'form-control payout-detail-field', 'data-method' => 'bank_transfer', 'placeholder' => trans('packages.wallet.payout_bank_name')]) !!}
+            </div>
+            <div class="form-group">
+              {!! Form::label('payout_account_holder', trans('packages.wallet.payout_account_holder')) !!}
+              {!! Form::text('payout_account_holder', null, ['class' => 'form-control payout-detail-field', 'data-method' => 'bank_transfer', 'placeholder' => trans('packages.wallet.payout_account_holder')]) !!}
+            </div>
+            <div class="form-group">
+              {!! Form::label('payout_account_number', trans('packages.wallet.payout_account_number')) !!}
+              {!! Form::text('payout_account_number', null, ['class' => 'form-control payout-detail-field', 'data-method' => 'bank_transfer', 'placeholder' => trans('packages.wallet.payout_account_number')]) !!}
+            </div>
           </div>
-          <div class="form-group">
-            {!! Form::label('payout_account_holder', trans('packages.wallet.payout_account_holder')) !!}
-            {!! Form::text('payout_account_holder', null, ['class' => 'form-control payout-detail-field', 'data-method' => 'bank_transfer', 'placeholder' => trans('packages.wallet.payout_account_holder')]) !!}
-          </div>
-          <div class="form-group">
-            {!! Form::label('payout_account_number', trans('packages.wallet.payout_account_number')) !!}
-            {!! Form::text('payout_account_number', null, ['class' => 'form-control payout-detail-field', 'data-method' => 'bank_transfer', 'placeholder' => trans('packages.wallet.payout_account_number')]) !!}
-          </div>
-        </div>
 
-        <div id="payout-details-mobile" class="payout-method-panel" style="display: none;">
-          <div class="form-group">
-            {!! Form::label('payout_mobile', trans('packages.wallet.payout_mobile_number')) !!}
-            {!! Form::text('payout_mobile', null, ['class' => 'form-control payout-detail-field', 'data-method' => 'mobile', 'placeholder' => '258XXXXXXXXX']) !!}
-            <p class="help-block small text-muted">{{ trans('packages.wallet.payout_mobile_help') }}</p>
+          <div id="payout-details-mobile" class="payout-method-panel" style="display: none;">
+            <div class="form-group">
+              {!! Form::label('payout_mobile', trans('packages.wallet.payout_mobile_number')) !!}
+              {!! Form::text('payout_mobile', null, ['class' => 'form-control payout-detail-field', 'data-method' => 'mobile', 'placeholder' => '258XXXXXXXXX']) !!}
+              <p class="help-block small text-muted">{{ trans('packages.wallet.payout_mobile_help') }}</p>
+            </div>
           </div>
-        </div>
 
-        @if (!empty($existing_instruction))
-          <p class="text-muted small">
-            <i class="fa fa-info-circle"></i>
-            {{ trans('packages.wallet.payout_saved_instruction') }}: {{ $existing_instruction }}
-          </p>
+          @if (!empty($existing_instruction))
+            <p class="text-muted small">
+              <i class="fa fa-info-circle"></i>
+              {{ trans('packages.wallet.payout_saved_instruction') }}: {{ $existing_instruction }}
+            </p>
+          @endif
+          @unless (auth()->guard('affiliate')->check())
+            <div class="alert alert-warning small">
+              <i class="fa fa-warning"></i> {{ trans('packages.wallet.payout_account_first_time_notice') }}
+            </div>
+          @endunless
         @endif
 
         <div class="form-group">
@@ -98,6 +117,9 @@
     }
 
     var $method = $('#payout-method-select');
+    if (!$method.length) {
+      return;
+    }
 
     function togglePayoutPanels() {
       var method = $method.val();

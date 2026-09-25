@@ -41,6 +41,9 @@ Route::get('subscription/{shop}/editTrial', [SubscriptionController::class, 'edi
 
 Route::put('subscription/{shop}/updateTrial', [SubscriptionController::class, 'updateTrial'])->name('subscription.updateTrial');
 
+// Reset a vendor's locked payout account so the next withdrawal registers a new one (support-approved change).
+Route::post('shop/{shop}/payout-account/reset', [ShopController::class, 'resetPayoutAccount'])->name('shop.resetPayoutAccount')->middleware('demoCheck');
+
 Route::put('shop/{shop}/toggle', [ShopController::class, 'toggleStatus'])->name('shop.toggle')->middleware('ajax');
 
 Route::get('shop/{shop}/staffs', [ShopController::class, 'staffs'])->name('shop.staffs');

@@ -353,6 +353,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('wallet/deposit/mpesa/status', [WalletDepositController::class, 'mpesaDepositStatus']);
         Route::get('wallet/deposit/emola/status', [WalletDepositController::class, 'emolaDepositStatus']);
         Route::post('wallet/deposit/emola/resend', [WalletDepositController::class, 'emolaResendDeposit']);
+        Route::get('wallet/payout-account', [WalletWithdrawController::class, 'payoutAccount']);
         Route::post('wallet/withdraw', [WalletWithdrawController::class, 'withdraw']);
         Route::get('wallet/transfer/vendors', [WalletTransferController::class, 'vendors']);
         Route::post('wallet/transfer', [WalletTransferController::class, 'transfer']);

@@ -153,6 +153,11 @@ return [
         'button_text' => 'Visit the shop',
     ],
 
+    'merchant_order_paid' => [
+        'subject' => 'Payment received — Order :order',
+        'message' => 'The payment of :amount for Order :order was confirmed. You can now prepare and ship it.',
+    ],
+
     'order_paid' => [
         'subject' => '[Order ID: :order] Your order been paid successfully!',
         'greeting' => 'Hello :customer',
@@ -363,6 +368,14 @@ return [
     ],
 
     // Vendor Notifications
+    'withdrawal_requested' => [
+        'subject' => 'New withdrawal request from :shop_name',
+        'greeting' => 'Hello!',
+        'message' => 'The vendor <strong>:shop_name</strong> has requested a withdrawal of <strong>:amount</strong>. Please review and process the transfer.',
+        'button_text' => 'Review the request',
+        'short' => 'Withdrawal request: :shop_name (:amount)',
+    ],
+
     'vendor_registered' => [
         'subject' => 'New vendor just registered!',
         'greeting' => 'Congratulation!',

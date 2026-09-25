@@ -298,6 +298,9 @@ class AccountController extends Controller
 
         $shop = Shop::where('owner_id', Auth::user()->id)->first();
 
+        // A registered payout account is locked; only an admin can reset it (via support).
+        abort_if($shop->hasLockedPayoutAccount(), 403, trans('packages.wallet.payout_account_locked_help'));
+
         $payout_instruction = $shop->pay_to;
 
         return view('admin.account.pay_to._edit', compact('payout_instruction'));
@@ -311,8 +314,13 @@ class AccountController extends Controller
     {
         abort_unless(Auth::user()->isMerchant(), 403);
 
-        Shop::where('owner_id', Auth::user()->id)
-            ->update(['pay_to' => $request->input('payout_instruction')]);
+        $shop = Shop::where('owner_id', Auth::user()->id)->firstOrFail();
+
+        if ($shop->hasLockedPayoutAccount()) {
+            return back()->with('warning', trans('packages.wallet.payout_account_locked_help'));
+        }
+
+        $shop->update(['pay_to' => $request->input('payout_instruction')]);
 
         return back()->with('success', trans('messages.profile_updated'));
     }

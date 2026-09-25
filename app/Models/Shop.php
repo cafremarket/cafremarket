@@ -57,6 +57,8 @@ class Shop extends ShopWallet
         'id_verified' => 'boolean',
         'phone_verified' => 'boolean',
         'address_verified' => 'boolean',
+        'payout_details' => 'array',
+        'payout_locked_at' => 'datetime',
     ];
 
     /**
@@ -119,6 +121,9 @@ class Shop extends ShopWallet
         'total_item_sold',
         'total_sold_amount',
         'pay_to',
+        'payout_method',
+        'payout_details',
+        'payout_locked_at',
         'fb_page_id',
         'extra_info',
         'order_invoice_template_id',
@@ -652,6 +657,17 @@ class Shop extends ShopWallet
         }
 
         return trans('app.not_verified');
+    }
+
+    /**
+     * Whether the vendor already has a registered (locked) payout account.
+     * Once locked, withdrawals always go to this account; only an admin can reset it.
+     */
+    public function hasLockedPayoutAccount(): bool
+    {
+        return $this->payout_locked_at !== null
+            && ! empty($this->payout_method)
+            && ! empty($this->payout_details);
     }
 
     public function getVerifiedAttribute()

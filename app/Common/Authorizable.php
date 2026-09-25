@@ -70,6 +70,7 @@ trait Authorizable
         'assign' => 'assign',
         'resetPassword' => 'edit',
         'resetPasswordForm' => 'edit',
+        'resetPayoutAccount' => 'edit',
         'requestDelete' => 'request_delete',
         'user' => 'view',
         'dashboard' => 'view',

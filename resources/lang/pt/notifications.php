@@ -148,6 +148,11 @@ return [
         'button_text' => 'Visitar a loja',
     ],
 
+    'merchant_order_paid' => [
+        'subject' => 'Pagamento recebido — Pedido :order',
+        'message' => 'O pagamento de :amount do Pedido :order foi confirmado. Já pode preparar e enviar a encomenda.',
+    ],
+
     'order_paid' => [
         'subject' => '[ID do Pedido: :order] Seu pedido foi pago com sucesso!',
         'greeting' => 'Olá :customer',
@@ -358,6 +363,14 @@ return [
     ],
 
     // Vendor Notifications
+    'withdrawal_requested' => [
+        'subject' => 'Novo pedido de levantamento de :shop_name',
+        'greeting' => 'Olá!',
+        'message' => 'O vendedor <strong>:shop_name</strong> pediu um levantamento de <strong>:amount</strong>. Por favor reveja e processe a transferência.',
+        'button_text' => 'Rever o pedido',
+        'short' => 'Pedido de levantamento: :shop_name (:amount)',
+    ],
+
     'vendor_registered' => [
         'subject' => 'Novo vendedor registado!',
         'greeting' => 'Parabéns!',

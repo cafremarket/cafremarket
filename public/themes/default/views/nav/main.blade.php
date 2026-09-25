@@ -23,6 +23,13 @@
 
         <div class="top-nav-right">
           <ul>
+            <li class="image-icon top-nav-sell">
+              <a href="{{ route('selling') }}">
+                <i class="fal fa-store"></i>
+                <span>{{ trans('theme.nav.sell_on', ['platform' => get_platform_title()]) }}</span>
+              </a>
+            </li>
+
             @auth('customer')
               <li class="image-icon">
                 <a href="{{ route('account', 'dashboard') }}">
@@ -154,7 +161,7 @@
             @endforeach
             <div class="search-box">
               <div class="search-box-select d-none d-sm-block">
-                <select class="category search-category-select" name="insubgrp" id="niceSelect">
+                <select class="category search-category-select" name="insubgrp" id="niceSelect" searchtext="{{ trans('theme.search') }}" aria-label="{{ trans('theme.all_categories') }}">
                   <option value="all">{{ trans('theme.all_categories') }}</option>
 
                   @foreach (($search_category_list ?? []) as $search_category)
