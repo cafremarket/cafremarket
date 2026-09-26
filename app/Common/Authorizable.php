@@ -191,13 +191,14 @@ trait Authorizable
         }
 
         // Merge assign_deliveryboy permission into fulfill
-        if ($slug == 'assign_deliveryboy') {
+        // getSlug() renames the deliveryboy module to delivery_boy, so match both spellings.
+        if (in_array($slug, ['assign_deliveryboy', 'assign_delivery_boy'])) {
             $slug = 'fulfill_order';
         } elseif ($slug == 'initiate_courier' || $slug == 'assign_courier') {
             // Courier assignment is part of order fulfillment, same as assign_deliveryboy above.
             $slug = 'fulfill_order';
-        } elseif ($slug == 'fulfill_courier' || $slug == 'fulfill_deliveryboy') {
-            // OTP confirmation (courier.confirmOtp / deliveryboy.confirmOtp) is part of
+        } elseif (in_array($slug, ['fulfill_courier', 'fulfill_deliveryboy', 'fulfill_delivery_boy', 'fulfill_pickup'])) {
+            // OTP confirmation (courier/deliveryboy/pickup.confirmOtp) is part of
             // order fulfillment too, same bucket as assign_courier/assign_deliveryboy above.
             $slug = 'fulfill_order';
         } elseif ($slug == 'addVariant' || $slug == 'saveVariant') {

@@ -376,7 +376,7 @@ class OrderController extends Controller
      */
     public function assignDeliveryBoy(Request $request, $id, DeliveryDispatchService $dispatchService)
     {
-        $order = $this->order->find($id);
+        $order = $this->panelOrderQuery($id)->firstOrFail();
 
         if ($order->isDelivered()) {
             return back()->with('error', trans('app.order_already_delivered'));
@@ -419,7 +419,7 @@ class OrderController extends Controller
                 // concurrent delivery confirmation must not be allowed to save
                 // over it — see DeliveryDispatchService::assignShopRider for
                 // the full race explanation.
-                $order = Order::whereKey($id)->lockForUpdate()->firstOrFail();
+                $order = $this->panelOrderQuery($id)->lockForUpdate()->firstOrFail();
 
                 if ($order->isDelivered()) {
                     throw new \RuntimeException(trans('app.order_already_delivered'));
@@ -475,7 +475,7 @@ class OrderController extends Controller
 
         try {
             \DB::transaction(function () use ($request, $id) {
-                $order = Order::whereKey($id)->lockForUpdate()->firstOrFail();
+                $order = $this->panelOrderQuery($id)->lockForUpdate()->firstOrFail();
 
                 if ($order->isDelivered()) {
                     throw new \RuntimeException(trans('app.order_already_delivered'));
@@ -515,7 +515,7 @@ class OrderController extends Controller
 
         try {
             \DB::transaction(function () use ($request, $id) {
-                $order = Order::whereKey($id)->lockForUpdate()->firstOrFail();
+                $order = $this->panelOrderQuery($id)->lockForUpdate()->firstOrFail();
 
                 if ($order->isDelivered()) {
                     throw new \RuntimeException(trans('app.order_already_delivered'));
@@ -539,6 +539,20 @@ class OrderController extends Controller
     }
 
     /**
+     * Orders a panel user may act on: stores only reach their own shop's orders.
+     */
+    private function panelOrderQuery($id)
+    {
+        $query = Order::whereKey($id);
+
+        if (! Auth::user()->isFromPlatform()) {
+            $query->where('shop_id', Auth::user()->merchantId());
+        }
+
+        return $query;
+    }
+
+    /**
      * Web-panel alternative to the delivery boy app's OTP confirmation, for
      * shop-owned riders (not couriers). Mirrors Api\DeliveryBoy\OrderController::confirmDelivery.
      *
@@ -553,7 +567,7 @@ class OrderController extends Controller
 
         try {
             \DB::transaction(function () use ($request, $id) {
-                $order = Order::whereKey($id)->lockForUpdate()->firstOrFail();
+                $order = $this->panelOrderQuery($id)->lockForUpdate()->firstOrFail();
 
                 if ($order->isDelivered()) {
                     throw new \RuntimeException(trans('app.order_already_delivered'));
