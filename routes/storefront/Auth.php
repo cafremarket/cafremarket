@@ -21,7 +21,7 @@ Route::middleware(['xssSanitizer'])->name('customer.')
 
         Route::post('/register', [
             Auth\RegisterController::class, 'register',
-        ])->name('register.submit');
+        ])->name('register.submit')->middleware('throttle:10,10');
 
         Route::get('/verify/{token?}', [
             Auth\RegisterController::class, 'verify',

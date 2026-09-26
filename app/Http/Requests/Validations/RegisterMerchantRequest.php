@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Validations;
 
+use App\Rules\RealPhone;
+use App\Rules\RealEmail;
 use App\Http\Requests\Request;
 use App\Models\Role;
 use Illuminate\Validation\Rule;
@@ -56,6 +58,7 @@ class RegisterMerchantRequest extends Request
                 'string',
                 'email',
                 'max:255',
+                new RealEmail,
                 Rule::unique('users', 'email')->whereNull('deleted_at'),
             ],
             'password' => 'required|string|min:6|confirmed',
@@ -78,6 +81,7 @@ class RegisterMerchantRequest extends Request
             $rules['phone'] = [
                 'required',
                 'string',
+                new RealPhone,
                 Rule::unique('users', 'phone')->whereNull('deleted_at'),
             ];
         }

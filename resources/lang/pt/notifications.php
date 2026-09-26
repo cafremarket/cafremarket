@@ -391,6 +391,9 @@ return [
         'greeting' => 'Parabéns :user!',
         'message' => 'A sua conta foi criada com sucesso! Clique no botão abaixo para verificar o seu endereço de email.',
         'button_text' => 'Verificar o meu email',
+        'code_intro' => 'Ou introduza este código de verificação na aplicação:',
+        'code_expiry' => 'Este código expira em :minutes minutos.',
+        'ignore' => 'Se não criou esta conta, pode ignorar este email.',
     ],
 
     // Version 1.2.6

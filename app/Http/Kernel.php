@@ -90,5 +90,6 @@ class Kernel extends HttpKernel
         'requireMerchantVerification' => \App\Http\Middleware\RequireMerchantVerification::class,
         'blockMerchantFromAdmin' => \App\Http\Middleware\BlockMerchantFromAdmin::class,
         'merchantPanel' => \App\Http\Middleware\EnsureMerchantPanelAccess::class,
+        'verifiedEmail' => \App\Http\Middleware\RequireVerifiedEmail::class,
     ];
 }

@@ -250,7 +250,7 @@ Route::middleware(['auth', 'merchantPanel'])->name('merchant.')->prefix('merchan
     });
 
     Route::get('verify', [MerchantVerificationController::class, 'index'])->name('verify');
-    Route::post('verify', [MerchantVerificationController::class, 'submit'])->name('verify.submit');
+    Route::post('verify', [MerchantVerificationController::class, 'submit'])->name('verify.submit')->middleware('verifiedEmail:web');
     Route::post('verify/location', [MerchantVerificationController::class, 'saveLocation'])->name('verify.location');
     Route::post('verify/phone', [MerchantVerificationController::class, 'savePhone'])->name('verify.phone');
     Route::post('verify/email', [MerchantVerificationController::class, 'saveEmail'])->name('verify.email');

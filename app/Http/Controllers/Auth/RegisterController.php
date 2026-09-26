@@ -11,7 +11,6 @@ use App\Jobs\SubscribeShopToNewPlan;
 use App\Models\Role;
 use App\Models\System;
 use App\Models\User;
-use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
 use App\Notifications\SuperAdmin\VendorRegistered as VendorRegisteredNotification;
 use App\Providers\RouteServiceProvider;
 use App\Services\Auth\JwtAuthService;
@@ -247,7 +246,7 @@ class RegisterController extends Controller
         event(new ShopCreated($merchant->owns));
 
         // Send email verification notification
-        safe_notify($merchant, new EmailVerificationNotification($merchant), 'merchant email verification');
+        $merchant->sendEmailVerification(true);
     }
 
     /**
@@ -259,14 +258,14 @@ class RegisterController extends Controller
     public function verify($token = null)
     {
         if (! $token) {
-            $user = Auth::user();
+            $wait = Auth::user()->sendEmailVerification();
 
-            $user->verification_token = Str::random(40);
+            if ($wait < 0) {
+                return redirect()->back();
+            }
 
-            if ($user->save()) {
-                safe_notify($user, new EmailVerificationNotification($user), 'user email verification');
-
-                return redirect()->back()->with('success', trans('auth.verification_link_sent'));
+            if ($wait > 0) {
+                return redirect()->back()->with('warning', trans('auth.email_code_resend_wait', ['seconds' => $wait]));
             }
 
             return redirect()->back()->with('success', trans('auth.verification_link_sent'));
@@ -279,9 +278,7 @@ class RegisterController extends Controller
                 ->with('success', trans('auth.invalid_token'));
         }
 
-        $user->verification_token = null;
-
-        if ($user->save()) {
+        if ($user->markEmailAsVerified()) {
             return redirect()->route('admin.admin.dashboard')
                 ->with('success', trans('auth.verification_successful'));
         }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Merchant;
 
+use App\Rules\RealPhone;
+use App\Rules\RealEmail;
 use App\Http\Controllers\Admin\ConfigController;
 use App\Http\Controllers\Controller;
 use App\Helpers\ListHelper;
@@ -47,7 +49,7 @@ class VerificationController extends Controller
         }
 
         $request->validate([
-            'support_phone' => 'required|string|max:32',
+            'support_phone' => ['required', 'string', 'max:32', new RealPhone],
         ]);
 
         $config->update([
@@ -68,7 +70,7 @@ class VerificationController extends Controller
         }
 
         $request->validate([
-            'support_email' => 'required|email|max:255',
+            'support_email' => ['required', 'email', 'max:255', new RealEmail],
         ]);
 
         $config->update([

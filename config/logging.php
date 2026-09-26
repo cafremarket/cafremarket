@@ -104,6 +104,14 @@ return [
             'level' => 'debug',
         ],
 
+        // Signup anti-fake checks (mail, DNS, reCAPTCHA, cache, cleanup).
+        'verification' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/verification.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
+
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,

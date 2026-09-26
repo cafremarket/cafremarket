@@ -33,7 +33,7 @@
 @include('admin.partials._global_notice')
 
 @if ($webUser && $webUser->isFromMerchant())
-    @unless ($webUser->isVerified())
+    @if ($webUser->needsEmailVerification())
       <div class="admin-alert admin-alert--info admin-alert--dismissible no-print">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <div class="admin-alert__icon"><i class="fa fa-info-circle"></i></div>
@@ -43,7 +43,7 @@
           <a href="{{ route('verify') }}">{{ trans('app.resend_verification_link') }}</a>
         </div>
       </div>
-    @endunless
+    @endif
 
     @if (optional($webUser->shop)->config && ! $webUser->shop->isVerified())
       <div class="admin-alert admin-alert--warning admin-alert--dismissible no-print">

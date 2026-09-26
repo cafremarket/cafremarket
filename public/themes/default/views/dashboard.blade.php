@@ -3,7 +3,7 @@
 @section('content')
   <section class="sf-dashboard-page account-section pb-5">
     <div class="container">
-      @if (!Auth::guard('customer')->user()->isVerified())
+      @if (Auth::guard('customer')->user()->needsEmailVerification())
         <div class="sf-alert sf-alert--info">
           <i class="fas fa-info-circle" aria-hidden="true"></i>
           <div>

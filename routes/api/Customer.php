@@ -64,7 +64,7 @@ Route::middleware('customerApp')->group(function () {
     Route::get('shop/{slug}/reviews', [ReviewController::class, 'show_shop_reviews']);
     Route::post('shop/{order}/review', [ReviewController::class, 'save_shop_review']);
     Route::get('shop/{shop}/contact', [ConversationController::class, 'conversation']);
-    Route::post('shop/{shop}/contact', [ConversationController::class, 'save_conversation']);
+    Route::post('shop/{shop}/contact', [ConversationController::class, 'save_conversation'])->middleware('verifiedEmail:api');
     Route::get('shop/{slug}/warehouses', [HomeController::class, 'showAllWarehousesOfShop']);
 
     // Brands
@@ -104,8 +104,8 @@ Route::middleware('customerApp')->group(function () {
     Route::get('cart/{cart}', [CartController::class, 'show']);
     Route::put('cart/{cart}/update', [CartController::class, 'update']);
     Route::get('cart/{cart}/shipping', [CartController::class, 'shipping']);
-    Route::post('cart/checkout_all', [CheckoutController::class, 'checkoutAll']);
-    Route::post('cart/{cart}/checkout', [CheckoutController::class, 'checkout']);
+    Route::post('cart/checkout_all', [CheckoutController::class, 'checkoutAll'])->middleware('verifiedEmail:api');
+    Route::post('cart/{cart}/checkout', [CheckoutController::class, 'checkout'])->middleware('verifiedEmail:api');
     Route::get('cart/{cart}/paymentOptions', [CheckoutController::class, 'paymentOptions']);
     Route::get('cart/{cart}/paymentOptions/debug', [CheckoutController::class, 'paymentOptionsDebug']);
 
@@ -118,13 +118,15 @@ Route::middleware('customerApp')->group(function () {
     Route::get('states/{country}', [HomeController::class, 'states']);
 
     // delivery body
-    Route::post('deliveryBoy/{order}/feedback', [FeedbackController::class, 'save_delivery_boy_feedbacks']);
+    Route::post('deliveryBoy/{order}/feedback', [FeedbackController::class, 'save_delivery_boy_feedbacks'])->middleware('verifiedEmail:api');
 
     // Auth
     Route::prefix('auth')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
+        Route::post('register', [AuthController::class, 'register'])->middleware('throttle:10,10');
         Route::post('login', [AuthController::class, 'login']);
         Route::post('logout', [AuthController::class, 'logout'])->middleware(['auth:api']);
+        Route::post('email/verify', [AuthController::class, 'verifyEmail'])->middleware(['auth:api', 'throttle:10,1']);
+        Route::post('email/resend', [AuthController::class, 'resendVerificationEmail'])->middleware(['auth:api', 'throttle:5,1']);
         Route::post('forgot', [AuthController::class, 'forgot']);
         Route::get('reset/{token}', [AuthController::class, 'token']);
         Route::post('reset', [AuthController::class, 'reset']);
@@ -157,18 +159,18 @@ Route::middleware('customerApp')->group(function () {
         Route::get('orders', [OrderController::class, 'index']);
         Route::get('order/{order}', [OrderController::class, 'show']);
         Route::get('order/{order}/conversation', [OrderController::class, 'conversation']);
-        Route::post('order/{order}/conversation', [OrderController::class, 'save_conversation']);
+        Route::post('order/{order}/conversation', [OrderController::class, 'save_conversation'])->middleware('verifiedEmail:api');
         Route::get('order/{order}/track', [OrderController::class, 'track']);
-        Route::post('order/{order}/feedback', [FeedbackController::class, 'save_product_feedbacks']);
+        Route::post('order/{order}/feedback', [FeedbackController::class, 'save_product_feedbacks'])->middleware('verifiedEmail:api');
         Route::get('order/{order}/order-feedback', [FeedbackController::class, 'show_order_feedback']);
-        Route::post('order/{order}/order-feedback', [FeedbackController::class, 'save_order_feedback']);
-        Route::post('order/{order}/review', [ReviewController::class, 'save_product_review']);
+        Route::post('order/{order}/order-feedback', [FeedbackController::class, 'save_order_feedback'])->middleware('verifiedEmail:api');
+        Route::post('order/{order}/review', [ReviewController::class, 'save_product_review'])->middleware('verifiedEmail:api');
 
         // Reviews - eligibility + write-directly-from-product/shop-page
         Route::get('shop/{slug}/reviews/eligibility', [ReviewController::class, 'shop_review_eligibility']);
-        Route::post('shop/{slug}/reviews', [ReviewController::class, 'store_shop_review']);
+        Route::post('shop/{slug}/reviews', [ReviewController::class, 'store_shop_review'])->middleware('verifiedEmail:api');
         Route::get('listing/{slug}/reviews/eligibility', [ReviewController::class, 'product_review_eligibility']);
-        Route::post('listing/{slug}/reviews', [ReviewController::class, 'store_product_review']);
+        Route::post('listing/{slug}/reviews', [ReviewController::class, 'store_product_review'])->middleware('verifiedEmail:api');
         Route::post('order/{order}/goodsReceived', [OrderController::class, 'goods_received']);
         Route::put('order/{order}/cancel', [OrderController::class, 'cancel']);
 
@@ -187,11 +189,11 @@ Route::middleware('customerApp')->group(function () {
         // Disputes
         Route::get('disputes', [DisputeController::class, 'index']);
         Route::get('order/{order}/dispute', [DisputeController::class, 'create']);
-        Route::post('order/{order}/dispute', [DisputeController::class, 'store']);
+        Route::post('order/{order}/dispute', [DisputeController::class, 'store'])->middleware('verifiedEmail:api');
         Route::get('dispute/{dispute}', [DisputeController::class, 'show']);
         Route::get('dispute/{dispute}/response', [DisputeController::class, 'response_form']);
-        Route::post('dispute/{dispute}/response', [DisputeController::class, 'response']);
-        Route::post('dispute/{dispute}/appeal', [DisputeController::class, 'appeal']);
+        Route::post('dispute/{dispute}/response', [DisputeController::class, 'response'])->middleware('verifiedEmail:api');
+        Route::post('dispute/{dispute}/appeal', [DisputeController::class, 'appeal'])->middleware('verifiedEmail:api');
         Route::put('dispute/{dispute}/solved', [DisputeController::class, 'mark_as_solved']);
         Route::post('dispute/{dispute}/request-close', [DisputeController::class, 'request_close']);
         Route::get('attachment/{attachment}/download', [AttachmentController::class, 'download']);

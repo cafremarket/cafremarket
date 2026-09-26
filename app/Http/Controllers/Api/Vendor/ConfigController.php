@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
+use App\Rules\RealPhone;
+use App\Rules\RealEmail;
 use App\Http\Controllers\Api\Vendor\Concerns\ResolvesVendorShop;
 use App\Events\Shop\ConfigUpdated;
 use App\Events\Shop\DownForMaintainace;
@@ -299,8 +301,8 @@ class ConfigController extends Controller
         }
 
         $request->validate([
-            'support_phone' => 'required|string|max:32',
-            'support_email' => 'required|email|max:255',
+            'support_phone' => ['required', 'string', 'max:32', new RealPhone],
+            'support_email' => ['required', 'email', 'max:255', new RealEmail],
         ]);
 
         $config->update([

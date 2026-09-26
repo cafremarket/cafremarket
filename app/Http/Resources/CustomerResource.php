@@ -24,6 +24,8 @@ class CustomerResource extends JsonResource
             'description' => $this->description,
             'active' => $this->active,
             'email' => $this->email,
+            'email_verified' => $this->hasVerifiedEmail(),
+            'email_verification_required' => $this->needsEmailVerification(),
             'phone' => $this->when(is_incevio_package_loaded('otp-login'), $this->phone),
             'accepts_marketing' => $this->accepts_marketing,
             'member_since' => optional($this->created_at)->diffForHumans(),

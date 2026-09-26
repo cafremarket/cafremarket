@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Storefront\Auth;
 
+use App\Rules\RealPhone;
+use App\Rules\RealEmail;
 use App\Events\Customer\Registered;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
-use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
 use App\Providers\RouteServiceProvider;
 use App\Services\Auth\CustomerJwtService;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -82,6 +83,7 @@ class RegisterController extends Controller
                 'string',
                 'email',
                 'max:255',
+                new RealEmail,
                 Rule::unique('customers', 'email')->whereNull('deleted_at'),
             ],
             'password' => 'required|string|min:6|confirmed',
@@ -95,6 +97,7 @@ class RegisterController extends Controller
             $rules['phone'] = [
                 'required',
                 'string',
+                new RealPhone,
                 Rule::unique('customers', 'phone')->whereNull('deleted_at'),
             ];
         }
@@ -213,6 +216,8 @@ class RegisterController extends Controller
 
         event(new Registered($customer));
 
+        $customer->sendEmailVerification(true);
+
         $this->guard('customer')->login($customer);
 
         $jwt = app(CustomerJwtService::class)->issue($customer);
@@ -232,12 +237,18 @@ class RegisterController extends Controller
         if (! $token) {
             $customer = Auth::guard('customer')->user();
 
-            $customer->verification_token = Str::random(40);
+            if (! $customer) {
+                return redirect()->route('homepage', ['login' => 1]);
+            }
 
-            if ($customer->save()) {
-                safe_notify($customer, new EmailVerificationNotification($customer), 'storefront register verification');
+            $wait = $customer->sendEmailVerification();
 
-                return redirect()->back()->with('success', trans('auth.verification_link_sent'));
+            if ($wait < 0) {
+                return redirect()->back();
+            }
+
+            if ($wait > 0) {
+                return redirect()->back()->with('warning', trans('auth.email_code_resend_wait', ['seconds' => $wait]));
             }
 
             return redirect()->back()->with('success', trans('auth.verification_link_sent'));
@@ -246,9 +257,7 @@ class RegisterController extends Controller
         try {
             $customer = Customer::where('verification_token', $token)->firstOrFail();
 
-            $customer->verification_token = null;
-
-            if ($customer->save()) {
+            if ($customer->markEmailAsVerified()) {
                 return redirect()->route('account', 'dashboard')->with('success', trans('auth.verification_successful'));
             }
         } catch (\Exception $e) {

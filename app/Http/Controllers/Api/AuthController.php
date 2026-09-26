@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\Customer\Registered;
+use App\Http\Controllers\Api\Concerns\VerifiesAccountEmail;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\RegisterCustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use App\Notifications\Auth\CustomerResetPasswordNotification as SendPasswordResetEmail;
-use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
 use App\Notifications\Customer\PasswordUpdated as PasswordResetSuccess;
 use App\Services\Auth\JwtAuthService;
 use App\Services\FCMService;
@@ -24,6 +24,13 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    use VerifiesAccountEmail;
+
+    protected function emailVerificationGuard(): string
+    {
+        return 'api';
+    }
+
     public function register(RegisterCustomerRequest $request)
     {
         $data = [
@@ -89,11 +96,11 @@ class AuthController extends Controller
                 }
             }
 
-            safe_notify(
-                $customer,
-                new EmailVerificationNotification($customer),
-                'api register verification'
-            );
+            try {
+                $customer->sendEmailVerification(true);
+            } catch (\Throwable $e) {
+                Log::warning('Verification email failed after API register: '.$e->getMessage());
+            }
 
             try {
                 event(new Registered($customer));
@@ -266,6 +273,11 @@ class AuthController extends Controller
 
         $customer->password = $request->password;
         $customer->save();
+
+        // The reset token was delivered to this inbox, which proves ownership.
+        if (! $customer->hasVerifiedEmail()) {
+            $customer->markEmailAsVerified();
+        }
 
         DB::table('password_resets')->where('token', $request->token)->delete();
 

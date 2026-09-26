@@ -16,7 +16,7 @@ Route::middleware(['web', 'xssSanitizer'])->group(function () {
 
         Route::post('chat', [
             ChatController::class, 'save',
-        ])->name('start');
+        ])->name('start')->middleware('verifiedEmail:customer');
     });
 
     // Customer dashboard multi-seller inbox (mirrors app MessagesScreen)
@@ -30,7 +30,7 @@ Route::middleware(['web', 'xssSanitizer'])->group(function () {
 
             Route::post('{chat}/reply', [
                 CustomerChatController::class, 'reply',
-            ])->name('reply');
+            ])->name('reply')->middleware('verifiedEmail:customer');
         });
 
     //admin suport chat route

@@ -11,24 +11,24 @@ Route::middleware(['xssSanitizer'])->group(function () {
 
     Route::post('order/feedback/{order}', [
         FeedbackController::class, 'save_product_feedbacks',
-    ])->name('save.feedback');
+    ])->name('save.feedback')->middleware('verifiedEmail:customer');
 
     // One order, one feedback: the customer's overall rating of an order.
     Route::post('order/{order}/order-feedback', [
         FeedbackController::class, 'save_order_feedback',
-    ])->name('order.orderFeedback.save');
+    ])->name('order.orderFeedback.save')->middleware('verifiedEmail:customer');
 
     Route::post('shop/feedback/{order}', [
         FeedbackController::class, 'save_shop_feedbacks',
-    ])->name('shop.feedback');
+    ])->name('shop.feedback')->middleware('verifiedEmail:customer');
 
     // Write/edit a review directly from the product/shop page (any past qualifying
     // purchase, not limited to a specific order).
     Route::post('listing/{slug}/review', [
         ReviewController::class, 'storeProductReview',
-    ])->name('listing.review.store');
+    ])->name('listing.review.store')->middleware('verifiedEmail:customer');
 
     Route::post('shop/{slug}/review', [
         ReviewController::class, 'storeShopReview',
-    ])->name('shop.review.store');
+    ])->name('shop.review.store')->middleware('verifiedEmail:customer');
 });

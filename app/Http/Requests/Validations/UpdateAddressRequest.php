@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Validations;
 
+use App\Rules\RealPhone;
 use App\Http\Requests\Request;
 
 class UpdateAddressRequest extends Request
@@ -34,7 +35,7 @@ class UpdateAddressRequest extends Request
             'state_id' => 'nullable|integer|exists:states,id',
             'zip_code' => 'nullable|string',
             'country_id' => 'required',
-            'phone' => 'nullable|string',
+            'phone' => ['nullable', 'string', new RealPhone],
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ];

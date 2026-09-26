@@ -396,6 +396,9 @@ return [
         'greeting' => 'Congratulation :user!',
         'message' => 'Your account has been created successfully! Click the button below to verify your email address.',
         'button_text' => 'Verify My Email',
+        'code_intro' => 'Or enter this verification code in the app:',
+        'code_expiry' => 'This code expires in :minutes minutes.',
+        'ignore' => 'If you did not create this account, you can ignore this email.',
     ],
 
     // Version 1.2.6

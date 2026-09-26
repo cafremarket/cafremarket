@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Validations;
 
+use App\Rules\RealPhone;
+use App\Rules\RealEmail;
 use App\Http\Requests\Request;
 use Illuminate\Validation\Rule;
 
@@ -30,6 +32,7 @@ class RegisterCustomerRequest extends Request
                 'required',
                 'email',
                 'max:255',
+                new RealEmail,
                 // Soft-deleted (trash) emails can be reclaimed as a new active account.
                 Rule::unique('customers', 'email')->whereNull('deleted_at'),
             ],
@@ -47,6 +50,7 @@ class RegisterCustomerRequest extends Request
                 'nullable',
                 'string',
                 'max:255',
+                new RealPhone,
                 Rule::unique('customers', 'phone')->whereNull('deleted_at'),
             ];
         }

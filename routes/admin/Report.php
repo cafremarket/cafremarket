@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Report\PerformanceIndicatorsController;
 use App\Http\Controllers\Admin\Report\SalesReportController;
+use App\Http\Controllers\Admin\Report\VerificationReportController;
 use Illuminate\Support\Facades\Route;
 
 // Metrics / Key Performance Indicators...
@@ -36,3 +37,6 @@ Route::get('report/sales/payments/getMore', [SalesReportController::class, 'getM
 Route::get('report/sales/products', [SalesReportController::class, 'products'])->name('sales.products');
 
 Route::get('report/sales/products/getMore', [SalesReportController::class, 'productsSearch'])->name('sales.products.getMore');
+
+// Anti-fake-account checks: email/phone verification, reCAPTCHA, mail health
+Route::get('report/verification', [VerificationReportController::class, 'index'])->name('report.verification');

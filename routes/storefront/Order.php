@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('order/{cart}', [
     OrderController::class, 'create',
-])->name('order.create')->middleware('xssSanitizer');
+])->name('order.create')->middleware(['xssSanitizer', 'verifiedEmail:customer']);
 
 Route::post('orders/checkout-all', [
     OrderController::class, 'createAll',
-])->name('order.createAll')->middleware('xssSanitizer');
+])->name('order.createAll')->middleware(['xssSanitizer', 'verifiedEmail:customer']);
 
 Route::match(['GET', 'POST'], 'paymentFailed/{order}', [
     OrderController::class, 'paymentFailed',
@@ -86,7 +86,7 @@ Route::middleware(['auth:customer', 'xssSanitizer'])->group(function () {
     // Conversations
     Route::post('order/conversation/{order}', [
         ConversationController::class, 'order_conversation',
-    ])->name('order.conversation');
+    ])->name('order.conversation')->middleware('verifiedEmail:customer');
 
     // Disputes
     Route::get('order/dispute/{order}', [
@@ -95,11 +95,11 @@ Route::middleware(['auth:customer', 'xssSanitizer'])->group(function () {
 
     Route::post('order/dispute/{order}', [
         DisputeController::class, 'open_dispute',
-    ])->name('dispute.save');
+    ])->name('dispute.save')->middleware('verifiedEmail:customer');
 
     Route::post('dispute/{dispute}', [
         DisputeController::class, 'response',
-    ])->name('dispute.response');
+    ])->name('dispute.response')->middleware('verifiedEmail:customer');
 
     Route::post('dispute/{dispute}/markAsSolved', [
         DisputeController::class, 'markAsSolved',

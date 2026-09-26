@@ -25,4 +25,13 @@ return [
     'check_your_email' => 'Before proceeding, please check your email for a verification link. If you did not receive the email',
     'request_another_link' => 'click here to request another',
     'password_reset_link' => 'Password reset link has been sent successfully',
+    'email_verification_required' => 'Please verify your email address (:email) to continue. Enter the 6-digit code we emailed you, or request a new one.',
+    'verification_code_sent' => 'We sent a 6-digit verification code to :email.',
+    'email_code_invalid' => 'That code is not correct. Please check the email and try again.',
+    'email_code_expired' => 'This code has expired. Please request a new one.',
+    'email_code_too_many_attempts' => 'Too many wrong attempts. Please request a new code.',
+    'email_code_resend_wait' => 'Please wait :seconds seconds before requesting another code.',
+    'email_already_verified' => 'Your email address is already verified.',
+    'verify_email_banner' => 'Please verify your email address to place orders, write reviews and message sellers.',
+    'resend_verification_email' => 'Resend verification email',
 ];

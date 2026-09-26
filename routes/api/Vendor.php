@@ -57,13 +57,15 @@ Route::prefix('vendor')->group(function () {
 
     // Authentication
     Route::prefix('auth')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
+        Route::post('register', [AuthController::class, 'register'])->middleware('throttle:10,10');
         Route::get('register', [AuthController::class, 'getRegisterFormFields']);
         Route::post('login', [AuthController::class, 'login']);
         Route::post('forgot', [AuthController::class, 'forgot']);
         Route::get('reset/{token}', [AuthController::class, 'token']);
         Route::post('reset', [AuthController::class, 'reset']);
         Route::post('logout', [AuthController::class, 'logout'])->middleware(['auth:vendor_api']);
+        Route::post('email/verify', [AuthController::class, 'verifyEmail'])->middleware(['auth:vendor_api', 'throttle:10,1']);
+        Route::post('email/resend', [AuthController::class, 'resendVerificationEmail'])->middleware(['auth:vendor_api', 'throttle:5,1']);
         Route::post('user/phone/verify', [PhoneVerificationController::class, 'verifyVendorOtp']);
     });
 
@@ -298,7 +300,7 @@ Route::prefix('vendor')->group(function () {
         Route::put('configs/{config}/ecommerce/toggle', [ConfigController::class, 'toggleActiveEcommerce']);
         Route::put('settings/{shop}/toggle', [ConfigController::class, 'toggleShopActive']);
         Route::get('shop/verification', [ConfigController::class, 'verificationStatus']);
-        Route::post('shop/verification', [ConfigController::class, 'submitVerification']);
+        Route::post('shop/verification', [ConfigController::class, 'submitVerification'])->middleware('verifiedEmail:vendor_api');
         Route::post('shop/verification/contact', [ConfigController::class, 'saveVerificationContact']);
         Route::post('shop/verification/location', [ConfigController::class, 'saveVerificationLocation']);
         Route::post('shop/verification/documents', [ConfigController::class, 'uploadVerificationDocuments']);

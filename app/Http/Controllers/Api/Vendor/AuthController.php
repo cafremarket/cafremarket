@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Vendor;
 
 use App\Events\Shop\ShopCreated;
+use App\Http\Controllers\Api\Concerns\VerifiesAccountEmail;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validations\RegisterMerchantRequest;
 use App\Http\Resources\MerchantRegistrationResource;
@@ -12,7 +13,6 @@ use App\Jobs\SubscribeShopToNewPlan;
 use App\Models\Role;
 use App\Models\System;
 use App\Models\User;
-use App\Notifications\Auth\SendVerificationEmail as EmailVerificationNotification;
 use App\Notifications\Auth\UserResetPasswordNotification as SendPasswordResetEmail;
 use App\Notifications\SuperAdmin\VendorRegistered as VendorRegisteredNotification;
 use App\Notifications\User\PasswordUpdated as PasswordResetSuccess;
@@ -27,6 +27,13 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    use VerifiesAccountEmail;
+
+    protected function emailVerificationGuard(): string
+    {
+        return 'vendor_api';
+    }
+
     /**
      * Register as merchant
      *
@@ -179,7 +186,7 @@ class AuthController extends Controller
         event(new ShopCreated($merchant->owns));
 
         // Send email verification notification
-        safe_notify($merchant, new EmailVerificationNotification($merchant), 'api merchant verification');
+        $merchant->sendEmailVerification(true);
     }
 
     /**
@@ -293,6 +300,11 @@ class AuthController extends Controller
 
         $user->password = $request->password;
         $user->save();
+
+        // The reset token was delivered to this inbox, which proves ownership.
+        if (! $user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+        }
 
         DB::table('password_resets')->where('token', $request->token)->delete();
 

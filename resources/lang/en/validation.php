@@ -280,4 +280,7 @@ return [
         'meta_title' => 'meta title',
         'meta_description' => 'meta description',
     ],
+    'email_disposable' => 'Temporary or disposable email addresses are not allowed. Please use your real email.',
+    'email_domain_invalid' => 'This email domain cannot receive mail. Please check the address.',
+    'phone_invalid' => 'Please enter a valid phone number.',
 ];

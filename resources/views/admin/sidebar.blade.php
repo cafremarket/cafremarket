@@ -903,6 +903,12 @@
               </li>
             @endif
 
+            <li class="{{ Request::is('admin/report/verification*') ? 'active' : '' }}">
+              <a href="{{ route('admin.report.verification') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('verification_report.title') }}
+              </a>
+            </li>
+
             @if (config('report.collect_visitor_data'))
               <li class="{{ Request::is('admin/report/visitors*') ? 'active' : '' }}">
                 <a href="{{ route('admin.report.visitors') }}">

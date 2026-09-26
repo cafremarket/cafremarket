@@ -8,6 +8,7 @@ use App\Common\Attachable;
 use App\Common\HasHumanAttributes;
 use App\Common\Imageable;
 use App\Common\Taggable;
+use App\Common\VerifiesEmail;
 use App\Notifications\Auth\CustomerResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 // use Spatie\Activitylog\Traits\HasActivity;
@@ -21,7 +22,7 @@ use Laravel\Scout\Searchable;
 
 class Customer extends CustomerWallet
 {
-    use Addressable, ApiAuthTokens, Attachable, HasFactory, HasHumanAttributes, Imageable, Notifiable, Searchable, SoftDeletes, Taggable;
+    use Addressable, ApiAuthTokens, Attachable, HasFactory, HasHumanAttributes, Imageable, Notifiable, Searchable, SoftDeletes, Taggable, VerifiesEmail;
 
     /**
      * The database table used by the model.
@@ -320,7 +321,7 @@ class Customer extends CustomerWallet
      */
     public function isVerified()
     {
-        return $this->verification_token == null;
+        return $this->hasVerifiedEmail();
     }
 
     /**
@@ -415,7 +416,8 @@ class Customer extends CustomerWallet
 
         $trashed->remember_token = null;
         $trashed->api_token = null;
-        $trashed->save();
+        // Whoever re-registers this email must prove they own it again.
+        $trashed->writeVerification(fn () => $trashed->save());
 
         return $trashed->fresh();
     }

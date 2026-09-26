@@ -280,4 +280,7 @@ return [
         'meta_title' => 'título meta',
         'meta_description' => 'descrição meta',
     ],
+    'email_disposable' => 'Não são permitidos endereços de email temporários ou descartáveis. Use o seu email real.',
+    'email_domain_invalid' => 'Este domínio de email não pode receber mensagens. Verifique o endereço.',
+    'phone_invalid' => 'Introduza um número de telefone válido.',
 ];

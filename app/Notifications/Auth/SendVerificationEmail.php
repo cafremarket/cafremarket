@@ -21,14 +21,17 @@ class SendVerificationEmail extends Notification implements ShouldQueue
 
     public $user;
 
+    public $code;
+
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($user)
+    public function __construct($user, ?string $code = null)
     {
         $this->user = $user;
+        $this->code = $code;
     }
 
     /**
@@ -64,6 +67,8 @@ class SendVerificationEmail extends Notification implements ShouldQueue
             ->markdown('admin.mail.auth.send_verification_email', [
                 'url' => $url,
                 'user' => $this->user,
+                'code' => $this->code,
+                'minutes' => $this->user::$emailCodeTtlMinutes,
             ]);
     }
 
