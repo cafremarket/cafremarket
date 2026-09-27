@@ -813,7 +813,8 @@ class MarketplaceReportService
         return DB::table('transactions')
             ->where('transactions.payable_type', (new Shop)->getMorphClass())
             ->where('transactions.type', 'withdraw')
-            ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(transactions.meta, '$.type')) = 'payout'")
+            // JSON_CONTAINS compares JSON values, so it works whatever the connection/column collation.
+            ->whereRaw("JSON_CONTAINS(transactions.meta, '\"payout\"', '$.type')")
             ->whereBetween('transactions.created_at', [$this->period->from, $this->period->to])
             ->when($this->shopId, fn ($q) => $q->where('transactions.payable_id', $this->shopId));
     }
@@ -826,7 +827,10 @@ class MarketplaceReportService
      */
     private function settlementsQuery(ReportPeriod $period): Builder
     {
-        $num = fn (string $key) => "CAST(COALESCE(JSON_UNQUOTE(JSON_EXTRACT(transactions.meta, '$.{$key}')), '0') AS DECIMAL(20,6))";
+        // Cast each JSON value to a number before COALESCE: mixing JSON text with a
+        // string literal fails on servers whose connection collation differs (error 1267).
+        $num = fn (string $key) => "COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(transactions.meta, '$.{$key}')) AS DECIMAL(20,6)), 0)";
+        $id = fn (string $key) => "CAST(JSON_UNQUOTE(JSON_EXTRACT(transactions.meta, '$.{$key}')) AS UNSIGNED)";
 
         return DB::table('transactions')
             ->where('transactions.payable_type', (new Shop)->getMorphClass())
@@ -838,7 +842,7 @@ class MarketplaceReportService
             })
             ->groupBy('settle_order_id')
             ->selectRaw("
-                CAST(COALESCE(JSON_UNQUOTE(JSON_EXTRACT(transactions.meta, '$.order_id')), JSON_UNQUOTE(JSON_EXTRACT(transactions.meta, '$.commission_return_order_id')), JSON_UNQUOTE(JSON_EXTRACT(transactions.meta, '$.affiliate_return_order_id'))) AS UNSIGNED) as settle_order_id,
+                COALESCE({$id('order_id')}, {$id('commission_return_order_id')}, {$id('affiliate_return_order_id')}) as settle_order_id,
                 SUM(CASE WHEN transactions.type = 'deposit' THEN {$num('marketplace_commission')} ELSE 0 END) as credited_commission,
                 SUM(CASE WHEN transactions.type = 'withdraw' THEN {$num('marketplace_commission')} ELSE {$num('commission_return')} END) as reversed_commission,
                 SUM(CASE WHEN transactions.type = 'deposit' THEN {$num('affiliate_commission')} - {$num('affiliate_return')} ELSE 0 END) as credited_affiliate,
@@ -879,7 +883,7 @@ class MarketplaceReportService
         return round((float) DB::table('transactions')
             ->where('transactions.payable_type', (new Shop)->getMorphClass())
             ->where('transactions.type', 'withdraw')
-            ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(transactions.meta, '$.purpose')) = 'subscription'")
+            ->whereRaw("JSON_CONTAINS(transactions.meta, '\"subscription\"', '$.purpose')")
             ->whereBetween('transactions.created_at', [$this->period->from, $this->period->to])
             ->when($this->shopId, fn ($q) => $q->where('transactions.payable_id', $this->shopId))
             ->sum(DB::raw('ABS(transactions.amount)')), 2);
