@@ -39,7 +39,7 @@ class WellKnownController extends Controller
     /**
      * iOS Universal Links verification.
      */
-    public function appleAppSiteAssociation(): Response
+    public function appleAppSiteAssociation(): JsonResponse
     {
         $payload = [
             'applinks' => [

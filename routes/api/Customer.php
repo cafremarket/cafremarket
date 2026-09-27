@@ -132,7 +132,10 @@ Route::middleware('customerApp')->group(function () {
         Route::get('reset/{token}', [AuthController::class, 'token']);
         Route::post('reset', [AuthController::class, 'reset']);
         Route::post('social/{provider}', [AuthSocialController::class, 'socialLogin']);
-        Route::post('customer/phone/verify', [PhoneVerificationController::class, 'verifyOtp']);
+        // OtpLogin package is optional; skip its route when not installed.
+        if (class_exists(PhoneVerificationController::class)) {
+            Route::post('customer/phone/verify', [PhoneVerificationController::class, 'verifyOtp']);
+        }
     });
 
     // Registered Customer API routes

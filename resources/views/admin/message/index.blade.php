@@ -1,15 +1,15 @@
 @extends('admin.layouts.master')
 
+@php
+  $search_q = isset($search_q) ? $search_q : null;
+  $requestLabel = isset(request()->route()->parameters['label']) ? request()->route()->parameters['label'] : 1;
+@endphp
+
 @section('page_title')
   {{ $search_q ? trans('app.search_result') : get_msg_folder_name_from_label($requestLabel) }}
 @endsection
 
 @section('content')
-  @php
-    $search_q = isset($search_q) ? $search_q : null;
-    $requestLabel = isset(request()->route()->parameters['label']) ? request()->route()->parameters['label'] : 1;
-  @endphp
-
   <div class="admin-mailbox">
     <aside class="admin-mailbox__sidebar">
       @include('admin.message._left_nav')

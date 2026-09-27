@@ -19,7 +19,7 @@
       @endphp
       <div class="admin-notification-item">
         <div class="admin-notification-item__body">
-          @include($notification_view)
+          @includeFirst([$notification_view, 'admin.partials.notifications.default'])
         </div>
         <div class="admin-notification-item__meta">
           <span class="text-muted small">{{ $notification->created_at->diffForHumans() }}</span>

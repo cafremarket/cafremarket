@@ -1052,11 +1052,24 @@ class ListHelper
      */
     public static function top_categories($count = 5)
     {
-        return Category::select('id', 'slug', 'name', 'active')
-            ->whereHas('listings', function ($query) {
-                $query->mine();
-            })
-            ->withCount('listings')
+        $shopId = Auth::user()?->merchantId();
+
+        if (! $shopId) {
+            return collect();
+        }
+
+        // Listings hang off sub-categories (category_product.category_id -> sub_categories.id)
+        $listingsCount = DB::table('category_product')
+            ->join('inventories', 'inventories.product_id', '=', 'category_product.product_id')
+            ->whereColumn('category_product.category_id', 'sub_categories.id')
+            ->where('inventories.shop_id', $shopId)
+            ->whereNull('inventories.parent_id')
+            ->whereNull('inventories.deleted_at')
+            ->selectRaw('COUNT(DISTINCT inventories.product_id)');
+
+        return SubCategory::select('sub_categories.id', 'sub_categories.slug', 'sub_categories.name', 'sub_categories.active')
+            ->selectSub($listingsCount, 'listings_count')
+            ->having('listings_count', '>', 0)
             ->orderBy('listings_count', 'desc')
             ->limit($count)->get();
     }

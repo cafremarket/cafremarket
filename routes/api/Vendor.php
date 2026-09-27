@@ -68,7 +68,10 @@ Route::prefix('vendor')->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->middleware(['auth:vendor_api']);
         Route::post('email/verify', [AuthController::class, 'verifyEmail'])->middleware(['auth:vendor_api', 'throttle:10,1']);
         Route::post('email/resend', [AuthController::class, 'resendVerificationEmail'])->middleware(['auth:vendor_api', 'throttle:5,1']);
-        Route::post('user/phone/verify', [PhoneVerificationController::class, 'verifyVendorOtp']);
+        // OtpLogin package is optional; skip its route when not installed.
+        if (class_exists(PhoneVerificationController::class)) {
+            Route::post('user/phone/verify', [PhoneVerificationController::class, 'verifyVendorOtp']);
+        }
     });
 
     // Plugins
@@ -173,13 +176,15 @@ Route::prefix('vendor')->group(function () {
 
         // Packagings (Addon)
 
-        Route::get('packagings', [PackagingController::class, 'index']);
-        Route::post('packaging/create', [PackagingController::class, 'store']);
-        Route::get('packaging/{packaging}', [PackagingController::class, 'show']);
-        Route::match(['post', 'put'], 'packaging/{packaging}/update', [PackagingController::class, 'update']);
-        Route::delete('packaging/{packaging}/trash', [PackagingController::class, 'trash']);
-        Route::put('packaging/{packaging_id}/restore', [PackagingController::class, 'restore']);
-        Route::delete('packaging/{packaging_id}/delete', [PackagingController::class, 'destroy']);
+        if (class_exists(PackagingController::class)) {
+            Route::get('packagings', [PackagingController::class, 'index']);
+            Route::post('packaging/create', [PackagingController::class, 'store']);
+            Route::get('packaging/{packaging}', [PackagingController::class, 'show']);
+            Route::match(['post', 'put'], 'packaging/{packaging}/update', [PackagingController::class, 'update']);
+            Route::delete('packaging/{packaging}/trash', [PackagingController::class, 'trash']);
+            Route::put('packaging/{packaging_id}/restore', [PackagingController::class, 'restore']);
+            Route::delete('packaging/{packaging_id}/delete', [PackagingController::class, 'destroy']);
+        }
 
         // Shipping
         Route::get('carriers', [CarrierController::class, 'index']);

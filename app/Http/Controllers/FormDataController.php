@@ -60,6 +60,10 @@ class FormDataController extends Controller
      */
     public function packagings()
     {
+        if (! is_incevio_package_loaded('packaging')) {
+            return collect();
+        }
+
         return ListHelper::packagings();
     }
 

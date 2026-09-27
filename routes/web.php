@@ -25,7 +25,10 @@ Route::post('payment/callback/emola', \App\Http\Controllers\Api\EmolaCallbackCon
 // Symfony strips leading ^ and trailing $ from where() patterns, so a
 // lookahead like (?!admin$) does NOT exclude /admin/dashboard — $ means
 // end of the whole URL, not the first segment. Use (?:/|$) instead.
-Route::middleware(['storefront', 'hasCookie'])->group(function () {
+//
+// Registered on app()->booted() so package routes (wallet, mpesa, …), which
+// load after this file, are matched before the catch-all.
+app()->booted(fn () => Route::middleware(['storefront', 'hasCookie'])->group(function () {
     $reserved = implode('|', [
         'page', 'product', 'listing', 'shop', 'shops', 'categories', 'category',
         'categorygrp', 'search', 'blog', 'selling', 'customer', 'contact',
@@ -37,13 +40,14 @@ Route::middleware(['storefront', 'hasCookie'])->group(function () {
         'fonts', 'images', 'assets', 'livewire', 'build', 'horizon', 'pulse',
         'telescope', 'image', 'address', 'helper', 'payment', 'auctions',
         'events', 'brands', 'switchToMerchant', 'a', 'aff', 'visit', 'affiliate',
+        'wallet', 'mpesa', 'emola',
     ]);
 
     Route::get('{category}/{subcategory}', [
         HomeController::class, 'browseCategory',
-    ])->where('category', '(?!(?:'.$reserved.')(?:/|$)).+')
+    ])->where('category', '(?!(?:'.$reserved.')(?:/|$))[^/]+')
         ->name('category.browse');
-});
+}));
 
 // AJAX routes for get images
 // Route::get('order/ajax/taxrate', [OrderController::class, 'ajaxTaxRate'])->name('ajax.taxrate');

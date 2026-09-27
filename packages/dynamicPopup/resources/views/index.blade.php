@@ -6,7 +6,7 @@
 
 @section('content')
   @include('admin.partials.ui.card_start', [
-    'title' => {{ trans('DynamicPopup::lang.dynamic_popups') }},
+    'title' => trans('DynamicPopup::lang.dynamic_popups'),
     'icon' => 'fa-user',
   ])
 

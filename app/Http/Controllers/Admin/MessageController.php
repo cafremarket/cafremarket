@@ -57,7 +57,7 @@ class MessageController extends Controller
      */
     public function statusOf($status = 1)
     {
-        $messages = $this->message->statusOf($label);
+        $messages = $this->message->statusOf($status);
 
         return view('admin.message.index', compact('messages'));
     }
