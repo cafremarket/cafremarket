@@ -24,6 +24,13 @@
               <div class="help-block with-errors"></div>
             </div>
 
+            @if (config('services.recaptcha.key'))
+              <div class="form-group has-feedback">
+                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.key') }}"></div>
+                <div class="help-block with-errors"></div>
+              </div>
+            @endif
+
             {!! Form::submit(trans('theme.button.send_password_link'), ['class' => 'btn btn-block btn-lg btn-flat btn-primary']) !!}
             {!! Form::close() !!}
             <a href="{{ route('homepage', ['login' => 1]) }}" class="btn btn-link">{{ trans('theme.button.login') }}</a>

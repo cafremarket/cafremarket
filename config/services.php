@@ -67,6 +67,10 @@ return [
     'recaptcha' => [
         'key' => env('GOOGLE_RECAPTCHA_KEY'),
         'secret' => env('GOOGLE_RECAPTCHA_SECRET'),
+        // Mobile apps: when false, a token is checked only if the app sends one,
+        // so app versions released before reCAPTCHA keep working. Turn on once
+        // the updated apps are published.
+        'app_enforce' => env('RECAPTCHA_APP_ENFORCE', false),
     ],
 
     'pusher' => [

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\ReCaptcha;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
@@ -106,7 +107,7 @@ class LoginController extends Controller
         $request->validate([
             'email' => 'required|string',
             'password' => 'required|string',
-        ]);
+        ] + ReCaptcha::rules(), ReCaptcha::messages());
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and

@@ -45,6 +45,13 @@
               <div class="help-block with-errors"></div>
             </div>
 
+            @if (config('services.recaptcha.key'))
+              <div class="form-group has-feedback">
+                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.key') }}"></div>
+                <div class="help-block with-errors"></div>
+              </div>
+            @endif
+
             <div class="row">
               <div class="col-sm-7">
                 <div class="form-group">

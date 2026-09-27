@@ -24,6 +24,13 @@
         <div class="help-block with-errors"></div>
       </div>
 
+      @if (config('services.recaptcha.key'))
+        <div class="form-group has-feedback">
+          <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.key') }}"></div>
+          <div class="help-block with-errors"></div>
+        </div>
+      @endif
+
       <div class="row">
         <div class="col-xs-7">
           <div class="form-group">
@@ -53,5 +60,9 @@
         <p><strong>MERCHANT::</strong> Username: <strong>merchant@demo.com</strong> | Password: <strong>123456</strong> </p>
       </div>
     </div>
+  @endif
+
+  @if (config('services.recaptcha.key'))
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   @endif
 @endsection

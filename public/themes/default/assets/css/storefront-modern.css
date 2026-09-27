@@ -6302,6 +6302,15 @@ input.cpc-composer__file[type="file"],
   object-position: center;
 }
 
+/* Whole image opens the product, in every grid/slider (the base rule only sized it inside .product-list-wrapper). */
+.sf-product-card .sf-product-card__media .product-link {
+  position: absolute;
+  inset: 0;
+  display: block;
+  z-index: 4;
+  cursor: pointer;
+}
+
 .sf-product-card .product-info {
   flex: 1 1 auto;
   display: flex;

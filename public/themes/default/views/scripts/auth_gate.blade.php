@@ -88,6 +88,18 @@
     var loginDefaultError = @json(trans('auth.failed'));
     var loginSubmitLabel = @json(trans('theme.button.login'));
 
+    var recaptchaRequiredMsg = @json(trans('validation.recaptcha'));
+
+    // Auto-rendered widgets name their textarea g-recaptcha-response[-<widgetId>].
+    function recaptchaWidgetId($form) {
+      var $field = $form.find('textarea[name="g-recaptcha-response"]');
+      if (!$field.length || !window.grecaptcha) {
+        return null;
+      }
+      var match = /-(\d+)$/.exec($field.attr('id') || '');
+      return match ? parseInt(match[1], 10) : 0;
+    }
+
     function hideLoginModalError() {
       var $alert = $('#loginModalError');
       $alert.addClass('d-none').find('.sf-login-modal-alert__text').text('');
@@ -136,6 +148,13 @@
         return;
       }
 
+      var captchaId = recaptchaWidgetId($form);
+      if (captchaId !== null && !grecaptcha.getResponse(captchaId)) {
+        $('#loginModalError').find('.sf-login-modal-alert__text').text(recaptchaRequiredMsg);
+        $('#loginModalError').removeClass('d-none');
+        return;
+      }
+
       $btn.prop('disabled', true).addClass('is-loading');
 
       $.ajax({
@@ -152,6 +171,9 @@
       }).fail(function(xhr) {
         showLoginModalError(extractLoginErrorMessage(xhr));
         $form.find('#password').val('').trigger('focus');
+        if (captchaId !== null) {
+          grecaptcha.reset(captchaId);
+        }
       }).always(function() {
         $btn.prop('disabled', false).removeClass('is-loading');
       });
@@ -340,6 +362,12 @@
   }
   .sf-login-modal-alert .fa {
     margin-right: 6px;
+  }
+  /* The 304px reCAPTCHA widget is wider than the small auth modals. */
+  .sf-auth-recaptcha .g-recaptcha {
+    transform: scale(0.85);
+    transform-origin: 0 0;
+    height: 66px;
   }
   #loginModal .form-control.is-invalid {
     border-color: #dc3545;

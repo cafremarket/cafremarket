@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Storefront\Auth;
 
+use App\Helpers\ReCaptcha;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
@@ -36,6 +37,11 @@ class ForgotPasswordController extends Controller
     protected function broker()
     {
         return Password::broker('customers');
+    }
+
+    protected function validateEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email'] + ReCaptcha::rules(), ReCaptcha::messages());
     }
 
     /**

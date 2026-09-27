@@ -7,6 +7,42 @@ use GuzzleHttp\Client;
 
 class ReCaptcha
 {
+    /**
+     * Validation rules for web auth forms; empty when reCAPTCHA is not configured.
+     */
+    public static function rules(): array
+    {
+        if (! config('services.recaptcha.key')) {
+            return [];
+        }
+
+        return ['g-recaptcha-response' => 'required|recaptcha'];
+    }
+
+    /**
+     * Rules for mobile-app auth endpoints. Always verified when the app sends a
+     * token; only required once services.recaptcha.app_enforce is on.
+     */
+    public static function appRules(): array
+    {
+        if (! config('services.recaptcha.key')) {
+            return [];
+        }
+
+        if (config('services.recaptcha.app_enforce')) {
+            return ['g-recaptcha-response' => 'required|recaptcha'];
+        }
+
+        return request()->filled('g-recaptcha-response')
+            ? ['g-recaptcha-response' => 'recaptcha']
+            : [];
+    }
+
+    public static function messages(): array
+    {
+        return ['g-recaptcha-response.required' => trans('validation.recaptcha')];
+    }
+
     public function validate($attribute, $value, $parameters, $validator)
     {
         if (! is_string($value) || $value === '') {

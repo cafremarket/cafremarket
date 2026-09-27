@@ -139,6 +139,9 @@ class SystemConfigResource extends JsonResource
             'publicly_show_affiliate_commission' => (bool) $attr('publicly_show_affiliate_commission', false),
 
             'disable_other_gender' => config('system.disable_other_gender'),
+
+            // Public site key: the apps show the reCAPTCHA checkbox when set.
+            'recaptcha_site_key' => config('services.recaptcha.key'),
         ];
     }
 }

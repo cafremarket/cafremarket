@@ -4,6 +4,7 @@
       <div class="product-widget">
         <div class="product-img-wrap">
           <img class="product-img lazy" src="{{ get_inventory_img_src($item, 'tiny') }}" src="{{ get_inventory_img_src($item, 'small') }}" data-name="product_image" alt="{{ $item->title }}" title="{{ $item->title }}" />
+          <a class="product-link" href="{{ storefront_product_url($item) }}" aria-label="{{ $item->title }}"></a>
         </div>
 
         <div class="product-info">

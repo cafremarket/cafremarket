@@ -37,6 +37,13 @@
               <div class="help-block with-errors"></div>
             </div>
 
+            @if (config('services.recaptcha.key'))
+              <div class="form-group has-feedback">
+                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.key') }}"></div>
+                <div class="help-block with-errors"></div>
+              </div>
+            @endif
+
             {!! Form::submit(trans('app.form.password_reset'), ['class' => 'btn btn-block btn-lg btn-flat btn-new admin-auth-form__submit']) !!}
             {!! Form::close() !!}
 
@@ -48,4 +55,8 @@
       </div>
     </div>
   </div>
+
+  @if (config('services.recaptcha.key'))
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  @endif
 @endsection

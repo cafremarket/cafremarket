@@ -2,6 +2,7 @@
 
 namespace Incevio\Package\Affiliate\Http\Controllers;
 
+use App\Helpers\ReCaptcha;
 use App\Http\Controllers\Controller;
 use App\Services\Auth\JwtAuthService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -25,11 +26,11 @@ class LoginController extends Controller
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
-        ], [
+        ] + ReCaptcha::rules(), [
             'email.required' => trans('packages.affiliate.email_required'),
             'email.email' => trans('packages.affiliate.email_invalid'),
             'password.required' => trans('packages.affiliate.password_required'),
-        ]);
+        ] + ReCaptcha::messages());
 
         if ($this->attemptLogin($request)) {
             if ($request->hasSession()) {

@@ -42,6 +42,12 @@
               </a>
             </div>
 
+            @if (config('services.recaptcha.key'))
+              <div class="form-group sf-auth-recaptcha">
+                <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.key') }}"></div>
+              </div>
+            @endif
+
             <div class="form-group text-left">
               <label>
                 <input name="remeber" id="remeber" class="i-check-blue" type="checkbox" /> {{ trans('theme.remember_me') }}
@@ -203,6 +209,12 @@
             <input name="email" class="form-control input-lg" placeholder="{{ trans('theme.placeholder.your_email') }}" type="email" required />
             <div class="help-block with-errors"></div>
           </div>
+
+          @if (config('services.recaptcha.key'))
+            <div class="form-group sf-auth-recaptcha">
+              <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.key') }}"></div>
+            </div>
+          @endif
 
           <input class="btn btn-primary btn-block btn-lg btn-round mt-3" type="submit" value="{{ trans('theme.button.recover_password') }}">
         </div>

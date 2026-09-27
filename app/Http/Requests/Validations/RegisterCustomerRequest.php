@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Validations;
 
+use App\Helpers\ReCaptcha;
 use App\Rules\RealPhone;
 use App\Rules\RealEmail;
 use App\Http\Requests\Request;
@@ -55,7 +56,7 @@ class RegisterCustomerRequest extends Request
             ];
         }
 
-        return $rules;
+        return $rules + ReCaptcha::appRules();
     }
 
     /**
@@ -69,6 +70,6 @@ class RegisterCustomerRequest extends Request
             'email.unique' => trans('validation.register_email_unique'),
             'phone.unique' => trans('validation.register_phone_unique'),
             'agree.required' => trans('validation.accepted', ['attribute' => 'terms']),
-        ];
+        ] + ReCaptcha::messages();
     }
 }

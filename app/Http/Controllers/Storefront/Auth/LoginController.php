@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Storefront\Auth;
 
+use App\Helpers\ReCaptcha;
 use App\Http\Controllers\SocialiteBaseController;
 use App\Models\Customer;
 use App\Services\Auth\CustomerJwtService;
@@ -93,7 +94,7 @@ class LoginController extends SocialiteBaseController
         $this->validate($request, [
             $this->username($request) => 'required|string',
             'password' => 'required|string',
-        ]);
+        ] + ReCaptcha::rules(), ReCaptcha::messages());
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and

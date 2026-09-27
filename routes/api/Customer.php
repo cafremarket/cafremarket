@@ -104,8 +104,9 @@ Route::middleware('customerApp')->group(function () {
     Route::get('cart/{cart}', [CartController::class, 'show']);
     Route::put('cart/{cart}/update', [CartController::class, 'update']);
     Route::get('cart/{cart}/shipping', [CartController::class, 'shipping']);
-    Route::post('cart/checkout_all', [CheckoutController::class, 'checkoutAll'])->middleware('verifiedEmail:api');
-    Route::post('cart/{cart}/checkout', [CheckoutController::class, 'checkout'])->middleware('verifiedEmail:api');
+    // Guests can view/edit their cart; placing an order requires login (same as web).
+    Route::post('cart/checkout_all', [CheckoutController::class, 'checkoutAll'])->middleware(['auth:api', 'verifiedEmail:api']);
+    Route::post('cart/{cart}/checkout', [CheckoutController::class, 'checkout'])->middleware(['auth:api', 'verifiedEmail:api']);
     Route::get('cart/{cart}/paymentOptions', [CheckoutController::class, 'paymentOptions']);
     Route::get('cart/{cart}/paymentOptions/debug', [CheckoutController::class, 'paymentOptionsDebug']);
 

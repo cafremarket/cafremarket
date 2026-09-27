@@ -27,6 +27,13 @@
       </label>
     </div>
 
+    @if (config('services.recaptcha.key'))
+      <div class="sf-sell-form-group {{ $errors->has('g-recaptcha-response') ? 'sf-sell-form-group--invalid' : '' }}">
+        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.key') }}"></div>
+        @include('partials._field_error', ['field' => 'g-recaptcha-response'])
+      </div>
+    @endif
+
     <button type="submit" class="sf-sell-btn sf-sell-btn--primary sf-sell-btn--lg sf-sell-btn--block">
       {{ trans('app.form.login') }}
     </button>
@@ -44,9 +51,14 @@
       loginError: @json(trans('theme.selling_page.login_error')),
       dashboardUrl: @json(route('merchant.dashboard')),
       fixFieldsMsg: @json(trans('theme.selling_page.fix_highlighted_fields')),
-      errorLabel: @json(trans('theme.error'))
+      errorLabel: @json(trans('theme.error')),
+      recaptchaRequired: @json(trans('validation.recaptcha'))
     };
   </script>
   <script src="{{ selling_theme_asset_url('js/selling-auth.js') }}?v={{ @filemtime(selling_theme_assets_path().'/js/selling-auth.js') ?: time() }}"></script>
   @include('scripts.password_toggle')
+
+  @if (config('services.recaptcha.key'))
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  @endif
 @endsection

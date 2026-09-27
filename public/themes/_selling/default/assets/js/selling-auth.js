@@ -122,6 +122,16 @@
         });
     }
 
+    // Auto-rendered widgets name their textarea g-recaptcha-response[-<widgetId>].
+    function recaptchaWidgetId($form) {
+        var $field = $form.find('textarea[name="g-recaptcha-response"]');
+        if (!$field.length || !window.grecaptcha) {
+            return null;
+        }
+        var match = /-(\d+)$/.exec($field.attr('id') || '');
+        return match ? parseInt(match[1], 10) : 0;
+    }
+
     function bindSellerLogin() {
         var $form = $('#seller-login-form');
         if (!$form.length) {
@@ -135,6 +145,13 @@
             var $alert = $('#sfSellAuthAlert');
             clearFieldErrors($form);
             $alert.empty();
+
+            var captchaId = recaptchaWidgetId($form);
+            if (captchaId !== null && !window.grecaptcha.getResponse(captchaId)) {
+                showFieldErrors($form, { 'g-recaptcha-response': [authApi.recaptchaRequired] });
+                return;
+            }
+
             $btn.prop('disabled', true);
 
             $.ajax({
@@ -161,6 +178,9 @@
                 showAlert($alert, message, 'danger');
             }).always(function () {
                 $btn.prop('disabled', false);
+                if (captchaId !== null) {
+                    window.grecaptcha.reset(captchaId);
+                }
             });
         });
     }

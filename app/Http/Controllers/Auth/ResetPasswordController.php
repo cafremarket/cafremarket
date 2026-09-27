@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\ReCaptcha;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\ResetsPasswords;
@@ -19,7 +20,9 @@ class ResetPasswordController extends Controller
     |
     */
 
-    use ResetsPasswords;
+    use ResetsPasswords {
+        rules as baseRules;
+    }
 
     /**
      * Where to redirect users after resetting their password.
@@ -36,5 +39,15 @@ class ResetPasswordController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+    }
+
+    protected function rules()
+    {
+        return $this->baseRules() + ReCaptcha::rules();
+    }
+
+    protected function validationErrorMessages()
+    {
+        return ReCaptcha::messages();
     }
 }
