@@ -20,7 +20,7 @@ return [
         'emola_complete_on_phone' => 'Complete the payment on your phone (eMola USSD).',
         'emola_redirect_when_paid' => 'Your wallet balance will update when Movitel confirms the payment.',
         'emola_deposit_sms' => 'Top up Cafre-pay',
-        'emola_resend_not_allowed' => 'This wallet deposit can no longer receive another eMola payment request. Start a new deposit if needed.',
+        'emola_resend_not_allowed' => 'This deposit cannot be paid with eMola again. Please start a new deposit.',
         'platform_fees_section' => 'Mobile payment fees (M-Pesa, eMola & payouts)',
         'platform_fees_page_title' => 'Payout fees',
         'platform_fees_menu' => 'Payout fees',

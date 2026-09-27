@@ -74,7 +74,7 @@ class EmolaGatewayController extends Controller
             Log::error('eMola pay failed', ['order_id' => $validated['order_id'], 'error' => $e->getMessage()]);
 
             return response()->json([
-                'message' => trans('api.payment_failed_reason', ['reason' => $e->getMessage()]),
+                'message' => trans('theme.emola_payment_not_updated'),
             ], 500);
         }
     }

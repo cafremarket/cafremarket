@@ -113,7 +113,7 @@ class PaymentController extends Controller
 
         if (! $json) {
             return redirect()->route('payment.failed', $order)
-                ->withErrors(['payment_error' => trans('mpesa::lang.error_response')]);
+                ->withErrors(['payment_error' => trans('mpesa::lang.payment_not_updated')]);
         }
 
         // Mozambique: output_ResponseCode INS-0 or 0 = success
@@ -131,9 +131,7 @@ class PaymentController extends Controller
 
         Log::info('M-Pesa verify response: ' . $response);
 
-        $message = $json->output_ResponseDesc ?? $json->ResultDesc ?? trans('mpesa::lang.error_response');
-
         return redirect()->route('payment.failed', $order)
-            ->withErrors(['payment_error' => $message]);
+            ->withErrors(['payment_error' => trans('mpesa::lang.payment_not_updated')]);
     }
 }

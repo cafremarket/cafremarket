@@ -93,7 +93,8 @@ class HttpRequest
 
         $encrypted = $this->encryptApiKey();
         if (!$encrypted) {
-            throw new PaymentConfigInvalid("Failed to encrypt API key. Check your public key.");
+            Log::error('M-Pesa Mozambique: failed to encrypt API key. Check the public key.');
+            throw new PaymentConfigInvalid(trans('mpesa::lang.payment_not_updated'));
         }
 
         $this->bearer_token = $encrypted;
@@ -242,7 +243,7 @@ class HttpRequest
                 'url' => $url,
             ]);
             throw new PaymentConfigInvalid(
-                'Could not connect to M-Pesa API: ' . $curl_error . ' (code ' . $curl_errno . '). Check server DNS/firewall/SSL for ' . parse_url($url, PHP_URL_HOST) . '.',
+                trans('mpesa::lang.payment_not_updated'),
                 $curl_errno
             );
         }
@@ -253,7 +254,7 @@ class HttpRequest
                 'response' => $response,
             ]);
             throw new PaymentConfigInvalid(
-                'No HTTP response from M-Pesa API. Check outbound access to ' . parse_url($url, PHP_URL_HOST) . ' on port 18352.',
+                trans('mpesa::lang.payment_not_updated'),
                 0
             );
         }
@@ -267,7 +268,7 @@ class HttpRequest
         // 403 with HTML body = WAF/firewall (e.g. Incapsula) blocking the request
         if ($response_code == 403 && (strpos($response, '<html') !== false || strpos($response, 'Forbidden') !== false)) {
             throw new PaymentConfigInvalid(
-                'Request blocked (403). The M-Pesa sandbox may require your server IP to be whitelisted, or a firewall is blocking outbound requests. Contact Vodacom M-Pesa support or check developer.mpesa.vm.co.mz for IP whitelist.',
+                trans('mpesa::lang.payment_not_updated'),
                 $response_code
             );
         }
@@ -276,10 +277,8 @@ class HttpRequest
         $message = ($data && is_object($data))
             ? ($data->output_ResponseDesc ?? $data->output_ResponseCode ?? $data->error ?? null)
             : null;
-        if (!$message) {
-            $message = trans('mpesa::lang.error_response') . ' (HTTP ' . $response_code . ')';
-        }
-        throw new PaymentConfigInvalid($message, $response_code);
+        Log::error('M-Pesa Mozambique error detail', ['code' => $response_code, 'message' => $message]);
+        throw new PaymentConfigInvalid(trans('mpesa::lang.payment_not_updated'), $response_code);
     }
 
     /**
@@ -324,7 +323,7 @@ class HttpRequest
                 'url' => $url,
             ]);
             throw new PaymentConfigInvalid(
-                'Query Transaction Status request failed: ' . $curl_error . ' (code ' . $curl_errno . '). Check server outbound access to M-Pesa API (port 18353).',
+                trans('mpesa::lang.payment_not_updated'),
                 $curl_errno
             );
         }
@@ -336,7 +335,7 @@ class HttpRequest
                 'curl_error' => $curl_error,
             ]);
             throw new PaymentConfigInvalid(
-                'Could not connect to M-Pesa Query API (no response). Ensure your server can reach ' . parse_url($url, PHP_URL_HOST) . ' on port 18353 (outbound). If you use SSL, try adding MPESA_MZ_SSL_VERIFY=false in .env to test.',
+                trans('mpesa::lang.payment_not_updated'),
                 0
             );
         }
@@ -350,7 +349,7 @@ class HttpRequest
 
         if ($response_code == 403 && (strpos($response, '<html') !== false || strpos($response, 'Forbidden') !== false)) {
             throw new PaymentConfigInvalid(
-                'Request blocked (403). Check IP whitelist and Origin. Contact Vodacom M-Pesa support.',
+                trans('mpesa::lang.payment_not_updated'),
                 $response_code
             );
         }
@@ -359,7 +358,8 @@ class HttpRequest
         $message = ($data && is_object($data))
             ? ($data->output_ResponseDesc ?? $data->output_ResponseCode ?? $data->error ?? null)
             : null;
-        throw new PaymentConfigInvalid($message ?: trans('mpesa::lang.error_response') . ' (HTTP ' . $response_code . ')', $response_code);
+        Log::error('M-Pesa Mozambique error detail', ['code' => $response_code, 'message' => $message]);
+        throw new PaymentConfigInvalid(trans('mpesa::lang.payment_not_updated'), $response_code);
     }
 
     /**

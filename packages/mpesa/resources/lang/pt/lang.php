@@ -3,7 +3,8 @@
 return [
     'confirm_order' => 'Confirmar encomenda',
     'bad_request' => 'Pedido inválido',
-    'error_response' => 'O servidor M-Pesa devolveu um erro. Verifique os registos da aplicação para mais detalhes.',
+    'error_response' => 'Pagamento não concluído. O estado do pagamento não foi actualizado. Tente novamente ou use outro método de pagamento.',
+    'payment_not_updated' => 'Pagamento não concluído. O estado do pagamento não foi actualizado. Tente novamente ou use outro método de pagamento.',
     'mpesa_number' => 'Número de telemóvel M-Pesa',
     'pay_with_mpesa' => 'Receberá um pedido de pagamento no seu telefone. Introduza o seu PIN M-Pesa para concluir o pagamento.',
     'payment_confirmation' => 'Conclua o pagamento no seu telefone. A sua encomenda será confirmada automaticamente quando o pagamento for recebido.',
@@ -12,7 +13,7 @@ return [
     'redirect_when_paid' => 'Será redirecionado quando o pagamento for recebido.',
     'waiting_for_payment' => 'A aguardar pagamento',
     'confirm_via_callback' => 'O estado do pagamento é atualizado automaticamente. Atualize a página para ver se o seu pagamento foi recebido.',
-    'poll_timeout_error' => 'O pagamento não foi confirmado a tempo. Se já pagou, atualize a página ou verifique o estado da sua encomenda. Caso contrário, tente novamente ou contacte o suporte.',
+    'poll_timeout_error' => 'Pagamento não confirmado. O estado do pagamento não foi actualizado. Se já pagou, actualize a página; caso contrário, tente novamente.',
     'detecting_payment' => 'A verificar pagamento…',
     'payment_detected' => 'Pagamento recebido. A confirmar a sua encomenda…',
     'lipa_na_mpesa' => 'Lipa Na M-Pesa',

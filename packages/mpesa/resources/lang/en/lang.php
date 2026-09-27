@@ -2,7 +2,8 @@
 return [
     'confirm_order' => 'Confirm order',
     'bad_request' => 'Bad request',
-    'error_response' => 'The M-Pesa server returned an error. Check the application logs for details.',
+    'error_response' => 'Payment not completed. Your payment status was not updated. Please try again or use another payment method.',
+    'payment_not_updated' => 'Payment not completed. Your payment status was not updated. Please try again or use another payment method.',
     'mpesa_number' => 'M-Pesa mobile number',
     'pay_with_mpesa' => 'You will receive a payment request on your phone. Enter your M-Pesa PIN to complete the payment.',
     'payment_confirmation' => 'Complete the payment on your phone. Your order will be confirmed automatically when payment is received.',
@@ -11,7 +12,7 @@ return [
     'redirect_when_paid' => 'You will be redirected when payment is received.',
     'waiting_for_payment' => 'Waiting for payment',
     'confirm_via_callback' => 'Payment status is updated automatically. Refresh the page to see if your payment was received.',
-    'poll_timeout_error' => 'Payment was not confirmed in time. If you have already paid, refresh the page or check your order status. Otherwise please try again or contact support.',
+    'poll_timeout_error' => 'Payment not confirmed. Your payment status was not updated. If you already paid, refresh the page; otherwise please try again.',
     'detecting_payment' => 'Checking for payment…',
     'payment_detected' => 'Payment received. Confirming your order…',
     'lipa_na_mpesa' => 'Lipa Na M-Pesa',

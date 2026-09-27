@@ -94,8 +94,11 @@ class MPesaPaymentService extends PaymentService
         }
 
         $this->status = self::STATUS_ERROR;
-        $message = $data->output_ResponseDesc ?? $data->output_ResponseCode ?? 'Payment request failed';
-        throw new PaymentFailedException($message);
+        Log::warning('M-Pesa payment failed', [
+            'code' => $data->output_ResponseCode ?? null,
+            'detail' => $data->output_ResponseDesc ?? null,
+        ]);
+        throw new PaymentFailedException(trans('mpesa::lang.payment_not_updated'));
     }
 
     public function setAmount($amount)

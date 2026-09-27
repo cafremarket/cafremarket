@@ -2,6 +2,8 @@
 
 namespace App\Services\Emola;
 
+use Illuminate\Support\Facades\Log;
+
 final class EmolaResponse
 {
     /** Spec §C — push accepted, async USSD sent. */
@@ -110,58 +112,36 @@ final class EmolaResponse
         return $this->isPaymentSuccess();
     }
 
+    /** Customer-facing message — always simple; technical detail goes to the log. */
     public function failureMessage(): string
     {
+        Log::warning('eMola payment failed', ['detail' => $this->technicalMessage()]);
+
+        return trans('theme.emola_payment_not_updated');
+    }
+
+    /** Raw gateway / business error detail for logs and admins. */
+    public function technicalMessage(): string
+    {
         if (config('emola.fake')) {
-            return 'eMola test mode is enabled (EMOLA_FAKE=true). Disable it on production to send real USSD requests.';
-        }
-
-        if ($this->gatewayError === 'SOAP_FAULT') {
-            return $this->gatewayDescription ?: 'eMola SOAP connection failed.';
-        }
-
-        if ($this->gatewayError === 'HTTP_ERROR') {
-            return $this->gatewayDescription ?: 'eMola HTTP request failed.';
+            return 'eMola test mode is enabled (EMOLA_FAKE=true).';
         }
 
         if (! $this->isGatewaySuccess()) {
-            $mapped = EmolaSpec::gatewayErrorMessage($this->gatewayError);
-            $detail = trim((string) ($this->gatewayDescription ?: $mapped ?: ''));
+            $detail = $this->gatewayDescription ?: EmolaSpec::gatewayErrorMessage($this->gatewayError);
 
-            return trans('theme.emola_movitel_gateway_failed', [
-                'code' => $this->gatewayError,
-                'detail' => $detail !== '' ? $detail : trans('theme.emola_movitel_no_detail'),
-            ]);
+            return trim('Gateway error '.$this->gatewayError.': '.($detail ?: 'no detail'));
         }
 
         $code = $this->businessErrorCode();
-        $message = trim((string) ($this->businessMessage() ?? ''));
-        $mapped = $code !== null ? EmolaSpec::businessErrorMessage($code) : null;
-        $detail = $message !== '' ? $message : trim((string) ($mapped ?? ''));
-
         if ($code !== null) {
-            $themeKey = EmolaSpec::businessErrorThemeKey($code);
-            if ($themeKey !== null && trans()->has($themeKey)) {
-                $attempted = EmolaSpec::lastTransAmountMzn();
+            $detail = $this->businessMessage() ?: EmolaSpec::businessErrorMessage($code);
+            $amount = EmolaSpec::lastTransAmountMzn();
 
-                return trans($themeKey, [
-                    'amount' => $attempted !== null
-                        ? get_formated_decimal($attempted, false, 0)
-                        : '—',
-                    'code' => $code,
-                    'detail' => $detail !== '' ? $detail : trans('theme.emola_movitel_no_detail'),
-                ]);
-            }
-
-            return trans('theme.emola_movitel_rejected_amount', [
-                'amount' => EmolaSpec::lastTransAmountMzn() !== null
-                    ? get_formated_decimal(EmolaSpec::lastTransAmountMzn(), false, 0)
-                    : '—',
-                'code' => $code,
-                'detail' => $detail !== '' ? $detail : trans('theme.emola_movitel_no_detail'),
-            ]);
+            return trim('Business error '.$code.': '.($detail ?: 'no detail')
+                .($amount !== null ? ' (amount '.$amount.' MZN)' : ''));
         }
 
-        return trans('theme.emola_movitel_no_ussd_confirm');
+        return 'USSD push not confirmed.';
     }
 }

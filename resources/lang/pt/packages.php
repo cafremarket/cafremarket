@@ -65,7 +65,7 @@ return [
         'emola_complete_on_phone' => 'Conclua o pagamento no telemóvel (USSD eMola).',
         'emola_redirect_when_paid' => 'O saldo da carteira será atualizado quando a Movitel confirmar o pagamento.',
         'emola_deposit_sms' => 'Recarregar Cafre-pay',
-        'emola_resend_not_allowed' => 'Este depósito na carteira já não pode receber outro pedido eMola. Inicie um novo depósito se necessário.',
+        'emola_resend_not_allowed' => 'Este depósito já não pode ser pago com eMola. Inicie um novo depósito.',
         'platform_fees_section' => 'Taxas de pagamento móvel (M-Pesa, eMola e levantamentos)',
         'platform_fees_page_title' => 'Taxas de levantamento',
         'platform_fees_menu' => 'Taxas de levantamento',

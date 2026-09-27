@@ -52,7 +52,7 @@ final class EmolaSpec
         $transId = substr($transId, 0, $max);
 
         if (strlen($transId) < $min) {
-            throw new PaymentFailedException('eMola transId must be '.$min.'–'.$max.' characters.');
+            throw new PaymentFailedException(trans('theme.emola_payment_not_updated'));
         }
 
         return $transId;
@@ -63,7 +63,7 @@ final class EmolaSpec
         $refNo = substr(preg_replace('/[^A-Za-z0-9]/', '', $refNo), 0, (int) config('emola.limits.ref_no_max', 20));
 
         if ($refNo === '') {
-            throw new PaymentFailedException('eMola refNo is required.');
+            throw new PaymentFailedException(trans('theme.emola_payment_not_updated'));
         }
 
         return $refNo;
@@ -335,7 +335,7 @@ final class EmolaSpec
         $content = trim($content);
 
         if ($content === '') {
-            throw new PaymentFailedException('eMola smsContent is required.');
+            throw new PaymentFailedException(trans('theme.emola_payment_not_updated'));
         }
 
         if (function_exists('mb_substr')) {

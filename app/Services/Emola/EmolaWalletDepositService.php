@@ -216,7 +216,7 @@ class EmolaWalletDepositService
             return EmolaSpec::sanitizeRefNo('WLTm'.(string) $payee->id);
         }
 
-        throw new PaymentFailedException('Unsupported wallet holder for eMola deposit.');
+        throw new PaymentFailedException(trans('theme.emola_payment_not_updated'));
     }
 
     public static function isWalletRefNo(string $refNo): bool
