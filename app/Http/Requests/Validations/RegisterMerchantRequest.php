@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Validations;
 
+use App\Helpers\ReCaptcha;
 use App\Rules\RealPhone;
 use App\Rules\RealEmail;
 use App\Http\Requests\Request;
@@ -72,10 +73,8 @@ class RegisterMerchantRequest extends Request
             $rules['plan'] = 'required';
         }
 
-        // When recaptcha in configured and the call is not from api
-        if (config('services.recaptcha.key') && ! $this->is('api/vendor/*')) {
-            $rules['g-recaptcha-response'] = 'required|recaptcha';
-        }
+        // Web form always requires reCAPTCHA; the seller app follows the app rollout switch.
+        $rules += $this->is('api/vendor/*') ? ReCaptcha::appRules() : ReCaptcha::rules();
 
         if (is_incevio_package_loaded('otp-login')) {
             $rules['phone'] = [
@@ -107,6 +106,6 @@ class RegisterMerchantRequest extends Request
             'shop_name.unique' => trans('validation.register_shop_name_unique'),
             'slug.unique' => trans('validation.register_slug_unique'),
             'extra_info.required' => trans('packages.smartForm.form_data_requied_validation_msg'),
-        ];
+        ] + ReCaptcha::messages();
     }
 }

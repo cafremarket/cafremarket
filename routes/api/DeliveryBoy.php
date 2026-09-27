@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\DeliveryBoy\LocationController;
 use App\Http\Controllers\Api\DeliveryBoy\OrderController;
 use App\Http\Controllers\Api\DeliveryBoy\ShopController;
 use App\Http\Controllers\Api\DeliveryBoy\HomeController;
+use App\Http\Controllers\Api\RecaptchaConfigController;
 use Illuminate\Support\Facades\Route;
 
 // Delivery boy
@@ -16,6 +17,7 @@ Route::prefix('deliveryboy')->namespace('DeliveryBoy')->group(function () {
     // Delivery boy authentication
     Route::post('login', [AuthController::class, 'login']);
     Route::post('forgot', [AuthController::class, 'forgot']);
+    Route::get('recaptcha', [RecaptchaConfigController::class, '__invoke']);
     Route::get('reset', [AuthController::class, 'token']);
     Route::post('reset', [AuthController::class, 'reset']);
 

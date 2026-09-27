@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Vendor;
 
+use App\Helpers\ReCaptcha;
 use App\Events\Shop\ShopCreated;
 use App\Http\Controllers\Api\Concerns\VerifiesAccountEmail;
 use App\Http\Controllers\Controller;
@@ -130,6 +131,8 @@ class AuthController extends Controller
             return response()->json(['message' => trans('packages.otp-login.verification_code_sent')], 200);
         }
 
+        $request->validate(ReCaptcha::appRules(), ReCaptcha::messages());
+
         $credentials = [
             'email' => $request->email,
             'password' => $request->password,
@@ -210,7 +213,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-        ]);
+        ] + ReCaptcha::appRules(), ReCaptcha::messages());
 
         $user = User::where('email', $request->email)->first();
 

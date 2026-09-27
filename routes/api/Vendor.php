@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Vendor\DashboardController;
 use App\Http\Controllers\Api\Vendor\DeliveryBoyController;
 use App\Http\Controllers\Api\Vendor\DisputeController;
 use App\Http\Controllers\Api\Vendor\HomeController;
+use App\Http\Controllers\Api\RecaptchaConfigController;
 use App\Http\Controllers\Api\Vendor\InventoryController;
 use App\Http\Controllers\Api\Vendor\ManufacturerController;
 use App\Http\Controllers\Api\Vendor\NotificationController;
@@ -61,6 +62,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('register', [AuthController::class, 'getRegisterFormFields']);
         Route::post('login', [AuthController::class, 'login']);
         Route::post('forgot', [AuthController::class, 'forgot']);
+        Route::get('recaptcha', [RecaptchaConfigController::class, '__invoke']);
         Route::get('reset/{token}', [AuthController::class, 'token']);
         Route::post('reset', [AuthController::class, 'reset']);
         Route::post('logout', [AuthController::class, 'logout'])->middleware(['auth:vendor_api']);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\DeliveryBoy;
 
 use App\Helpers\ApiAlert;
+use App\Helpers\ReCaptcha;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeliveryBoy\LoginRequest;
 use App\Http\Requests\DeliveryBoy\UpdatePasswordRequest;
@@ -14,6 +15,7 @@ use App\Services\Auth\JwtAuthService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -29,6 +31,12 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
+        // The second step of a multi-store login carries the pass issued by the
+        // first step, so the rider isn't asked for a new reCAPTCHA.
+        if (! $this->validStorePickPass($request)) {
+            $request->validate(ReCaptcha::appRules(), ReCaptcha::messages());
+        }
+
         // A rider who works for more than one store has one account row per
         // store (email is only unique within a store) — find every row this
         // email+password combination matches.
@@ -47,6 +55,10 @@ class AuthController extends Controller
         } elseif ($matches->count() > 1) {
             return response()->json([
                 'choose_store' => true,
+                'store_pick_pass' => Crypt::encryptString(json_encode([
+                    'email' => strtolower($request->email),
+                    'exp' => now()->addMinutes(10)->timestamp,
+                ])),
                 'message' => trans('api.multiple_stores_found'),
                 'stores' => $matches->map(fn ($account) => [
                     'shop_id' => $account->shop_id,
@@ -66,6 +78,23 @@ class AuthController extends Controller
         }
 
         return new DeliveryBoyResource($deliveryBoy);
+    }
+
+    private function validStorePickPass(Request $request): bool
+    {
+        if (! $request->filled('shop_id') || ! $request->filled('store_pick_pass')) {
+            return false;
+        }
+
+        try {
+            $pass = json_decode(Crypt::decryptString($request->store_pick_pass), true);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return is_array($pass)
+            && ($pass['email'] ?? null) === strtolower((string) $request->email)
+            && ($pass['exp'] ?? 0) >= now()->timestamp;
     }
 
     /**
@@ -184,7 +213,7 @@ class AuthController extends Controller
      */
     public function forgot(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        $request->validate(['email' => 'required|email'] + ReCaptcha::appRules(), ReCaptcha::messages());
 
         $deliveryBoy = DeliveryBoy::where('email', $request->email)->first();
 
