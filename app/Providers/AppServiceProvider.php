@@ -31,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
 
         $this->ensureStorageFrameworkDirectoriesExist();
 
+        // Log every scheduled task run for the admin Cron jobs page.
+        \App\Services\Cron\CronMonitor::register($this->app['events']);
+
         if ($this->app->environment('production') && filter_var(env('EMOLA_FAKE', false), FILTER_VALIDATE_BOOLEAN)) {
             \Illuminate\Support\Facades\Log::warning(
                 'EMOLA_FAKE=true in .env on production is ignored — set EMOLA_FAKE=false and run php artisan config:clear so real USSD pushes are sent.'

@@ -451,6 +451,7 @@ class InventoryController extends Controller
             'available_from' => $request->available_from,
             'expiry_date' => $request->expiry_date,
             'min_order_quantity' => $request->min_order_quantity,
+            'refund_days' => $request->input('refund_days'),
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
             'download_limit' => $request->download_limit,
@@ -484,6 +485,7 @@ class InventoryController extends Controller
 
                 // Merge the common info and dynamic info to data array
                 $data = array_merge($dynamicInfo, $commonInfo);
+                $data['refund_days'] = variant_refund_days($request, $key);
 
                 // Insert the record
                 $inventory = Inventory::find($key);
@@ -687,6 +689,7 @@ class InventoryController extends Controller
             'available_from' => $inventory->available_from->format('Y-m-d h:i a'),
             'slug' => $inventory->slug.'-'.$request->get('sku'),
             'min_order_quantity' => $inventory->min_order_quantity,
+            'refund_days' => $request->input('refund_days', $inventory->refund_days),
             'user_id' => $request->user()->id,
             'sale_price' => $request->get('sale_price'),
             'affiliate_commission_percentage' => $request->get('affiliate_commission_percentage'),

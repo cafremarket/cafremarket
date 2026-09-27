@@ -201,6 +201,7 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
             'active' => $request->input('active'),
             'tax_id' => $request->input('tax_id'),
             'min_order_quantity' => $request->input('min_order_quantity'),
+            'refund_days' => $request->input('refund_days'),
             'alert_quantity' => $request->input('alert_quantity'),
             'description' => $request->input('description'),
             'condition_note' => $request->input('condition_note'),
@@ -279,6 +280,7 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
 
             // Merge the common info and dynamic info to data array
             $data = array_merge($dynamicInfo, $commonInfo);
+            $data['refund_days'] = variant_refund_days($request, $key);
 
             // Insert the record
             $inventory = Inventory::create($data);

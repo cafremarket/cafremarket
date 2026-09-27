@@ -82,6 +82,7 @@ class ProductController extends Controller
                     'condition_note' => $request->condition_note,
                     'stock_quantity' => $request->input('stock_quantity', 1),
                     'min_order_quantity' => $request->input('min_order_quantity', 1),
+                    'refund_days' => $request->input('refund_days'),
                     'sale_price' => $request->sale_price,
                     'offer_price' => $request->offer_price,
                     'offer_start' => $request->offer_start,
@@ -179,6 +180,7 @@ class ProductController extends Controller
                         'available_from' => $request->input('available_from', now()->format('Y-m-d h:i a')),
                         'active' => $request->active,
                         'min_order_quantity' => $request->input('min_order_quantity', 1),
+                        'refund_days' => $request->input('refund_days'),
                         'description' => $request->description,
                         'key_features' => $request->input('key_features'),
                         'meta_title' => $request->input('meta_title'),
@@ -205,6 +207,7 @@ class ProductController extends Controller
                             'sale_price' => $salePrices[$key] ?? 0,
                             'offer_price' => ! empty($offerPrices[$key]) ? $offerPrices[$key] : null,
                             'affiliate_commission_percentage' => $affiliateCommissions[$key] ?? null,
+                            'refund_days' => variant_refund_days($request, $key),
                             'slug' => generate_unique_listing_slug($request->input('slug').' '.$skus[$key]),
                         ]);
 
@@ -296,6 +299,7 @@ class ProductController extends Controller
                     'condition' => $request->input('condition', $inventory->condition),
                     'condition_note' => $request->condition_note,
                     'min_order_quantity' => $request->input('min_order_quantity', $inventory->min_order_quantity),
+                    'refund_days' => $request->input('refund_days', $inventory->refund_days),
                     'sale_price' => $request->sale_price,
                     'offer_price' => $request->offer_price,
                     'offer_start' => $request->input('offer_start', $inventory->offer_start),

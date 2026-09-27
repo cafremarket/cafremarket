@@ -2660,8 +2660,13 @@ if (! function_exists('get_item_details_of')) {
             'condition_note',
             'shipping_weight',
             'min_order_quantity',
+            'refund_days',
             'available_from',
         ])->where('id', $id)->first();
+
+        if ($item_details) {
+            $item_details->refund_policy = refund_period_label($item_details->refund_days ?? \App\Models\Inventory::REFUND_DAYS_DEFAULT);
+        }
 
         return $item_details;
     }

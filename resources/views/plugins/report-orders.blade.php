@@ -161,8 +161,8 @@
                 maintainAspectRatio: false,
                 legend: {position: 'bottom'},
                 scales: {
-                    x: {stacked: true},
-                    y: {stacked: true, ticks: {beginAtZero: true, precision: 0}}
+                    xAxes: [{stacked: true}],
+                    yAxes: [{stacked: true, ticks: {beginAtZero: true, precision: 0}}]
                 }
             }
         };

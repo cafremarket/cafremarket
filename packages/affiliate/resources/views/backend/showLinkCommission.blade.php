@@ -39,11 +39,7 @@
                 {{ get_formated_currency($commission->total_commission, 2, config('system_settings.currency.id')) }}
               </td>
               <td>
-                @if ($commission->isPaid())
-                  <i class="fa fa-check text-success"></i> {{ trans('packages.affiliate.released') }}
-                @else
-                    <i class="fa fa-hourglass text-info"></i> {{ trans('packages.affiliate.pending_commission') }}
-                @endif
+                @include('affiliate::partials._commission_status', ['commission' => $commission, 'paidLabel' => trans('packages.affiliate.released')])
               </td>
             </tr>
           @endforeach

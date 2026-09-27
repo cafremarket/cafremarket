@@ -40,6 +40,7 @@
             </th>
           @endif
 
+          <th>{{ trans('refund_period.label') }}</th>
           <th><i class="fa fa-trash-o"></i></th>
         </tr>
       </thead>
@@ -124,6 +125,10 @@
           </div>
         </td>
       @endif
+
+      <td>
+        @include('admin.inventory.partials._refund_days_select', ['name' => 'variant_refund_days[' . $variant->id . ']', 'value' => $variant->refund_days, 'bare' => true])
+      </td>
 
       <td>
         <div class="form-group text-muted">

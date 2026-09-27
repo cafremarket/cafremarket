@@ -48,11 +48,7 @@
               </td>
               <td>
                 <span class="label label-outline text-uppercase">
-                  @if ($commission->isPaid())
-                    <i class="fa fa-check text-success"></i> {{ trans('packages.affiliate.received') }}
-                  @else
-                    <i class="fa fa-hourglass text-info"></i> {{ trans('packages.affiliate.pending') }}
-                  @endif
+                  @include('affiliate::partials._commission_status', ['commission' => $commission, 'paidLabel' => trans('packages.affiliate.received')])
                 </span>
               </td>
             </tr>

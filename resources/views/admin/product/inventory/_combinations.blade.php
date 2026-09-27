@@ -69,6 +69,8 @@
             'commissionName' => 'affiliate_commissions[' . $loop->index . ']',
             'commissionValue' => null,
             'enabledName' => 'affiliate_enabled_variants[' . $loop->index . ']',
+            'refundName' => 'variant_refund_days[' . $loop->index . ']',
+            'refundValue' => null,
             'enabledValue' => true,
           ])
         </td>

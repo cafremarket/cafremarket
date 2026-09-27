@@ -220,6 +220,10 @@
           <i class="fa fa-bar-chart"></i>
           <span>{{ trans('nav.performance') }}</span>
         </a>
+        <a href="{{ mp_route('admin.shop-earnings') }}" class="mp-sidebar__link mp-sidebar__link--sub {{ mp_is('merchant/shop/report/earnings*') ? 'is-active' : '' }}">
+          <i class="fa fa-percent"></i>
+          <span>{{ trans('reports.nav.earnings') }}</span>
+        </a>
       </div>
     </div>
   </div>

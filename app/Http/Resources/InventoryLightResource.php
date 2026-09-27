@@ -23,6 +23,8 @@ class InventoryLightResource extends JsonResource
             'sold_quantity' => $this->sold_quantity,
             'stock_quantity' => $this->stock_quantity,
             'min_order_quantity' => $this->min_order_quantity,
+            'refund_days' => (int) ($this->refund_days ?? \App\Models\Inventory::REFUND_DAYS_DEFAULT),
+            'refund_policy' => refund_period_label($this->refund_days ?? \App\Models\Inventory::REFUND_DAYS_DEFAULT),
             'price' => get_formated_currency($this->sale_price, config('system_settings.decimals', 2)),
             'has_offer' => $this->hasOffer(),
             'offer_price' => $this->hasOffer() ? get_formated_currency($this->offer_price, config('system_settings.decimals', 2)) : null,

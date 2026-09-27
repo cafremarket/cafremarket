@@ -363,26 +363,23 @@ class Statistics
 
     public static function unread_msg_count()
     {
-        return \DB::table('messages')->where('shop_id', Auth::user()->merchantId())
-            ->where('label', Message::LABEL_INBOX)
+        return Message::mine()->labelOf(Message::LABEL_INBOX)
             ->where('status', '<', Message::STATUS_READ)->count();
     }
 
     public static function draft_msg_count()
     {
-        return \DB::table('messages')->where('shop_id', Auth::user()->merchantId())
-            ->where('label', Message::LABEL_DRAFT)->count();
+        return Message::mine()->labelOf(Message::LABEL_DRAFT)->count();
     }
 
     public static function spam_msg_count()
     {
-        return \DB::table('messages')->where('shop_id', Auth::user()->merchantId())
-            ->where('label', Message::LABEL_SPAM)->count();
+        return Message::mine()->labelOf(Message::LABEL_SPAM)->count();
     }
 
     public static function trash_msg_count()
     {
-        return \DB::table('messages')->where('shop_id', Auth::user()->merchantId())->where('label', Message::LABEL_TRASH)->count();
+        return Message::mine()->labelOf(Message::LABEL_TRASH)->count();
     }
 
     public static function open_refund_request_count($shop = null)

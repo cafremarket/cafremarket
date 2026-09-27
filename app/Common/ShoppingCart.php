@@ -403,6 +403,8 @@ trait ShoppingCart
                 'item_description' => $item->pivot->item_description,
                 'quantity' => $item->pivot->quantity,
                 'unit_price' => $item->pivot->unit_price,
+                // Keep the refund/return period the buyer saw, even if the seller changes it later.
+                'refund_days' => $item->refund_days ?? \App\Models\Inventory::REFUND_DAYS_DEFAULT,
                 'created_at' => $item->pivot->created_at,
                 'updated_at' => $item->pivot->updated_at,
             ];

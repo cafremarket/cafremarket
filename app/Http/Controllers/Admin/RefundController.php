@@ -159,6 +159,8 @@ class RefundController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
+        $this->return_commission($refund);
+
         event(new RefundApproved($refund, $request->filled('notify_customer')));
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
@@ -183,6 +185,23 @@ class RefundController extends Controller
         $this->refund->markIssue($id, trim($request->input('admin_note')));
 
         return back()->with('success', trans('messages.updated', ['model' => $this->model_name]));
+    }
+
+    /**
+     * Give the vendor back part of the commission on this order. A failure here
+     * must not undo the refund the customer already received, so it is only logged.
+     */
+    private function return_commission($refund)
+    {
+        if (! is_incevio_package_loaded('wallet') || vendor_get_paid_directly()) {
+            return;
+        }
+
+        try {
+            (new \Incevio\Package\Wallet\Services\OrderWalletService)->returnCommissionForRefund($refund);
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     private function refund_to_wallet($refund)

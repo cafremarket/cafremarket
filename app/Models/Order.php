@@ -295,7 +295,7 @@ class Order extends BaseModel
     public function inventories()
     {
         return $this->belongsToMany(Inventory::class, 'order_items')
-            ->withPivot(['item_description', 'quantity', 'unit_price', 'feedback_id', 'download'])
+            ->withPivot(['item_description', 'quantity', 'unit_price', 'refund_days', 'feedback_id', 'download'])
             ->withTimestamps();
     }
 
@@ -313,8 +313,8 @@ class Order extends BaseModel
     }
 
     /**
-     * Release unpaid affiliate commissions to the affiliate wallet immediately on delivery.
-     * No holding period / cron — payout is direct when the order is delivered and paid.
+     * Pay out unpaid affiliate commissions immediately (manual override). Normal payout
+     * waits for the refund/return period: see AffiliateCommissionRelease.
      */
     public function releaseAffiliateCommissions(bool $force = false): void
     {
@@ -831,9 +831,16 @@ class Order extends BaseModel
             }
         }
 
-        // Release affiliate commissions after delivery (same settlement moment as vendor wallet).
-        if (! $alreadyDelivered && $this->isPaid()) {
-            $this->releaseAffiliateCommissions();
+        // Affiliate commissions are credited only after the item's refund/return period
+        // (affiliate:release-commissions, hourly); here we only set the release date.
+        if (! $alreadyDelivered && $this->isPaid() && is_incevio_package_loaded('affiliate')) {
+            try {
+                app(\App\Services\Affiliate\AffiliateCommissionRelease::class)->schedule($this->fresh());
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::channel('wallet')->error(
+                    'Affiliate commission scheduling failed for order #'.$this->order_number.': '.$e->getMessage()
+                );
+            }
         }
 
         return $this;
@@ -932,10 +939,13 @@ class Order extends BaseModel
     public function canRequestReturn()
     {
         if ($this->cancellation) {
-            return $this->isDelivered() && ! $this->cancellation->return_goods;
+            $can = $this->isDelivered() && ! $this->cancellation->return_goods;
+        } else {
+            $can = $this->isDelivered() && ! $this->isCanceled();
         }
 
-        return $this->isDelivered() && ! $this->isCanceled();
+        // At least one item must still be inside its refund/return period.
+        return $can && \App\Services\Orders\RefundWindow::forOrder($this)->contains('allowed', true);
     }
 
     /**
@@ -1242,7 +1252,7 @@ class Order extends BaseModel
         $this->save();
 
         // Vendor Cafrepay wallet is credited only after the order is delivered.
-        // Affiliate commissions are also released only after delivery (direct, no cron).
+        // Affiliate commissions are credited only after the refund/return period that follows delivery.
 
         if ($this->shop->periodic_sold_amount) {    // Update shop's periodic sold amount
             $this->shop->periodic_sold_amount += $this->total;

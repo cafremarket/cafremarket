@@ -131,6 +131,27 @@ class Message extends BaseModel
     }
 
     /**
+     * Merchants see their shop's messages; platform staff see the marketplace
+     * inbox (messages without a shop, e.g. contact-us submissions).
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeMine($query)
+    {
+        $user = Auth::user();
+
+        if ($shopId = $user?->merchantId()) {
+            return $query->where('shop_id', $shopId);
+        }
+
+        if ($user instanceof User && $user->isFromPlatform()) {
+            return $query->whereNull('shop_id');
+        }
+
+        return $query->whereRaw('0 = 1');
+    }
+
+    /**
      * Scope a query to only include records from the user.
      *
      * @return \Illuminate\Database\Eloquent\Builder

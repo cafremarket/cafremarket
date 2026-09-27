@@ -245,6 +245,7 @@ foreach ($variants as &$value) {
       $('#item_condition_note').attr('data-original-title', details.condition_note);
       $('#item_sku').html(details.sku);
       $('#item_min_order_qtt').html(details.min_order_quantity);
+      $('#item_refund_policy').text(details.refund_policy || '');
       $('#item_shipping_weight').html(details.shipping_weight + ' ' + "{{ config('system_settings.weight_unit') }}");
     }
 

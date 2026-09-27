@@ -63,6 +63,14 @@
     </div>
   </div>
 
+  @if (! empty($refundName))
+    @include('admin.inventory.partials._refund_days_select', [
+      'name' => $refundName,
+      'value' => $refundValue ?? null,
+      'inherit' => true,
+    ])
+  @endif
+
   @if (is_incevio_package_loaded('affiliate') && $commissionName)
     @php
       $enabledName = $enabledName ?? null;

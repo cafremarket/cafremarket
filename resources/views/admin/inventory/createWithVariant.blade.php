@@ -75,6 +75,12 @@
         </div>
       </div>
 
+      <div class="row">
+        <div class="col-lg-3 col-md-6 nopadding-right">
+          @include('admin.inventory.partials._refund_days_select', ['name' => 'refund_days', 'value' => null])
+        </div>
+      </div>
+
       @if ($product->requires_shipping)
         <div class="row">
           <div class="col-lg-3 col-md-6 nopadding-right">
@@ -190,6 +196,7 @@
                 <small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{ trans('packages.affiliate.help_commission_field') }}"><sup><i class="fa fa-question"></i></sup></small>
               </th>
             @endif
+            <th>{{ trans('refund_period.label') }}</th>
             <th><i class="fa fa-trash-o"></i></th>
           </tr>
         </thead>
@@ -268,6 +275,9 @@
                   </div>
                 </td>
               @endif
+              <td>
+                @include('admin.inventory.partials._refund_days_select', ['name' => 'variant_refund_days[' . $i . ']', 'value' => null, 'inherit' => true, 'bare' => true])
+              </td>
               <td>
                 <div class="form-group text-muted">
                   <i class="fa fa-close deleteThisRow" data-toggle="tooltip" data-placement="left" title="{{ trans('help.delete_this_combination') }}"></i>

@@ -15,6 +15,25 @@ class OrderItemResource extends JsonResource
     }
 
     /**
+     * The order this item belongs to, unless it is canceled. Loaded by id: when
+     * orders are eager-loaded, the pivot's parent is an empty placeholder model.
+     */
+    protected function refundOrder(): ?\App\Models\Order
+    {
+        static $orders = [];
+
+        $orderId = $this->pivot->order_id ?? null;
+
+        if (! $orderId) {
+            return null; // cart line, not an order item
+        }
+
+        $order = $orders[$orderId] ??= \App\Models\Order::find($orderId);
+
+        return $order && ! $order->isCanceled() ? $order : null;
+    }
+
+    /**
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -33,6 +52,20 @@ class OrderItemResource extends JsonResource
             'unit_price_raw' => strval(round((float) $this->pivot->unit_price, 2)),
             'total' => get_formated_currency($this->pivot->unit_price * $this->pivot->quantity, config('system_settings.decimals', 2), $this->currency_id),
             'total_raw' => strval(round((float) $this->pivot->unit_price * (int) $this->pivot->quantity, 2)),
+            'refund_days' => \App\Services\Orders\RefundWindow::daysFor($this->resource),
+            'refund_policy' => refund_period_label(\App\Services\Orders\RefundWindow::daysFor($this->resource)),
+            // Only for order items (not cart lines): the item's refund/return window right now.
+            'refund_window' => $this->when($this->refundOrder() !== null, function () {
+                $window = \App\Services\Orders\RefundWindow::forItem($this->refundOrder(), $this->resource);
+
+                return [
+                    'status' => $window['status'],
+                    'allowed' => $window['allowed'],
+                    'days' => $window['days'],
+                    'deadline' => optional($window['deadline'])->toDateTimeString(),
+                    'label' => $window['label'],
+                ];
+            }),
             'image' => get_inventory_img_src($this, 'small'),
             'attachments' => AttachmentResource::collection($this->attachments),
             'feedback' => $this->when($request->is('api/order/*'), function () {

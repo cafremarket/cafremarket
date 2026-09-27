@@ -30,6 +30,9 @@ return [
 
         /** Vendor marketplace commission % when subscriptions are disabled globally. */
         'default_marketplace_commission' => (float) env('DEFAULT_MARKETPLACE_COMMISSION', 10),
+
+        /** Share (%) of the collected marketplace commission returned to the vendor when a refund is approved. */
+        'refund_commission_return_percent' => (float) env('REFUND_COMMISSION_RETURN_PERCENT', 50),
     ],
 
     /*
@@ -320,4 +323,7 @@ return [
         'zcart_encryption_key' => env('ZCART_ENCRYPTION_KEY'),
         'zcart_encryption_iv' => env('ZCART_ENCRYPTION_IV'),
     ],
+
+    /** PHP command-line binary for the Cron jobs "Run now" button (auto-detected when empty). */
+    'php_cli_binary' => env('PHP_CLI_BINARY'),
 ];

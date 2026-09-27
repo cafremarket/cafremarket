@@ -46,6 +46,13 @@
               </div>
             </div>
 
+            <div class="col-md-4 nopadding-left">
+              @include('admin.inventory.partials._refund_days_select', [
+                'name' => 'refund_days',
+                'value' => isset($variant) ? $variant->refund_days : $inventory->refund_days,
+              ])
+            </div>
+
             @if (is_incevio_package_loaded('affiliate'))
               <div class="col-md-4 nopadding-left">
                 <div class="form-group">

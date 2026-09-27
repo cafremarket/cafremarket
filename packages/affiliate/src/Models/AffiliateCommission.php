@@ -22,11 +22,15 @@ class AffiliateCommission extends Model
         'paid',
         'commission_rate',
         'total_commission',
+        'release_at',
+        'voided_at',
     ];
 
     protected $casts = [
         'paid' => 'boolean',
         'clicked_at' => 'datetime',
+        'release_at' => 'datetime',
+        'voided_at' => 'datetime',
     ];
 
     public function affiliate()
@@ -54,10 +58,20 @@ class AffiliateCommission extends Model
         return $this->paid;
     }
 
+    /** Cancelled because the order was refunded/canceled before the refund period ended. */
+    public function isVoided(): bool
+    {
+        return $this->voided_at !== null;
+    }
+
     public function markAsPaid()
     {
         if ($this->isPaid()) {
             return true;
+        }
+
+        if ($this->isVoided()) {
+            return false;
         }
 
         if (! is_incevio_package_loaded('wallet')) {

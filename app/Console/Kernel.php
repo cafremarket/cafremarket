@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('activitylog:clean')->daily(); // Clean older activity logs
+        $schedule->command('affiliate:release-commissions')->hourly()->withoutOverlapping(); // Pay affiliates after the refund period
         // $schedule->command('incevio:kpi')->dailyAt('23:58');
         // $schedule->command('backup:clean')->daily()->at('01:00');
         // $schedule->command('backup:run')->daily()->at('02:00');
@@ -82,12 +83,13 @@ class Kernel extends ConsoleKernel
             $schedule->command('wallet:release-payment')->daily();
         }
 
-        // Affiliate commissions release immediately on delivery (no cron).
-
         // Auction check and process. Runes every hour
         if (is_incevio_package_loaded('auction')) {
             $schedule->command('incevio:auction')->hourly();
         }
+
+        // Heartbeat + run logs for the admin Cron jobs page (keep last).
+        \App\Services\Cron\CronMonitor::instrument($schedule);
     }
 
     /**

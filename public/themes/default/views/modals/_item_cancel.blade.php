@@ -33,18 +33,33 @@
         <div class="row my-3">
           <div class="form-group col-md-12">
             <label for="product_id">@lang('theme.select_product'):*</label>
+            @php
+              // For returns, items outside their refund/return period can't be picked.
+              $refundWindows = $action === 'return' ? \App\Services\Orders\RefundWindow::forOrder($order) : collect();
+              $allReturnable = $refundWindows->every(fn ($w) => $w['allowed']);
+            @endphp
             <ul class="list-group" style="margin-bottom: 0">
+              @if ($action !== 'return' || $allReturnable)
               <li class="list-group-item">
                 {!! Form::checkbox('all_items', null, $order->cancellation && !$order->cancellation->isPartial() ? 1 : null, ['class' => 'i-check']) !!}
                 {{ trans('theme.all_items') }} <small class="text-muted pl-2">({{ $order->quantity . ' ' . trans('theme.items') }})</small>
                 <span class="badge badge-primary badge-pill">{{ get_formated_currency($order->total, 2, $order->currency_id) }}</span>
               </li>
+              @endif
               @foreach ($order->inventories as $item)
+                @php $refundWindow = $refundWindows->get($item->id); @endphp
                 <li class="list-group-item">
-                  {!! Form::checkbox('items[]', $item->id, $order->cancellation && $order->cancellation->isItemInRequest($item->id) ? 1 : null, ['class' => 'i-check']) !!}
+                  @if ($refundWindow && ! $refundWindow['allowed'])
+                    <input type="checkbox" disabled>
+                  @else
+                    {!! Form::checkbox('items[]', $item->id, $order->cancellation && $order->cancellation->isItemInRequest($item->id) ? 1 : null, ['class' => 'i-check']) !!}
+                  @endif
                   <img src="{{ get_storage_file_url(optional($item->image)->path, 'tiny') }}" alt="{{ $item->slug }}" title="{{ $item->slug }}" />
 
                   <span class="small">{{ $item->pivot->item_description }} <small class="text-muted indent5">x {{ $item->pivot->quantity }}</small></span>
+                  @if ($refundWindow)
+                    <small class="{{ $refundWindow['allowed'] ? 'text-success' : 'text-danger' }} indent5"><i class="fa fa-undo"></i> {{ $refundWindow['label'] }}</small>
+                  @endif
 
                   <span class="badge badge-primary badge-pill">{{ get_formated_currency($item->pivot->unit_price * $item->pivot->quantity, 2, $order->currency_id) }}</span>
                 </li>

@@ -365,6 +365,10 @@
                           <td class="noborder" id="item_min_order_qtt" style="width: 65%;">{{ $item->min_order_quantity }}</td>
                         </tr>
                       @endif
+                      <tr class="noborder">
+                        <th class="text-right noborder">{{ trans('refund_period.label') }}:</th>
+                        <td class="noborder" id="item_refund_policy" style="width: 65%;">{{ $item->refund_policy_text }}</td>
+                      </tr>
                       @if ($item->shipping_weight)
                         <tr class="noborder">
                           <th class="text-right noborder">{{ trans('theme.shipping_weight') }}:</th>

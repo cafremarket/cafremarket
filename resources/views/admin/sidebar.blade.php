@@ -850,7 +850,7 @@
     @endif
 
     @if (Auth::user()->isAdmin() || Auth::user()->isMerchant() || Gate::allows('report', \Incevio\Package\Wallet\Models\Wallet::class))
-      <li class="treeview {{ Request::is('admin/report*') || Request::is('admin/shop/report*') ? 'active' : '' }}">
+      <li class="treeview {{ Request::is('admin/report*') || Request::is('admin/shop/report*') || Request::is('merchant/shop/report*') ? 'active' : '' }}">
         <a href="javascript:void(0)">
           <i class="fa fa-bar-chart"></i>
           <span>{{ trans('nav.reports') }}</span>
@@ -863,6 +863,36 @@
           @endif
 
           @if (Auth::user()->isAdmin())
+            <li class="{{ Request::is('admin/report/overview*') ? 'active' : '' }}">
+              <a href="{{ route('admin.report.overview') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('reports.nav.overview') }}
+              </a>
+            </li>
+
+            <li class="{{ Request::is('admin/report/commission*') ? 'active' : '' }}">
+              <a href="{{ route('admin.report.commission') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('reports.nav.commission') }}
+              </a>
+            </li>
+
+            <li class="{{ Request::is('admin/report/vendors*') ? 'active' : '' }}">
+              <a href="{{ route('admin.report.vendors') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('reports.nav.vendors') }}
+              </a>
+            </li>
+
+            <li class="{{ Request::is('admin/report/customers*') ? 'active' : '' }}">
+              <a href="{{ route('admin.report.customers') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('reports.nav.customers') }}
+              </a>
+            </li>
+
+            <li class="{{ Request::is('admin/report/refunds*') ? 'active' : '' }}">
+              <a href="{{ route('admin.report.refunds') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('reports.nav.refunds') }}
+              </a>
+            </li>
+
             <li class="{{ Request::is('admin/report/kpi*') ? 'active' : '' }}">
               <a href="{{ route('admin.kpi') }}">
                 <i class="fa fa-angle-double-right"></i> {{ trans('nav.performance') }}
@@ -903,6 +933,12 @@
               </li>
             @endif
 
+            <li class="{{ Request::is('admin/report/cron*') ? 'active' : '' }}">
+              <a href="{{ route('admin.report.cron') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('cron.title') }}
+              </a>
+            </li>
+
             <li class="{{ Request::is('admin/report/verification*') ? 'active' : '' }}">
               <a href="{{ route('admin.report.verification') }}">
                 <i class="fa fa-angle-double-right"></i> {{ trans('verification_report.title') }}
@@ -920,6 +956,12 @@
             <li class="{{ Request::is('admin/shop/report/kpi*') ? 'active' : '' }}">
               <a href="{{ route('admin.shop-kpi') }}">
                 <i class="fa fa-angle-double-right"></i> {{ trans('nav.performance') }}
+              </a>
+            </li>
+
+            <li class="{{ Request::is('admin/shop/report/earnings*') || Request::is('merchant/shop/report/earnings*') ? 'active' : '' }}">
+              <a href="{{ route('merchant.shop-earnings') }}">
+                <i class="fa fa-angle-double-right"></i> {{ trans('reports.nav.earnings') }}
               </a>
             </li>
           @endif

@@ -190,6 +190,11 @@
                   </div>
                 </div>
 
+                @include('admin.inventory.partials._refund_days_select', [
+                  'name' => 'refund_days',
+                  'value' => isset($inventory) ? $inventory->refund_days : null,
+                ])
+
                 @if (config('system_settings.show_item_conditions'))
                   <div class="form-group">
                     {!! Form::label('condition', trans('app.form.condition')) !!}

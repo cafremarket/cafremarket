@@ -441,6 +441,13 @@
                         <span>{{ get_formated_currency($item->pivot->unit_price, 2, $order->currency_id) }} x {{ $item->pivot->quantity }}</span>
                       </div>
 
+                      @unless ($order->isCanceled())
+                        @php $refundWindow = \App\Services\Orders\RefundWindow::forItem($order, $item); @endphp
+                        <div class="order-refund-window small {{ $refundWindow['status'] === 'open' ? 'text-success' : 'text-muted' }}">
+                          <i class="fas fa-undo"></i> {{ $refundWindow['label'] }}
+                        </div>
+                      @endunless
+
                       <ul class="mailbox-attachments clearfix order-detail-attachments">
                         @if (isset($item->attachments))
                           @foreach ($item->attachments as $attachment)

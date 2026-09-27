@@ -30,6 +30,8 @@ class ItemResource extends JsonResource
             'sold_quantity' => $this->sold_quantity,
             'stock_quantity' => $this->stock_quantity,
             'min_order_quantity' => $this->min_order_quantity,
+            'refund_days' => (int) ($this->refund_days ?? \App\Models\Inventory::REFUND_DAYS_DEFAULT),
+            'refund_policy' => refund_period_label($this->refund_days ?? \App\Models\Inventory::REFUND_DAYS_DEFAULT),
             'has_offer' => $this->hasOffer(),
 
             $this->mergeWhen(is_incevio_package_loaded('auction'), [

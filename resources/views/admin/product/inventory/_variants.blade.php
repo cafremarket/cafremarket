@@ -81,6 +81,8 @@
           'commissionName' => 'variant_affiliate_commissions[' . $variant->id . ']',
           'commissionValue' => $variant->affiliate_commission_percentage,
           'enabledName' => 'variant_affiliate_enabled[' . $variant->id . ']',
+          'refundName' => 'variant_refund_days[' . $variant->id . ']',
+          'refundValue' => $variant->refund_days,
           'enabledValue' => $variant->isAffiliateEnabled(),
         ])
       </td>

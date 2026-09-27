@@ -24,6 +24,8 @@ class InventoryResource extends JsonResource
             'sold_quantity' => $this->sold_quantity,
             'stock_quantity' => $this->stock_quantity,
             'min_order_quantity' => $this->min_order_quantity,
+            'refund_days' => (int) ($this->refund_days ?? \App\Models\Inventory::REFUND_DAYS_DEFAULT),
+            'refund_policy' => refund_period_label($this->refund_days ?? \App\Models\Inventory::REFUND_DAYS_DEFAULT),
             'sale_price' => $this->sale_price,
             'warehouse_id' => $this->warehouse_id,
             'product_id' => $this->product_id,

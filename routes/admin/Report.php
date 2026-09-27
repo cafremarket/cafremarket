@@ -1,9 +1,24 @@
 <?php
 
+use App\Http\Controllers\Admin\Report\CronJobController;
+use App\Http\Controllers\Admin\Report\MarketplaceReportController;
 use App\Http\Controllers\Admin\Report\PerformanceIndicatorsController;
 use App\Http\Controllers\Admin\Report\SalesReportController;
 use App\Http\Controllers\Admin\Report\VerificationReportController;
 use Illuminate\Support\Facades\Route;
+
+// Report hub: overview, commission, vendors, customers, refunds (+ CSV export)
+Route::get('report/overview', [MarketplaceReportController::class, 'overview'])->name('report.overview');
+
+Route::get('report/commission', [MarketplaceReportController::class, 'commission'])->name('report.commission');
+
+Route::get('report/vendors', [MarketplaceReportController::class, 'vendors'])->name('report.vendors');
+
+Route::get('report/customers', [MarketplaceReportController::class, 'customers'])->name('report.customers');
+
+Route::get('report/refunds', [MarketplaceReportController::class, 'refunds'])->name('report.refunds');
+
+Route::get('report/export/{type}', [MarketplaceReportController::class, 'export'])->name('report.export');
 
 // Metrics / Key Performance Indicators...
 Route::get('report/kpi', [PerformanceIndicatorsController::class, 'all'])->name('kpi');
@@ -37,6 +52,11 @@ Route::get('report/sales/payments/getMore', [SalesReportController::class, 'getM
 Route::get('report/sales/products', [SalesReportController::class, 'products'])->name('sales.products');
 
 Route::get('report/sales/products/getMore', [SalesReportController::class, 'productsSearch'])->name('sales.products.getMore');
+
+// Scheduler health and the log of every cron (scheduled task) run
+Route::get('report/cron', [CronJobController::class, 'index'])->name('report.cron');
+
+Route::post('report/cron/run', [CronJobController::class, 'run'])->name('report.cron.run');
 
 // Anti-fake-account checks: email/phone verification, reCAPTCHA, mail health
 Route::get('report/verification', [VerificationReportController::class, 'index'])->name('report.verification');

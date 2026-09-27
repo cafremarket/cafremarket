@@ -1,6 +1,6 @@
-@include('admin.partials.reports.styles')
+@include('admin.partials.reports.hub_nav')
 
-<div class="report-sales-nav">
+<div class="report-sales-nav report-sub-nav">
   <ul class="nav nav-pills">
     <li class="{{ request()->routeIs('admin.sales.orders') ? 'active' : '' }}">
       <a href="{{ route('admin.sales.orders') }}">

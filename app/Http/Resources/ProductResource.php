@@ -46,6 +46,8 @@ class ProductResource extends JsonResource
             'condition_note' => optional($inventory)->condition_note,
             'stock_quantity' => optional($inventory)->stock_quantity,
             'min_order_quantity' => optional($inventory)->min_order_quantity,
+            'refund_days' => $inventory ? (int) $inventory->refund_days : null,
+            'refund_policy' => $inventory ? refund_period_label($inventory->refund_days) : null,
             'sale_price' => optional($inventory)->sale_price,
             'offer_price' => optional($inventory)->offer_price,
             'offer_start' => optional($inventory)->offer_start,

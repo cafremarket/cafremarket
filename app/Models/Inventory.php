@@ -26,6 +26,12 @@ class Inventory extends Inspectable
 
     const CONDITIONS = ['New', 'Used', 'Refurbished'];
 
+    /** Longest refund/return period a seller can offer, in days after delivery. */
+    const REFUND_DAYS_MAX = 15;
+
+    /** Period for listings where the seller has not chosen one. */
+    const REFUND_DAYS_DEFAULT = 7;
+
     /**
      * The database table used by the model.
      *
@@ -123,6 +129,7 @@ class Inventory extends Inspectable
         'available_from',
         'expiry_date',
         'min_order_quantity',
+        'refund_days',
         'linked_items',
         'slug',
         'meta_title',
@@ -643,6 +650,46 @@ class Inventory extends Inspectable
     public function discount_percentage()
     {
         return $this->hasOffer() ? get_percentage_of($this->sale_price, $this->offer_price) : 0;
+    }
+
+    /**
+     * 0 = no refund/return, otherwise 1..REFUND_DAYS_MAX days. An empty value keeps
+     * the current period (forms/apps that do not send the field never reset it).
+     */
+    public function setRefundDaysAttribute($value)
+    {
+        if ($value === null || $value === '') {
+            if (! array_key_exists('refund_days', $this->attributes)) {
+                $this->attributes['refund_days'] = static::REFUND_DAYS_DEFAULT;
+            }
+
+            return;
+        }
+
+        $this->attributes['refund_days'] = max(0, min(static::REFUND_DAYS_MAX, (int) $value));
+    }
+
+    public function isRefundable(): bool
+    {
+        return (int) $this->refund_days > 0;
+    }
+
+    /** "7 days refund/return" or "No refund/return", for product and order pages. */
+    public function getRefundPolicyTextAttribute(): string
+    {
+        return refund_period_label($this->refund_days);
+    }
+
+    /** Options for the seller's refund period dropdown. */
+    public static function refundDayOptions(): array
+    {
+        $options = [0 => trans('refund_period.no_refund')];
+
+        for ($day = 1; $day <= static::REFUND_DAYS_MAX; $day++) {
+            $options[$day] = trans_choice('refund_period.days_option', $day, ['count' => $day]);
+        }
+
+        return $options;
     }
 
     public function setAffiliateCommissionPercentageAttribute($value)

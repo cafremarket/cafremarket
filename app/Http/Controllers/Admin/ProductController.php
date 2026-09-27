@@ -192,6 +192,7 @@ class ProductController extends Controller
             'available_from' => $request->available_from,
             'expiry_date' => $request->expiry_date,
             'min_order_quantity' => $request->min_order_quantity,
+            'refund_days' => $request->input('refund_days'),
             'linked_items' => $request->linked_items,
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
@@ -251,6 +252,7 @@ class ProductController extends Controller
                 'active' => $request->input('active'),
                 'tax_id' => $request->input('tax_id'),
                 'min_order_quantity' => $request->input('min_order_quantity'),
+                'refund_days' => $request->input('refund_days'),
                 'alert_quantity' => $request->input('alert_quantity'),
                 'description' => $request->input('description'),
                 'key_features' => $request->input('key_features'),
@@ -281,6 +283,7 @@ class ProductController extends Controller
                     'offer_price' => $offer_prices[$key] ?? null,
                     'affiliate_commission_percentage' => $affiliate_commissions[$key] ?? null,
                     'affiliate_enabled' => filter_var($affiliate_enabled_variants[$key] ?? true, FILTER_VALIDATE_BOOLEAN),
+                    'refund_days' => variant_refund_days($request, $key),
                     'slug' => generate_unique_listing_slug($request->input('slug').' '.$skus[$key]),
                 ]);
 
@@ -481,6 +484,7 @@ class ProductController extends Controller
             'available_from' => $request->available_from,
             'expiry_date' => $request->expiry_date,
             'min_order_quantity' => $request->min_order_quantity,
+            'refund_days' => $request->input('refund_days'),
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
             'download_limit' => $request->download_limit,
@@ -518,6 +522,7 @@ class ProductController extends Controller
 
                 // Merge the common info and dynamic info to data array
                 $data = array_merge($dynamicInfo, $commonInfo);
+                $data['refund_days'] = variant_refund_days($request, $key);
 
                 // Insert the record
                 $inventory = Inventory::find($key);
@@ -595,6 +600,7 @@ class ProductController extends Controller
             'available_from' => $parent->available_from->format('Y-m-d h:i a'),
             'slug' => $parent->slug.'-'.$request->get('sku'),
             'min_order_quantity' => $parent->min_order_quantity,
+            'refund_days' => $request->input('refund_days', $parent->refund_days),
             'user_id' => $request->user()->id,
             'sale_price' => $request->get('sale_price'),
             'affiliate_commission_percentage' => $request->get('affiliate_commission_percentage'),

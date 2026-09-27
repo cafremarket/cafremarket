@@ -66,6 +66,31 @@ class OrderCancellationRequest extends Request
     }
 
     /**
+     * Customers can only return items whose refund/return period is still open.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if (! $this->user() instanceof Customer || $this->input('action') !== 'return') {
+                return;
+            }
+
+            $windows = \App\Services\Orders\RefundWindow::forOrder($this->route('order'));
+            $requested = $this->has('all_items')
+                ? $windows
+                : $windows->only(array_map('intval', (array) $this->input('items', [])));
+
+            $blocked = $requested->where('allowed', false);
+
+            if ($blocked->isNotEmpty()) {
+                $validator->errors()->add('items', trans('refund_period.error_items_not_returnable', [
+                    'items' => $blocked->pluck('label')->unique()->implode('; '),
+                ]));
+            }
+        });
+    }
+
+    /**
      * Get the error messages for the defined validation rules.
      *
      * @return array

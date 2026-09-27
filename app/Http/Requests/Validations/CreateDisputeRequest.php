@@ -53,6 +53,29 @@ class CreateDisputeRequest extends Request
     }
 
     /**
+     * Customers can only ask for a refund/return on received goods while the
+     * items' refund period is open (vendors raising disputes are not limited).
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if (! $this->user() instanceof Customer || $validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            $error = \App\Services\Orders\RefundWindow::customerRequestError(
+                $this->route('order'),
+                filter_var($this->input('order_received'), FILTER_VALIDATE_BOOLEAN),
+                $this->input('product_id')
+            );
+
+            if ($error) {
+                $validator->errors()->add($this->filled('product_id') ? 'product_id' : 'order_received', $error);
+            }
+        });
+    }
+
+    /**
      * Get the error messages for the defined validation rules.
      *
      * @return array

@@ -203,6 +203,11 @@
           </div> <!-- /.row -->
         @endif
 
+        @include('admin.inventory.partials._refund_days_select', [
+          'name' => 'refund_days',
+          'value' => isset($inventory) ? $inventory->refund_days : null,
+        ])
+
         <div class="{{ isset($inventory) && $inventory->auctionable ? 'd-none' : '' }}" id="js-direct-sale">
           <div class="row">
             <div class="col-md-6 nopadding-right">

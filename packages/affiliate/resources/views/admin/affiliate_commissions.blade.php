@@ -39,14 +39,10 @@
           <td>{!! $commission->affiliate ? $commission->affiliate->getName() : '—' !!}</td>
           <td>{{ get_formated_currency($commission->total_commission, 2, config('system_settings.currency.id')) }}</td>
           <td>
-            @if ($commission->isPaid())
-              <i class="fa fa-check text-success"></i> {{ trans('packages.affiliate.released') }}
-            @else
-              <i class="fa fa-hourglass text-info"></i> {{ trans('packages.affiliate.pending_commission') }}
-            @endif
+            @include('affiliate::partials._commission_status', ['commission' => $commission, 'paidLabel' => trans('packages.affiliate.released')])
           </td>
           <td class="row-options admin-row-actions">
-            @unless ($commission->isPaid())
+            @unless ($commission->isPaid() || $commission->voided_at)
               {!! Form::open(['route' => ['admin.affiliate.commission.release', $commission], 'method' => 'put', 'class' => 'action-form confirm admin-inline-form']) !!}
               <button class="btn btn-flat btn-primary btn-sm"><i class="fa fa-check"></i> {{ trans('packages.affiliate.release') }}</button>
               {!! Form::close() !!}

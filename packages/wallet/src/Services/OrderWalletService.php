@@ -3,6 +3,7 @@
 namespace Incevio\Package\Wallet\Services;
 
 use App\Models\Order;
+use App\Models\Refund;
 use Incevio\Package\Wallet\Models\Transaction;
 
 class OrderWalletService
@@ -58,6 +59,62 @@ class OrderWalletService
     }
 
     public function refund(Order $order, bool $confirmed = true, array $meta = []) {}
+
+    /**
+     * Give the vendor back part of the marketplace commission when a refund is approved.
+     *
+     * Only commission actually collected (sale credit on delivery) is returned:
+     * the configured share (default 50%) scaled by the refunded part of the order,
+     * never more than that share in total across several partial refunds.
+     */
+    public function returnCommissionForRefund(Refund $refund): ?Transaction
+    {
+        $order = $refund->order;
+        $shop = $order ? $order->shop : null;
+
+        if (! $refund->isApproved() || ! $shop || (float) $refund->amount <= 0) {
+            return null;
+        }
+
+        $returns = $shop->transactions()
+            ->where('type', Transaction::TYPE_DEPOSIT)
+            ->where('meta->commission_return_order_id', $order->id)
+            ->get();
+
+        if ($returns->contains(fn ($t) => (int) $t->getFromMetaData('refund_id') === (int) $refund->id)) {
+            return null; // already returned for this refund
+        }
+
+        $sale = $this->findVendorSaleCredit($order);
+        $collected = $sale ? (float) $sale->getFromMetaData('marketplace_commission') : 0.0;
+
+        if ($collected <= 0) {
+            return null; // refunded before delivery: no commission was taken
+        }
+
+        $percent = max(0, min(100, (float) config('system.subscription.refund_commission_return_percent', 50)));
+        $cap = round($collected * $percent / 100, 2);
+        $alreadyReturned = (float) $returns->sum(fn ($t) => (float) $t->getFromMetaData('commission_return'));
+        $gross = (float) ($sale->getFromMetaData('gross_sale_amount') ?: $order->grand_total);
+        $refundedShare = $gross > 0 ? min(1, (float) $refund->amount / $gross) : 1;
+        $amount = min(round($cap * $refundedShare, 2), round($cap - $alreadyReturned, 2));
+
+        if ($amount <= 0) {
+            return null;
+        }
+
+        return $shop->deposit($amount, [
+            'type' => trans('packages.wallet.commission_return'),
+            'purpose' => 'commission_return',
+            'description' => trans('packages.wallet.commission_return_of', [
+                'percent' => rtrim(rtrim(number_format($percent, 2, '.', ''), '0'), '.'),
+                'order' => $order->order_number,
+            ]),
+            'commission_return' => $amount,
+            'commission_return_order_id' => $order->id,
+            'refund_id' => $refund->id,
+        ], true);
+    }
 
     /**
      * Whether this order already has a vendor wallet sale credit.
