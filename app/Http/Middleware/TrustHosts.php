@@ -15,6 +15,8 @@ class TrustHosts extends Middleware
     {
         return [
             $this->allSubdomainsOfApplicationUrl(),
+            // Dev tunnels (see ConfigurePublicUrlSession).
+            '^(.+\\.)?ngrok(-free)?\\.(app|dev|io)$',
         ];
     }
 }

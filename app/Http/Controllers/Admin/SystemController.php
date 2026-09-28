@@ -144,6 +144,7 @@ class SystemController extends Controller
         if ($request->hasFile('icon')) {
             $system->updateImage($request->file('icon'), 'icon');
             Cache::forget('favicon_img');
+            Cache::forget('system_icon_path');
         }
 
         if ($request->hasFile('logo')) {
@@ -156,6 +157,7 @@ class SystemController extends Controller
                 Cache::forget('system_logo_img_'.$size);
             }
             Cache::forget('system_logo_img_full');
+            Cache::forget('system_logo_path');
         }
 
         event(new SystemInfoUpdated($system));

@@ -1671,16 +1671,16 @@ if (! function_exists('get_logo_url')) {
     function get_logo_url($model, $size = 'small')
     {
         if ($model == 'system') {
-            return Cache::rememberForever('system_logo_img_'.$size, function () use ($size) {
+            // Cache only the storage path, never an absolute URL: url() uses the
+            // request's Host, so caching it lets one spoofed request poison every page.
+            $path = Cache::rememberForever('system_logo_path', function () {
                 $system = System::orderBy('id', 'asc')->first();
                 $path = optional($system?->logoImage)->path;
 
-                if ($path && Storage::exists($path)) {
-                    return url("image/{$path}?p={$size}");
-                }
-
-                return default_brand_logo_url($size);
+                return ($path && Storage::exists($path)) ? $path : '';
             });
+
+            return $path !== '' ? url("image/{$path}?p={$size}") : default_brand_logo_url($size);
         }
 
         $path = is_object($model) ? optional($model->logoImage)->path : null;
@@ -1697,16 +1697,15 @@ if (! function_exists('get_icon_url')) {
     function get_icon_url($model, $size = 'thumbnail')
     {
         if ($model == 'system') {
-            return Cache::rememberForever('favicon_img', function () use ($size) {
+            // Cache only the path (see get_logo_url).
+            $path = Cache::rememberForever('system_icon_path', function () {
                 $system = System::orderBy('id', 'asc')->first();
                 $path = optional($system?->iconImage)->path;
 
-                if ($path && Storage::exists($path)) {
-                    return url("image/{$path}?p={$size}");
-                }
-
-                return default_brand_icon_url($size);
+                return ($path && Storage::exists($path)) ? $path : '';
             });
+
+            return $path !== '' ? url("image/{$path}?p={$size}") : default_brand_icon_url($size);
         }
 
         if (is_object($model) && $model->iconImage && Storage::exists($model->iconImage->path)) {
