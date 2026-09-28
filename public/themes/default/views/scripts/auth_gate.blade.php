@@ -294,7 +294,7 @@
   }
   .sf-auth-link {
     color: var(--primary-color, #ff6600);
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.92rem;
     text-decoration: none;
   }
@@ -323,7 +323,7 @@
   .sf-auth-register-btn {
     border: 1px solid #e2e8f0 !important;
     color: #334155 !important;
-    font-weight: 600;
+    font-weight: 500;
     background: #fff !important;
   }
   .sf-auth-register-btn:hover,

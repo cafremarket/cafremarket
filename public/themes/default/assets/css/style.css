@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,400;0,500;1,400;1,500&family=Roboto:ital,wght@0,100;0,400;0,500;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,400&display=swap');
 
 :root, :root[theme='light'] {
   --bg-color: #ffffff;
@@ -380,7 +380,7 @@ img.lazy {
 }
 .fa.no-fill,
 .fas.no-fill {
-  font-weight: 100 !important;
+  font-weight: 400!important;
   margin-inline-end: 3px;
 }
 
@@ -1187,7 +1187,7 @@ header.header {
   font-size: var(--font-size-xl);
   line-height: 20px;
   color: var(--secondary-text);
-  font-weight: 300;
+  font-weight: 400;
   text-align: center;
 }
 
@@ -1204,7 +1204,7 @@ header.header {
 .banner-overlay-title h3 {
   font-size: 27px;
   line-height: 32px;
-  font-weight: 600;
+  font-weight: 500;
   /* text-shadow: 0.1px 0.1px 0.9px rgba(0, 0, 0, 0.2); */
 }
 
@@ -1227,7 +1227,7 @@ header.header {
 .banner-overlay-price-text {
   position: absolute;
   bottom: 20px;
-  font-weight: 600;
+  font-weight: 500;
   font-size: var(--font-size-lg);
 }
 
@@ -1264,7 +1264,7 @@ header.header {
   font-size: 40px;
   line-height: 50px;
   color: var(--primary-text);
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   text-align: center;
 }
@@ -1283,7 +1283,7 @@ header.header {
   background-color: var(--yellow);
   color: var(--dark);
   font-size: var(--font-size);
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
   border-radius: var(--border-radius-3);
   display: inline-block;
@@ -1315,7 +1315,7 @@ header.header {
   }
 
   .banner-overlay-price-text h3 {
-    font-weight: 600;
+    font-weight: 500;
     font-size: var(--font-size-lg);
     color: var(--primary-color);
   }
@@ -1456,7 +1456,7 @@ div.datepicker>div {
   color: var(--dark);
   margin-bottom: 10px;
   padding: 10px 10px 5px;
-  font-weight: 100;
+  font-weight: 400;
   letter-spacing: 1px;
   text-transform: uppercase;
   border-bottom: 1px solid #19b6ee;
@@ -1480,7 +1480,7 @@ div.datepicker>div {
 }
 
 .modal-title {
-  font-weight: 300;
+  font-weight: 400;
   padding: 0;
   margin-bottom: 3px;
   letter-spacing: 2px;
@@ -1739,7 +1739,7 @@ img.verified-badge {
 
 .form-control::placeholder,
 .form-control::-ms-input-placeholder {
-  font-weight: 100;
+  font-weight: 400;
   letter-spacing: 1.5px;
   opacity: 1;
 }
@@ -2237,7 +2237,7 @@ img.lang-flag {
   letter-spacing: 1px !important;
   word-spacing: 3px;
   color: var(--black);
-  font-weight: bolder;
+  font-weight: 700;
   display: inline-block;
   padding: 16px 10px 15px;
   outline: 4px solid #E5E5E5;
@@ -2858,7 +2858,7 @@ img.lang-flag {
 }
 
 .header .menu-cat .mega-dropdown-item p {
-  font-weight: 100;
+  font-weight: 400;
   font-size: var(--font-size-sm);
   line-height: 18px;
   color: var(--secondary-text);
@@ -2972,7 +2972,7 @@ img.lang-flag {
 .header-nav-items .menu-link i {
   margin: 3px 0 0 5px;
   font-size: 8px;
-  font-weight: bold;
+  font-weight: 700;
   /* color: var(--yellow); */
 }
 
@@ -3417,7 +3417,7 @@ body.rtl .product-list-top-filter .pull-right {
   font-size: 40px;
   line-height: 50px;
   color: var(--primary-text);
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   text-align: center;
 }
@@ -3728,7 +3728,7 @@ body.rtl .product-list-top-filter .pull-right {
 .message-list-header h4 {
   margin-inline-start: 30px;
   font-size: var(--font-size-lg);
-  font-weight: 100;
+  font-weight: 400;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
@@ -4253,7 +4253,7 @@ a.ship_to:hover {
   padding: 4px 7px;
   color: var(--white);
   background-color: var(--red);
-  font-weight: 100;
+  font-weight: 400;
   text-transform: uppercase;
 }
 
@@ -4264,7 +4264,7 @@ a.ship_to:hover {
   color: var(--white);
   background-color: var(--red);
   font-size: 0.5em;
-  font-weight: 100;
+  font-weight: 400;
   line-height: 0.5em;
   text-transform: uppercase;
 }
@@ -4515,7 +4515,7 @@ table .product-info-price .percent-off {
 #quickViewModal .close {
   height: 36px;
   width: 36px;
-  font-weight: lighter;
+  font-weight: 400;
   font-size: 3em;
 }
 
@@ -4803,7 +4803,7 @@ table .product-info-price .percent-off {
   font-size: var(--font-size-xxl);
   display: block;
   /*margin: 5px 0px;*/
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
   text-shadow: 1px 2px var(--gray);
   letter-spacing: 2px;
@@ -5074,7 +5074,7 @@ ul.key-feature-list li {
 
 ul.key-feature-list li i {
   margin: 0 5px 0 -25px;
-  /* font-weight: 600; */
+  /* font-weight: 500; */
   color: var(--primary-color);
 }
 
@@ -5089,7 +5089,7 @@ ul.key-feature-list li i {
 
 .popover-title {
   color: var(--dark);
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .popover #item-shipping-options-table {
@@ -5215,7 +5215,7 @@ ul.key-feature-list li i {
 }
 
 .footer-subscribe-form h3 {
-  font-weight: 200;
+  font-weight: 400;
 }
 
 .footer-subscribe-form .footer-subscribe-input {
@@ -5343,7 +5343,7 @@ ul.footer-social-list {
 .contact-info .media .media-body h4 {
   color: var(--primary-text);
   font-size: var(--font-size-lg) !important;
-  font-weight: lighter !important;
+  font-weight: 400!important;
   letter-spacing: 1px;
 }
 
@@ -5421,7 +5421,7 @@ ul.footer-social-list {
 
 .info-box-content {
   padding: 15px 5px 15px 10px;
-  font-weight: lighter;
+  font-weight: 400;
   letter-spacing: 1px;
   margin-inline-start: 90px;
 }
@@ -5512,7 +5512,7 @@ h1.blog-post-title a {
 .blog-post-excerpt {
   font-size: var(--font-size);
   line-height: 1.5;
-  font-weight: 300;
+  font-weight: 400;
   color: #727272;
 }
 
@@ -5566,7 +5566,7 @@ h1.blog-post-title a {
 
 .blog-sidebar-posts>li h5 {
   font-size: var(--font-size-lg);
-  font-weight: 100;
+  font-weight: 400;
   line-height: 1.1;
   margin-bottom: 0px;
   letter-spacing: 1;
@@ -5661,7 +5661,7 @@ h1.blog-post-title a {
   margin-top: 0;
   margin-bottom: 5px;
   font-size: var(--font-size-xxl);
-  font-weight: 300;
+  font-weight: 400;
   text-shadow: var(--box-shadow);
 }
 
@@ -5686,7 +5686,7 @@ h1.blog-post-title a {
   display: block;
   margin: 10px 0;
   text-align: center;
-  font-weight: 100;
+  font-weight: 400;
 }
 
 .description-block>.description-header {
@@ -5727,7 +5727,7 @@ h1.blog-post-title a {
 
 .message-inbox .mailbox-subject span {
   color: var(--primary-text);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .dashboard-section table td {
@@ -6830,7 +6830,7 @@ h1.blog-post-title a {
 
 .best-seller-item-price .regular-price {
   color: var(--primary-color);
-  font-weight: bold;
+  font-weight: 700;
   font-size: var(--font-size-lg);
 }
 
@@ -7212,12 +7212,12 @@ h1.blog-post-title a {
 }
 
 .footer-newsletter-box-text h3 {
-  font-weight: 600;
+  font-weight: 500;
   text-transform: capitalize;
 }
 
 .footer-newsletter-box-text p {
-  font-weight: 300;
+  font-weight: 400;
 }
 
 @media screen and (max-width: 991px) {
@@ -7868,7 +7868,7 @@ h1.blog-post-title a {
 
 .dd-option {
   color: var(--primary-text);
-  font-weight: 100;
+  font-weight: 400;
   border: none !important;
   background: var(--white) !important;
 }
@@ -8142,7 +8142,7 @@ select.category::before {
 .featured-categories .featured-category .featured-category-text h3 {
   color: var(--primary-text);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.5px;
   transition: all .3s ease;
 }
@@ -8153,7 +8153,7 @@ select.category::before {
 
 .featured-categories .featured-category .featured-category-text span {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   border-top: 1px solid rgba(0,0,0,.13);
   color: var(--secondary-text);
   margin-top: 5px;
@@ -8981,7 +8981,7 @@ iframe.customer-map {
 .comparison-key > th {
   background: var(--primary-color);
   color: var(--white);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 1px;
   padding: 6px 4px !important;
   word-spacing: 2px;
@@ -9275,7 +9275,7 @@ iframe.customer-map {
 #profile-container .profile-header .profile-stats .inlinestats-col {
   padding-top: 15px;
   text-align: center;
-  /* font-family: 'Roboto', 'Lucida Sans', 'trebuchet MS', Arial, Helvetica; */
+  /* font-family: var(--primary-font); */
   border-top: 1px solid var(--light);
   min-height: 55px;
 }
@@ -9838,7 +9838,7 @@ iframe.customer-map {
   .frequently-bought-section .btn-lg.add-to-card-now-btn.sc-add-to-cart {
     padding: 5px 10px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
   }
   .frequently-bought-section .box-ratting ul,
   .frequently-bought-section .box-price {justify-content: center;}
@@ -9940,7 +9940,7 @@ iframe.customer-map {
 
   .product-deal-header .ends_in_text {
     display: block;
-    font-weight: 600;
+    font-weight: 500;
     word-spacing: 3px;
   }
   .flashSellBg {display: inline-block;}

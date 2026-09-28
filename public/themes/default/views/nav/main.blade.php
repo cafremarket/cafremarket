@@ -48,7 +48,8 @@
               @else
                 <li class="image-icon">
                   <a href="{{ route('customer.switchToMerchant') }}">
-                    <i class="fal fa-dashboard"></i> {{ trans('theme.view_merchant_dashboard') }}
+                    <i class="fal fa-dashboard"></i>
+                    <span>{{ trans('theme.view_merchant_dashboard') }}</span>
                   </a>
                 </li>
               @endif
@@ -61,19 +62,6 @@
               </li>
             @endauth
 
-            @if (is_wallet_configured_for('customer'))
-              <li class="image-icon">
-                <a href="{{ route('customer.account.wallet') }}">
-                  <i class="fas fa-wallet no-fill"></i>
-                  @if (Auth::guard('customer')->check())
-                    <strong>{{ get_formated_currency(Auth::guard('customer')->user()->balance) }}</strong>
-                  @else
-                    {{ trans('packages.wallet.wallet') }}
-                  @endif
-                </a>
-              </li>
-            @endif
-
             {{-- <li class="image-icon">
               <a href="{{ route('brands') }}">
                 <i class="fal fa-crown"></i> {{ trans('theme.all_brands') }}
@@ -85,19 +73,6 @@
                 <i class="fal fa-store"></i> {{ trans('theme.stores') }}
               </a>
             </li> --}}
-
-            <li class="image-icon">
-              <a href="{{ route('account', 'orders') }}">
-                <!-- <img src="images/truck.svg" alt=""> -->
-                <i class="fal fa-map-marker-alt"></i> {{ trans('theme.track_your_order') }}
-              </a>
-            </li>
-
-            <li class="image-icon">
-              <a href="{{ get_page_url(\App\Models\Page::PAGE_CONTACT_US) }}">
-                <i class="fal fa-life-ring"></i> {{ trans('theme.support') }}
-              </a>
-            </li>
 
             @if (is_incevio_package_loaded('dynamic-currency'))
               <li class="currency">
@@ -224,6 +199,13 @@
             <ul class="d-flex">
               <li class="search-btn">
                 <span class="fal fa-search"></span>
+              </li>
+
+              <li class="header-stores-link">
+                <a href="{{ route('shops') }}" aria-label="{{ trans('theme.stores') }}">
+                  <i class="fal fa-store"></i>
+                  <span class="d-none d-lg-inline">{{ trans('theme.stores') }}</span>
+                </a>
               </li>
 
               <li>

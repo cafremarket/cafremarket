@@ -731,7 +731,7 @@
   legend.wire-recovery-label {
     display: block;
     width: 100%;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.85rem;
     color: var(--primary-text, #333e48);
     margin-bottom: 10px;
@@ -829,7 +829,7 @@
   }
 
   .wire-recovery-upload__filename:not(:empty) {
-    font-weight: 600;
+    font-weight: 500;
     color: var(--primary-text, #333e48);
   }
 

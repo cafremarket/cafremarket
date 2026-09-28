@@ -74,19 +74,14 @@
         <div class="sf-footer-col">
           <h4>{{ trans('theme.nav.make_money') }}</h4>
           <ul>
-            <li>
-              <a href="{{ route('selling.login') }}" class="sf-footer-seller-link">
-                <i class="fal fa-store"></i> {{ trans('theme.nav.seller_login') }}
-              </a>
-            </li>
+            <li><a href="{{ route('selling.login') }}">{{ trans('theme.nav.seller_login') }}</a></li>
             <li><a href="{{ url('/selling') }}">{{ trans('theme.nav.sell_on', ['platform' => get_platform_title()]) }}</a></li>
             <li><a href="{{ url('/selling#pricing') }}">{{ trans('theme.nav.become_merchant') }}</a></li>
             <li><a href="{{ url('/selling#howItWorks') }}">{{ trans('theme.nav.how_it_works') }}</a></li>
             <li><a href="{{ url('/selling#faqs') }}">{{ trans('theme.nav.faq') }}</a></li>
             @if (is_incevio_package_loaded('affiliate'))
               <li>
-                <a href="{{ auth()->guard('affiliate')->check() ? route('affiliate.dashboard') : route('affiliate.login.form') }}" class="sf-footer-seller-link">
-                  <i class="fal fa-handshake"></i>
+                <a href="{{ auth()->guard('affiliate')->check() ? route('affiliate.dashboard') : route('affiliate.login.form') }}">
                   {{ auth()->guard('affiliate')->check() ? trans('packages.affiliate.affiliate_dashboard') : trans('packages.affiliate.login') }}
                 </a>
               </li>
