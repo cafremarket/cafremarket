@@ -3,6 +3,7 @@
 namespace Incevio\Package\MPesa\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\Payments\CheckoutPaymentIntentService;
 use Incevio\Package\MPesa\Services\MPesaPaymentService;
 use Incevio\Package\Wallet\Models\Transaction;
 use Incevio\Package\Wallet\Jobs\SendNotificationJob;
@@ -48,6 +49,8 @@ class ResponseController extends Controller
 
         if ($refId) {
             $orders = Order::where('payment_ref_id', $refId)->get();
+            $code = isset($response->output_ResponseCode) ? (string) $response->output_ResponseCode : null;
+
             if ($orders->isNotEmpty()) {
                 foreach ($orders as $order) {
                     if ($success) {
@@ -58,6 +61,8 @@ class ResponseController extends Controller
                         $order->save();
                     }
                 }
+            } elseif (app(CheckoutPaymentIntentService::class)->handleMpesaCallback($refId, $success, $code)) {
+                // Checkout waiting on this payment: its orders are created now.
             } elseif ($success) {
                 $this->creditWalletDeposit($refId);
             }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Storefront\ConversationController;
 use App\Http\Controllers\Storefront\DisputeController;
 use App\Http\Controllers\Storefront\OrderCancelController;
 use App\Http\Controllers\Storefront\OrderController;
+use App\Http\Controllers\Storefront\PaymentIntentController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('order/{cart}', [
@@ -56,6 +57,27 @@ Route::middleware(['auth:customer', 'xssSanitizer'])->group(function () {
     Route::get('order/again/{order}', [
         OrderController::class, 'again',
     ])->name('order.again');
+
+    // Mobile-money checkout waiting screen (order is created only after payment).
+    Route::get('checkout/payment/{intent}', [
+        PaymentIntentController::class, 'show',
+    ])->name('checkout.payment.wait');
+
+    Route::post('checkout/payment/{intent}/initiate', [
+        PaymentIntentController::class, 'initiate',
+    ])->name('checkout.payment.initiate');
+
+    Route::get('checkout/payment/{intent}/status', [
+        PaymentIntentController::class, 'status',
+    ])->name('checkout.payment.status');
+
+    Route::post('checkout/payment/{intent}/cancel', [
+        PaymentIntentController::class, 'cancel',
+    ])->name('checkout.payment.cancel');
+
+    Route::post('checkout/payment/{intent}/retry', [
+        PaymentIntentController::class, 'retry',
+    ])->name('checkout.payment.retry');
 
     Route::post('order/emola/resend/{order}', [
         OrderController::class, 'resendEmolaPayment',

@@ -45,6 +45,22 @@
       </div>
     @endif
 
+    @php
+      $pendingPayment = auth('customer')->check()
+          ? \App\Models\PaymentIntent::open()
+              ->where('customer_id', auth('customer')->id())
+              ->where('expires_at', '>', now())
+              ->latest('id')
+              ->first()
+          : null;
+    @endphp
+    @if ($pendingPayment)
+      <div class="notice notice-warning notice-sm mb-3">
+        <i class="fas fa-mobile-alt"></i> {{ trans('theme.payment_wait.pending_banner') }}
+        <a href="{{ route('checkout.payment.wait', $pendingPayment) }}"><strong>{{ trans('theme.payment_wait.view_status') }}</strong></a>
+      </div>
+    @endif
+
     @if ($carts->count() > 0)
       <header class="sf-checkout__intro">
         <h1>{{ trans('theme.checkout') }}</h1>

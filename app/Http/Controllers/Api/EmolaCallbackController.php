@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Emola\EmolaCallbackPayload;
 use App\Services\Emola\EmolaOrderPaymentService;
 use App\Services\Emola\EmolaWalletDepositService;
+use App\Services\Payments\CheckoutPaymentIntentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -15,6 +16,7 @@ class EmolaCallbackController extends Controller
         Request $request,
         EmolaOrderPaymentService $emolaOrders,
         EmolaWalletDepositService $emolaWallet,
+        CheckoutPaymentIntentService $intents,
     ) {
         Log::info('eMola callback received', [
             'content_type' => $request->header('Content-Type'),
@@ -35,7 +37,8 @@ class EmolaCallbackController extends Controller
             ], 422);
         }
 
-        if (! $emolaWallet->processCallbackPayload($data)) {
+        if (! $emolaWallet->processCallbackPayload($data)
+            && ! $intents->handleEmolaCallback($data)) {
             $emolaOrders->processCallbackPayload($data);
         }
 

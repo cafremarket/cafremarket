@@ -28,6 +28,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('activitylog:clean')->daily(); // Clean older activity logs
         $schedule->command('affiliate:release-commissions')->hourly()->withoutOverlapping(); // Pay affiliates after the refund period
+        $schedule->command('payments:sweep-intents')->everyFiveMinutes()->withoutOverlapping(); // Settle pending mobile-money checkouts
         // $schedule->command('incevio:kpi')->dailyAt('23:58');
         // $schedule->command('backup:clean')->daily()->at('01:00');
         // $schedule->command('backup:run')->daily()->at('02:00');

@@ -14,7 +14,9 @@ use App\Http\Resources\OrderResource;
 use App\Http\Resources\PaymentMethodResource;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\PaymentIntent;
 use App\Models\PaymentMethod;
+use App\Services\Payments\CheckoutPaymentIntentService;
 // use App\Contracts\PaymentServiceContract as PaymentService;
 // use App\Http\Requests\Validations\DirectCheckoutRequest;
 use App\Services\Payments\PaymentService;
@@ -163,6 +165,11 @@ class CheckoutController extends Controller
             if ($walletCheck !== null) {
                 return $walletCheck;
             }
+        }
+
+        // Mobile money: no order until the gateway confirms the payment.
+        if (PaymentIntent::usesIntent($paymentMethod) && ! $request->has('payment_meta')) {
+            return $this->startPaymentIntent($request, collect([$cart]), false);
         }
 
         DB::beginTransaction();
@@ -346,6 +353,14 @@ class CheckoutController extends Controller
             $carts->each(fn (Cart $cart) => $cart->customer_id = $customerId);
         }
 
+        if (PaymentIntent::usesIntent($paymentMethod) && ! $request->has('payment_meta')) {
+            foreach ($carts as $cart) {
+                crosscheckAndUpdateOldCartInfo($request, $cart);
+            }
+
+            return $this->startPaymentIntent($request, $carts, true);
+        }
+
         DB::beginTransaction();
 
         $orders = [];
@@ -509,6 +524,47 @@ class CheckoutController extends Controller
                 return (new OrderLightResource($order))->resolve();
             })->values(),
         ], 200);
+    }
+
+    /**
+     * Create the payment intent and push the request to the phone in one call.
+     * 202 while waiting (app shows its waiting screen and polls), 200 when M-Pesa
+     * confirmed synchronously and the orders already exist.
+     */
+    private function startPaymentIntent(CheckoutCartRequest $request, $carts, bool $checkoutAll)
+    {
+        $intents = app(CheckoutPaymentIntentService::class);
+
+        try {
+            $intent = $intents->initiate($intents->create($request, $carts, $checkoutAll, 'api'));
+        } catch (PaymentFailedException $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'carts' => CartResource::collection($carts),
+            ], 403);
+        } catch (\Exception $e) {
+            Log::error($request->payment_method.' payment intent failed: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json([
+                'error' => trans('theme.notify.payment_failed'),
+                'message' => trans('theme.notify.payment_failed'),
+                'carts' => CartResource::collection($carts),
+            ], 403);
+        }
+
+        if (in_array($intent->status, [PaymentIntent::STATUS_FAILED, PaymentIntent::STATUS_CANCELLED, PaymentIntent::STATUS_EXPIRED], true)) {
+            $message = $intent->message ?: trans('theme.payment_wait.failed');
+
+            return response()->json([
+                'error' => $message,
+                'message' => $message,
+                'payment_intent' => $intents->present($intent),
+                'carts' => CartResource::collection($carts),
+            ], 403);
+        }
+
+        return PaymentIntentController::intentResponse($intent);
     }
 
     /**

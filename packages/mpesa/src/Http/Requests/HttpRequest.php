@@ -35,6 +35,11 @@ class HttpRequest
 
     public $reference;
 
+    /** References sent with the last C2B request (to query it when the response was lost). */
+    public $lastTransactionRef;
+
+    public $lastThirdPartyRef;
+
     public $sandbox;
 
     /** @var string Path prefix (e.g. /ipg/v1x) */
@@ -140,6 +145,8 @@ class HttpRequest
         $phone = $this->get_phone_number();
         $thirdPartyRef = $this->generateConversationId();
         $transactionRef = $this->reference . '_' . substr(uniqid(), -6);
+        $this->lastTransactionRef = $transactionRef;
+        $this->lastThirdPartyRef = $thirdPartyRef;
 
         // Same payload shape as mpesa-mz-nodejs-lib: input_Amount as decimal string, input_ThirdPartyReference
         $body = [

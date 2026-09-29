@@ -300,6 +300,25 @@ trait ShoppingCart
     }
 
     /**
+     * Resolve fulfilment type before calculate_grand_total() — Cart::isPickup()
+     * (set via setFulfilmentType()) is what zeroes out shipping/handling for pickup,
+     * so this must run first. Never trust the warehouse_id blindly: it must belong to
+     * this shop and the shop must actually allow pickup.
+     *
+     * @return \App\Models\Warehouse|null The pickup warehouse, null for delivery
+     */
+    private function applyCheckoutFulfilment(Request $request, Cart $cart)
+    {
+        $warehouse = null;
+        if ($request->fulfilment_type === Order::FULFILMENT_TYPE_PICKUP && optional($cart->shop)->isPickupEnabled()) {
+            $warehouse = $cart->shop->warehouses()->active()->find($request->warehouse_id);
+        }
+        $cart->setFulfilmentType($warehouse ? Order::FULFILMENT_TYPE_PICKUP : Order::FULFILMENT_TYPE_DELIVER);
+
+        return $warehouse;
+    }
+
+    /**
      * Create a new order from the cart
      *
      *
@@ -311,15 +330,7 @@ trait ShoppingCart
         $customerLat = $request->customer_latitude ?? $request->latitude ?? $buyerLocation->latitude();
         $customerLng = $request->customer_longitude ?? $request->longitude ?? $buyerLocation->longitude();
 
-        // Resolve fulfilment type before calculate_grand_total() below — Cart::isPickup()
-        // (set via setFulfilmentType()) is what zeroes out shipping/handling for pickup,
-        // so this must run first. Never trust the warehouse_id blindly: it must belong to
-        // this shop and the shop must actually allow pickup.
-        $warehouse = null;
-        if ($request->fulfilment_type === Order::FULFILMENT_TYPE_PICKUP && optional($cart->shop)->isPickupEnabled()) {
-            $warehouse = $cart->shop->warehouses()->active()->find($request->warehouse_id);
-        }
-        $cart->setFulfilmentType($warehouse ? Order::FULFILMENT_TYPE_PICKUP : Order::FULFILMENT_TYPE_DELIVER);
+        $warehouse = $this->applyCheckoutFulfilment($request, $cart);
 
         // Save the order
         // Use getAttributes() — NOT toArray(). Loaded relations like shipTo() are

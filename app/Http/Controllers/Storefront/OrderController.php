@@ -16,6 +16,8 @@ use App\Models\Attachment;
 use App\Models\Cart;
 use App\Models\Inventory;
 use App\Models\Order;
+use App\Models\PaymentIntent;
+use App\Services\Payments\CheckoutPaymentIntentService;
 use App\Services\Payments\PaymentService;
 use App\Services\Payments\PaypalPaymentService;
 use Exception;
@@ -103,6 +105,11 @@ class OrderController extends Controller
         if (! shop_can_accept_sales($cart->shop)) {
             return redirect()->route('cart.checkout', $cart)
                 ->with('error', trans('packages.wallet.vendor_sales_require_subscription'));
+        }
+
+        // Mobile money: no order until the gateway confirms the payment.
+        if (PaymentIntent::usesIntent($request->input('payment_method'))) {
+            return $this->startPaymentIntent($request, collect([$cart]), false);
         }
 
         DB::beginTransaction();
@@ -252,6 +259,14 @@ class OrderController extends Controller
             }
         }
 
+        if (PaymentIntent::usesIntent($request->input('payment_method'))) {
+            foreach ($carts as $cart) {
+                crosscheckAndUpdateOldCartInfo($request, $cart);
+            }
+
+            return $this->startPaymentIntent($request, $carts, true);
+        }
+
         DB::beginTransaction();
 
         $orders = [];
@@ -389,6 +404,25 @@ class OrderController extends Controller
 
         return redirect()->route('order.confirmation', ['order_number' => $this->toRouteSafeOrderNumber($primary->order_number)])
             ->with($flashKey, $flashMessage);
+    }
+
+    /**
+     * Store the pending payment and send the customer to the waiting screen,
+     * which pushes the request to the phone and polls until it is settled.
+     */
+    private function startPaymentIntent(CheckoutCartRequest $request, $carts, bool $checkoutAll): RedirectResponse
+    {
+        try {
+            $intent = app(CheckoutPaymentIntentService::class)->create($request, $carts, $checkoutAll, 'web');
+        } catch (PaymentFailedException $e) {
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
+        } catch (Exception $e) {
+            Log::error($request->payment_method.' payment intent failed: '.$e->getMessage(), ['exception' => $e]);
+
+            return redirect()->back()->with('error', trans('theme.notify.payment_failed'))->withInput();
+        }
+
+        return redirect()->route('checkout.payment.wait', $intent);
     }
 
     /**

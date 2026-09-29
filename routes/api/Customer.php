@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\CustomerLocationController;
 use App\Http\Controllers\Api\NearbyShopController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PackageController;
+use App\Http\Controllers\Api\PaymentIntentController;
 use App\Http\Controllers\Api\PaymentCredentialController;
 use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Support\Facades\Route;
@@ -177,6 +178,11 @@ Route::middleware('customerApp')->group(function () {
         Route::post('listing/{slug}/reviews', [ReviewController::class, 'store_product_review'])->middleware('verifiedEmail:api');
         Route::post('order/{order}/goodsReceived', [OrderController::class, 'goods_received']);
         Route::put('order/{order}/cancel', [OrderController::class, 'cancel']);
+
+        // Mobile-money checkout waiting screen (order is created only after payment)
+        Route::get('payment-intent/{intent}', [PaymentIntentController::class, 'show']);
+        Route::post('payment-intent/{intent}/cancel', [PaymentIntentController::class, 'cancel']);
+        Route::post('payment-intent/{intent}/retry', [PaymentIntentController::class, 'retry']);
 
         // eMola order status + resend (mobile app polling)
         Route::get('order/{order}/emola/status', [OrderController::class, 'emolaPaymentStatus']);
