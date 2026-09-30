@@ -43,46 +43,6 @@ class OrderController extends Controller
     }
 
     /**
-     * Resolve order from gateway callback identifier.
-     * Some gateways may return cart/checkout-like references instead of order id.
-     */
-    private function resolveGatewayOrder($identifier)
-    {
-        // Direct order id hit
-        if (is_numeric($identifier)) {
-            $order = Order::withTrashed()->find((int) $identifier);
-            if ($order) {
-                return $order;
-            }
-        }
-
-        // Try by order number / payment ref id
-        $order = Order::withTrashed()
-            ->where('order_number', (string) $identifier)
-            ->orWhere('payment_ref_id', (string) $identifier)
-            ->latest('id')
-            ->first();
-
-        if ($order) {
-            return $order;
-        }
-
-        // Last resort: latest pending order of current customer (fresh callback)
-        if (auth('customer')->check()) {
-            return Order::withTrashed()
-                ->where('customer_id', auth('customer')->id())
-                ->whereIn('payment_status', [
-                    Order::PAYMENT_STATUS_UNPAID,
-                    Order::PAYMENT_STATUS_PENDING,
-                ])
-                ->latest('id')
-                ->first();
-        }
-
-        return null;
-    }
-
-    /**
      * Checkout the cart and process the payment.
      *
      * @param  CheckoutCartRequest  $request  The request object containing the cart data.
@@ -434,34 +394,39 @@ class OrderController extends Controller
      */
     public function paymentGatewaySuccessResponse(Request $request, $gateway, $order)
     {
-        // Normalize order identifier from callback.
-        $resolved = $this->resolveGatewayOrder($order);
-        if ($resolved) {
-            $order = $resolved->id;
-        }
+        // $order is the exact id string ("12" or "12-13") we gave PayPal as the return URL.
+        $order = (string) $order;
 
         // Verify Payment Gateway Calls
         if (! $this->verifyPaymentGatewayCalls($request, $gateway)) {
-            return redirect()->route('payment.failed', $order);
+            return redirect()->route('cart.index')->with('error', trans('theme.notify.payment_failed'));
+        }
+
+        // The PayPal token must have been issued for exactly these orders; otherwise a token
+        // from any cheap payment could confirm a different (or someone else's) order.
+        if (PaypalPaymentService::orderIdsForToken($request->query('token')) !== (string) $order) {
+            Log::warning('PayPal return: token not bound to order', ['order' => $order]);
+
+            abort(403);
         }
 
         if ($gateway == 'paypal') {
-            // Log::info($request->all());
-
             $receiver = vendor_get_paid_directly() ? PaymentService::RECEIVER_MERCHANT : PaymentService::RECEIVER_PLATFORM;
 
             try {
                 $service = new PaypalPaymentService($request);
                 $response = $service->setReceiver($receiver)->setConfig()->paymentExecution($request);
-
-                // If the payment failed
-                if ($response->status != PaymentService::STATUS_PAID) {
-                    return redirect()->route('payment.failed', $order);
-                }
             } catch (Exception $e) {
-                Log::error('Paypal payment failed on execution step:: ');
-                Log::error($e->getMessage());
+                Log::error('Paypal payment failed on execution step: '.$e->getMessage());
+
+                return redirect()->route('payment.failed', ['order' => $order, 'token' => $request->query('token')]);
             }
+
+            if ($response->status != PaymentService::STATUS_PAID) {
+                return redirect()->route('payment.failed', ['order' => $order, 'token' => $request->query('token')]);
+            }
+
+            PaypalPaymentService::forgetToken((string) $request->query('token'));
         }
         // Order has been paid
 
@@ -501,9 +466,8 @@ class OrderController extends Controller
      */
     public function paymentFailed(Request $request, $order)
     {
-        $resolved = $this->resolveGatewayOrder($order);
-        if ($resolved) {
-            $order = $resolved->id;
+        if (! $this->mayAbandonOrders($request, (string) $order)) {
+            abort(403);
         }
 
         if (! is_array($order)) {
@@ -533,6 +497,37 @@ class OrderController extends Controller
         }
 
         return redirect()->route('cart.checkout', $cart)->with('error', $msg);
+    }
+
+    private function abortUnlessOwnOrder(Order $order): void
+    {
+        abort_unless((int) $order->customer_id === (int) auth('customer')->id(), 404);
+    }
+
+    /**
+     * Abandoning an order deletes it and restocks its items, so only allow it for unpaid orders the
+     * caller started.
+     */
+    private function mayAbandonOrders(Request $request, string $orderIds): bool
+    {
+        $ids = array_filter(explode('-', $orderIds), 'is_numeric');
+        $orders = Order::withTrashed()->whereIn('id', $ids)->get();
+
+        if ($orders->isEmpty() || $orders->count() !== count($ids)) {
+            return false;
+        }
+
+        if ($orders->contains(fn (Order $o) => $o->isPaid())) {
+            return false;
+        }
+
+        // PayPal's cancel return carries the token bound to these orders; our own redirects (e.g.
+        // M-Pesa confirm) use a short-lived signed URL. A bare link from elsewhere is refused.
+        if (PaypalPaymentService::orderIdsForToken($request->query('token')) === $orderIds) {
+            return true;
+        }
+
+        return $request->hasValidSignature();
     }
 
     /**
@@ -858,13 +853,17 @@ class OrderController extends Controller
      */
     public function invoice(Order $order)
     {
-        // $this->authorize('view', $order); // Check permission
+        $this->abortUnlessOwnOrder($order);
 
         return $order->invoice(); // Download the invoice
     }
 
     public function downloadShippingLabel(Order $order)
     {
+        // Route is under the panel `auth` guard: platform staff or the order's own shop.
+        $user = auth()->user();
+        abort_unless($user && ($user->isFromPlatform() || (int) $order->shop_id === (int) $user->merchantId()), 403);
+
         return $order->shippingLabelPdf();
     }
 
@@ -876,6 +875,8 @@ class OrderController extends Controller
      */
     public function track(Request $request, Order $order)
     {
+        $this->abortUnlessOwnOrder($order);
+
         return view('theme::order_tracking', compact('order'));
     }
 
@@ -884,6 +885,8 @@ class OrderController extends Controller
      */
     public function again(Request $request, Order $order)
     {
+        $this->abortUnlessOwnOrder($order);
+
         $cart = $this->moveAllItemsToCartAgain($order);
 
         // If any waring returns from cart, normally out of stock items
@@ -930,6 +933,21 @@ class OrderController extends Controller
      */
     public function download(Request $request, Attachment $attachment, $order, Inventory $inventory)
     {
+        // Paid digital goods: the file must belong to the item, the item to the order, and the
+        // order must be this customer's and paid.
+        $customerId = auth('customer')->id();
+        $orderModel = Order::find($order);
+
+        $allowed = $customerId
+            && $orderModel
+            && (int) $orderModel->customer_id === (int) $customerId
+            && $orderModel->isPaid()
+            && $attachment->attachable_type === Inventory::class
+            && (int) $attachment->attachable_id === (int) $inventory->id
+            && DB::table('order_items')->where('order_id', $orderModel->id)->where('inventory_id', $inventory->id)->exists();
+
+        abort_unless($allowed, 403);
+
         // Check the existence of the file
         if (! Storage::exists($attachment->path)) {
             return back()->with('error', trans('messages.file_not_exist'));

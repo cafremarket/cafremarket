@@ -51,7 +51,11 @@ class ConfigMPesaController extends Controller
     {
         $config = ConfigMPesa::firstOrCreate(['shop_id' => $this->getShopId()]);
 
-        $config->update($request->all());
+        // Never shop_id: it is the primary key, and re-keying would attach these till credentials
+        // to another shop.
+        $config->update($request->only([
+            'consumer_key', 'consumer_secret', 'short_code', 'mpesa_passkey', 'lipa_na_mpesa', 'sandbox',
+        ]));
 
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
     }

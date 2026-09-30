@@ -21,7 +21,6 @@ class CustomerLightResource extends JsonResource
             'phone_number' => optional($this->address)->phone,
             'active' => $this->active,
             'avatar' => get_storage_file_url(optional($this->avatarImage)->path, 'small'),
-            'api_token' => $this->when(isset($this->api_token), $this->api_token),
         ];
     }
 }

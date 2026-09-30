@@ -128,7 +128,7 @@ class MerchantUploadController extends Controller
     public function downloadFailedRows(Request $request)
     {
         foreach ($request->input('data') as $row) {
-            $data[] = unserialize($row);
+            $data[] = unserialize($row, ['allowed_classes' => false]);
         }
 
         return (new FastExcel(collect($data)))->download('failed_rows.xlsx');

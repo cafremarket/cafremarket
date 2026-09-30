@@ -26,7 +26,7 @@ class TransferRequest extends Request
     public function rules()
     {
         $rules = [
-            'amount' => 'required|numeric',
+            'amount' => 'required|numeric|min:0.01',
         ];
 
         if ($this->has('email')) {

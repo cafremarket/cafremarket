@@ -17,6 +17,6 @@ class EloquentShippingRate extends EloquentRepository implements BaseRepository,
 
     public function destroy($id)
     {
-        return $this->model->findOrFail($id)->forceDelete();
+        return $this->scopedQuery(true)->findOrFail($id)->forceDelete();
     }
 }

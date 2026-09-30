@@ -72,7 +72,7 @@ class AccountController extends Controller
 
         $customer = Customer::where('id', Auth::guard('api')->user()->id)->first();
 
-        $customer->update($request->all());
+        $customer->update($request->only(Customer::SELF_EDITABLE));
 
         if ($request->hasFile('avatar') || $request->has('delete_avatar')) {
             $customer->deleteImage();
@@ -148,7 +148,7 @@ class AccountController extends Controller
 
         $customer = Customer::where('id', Auth::guard('api')->user()->id)->first();
 
-        $customer->update($request->all());
+        $customer->update($request->only('password'));
 
         event(new PasswordUpdated(Auth::user()));
 

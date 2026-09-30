@@ -28,7 +28,7 @@ class EloquentAttributeValue extends EloquentRepository implements AttributeValu
 
     public function massDestroy($ids)
     {
-        $attributes = $this->model->withTrashed()->whereIn('id', $ids)->get();
+        $attributes = $this->scopedQuery(true)->withTrashed()->whereIn($this->model->qualifyColumn('id'), $ids)->get();
 
         foreach ($attributes as $attribute) {
             $attribute->flushImages();

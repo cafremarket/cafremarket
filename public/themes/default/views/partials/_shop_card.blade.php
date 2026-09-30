@@ -3,7 +3,7 @@
     @include('theme::partials._shop_logo_frame', ['shop' => $shop, 'frameSize' => 'sm', 'class' => 'mx-auto'])
 
     @if (config('system_settings.show_merchant_info_as_vendor'))
-      <h4 class="mb-1 mt-2">{!! $shop->owner->getName() !!}</h4>
+      <h4 class="mb-1 mt-2">{{ $shop->owner->getName() }}</h4>
     @else
       <h4 class="mb-1 mt-2">{!! $shop->getQualifiedName(10) !!}</h4>
     @endif

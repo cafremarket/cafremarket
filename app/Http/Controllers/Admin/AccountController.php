@@ -226,7 +226,7 @@ class AccountController extends Controller
         if (! customer_can_register()) {
             $buyer_profile = Customer::where('email', Auth::user()->email)->first();
             if ($buyer_profile) {
-                $buyer_profile->update($request->all());
+                $buyer_profile->update($request->only(\App\Models\User::SELF_EDITABLE));
             }
         }
 

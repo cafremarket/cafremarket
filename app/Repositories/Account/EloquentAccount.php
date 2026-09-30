@@ -16,7 +16,7 @@ class EloquentAccount extends EloquentRepository implements AccountRepository, B
 
     public function updateProfile(Request $request)
     {
-        return Auth::user()->update($request->all());
+        return Auth::user()->update($request->only(\App\Models\User::SELF_EDITABLE));
     }
 
     public function updatePhoto(Request $request)

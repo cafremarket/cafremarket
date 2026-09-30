@@ -44,7 +44,8 @@
         data-conversation-id="{{ $chat->id }}"
         data-shop-id="{{ $chat->shop_id }}"
         data-customer-id="{{ $chat->customer_id }}"
-        data-ws-room="{{ get_chat_room_name($chat->shop_id.$chat->customer_id) }}">
+        data-ws-room="{{ chat_thread_room($chat->shop_id, $chat->customer_id) }}"
+        data-ws-token="{{ chat_room_token(chat_thread_room($chat->shop_id, $chat->customer_id)) }}">
   <button type="button" class="cpc-thread__back" id="cpc-back-list" aria-label="Back">
     <i class="fas fa-arrow-left"></i>
   </button>

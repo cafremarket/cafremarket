@@ -86,11 +86,11 @@ class ShippingZone extends BaseModel
      */
     public function getCountryIdsAttribute($value)
     {
-        return unserialize($value);
+        return unserialize($value, ['allowed_classes' => false]);
     }
 
     public function getStateIdsAttribute($value)
     {
-        return unserialize($value);
+        return unserialize($value, ['allowed_classes' => false]);
     }
 }

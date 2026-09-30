@@ -18,7 +18,7 @@ Route::get('locale/{locale?}', [
 Route::post('/contact_us', [
     ContactUsController::class,
     'send',
-])->name('contact_us');
+])->name('contact_us')->middleware(['xssSanitizer', 'throttle:10,1']);
 
 // To view img no need to login
 Route::get('image/{path}', [
@@ -34,12 +34,12 @@ Route::get('order/attachment/{attachment}/{order}/{inventory}/download', [
 Route::get('address/search', [
     \App\Http\Controllers\Storefront\LocationController::class,
     'searchAddress',
-])->name('address.search');
+])->name('address.search')->middleware('throttle:30,1');
 
 Route::post('address/reverse-geocode', [
     \App\Http\Controllers\Storefront\LocationController::class,
     'reverseGeocode',
-])->name('address.reverse');
+])->name('address.reverse')->middleware('throttle:30,1');
 
 Route::middleware(['ajax', 'xssSanitizer'])->group(function () {
     // Use php helper functions from js

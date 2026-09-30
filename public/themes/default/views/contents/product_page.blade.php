@@ -288,7 +288,7 @@
 
             <div class="tab-content sf-pdp__tab-body">
               <div role="tabpanel" class="tab-pane fade active in" id="desc_tab">
-                {!! $item->product->description !!}
+                {!! clean_rich_html($item->product->description) !!}
 
                 @unless (config('system_settings.hide_technical_details_on_product_page'))
                   <h3>{{ trans('theme.technical_details') }}</h3>
@@ -399,7 +399,7 @@
                 @endif
                 @if ($item->shop->config->show_refund_policy_with_listing && $item->shop->config->return_refund)
                   <hr class="dashes my-4" />
-                  {!! $item->shop->config->return_refund !!}
+                  {!! clean_rich_html($item->shop->config->return_refund) !!}
                 @endif
               </div>
 

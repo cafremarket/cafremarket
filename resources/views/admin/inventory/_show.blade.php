@@ -74,7 +74,7 @@
                 <tbody>
                   <tr>
                     <td>{{ $inventory->sku }}</td>
-                    <td>{!! $inventory->condition !!}</td>
+                    <td>{{ $inventory->condition }}</td>
                     <td> {{ $inventory->stock_quantity }} </td>
                     <td> {{ get_formated_currency($inventory->sale_price, 2, config('system_settings.currency.id')) }} </td>
                     <td>
@@ -95,7 +95,7 @@
                   @foreach ($inventory->variants as $variant)
                     <tr>
                       <td>{{ $variant->sku }}</td>
-                      <td>{!! $variant->condition !!}</td>
+                      <td>{{ $variant->condition }}</td>
                       <td> {{ $variant->stock_quantity }} </td>
                       <td> {{ get_formated_currency($variant->sale_price, 2, config('system_settings.currency.id')) }} </td>
                       <td>
@@ -155,7 +155,7 @@
 
                 <tr>
                   <th class="text-right">{{ trans('app.condition') }}:</th>
-                  <td style="width: 75%;">{!! $inventory->condition !!}</td>
+                  <td style="width: 75%;">{{ $inventory->condition }}</td>
                 </tr>
 
                 @if ($inventory->condition_note)
@@ -320,7 +320,7 @@
               <tr>
                 <th class="text-right">{{ trans('app.description') }}: </th>
                 <td style="width: 75%;">
-                  {!! htmlspecialchars_decode($inventory->product->description) !!}
+                  {!! clean_html(htmlspecialchars_decode($inventory->product->description)) !!}
                 </td>
               </tr>
 
@@ -331,7 +331,7 @@
           <div class="tab-pane" id="description_tab">
             <div class="box-body">
               @if ($inventory->description)
-                {!! $inventory->description !!}
+                {!! clean_html($inventory->description) !!}
               @else
                 <p>{{ trans('app.description_not_available') }} </p>
               @endif

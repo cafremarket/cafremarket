@@ -43,11 +43,19 @@ class WalletController extends Controller
      */
     public function invoice(Transaction $transaction)
     {
+        // Only the holder of the transaction's wallet (or platform staff) gets its invoice.
+        $holderType = $transaction->payable_type;
+        $holderId = (int) $transaction->payable_id;
+
         if (Auth::guard('customer')->check()) {
+            abort_unless($holderType === \App\Models\Customer::class && $holderId === (int) Auth::guard('customer')->id(), 404);
+
             return $transaction->customerInvoice('download');
         }
 
         if (is_incevio_package_loaded('affiliate') && Auth::guard('affiliate')->check()) {
+            abort_unless($holderType === get_class(Auth::guard('affiliate')->user()) && $holderId === (int) Auth::guard('affiliate')->id(), 404);
+
             if ($transaction->isTypeOf('affiliate_commission')) {
                 return $transaction->affiliateInvoice('download');
             } else {
@@ -56,7 +64,13 @@ class WalletController extends Controller
         }
 
         if (Auth::check()) {
-            if (Auth::user()->isFromPlatform() || Auth::user()->isMerchant()) {
+            if (Auth::user()->isFromPlatform()) {
+                return $transaction->invoice('download');
+            }
+
+            if (Auth::user()->isMerchant()) {
+                abort_unless($holderType === \App\Models\Shop::class && $holderId === (int) Auth::user()->merchantId(), 404);
+
                 return $transaction->invoice('download');
             }
         }

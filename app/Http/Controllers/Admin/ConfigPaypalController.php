@@ -46,7 +46,8 @@ class ConfigPaypalController extends Controller
     {
         $paypal = ConfigPaypal::firstOrCreate(['shop_id' => Auth::user()->merchantId()]);
 
-        $paypal->update($request->all());
+        // Never shop_id: it is the primary key, and re-keying would attach these credentials to another shop.
+        $paypal->update($request->only(['client_id', 'secret', 'sandbox']));
 
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
     }

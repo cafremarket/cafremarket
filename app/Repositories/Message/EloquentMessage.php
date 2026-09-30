@@ -45,7 +45,7 @@ class EloquentMessage extends EloquentRepository implements BaseRepository, Mess
 
     public function massUpdate($ids, $statusOrLabel, $type)
     {
-        return $this->model->whereIn('id', $ids)->update([$type => $statusOrLabel]);
+        return $this->scopedQuery(true)->whereIn($this->model->qualifyColumn('id'), $ids)->update([$type => $statusOrLabel]);
     }
 
     public function markAsRead(Request $request, $message)
@@ -71,14 +71,14 @@ class EloquentMessage extends EloquentRepository implements BaseRepository, Mess
 
     public function show($id)
     {
-        return $this->model->with(['replies' => function ($query) {
+        return $this->scopedQuery(true)->with(['replies' => function ($query) {
             $query->with('attachments', 'user')->orderBy('id', 'desc');
         }])->find($id);
     }
 
     public function update(Request $request, $id)
     {
-        $message = $this->model->find($id);
+        $message = $this->scopedQuery(true)->find($id);
 
         $message->update($request->all());
 
@@ -91,7 +91,7 @@ class EloquentMessage extends EloquentRepository implements BaseRepository, Mess
 
     public function storeReply(Request $request, $id)
     {
-        $message = $this->model->findOrFail($id);
+        $message = $this->scopedQuery(true)->findOrFail($id);
 
         // Update parent message
         $message->hasNewReply();

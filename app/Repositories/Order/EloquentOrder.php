@@ -97,13 +97,13 @@ class EloquentOrder extends EloquentRepository implements BaseRepository, OrderR
 
     public function find($order)
     {
-        return $this->model->withTrashed()->find($order);
+        return $this->scopedQuery(true)->withTrashed()->find($order);
     }
 
     public function fulfill(Request $request, $order)
     {
         if (! $order instanceof Order) {
-            $order = $this->model->find($order);
+            $order = $this->scopedQuery(true)->find($order);
         }
 
         $order->update($request->all());
@@ -118,7 +118,7 @@ class EloquentOrder extends EloquentRepository implements BaseRepository, OrderR
     public function updateAdminNote(Request $request, $order)
     {
         if (! $order instanceof Order) {
-            $order = $this->model->find($order);
+            $order = $this->scopedQuery(true)->find($order);
         }
 
         $order->admin_note = $request->input('admin_note');
@@ -207,7 +207,7 @@ class EloquentOrder extends EloquentRepository implements BaseRepository, OrderR
      */
     public function destroy($id)
     {
-        $model = $this->model->onlyTrashed()->findOrFail($id);
+        $model = $this->scopedQuery(true)->onlyTrashed()->findOrFail($id);
 
         return $model->forceDelete();
     }

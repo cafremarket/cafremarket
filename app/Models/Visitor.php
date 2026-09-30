@@ -76,7 +76,7 @@ class Visitor extends BaseModel
      */
     public function getInfoAttribute($value)
     {
-        return unserialize($value);
+        return unserialize($value, ['allowed_classes' => false]);
     }
 
     /**

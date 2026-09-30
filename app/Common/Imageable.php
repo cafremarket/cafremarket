@@ -208,6 +208,41 @@ trait Imageable
     }
 
     /**
+     * True for an http(s) URL whose host resolves only to public (non-private, non-reserved) IPs.
+     */
+    public static function isPublicHttpUrl($url): bool
+    {
+        if (! is_string($url) || ! filter_var($url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        $parts = parse_url($url);
+        if (! in_array(strtolower($parts['scheme'] ?? ''), ['http', 'https'], true) || empty($parts['host'])) {
+            return false;
+        }
+
+        $host = trim($parts['host'], '[]');
+        $ips = filter_var($host, FILTER_VALIDATE_IP)
+            ? [$host]
+            : array_merge(
+                gethostbynamel($host) ?: [],
+                array_column(@dns_get_record($host, DNS_AAAA) ?: [], 'ipv6')
+            );
+
+        if (! $ips) {
+            return false;
+        }
+
+        foreach ($ips as $ip) {
+            if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Save images from external URL
      *
      * @param  file  $image
@@ -215,8 +250,21 @@ trait Imageable
      */
     public function saveImageFromUrl($url, $type = null)
     {
+        // Server-side fetch of a caller-supplied URL: public http(s) hosts only, no redirects
+        // (a redirect could point back at an internal address).
+        if (! self::isPublicHttpUrl($url)) {
+            Log::warning('Image import blocked: URL is not a public http(s) address', ['url' => $url]);
+
+            return;
+        }
+
         try {
             $context = stream_context_create([
+                'http' => [
+                    'follow_location' => 0,
+                    'max_redirects' => 0,
+                    'timeout' => 15,
+                ],
                 'ssl' => [
                     'verify_peer' => false,
                     'verify_peer_name' => false,
@@ -248,8 +296,11 @@ trait Imageable
         // Get file name
         $name = isset($pathinfo['filename']) ? $pathinfo['filename'].'.'.$extension : substr($url, strrpos($url, '/', -1) + 1);
 
-        // Get the original file
-        $file_content = file_get_contents($url);
+        // Get the original file (capped at 10 MB)
+        $file_content = file_get_contents($url, false, $context, 0, 10 * 1024 * 1024);
+        if ($file_content === false) {
+            return;
+        }
 
         // Get file size in Bite
         $size = isset($file_headers['Content-Length']) ? $file_headers['Content-Length'] : strlen($file_content);

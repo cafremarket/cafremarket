@@ -1189,7 +1189,8 @@
     "use strict";
     (function($, window, document) {
       $(document).ready(function() {
-        var room = '{{ get_chat_room_name($shop->id . Auth::guard('customer')->user()->id) }}';
+        var room = '{{ chat_thread_room($shop->id, Auth::guard('customer')->user()->id) }}';
+        var roomToken = '{{ chat_room_token(chat_thread_room($shop->id, Auth::guard('customer')->user()->id)) }}';
         var wsScheme = '{{ config('chat_socket.scheme') }}';
         var wsHost = '{{ config('chat_socket.client_host') }}';
         var wsPort = '{{ (int) config('chat_socket.port') }}';
@@ -1295,7 +1296,8 @@
             window.socketConnected = true;
             socket.send(JSON.stringify({
               action: 'subscribe',
-              room: room
+              room: room,
+              token: roomToken
             }));
           };
 

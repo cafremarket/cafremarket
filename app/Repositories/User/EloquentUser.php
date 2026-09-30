@@ -87,7 +87,7 @@ class EloquentUser extends EloquentRepository implements BaseRepository, UserRep
 
     public function massDestroy($ids)
     {
-        $users = $this->model->withTrashed()->whereIn('id', $ids)->get();
+        $users = $this->scopedQuery(true)->withTrashed()->whereIn($this->model->qualifyColumn('id'), $ids)->get();
 
         foreach ($users as $user) {
             $user->flushAddresses();

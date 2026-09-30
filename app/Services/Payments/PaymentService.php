@@ -235,4 +235,16 @@ class PaymentService implements PaymentServiceContract
 
         return $this;
     }
+
+    /**
+     * A client claims it already paid (payment_status=paid + payment_meta). The claim alone is
+     * never proof: a gateway may override this only by verifying the payment server-to-server
+     * and binding it to this order's amount.
+     */
+    public function verifyPaidPayment()
+    {
+        $this->status = self::STATUS_ERROR;
+
+        throw new \App\Exceptions\PaymentFailedException(trans('theme.notify.payment_failed'));
+    }
 }

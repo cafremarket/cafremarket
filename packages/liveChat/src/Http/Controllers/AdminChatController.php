@@ -160,7 +160,7 @@ class AdminChatController extends Controller
 
         try {
             ChatSocketPublisher::publish(
-                get_chat_room_name($chat->shop_id.$chat->customer_id),
+                chat_thread_room($chat->shop_id, $chat->customer_id),
                 'chat.message',
                 $payload
             );

@@ -122,7 +122,12 @@ class RouteServiceProvider extends ServiceProvider
                     ?: $request->ip()
                 ));
 
-                return Limit::perMinute(20)->by('auth:'.$request->ip().'|'.$identity);
+                // Per IP+account, plus per account alone so rotating IPs cannot brute-force one account.
+                return [
+                    Limit::perMinute(20)->by('auth:'.$request->ip().'|'.$identity),
+                    Limit::perMinute(10)->by('auth-id:'.$request->path().'|'.$identity),
+                    Limit::perHour(60)->by('auth-id-h:'.$request->path().'|'.$identity),
+                ];
             }
 
             $token = $request->bearerToken()

@@ -137,7 +137,7 @@ class EloquentProduct extends EloquentRepository implements BaseRepository, Prod
 
     public function massDestroy($ids)
     {
-        $products = Product::onlyTrashed()->whereIn('id', $ids)->get();
+        $products = $this->scopedQuery(true)->onlyTrashed()->whereIn($this->model->qualifyColumn('id'), $ids)->get();
 
         foreach ($products as $product) {
             $product->detachTags($product->id, 'product');

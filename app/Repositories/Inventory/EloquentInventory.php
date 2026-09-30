@@ -487,7 +487,7 @@ class EloquentInventory extends EloquentRepository implements BaseRepository, In
 
     public function massDestroy($ids)
     {
-        $inventories = $this->model->withTrashed()->whereIn('id', $ids)->get();
+        $inventories = $this->scopedQuery(true)->withTrashed()->whereIn($this->model->qualifyColumn('id'), $ids)->get();
 
         foreach ($inventories as $inventory) {
             $inventory->detachTags($inventory->id, 'inventory');

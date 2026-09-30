@@ -3,11 +3,14 @@
 namespace App\Services\Payments;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class PaypalPaymentService extends PaymentService
 {
+    private const CHECKOUT_CACHE_PREFIX = 'paypal_checkout_';
+
     private $client_id;
 
     private $client_secret;
@@ -204,6 +207,15 @@ class PaypalPaymentService extends PaymentService
         $payPalOrder = $this->provider->createOrder($data);
 
         if (isset($payPalOrder['id']) && $payPalOrder['id'] != null) {
+            // Bind the PayPal order to our order(s) so its token cannot confirm a different order.
+            if ($this->order) {
+                Cache::put(self::CHECKOUT_CACHE_PREFIX.$payPalOrder['id'], [
+                    'order_ids' => (string) $this->getOrderId(),
+                    'amount' => (string) $this->amount,
+                    'currency' => (string) $this->currency,
+                ], now()->addHours(6));
+            }
+
             foreach ($payPalOrder['links'] as $link) {
                 if ($link['rel'] == 'approve') {
                     return redirect()->away($link['href']);  // redirect to approve href
@@ -266,6 +278,25 @@ class PaypalPaymentService extends PaymentService
         }
 
         return $this;
+    }
+
+    /**
+     * Order ids ("12" or "12-13") a PayPal order token was created for, or null if unknown.
+     */
+    public static function orderIdsForToken(?string $token): ?string
+    {
+        if (! $token) {
+            return null;
+        }
+
+        $binding = Cache::get(self::CHECKOUT_CACHE_PREFIX.$token);
+
+        return is_array($binding) ? ($binding['order_ids'] ?? null) : null;
+    }
+
+    public static function forgetToken(string $token): void
+    {
+        Cache::forget(self::CHECKOUT_CACHE_PREFIX.$token);
     }
 
     public function setAmount($amount)

@@ -517,7 +517,7 @@ class StockService
         }
 
         if (is_string($value) && function_exists('is_serialized') && is_serialized($value)) {
-            $decoded = @unserialize($value);
+            $decoded = @unserialize($value, ['allowed_classes' => false]);
             if (is_array($decoded)) {
                 $first = reset($decoded);
 

@@ -582,6 +582,7 @@
       })();
       var wsUrl = window.__chatWsUrl;
       var room = '{{ get_vendor_chat_room_id() }}';
+      var roomToken = '{{ chat_room_token(get_vendor_chat_room_id()) }}';
       var socket = null;
       var CHAT_WS_DEBUG = {{ config('chat_socket.debug') ? 'true' : 'false' }};
 
@@ -605,7 +606,8 @@
           chatWsLog('OPEN → subscribe', room);
           socket.send(JSON.stringify({
             action: 'subscribe',
-            room: room
+            room: room,
+            token: roomToken
           }));
         };
 

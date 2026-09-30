@@ -1417,7 +1417,7 @@ class ListHelper
      */
     public static function linked_items($item)
     {
-        $linked_items = unserialize($item->linked_items);
+        $linked_items = unserialize($item->linked_items, ['allowed_classes' => false]);
 
         if (empty($linked_items)) {
             return collect([]);

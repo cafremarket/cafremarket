@@ -32,6 +32,10 @@ class ImageController extends Controller
         // Glide/Intervention can throw or return 500 for some real-world JPEGs/PDFs.
         $attachmentPrefix = Str::finish(attachment_storage_dir(), '/');
         if (Str::startsWith($path, $attachmentPrefix)) {
+            // Same access rule as attachment/{id}/view: this path must not bypass it.
+            $attachment = \App\Models\Attachment::where('path', $path)->first();
+            abort_unless($attachment && \App\Support\AttachmentAccess::allows($attachment), 404);
+
             return $this->rawStorageFileResponse($path);
         }
 
@@ -79,6 +83,7 @@ class ImageController extends Controller
         $headers = [
             'Accept-Ranges' => 'bytes',
             'Cache-Control' => 'public, max-age=86400',
+            'X-Content-Type-Options' => 'nosniff',
         ];
 
         if (isset($videoMimes[$ext])) {
@@ -88,6 +93,12 @@ class ImageController extends Controller
                 $mime = $this->disk->mimeType($path);
                 if (is_string($mime) && $mime !== '') {
                     $headers['Content-Type'] = $mime;
+                }
+
+                // Uploaded HTML/SVG/XML must never render as a page on this origin.
+                if (is_string($mime) && preg_match('#(html|svg|xml|javascript)#i', $mime)) {
+                    $headers['Content-Security-Policy'] = 'sandbox';
+                    $headers['Content-Disposition'] = 'attachment';
                 }
             } catch (\Throwable $e) {
                 // Keep disk default Content-Type.
@@ -104,10 +115,13 @@ class ImageController extends Controller
 
     private function getSvgImageResponse($path)
     {
+        // Uploaded SVGs can carry script; the sandbox CSP keeps them inert when opened directly.
         return response()->stream(function () use ($path) {
             echo $this->disk->read($path);
         }, 200, [
             'Content-Type' => 'image/svg+xml',
+            'Content-Security-Policy' => "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+            'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 
@@ -136,8 +150,20 @@ class ImageController extends Controller
         $fileSize = $request->input('fileSize') ?? $rawFile->getSize();
 
         // Linked model info
-        $model_name = $request->input('model_name');
+        $model_name = (string) $request->input('model_name');
         $model_id = $request->input('model_id');
+
+        // Both end up in a filesystem path and a model lookup.
+        if (! preg_match('/^[A-Za-z_]{1,64}$/', $model_name) || ! ctype_digit((string) $model_id)) {
+            return Response::json(['error' => trans('responses.model_not_defined')]);
+        }
+
+        $model = get_qualified_model($model_name);
+        $attachable = class_exists($model) ? (new $model)->find($model_id) : null;
+
+        if (! $attachable || ! method_exists($attachable, 'images') || ! $this->canManageImagesOf($attachable)) {
+            abort(403);
+        }
 
         // Chunk info
         $index = $request->input('chunkIndex');        // the current file chunk index
@@ -190,9 +216,6 @@ class ImageController extends Controller
                     File::deleteDirectory($tempDir);
                 }
 
-                $model = get_qualified_model($model_name);
-                $attachable = (new $model)->find($model_id);
-
                 $data = [
                     'path' => $targetFile,
                     'name' => $realName,
@@ -237,6 +260,8 @@ class ImageController extends Controller
      */
     public function delete(Request $request, Image $image)
     {
+        abort_unless($image->imageable && $this->canManageImagesOf($image->imageable), 403);
+
         $image->delete();
 
         if (Storage::exists($image->path)) {
@@ -264,10 +289,45 @@ class ImageController extends Controller
         $images = Image::find(array_keys($order));
 
         foreach ($images as $image) {
+            if (! $image->imageable || ! $this->canManageImagesOf($image->imageable)) {
+                abort(403);
+            }
+        }
+
+        foreach ($images as $image) {
             $image->update(['order' => $order[$image->id]]);
         }
 
         return Response::json(['success' => trans('response.success')]);
+    }
+
+    /**
+     * Platform staff manage any record's images; a merchant only their own shop, its records and
+     * their own user.
+     */
+    private function canManageImagesOf($record): bool
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->isFromPlatform()) {
+            return true;
+        }
+
+        $shopId = (int) $user->merchantId();
+
+        if ($record instanceof \App\Models\Shop) {
+            return $shopId > 0 && (int) $record->id === $shopId;
+        }
+
+        if ($record instanceof \App\Models\User) {
+            return (int) $record->id === (int) $user->id;
+        }
+
+        return $shopId > 0 && isset($record->shop_id) && (int) $record->shop_id === $shopId;
     }
 
     /**

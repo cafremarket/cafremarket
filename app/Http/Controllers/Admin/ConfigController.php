@@ -212,7 +212,9 @@ class ConfigController extends Controller
 
         $this->authorize('update', $config); // Check permission
 
-        $data = $request->all();
+        $data = $request->user()->isFromPlatform()
+            ? $request->all()
+            : $request->only(Shop::MERCHANT_EDITABLE);
 
         $slugChanges = app(ShopSlugChangeService::class);
         $newSlug = $request->input('slug');
@@ -285,7 +287,12 @@ class ConfigController extends Controller
 
         $this->authorize('update', $config); // Check permission
 
-        if ($config->update($request->all())) {
+        // shop_id is the primary key; verification state is decided by the platform.
+        $data = $request->user()->isFromPlatform()
+            ? $request->except('shop_id')
+            : $request->except(['shop_id', 'pending_verification', 'verification_rejection_reason', 'verification_rejected_at', 'verification_meta']);
+
+        if ($config->update($data)) {
             event(new ConfigUpdated($config->shop, Auth::user()));
 
             clearShopConfigCache($id); // Clear cached values
@@ -567,7 +574,16 @@ class ConfigController extends Controller
     {
         $shop_id = Auth::user()->merchantId();
 
-        Config::find($shop_id)->update($request->all());
+        Config::find($shop_id)->update($request->only([
+            'bank_name',
+            'ac_holder_name',
+            'ac_number',
+            'ac_type',
+            'ac_routing_number',
+            'ac_swift_bic_code',
+            'ac_iban',
+            'ac_bank_address',
+        ]));
 
         clearShopConfigCache($shop_id); // Clear cached values
 

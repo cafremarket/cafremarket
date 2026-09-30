@@ -14,7 +14,7 @@
 
       <div class="admin-mailbox-read__header">
         <div class="admin-mailbox-read__meta">
-          <h3 class="admin-mailbox-read__subject">{!! $message->subject !!}</h3>
+          <h3 class="admin-mailbox-read__subject">{{ $message->subject }}</h3>
           <div class="admin-mailbox-read__from">
             {{ $message->user_id ? trans('app.to') : trans('app.from') }}:
             <strong>{{ $message->customer->getName() }}</strong>
@@ -41,7 +41,7 @@
       </div>
 
       <div class="admin-mailbox-read__body">
-        {!! $message->message !!}
+        {!! clean_html($message->message) !!}
       </div>
   @include('admin.partials.ui.card_body_end')
 
@@ -65,7 +65,7 @@
               </div>
               <div class="col-md-8 nopadding">
                 <blockquote style="font-size: 1em;" class="{{ $reply->customer_id ? 'blockquote-reverse' : '' }}">
-                  {!! $reply->reply !!}
+                  {!! clean_html($reply->reply) !!}
                   @if (count($reply->attachments))
                     <small class="no-print">
                       {{ trans('app.attachments') . ': ' }}

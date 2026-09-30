@@ -85,7 +85,7 @@ class EloquentDeliveryBoy extends EloquentRepository implements BaseRepository, 
      */
     public function destroy($id)
     {
-        $deliveryBoy = $this->model->findOrFail($id);
+        $deliveryBoy = $this->scopedQuery(true)->findOrFail($id);
 
         $deliveryBoy->flushImages();
 
@@ -97,12 +97,12 @@ class EloquentDeliveryBoy extends EloquentRepository implements BaseRepository, 
      */
     public function massDestroy($ids)
     {
-        $deliveryBoys = $this->model->whereIn('id', $ids)->get();
+        $deliveryBoys = $this->scopedQuery(true)->whereIn($this->model->qualifyColumn('id'), $ids)->get();
 
         foreach ($deliveryBoys as $deliveryBoy) {
             $deliveryBoy->flushImages();
         }
 
-        return $this->model->whereIn('id', $ids)->delete();
+        return $this->scopedQuery(true)->whereIn($this->model->qualifyColumn('id'), $ids)->delete();
     }
 }

@@ -36,7 +36,7 @@ class EloquentCarrier extends EloquentRepository implements BaseRepository, Carr
 
     public function massDestroy($ids)
     {
-        $carriers = $this->model->withTrashed()->whereIn('id', $ids)->get();
+        $carriers = $this->scopedQuery(true)->withTrashed()->whereIn($this->model->qualifyColumn('id'), $ids)->get();
 
         foreach ($carriers as $carrier) {
             $carrier->flushImages();

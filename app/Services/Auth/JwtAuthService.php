@@ -74,6 +74,12 @@ class JwtAuthService
             return $this->resolveJwt($token, $guard);
         }
 
+        // A raw token equals the stored jti, which anyone holding a JWT can read from its payload:
+        // accepting it would skip the signature, expiry and guard checks. Only for old app builds.
+        if (! config('jwt.allow_legacy_tokens', false)) {
+            return null;
+        }
+
         return $this->resolveLegacyToken($token, $guard);
     }
 

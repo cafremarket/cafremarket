@@ -25,7 +25,7 @@ class EloquentShippingZone extends EloquentRepository implements BaseRepository,
 
     public function update(Request $request, $id)
     {
-        $zone = $this->model->findOrFail($id);
+        $zone = $this->scopedQuery(true)->findOrFail($id);
 
         if ($request->has('rest_of_the_world') && $request->input('rest_of_the_world') == 1) {
             $request->merge(['state_ids' => [], 'country_ids' => []]);
@@ -87,7 +87,7 @@ class EloquentShippingZone extends EloquentRepository implements BaseRepository,
 
     public function removeCountry(Request $request, $id, $country)
     {
-        $zone = $this->model->findOrFail($id);
+        $zone = $this->scopedQuery(true)->findOrFail($id);
 
         // Remove state ids of the country
         $old_states = $zone->state_ids;
@@ -109,6 +109,6 @@ class EloquentShippingZone extends EloquentRepository implements BaseRepository,
 
     public function destroy($id)
     {
-        return $this->model->findOrFail($id)->forceDelete();
+        return $this->scopedQuery(true)->findOrFail($id)->forceDelete();
     }
 }

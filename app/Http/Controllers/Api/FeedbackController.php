@@ -94,7 +94,8 @@ class FeedbackController extends Controller
             ], 200);
         }
 
-        $feedback = $order->deliveryBoy->feedbacks()->create($request->all());
+        // approved/spam are moderation flags, not customer input.
+        $feedback = $order->deliveryBoy->feedbacks()->create($request->only(['customer_id', 'rating', 'comment']));
 
         $order->delivery_boy_feedback_given($feedback->id);
 

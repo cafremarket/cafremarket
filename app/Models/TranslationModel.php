@@ -23,6 +23,6 @@ abstract class TranslationModel extends BaseModel
      */
     public function getTranslationAttribute($value)
     {
-        return unserialize(base64_decode($value));
+        return unserialize(base64_decode($value), ['allowed_classes' => false]);
     }
 }

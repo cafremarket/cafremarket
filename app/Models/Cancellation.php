@@ -103,7 +103,7 @@ class Cancellation extends BaseModel
 
     public function getItemsAttribute($value)
     {
-        return $value ? unserialize($value) : null;
+        return $value ? unserialize($value, ['allowed_classes' => false]) : null;
     }
 
     public function getItemsCountAttribute($value)

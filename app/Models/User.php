@@ -99,6 +99,12 @@ class User extends Authenticatable
     }
 
     /**
+     * Fields a user may change on their own profile. $fillable also holds role_id, shop_id and
+     * active for admin-side user management, so self-service updates must use only these.
+     */
+    public const SELF_EDITABLE = ['name', 'nice_name', 'email', 'dob', 'phone', 'description', 'sex'];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

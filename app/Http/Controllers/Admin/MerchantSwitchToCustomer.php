@@ -26,6 +26,12 @@ class MerchantSwitchToCustomer extends Controller
             return redirect()->back()->with('error', trans('messages.customer_acc_not_exist'));
         }
 
+        // A matching email alone is not proof: panel users can set their own email. Twin accounts
+        // are created with the same password hash, which nobody can copy without the password.
+        if (! $customer->password || ! hash_equals((string) $customer->password, (string) $user->password)) {
+            return redirect()->back()->with('error', trans('messages.customer_acc_not_exist'));
+        }
+
         try {
             Cache::forget('permissions_'.$user->id);              // Clear permissions cache for user
             Auth::guard('web')->logout();                           // Logout the vendor

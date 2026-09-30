@@ -487,8 +487,12 @@ class InventoryController extends Controller
                 $data = array_merge($dynamicInfo, $commonInfo);
                 $data['refund_days'] = variant_refund_days($request, $key);
 
-                // Insert the record
-                $inventory = Inventory::find($key);
+                // Only this listing or its own variants: ids come from the request.
+                $inventory = Inventory::where(fn ($q) => $q->whereKey($id)->orWhere('parent_id', $id))
+                    ->find($key);
+                if (! $inventory) {
+                    continue;
+                }
                 $inventory->update($data);
 
                 // Save Images

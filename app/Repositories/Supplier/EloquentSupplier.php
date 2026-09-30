@@ -60,7 +60,7 @@ class EloquentSupplier extends EloquentRepository implements BaseRepository, Sup
 
     public function massDestroy($ids)
     {
-        $suppliers = Supplier::withTrashed()->whereIn('id', $ids)->get();
+        $suppliers = $this->scopedQuery(true)->withTrashed()->whereIn($this->model->qualifyColumn('id'), $ids)->get();
 
         foreach ($suppliers as $supplier) {
             $supplier->flushAddresses();

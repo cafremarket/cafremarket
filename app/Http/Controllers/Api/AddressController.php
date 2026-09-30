@@ -51,7 +51,7 @@ class AddressController extends Controller
     public function store(CreateAddressRequest $request)
     {
         $customer = Auth::guard('api')->user();
-        $address = $customer->addresses()->create($request->all());
+        $address = $customer->addresses()->create($request->only(Address::SELF_EDITABLE));
         $this->finalizeCustomerAddress($address, $customer);
 
         return AddressResource::collection($customer->fresh()->addresses);
@@ -64,6 +64,8 @@ class AddressController extends Controller
      */
     public function edit(Address $address)
     {
+        abort_unless($address->addressable_type === Customer::class && (int) $address->addressable_id === (int) Auth::guard('api')->id(), 404);
+
         return (new AddressResource($address))->additional([
             'address_types' => ListHelper::address_types(),
             'countries' => ListHelper::countries(),
@@ -78,7 +80,7 @@ class AddressController extends Controller
      */
     public function update(SelfAddressUpdateRequest $request, Address $address)
     {
-        $address->update($request->all());
+        $address->update($request->only(Address::SELF_EDITABLE));
         $this->finalizeCustomerAddress($address->fresh(), Auth::guard('api')->user());
 
         return AddressResource::collection(Auth::guard('api')->user()->addresses);

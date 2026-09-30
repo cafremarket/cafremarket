@@ -21,7 +21,7 @@
       </div>
       <div class="sf-message-bubble__body">
         <h5>{{ $message->subject }}</h5>
-        {!! $message->message !!}
+        {!! clean_html($message->message) !!}
 
         @if ($message->hasAttachments())
           <div class="sf-message-bubble__attach">
@@ -46,7 +46,7 @@
               @lang('theme.me')
             @else
               @if ($msg->repliable->shop)
-                {!! $msg->repliable->shop->getName() !!}
+                {{ $msg->repliable->shop->getName() }}
               @elseif($msg->repliable->shop_id)
                 {{ trans('theme.store') }}
               @else
@@ -57,7 +57,7 @@
           {{ $msg->created_at->toDayDateTimeString() }}
         </div>
         <div class="sf-message-bubble__body">
-          {!! $msg->reply !!}
+          {!! clean_html($msg->reply) !!}
 
           @if ($msg->attachments->count())
             <div class="sf-message-bubble__attach">

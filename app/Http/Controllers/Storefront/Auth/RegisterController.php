@@ -197,7 +197,7 @@ class RegisterController extends Controller
         }
 
         if (is_incevio_package_loaded('zipcode')) {
-            $customer->addresses()->create($request->all());
+            $customer->addresses()->create($request->only(\App\Models\Address::SELF_EDITABLE));
         }
 
         if (is_incevio_package_loaded('smartForm') && isset($request['extra_info']['file_paths'])) {

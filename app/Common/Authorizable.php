@@ -162,11 +162,61 @@ trait Authorizable
      */
     public function callAction($method, $parameters)
     {
+        // Record level first: every route-bound record that belongs to a shop must belong to
+        // this merchant's shop (platform staff are not shop-bound).
+        if (! $this->ownsBoundRecords($parameters)) {
+            return Request::ajax() ? response()->json(['error' => trans('responses.unauthorized')], 403) : view('errors.forbidden');
+        }
+
         if (! $this->checkPermission('', $parameters)) {
             return view('errors.forbidden');
         }
 
         return parent::callAction($method, $parameters);
+    }
+
+    /**
+     * @param  array<int|string, mixed>  $parameters
+     */
+    private function ownsBoundRecords($parameters): bool
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->isFromPlatform()) {
+            return true;
+        }
+
+        $shopId = (int) $user->merchantId();
+
+        // Catalog records are shared between shops: any merchant may view or list against them,
+        // only the owning shop may change them.
+        $sharedCatalog = [\App\Models\Product::class, \App\Models\Manufacturer::class];
+        $readOnly = in_array($this->abilities[$this->currentRouteAction()] ?? null, ['view', 'add'], true);
+
+        foreach ((array) $parameters as $parameter) {
+            if (! $parameter instanceof \Illuminate\Database\Eloquent\Model) {
+                continue;
+            }
+
+            if ($readOnly && in_array($parameter::class, $sharedCatalog, true)) {
+                continue;
+            }
+
+            if ($parameter instanceof \App\Models\Shop) {
+                if ((int) $parameter->getKey() !== $shopId) {
+                    return false;
+                }
+
+                continue;
+            }
+
+            $attributes = $parameter->getAttributes();
+            if (array_key_exists('shop_id', $attributes) && $attributes['shop_id'] !== null && (int) $attributes['shop_id'] !== $shopId) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -179,7 +229,10 @@ trait Authorizable
      */
     private function checkPermission($slug = '', $model = null)
     {
-        if (Request::ajax()) {
+        // AJAX helper routes whose action maps to no permission stay open to panel users; mapped
+        // actions (show, edit, update, delete, ...) are checked like any other request, since the
+        // X-Requested-With header is set by the client.
+        if (Request::ajax() && ! array_key_exists($this->currentRouteAction(), $this->abilities)) {
             return true;
         }
 
@@ -206,6 +259,13 @@ trait Authorizable
         }
 
         return (new Authorize(Auth::user(), $slug, $model))->check();
+    }
+
+    private function currentRouteAction(): string
+    {
+        $parts = explode('.', (string) optional(Request::route())->getName());
+
+        return (string) end($parts);
     }
 
     /**

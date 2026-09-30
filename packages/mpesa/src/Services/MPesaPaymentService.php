@@ -128,6 +128,26 @@ class MPesaPaymentService extends PaymentService
     }
 
     /**
+     * Whether a query-transaction-status response says the payment completed. INS-0 alone only
+     * means the *query* succeeded; the transaction state is output_ResponseTransactionStatus.
+     */
+    public static function queryResponseIsPaid($json): bool
+    {
+        if (! $json) {
+            return false;
+        }
+
+        if (isset($json->output_ResponseCode)) {
+            $code = (string) $json->output_ResponseCode;
+            $status = strtolower((string) ($json->output_ResponseTransactionStatus ?? ''));
+
+            return ($code === 'INS-0' || $code === '0') && in_array($status, ['', 'completed'], true);
+        }
+
+        return (int) ($json->ResultCode ?? 1) === 0;
+    }
+
+    /**
      * Verify payment (query transaction status).
      */
     public function verifyPayment($transactionRef)

@@ -3,7 +3,9 @@
 namespace Incevio\Package\MPesa\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\PaymentIntent;
 use App\Services\Payments\CheckoutPaymentIntentService;
+use Incevio\Package\MPesa\Http\Requests\HttpRequest as MPesaHttpClient;
 use Incevio\Package\MPesa\Services\MPesaPaymentService;
 use Incevio\Package\Wallet\Models\Transaction;
 use Incevio\Package\Wallet\Jobs\SendNotificationJob;
@@ -41,30 +43,43 @@ class ResponseController extends Controller
 
         if ($isMozambique) {
             $refId = $response->output_TransactionID ?? $response->output_ThirdPartyConversationID ?? null;
-            $success = ($response->output_ResponseCode ?? '') === 'INS-0' || ($response->output_ResponseCode ?? '') === '0';
         } else {
             $refId = $response->CheckoutRequestID ?? null;
-            $success = (int) ($response->ResultCode ?? 1) === 0;
         }
 
+        // The callback is unsigned: its result code is ignored. Only a reference we issued is acted
+        // on, and only with the status M-Pesa itself reports for that reference.
         if ($refId) {
+            $refId = (string) $refId;
             $orders = Order::where('payment_ref_id', $refId)->get();
-            $code = isset($response->output_ResponseCode) ? (string) $response->output_ResponseCode : null;
+            $intent = PaymentIntent::where('gateway_ref', $refId)->where('payment_method', 'mpesa')->exists();
+            $deposit = Cache::has(MPesaPaymentService::CACHE_KEY_WALLET_DEPOSIT . $refId);
 
-            if ($orders->isNotEmpty()) {
-                foreach ($orders as $order) {
-                    if ($success) {
-                        $order->markAsPaid();
-                    } else {
-                        $order->payment_status = Order::PAYMENT_STATUS_PENDING;
-                        $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
-                        $order->save();
+            if ($orders->isEmpty() && ! $intent && ! $deposit) {
+                Log::warning('M-Pesa callback: unknown reference ignored', ['ref' => $refId, 'ip' => $request->ip()]);
+            } else {
+                $status = $this->verifiedStatus($refId, $orders->first());
+
+                if ($status === null) {
+                    Log::info('M-Pesa callback: gateway status not final, left for polling', ['ref' => $refId]);
+                } elseif ($orders->isNotEmpty()) {
+                    foreach ($orders as $order) {
+                        if ($status === 'paid') {
+                            if (! $order->isPaid()) {
+                                $order->markAsPaid();
+                            }
+                        } elseif (! $order->isPaid()) {
+                            $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+                            $order->order_status_id = Order::STATUS_PAYMENT_ERROR;
+                            $order->save();
+                        }
                     }
+                } elseif ($intent) {
+                    app(CheckoutPaymentIntentService::class)
+                        ->handleMpesaCallback($refId, $status === 'paid', $status === 'paid' ? 'INS-0' : 'INS-2006');
+                } elseif ($status === 'paid') {
+                    $this->creditWalletDeposit($refId);
                 }
-            } elseif (app(CheckoutPaymentIntentService::class)->handleMpesaCallback($refId, $success, $code)) {
-                // Checkout waiting on this payment: its orders are created now.
-            } elseif ($success) {
-                $this->creditWalletDeposit($refId);
             }
         }
 
@@ -74,6 +89,44 @@ class ResponseController extends Controller
             'ResultDesc' => 'Accept Service',
             'ThirdPartyTransID' => Str::random(13),
         ]);
+    }
+
+    /**
+     * M-Pesa's own answer for the reference: 'paid', 'failed', or null while undecided (or when the
+     * query is disabled or fails, so polling settles it instead of the unsigned callback).
+     */
+    private function verifiedStatus(string $refId, ?Order $order): ?string
+    {
+        if (! config('mpesa.query_enabled', true)) {
+            Log::warning('M-Pesa callback: status query disabled, callback not trusted', ['ref' => $refId]);
+
+            return null;
+        }
+
+        try {
+            $client = new MPesaHttpClient(request());
+            if ($order && $order->shop && vendor_get_paid_directly()) {
+                $client->setVendorAPIKey($order->shop);
+            }
+            $json = json_decode((string) $client->verifyTransaction($refId));
+        } catch (\Throwable $e) {
+            Log::warning('M-Pesa callback: status query failed', ['ref' => $refId, 'error' => $e->getMessage()]);
+
+            return null;
+        }
+
+        if (! $json) {
+            return null;
+        }
+
+        $code = $json->output_ResponseCode ?? null;
+        $txStatus = strtolower((string) ($json->output_ResponseTransactionStatus ?? ''));
+
+        if (($code === 'INS-0' || $code === '0') && in_array($txStatus, ['', 'completed'], true)) {
+            return 'paid';
+        }
+
+        return in_array($txStatus, ['cancelled', 'expired', 'failed'], true) ? 'failed' : null;
     }
 
     /**

@@ -29,7 +29,17 @@ class AccountController extends Controller
      */
     public function update(Request $request, Affiliate $affiliate)
     {
-        $affiliate->update($request->all());
+        // Always the logged-in affiliate: the {affiliate} route id is not trusted.
+        $affiliate = Auth::guard('affiliate')->user();
+        abort_unless($affiliate, 403);
+
+        $this->validate($request, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:affiliates,email,'.$affiliate->id,
+            'phone' => 'nullable|string|max:50',
+        ]);
+
+        $affiliate->update($request->only(['name', 'email', 'phone']));
 
         return redirect()->back()->with('success', trans('packages.affiliate.affiliate_updated'));
     }
@@ -63,7 +73,11 @@ class AccountController extends Controller
             'password_confirmation' => 'required|string|min:6',
         ]);
 
-        $affiliate->update($request->all());
+        // Always the logged-in affiliate: the {affiliate} route id is not trusted.
+        $affiliate = Auth::guard('affiliate')->user();
+        abort_unless($affiliate, 403);
+
+        $affiliate->update($request->only('password'));
 
         return back()->with('success', trans('packages.affiliate.notification_password_updated'));
     }

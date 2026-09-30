@@ -51,7 +51,8 @@ class AccountController extends Controller
             return ['warning' => trans('messages.demo_restriction')];
         }
 
-        $user->update($request->all());
+        // shop_id and status are set by the shop, not by the rider.
+        $user->update($request->only(['first_name', 'last_name', 'nice_name', 'email', 'phone_number', 'dob', 'sex']));
 
         if ($request->hasFile('avatar') || $request->has('delete_avatar')) {
             $user->deleteImage();

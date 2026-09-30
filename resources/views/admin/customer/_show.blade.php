@@ -87,7 +87,7 @@
               @if ($customer->description)
                 <tr>
                   <th>{{ trans('app.description') }}: </th>
-                  <td>{!! $customer->description !!}</td>
+                  <td>{!! clean_html($customer->description) !!}</td>
                 </tr>
               @endif
 

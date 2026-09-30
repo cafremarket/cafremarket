@@ -100,6 +100,7 @@
     var sending = false;
     var socket = null;
     var activeRoom = '';
+    var activeRoomToken = '';
 
     function qs(sel, el) { return (el || document).querySelector(sel); }
     function qsa(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
@@ -354,11 +355,12 @@
       return false;
     }
 
-    function subscribeRoom(room) {
+    function subscribeRoom(room, token) {
       activeRoom = room || '';
+      if (token !== undefined) activeRoomToken = token || '';
       if (!socket || socket.readyState !== 1 || !activeRoom) return;
       try {
-        socket.send(JSON.stringify({ action: 'subscribe', room: activeRoom }));
+        socket.send(JSON.stringify({ action: 'subscribe', room: activeRoom, token: activeRoomToken }));
       } catch (e) {}
     }
 
@@ -400,7 +402,7 @@
         bindComposer();
         bindQuoteUi();
         var head = qs('.cpc-thread__head');
-        if (head) subscribeRoom(head.getAttribute('data-ws-room') || '');
+        if (head) subscribeRoom(head.getAttribute('data-ws-room') || '', head.getAttribute('data-ws-token') || '');
       }).catch(function (err) {
         var title = (err && err._title) || 'Could not open chat';
         var detail = (err && err._detail) || (err && err.message) || 'Error';

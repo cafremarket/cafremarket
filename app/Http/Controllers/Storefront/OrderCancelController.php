@@ -38,13 +38,16 @@ class OrderCancelController extends Controller
             return redirect()->back()->with('error', trans('theme.cancel_items_disabled'));
         }
 
+        // Never status: approval is the vendor's/platform's decision.
+        $data = $request->only(['shop_id', 'customer_id', 'cancellation_reason_id', 'items', 'description', 'return_goods']);
+
         if ($order->cancellation) {
-            $order->cancellation->update($request->all());
+            $order->cancellation->update($data);
 
             // Reset previous status
             $order->cancellation->resetStatus();
         } else {
-            $order->cancellation()->create($request->all());
+            $order->cancellation()->create($data);
         }
 
         event(new OrderCancellationRequestCreated($order));

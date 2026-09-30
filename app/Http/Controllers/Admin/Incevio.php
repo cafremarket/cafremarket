@@ -42,6 +42,9 @@ class Incevio extends Controller
      */
     public function upgrade($option = 'migrate')
     {
+        // Runs migrations from a GET link: super admin only.
+        abort_unless(auth()->user() && auth()->user()->isSuperAdmin(), 403);
+
         // Flash the composer autoload file
         // Artisan::call('dump-autoload');
 
@@ -98,8 +101,11 @@ class Incevio extends Controller
      */
     public function command($option = 'job')
     {
+        abort_unless(auth()->user() && auth()->user()->isSuperAdmin(), 403);
+
         if ($option == 'job') {
-            Artisan::call('queue:work');
+            // Inside a web request: process what is queued and return, never run forever.
+            Artisan::call('queue:work', ['--stop-when-empty' => true, '--max-time' => 50]);
 
             return '<info>✔</info> '.Artisan::output().'<br/>';
         }

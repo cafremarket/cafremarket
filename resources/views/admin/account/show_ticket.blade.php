@@ -45,7 +45,7 @@
 
           @if ($ticket->message)
             <div class="well">
-              {!! $ticket->message !!}
+              {!! clean_html($ticket->message) !!}
             </div>
           @endif
 

@@ -167,7 +167,7 @@ class Warehouse extends BaseModel
         // unserialize() returns false (not null) on empty/invalid input — never
         // hand that back as "business_days", it breaks any consumer expecting
         // either an array or null (e.g. the mobile apps' JSON parsers).
-        $unserialized = @unserialize($business_days);
+        $unserialized = @unserialize($business_days, ['allowed_classes' => false]);
 
         return is_array($unserialized) ? $unserialized : null;
     }

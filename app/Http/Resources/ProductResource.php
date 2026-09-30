@@ -58,7 +58,7 @@ class ProductResource extends JsonResource
             'supplier_id' => optional($inventory)->supplier_id,
             'free_shipping' => (bool) optional($inventory)->free_shipping,
             'key_features' => optional($inventory)->key_features
-                ? unserialize($inventory->key_features)
+                ? unserialize($inventory->key_features, ['allowed_classes' => false])
                 : [],
             'shipping_type' => optional($inventory)->shipping_type,
             'shipping_fixed_rate' => optional($inventory)->shipping_fixed_rate,

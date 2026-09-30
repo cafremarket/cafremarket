@@ -25,7 +25,7 @@ class ItemResource extends JsonResource
             'condition' => $this->condition,
             'condition_note' => $this->condition_note,
             'description' => $this->description,
-            'key_features' => $this->key_features ? unserialize($this->key_features) : [],
+            'key_features' => $this->key_features ? unserialize($this->key_features, ['allowed_classes' => false]) : [],
             'total_stock' => $this->total_stock,
             'sold_quantity' => $this->sold_quantity,
             'stock_quantity' => $this->stock_quantity,

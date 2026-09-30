@@ -16,16 +16,31 @@ class CreateShopForMerchant
 
     protected $request;
 
+    protected $trusted;
+
+    /**
+     * Input a self-registering merchant may supply. Everything else (active, trial, billing,
+     * commission, verification flags, sender identity, remote image URLs) is platform-controlled.
+     */
+    private const SELF_SERVICE_FIELDS = [
+        'shop_name', 'name', 'description', 'legal_name', 'seller_type', 'nuit', 'slug',
+        'external_url', 'plan', 'extra_info', 'return_refund_policy', 'support_phone', 'phone',
+        'support_email', 'address_line_1', 'address_line_2', 'landmark', 'city', 'state_id',
+        'country_id', 'zip_code', 'latitude', 'longitude',
+    ];
+
     /**
      * Create a new job instance.
      *
-     * @param  string  $request
+     * @param  array  $request
+     * @param  bool  $trusted  true only for platform-admin callers (merchant create, CSV import)
      * @return void
      */
-    public function __construct(User $merchant, $request)
+    public function __construct(User $merchant, $request, bool $trusted = false)
     {
         $this->merchant = $merchant;
         $this->request = $request;
+        $this->trusted = $trusted;
     }
 
     /**
@@ -35,6 +50,10 @@ class CreateShopForMerchant
      */
     public function handle()
     {
+        if (! $this->trusted) {
+            $this->request = array_intersect_key((array) $this->request, array_flip(self::SELF_SERVICE_FIELDS));
+        }
+
         if (isset($this->request['active'])) {
             $status = $this->request['active'];
         } else {
@@ -53,8 +72,9 @@ class CreateShopForMerchant
                 }
 
                 if ($value instanceof UploadedFile) {
-                    $directory = 'shop_extra_info/'.$this->merchant->id.'/'.$this->request['shop_name'];
-                    $this->request['extra_info']['file_paths'][$key] = $value->storeAs($directory, $value->getClientOriginalName());
+                    // Never build storage paths from the shop name or the client file name.
+                    $directory = 'shop_extra_info/'.$this->merchant->id;
+                    $this->request['extra_info']['file_paths'][$key] = $value->store($directory);
                 }
             }
         }
@@ -87,8 +107,8 @@ class CreateShopForMerchant
         ]);
 
         // Remove commission_rate when the Dynamic Commission plugin is not present
-        if (isset($this->request['commission_rate']) && ! is_incevio_package_loaded('dynamicCommission')) {
-            unset($this->request['commission_rate']);
+        if (isset($shopData['commission_rate']) && ! is_incevio_package_loaded('dynamicCommission')) {
+            unset($shopData['commission_rate']);
         }
 
         $shop = Shop::create($shopData);

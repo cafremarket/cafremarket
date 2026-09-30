@@ -94,7 +94,7 @@
             </div> <!-- /.tab-pane -->
 
             <div class="tab-pane" id="refund_policy_tab">
-              {!! $shop->config->return_refund !!}
+              {!! clean_rich_html($shop->config->return_refund) !!}
             </div> <!-- /.tab-pane -->
 
             <div class="tab-pane" id="shop_reviews_tab">

@@ -172,7 +172,7 @@ class ChatConversation extends BaseModel
             ];
 
             ChatSocketPublisher::publish(
-                get_chat_room_name($this->shop_id.$this->customer_id),
+                chat_thread_room($this->shop_id, $this->customer_id),
                 'chat.read',
                 $payload
             );

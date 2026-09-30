@@ -73,7 +73,7 @@ class CustomerUploadController extends Controller
         $this->failed_list = [];
 
         foreach ($request->input('data') as $row) {
-            $data = unserialize($row);
+            $data = unserialize($row, ['allowed_classes' => false]);
 
             if (! is_array($data)) { // Invalid data
                 continue;
@@ -180,7 +180,7 @@ class CustomerUploadController extends Controller
     public function downloadFailedRows(Request $request)
     {
         foreach ($request->input('data') as $row) {
-            $data[] = unserialize($row);
+            $data[] = unserialize($row, ['allowed_classes' => false]);
         }
 
         return (new FastExcel(collect($data)))->download('failed_rows.xlsx');

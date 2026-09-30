@@ -147,7 +147,7 @@ class InventoryTranslationController extends Controller
 
         $records = $request->input('data');
         foreach ($records as $row) {
-            $data = unserialize($row);
+            $data = unserialize($row, ['allowed_classes' => false]);
 
             if ($this->dataHasMissingField($data)) {
                 $this->pushIntoFailed($data, trans('help.missing_required_data'));
@@ -259,7 +259,7 @@ class InventoryTranslationController extends Controller
     public function downloadFailedRows(Request $request)
     {
         foreach ($request->input('data') as $row) {
-            $data[] = unserialize($row);
+            $data[] = unserialize($row, ['allowed_classes' => false]);
         }
 
         return (new FastExcel(collect($data)))->download('failed_rows.xlsx');

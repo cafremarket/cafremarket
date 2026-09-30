@@ -457,7 +457,10 @@ class ProductController extends Controller
 
         $product->syncTaxesFromRows($request->input('tax_rows', []));
 
-        $inventoryId = Inventory::where('product_id', $id)->whereNull('parent_id')->pluck('id')->first();
+        // The editing shop's own listing of this (possibly shared) catalog product.
+        $inventoryId = Inventory::where('product_id', $id)->whereNull('parent_id')
+            ->when(! Auth::user()->isFromPlatform(), fn ($q) => $q->where('shop_id', Auth::user()->merchantId()))
+            ->pluck('id')->first();
 
         $product = $this->inventory->update($request, $inventoryId);
 
@@ -524,8 +527,12 @@ class ProductController extends Controller
                 $data = array_merge($dynamicInfo, $commonInfo);
                 $data['refund_days'] = variant_refund_days($request, $key);
 
-                // Insert the record
-                $inventory = Inventory::find($key);
+                // Only this listing or its own variants: ids come from the request.
+                $inventory = Inventory::where(fn ($q) => $q->whereKey($inventoryId)->orWhere('parent_id', $inventoryId))
+                    ->find($key);
+                if (! $inventory) {
+                    continue;
+                }
                 $inventory->update($data);
 
                 // Save Images

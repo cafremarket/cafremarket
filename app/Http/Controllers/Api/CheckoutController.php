@@ -574,6 +574,11 @@ class CheckoutController extends Controller
      */
     public function paymentOptions(Cart $cart)
     {
+        // Includes the cart owner's wallet balance.
+        if (! crosscheckCartOwnership(request(), $cart)) {
+            return response()->json(['message' => trans('api.auth_required')], 403);
+        }
+
         // Get the shop
         $shop = $cart->shop;
 

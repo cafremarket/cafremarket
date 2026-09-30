@@ -5,6 +5,9 @@ return [
 
     'algo' => env('JWT_ALGO', 'HS256'),
 
+    // Accept raw api_token values (pre-JWT app builds). Off: they bypass JWT expiry and guard binding.
+    'allow_legacy_tokens' => (bool) env('JWT_ALLOW_LEGACY_TOKENS', false),
+
     'ttl_minutes' => (int) env('JWT_TTL', 60 * 24 * 30),
 
     'remember_ttl_minutes' => (int) env('JWT_REMEMBER_TTL', 60 * 24 * 365),

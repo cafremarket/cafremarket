@@ -107,7 +107,8 @@ if (! function_exists('clean_rich_html')) {
             return e($plain);
         }
 
-        return $out;
+        // Styling cleanup above is not a security filter (it even decodes entities first).
+        return clean_html($out);
     }
 }
 
@@ -1085,19 +1086,110 @@ if (! function_exists('customerHasGroupPricing')) {
 if (! function_exists('highlightWords')) {
     function highlightWords($content = null, $words = null)
     {
-        if (is_null($content) || is_null($words)) {
+        // Callers print the result raw, and content/words are user input: escape both first.
+        if (is_null($content)) {
             return $content;
         }
 
-        if (is_array($words)) {
-            foreach ($words as $word) {
+        $content = e($content);
+
+        if (is_null($words) || $words === '') {
+            return $content;
+        }
+
+        foreach ((array) $words as $word) {
+            $word = e($word);
+            if ($word !== '') {
                 $content = str_ireplace($word, '<mark>'.$word.'</mark>', $content);
             }
-
-            return $content;
         }
 
-        return str_ireplace($words, '<mark>'.$words.'</mark>', $content);
+        return $content;
+    }
+}
+
+if (! function_exists('clean_html')) {
+    /**
+     * Rich text from users (messages, replies, descriptions, policies) for raw output: keeps basic
+     * formatting, links and images, drops scripts, event handlers, styles and non-http(s) URLs.
+     */
+    function clean_html($html): string
+    {
+        $html = (string) $html;
+        if (trim($html) === '') {
+            return '';
+        }
+
+        $allowed = [
+            'p' => [], 'br' => [], 'b' => [], 'strong' => [], 'i' => [], 'em' => [], 'u' => [], 's' => [],
+            'ul' => [], 'ol' => [], 'li' => [], 'blockquote' => [], 'h1' => [], 'h2' => [], 'h3' => [],
+            'h4' => [], 'h5' => [], 'h6' => [], 'span' => [], 'div' => [], 'hr' => [], 'pre' => [],
+            'code' => [], 'small' => [], 'sub' => [], 'sup' => [], 'table' => [], 'thead' => [],
+            'tbody' => [], 'tr' => [], 'td' => ['colspan', 'rowspan'], 'th' => ['colspan', 'rowspan'],
+            'a' => ['href', 'title', 'target'], 'img' => ['src', 'alt', 'title', 'width', 'height'],
+        ];
+        $urlAttributes = ['href', 'src'];
+
+        $doc = new \DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        $doc->loadHTML('<?xml encoding="UTF-8"><div id="clean-html-root">'.$html.'</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        $root = $doc->getElementById('clean-html-root');
+        if (! $root) {
+            return e(strip_tags($html));
+        }
+
+        $walk = function (\DOMNode $node) use (&$walk, $allowed, $urlAttributes) {
+            foreach (iterator_to_array($node->childNodes) as $child) {
+                if ($child instanceof \DOMElement) {
+                    $tag = strtolower($child->tagName);
+
+                    if (! array_key_exists($tag, $allowed)) {
+                        // Drop the element; keep its text unless it is executable/style content.
+                        if (! in_array($tag, ['script', 'style', 'iframe', 'object', 'embed', 'svg', 'math', 'template', 'noscript'], true)) {
+                            $walk($child);
+                            while ($child->firstChild) {
+                                $node->insertBefore($child->firstChild, $child);
+                            }
+                        }
+                        $node->removeChild($child);
+
+                        continue;
+                    }
+
+                    foreach (iterator_to_array($child->attributes) as $attr) {
+                        $name = strtolower($attr->name);
+                        $keep = in_array($name, $allowed[$tag], true);
+
+                        if ($keep && in_array($name, $urlAttributes, true)) {
+                            $keep = (bool) preg_match('#^(https?:)?//|^/(?!/)|^mailto:#i', trim($attr->value));
+                        }
+
+                        if (! $keep) {
+                            $child->removeAttribute($attr->name);
+                        }
+                    }
+
+                    if ($tag === 'a' && $child->hasAttribute('target')) {
+                        $child->setAttribute('rel', 'noopener noreferrer');
+                    }
+
+                    $walk($child);
+                } elseif ($child instanceof \DOMComment || $child instanceof \DOMProcessingInstruction) {
+                    $node->removeChild($child);
+                }
+            }
+        };
+        $walk($root);
+
+        $out = '';
+        foreach ($root->childNodes as $child) {
+            $out .= $doc->saveHTML($child);
+        }
+
+        return $out;
     }
 }
 
@@ -2749,7 +2841,7 @@ if (! function_exists('get_shipping_zone_of')) {
                 $worldwide = $zone;
             }
 
-            $countries = unserialize($zone->country_ids);
+            $countries = unserialize($zone->country_ids, ['allowed_classes' => false]);
 
             // Skip if the country is not found in this zone
             if (empty($countries) || ! in_array($country, $countries)) {
@@ -2761,7 +2853,7 @@ if (! function_exists('get_shipping_zone_of')) {
                 return $zone;
             }
 
-            $states = unserialize($zone->state_ids);
+            $states = unserialize($zone->state_ids, ['allowed_classes' => false]);
 
             // Skip if the country has states but the id not supplied
             if ($state_counts > 0 && is_null($state)) {
@@ -3641,7 +3733,7 @@ if (! function_exists('verifyRequiredDataForBulkUpload')) {
     function verifyRequiredDataForBulkUpload($data, $type = 'inventory')
     {
         if (! is_array($data)) {
-            $data = unserialize($data);
+            $data = unserialize($data, ['allowed_classes' => false]);
         }
 
         $required = array_flip(config('system.import_required.'.$type, []));
@@ -3791,6 +3883,36 @@ if (! function_exists('get_chat_room_name')) {
     }
 }
 
+if (! function_exists('chat_thread_room')) {
+    /**
+     * Room of one shop <-> customer thread. The separator matters: without it shop 1 + customer 23
+     * and shop 12 + customer 3 share a room.
+     */
+    function chat_thread_room($shopId, $customerId): string
+    {
+        return get_chat_room_name((int) $shopId.'-'.(int) $customerId);
+    }
+}
+
+if (! function_exists('chat_room_token')) {
+    /**
+     * Subscription token for chat-ws-node: "<expiry>.<hmac-sha256(room|expiry)>" with CHAT_WS_SECRET.
+     * Issue it only to a principal allowed to read the room. Empty when no secret is configured.
+     */
+    function chat_room_token(string $room, int $ttlSeconds = 43200): string
+    {
+        $secret = (string) config('chat_socket.secret');
+
+        if ($secret === '' || $room === '') {
+            return '';
+        }
+
+        $expires = time() + $ttlSeconds;
+
+        return $expires.'.'.hash_hmac('sha256', $room.'|'.$expires, $secret);
+    }
+}
+
 if (! function_exists('get_vendor_chat_room_id')) {
     /**
      * Return vendor_chat_room_id
@@ -3819,7 +3941,7 @@ if (! function_exists('get_private_chat_room_id')) {
      */
     function get_private_chat_room_id(\Incevio\Package\LiveChat\Models\ChatConversation $conversation)
     {
-        return get_chat_room_name($conversation->shop_id.$conversation->customer_id);
+        return chat_thread_room($conversation->shop_id, $conversation->customer_id);
     }
 }
 

@@ -250,6 +250,10 @@ class CartController extends Controller
      */
     public function update(ApiUpdateCartRequest $request, Cart $cart)
     {
+        if (! crosscheckCartOwnership($request, $cart)) {
+            return response()->json(['message' => trans('api.auth_required')], 403);
+        }
+
         if ($request->item && $request->quantity) {
             if (is_numeric($request->item)) {
                 $item = Inventory::findOrFail($request->item);
@@ -397,6 +401,10 @@ class CartController extends Controller
      */
     public function shipping(Request $request, Cart $cart)
     {
+        if (! crosscheckCartOwnership($request, $cart)) {
+            return response()->json(['message' => trans('api.auth_required')], 403);
+        }
+
         $destLat = $request->input('latitude') ?? $request->input('lat');
         $destLng = $request->input('longitude') ?? $request->input('lng');
 
@@ -414,6 +422,10 @@ class CartController extends Controller
      */
     public function validateCoupon(Request $request, Cart $cart)
     {
+        if (! crosscheckCartOwnership($request, $cart)) {
+            return response()->json(['message' => trans('api.auth_required')], 403);
+        }
+
         $coupon = Coupon::active()->where([
             ['code', $request->coupon],
             ['shop_id', $cart->shop_id],

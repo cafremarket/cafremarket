@@ -125,7 +125,7 @@ class InventoryUploadController extends Controller
     public function downloadFailedRows(Request $request)
     {
         foreach ($request->input('data') as $row) {
-            $data[] = unserialize($row);
+            $data[] = unserialize($row, ['allowed_classes' => false]);
         }
 
         $path = storage_path('failed_rows.xlsx');

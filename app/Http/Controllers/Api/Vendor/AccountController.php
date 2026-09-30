@@ -59,7 +59,7 @@ class AccountController extends Controller
         try {
             $user = User::where('id', Auth::guard('vendor_api')->user()->id)->first();
 
-            $user->update($request->all());
+            $user->update($request->only(User::SELF_EDITABLE));
 
             event(new UserUpdated(Auth::guard('vendor_api')->user()));
         } catch (Exception $e) {
@@ -106,7 +106,7 @@ class AccountController extends Controller
         try {
             $user = User::where('id', Auth::guard('vendor_api')->user()->id)->first();
 
-            $user->update($request->all());
+            $user->update($request->only('password'));
 
             event(new PasswordUpdated(Auth::guard('vendor_api')->user()));
         } catch (Exception $e) {

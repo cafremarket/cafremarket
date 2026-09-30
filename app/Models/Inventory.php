@@ -757,7 +757,7 @@ class Inventory extends Inspectable
         }
 
         if (is_string($value) && function_exists('is_serialized') && is_serialized($value)) {
-            $decoded = @unserialize($value);
+            $decoded = @unserialize($value, ['allowed_classes' => false]);
             $value = is_array($decoded) ? reset($decoded) : $decoded;
         }
 
@@ -770,7 +770,7 @@ class Inventory extends Inspectable
     {
         // Legacy rows may still hold a serialized multi-id payload.
         if (is_string($value) && function_exists('is_serialized') && is_serialized($value)) {
-            $decoded = @unserialize($value);
+            $decoded = @unserialize($value, ['allowed_classes' => false]);
             if (is_array($decoded)) {
                 $first = reset($decoded);
 

@@ -233,11 +233,8 @@ class EmolaOrderPaymentService
 
     private function findOrderByEmolaReference(string $transId, string $refNo): ?Order
     {
-        return Order::query()
-            ->where(function ($q) use ($transId, $refNo) {
-                $q->where('emola_trans_id', $transId)
-                    ->orWhere('emola_ref_no', $refNo);
-            })
+        // Match only our own transId; refNo is predictable (REF<order id>) and not proof of anything.
+        return Order::where('emola_trans_id', $transId)
             ->latest('id')
             ->first();
     }

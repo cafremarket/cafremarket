@@ -304,11 +304,8 @@ class CheckoutPaymentIntentService
      */
     public function handleEmolaCallback(array $data): bool
     {
-        $intent = PaymentIntent::query()
-            ->where(function ($q) use ($data) {
-                $q->where('emola_trans_id', $data['transId'])
-                    ->orWhere('emola_ref_no', $data['refNo']);
-            })
+        // Match only our own transId; refNo is predictable (PI<id>) and not proof of anything.
+        $intent = PaymentIntent::where('emola_trans_id', $data['transId'])
             ->latest('id')
             ->first();
 

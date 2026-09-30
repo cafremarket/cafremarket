@@ -304,7 +304,7 @@ class ChatController extends Controller
         $attachmentsPayload = livechat_socket_attachments_payload($msg_object);
         $conversation->refresh();
 
-        $room = get_chat_room_name($shop->id.$request->customer_id);
+        $room = chat_thread_room($shop->id, $request->customer_id);
         $clock = livechat_format_message_time($msg_object->created_at);
         $socketPayload = array_merge([
             'text' => $replyText,

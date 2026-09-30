@@ -3,9 +3,50 @@
 namespace App\Repositories;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 abstract class EloquentRepository
 {
+    /** Shared between shops: readable by every merchant, changeable only by the owning shop. */
+    protected const SHARED_CATALOG_MODELS = [\App\Models\Product::class, \App\Models\Manufacturer::class];
+
+    /** @var array<string, bool> */
+    private static $tablesWithShopId = [];
+
+    /**
+     * Base query limited to the merchant's own shop for merchant panel users (platform staff and
+     * non-panel callers are unrestricted). Without this, ids in URLs reach other shops' records.
+     */
+    protected function scopedQuery(bool $forWrite = false)
+    {
+        $query = $this->model->newQuery();
+        $user = Auth::user();
+
+        if (! $user instanceof \App\Models\User || $user->isFromPlatform()) {
+            return $query;
+        }
+
+        if (! $forWrite && in_array(get_class($this->model), self::SHARED_CATALOG_MODELS, true)) {
+            return $query;
+        }
+
+        $table = $this->model->getTable();
+        self::$tablesWithShopId[$table] ??= Schema::hasColumn($table, 'shop_id');
+
+        if (self::$tablesWithShopId[$table]) {
+            $column = $this->model->qualifyColumn('shop_id');
+            $shopId = (int) $user->merchantId();
+
+            // Platform-wide rows (shop_id NULL) are readable, never writable, by merchants.
+            $forWrite
+                ? $query->where($column, $shopId)
+                : $query->where(fn ($q) => $q->where($column, $shopId)->orWhereNull($column));
+        }
+
+        return $query;
+    }
+
     public function all()
     {
         return $this->model->get();
@@ -18,12 +59,12 @@ abstract class EloquentRepository
 
     public function find($id)
     {
-        return $this->model->findOrFail($id);
+        return $this->scopedQuery()->findOrFail($id);
     }
 
     public function findTrash($id)
     {
-        return $this->model->onlyTrashed()->findOrFail($id);
+        return $this->scopedQuery()->onlyTrashed()->findOrFail($id);
     }
 
     public function findBy($filed, $value)
@@ -57,7 +98,7 @@ abstract class EloquentRepository
 
     public function update(Request $request, $model)
     {
-        $model = is_numeric($model) ? $this->model->findOrFail($model) : $model;
+        $model = is_numeric($model) ? $this->scopedQuery(true)->findOrFail($model) : $model;
 
         if ($request->hasFile('digital_file')) {
             $model->flushAttachments();
@@ -93,17 +134,17 @@ abstract class EloquentRepository
 
     public function trash($id)
     {
-        return $this->model->findOrFail($id)->delete();
+        return $this->scopedQuery(true)->findOrFail($id)->delete();
     }
 
     public function restore($id)
     {
-        return $this->model->onlyTrashed()->findOrFail($id)->restore();
+        return $this->scopedQuery(true)->onlyTrashed()->findOrFail($id)->restore();
     }
 
     public function destroy($id)
     {
-        $model = $this->model->onlyTrashed()->findOrFail($id);
+        $model = $this->scopedQuery(true)->onlyTrashed()->findOrFail($id);
 
         // $model->flushImages();
 
@@ -112,22 +153,23 @@ abstract class EloquentRepository
 
     public function massTrash($ids)
     {
-        return $this->model->whereIn('id', $ids)->delete();
+        return $this->scopedQuery(true)->whereIn($this->model->qualifyColumn('id'), $ids)->delete();
     }
 
     public function massRestore($ids)
     {
-        return $this->model->onlyTrashed()->whereIn('id', $ids)->restore();
+        return $this->scopedQuery(true)->onlyTrashed()->whereIn($this->model->qualifyColumn('id'), $ids)->restore();
     }
 
     public function massDestroy($ids)
     {
-        return $this->model->withTrashed()->whereIn('id', $ids)->forceDelete();
+        return $this->scopedQuery(true)->withTrashed()->whereIn($this->model->qualifyColumn('id'), $ids)->forceDelete();
     }
 
     public function emptyTrash()
     {
-        return $this->model->onlyTrashed()->forceDelete();
+        // Scoped: a merchant empties only their own shop's trash.
+        return $this->scopedQuery(true)->onlyTrashed()->forceDelete();
     }
 
     public function saveAdrress(array $address, $model)

@@ -78,9 +78,9 @@ class OrderController extends Controller
      */
     public function markAsPaid(MyDeliveryRequest $request, Order $order)
     {
-        // Bank transfer proofs are verified by admin only — a rider collects
-        // cash/COD, never a bank transfer, so never let this bypass that check.
-        if (optional($order->paymentMethod)->code === 'wire') {
+        // A rider only ever collects cash on delivery. Online payments (M-Pesa, eMola, PayPal,
+        // wallet) are confirmed by the gateway and bank transfers by an admin, never by a rider.
+        if (optional($order->paymentMethod)->code !== 'cod') {
             return $this->error(trans('api.something_went_wrong'));
         }
 

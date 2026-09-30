@@ -29,6 +29,14 @@ class Address extends BaseModel
      *
      * @var array
      */
+    /**
+     * Fields an owner may set on their own address; addressable_* is set by the relationship only.
+     */
+    public const SELF_EDITABLE = [
+        'address_title', 'address_type', 'address_line_1', 'address_line_2', 'landmark', 'city',
+        'state_id', 'country_id', 'zip_code', 'phone', 'latitude', 'longitude',
+    ];
+
     protected $fillable = [
         'address_title',
         'address_type',

@@ -401,7 +401,7 @@ class Config extends BaseModel
      */
     public function getDefaultPackagingIdsAttribute($value)
     {
-        return unserialize($value);
+        return unserialize($value, ['allowed_classes' => false]);
     }
 
     /**

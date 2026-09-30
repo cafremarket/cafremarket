@@ -21,7 +21,10 @@ class SyncJwtToSession
                 continue;
             }
 
-            $user = $jwt->resolveFromRequest($request, $guard);
+            // Cookie only: a token from the URL or a header would let a link log the browser into
+            // someone else's account (and leak tokens into logs and Referer headers).
+            $cookie = config("jwt.guards.{$guard}.cookie");
+            $user = $cookie ? $jwt->resolve($request->cookie($cookie), $guard) : null;
 
             if ($user) {
                 Auth::guard($guard)->login($user);

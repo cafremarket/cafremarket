@@ -17,6 +17,8 @@ class AttachmentController extends Controller
      */
     public function download(Request $request, Attachment $attachment)
     {
+        abort_unless(\App\Support\AttachmentAccess::allows($attachment), 404);
+
         if (Storage::exists($attachment->path)) {
             return Storage::download($attachment->path, $attachment->name);
         }

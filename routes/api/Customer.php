@@ -19,7 +19,6 @@ use App\Http\Controllers\Api\NearbyShopController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\PaymentIntentController;
-use App\Http\Controllers\Api\PaymentCredentialController;
 use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Support\Facades\Route;
 use Incevio\Package\LiveChat\Http\Controllers\Api\ConversationController;
@@ -27,10 +26,8 @@ use Incevio\Package\OtpLogin\Http\Controllers\Api\PhoneVerificationController;
 use Incevio\Package\MPesa\Http\Controllers\PaymentController as MpesaPaymentController;
 
 Route::middleware('customerApp')->group(function () {
-    // Get Payment API Credentials
-    Route::post('payment/{payment_method}/credential', [
-        PaymentCredentialController::class, 'credential',
-    ]);
+    // payment/{method}/credential removed: it returned raw gateway secrets (PayPal secret, M-Pesa API
+    // key, eMola password) behind only a static key shipped in the app, and no app uses it.
 
     // Homepage
     Route::get('sliders', [HomeController::class, 'sliders']);
@@ -90,8 +87,8 @@ Route::middleware('customerApp')->group(function () {
     Route::get('recently-added-products', [ListingController::class, 'recentlyAdded']);
 
     // Location lookup (public — same geocode as web; save stays auth-only)
-    Route::get('customer/location/search', [CustomerLocationController::class, 'searchAddress']);
-    Route::post('customer/location/reverse-geocode', [CustomerLocationController::class, 'reverseGeocode']);
+    Route::get('customer/location/search', [CustomerLocationController::class, 'searchAddress'])->middleware('throttle:30,1');
+    Route::post('customer/location/reverse-geocode', [CustomerLocationController::class, 'reverseGeocode'])->middleware('throttle:30,1');
 
     // Deals
     Route::prefix('deals')->group(function () {
@@ -109,7 +106,6 @@ Route::middleware('customerApp')->group(function () {
     Route::post('cart/checkout_all', [CheckoutController::class, 'checkoutAll'])->middleware(['auth:api', 'verifiedEmail:api']);
     Route::post('cart/{cart}/checkout', [CheckoutController::class, 'checkout'])->middleware(['auth:api', 'verifiedEmail:api']);
     Route::get('cart/{cart}/paymentOptions', [CheckoutController::class, 'paymentOptions']);
-    Route::get('cart/{cart}/paymentOptions/debug', [CheckoutController::class, 'paymentOptionsDebug']);
 
     // M-Pesa order status (polling – same as Laravel web mpesa/{order}/status)
     Route::get('mpesa/order/{order}/status', [MpesaPaymentController::class, 'paymentStatus']);
@@ -147,6 +143,7 @@ Route::middleware('customerApp')->group(function () {
         Route::delete('account/delete', [AccountController::class, 'delete']);
         Route::put('password/update', [AccountController::class, 'password_update']);
         Route::get('conversations', [ConversationController::class, 'conversations']);
+        Route::get('chat/socket-room', [\App\Http\Controllers\Api\ChatSocketController::class, 'customerRoom']);
 
         // Address
         Route::get('addresses', [AddressController::class, 'index']);

@@ -29,7 +29,7 @@
         </a> --}}
 
           <div class="header-information show-hide-content mb-0 less">
-            {!! $brand->description !!}
+            {!! clean_rich_html($brand->description) !!}
           </div>
           <a href="javascript::void(0)" class="small show-hide-content-btn">
             {{ trans('theme.show_more') }} <i class="fa fa-angle-down"></i>

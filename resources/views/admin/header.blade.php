@@ -89,7 +89,7 @@
                         <img src="{{ get_avatar_src($message->customer, 'tiny') }}" class="img-circle" alt="">
                       </div>
                       <div class="topbar-dropdown-body">
-                        <h4>{!! $message->subject !!} <small>{{ $message->created_at->diffForHumans() }}</small></h4>
+                        <h4>{{ $message->subject }} <small>{{ $message->created_at->diffForHumans() }}</small></h4>
                         <p>{{ strip_tags(Str::limit($message->message, 80)) }}</p>
                       </div>
                     </a>

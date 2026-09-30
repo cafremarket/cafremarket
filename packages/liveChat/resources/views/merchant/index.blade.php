@@ -3,7 +3,7 @@
 @section('page_title', trans('nav.chats') ?? 'Chat')
 
 @section('content')
-  <div class="mpc" id="chatbox" data-ws-room="{{ get_vendor_chat_room_id() }}"
+  <div class="mpc" id="chatbox" data-ws-room="{{ get_vendor_chat_room_id() }}" data-ws-token="{{ chat_room_token(get_vendor_chat_room_id()) }}"
        data-ws-url=""
        data-csrf="{{ csrf_token() }}">
     <div class="mpc__shell">
@@ -89,6 +89,7 @@
 
   var csrf = root.getAttribute('data-csrf') || (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
   var room = root.getAttribute('data-ws-room') || '';
+  var roomToken = root.getAttribute('data-ws-token') || '';
   var sending = false;
   var socket = null;
 
@@ -1232,7 +1233,7 @@
     function connect() {
       try { socket = new WebSocket(url); } catch (e) { return; }
       socket.onopen = function () {
-        socket.send(JSON.stringify({ action: 'subscribe', room: room }));
+        socket.send(JSON.stringify({ action: 'subscribe', room: room, token: roomToken }));
       };
       socket.onclose = function () { setTimeout(connect, 4000); };
       socket.onmessage = function (ev) {

@@ -74,7 +74,7 @@ class ProcessMerchantCsvBulkUpload implements ShouldQueue
         Session::forget('failed_rows'); // Clear failed_rows cache
 
         foreach ($this->csv_data as $row) {
-            $data = unserialize($row);
+            $data = unserialize($row, ['allowed_classes' => false]);
 
             // Invalid data
             if (! is_array($data)) {
@@ -126,9 +126,9 @@ class ProcessMerchantCsvBulkUpload implements ShouldQueue
 
                 // Dispatching Shop create job
                 if (config('queue.default') == 'sync') {
-                    CreateShopForMerchant::dispatchSync($merchant, $data);
+                    CreateShopForMerchant::dispatchSync($merchant, $data, true);
                 } else {
-                    CreateShopForMerchant::dispatch($merchant, $data);
+                    CreateShopForMerchant::dispatch($merchant, $data, true);
                 }
 
                 // Create subscription when enabled

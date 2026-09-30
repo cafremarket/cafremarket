@@ -290,7 +290,7 @@ class AccountController extends Controller
                 ->with('warning', trans('messages.demo_restriction'));
         }
 
-        Auth::guard('customer')->user()->update($request->all());
+        Auth::guard('customer')->user()->update($request->only('password'));
 
         // event(new PasswordUpdated(Auth::user()));
 
@@ -397,7 +397,7 @@ class AccountController extends Controller
     public function save_address(CreateAddressRequest $request)
     {
         $customer = Auth::guard('customer')->user();
-        $address = $customer->addresses()->create($request->all());
+        $address = $customer->addresses()->create($request->only(Address::SELF_EDITABLE));
 
         $this->finalizeCustomerAddress($address, $customer);
 
@@ -430,7 +430,7 @@ class AccountController extends Controller
      */
     public function address_update(SelfAddressUpdateRequest $request, Address $address)
     {
-        $address->update($request->all());
+        $address->update($request->only(Address::SELF_EDITABLE));
 
         $this->finalizeCustomerAddress($address->fresh(), Auth::guard('customer')->user());
 
@@ -511,6 +511,12 @@ class AccountController extends Controller
         $merchant = Merchant::where('email', $user->email)->first();
 
         if (! $merchant) {
+            return redirect()->back()->with('error', trans('theme.notify.merchant_acc_not_exist'));
+        }
+
+        // A matching email alone is not proof: customers can set their own email. Twin accounts are
+        // created with the same password hash, which nobody can copy without knowing the password.
+        if (! $merchant->password || ! hash_equals((string) $merchant->password, (string) $user->password)) {
             return redirect()->back()->with('error', trans('theme.notify.merchant_acc_not_exist'));
         }
 

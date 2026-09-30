@@ -99,6 +99,15 @@ class Customer extends CustomerWallet
     }
 
     /**
+     * Fields a customer may change on their own profile. $fillable also holds account status,
+     * approval, verification and buyer-group fields that only the platform may set.
+     */
+    public const SELF_EDITABLE = [
+        'name', 'nice_name', 'email', 'dob', 'sex', 'phone', 'description', 'accepts_marketing',
+        'fcm_token', 'preferred_latitude', 'preferred_longitude', 'preferred_address_text',
+    ];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -360,7 +369,7 @@ class Customer extends CustomerWallet
 
     public function getExtraInfoAttribute($value)
     {
-        return unserialize($value);
+        return unserialize($value, ['allowed_classes' => false]);
     }
 
     /**

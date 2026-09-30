@@ -17,7 +17,6 @@ class VerifyCsrfToken extends Middleware
         'api/*',
         'customer/login/apple/callback',
         'ebay/callbacks/*',
-        'paymentFailed/*',
         'payment/response/callback',
         'socialite/customer/apple/callback',
         '/build-twiml/*',

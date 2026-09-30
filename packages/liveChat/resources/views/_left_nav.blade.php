@@ -16,7 +16,7 @@
           <div class="mp-chat-list__meta sideBar-main">
             <div class="mp-chat-list__row">
               <span class="name-meta {{ $conversation->isUnread() ? 'strong' : '' }}">
-                {!! $conversation->customer->getName() !!}
+                {{ $conversation->customer->getName() }}
               </span>
               <span class="time-meta">{{ $conversation->updated_at->diffForHumans() }}</span>
             </div>
@@ -33,7 +33,7 @@
                       $preview = $lastMessage;
                   }
                 @endphp
-                {!! \Illuminate\Support\Str::limit($preview, 80) !!}
+                {{ \Illuminate\Support\Str::limit(strip_tags($preview), 80) }}
               </p>
               <span class="mp-chat-list__badge label label-primary flat {{ !$conversation->isUnread() ? 'hide' : '' }}">{{ $conversation->statusName(true) }}</span>
             </div>

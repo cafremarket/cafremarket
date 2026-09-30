@@ -37,7 +37,7 @@ class CustomerResource extends JsonResource
         if (is_incevio_package_loaded('buyerGroup')) {
             $details = $this->buyer_group_application_details;
             if (is_string($details) && $details !== '') {
-                $unserialized = @unserialize($details);
+                $unserialized = @unserialize($details, ['allowed_classes' => false]);
                 $details = $unserialized === false ? null : $unserialized;
             }
 

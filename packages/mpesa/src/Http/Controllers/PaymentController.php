@@ -14,6 +14,8 @@ class PaymentController extends Controller
 {
     public function showConfirmationForm(Request $request, Order $order)
     {
+        $this->abortUnlessViewer($order);
+
         if ($order->isPaid()) {
             return redirect()->to(url('mpesa/' . $order->id . '/complete'))
                 ->with('success', trans('theme.notify.order_placed'));
@@ -44,9 +46,7 @@ class PaymentController extends Controller
                         if ($response !== null) {
                             $json = json_decode($response);
                             if ($json) {
-                                $success = isset($json->output_ResponseCode)
-                                    ? (($json->output_ResponseCode === 'INS-0') || ($json->output_ResponseCode === '0'))
-                                    : ((int) ($json->ResultCode ?? 1) === 0);
+                                $success = MPesaPaymentService::queryResponseIsPaid($json);
                                 if ($success) {
                                     // Mark every order that shares this M-Pesa payment reference (checkout-all).
                                     Order::where('payment_ref_id', $order->payment_ref_id)->get()
@@ -83,6 +83,8 @@ class PaymentController extends Controller
      */
     public function showComplete(Request $request, Order $order)
     {
+        $this->abortUnlessViewer($order);
+
         if ($order->isPaid()) {
             return view('theme::order_complete', compact('order'))
                 ->with('success', trans('theme.notify.order_placed'));
@@ -96,6 +98,8 @@ class PaymentController extends Controller
      */
     public function confirm(Request $request, Order $order)
     {
+        $this->abortUnlessViewer($order);
+
         $order->refresh();
         if ($order->isPaid()) {
             return view('theme::order_complete', compact('order'))
@@ -112,14 +116,12 @@ class PaymentController extends Controller
         $json = $response ? json_decode($response) : null;
 
         if (! $json) {
-            return redirect()->route('payment.failed', $order)
+            return redirect()->to(\Illuminate\Support\Facades\URL::temporarySignedRoute('payment.failed', now()->addMinutes(15), ['order' => $order->id]))
                 ->withErrors(['payment_error' => trans('mpesa::lang.payment_not_updated')]);
         }
 
         // Mozambique: output_ResponseCode INS-0 or 0 = success
-        $success = isset($json->output_ResponseCode)
-            ? (($json->output_ResponseCode === 'INS-0') || ($json->output_ResponseCode === '0'))
-            : ((int) ($json->ResultCode ?? 1) === 0);
+        $success = MPesaPaymentService::queryResponseIsPaid($json);
 
         if ($success) {
             $order->markAsPaid();
@@ -131,7 +133,17 @@ class PaymentController extends Controller
 
         Log::info('M-Pesa verify response: ' . $response);
 
-        return redirect()->route('payment.failed', $order)
+        return redirect()->to(\Illuminate\Support\Facades\URL::temporarySignedRoute('payment.failed', now()->addMinutes(15), ['order' => $order->id]))
             ->withErrors(['payment_error' => trans('mpesa::lang.payment_not_updated')]);
+    }
+
+    /**
+     * These pages show order details: only the ordering customer (guest orders have none).
+     */
+    private function abortUnlessViewer(Order $order): void
+    {
+        if ($order->customer_id) {
+            abort_unless((int) $order->customer_id === (int) auth('customer')->id(), 404);
+        }
     }
 }

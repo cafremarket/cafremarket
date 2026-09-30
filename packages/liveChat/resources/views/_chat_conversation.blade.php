@@ -3,7 +3,7 @@
     <img src="{{ get_avatar_src($chat->customer, 'mini') }}" class="mp-chat-thread__avatar img-circle" alt="{{ trans('app.avatar') }}">
     <div class="heading-name">
       @if (Gate::allows('view', $chat->customer) && ! livechat_is_merchant_panel())
-        <a href="javascript:void(0)" data-link="{{ route('admin.admin.customer.show', $chat->customer_id) }}" class="ajax-modal-btn heading-name-meta">{!! $chat->customer->getName() !!}</a>
+        <a href="javascript:void(0)" data-link="{{ route('admin.admin.customer.show', $chat->customer_id) }}" class="ajax-modal-btn heading-name-meta">{{ $chat->customer->getName() }}</a>
       @else
         <span class="heading-name-meta">{{ $chat->customer->getName() }}</span>
       @endif

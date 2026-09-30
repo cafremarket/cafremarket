@@ -74,7 +74,7 @@ class MerchantController extends Controller
             $merchant = $this->merchant->store($request);
 
             // Dispatching Shop create job
-            CreateShopForMerchant::dispatch($merchant, $request->all());
+            CreateShopForMerchant::dispatch($merchant, $request->all(), true);
         } catch (\Exception $e) {
             // Rollback the transaction and log the error
             DB::rollback();

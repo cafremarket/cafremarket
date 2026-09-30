@@ -484,31 +484,16 @@ if (! function_exists('get_visitor_IP')) {
      */
     function get_visitor_IP()
     {
-        // Get real visitor IP behind CloudFlare network
-        if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-            $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_CF_CONNECTING_IP'];
-            $_SERVER['HTTP_CLIENT_IP'] = $_SERVER['HTTP_CF_CONNECTING_IP'];
+        $request = request();
+
+        // Client-supplied headers name the visitor only when a trusted proxy (TrustProxies) sent
+        // the request; otherwise anyone could pick their own IP for rate limits and logs.
+        $cf = $request->header('CF-Connecting-IP');
+        if ($cf && filter_var($cf, FILTER_VALIDATE_IP) && $request->isFromTrustedProxy()) {
+            return $cf;
         }
 
-        // Sometimes the `HTTP_CLIENT_IP` can be used by proxy servers
-        $ip = @$_SERVER['HTTP_CLIENT_IP'];
-        if (filter_var($ip, FILTER_VALIDATE_IP)) {
-            return $ip;
-        }
-
-        // Sometimes the `HTTP_X_FORWARDED_FOR` can contain more than IPs
-        $forward_ips = @$_SERVER['HTTP_X_FORWARDED_FOR'];
-        if ($forward_ips) {
-            $all_ips = explode(',', $forward_ips);
-
-            foreach ($all_ips as $ip) {
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                    return $ip;
-                }
-            }
-        }
-
-        return $_SERVER['REMOTE_ADDR'];
+        return $request->ip();
     }
 }
 
@@ -577,9 +562,8 @@ if (! function_exists('crosscheckCartOwnership')) {
             return $bool || ($cart->customer_id == Auth::guard('customer')->user()->id);
         } elseif (Auth::guard('api')->check()) {
             return $bool || ($cart->customer_id == Auth::guard('api')->user()->id);
-        } elseif ($request->customer_id) {
-            return $bool || ($cart->customer_id == $request->customer_id);
         }
+        // Never trust a customer_id sent by the client: it would unlock that customer's carts.
 
         return $bool;
     }

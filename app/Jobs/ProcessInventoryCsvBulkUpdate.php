@@ -70,7 +70,7 @@ class ProcessInventoryCsvBulkUpdate implements ShouldQueue
     public function handle()
     {
         foreach ($this->csv_data as $row) {
-            $data = unserialize($row);
+            $data = unserialize($row, ['allowed_classes' => false]);
 
             // Invalid data
             if (! is_array($data)) {

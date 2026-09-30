@@ -368,6 +368,6 @@ class Message extends BaseModel
 
     public function getExtraInfoAttribute($value)
     {
-        return unserialize($value);
+        return unserialize($value, ['allowed_classes' => false]);
     }
 }

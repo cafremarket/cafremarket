@@ -173,6 +173,9 @@ class OrderController extends Controller
      */
     public function track(Request $request, Order $order, DistanceService $distanceService)
     {
+        // Rider live location and the delivery coordinates: only for the ordering customer.
+        abort_unless((int) $order->customer_id === (int) Auth::guard('api')->id(), 404);
+
         $payload = ['tracking_url' => $order->getTrackingUrl()];
 
         if ($order->canTrack()) {
@@ -267,6 +270,8 @@ class OrderController extends Controller
      */
     public function invoice(Order $order)
     {
+        abort_unless((int) $order->customer_id === (int) Auth::guard('api')->id(), 404);
+
         return $order->invoice('download');
     }
 

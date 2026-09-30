@@ -132,7 +132,7 @@
                       @forelse ($checkoutShop->warehouses()->active()->get() as $warehouse)
                         <div class="col-sm-12 col-md-6 textClass">
                           <div class="address-list-item">
-                            <i class="fa fa-home"></i><strong> {!! $warehouse->name !!} </strong><br>
+                            <i class="fa fa-home"></i><strong> {{ $warehouse->name }} </strong><br>
                             <i class="fa fa-map-marker"></i> <em>{{ trans('app.address') }} :</em>
                             {!! optional($warehouse->pickupAddress())->toHtml(', ', false) !!}
                             @if ($warehouse->pickup_instruction)

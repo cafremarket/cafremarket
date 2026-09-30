@@ -49,7 +49,8 @@ class ConfigPaypalExpressController extends Controller
     {
         $paypalExpress = ConfigPaypalExpress::firstOrCreate(['shop_id' => Auth::user()->merchantId()]);
 
-        $paypalExpress->update($request->all());
+        // Never shop_id: it is the primary key, and re-keying would attach these credentials to another shop.
+        $paypalExpress->update($request->only(['account', 'client_id', 'secret', 'sandbox']));
 
         return back()->with('success', trans('messages.created', ['model' => $this->model_name]));
     }

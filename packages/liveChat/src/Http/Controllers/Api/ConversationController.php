@@ -237,7 +237,7 @@ class ConversationController extends Controller
             ], livechat_quote_socket_payload($quotedParent));
 
             ChatSocketPublisher::publish(
-                get_chat_room_name($shop->id.$request->customer_id),
+                chat_thread_room($shop->id, $request->customer_id),
                 'chat.message',
                 $socketPayload
             );
@@ -403,7 +403,7 @@ class ConversationController extends Controller
         ], livechat_quote_socket_payload($quotedParent));
 
         ChatSocketPublisher::publish(
-            get_chat_room_name($chat->shop_id.$chat->customer_id),
+            chat_thread_room($chat->shop_id, $chat->customer_id),
             'chat.message',
             $payload
         );

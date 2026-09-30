@@ -32,7 +32,8 @@ class ContactUsController extends Controller
             $request = store_files_from_request_for_message($request);
         }
 
-        $message = Message::create($request->all());
+        // A public form: never let it pick the shop, customer, user, order or status.
+        $message = Message::create($request->only(['name', 'email', 'phone', 'subject', 'message', 'extra_info']));
 
         try {
             SendContactFromMessageToAdmin::dispatch($message);

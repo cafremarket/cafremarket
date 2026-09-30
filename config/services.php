@@ -60,6 +60,8 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('APP_URL').'/socialite/customer/google/callback',
+        // Comma-separated Android/iOS OAuth client IDs of the mobile apps; tokens from other apps are refused.
+        'app_client_ids' => env('GOOGLE_APP_CLIENT_IDS', ''),
         'place_api_key' => env('GOOGLE_PLACE_KEY'),
         'gtm_container_id' => env('GTM_CONTAINER_ID'),
     ],

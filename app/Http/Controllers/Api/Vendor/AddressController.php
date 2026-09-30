@@ -65,10 +65,14 @@ class AddressController extends Controller
      */
     public function index(Request $request)
     {
+        $vendor = Auth::guard('vendor_api')->user();
+        $user = $vendor;
+
+        // Another user's addresses only for a colleague in the same shop.
         if ($request->has('user_id')) {
-            $user = User::find($request->get('user_id'));
-        } else {
-            $user = Auth::guard('vendor_api')->user();
+            $user = User::where('id', $request->get('user_id'))
+                ->where('shop_id', $vendor->merchantId())
+                ->firstOrFail();
         }
 
         $addresses = $user->addresses()->with('country', 'state')->get();
@@ -85,7 +89,7 @@ class AddressController extends Controller
     public function store(CreateAddressRequest $request)
     {
         try {
-            Address::create($request->all());
+            Auth::guard('vendor_api')->user()->addresses()->create($request->only(Address::SELF_EDITABLE));
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -100,6 +104,8 @@ class AddressController extends Controller
      */
     public function show(Address $address)
     {
+        $this->assertOwnsAddress($address);
+
         return new AddressResource($address);
     }
 
@@ -110,8 +116,10 @@ class AddressController extends Controller
      */
     public function update(Request $request, Address $address)
     {
+        $this->assertOwnsAddress($address);
+
         try {
-            $address->update($request->all());
+            $address->update($request->only(\App\Models\Address::SELF_EDITABLE));
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -128,5 +136,18 @@ class AddressController extends Controller
     public function destroy(Address $address_id)
     {
         //
+    }
+
+    /**
+     * The vendor's own address, or an address of their shop.
+     */
+    private function assertOwnsAddress(Address $address): void
+    {
+        $vendor = Auth::guard('vendor_api')->user();
+
+        $ownsIt = ($address->addressable_type === User::class && (int) $address->addressable_id === (int) $vendor->id)
+            || ($address->addressable_type === \App\Models\Shop::class && (int) $address->addressable_id === (int) $vendor->merchantId());
+
+        abort_unless($ownsIt, 403);
     }
 }

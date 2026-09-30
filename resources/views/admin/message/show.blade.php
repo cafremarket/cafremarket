@@ -15,7 +15,7 @@
         <div class="alert alert-info alert-dismissible">
           <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
           <strong>{{ trans('app.important') }}: </strong>
-          {!! trans('app.message_send_by_staff', ['user' => $message->user->getName()]) !!}
+          {!! trans('app.message_send_by_staff', ['user' => e($message->user->getName())]) !!}
         </div>
       @endif
 
@@ -37,7 +37,7 @@
             </div>
 
             <div class="admin-mailbox-read__meta">
-              <h3 class="admin-mailbox-read__subject">{!! $message->subject !!}</h3>
+              <h3 class="admin-mailbox-read__subject">{{ $message->subject }}</h3>
               <div class="admin-mailbox-read__from">
                 {{ $message->user_id ? trans('app.to') : trans('app.from') }}:
                 <strong>{{ $message->customer->getName() }}</strong>
@@ -117,7 +117,7 @@
           </div>
 
           <div class="admin-mailbox-read__body">
-            {!! $message->message !!}
+            {!! clean_html($message->message) !!}
 
             @if (is_incevio_package_loaded('smartForm'))
               @include('smartForm::partials.extra_info_for_message')

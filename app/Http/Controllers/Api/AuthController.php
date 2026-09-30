@@ -71,7 +71,7 @@ class AuthController extends Controller
 
         // Create address
         if ($request->address_line_1) {
-            $customer->addresses()->create($request->all());
+            $customer->addresses()->create($request->only(\App\Models\Address::SELF_EDITABLE));
         }
 
         if (empty($customer->jwt_access_token) && is_string($jwt) && $jwt !== '') {

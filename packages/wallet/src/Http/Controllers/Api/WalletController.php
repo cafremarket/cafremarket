@@ -50,6 +50,9 @@ class WalletController extends Controller
      */
     public function invoice(Transaction $transaction)
     {
+        abort_unless($transaction->payable_type === \App\Models\Customer::class
+            && (int) $transaction->payable_id === (int) \Illuminate\Support\Facades\Auth::guard('api')->id(), 404);
+
         return $transaction->customerInvoice('download');
     }
 }

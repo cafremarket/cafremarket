@@ -229,9 +229,7 @@ class DepositController extends Controller
                 $json = json_decode($response);
 
                 if ($json) {
-                    $success = isset($json->output_ResponseCode)
-                        ? (($json->output_ResponseCode === 'INS-0') || ($json->output_ResponseCode === '0'))
-                        : ((int) ($json->ResultCode ?? 1) === 0);
+                    $success = MPesaPaymentService::queryResponseIsPaid($json);
 
                     if ($success) {
                         if (Cache::has($paidKey)) {

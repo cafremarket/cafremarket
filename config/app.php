@@ -69,6 +69,10 @@ return [
 
     'debug' => env('APP_DEBUG', false),
 
+    // Comma-separated IPs/CIDRs of reverse proxies whose X-Forwarded-* headers are trusted
+    // (default: loopback and private networks). Never '*': clients could forge their IP.
+    'trusted_proxies' => env('TRUSTED_PROXIES', ''),
+
     /*
     |--------------------------------------------------------------------------
     | Application URL

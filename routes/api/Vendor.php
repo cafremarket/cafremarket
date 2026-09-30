@@ -53,8 +53,8 @@ Route::prefix('vendor')->group(function () {
     // backed by the same GeocodeService the web uses, so it automatically
     // uses whichever Google Maps key (or the free OSM fallback) is configured
     // in the web .env, with no key ever hardcoded in the app.
-    Route::get('location/search', [AddressController::class, 'searchLocation']);
-    Route::post('location/reverse-geocode', [AddressController::class, 'reverseGeocode']);
+    Route::get('location/search', [AddressController::class, 'searchLocation'])->middleware('throttle:30,1');
+    Route::post('location/reverse-geocode', [AddressController::class, 'reverseGeocode'])->middleware('throttle:30,1');
 
     // Authentication
     Route::prefix('auth')->group(function () {
@@ -77,7 +77,7 @@ Route::prefix('vendor')->group(function () {
     // Plugins
     Route::get('plugin/{slug}', [PackageController::class, 'isLoaded']);
 
-    Route::middleware('auth:vendor_api')->group(function () {
+    Route::middleware(['auth:vendor_api', 'vendorOwnsRecords'])->group(function () {
 
         // Account
         Route::get('user/profile', [AccountController::class, 'profile']);
@@ -333,6 +333,8 @@ Route::prefix('vendor')->group(function () {
         //        Route::post('conversation/save', [ConversationController::class, 'save_conversation']);
 
         Route::get('conversations', [ConversationController::class, 'index']);
+
+        Route::get('chat/socket-room', [\App\Http\Controllers\Api\ChatSocketController::class, 'vendorRoom']);
 
         Route::get('chat/{chat}', [ConversationController::class, 'show']);
 

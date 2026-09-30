@@ -118,7 +118,7 @@
 
       <div id="return-policy-tab" class="tab-pane">
         <article class="sf-store__policy html-content">
-          {!! $shop->config->return_refund !!}
+          {!! clean_rich_html($shop->config->return_refund) !!}
         </article>
       </div>
 

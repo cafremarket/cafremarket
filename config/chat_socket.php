@@ -7,5 +7,7 @@ return [
     'scheme' => env('CHAT_SOCKET_SCHEME', 'ws'),
     'client_path' => env('CHAT_SOCKET_CLIENT_PATH', ''),
     'debug' => (bool) env('CHAT_SOCKET_DEBUG', false),
+    // Same value as chat-ws-node's CHAT_WS_SECRET; signs room subscription tokens.
+    'secret' => env('CHAT_WS_SECRET', ''),
 ];
 

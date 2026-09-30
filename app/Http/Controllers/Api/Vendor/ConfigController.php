@@ -22,6 +22,7 @@ use App\Models\Config;
 use App\Models\Shop;
 use App\Services\Geo\GeocodeService;
 use App\Services\Shop\ShopAddressChangeService;
+use App\Services\Shop\ShopSlugChangeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -85,7 +86,26 @@ class ConfigController extends Controller
 
         $shop = Shop::findOrFail($shop_id);
 
-        $shop->update($request->all());
+        $data = $request->only(Shop::MERCHANT_EDITABLE);
+
+        // Same slug-change approval rule as the web panel (Admin\ConfigController::updateBasicConfig).
+        $slugChanges = app(ShopSlugChangeService::class);
+        $newSlug = $request->input('slug');
+        $message = trans('api.config_updated_successfully');
+
+        if ($slugChanges->requiresApproval($shop, $newSlug)) {
+            try {
+                $slugChanges->submitRequest($shop, $newSlug, Auth::guard('vendor_api')->user());
+                $message = trans('messages.slug_change_request_submitted');
+            } catch (\RuntimeException $e) {
+                return response()->json(['message' => $e->getMessage()], 422);
+            }
+            unset($data['slug']);
+        } elseif ($slugChanges->hasPendingRequest($shop->id)) {
+            unset($data['slug']);
+        }
+
+        $shop->update($data);
 
         if ($request->hasFile('logo') || ($request->input('delete_logo') == 1)) {
             $shop->deleteLogo();
@@ -113,7 +133,7 @@ class ConfigController extends Controller
 
         event(new ShopUpdated($shop));
 
-        return response()->json(['message' => trans('api.config_updated_successfully')], 200);
+        return response()->json(['message' => $message], 200);
     }
 
     /**

@@ -54,14 +54,14 @@ class EloquentTicket extends EloquentRepository implements BaseRepository, Ticke
 
     public function show($id)
     {
-        return $this->model->with(['replies' => function ($query) {
+        return $this->scopedQuery(true)->with(['replies' => function ($query) {
             $query->with('attachments', 'user')->orderBy('id', 'desc');
         }])->find($id);
     }
 
     public function storeReply(Request $request, $id)
     {
-        $ticket = $this->model->find($id);
+        $ticket = $this->scopedQuery(true)->find($id);
 
         $ticket->update($request->except('user_id'));
 
@@ -76,7 +76,7 @@ class EloquentTicket extends EloquentRepository implements BaseRepository, Ticke
 
     public function assign(Request $request, $id)
     {
-        $ticket = $this->model->find($id);
+        $ticket = $this->scopedQuery(true)->find($id);
 
         $ticket->update($request->all());
 
@@ -85,7 +85,7 @@ class EloquentTicket extends EloquentRepository implements BaseRepository, Ticke
 
     public function update(Request $request, $id)
     {
-        $ticket = $this->model->find($id);
+        $ticket = $this->scopedQuery(true)->find($id);
 
         $ticket->update($request->all());
 
@@ -94,7 +94,7 @@ class EloquentTicket extends EloquentRepository implements BaseRepository, Ticke
 
     public function reopen(Request $request, $id)
     {
-        $ticket = $this->model->find($id);
+        $ticket = $this->scopedQuery(true)->find($id);
 
         $ticket->update(['status' => Ticket::STATUS_OPEN]);
 

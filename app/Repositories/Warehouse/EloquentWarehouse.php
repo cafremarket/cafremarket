@@ -62,7 +62,7 @@ class EloquentWarehouse extends EloquentRepository implements BaseRepository, Wa
 
     public function massDestroy($ids)
     {
-        $warehouses = $this->model->withTrashed()->whereIn('id', $ids)->get();
+        $warehouses = $this->scopedQuery(true)->withTrashed()->whereIn($this->model->qualifyColumn('id'), $ids)->get();
 
         foreach ($warehouses as $warehouse) {
             $warehouse->flushAddresses();

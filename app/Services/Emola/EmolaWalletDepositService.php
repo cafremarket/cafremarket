@@ -329,22 +329,16 @@ class EmolaWalletDepositService
         Cache::put(self::CACHE_KEY_WALLET_REF.$refNo, $transId, $ttl);
     }
 
+    public function hasPendingDeposit(string $transId): bool
+    {
+        return Cache::has(self::CACHE_KEY_WALLET_DEPOSIT.$transId);
+    }
+
     private function findPendingDeposit(string $transId, string $refNo): ?array
     {
+        // Match only our own transId; refNo is predictable (WLTc<customer id>) and not proof of anything.
         $deposit = Cache::get(self::CACHE_KEY_WALLET_DEPOSIT.$transId);
 
-        if ($deposit) {
-            return $deposit;
-        }
-
-        if (self::isWalletRefNo($refNo)) {
-            $mappedTransId = Cache::get(self::CACHE_KEY_WALLET_REF.$refNo);
-
-            if ($mappedTransId) {
-                return Cache::get(self::CACHE_KEY_WALLET_DEPOSIT.$mappedTransId);
-            }
-        }
-
-        return null;
+        return is_array($deposit) ? $deposit : null;
     }
 }

@@ -45,6 +45,11 @@ abstract class SocialiteBaseController extends Controller
     {
         try {
             $socialUser = $this->getSocialUser($provider);
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            Log::info('Social login callback with missing or mismatched state', ['provider' => $provider]);
+
+            return redirect()->route('homepage', ['login' => 1])
+                ->withErrors(trans('theme.notify.authentication_failed', ['msg' => 'state']));
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             Log::info($e);
 
@@ -90,7 +95,9 @@ abstract class SocialiteBaseController extends Controller
             return $socialite->userFromToken($token);
         }
 
-        return $socialite->stateless()->user();
+        // Stateful: Socialite checks the OAuth `state` against the session, so a callback URL
+        // started by someone else cannot log this browser into their account.
+        return $socialite->user();
     }
 
     /**

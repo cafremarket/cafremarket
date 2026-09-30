@@ -37,3 +37,11 @@ queue.pid
 /.htaccess
 /composer1.phar
 .phpunit.result.cache
+
+# Runtime logs and local debug artifacts (may hold server paths, tokens, request data)
+error_log
+**/error_log
+workerman.log
+cookies.txt
+post_result.html
+register.html

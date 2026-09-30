@@ -78,7 +78,7 @@
 
       @if($ticket->message)
         <div class="admin-detail-view__message well">
-          {!! $ticket->message !!}
+          {!! clean_html($ticket->message) !!}
         </div>
       @endif
 

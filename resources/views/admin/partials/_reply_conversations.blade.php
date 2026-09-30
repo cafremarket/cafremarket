@@ -13,7 +13,7 @@
 
   <div class="col-md-8 nopadding">
     <blockquote style="font-size: 1em;" class="{{ $reply->customer_id ? 'blockquote-reverse' : '' }}">
-      {!! $reply->reply !!}
+      {!! clean_html($reply->reply) !!}
       @if (count($reply->attachments))
         <small class="no-print">
           {{ trans('app.attachments') . ': ' }}

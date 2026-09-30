@@ -106,7 +106,7 @@
         @endif
 
         @if ($dispute->description)
-          <div class="admin-detail-view__message well">{!! $dispute->description !!}</div>
+          <div class="admin-detail-view__message well">{!! clean_html($dispute->description) !!}</div>
         @endif
 
         @if ($dispute->replies->count() > 0)

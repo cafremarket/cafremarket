@@ -88,6 +88,15 @@ class Shop extends ShopWallet
     ];
 
     /**
+     * Fields a merchant may change on their own shop. $fillable also holds commission, billing,
+     * verification, sales totals and owner fields that only the platform may set.
+     */
+    public const MERCHANT_EDITABLE = [
+        'name', 'legal_name', 'seller_type', 'nuit', 'email', 'slug', 'description',
+        'external_url', 'timezone_id', 'service_radius_km', 'fb_page_id',
+    ];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -851,11 +860,12 @@ class Shop extends ShopWallet
             $badge = '<img src="'.get_verified_badge().'" class="verified-badge img-tiny" data-toggle="tooltip" data-placement="top" title="'.trans('help.verified_seller').'" alt="verified-badge">';
         }
 
+        // Printed raw by the storefront views (for the badge markup): the name itself is escaped.
         if ($length) {
-            return Str::limit($this->name, $length).$badge;
+            return e(Str::limit($this->name, $length)).$badge;
         }
 
-        return $this->name.$badge;
+        return e($this->name).$badge;
     }
 
     public function verifiedText()

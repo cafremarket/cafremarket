@@ -18,11 +18,12 @@ class AjaxController extends Controller
     {
         if ($request->ajax()) {
             // Sanitize the data
+            // This route is public (the `ajax` check is only a header). getShopConfig is not
+            // exposed: it returns a shop's whole config row, bank account details included.
             $allowed_functions = [
                 'get_shipping_zone_of',
                 'getShippingRates',
                 'get_item_location_shipping_options',
-                'getShopConfig',
                 'get_item_details_of',
                 'get_storage_file_url',
                 'get_product_img_src',
@@ -31,15 +32,31 @@ class AjaxController extends Controller
                 'generateCouponCode',
             ];
 
+            // Used only by the admin/merchant panel.
+            $panel_only_functions = ['verifyUniqueSlug', 'generateCouponCode'];
+
             $funcName = $request->input('funcName');
 
-            if (! in_array($funcName, $allowed_functions)) {
+            if (! in_array($funcName, $allowed_functions, true)) {
+                return response()->json(['error' => trans('responses.resource_not_found')], 404);
+            }
+
+            if (in_array($funcName, $panel_only_functions, true) && ! auth()->check()) {
                 return response()->json(['error' => trans('responses.resource_not_found')], 404);
             }
 
             // Prepare arguments
             $args = $request->input('args');
             $args = is_array($args) ? $args : explode(',', $args);
+
+            // Slug check only: fixed `slug` column of a real table, not an arbitrary table/column oracle.
+            if ($funcName === 'verifyUniqueSlug') {
+                $table = (string) ($args[1] ?? '');
+                if (! preg_match('/^[a-z_]{1,64}$/', $table) || ! \Illuminate\Support\Facades\Schema::hasColumn($table, 'slug')) {
+                    return response()->json(['error' => trans('responses.resource_not_found')], 404);
+                }
+                $args = [(string) ($args[0] ?? ''), $table];
+            }
 
             $results = call_user_func_array($funcName, $args);
 

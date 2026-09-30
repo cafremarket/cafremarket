@@ -43,11 +43,17 @@ class ApiRateLimiterTest extends TestCase
             'REMOTE_ADDR' => '203.0.113.10',
         ]);
 
-        $limit = $this->limitFor($request);
+        $limits = $this->limitFor($request);
 
-        $this->assertInstanceOf(Limit::class, $limit);
-        $this->assertSame(20, $limit->maxAttempts);
-        $this->assertSame('auth:203.0.113.10|buyer@example.com', $limit->key);
+        $this->assertIsArray($limits);
+        $this->assertSame(20, $limits[0]->maxAttempts);
+        $this->assertSame('auth:203.0.113.10|buyer@example.com', $limits[0]->key);
+
+        // Per account regardless of IP, so rotating IPs cannot brute-force one account.
+        $this->assertSame(10, $limits[1]->maxAttempts);
+        $this->assertSame('auth-id:api/auth/login|buyer@example.com', $limits[1]->key);
+        $this->assertSame(60, $limits[2]->maxAttempts);
+        $this->assertSame(3600, $limits[2]->decaySeconds);
     }
 
     public function test_payment_webhooks_are_not_rate_limited()
@@ -57,16 +63,15 @@ class ApiRateLimiterTest extends TestCase
         $this->assertInstanceOf(Unlimited::class, $limit);
     }
 
-    private function limitFor(Request $request): Limit
+    /**
+     * @return Limit|array<int, Limit>
+     */
+    private function limitFor(Request $request): Limit|array
     {
         $limiter = RateLimiter::limiter('api');
 
         $this->assertIsCallable($limiter);
 
-        $limit = $limiter($request);
-
-        $this->assertInstanceOf(Limit::class, $limit);
-
-        return $limit;
+        return $limiter($request);
     }
 }
