@@ -7,9 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\DeliveryBoy\UpdateProfileRequest;
 use App\Http\Resources\DeliveryBoyResource;
 use App\Http\Resources\ShopLightResource;
+use App\Models\DeliveryBoy;
 use App\Models\Shop;
 use App\Repositories\DeliveryBoy\DeliveryBoyRepository;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
 {
@@ -81,8 +84,9 @@ class AccountController extends Controller
     }
 
     /**
-     * App Store–safe "delete account": returns success and ends the session,
-     * but does NOT remove the delivery boy row from the database.
+     * Delete the rider's account. A rider is one person across stores (the
+     * same email can switch stores without a password), so every store
+     * account under this email is deleted.
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -91,10 +95,15 @@ class AccountController extends Controller
         $user = Auth::guard('delivery_boy-api')->user();
 
         try {
-            // Invalidate this device session only — keep the account & id intact.
-            $user->api_token = null;
-            $user->fcm_token = null;
-            $user->save();
+            DB::transaction(function () use ($user) {
+                $accounts = DeliveryBoy::where('email', $user->email)->get();
+
+                foreach ($accounts as $account) {
+                    $account->deleteAccount();
+                }
+
+                Log::info('Delivery account deleted from app', ['ids' => $accounts->pluck('id')->all()]);
+            });
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }

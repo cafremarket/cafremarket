@@ -5,6 +5,7 @@ use App\Http\Controllers\Selling\RegisterController as SellingRegisterController
 use App\Http\Controllers\Selling\SellingApiController;
 use App\Http\Controllers\Selling\SellingController;
 use App\Http\Controllers\Storefront\AccountController;
+use App\Http\Controllers\Storefront\AccountDeletionController;
 use App\Http\Controllers\Storefront\BlogController;
 use App\Http\Controllers\Storefront\ConversationController;
 use App\Http\Controllers\Storefront\HomeController;
@@ -32,6 +33,25 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
     Route::get('page/{page}', [
         HomeController::class, 'openPage',
     ])->name('page.open');
+
+    // Public account deletion page (customers, sellers, delivery people) —
+    // the web deletion URL given to Google Play / App Store.
+    Route::get('account/delete', [
+        AccountDeletionController::class, 'show',
+    ])->name('account.deletion.form');
+
+    Route::post('account/delete', [
+        AccountDeletionController::class, 'destroy',
+    ])->name('account.deletion.destroy')->middleware('throttle:5,1');
+
+    // Delete some data while keeping the account (Google Play "data deletion" URL).
+    Route::get('account/data-deletion', [
+        AccountDeletionController::class, 'showData',
+    ])->name('account.data_deletion.form');
+
+    Route::post('account/data-deletion', [
+        AccountDeletionController::class, 'destroyData',
+    ])->name('account.data_deletion.destroy')->middleware('throttle:5,1');
 
     Route::get('product/{slug}', function ($slug) {
         $item = \App\Models\Inventory::query()->where('slug', $slug)->first(['id', 'slug', 'shop_id']);

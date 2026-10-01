@@ -99,6 +99,8 @@
             <li><a href="{{ route('account', 'disputes') }}">{{ trans('theme.nav.refunds_disputes') }}</a></li>
             <li><a href="{{ route('account', 'orders') }}">{{ trans('theme.nav.contact_seller') }}</a></li>
             <li><a href="{{ get_page_url(\App\Models\Page::PAGE_CONTACT_US) }}">{{ trans('theme.nav.contact_us') }}</a></li>
+            <li><a href="{{ route('account.deletion.form') }}" rel="nofollow">{{ trans('account_deletion.footer_link') }}</a></li>
+            <li><a href="{{ route('account.data_deletion.form') }}" rel="nofollow">{{ trans('account_deletion.data_footer_link') }}</a></li>
             @foreach (($pages ?? collect())->where('position', 'footer_3rd_column') as $page)
               <li><a href="{{ get_page_url($page->slug) }}" rel="nofollow" target="_blank">{{ $page->title }}</a></li>
             @endforeach

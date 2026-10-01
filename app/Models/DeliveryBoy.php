@@ -77,6 +77,18 @@ class DeliveryBoy extends Authenticatable
             ->values();
     }
 
+    /**
+     * Permanently delete this rider account (account deletion requested by
+     * the rider). No SoftDeletes on this model, so the row is removed; orders
+     * keep their delivery_boy_id for records.
+     */
+    public function deleteAccount(): void
+    {
+        $this->flushAddresses();
+        $this->flushImages();
+        $this->delete();
+    }
+
     public function setPasswordAttribute($password)
     {
         if ($password === null || $password === '') {
