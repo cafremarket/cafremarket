@@ -53,6 +53,27 @@ Route::middleware(['storefront', 'hasCookie'])->namespace('Storefront')->group(f
         AccountDeletionController::class, 'destroyData',
     ])->name('account.data_deletion.destroy')->middleware('throttle:5,1');
 
+    // Alias URLs (store listings / data safety forms) → canonical pages, so a
+    // slightly different link never 404s for the Play review crawler.
+    foreach (['delete-account', 'account-delete', 'account/deletion', 'account-deletion', 'delete-my-account'] as $alias) {
+        Route::get($alias, fn () => redirect()->route('account.deletion.form', request()->query(), 301));
+    }
+    foreach (['delivery/delete-account', 'delivery/account/delete', 'deliveryboy/account/delete', 'deliveryboy/delete-account', 'rider/delete-account'] as $alias) {
+        Route::get($alias, fn () => redirect()->route('account.deletion.form', ['type' => 'delivery'], 301));
+    }
+    foreach (['vendor/delete-account', 'vendor/account/delete', 'seller/delete-account', 'seller/account/delete'] as $alias) {
+        Route::get($alias, fn () => redirect()->route('account.deletion.form', ['type' => 'seller'], 301));
+    }
+    foreach (['data-deletion', 'delete-data', 'account/delete-data', 'account/data-delete'] as $alias) {
+        Route::get($alias, fn () => redirect()->route('account.data_deletion.form', request()->query(), 301));
+    }
+    foreach (['delivery/data-deletion', 'deliveryboy/data-deletion'] as $alias) {
+        Route::get($alias, fn () => redirect()->route('account.data_deletion.form', ['type' => 'delivery'], 301));
+    }
+    foreach (['vendor/data-deletion', 'seller/data-deletion'] as $alias) {
+        Route::get($alias, fn () => redirect()->route('account.data_deletion.form', ['type' => 'seller'], 301));
+    }
+
     Route::get('product/{slug}', function ($slug) {
         $item = \App\Models\Inventory::query()->where('slug', $slug)->first(['id', 'slug', 'shop_id']);
         if ($item) {
