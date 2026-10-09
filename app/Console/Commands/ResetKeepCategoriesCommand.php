@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Wipe all marketplace data (shops, merchants, customers, products, orders,
@@ -22,6 +21,7 @@ class ResetKeepCategoriesCommand extends Command
     protected $signature = 'cafrepay:reset-keep-categories
                             {--admin-id=1 : User ID of the admin to keep}
                             {--dry-run : Show what would be cleared without changing anything}
+                            {--files-only : Skip the database; only delete orphaned uploads, flush search indexes and cache}
                             {--force : Required to run the destructive reset}';
 
     protected $description = 'Reset the whole system — keep categories, the admin user and platform settings only';
@@ -62,12 +62,21 @@ class ResetKeepCategoriesCommand extends Command
         'App\\Models\\Popup', 'App\\Models\\Banner',
     ];
 
-    /** Storage folders holding only per-user uploads — emptied completely. */
-    protected array $wipeDirs = ['payout-proofs'];
+    /** Upload folders whose files are deleted unless an images/attachments row still points at them. */
+    protected array $sweepDirs = ['images', 'attachments'];
+
+    /** Storage folders holding only per-user uploads or regenerable cache — emptied completely. */
+    protected array $wipeDirs = ['payout-proofs', 'videos', 'images/.cache'];
 
     public function handle(): int
     {
         $dryRun = (bool) $this->option('dry-run');
+
+        if ($this->option('files-only')) {
+            $this->cleanFiles($dryRun);
+
+            return self::SUCCESS;
+        }
 
         if (! $dryRun && ! $this->option('force')) {
             $this->error('This permanently deletes all shops, customers, products and orders.');
@@ -106,9 +115,6 @@ class ResetKeepCategoriesCommand extends Command
             return self::SUCCESS;
         }
 
-        // Collect files of image/attachment rows that are about to go, before deleting the rows.
-        $files = $this->filesToDelete($adminId);
-
         Schema::disableForeignKeyConstraints();
         try {
             foreach ($truncate as $table) {
@@ -121,23 +127,7 @@ class ResetKeepCategoriesCommand extends Command
         }
         $this->info('Database cleaned.');
 
-        $disk = Storage::disk('public');
-        $deleted = 0;
-        foreach ($files as $path) {
-            if ($path && $disk->exists($path) && $disk->delete($path)) {
-                $deleted++;
-            }
-        }
-        foreach ($this->wipeDirs as $dir) {
-            File::cleanDirectory($disk->path($dir));
-        }
-        $this->info("Deleted {$deleted} uploaded files.");
-
-        // Search indexes still hold deleted products/customers.
-        foreach (['App\\Models\\Product', 'App\\Models\\Inventory', 'App\\Models\\Customer'] as $model) {
-            $this->callSilently('scout:flush', ['model' => $model]);
-        }
-        $this->call('cache:clear');
+        $this->cleanFiles(false);
 
         $this->newLine();
         $this->table(['Kept', 'Count'], [
@@ -190,13 +180,52 @@ class ResetKeepCategoriesCommand extends Command
                 ->whereIn('imageable_id', DB::table('banners')->whereNotNull('shop_id')->select('id')));
     }
 
-    protected function filesToDelete(int $adminId): array
+    /**
+     * Delete uploads no database row references any more, then flush search
+     * indexes and cache. Uses plain filesystem calls (not the Storage disk),
+     * so it runs on PHP builds without the fileinfo extension.
+     */
+    protected function cleanFiles(bool $dryRun): void
     {
-        $images = $this->imagesToDeleteQuery($adminId)->pluck('path')->all();
-        $attachments = DB::table('attachments')
-            ->where('attachable_type', '!=', 'App\\Models\\System')
-            ->pluck('path')->all();
+        $root = storage_path('app/public');
+        $referenced = DB::table('images')->pluck('path')
+            ->merge(DB::table('attachments')->pluck('path'))
+            ->filter()->flip();
 
-        return array_merge($images, $attachments);
+        $orphans = [];
+        foreach ($this->sweepDirs as $dir) {
+            if (! is_dir("{$root}/{$dir}")) {
+                continue;
+            }
+            foreach (File::files("{$root}/{$dir}") as $file) {
+                $relative = "{$dir}/".$file->getFilename();
+                if (! $referenced->has($relative)) {
+                    $orphans[] = $file->getPathname();
+                }
+            }
+        }
+
+        $this->line('Orphaned uploads: '.count($orphans).' (kept: '.$referenced->count().' referenced)');
+        $this->line('Folders to empty: '.implode(', ', $this->wipeDirs));
+
+        if ($dryRun) {
+            $this->comment('Dry run — no files deleted.');
+
+            return;
+        }
+
+        File::delete($orphans);
+        foreach ($this->wipeDirs as $dir) {
+            if (is_dir("{$root}/{$dir}")) {
+                File::cleanDirectory("{$root}/{$dir}");
+            }
+        }
+        $this->info('Deleted '.count($orphans).' orphaned uploads.');
+
+        // Search indexes still hold deleted products/customers.
+        foreach (['App\\Models\\Product', 'App\\Models\\Inventory', 'App\\Models\\Customer'] as $model) {
+            $this->callSilently('scout:flush', ['model' => $model]);
+        }
+        $this->call('cache:clear');
     }
 }
