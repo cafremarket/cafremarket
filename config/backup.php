@@ -103,6 +103,14 @@ return [
             'filename_prefix' => env('BACKUP_PREFIX', 'backup_'),
 
             /*
+             * Set explicitly: without it laravel-backup falls back to
+             * ZipArchive::CM_DEFAULT, which crashes every artisan command on
+             * servers without the zip extension. -1 == ZipArchive::CM_DEFAULT.
+             */
+            'compression_method' => -1,
+            'compression_level' => 9,
+
+            /*
              * The disk names on which the backups will be stored.
              */
             'disks' => [
